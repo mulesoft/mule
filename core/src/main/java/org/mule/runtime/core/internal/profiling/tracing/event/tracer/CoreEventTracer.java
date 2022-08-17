@@ -9,8 +9,13 @@ package org.mule.runtime.core.internal.profiling.tracing.event.tracer;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
+
+import java.util.Map;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * A tracer for {@link CoreEvent}'s.
@@ -48,4 +53,11 @@ public interface CoreEventTracer {
    */
   void endCurrentSpan(CoreEvent coreEvent);
 
+  /**
+   * @param span the span for the distributed trace context to retrieve.
+   * @return a map containing the span context to propagate.
+   */
+  default Map<String, String> getDistributedTraceContextMap(InternalSpan span) {
+    return emptyMap();
+  }
 }

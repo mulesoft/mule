@@ -52,6 +52,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
@@ -164,8 +165,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new SdkOperationTransactionalActionArgumentResolver();
   private static final ArgumentResolver<CorrelationInfo> CORRELATION_INFO_ARGUMENT_RESOLVER =
       new CorrelationInfoArgumentResolver();
-  private static final ArgumentResolver<DistributedTraceContextManager> DISTRIBUTED_TRACE_CONTEXT_MANAGER_RESOLVER =
-      new DistributedTraceContextManagerResolver();
   private static final ArgumentResolver<NotificationEmitter> LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
       new NotificationHandlerArgumentResolver();
   private static final ArgumentResolver<org.mule.sdk.api.notification.NotificationEmitter> NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
@@ -181,6 +180,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
   @Inject
   private ExpressionManager expressionManager;
+
+  @Inject
+  private InternalProfilingService profilingService;
 
   private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
@@ -289,7 +291,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (isCorrelationInfoType(parameterType)) {
         argumentResolver = CORRELATION_INFO_ARGUMENT_RESOLVER;
       } else if (isDistributedTraceContextManagerType(parameterType)) {
-        argumentResolver = DISTRIBUTED_TRACE_CONTEXT_MANAGER_RESOLVER;
+        argumentResolver = new DistributedTraceContextManagerResolver(profilingService.getCoreEventTracer());
       } else if (NotificationEmitter.class.equals(parameterType)) {
         argumentResolver = LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.notification.NotificationEmitter.class.equals(parameterType)) {

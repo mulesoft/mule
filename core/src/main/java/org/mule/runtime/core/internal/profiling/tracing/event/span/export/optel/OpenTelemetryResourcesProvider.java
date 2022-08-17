@@ -8,23 +8,33 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel;
 
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter.OPENTELEMETRY_SPAN_VISITOR;
 
 import static java.lang.Boolean.parseBoolean;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanVisitor;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.CapturingSpanExporterWrapper;
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapSetter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.common.CompletableResultCode;
@@ -44,6 +54,12 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
  */
 public class OpenTelemetryResourcesProvider {
 
+
+  private static final OpenTelemetryContextVisitor OPTEL_CONTEXT_VISITOR = new OpenTelemetryContextVisitor();
+
+  // Insert the context as Header
+  private final static TextMapSetter<Map<String, String>> SETTER =
+      Map::put;
 
   private final static CapturingSpanExporterWrapper capturingSpanExporterWrapper =
       new CapturingSpanExporterWrapper(new SpanExporter() {
@@ -72,6 +88,7 @@ public class OpenTelemetryResourcesProvider {
   // TODO: W-11610439: tracking: verify if the semconv dependency (alpha) should be added
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#semantic-attributes-with-dedicated-environment-variable
   public static final AttributeKey<String> SERVICE_NAME_KEY = stringKey("service.name");
+  private static ContextPropagators propagator;
 
   private OpenTelemetryResourcesProvider() {}
 
@@ -96,7 +113,7 @@ public class OpenTelemetryResourcesProvider {
 
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProvider)
-        .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
+        .setPropagators(getPropagator())
         .build();
 
     return openTelemetry.getTracer(MULE_INSTRUMENTATION_NAME, INSTRUMENTATION_VERSION);
@@ -120,6 +137,42 @@ public class OpenTelemetryResourcesProvider {
       return OtlpGrpcSpanExporter.builder().setEndpoint(endpoint).build();
     } else {
       return OtlpGrpcSpanExporter.builder().build();
+    }
+  }
+
+  private static ContextPropagators getPropagator() {
+    if (propagator == null) {
+      propagator = ContextPropagators.create(W3CTraceContextPropagator.getInstance());
+    }
+    return propagator;
+  }
+
+  /**
+   * @param span the span for the distributed trace context to retrieve
+   * @return a map containing the span context to propagate.
+   */
+  public static Map<String, String> getDistributedTraceContextMap(InternalSpan span) {
+    Map<String, String> contextMap = new HashMap<>();
+    Optional<Context> optionalContext = span.visit(OPTEL_CONTEXT_VISITOR);
+    optionalContext.ifPresent(context -> getPropagator().getTextMapPropagator().inject(context, contextMap, SETTER));
+    return contextMap;
+  }
+
+  private static class OpenTelemetryContextVisitor implements InternalSpanVisitor<Optional<Context>> {
+
+    @Override
+    public Optional<Context> accept(ExportOnEndSpan exportOnEndSpan) {
+      return Optional.of(Context.current().with(exportOnEndSpan.getSpanExporter().visit(OPENTELEMETRY_SPAN_VISITOR)));
+    }
+
+    @Override
+    public Optional<Context> accept(ExecutionSpan executionSpan) {
+      return Optional.empty();
+    }
+
+    @Override
+    public Optional<Context> accept(InternalSpan.SpanInternalWrapper spanInternalWrapper) {
+      return Optional.empty();
     }
   }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter.OPENTELEMETRY_SPAN_VISITOR;
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 
 import static java.util.Optional.empty;
@@ -15,6 +14,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -25,10 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.context.Context;
-import io.opentelemetry.context.propagation.TextMapSetter;
-
 /**
  * {@link ArgumentResolver} that yields instances of {@link DistributedTraceContextManager}
  *
@@ -36,9 +32,11 @@ import io.opentelemetry.context.propagation.TextMapSetter;
  */
 public class DistributedTraceContextManagerResolver implements ArgumentResolver<DistributedTraceContextManager> {
 
-  // Insert the context as Header
-  TextMapSetter<Map<String, String>> setter =
-      Map::put;
+  private final CoreEventTracer coreEventTracer;
+
+  public DistributedTraceContextManagerResolver(CoreEventTracer coreEventTracer) {
+    this.coreEventTracer = coreEventTracer;
+  }
 
   @Override
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
@@ -52,11 +50,10 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
       ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
                                                                           e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
           .orElse(null);
-      Map<String, String> map = new HashMap<>();
+
+      Map<String, String> map = coreEventTracer.getDistributedTraceContextMap(span);
       map.putAll(distributedTraceContext.tracingFieldsAsMap());
       map.putAll(distributedTraceContext.baggageItemsAsMap());
-      GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
-          .inject(Context.current().with(span.getSpanExporter().visit(OPENTELEMETRY_SPAN_VISITOR)), map, setter);
 
       return new DistributedTraceContext() {
 

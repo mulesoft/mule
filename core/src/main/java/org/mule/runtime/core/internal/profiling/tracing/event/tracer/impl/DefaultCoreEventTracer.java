@@ -12,11 +12,15 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+
+import java.util.Map;
 
 /**
  * A default implementation for a {@link CoreEventTracer}.
@@ -78,6 +82,11 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
           .getDistributedTraceContext()
           .endCurrentContextSpan();
     }
+  }
+
+  @Override
+  public Map<String, String> getDistributedTraceContextMap(InternalSpan span) {
+    return OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span);
   }
 
   /**
