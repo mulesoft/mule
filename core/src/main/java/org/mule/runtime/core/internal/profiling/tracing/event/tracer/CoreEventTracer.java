@@ -54,10 +54,10 @@ public interface CoreEventTracer {
   void endCurrentSpan(CoreEvent coreEvent);
 
   /**
-   * @param span the span for the distributed trace context to retrieve.
+   * @param event the event to retrieve the distributed trace context map from
    * @return a map containing the span context to propagate.
    */
-  default Map<String, String> getDistributedTraceContextMap(InternalSpan span) {
+  default Map<String, String> getDistributedTraceContextMap(CoreEvent event) {
     return emptyMap();
   }
 }

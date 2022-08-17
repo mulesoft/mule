@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -15,6 +17,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpan
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
@@ -85,8 +88,33 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   }
 
   @Override
-  public Map<String, String> getDistributedTraceContextMap(InternalSpan span) {
-    return OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span);
+  public Map<String, String> getDistributedTraceContextMap(CoreEvent event) {
+    if (event instanceof DistributedTraceContextAware) {
+      DistributedTraceContext distributedTraceContext = ((DistributedTraceContextAware) event).getDistributedTraceContext();
+      ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
+                                                                          e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
+          .orElse(null);
+
+      if (span == null) {
+        return emptyMap();
+      }
+
+      Map<String, String> contextMap = OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span);
+      contextMap.putAll(distributedTraceContext.tracingFieldsAsMap());
+      contextMap.putAll(distributedTraceContext.baggageItemsAsMap());
+
+      return contextMap;
+    } else {
+      return emptyMap();
+    }
+  }
+
+  private ExportOnEndSpan getInternalSpanOpentelemetryExecutionSpanFunction(InternalSpan internalSpan) {
+    if (internalSpan instanceof ExportOnEndSpan) {
+      return (ExportOnEndSpan) internalSpan;
+    }
+
+    return null;
   }
 
   /**

@@ -45,68 +45,49 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
   }
 
   private DistributedTraceContext getDistributedTraceContext(CoreEvent event) {
-    if (event instanceof DistributedTraceContextAware) {
-      DistributedTraceContext distributedTraceContext = ((DistributedTraceContextAware) event).getDistributedTraceContext();
-      ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
-                                                                          e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
-          .orElse(null);
+    Map<String, String> map = coreEventTracer.getDistributedTraceContextMap(event);
 
-      Map<String, String> map = coreEventTracer.getDistributedTraceContextMap(span);
-      map.putAll(distributedTraceContext.tracingFieldsAsMap());
-      map.putAll(distributedTraceContext.baggageItemsAsMap());
+    return new DistributedTraceContext() {
 
-      return new DistributedTraceContext() {
+      @Override
+      public Optional<String> getTraceFieldValue(String key) {
+        return Optional.ofNullable(map.get(key));
+      }
 
-        @Override
-        public Optional<String> getTraceFieldValue(String key) {
-          return Optional.ofNullable(map.get(key));
-        }
+      @Override
+      public Map<String, String> tracingFieldsAsMap() {
+        return map;
+      }
 
-        @Override
-        public Map<String, String> tracingFieldsAsMap() {
-          return map;
-        }
+      @Override
+      public Optional<String> getBaggageItem(String key) {
+        return empty();
+      }
 
-        @Override
-        public Optional<String> getBaggageItem(String key) {
-          return empty();
-        }
+      @Override
+      public Map<String, String> baggageItemsAsMap() {
+        return new HashMap<>();
+      }
 
-        @Override
-        public Map<String, String> baggageItemsAsMap() {
-          return new HashMap<>();
-        }
+      @Override
+      public DistributedTraceContext copy() {
+        return this;
+      }
 
-        @Override
-        public DistributedTraceContext copy() {
-          return this;
-        }
+      @Override
+      public void endCurrentContextSpan() {
+        // Nothing to do.
+      }
 
-        @Override
-        public void endCurrentContextSpan() {
-          // Nothing to do.
-        }
+      @Override
+      public void setCurrentSpan(InternalSpan span) {
+        // Nothing to do.
+      }
 
-        @Override
-        public void setCurrentSpan(InternalSpan span) {
-          // Nothing to do.
-        }
-
-        @Override
-        public Optional<InternalSpan> getCurrentSpan() {
-          return empty();
-        }
-      };
-    }
-
-    return emptyDistributedEventContext();
-  }
-
-  private ExportOnEndSpan getInternalSpanOpentelemetryExecutionSpanFunction(InternalSpan internalSpan) {
-    if (internalSpan instanceof ExportOnEndSpan) {
-      return (ExportOnEndSpan) internalSpan;
-    }
-
-    return null;
+      @Override
+      public Optional<InternalSpan> getCurrentSpan() {
+        return empty();
+      }
+    };
   }
 }
