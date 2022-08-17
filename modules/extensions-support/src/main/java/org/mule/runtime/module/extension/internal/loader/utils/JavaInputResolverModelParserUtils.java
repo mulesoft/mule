@@ -11,10 +11,10 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.api.metadata.resolving.StaticResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
@@ -25,8 +25,11 @@ import java.util.Optional;
 
 public class JavaInputResolverModelParserUtils {
 
-  public static List<JavaInputResolverModelParser> parseInputResolversModelParser(MethodElement<?> methodElement) {
-    return methodElement.getParameters().stream()
+  public static List<JavaInputResolverModelParser> parseInputResolversModelParser(OperationDeclaration declaration) {
+    return declaration.getAllParameters().stream()
+        .map(param -> param.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
+        .filter(Optional::isPresent)
+        .map(modelProperty -> modelProperty.get().getExtensionParameter())
         .map(JavaInputResolverModelParserUtils::getResolverParser)
         .filter(Optional::isPresent)
         .map(Optional::get)
