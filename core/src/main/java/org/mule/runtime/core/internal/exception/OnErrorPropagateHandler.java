@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,6 +30,7 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -38,6 +42,7 @@ import java.util.function.Function;
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
+  private static final String COMPONENT_IDENTIFIER = CORE_PREFIX + ":" + ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER;
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
 
   @Inject
@@ -47,8 +52,14 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
 
   public OnErrorPropagateHandler() {
+
+
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
+
+    // Identifier for cases where this class is directly instantiated by the runtime core in order to implement default error
+    // handling.
+    setAnnotations(Collections.singletonMap(ANNOTATION_NAME, buildFromStringRepresentation(COMPONENT_IDENTIFIER)));
 
     redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
   }

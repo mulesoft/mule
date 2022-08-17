@@ -10,6 +10,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -38,6 +39,7 @@ public class ErrorHandlerContextManager {
    */
   public static final String ERROR_HANDLER_CONTEXT = "error.context";
   private final Map<String, Deque<ErrorHandlerContext>> items = new SmallMap<>();
+  private CoreEventTracer muleEventTracer;
 
   /**
    * Extracts an {@link ErrorHandlerContextManager} instance from the given {@link CoreEvent}.
@@ -78,7 +80,8 @@ public class ErrorHandlerContextManager {
    * @see #resolveHandling(FlowExceptionHandler, MessagingException)
    */
   public static CoreEvent addContext(FlowExceptionHandler handler, MessagingException exception,
-                                     Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback) {
+                                     Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback,
+                                     CoreEventTracer coreEventTracer) {
     CoreEvent originalEvent = exception.getEvent();
     ErrorHandlerContextManager errorHandlerContextManager = ErrorHandlerContextManager.from(exception.getEvent());
     if (errorHandlerContextManager == null) {
@@ -86,7 +89,7 @@ public class ErrorHandlerContextManager {
       originalEvent = quickCopy(originalEvent, of(ERROR_HANDLER_CONTEXT, errorHandlerContextManager));
     }
     errorHandlerContextManager.items.computeIfAbsent(getParameterId(originalEvent, handler), key -> new ArrayDeque<>(1))
-        .addFirst(new ErrorHandlerContext(exception, originalEvent, successCallback, errorCallback));
+        .addFirst(new ErrorHandlerContext(exception, originalEvent, successCallback, errorCallback, coreEventTracer));
     return originalEvent;
   }
 
@@ -104,6 +107,8 @@ public class ErrorHandlerContextManager {
   public static void resolveHandling(FlowExceptionHandler handler, CoreEvent result) {
     ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
     MessagingException exception = errorHandlerContext.getException();
+    // End the on error handler component Span.
+    errorHandlerContext.eventTracer.endCurrentSpan(exception.getEvent());
     // A successful handling event does not imply that the exception was handled, but that there were no errors during the
     // handling.
     if (exception.handled()) {
@@ -156,13 +161,16 @@ public class ErrorHandlerContextManager {
     private final CoreEvent originalEvent;
     private final Consumer<CoreEvent> successCallback;
     private final Consumer<Throwable> errorCallback;
+    private final CoreEventTracer eventTracer;
 
     public ErrorHandlerContext(MessagingException exception, CoreEvent originalEvent,
-                               Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback) {
+                               Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback,
+                               CoreEventTracer eventTracer) {
       this.exception = exception;
       this.originalEvent = originalEvent;
       this.successCallback = successCallback;
       this.errorCallback = errorCallback;
+      this.eventTracer = eventTracer;
     }
 
     public MessagingException getException() {

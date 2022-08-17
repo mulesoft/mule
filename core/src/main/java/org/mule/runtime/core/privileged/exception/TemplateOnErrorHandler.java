@@ -73,6 +73,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
@@ -121,6 +122,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Inject
   private ConfigurationProperties configurationProperties;
 
+  @Inject
+  private InternalProfilingService profilingService;
+
   protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
@@ -154,8 +158,15 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
       Flux<CoreEvent> onErrorFlux = sinkRef.flux().map(beforeRouting());
 
+      // This optimization omits the execution of the on error handler MessageProcessorChain when it does not have any Processor
+      // (empty chain).
       if (!getMessageProcessors().isEmpty()) {
         onErrorFlux = onErrorFlux.compose(TemplateOnErrorHandler.this::route);
+      } else {
+        // We need to start the tracing that would be started by the on error handler MessageProcessorChain.
+        onErrorFlux = onErrorFlux.doOnNext(coreEvent -> profilingService.getCoreEventTracer()
+            .startComponentSpan(coreEvent,
+                                new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(TemplateOnErrorHandler.this)));
       }
 
       onErrorFlux = Flux.from(publisherPostProcessor
@@ -188,7 +199,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   @Override
-  final public CoreEvent handleException(Exception exception, CoreEvent event) {
+  public final CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
       return applyInternal(exception).block();
     } catch (Throwable throwable) {
@@ -212,7 +223,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       @Override
       public void accept(Exception error) {
         // All calling methods will end up transforming any error class other than MessagingException into that one
-        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
+        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback,
+                                 profilingService.getCoreEventTracer()));
       }
     };
   }

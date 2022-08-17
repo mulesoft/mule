@@ -215,15 +215,21 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
             final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
-                        handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))));
+                        handled -> {
+                          // End MessageProcessor chain span.
+                          muleEventTracer.endCurrentSpan(handled);
+                          errorSwitchSinkSinkRef.next(right(handled));
+                        },
+                        rethrown -> {
+                          // End MessageProcessor chain span.
+                          muleEventTracer.endCurrentSpan(((MessagingException) rethrown).getEvent());
+                          errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
+                        }));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
                   inflightEvents.incrementAndGet();
-                  // Ending current span
-                  muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
-                  // Ending parent span
+                  // End current Processor span.
                   muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
                   routeError(errorRouter, throwable);
                 }));
@@ -252,9 +258,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     } else {
       return doApply(publisher, interceptors, (context, throwable) -> {
-        // Ending current span
+        // End current Processor span.
         muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
-        // Ending parent span
+        // End MessageProcessor chain span.
         muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
         context.error(throwable);
       });
