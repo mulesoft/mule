@@ -315,7 +315,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     }
 
     public String getPollId() {
-      return componentLocation.getLocation() + " | " + timestamp;
+      return componentLocation.getRootContainerName() + " @ " + timestamp;
     }
 
     @Override
@@ -340,7 +340,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           currentPollItems++;
           if (EMIT_NOTIFICATIONS) {
             callbackContext.addVariable(ACCEPTED_POLL_ITEM_NOTIFICATION,
-                                        new PollingSourceItemNotification(getPollId(), itemId, pollItem.getWatermark(),
+                                        new PollingSourceItemNotification(getPollId(), itemId,
+                                                                          pollItem.getWatermark().orElse(null),
                                                                           ITEM_DISPATCHED, "", componentLocation.getLocation()));
           }
           sourceCallback.handle(pollItem.getResult(), callbackContext);
@@ -353,8 +354,11 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       if (status != ACCEPTED || currentPollItemLimitApplied) {
         LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);
-        dispatchPollingSourceNotification(new PollingSourceItemNotification(getPollId(), itemId, pollItem.getWatermark(),
-                                                                            matchAction(status, currentPollItemLimitApplied), "",
+        dispatchPollingSourceNotification(new PollingSourceItemNotification(getPollId(), itemId,
+                                                                            pollItem.getWatermark().orElse(null),
+                                                                            statusToNotificationType(status,
+                                                                                                     currentPollItemLimitApplied),
+                                                                            "",
                                                                             componentLocation.getLocation()));
         rejectItem(pollItem.getResult(), callbackContext);
       } else {
@@ -792,7 +796,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     }
   }
 
-  private int matchAction(PollContext.PollItemStatus status, boolean currentPollItemLimitApplied) {
+  private int statusToNotificationType(PollContext.PollItemStatus status, boolean currentPollItemLimitApplied) {
     if (currentPollItemLimitApplied) {
       return ITEM_REJECTED_LIMIT;
     }

@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter.emptyTraceContextMapGetter;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.PollingSourceItemNotification;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
@@ -33,7 +34,7 @@ public class SourceResultAdapter {
   private final MediaType mediaType;
   private final Optional<String> correlationId;
   private final PayloadMediaTypeResolver payloadMediaTypeResolver;
-  private final Optional<Object> notification;
+  private final Optional<PollingSourceItemNotification> notification;
   private final DistributedTraceContextGetter distributedTraceContextGetter;
 
   /**
@@ -51,7 +52,7 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId) {
-    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null, empty());
+    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null, null);
   }
 
   /**
@@ -69,7 +70,7 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId,
-                             PayloadMediaTypeResolver payloadMediaTypeResolver, Optional<Object> notification) {
+                             PayloadMediaTypeResolver payloadMediaTypeResolver, PollingSourceItemNotification notification) {
     this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
          emptyTraceContextMapGetter(), notification);
   }
@@ -80,14 +81,15 @@ public class SourceResultAdapter {
                              boolean isCollection,
                              Optional<String> correlationId,
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
-                             DistributedTraceContextGetter distributedTraceContextGetter, Optional<Object> notification) {
+                             DistributedTraceContextGetter distributedTraceContextGetter,
+                             PollingSourceItemNotification notification) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
     this.payloadMediaTypeResolver = payloadMediaTypeResolver;
-    this.notification = notification;
+    this.notification = ofNullable(notification);
     this.distributedTraceContextGetter = distributedTraceContextGetter;
   }
 
@@ -136,7 +138,7 @@ public class SourceResultAdapter {
    *
    * @since 4.5.0
    */
-  public Optional<Object> getNotification() {
+  public Optional<PollingSourceItemNotification> getNotification() {
     return notification;
   }
 

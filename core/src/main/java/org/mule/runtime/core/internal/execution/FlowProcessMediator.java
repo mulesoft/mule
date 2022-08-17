@@ -220,8 +220,8 @@ public class FlowProcessMediator implements Initialisable {
                                           responseCompletion, flowConstruct);
 
       template.getSourceMessage().getNotification().ifPresent(n -> {
-        ((PollingSourceItemNotification) n).setEventId(event.getContext().getId());
-        notificationManager.fireNotification((Notification) n);
+        n.setEventId(event.getContext().getId());
+        notificationManager.fireNotification(n);
       });
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);

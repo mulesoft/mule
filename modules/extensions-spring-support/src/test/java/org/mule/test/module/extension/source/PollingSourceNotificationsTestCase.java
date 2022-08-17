@@ -168,7 +168,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
       assertThat(sourceNotifications.isEmpty(), is(false));
       assertThat(pipelineNotifications.isEmpty(), is(false));
       assertThat(((PipelineMessageNotification) pipelineNotifications.get(0)).getEvent().getContext().getRootId(),
-                 is(sourceNotifications.get(0).getEventId()));
+                 is(sourceNotifications.get(0).getEventId().get()));
     } finally {
       notificationListenerRegistry.unregisterListener(pipelineListener);
       notificationListenerRegistry.unregisterListener(sourceListener);

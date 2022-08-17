@@ -26,6 +26,7 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.PollingSourceItemNotification;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -253,10 +254,12 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                                      encodingParam,
                                                                                      mimeTypeInitParam);
 
+    PollingSourceItemNotification notification =
+        (PollingSourceItemNotification) context.getVariable(ACCEPTED_POLL_ITEM_NOTIFICATION).orElse(null);
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context),
-                                context.getVariable(ACCEPTED_POLL_ITEM_NOTIFICATION));
+                                notification);
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();
