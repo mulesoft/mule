@@ -13,21 +13,22 @@ import static java.lang.Boolean.parseBoolean;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.sdk.resources.Resource;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.CapturingSpanExporterWrapper;
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
+import java.util.Collection;
+
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
-
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.common.CompletableResultCode;
+import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -35,8 +36,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-
-import java.util.Collection;
 
 /**
  * Utility class that provides resources for OpTel Tracing
@@ -70,6 +69,7 @@ public class OpenTelemetryResourcesProvider {
   // This is only defined in the semconv artifact which is in alpha state and is only needed for this.
   // In order not to add another dependency we add it here.
   // For the moment it is defined in the spec here:
+  // TODO: W-11610439: tracking: verify if the semconv dependency (alpha) should be added
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#semantic-attributes-with-dedicated-environment-variable
   public static final AttributeKey<String> SERVICE_NAME_KEY = stringKey("service.name");
 
