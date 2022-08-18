@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -18,6 +19,7 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
+  private final FeatureFlaggingService featureFlaggingService;
 
   /**
    * Creates a new factory instance
@@ -25,16 +27,19 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
    *                                   null.
    * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
+   * @param featureFlaggingService     the feature flagging service. Not null.
    */
   public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                                            RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+                                                            RegionPluginClassLoadersFactory pluginClassLoadersFactory,
+                                                            FeatureFlaggingService featureFlaggingService) {
 
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.pluginClassLoadersFactory = pluginClassLoadersFactory;
+    this.featureFlaggingService = featureFlaggingService;
   }
 
   @Override
   public PolicyTemplateClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new PolicyTemplateClassLoaderBuilder(artifactClassLoaderFactory, pluginClassLoadersFactory);
+    return new PolicyTemplateClassLoaderBuilder(artifactClassLoaderFactory, pluginClassLoadersFactory, featureFlaggingService);
   }
 }

@@ -11,13 +11,16 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.FeatureFlaggingAwareRegionClassLoader;
 
 /**
  * Builds the class loader to use on a {@link org.mule.runtime.deployment.model.api.policy.PolicyTemplate}
@@ -26,6 +29,7 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private ArtifactClassLoader parentClassLoader;
+  private final FeatureFlaggingService featureFlaggingService;
 
   /**
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
@@ -33,11 +37,14 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
    *                                   null.
    * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the policy's region. Non null
+   * @param featureFlaggingService     the feature flagging service. Not null.
    */
   public PolicyTemplateClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                          RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+                                          RegionPluginClassLoadersFactory pluginClassLoadersFactory,
+                                          FeatureFlaggingService featureFlaggingService) {
     super(pluginClassLoadersFactory);
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
+    this.featureFlaggingService = featureFlaggingService;
   }
 
 
@@ -54,6 +61,17 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
   @Override
   public MuleDeployableArtifactClassLoader build() {
     return (MuleDeployableArtifactClassLoader) super.build();
+  }
+
+  @Override
+  protected RegionClassLoader createRegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor,
+                                                      ClassLoader parentClassLoader,
+                                                      ClassLoaderLookupPolicy parentLookupPolicy) {
+    return new FeatureFlaggingAwareRegionClassLoader(artifactId,
+                                                     artifactDescriptor,
+                                                     parentClassLoader,
+                                                     parentLookupPolicy,
+                                                     featureFlaggingService);
   }
 
   public PolicyTemplateClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {

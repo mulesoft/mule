@@ -136,15 +136,10 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    * 
    * @return a new {@link RegionClassLoader}
    */
-  protected RegionClassLoader createRegionClassLoader(String artifactId,
-                                                      ArtifactDescriptor artifactDescriptor,
-                                                      ClassLoader parentClassLoader,
-                                                      ClassLoaderLookupPolicy parentLookupPolicy) {
-    return new RegionClassLoader(artifactId,
-                                 artifactDescriptor,
-                                 parentClassLoader,
-                                 parentLookupPolicy);
-  }
+  protected abstract RegionClassLoader createRegionClassLoader(String artifactId,
+                                                               ArtifactDescriptor artifactDescriptor,
+                                                               ClassLoader parentClassLoader,
+                                                               ClassLoaderLookupPolicy parentLookupPolicy);
 
   /**
    * @param parentClassLoader parent class loader for the creates artifact class loader

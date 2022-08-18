@@ -18,6 +18,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorF
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
+import static org.mule.runtime.module.artifact.internal.classloader.FeatureFlaggingAwareRegionClassLoader.configureRegionClassLoaderFeatureFlags;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import static java.lang.Thread.currentThread;
@@ -224,10 +225,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     memoryManagementService.setProfilingService(containerProfilingService);
 
     MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(memoryManagementService);
+    FeatureFlaggingService featureFlaggingService = getContainerFeatureFlaggingService();
 
     // Registers the memory management so that this can be injected.
     registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, artifactMemoryManagementService);
-    registerObject(MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE, getContainerFeatureFlaggingService());
+    registerObject(MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE, featureFlaggingService);
 
     runtimeLockFactory = new ServerLockFactory();
 
@@ -254,10 +256,13 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                     artifactDescriptorValidatorBuilder);
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
-        new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
-                                                         new DefaultArtifactClassLoaderResolver(containerClassLoader,
-                                                                                                moduleRepository,
-                                                                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
+        new DefaultArtifactClassLoaderResolver(containerClassLoader,
+                                               moduleRepository,
+                                               new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)),
+                                               featureFlaggingService);
+
+    artifactClassLoaderResolver =
+        new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager, artifactClassLoaderResolver);
 
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactClassLoaderResolver);
     applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
@@ -287,7 +292,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
-        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
+        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory,
+                                                               featureFlaggingService);
 
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                                        domainManager, serviceManager,
@@ -308,6 +314,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     FeatureFlaggingRegistry ffRegistry = getInstance();
 
     configureEnableProfilingService();
+    configureRegionClassLoaderFeatureFlags();
 
     return new FeatureFlaggingServiceBuilder()
         .withContext(new FeatureContext(new MuleVersion("4.5.0-SNAPSHOT"), CONTAINER_FEATURE_CONTEXT_NAME))

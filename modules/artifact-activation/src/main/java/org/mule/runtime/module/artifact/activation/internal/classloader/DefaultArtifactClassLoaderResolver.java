@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -49,6 +50,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.FeatureFlaggingAwareRegionClassLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -74,13 +76,22 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   private final ModuleRepository moduleRepository;
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
   private final MuleDeployableArtifactClassLoader defaultDomainClassloader;
+  private final FeatureFlaggingService featureFlaggingService;
 
   public DefaultArtifactClassLoaderResolver(ArtifactClassLoader containerClassLoader,
                                             ModuleRepository moduleRepository,
                                             NativeLibraryFinderFactory nativeLibraryFinderFactory) {
+    this(containerClassLoader, moduleRepository, nativeLibraryFinderFactory, null);
+  }
+
+  public DefaultArtifactClassLoaderResolver(ArtifactClassLoader containerClassLoader,
+                                            ModuleRepository moduleRepository,
+                                            NativeLibraryFinderFactory nativeLibraryFinderFactory,
+                                            FeatureFlaggingService featureFlaggingService) {
     this.containerClassLoader = containerClassLoader;
     this.moduleRepository = moduleRepository;
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
+    this.featureFlaggingService = featureFlaggingService;
     defaultDomainClassloader = createDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME));
   }
 
@@ -96,10 +107,10 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     ClassLoaderLookupPolicy parentLookupPolicy = getDomainParentLookupPolicy(containerClassLoader);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactId,
-                                                                descriptor,
-                                                                containerClassLoader.getClassLoader(),
-                                                                parentLookupPolicy);
+    RegionClassLoader regionClassLoader = createRegionClassLoader(artifactId,
+                                                                  descriptor,
+                                                                  containerClassLoader.getClassLoader(),
+                                                                  parentLookupPolicy);
 
     ArtifactClassLoaderFilter artifactClassLoaderFilter = createArtifactClassLoaderFilter(descriptor, parentLookupPolicy);
 
@@ -129,6 +140,26 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                           parentLookupPolicy)));
 
     return domainClassLoader;
+  }
+
+  private RegionClassLoader createRegionClassLoader(String artifactId,
+                                                    ArtifactDescriptor descriptor,
+                                                    ClassLoader parentClassloader,
+                                                    ClassLoaderLookupPolicy parentLookupPolicy) {
+    RegionClassLoader regionClassLoader;
+    if (featureFlaggingService != null) {
+      regionClassLoader = new FeatureFlaggingAwareRegionClassLoader(artifactId,
+                                                                    descriptor,
+                                                                    parentClassloader,
+                                                                    parentLookupPolicy,
+                                                                    featureFlaggingService);
+    } else {
+      regionClassLoader = new RegionClassLoader(artifactId,
+                                                descriptor,
+                                                parentClassloader,
+                                                parentLookupPolicy);
+    }
+    return regionClassLoader;
   }
 
   private MuleSharedDomainClassLoader getDefaultDomainClassLoader(ArtifactClassLoader parent,
@@ -194,10 +225,10 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     ClassLoaderLookupPolicy parentLookupPolicy = getApplicationParentLookupPolicy(parentClassLoader);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactId,
-                                                                descriptor,
-                                                                parentClassLoader.getClassLoader(),
-                                                                parentLookupPolicy);
+    RegionClassLoader regionClassLoader = createRegionClassLoader(artifactId,
+                                                                  descriptor,
+                                                                  parentClassLoader.getClassLoader(),
+                                                                  parentLookupPolicy);
 
     ArtifactClassLoaderFilter artifactClassLoaderFilter = createArtifactClassLoaderFilter(descriptor, parentLookupPolicy);
 

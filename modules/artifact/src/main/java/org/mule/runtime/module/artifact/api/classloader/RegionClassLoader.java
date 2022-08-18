@@ -65,6 +65,7 @@ import org.slf4j.Logger;
 public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";
+  protected static final ResourceReleaser EXPLICIT_GC_RELEASER = System::gc;
   static {
     registerAsParallelCapable();
   }
@@ -91,7 +92,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    *
    * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor
    */
-  private ResourceReleaser regionResourceReleaser = System::gc;
+  private ResourceReleaser regionResourceReleaser = EXPLICIT_GC_RELEASER;
 
   /**
    * Creates a new region.
