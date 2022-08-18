@@ -38,6 +38,7 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
 
   @Override
   protected void doTearDownAfterMuleContextDispose() {
+    // The managed streams aren't going to be closed by the operation itself, but by the Ghost Buster.
     assertAllStreamingResourcesClosed();
   }
 
