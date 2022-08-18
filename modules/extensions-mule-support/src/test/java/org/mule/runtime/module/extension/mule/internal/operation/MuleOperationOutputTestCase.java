@@ -17,6 +17,12 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingStatistics;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+
+import javax.inject.Inject;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -26,6 +32,14 @@ import org.junit.Test;
 @Feature(REUSE)
 @Story(OPERATIONS)
 public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase {
+
+  @Inject
+  private StreamingManager streamingManager;
+
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    assertAllStreamingResourcesClosed();
+  }
 
   @Override
   protected String getConfigFile() {
@@ -59,5 +73,14 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
     CoreEvent resultEvent = flowRunner("withRepeatableStreamingFlow").run();
     Object cursorIteratorProvider = resultEvent.getMessage().getPayload().getValue();
     assertThat(cursorIteratorProvider, is(instanceOf(CursorIteratorProvider.class)));
+  }
+
+  private void assertAllStreamingResourcesClosed() {
+    StreamingStatistics stats = streamingManager.getStreamingStatistics();
+    new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
+      assertThat("There are still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
+      assertThat("There are still open cursors", stats.getOpenCursorsCount(), is(0));
+      return true;
+    }));
   }
 }
