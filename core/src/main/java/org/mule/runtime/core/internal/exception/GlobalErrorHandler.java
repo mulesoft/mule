@@ -6,27 +6,74 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 public class GlobalErrorHandler extends ErrorHandler {
+
+  private static final Logger LOGGER = getLogger(GlobalErrorHandler.class);
 
   private final AtomicBoolean initialised = new AtomicBoolean(false);
   private final AtomicInteger started = new AtomicInteger(0);
 
+  private Map<Component, Consumer<Exception>> routers = new HashMap<>();
+
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
+  }
+
+  public Consumer<Exception> routerForChain(MessageProcessorChain chain, Supplier<Consumer<Exception>> errorRouterSupplier) {
+    if (!reuseGlobalErrorHandler()) {
+      return errorRouterSupplier.get();
+    }
+    if (!routers.containsKey(chain)) {
+      routers.put(chain, newGlobalRouter(errorRouterSupplier.get()));
+    }
+    return routers.get(chain);
+  }
+
+  private Consumer<Exception> newGlobalRouter(Consumer<Exception> router) {
+    return new ExceptionRouter() {
+
+      final AtomicBoolean disposed = new AtomicBoolean(false);
+
+      @Override
+      public void accept(Exception error) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Routing error in '" + this + "'...");
+        }
+
+        router.accept(error);
+      }
+
+      @Override
+      public void dispose() {
+        if (!disposed.getAndSet(true)) {
+          disposeIfNeeded(router, LOGGER);
+        }
+      }
+    };
   }
 
   @Override
@@ -89,5 +136,15 @@ public class GlobalErrorHandler extends ErrorHandler {
     local.setExceptionListeners(getExceptionListeners());
     local.setExceptionListenersLocation(flowLocation);
     return local;
+  }
+
+  public Map<Component, Consumer<Exception>> getRouters() {
+    return routers;
+  }
+
+  public void clearRouterForChain(MessageProcessorChain chain) {
+    if (reuseGlobalErrorHandler()) {
+      routers.remove(chain);
+    }
   }
 }
