@@ -8,10 +8,9 @@
 package org.mule.runtime.core.internal.profiling.tracing.export;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
-
-import static java.time.Instant.ofEpochMilli;
-
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
@@ -28,9 +27,10 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapGetter;
 
-import javax.annotation.Nullable;
-
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
 
 /**
  * A {@link InternalSpanExporter} that exports the {@link InternalSpan}'s as open telemetry spans.
@@ -59,7 +59,7 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
 
   @Override
   public void export(InternalSpan internalSpan) {
-    openTelemetrySpan.end(ofEpochMilli(internalSpan.getDuration().getEnd()));
+    openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
   @Override
@@ -108,7 +108,7 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
     }
 
-    return spanBuilder.setStartTimestamp(ofEpochMilli(internalSpan.getDuration().getStart()))
+    return spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
   }
 
