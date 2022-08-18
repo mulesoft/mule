@@ -37,7 +37,7 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
   private StreamingManager streamingManager;
 
   @Override
-  protected void doTearDownAfterMuleContextDispose() throws Exception {
+  protected void doTearDownAfterMuleContextDispose() {
     assertAllStreamingResourcesClosed();
   }
 
@@ -63,21 +63,21 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
   @Test
   @Description("Executes an operation setting a repeatable stream output, but with void output type, then the output payload is null")
   public void withRepeatableStreamingAndVoidOutput() throws Exception {
-    CoreEvent resultEvent = flowRunner("withRepeatableStreamingAndVoidOutputFlow").run();
+    CoreEvent resultEvent = flowRunner("withRepeatableStreamingAndVoidOutputFlow").keepStreamsOpen().run();
     assertThat(resultEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   @Description("Executes an operation setting a repeatable stream output, then the output payload is the stream")
   public void withRepeatableStreaming() throws Exception {
-    CoreEvent resultEvent = flowRunner("withRepeatableStreamingFlow").run();
+    CoreEvent resultEvent = flowRunner("withRepeatableStreamingFlow").keepStreamsOpen().run();
     Object cursorIteratorProvider = resultEvent.getMessage().getPayload().getValue();
     assertThat(cursorIteratorProvider, is(instanceOf(CursorIteratorProvider.class)));
   }
 
   private void assertAllStreamingResourcesClosed() {
     StreamingStatistics stats = streamingManager.getStreamingStatistics();
-    new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(10000L, 100L).check(new JUnitLambdaProbe(() -> {
       assertThat("There are still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
       assertThat("There are still open cursors", stats.getOpenCursorsCount(), is(0));
       return true;
