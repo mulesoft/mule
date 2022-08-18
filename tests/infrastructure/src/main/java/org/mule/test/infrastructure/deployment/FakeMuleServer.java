@@ -101,8 +101,8 @@ public class FakeMuleServer {
   public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
-        // This is done to avoid reregistration of byte buffers.
-        // as this fake mule servers use the same classloader
+        // This is done to guarantee that different fake servers (containers)
+        // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
