@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
@@ -14,6 +13,7 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+import org.mule.runtime.core.internal.profiling.tracing.Clock;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void end() {
-    this.endTime = currentTimeMillis();
+    this.endTime = Clock.getDefault().now();
   }
 
   @Override

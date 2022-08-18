@@ -16,6 +16,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.Clock;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
@@ -59,7 +60,7 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                                             componentSpanIdentifierFrom(muleConfiguration.getId(),
                                                                                                         eventContext
                                                                                                             .getCorrelationId()),
-                                                                            currentTimeMillis(),
+                                                                            Clock.getDefault().now(),
                                                                             null,
                                                                             getCurrentSpan(eventContext).orElse(null)),
                                                           eventContext,
