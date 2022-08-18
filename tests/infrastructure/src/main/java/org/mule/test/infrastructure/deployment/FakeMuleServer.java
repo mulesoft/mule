@@ -11,6 +11,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.internal.memory.management.DefaultMemoryManagementService.newDefaultMemoryManagementService;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
@@ -100,6 +101,9 @@ public class FakeMuleServer {
   public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
+        // This is done to guarantee that different fake servers (containers)
+        // have different memory management services.
+        .withMemoryManagementService(newDefaultMemoryManagementService())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();

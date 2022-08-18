@@ -42,6 +42,15 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
     return INSTANCE;
   }
 
+  /**
+   * This is added for testing purposes when we want to create a different service for fake test components.
+   *
+   * @return a new independent {@link DefaultMemoryManagementService}
+   */
+  public static DefaultMemoryManagementService newDefaultMemoryManagementService() {
+    return new DefaultMemoryManagementService();
+  }
+
   private DefaultMemoryManagementService() {};
 
   @Override
