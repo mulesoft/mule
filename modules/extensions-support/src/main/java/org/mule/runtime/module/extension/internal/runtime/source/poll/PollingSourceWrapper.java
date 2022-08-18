@@ -61,6 +61,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.execution.ItemInformation;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -97,7 +98,7 @@ import org.slf4j.Logger;
  */
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
-  public static final String ACCEPTED_POLL_ITEM_NOTIFICATION = "mule-polling-source-accepted-item";
+  public static final String ACCEPTED_ITEM_INFORMATION = "mule-polling-source-accepted-item-information";
 
   public static final String REJECTED_ITEM_MESSAGE = "Item with id:[{}] is rejected with status:[{}]";
   public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[{}] is accepted";
@@ -339,10 +340,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
           if (EMIT_NOTIFICATIONS) {
-            callbackContext.addVariable(ACCEPTED_POLL_ITEM_NOTIFICATION,
-                                        new PollingSourceItemNotification(getPollId(), itemId,
-                                                                          pollItem.getWatermark().orElse(null),
-                                                                          ITEM_DISPATCHED, "", componentLocation.getLocation()));
+            callbackContext
+                .addVariable(ACCEPTED_ITEM_INFORMATION,
+                             new ItemInformation(getPollId(), itemId, pollItem.getWatermark(), componentLocation.getLocation()));
+            /*
+             * callbackContext.addVariable(ACCEPTED_POLL_ITEM_NOTIFICATION, new PollingSourceItemNotification(getPollId(), itemId,
+             * pollItem.getWatermark().orElse(null), ITEM_DISPATCHED, "", componentLocation.getLocation()));
+             */
           }
           sourceCallback.handle(pollItem.getResult(), callbackContext);
           saveWatermarkValue(watermarkStatus, pollItem);

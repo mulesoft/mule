@@ -16,6 +16,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_DISPATCHED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
@@ -219,9 +220,11 @@ public class FlowProcessMediator implements Initialisable {
       final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
 
-      template.getSourceMessage().getNotification().ifPresent(n -> {
-        n.setEventId(event.getContext().getId());
-        notificationManager.fireNotification(n);
+      template.getSourceMessage().getItemInformation().ifPresent(info -> {
+        notificationManager
+            .fireNotification(new PollingSourceItemNotification(info.getPollId(), info.getItemId(),
+                                                                info.getWatermark().orElse(null), ITEM_DISPATCHED,
+                                                                event.getContext().getId(), info.getComponentLocation()));
       });
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
