@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.privileged.profiling.SpanExportManager;
@@ -19,9 +20,10 @@ import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 public interface InternalSpanExportManager<T> extends SpanExportManager {
 
   /**
-   * @param context      the context
-   * @param internalSpan the {@link InternalSpan} to export.
+   * @param context           the context
+   * @param muleConfiguration information about the artifact where the span is generated.
+   * @param internalSpan      the {@link InternalSpan} to export.
    * @return an {@link InternalSpanExporter}.
    */
-  InternalSpanExporter getInternalSpanExporter(T context, InternalSpan internalSpan);
+  InternalSpanExporter getInternalSpanExporter(T context, MuleConfiguration muleConfiguration, InternalSpan internalSpan);
 }

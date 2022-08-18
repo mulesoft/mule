@@ -64,7 +64,8 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                                             getCurrentSpan(eventContext).orElse(null)),
                                                           eventContext,
                                                           internalSpanExportManager,
-                                                          spanCustomizationInfo.getChildSpanCustomizationInfo());
+                                                          spanCustomizationInfo.getChildSpanCustomizationInfo(),
+                                                          muleConfiguration);
 
 
     Map<String, String> attributes =

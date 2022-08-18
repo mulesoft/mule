@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenetelemetryCoreEventInternalSpanExporterFactory.getOpenetelemetryCoreEventInternalSpanExporterFactory;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
@@ -31,7 +32,8 @@ public class OpentelemetrySpanExporterManager implements InternalSpanExportManag
   }
 
   @Override
-  public InternalSpanExporter getInternalSpanExporter(EventContext context, InternalSpan internalSpan) {
-    return SPAN_EXPORTER_FACTORY.from(context, internalSpan);
+  public InternalSpanExporter getInternalSpanExporter(EventContext context, MuleConfiguration muleConfiguration,
+                                                      InternalSpan internalSpan) {
+    return SPAN_EXPORTER_FACTORY.from(context, muleConfiguration, internalSpan);
   }
 }

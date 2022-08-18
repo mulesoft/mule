@@ -10,8 +10,12 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getNewExportedSpanCapturer;
 
 import static java.lang.System.getProperty;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getOpenTelemetryTracer;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractDefaultAttributesResolvingSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter;
@@ -29,7 +33,6 @@ public class OpenetelemetryCoreEventInternalSpanExporterFactory {
 
   private static final SpanExporterConfiguration CONFIGURATION = new SystemPropertiesSpanExporterConfiguration();
 
-  private static final Tracer TRACER = OpenTelemetryResourcesProvider.getOpenTelemetryTracer(CONFIGURATION);
   private static OpenetelemetryCoreEventInternalSpanExporterFactory instance;
 
   private OpenetelemetryCoreEventInternalSpanExporterFactory() {}
@@ -48,8 +51,9 @@ public class OpenetelemetryCoreEventInternalSpanExporterFactory {
    * @param internalSpan the {@link InternalSpan} that will eventually be exported
    * @return the result exporter.
    */
-  public InternalSpanExporter from(EventContext eventContext, InternalSpan internalSpan) {
-    return new OpentelemetrySpanExporter(TRACER, eventContext, internalSpan);
+  public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, InternalSpan internalSpan) {
+    return new OpentelemetrySpanExporter(getOpenTelemetryTracer(CONFIGURATION, muleConfiguration.getId()), eventContext,
+                                         internalSpan);
   }
 
   public ExportedSpanCapturer getExportedSpanCapturer() {
