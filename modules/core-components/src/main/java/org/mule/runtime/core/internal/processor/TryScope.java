@@ -225,7 +225,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       }
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
-                                                         messagingExceptionHandler);
+                                                         messagingExceptionHandler, getLocation().getLocation());
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
     startProducer = profilingService.getProfilingDataProducer(TX_START);
