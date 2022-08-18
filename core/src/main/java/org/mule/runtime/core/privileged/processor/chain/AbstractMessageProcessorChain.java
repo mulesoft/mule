@@ -68,6 +68,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
@@ -93,6 +94,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -199,10 +201,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             // finished.
             final AtomicInteger inflightEvents = new AtomicInteger();
 
-            final Consumer<Exception> errorRouter = messagingExceptionHandler
+            final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -222,16 +224,35 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                             () -> {
                                               errorSwitchSinkSinkRef.complete();
                                               disposeIfNeeded(errorRouter, LOGGER);
+                                              clearRouterInGlobalErrorHandler(messagingExceptionHandler);
                                             },
                                             t -> {
                                               errorSwitchSinkSinkRef.error(t);
                                               disposeIfNeeded(errorRouter, LOGGER);
+                                              clearRouterInGlobalErrorHandler(messagingExceptionHandler);
                                             }))
                                                 .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
           });
 
     } else {
       return doApply(publisher, interceptors, (context, throwable) -> context.error(throwable));
+    }
+  }
+
+  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier) {
+    final Consumer<Exception> errorRouter;
+    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+      errorRouter = ((GlobalErrorHandler) messagingExceptionHandler)
+          .routerForChain(this, errorRouterSupplier);
+    } else {
+      errorRouter = errorRouterSupplier.get();
+    }
+    return errorRouter;
+  }
+
+  private void clearRouterInGlobalErrorHandler(FlowExceptionHandler messagingExceptionHandler) {
+    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+      ((GlobalErrorHandler) messagingExceptionHandler).clearRouterForChain(this);
     }
   }
 
