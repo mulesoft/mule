@@ -221,7 +221,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.containerProfilingService = new DefaultProfilingService();
 
-    memoryManagementService.setProfilingService(containerProfilingService);
+    this.memoryManagementService.setProfilingService(containerProfilingService);
 
     MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(memoryManagementService);
 
