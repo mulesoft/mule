@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
-
 import static java.util.Optional.empty;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -42,6 +38,10 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
     return new PropagateAllDistributedTraceContextManager(getDistributedTraceContext(((ExecutionContextAdapter<?>) executionContext)
         .getEvent()));
+  }
+
+  public DistributedTraceContextManager resolve(CoreEvent coreEvent) {
+    return new PropagateAllDistributedTraceContextManager(getDistributedTraceContext(coreEvent));
   }
 
   private DistributedTraceContext getDistributedTraceContext(CoreEvent event) {

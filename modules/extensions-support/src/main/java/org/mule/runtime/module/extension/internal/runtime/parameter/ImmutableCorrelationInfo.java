@@ -7,7 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
 import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.ItemSequenceInfo;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 
 import java.util.Optional;
@@ -23,13 +26,15 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final boolean outboundCorrelationEnabled;
   private final String correlationId;
   private final ItemSequenceInfo itemSequenceInfo;
+  private final CoreEvent event;
 
   public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
-                                  ItemSequenceInfo itemSequenceInfo) {
+                                  ItemSequenceInfo itemSequenceInfo, CoreEvent event) {
     this.eventId = eventId;
     this.outboundCorrelationEnabled = outboundCorrelationEnabled;
     this.correlationId = correlationId;
     this.itemSequenceInfo = itemSequenceInfo;
+    this.event = event;
   }
 
   /**
@@ -62,5 +67,12 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   @Override
   public Optional<ItemSequenceInfo> getItemSequenceInfo() {
     return ofNullable(itemSequenceInfo);
+  }
+
+  /**
+   * @return The {@link CoreEvent} being processed
+   */
+  public CoreEvent getEvent() {
+    return event;
   }
 }
