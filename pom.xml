@@ -216,7 +216,7 @@
         <jettyVersion>9.4.35.v20201120</jettyVersion>
         <jodaTimeVersion>2.9.7</jodaTimeVersion>
         <jschVersion>0.1.55</jschVersion>
-        <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
+        <jsonSchemaValidatorVersion>2.2.14</jsonSchemaValidatorVersion>
         <junitVersion>4.13.1</junitVersion>
         <jythonVersion>2.7.2b2</jythonVersion>
         <jrubyVersion>9.2.14.0</jrubyVersion>
