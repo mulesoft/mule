@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.config;
+package org.mule.runtime.module.artifact.internal.descriptor;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static java.lang.Boolean.getBoolean;

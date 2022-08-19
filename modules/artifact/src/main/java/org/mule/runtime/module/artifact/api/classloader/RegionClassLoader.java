@@ -7,8 +7,10 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+import static org.mule.runtime.module.artifact.internal.descriptor.FeatureFlaggingUtils.isFeatureEnabled;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -21,6 +23,7 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -89,9 +92,18 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution. By default it
    * will prompt a gc in the JVM if possible to release the softkeys cleared in the caches.
    *
-   * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor
+   * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor.
+   *
+   * Additionally, there is a feature flag controlling this ({@link MuleRuntimeFeature#DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT}}).
    */
-  private ResourceReleaser regionResourceReleaser = System::gc;
+  private ResourceReleaser regionResourceReleaser = () -> {
+    // Checks if we need to skip the explicit GC call
+    if (isFeatureEnabled(DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT, getArtifactDescriptor())) {
+      return;
+    }
+
+    System.gc();
+  };
 
   /**
    * Creates a new region.

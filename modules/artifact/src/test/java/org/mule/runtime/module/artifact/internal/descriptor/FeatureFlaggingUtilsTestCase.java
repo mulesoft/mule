@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.config;
+package org.mule.runtime.module.artifact.internal.descriptor;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -20,9 +20,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
-import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE;
-import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE_OVERRIDE;
+import static org.mule.runtime.module.artifact.internal.descriptor.ArtifactTestingFeatures.ALWAYS_ON_FEATURE;
+import static org.mule.runtime.module.artifact.internal.descriptor.ArtifactTestingFeatures.OVERRIDEABLE_FEATURE;
+import static org.mule.runtime.module.artifact.internal.descriptor.ArtifactTestingFeatures.OVERRIDEABLE_FEATURE_OVERRIDE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
 @SmallTest

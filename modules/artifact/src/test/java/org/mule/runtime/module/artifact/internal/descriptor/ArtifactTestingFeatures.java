@@ -4,13 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.config;
+package org.mule.runtime.module.artifact.internal.descriptor;
 
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.runtime.module.artifact.internal.descriptor.FeatureFlaggingUtils;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,29 +20,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 
  * @see FeatureFlaggingUtils
  * @see org.mule.runtime.api.config.FeatureFlaggingService
- * @since 4.4.0
+ * @since 4.5.0
  */
-public enum DeploymentTestingFeatures implements Feature {
+public enum ArtifactTestingFeatures implements Feature {
 
-  ALWAYS_ON_FEATURE("Testing feature", "MULE-123", "4.4.0");
+  ALWAYS_ON_FEATURE("Testing feature", "MULE-123", "4.4.0"), OVERRIDEABLE_FEATURE("Testing feature", "MULE-123", "4.4.0",
+      "overrideable.feature.override");
 
   private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
   static {
     if (!areFeatureFlagsConfigured.getAndSet(true)) {
       FeatureFlaggingRegistry.getInstance().registerFeatureFlag(ALWAYS_ON_FEATURE, featureContext -> true);
+      FeatureFlaggingRegistry.getInstance().registerFeatureFlag(OVERRIDEABLE_FEATURE, featureContext -> false);
     }
   }
 
+  public static final String OVERRIDEABLE_FEATURE_OVERRIDE = "overrideable.feature.override";
   private final String description;
   private final String issue;
   private final String enabledByDefaultSince;
   private final String overridingSystemPropertyName;
 
-  DeploymentTestingFeatures(String description, String issue, String enabledByDefaultSince) {
+  ArtifactTestingFeatures(String description, String issue, String enabledByDefaultSince) {
     this(description, issue, enabledByDefaultSince, null);
   }
 
-  DeploymentTestingFeatures(String description, String issue, String enabledByDefaultSince, String overridingSystemPropertyName) {
+  ArtifactTestingFeatures(String description, String issue, String enabledByDefaultSince, String overridingSystemPropertyName) {
     this.description = description;
     this.issue = issue;
     this.enabledByDefaultSince = enabledByDefaultSince;

@@ -10,6 +10,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
@@ -77,6 +78,7 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -333,6 +335,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
+      registerFeatureOnMinMuleVersion(DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT);
     }
   }
 
@@ -1471,6 +1474,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
                                                 minMuleVersion("4.5.0"));
+  }
+
+  private static void registerFeatureOnMinMuleVersion(Feature feature) {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(feature, minMuleVersion(feature.getEnabledByDefaultSince()));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
