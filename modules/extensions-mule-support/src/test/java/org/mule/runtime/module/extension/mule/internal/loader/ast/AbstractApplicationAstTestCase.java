@@ -55,7 +55,7 @@ public abstract class AbstractApplicationAstTestCase extends AbstractMuleTestCas
   @Before
   public void before() {
     properties.clear();
-    classLoader = DeprecationAstTestCase.class.getClassLoader();
+    classLoader = this.getClass().getClassLoader();
 
     Builder astParserBuilder = builder()
         .withSchemaValidationsDisabled()
