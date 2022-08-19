@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
-import org.mule.sdk.api.utils.ForwardCompatibilityHelper;
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
