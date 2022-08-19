@@ -363,7 +363,7 @@
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.55.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.8.jar
-/mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.8.jar
+/mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.14.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/jsr305-3.0.2.jar
