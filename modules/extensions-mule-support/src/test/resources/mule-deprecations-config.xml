@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+          http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+          http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <operation:def name="deprecatedOperation">
+        <operation:deprecated since="1.1.0"
+                              message="Some deprecation message" />
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Some deprecated value" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationWithDeprecatedParameter">
+        <operation:parameters>
+            <operation:parameter name="deprecatedParameter" type="string">
+                <operation:deprecated since="1.1.0"
+                                      message="Some deprecation message" />
+            </operation:parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Irrelevant" />
+        </operation:body>
+    </operation:def>
+</mule>
