@@ -52,8 +52,6 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
 
   public OnErrorPropagateHandler() {
-
-
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
