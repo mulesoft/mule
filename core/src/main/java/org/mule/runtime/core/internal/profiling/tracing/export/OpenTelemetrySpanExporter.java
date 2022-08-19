@@ -111,7 +111,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       return Context.current().with(parentOpenTelemetrySpan);
     }
 
-    return remoteContext;
+    return null;
   }
 
   private Context resolveRemoteContext(EventContext eventContext) {

@@ -19,6 +19,8 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
+
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -53,6 +55,7 @@ import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.ArrayDeque;
@@ -99,6 +102,26 @@ public class MessageProcessors {
     }
   }
 
+  public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
+                                               String name) {
+    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
+      return (MessageProcessorChain) processors.get(0);
+    } else {
+      return buildNewChainWithListOfProcessors(processingStrategy, processors, new SpanCustomizationInfo() {
+
+        @Override
+        public String getName(CoreEvent coreEvent) {
+          return name;
+        }
+
+        @Override
+        public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
+          return getDefaultChildSpanInfo();
+        }
+      });
+    }
+  }
+
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
@@ -120,6 +143,15 @@ public class MessageProcessors {
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
     defaultMessageProcessorChainBuilder.setName(name);
+    return defaultMessageProcessorChainBuilder.chain(processors).build();
+  }
+
+  public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
+                                                                        List<Processor> processors,
+                                                                        SpanCustomizationInfo spanCustomizationInfo) {
+    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
+    processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
+    defaultMessageProcessorChainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
