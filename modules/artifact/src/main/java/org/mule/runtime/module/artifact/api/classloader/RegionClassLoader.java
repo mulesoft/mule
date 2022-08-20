@@ -94,7 +94,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    *
    * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor.
    *
-   * Additionally, there is a feature flag controlling this ({@link MuleRuntimeFeature#DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT}}).
+   * Additionally, there is a feature flag controlling this
+   * ({@link MuleRuntimeFeature#DISABLE_EXPLICIT_GC_WHEN_DISPOSING_ARTIFACT}}).
    */
   private ResourceReleaser regionResourceReleaser = () -> {
     // Checks if we need to skip the explicit GC call
