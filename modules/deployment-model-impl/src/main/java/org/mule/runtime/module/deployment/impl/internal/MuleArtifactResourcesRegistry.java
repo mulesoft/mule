@@ -223,7 +223,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.memoryManagementService.setProfilingService(containerProfilingService);
 
-    MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(memoryManagementService);
+    MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(this.memoryManagementService);
 
     // Registers the memory management so that this can be injected.
     registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, artifactMemoryManagementService);
