@@ -1059,4 +1059,14 @@ public interface AllureConstants {
       String OPERATION_POLICIES = "Operation policies";
     }
   }
+
+  interface MonitoringSideCar {
+
+    String MONITOR_NET_BYTES_USED = "Monitor net bytes used";
+
+    interface MonitoringSideCarStory {
+
+      String ANYPOINT_MONITORING_SIDECAR = "Anypoint monitoring sidecar";
+    }
+  }
 }
