@@ -81,7 +81,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     List<String> raisedErrors = getRaisedErrors(extensionModel);
     assertThat(raisedErrors,
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
-                                  "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM"));
+                                  "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH"));
   }
 
   @Test
