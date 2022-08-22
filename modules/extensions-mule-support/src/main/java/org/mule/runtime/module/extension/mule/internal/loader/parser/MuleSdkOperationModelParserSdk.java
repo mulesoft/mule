@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
+import static org.mule.runtime.ast.api.util.AstTraversalDirection.TOP_DOWN;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.FilteringCharacteristic;
@@ -19,8 +20,10 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -48,8 +51,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParse
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.AggregatedErrorsCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedErrorsCharacteristic;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.ComponentAstWithHierarchy;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsBlockingCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsTransactionalCharacteristic;
 
@@ -63,12 +67,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+
 /**
  * {@link OperationModelParser} implementation for Mule SDK
  *
  * @since 4.5.0
  */
 class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
+
+  private static final Logger LOGGER = getLogger(MuleSdkOperationModelParserSdk.class);
 
   private static final String BODY_CHILD = "body";
   private static final String DESCRIPTION_PARAMETER = "description";
@@ -305,12 +313,13 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     return getSingleChild(operation, BODY_CHILD).get();
   }
 
-  private Stream<ComponentAst> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
-                                                           Set<String> visitedOperations, ComponentAst componentAst,
-                                                           Predicate<ComponentAst> filterCondition,
-                                                           Predicate<ComponentAst> ignoreCondition) {
+  private Stream<ComponentAstWithHierarchy> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+                                                                        Set<String> visitedOperations,
+                                                                        ComponentAstWithHierarchy componentAst,
+                                                                        Predicate<ComponentAstWithHierarchy> filterCondition,
+                                                                        Predicate<ComponentAstWithHierarchy> ignoreCondition) {
     final MuleSdkOperationModelParserSdk operationParser =
-        operationModelParsersByName.get(componentAst.getIdentifier().getName());
+        operationModelParsersByName.get(componentAst.getComponentAst().getIdentifier().getName());
 
     if (operationParser != null) {
       return operationParser.getOperationsAstRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition,
@@ -320,49 +329,54 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     }
   }
 
-  private Stream<ComponentAst> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
     return getOperationsAstRecursiveStream(operationModelParsersByName, componentAst -> false, componentAst -> false);
   }
 
   /**
-   * @return returns a stream of {@link ComponentAst} with all the operations ASTs within a Mule Operation's body.
+   * @return returns a stream of {@link ComponentAstWithHierarchy} with all the operations ASTs within a Mule Operation's body.
    *
-   * @param filterCondition when it returns true for a {@link ComponentAst}, it will be filtered, as well as all its inner
-   *                        children.
+   * @param filterCondition when it returns true for a {@link ComponentAstWithHierarchy}, it will be filtered, as well as all its
+   *                        inner children.
    * @param ignoreCondition when it returns true, that particular component is ignored.
    */
-  private Stream<ComponentAst> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
-                                                               Predicate<ComponentAst> filterCondition,
-                                                               Predicate<ComponentAst> ignoreCondition) {
+  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+                                                                            Predicate<ComponentAstWithHierarchy> filterCondition,
+                                                                            Predicate<ComponentAstWithHierarchy> ignoreCondition) {
     final Set<String> visitedOperations = new HashSet<>();
     return getOperationsAstRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition, ignoreCondition);
   }
 
-  private Stream<ComponentAst> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
-                                                               Set<String> visitedOperations,
-                                                               Predicate<ComponentAst> filterCondition,
-                                                               Predicate<ComponentAst> ignoreCondition) {
+  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+                                                                            Set<String> visitedOperations,
+                                                                            Predicate<ComponentAstWithHierarchy> filterCondition,
+                                                                            Predicate<ComponentAstWithHierarchy> ignoreCondition) {
     if (!visitedOperations.add(this.getName())) {
       return Stream.empty();
     }
 
     Set<ComponentAst> filtered = new HashSet<>();
 
-    return getBody().recursiveStream()
-        .flatMap(componentAst -> {
-          if (filtered.contains(componentAst) || ignoreCondition.test(componentAst)) {
+    return TOP_DOWN.recursiveStreamWithHierarchy(Stream.of(getBody()))
+        .map(ComponentAstWithHierarchy::new)
+        .flatMap(componentAstWithHierarchy -> {
+          ComponentAst componentAst = componentAstWithHierarchy.getComponentAst();
+          List<ComponentAst> hierarchy = componentAstWithHierarchy.getHierarchy();
+          LOGGER.trace("Iteration is processing the ast: [{}] -> [{}]", hierarchy, componentAst);
+
+          if (filtered.contains(componentAst) || ignoreCondition.test(componentAstWithHierarchy)) {
             return Stream.empty();
           }
           Optional<OperationModel> operationModel = componentAst.getModel(OperationModel.class);
           if (operationModel.isPresent()) {
             // It's an operation ast, with an operation model.
-            return Stream.of(componentAst);
-          } else if (filterCondition.test(componentAst)) {
+            return Stream.of(componentAstWithHierarchy);
+          } else if (filterCondition.test(componentAstWithHierarchy)) {
             recursiveAddToFiltered(componentAst, filtered);
             return Stream.empty();
           } else if (componentAst.getComponentType().equals(UNKNOWN)) {
-            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst, filterCondition,
-                                               ignoreCondition);
+            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAstWithHierarchy,
+                                               filterCondition, ignoreCondition);
           } else {
             return Stream.empty();
           }

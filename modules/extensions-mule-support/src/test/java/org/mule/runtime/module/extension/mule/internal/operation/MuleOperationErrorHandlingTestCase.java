@@ -23,8 +23,11 @@ import org.junit.Test;
 public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
-  protected String getConfigFile() {
-    return "mule-error-handling-operations-config.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {
+        "mule-error-handling-operations-config.xml",
+        "mule-error-handling-with-try-operations-config.xml"
+    };
   }
 
   @Test
@@ -60,5 +63,11 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   @Test
   public void errorMappingInsideBodyAndInInvocation() throws Exception {
     flowRunner("errorMappingInsideBodyAndInInvocationFlow").runExpectingException(errorType("MY", "MAPPED_TWICE"));
+  }
+
+  @Test
+  public void callingOperationThatSilencesErrors() throws Exception {
+    flowRunner("flowCallingOperationThatSilencesOneSpecificErrorAndRaisesAnother")
+        .runExpectingException(errorType("THIS", "CUSTOM"));
   }
 }

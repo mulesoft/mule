@@ -6,24 +6,15 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
-import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkErrorModelParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +30,46 @@ import java.util.function.Predicate;
  */
 public class Characteristic<T> {
 
+  public static class ComponentAstWithHierarchy {
+
+    private final ComponentAst componentAst;
+    private final List<ComponentAst> hierarchy;
+
+    public ComponentAstWithHierarchy(Pair<ComponentAst, List<ComponentAst>> pair) {
+      this(pair.getFirst(), pair.getSecond());
+    }
+
+    public ComponentAstWithHierarchy(ComponentAst componentAst, List<ComponentAst> hierarchy) {
+      this.componentAst = componentAst;
+      this.hierarchy = hierarchy;
+    }
+
+    public ComponentAst getComponentAst() {
+      return componentAst;
+    }
+
+    public List<ComponentAst> getHierarchy() {
+      return hierarchy;
+    }
+
+    @Override
+    public String toString() {
+      return "ComponentAstWithHierarchy{" +
+          "componentAst=" + componentAst +
+          ", hierarchy=" + hierarchy +
+          '}';
+    }
+  }
+
   private static final String CHARACTERISTICS_NOT_COMPUTED_MSG = "Characteristics have not been computed yet.";
 
-  private final BiFunction<? super ComponentAst, ? super T, ? extends T> mapper;
+  private final BiFunction<ComponentAstWithHierarchy, ? super T, ? extends T> mapper;
   private final T defaultValue;
   private final T stopValue;
 
   private T value;
 
-  private Characteristic(BiFunction<? super ComponentAst, ? super T, ? extends T> mapper, T defaultValue, T stopValue) {
+  protected Characteristic(BiFunction<ComponentAstWithHierarchy, ? super T, ? extends T> mapper, T defaultValue, T stopValue) {
     this.mapper = mapper;
     this.defaultValue = defaultValue;
     this.stopValue = stopValue;
@@ -58,7 +80,7 @@ public class Characteristic<T> {
    *
    * @param operationAst is the operation AST. It always has a {@link OperationModel}.
    */
-  public void computeFrom(ComponentAst operationAst) {
+  public void computeFrom(ComponentAstWithHierarchy operationAst) {
     value = mapper.apply(operationAst, value);
   }
 
@@ -99,7 +121,7 @@ public class Characteristic<T> {
    */
   public static class BooleanCharacteristic extends Characteristic<Boolean> {
 
-    private BooleanCharacteristic(Predicate<ComponentAst> predicate, Boolean defaultValue, Boolean stopValue) {
+    private BooleanCharacteristic(Predicate<ComponentAstWithHierarchy> predicate, Boolean defaultValue, Boolean stopValue) {
       super(((operationAst,
               curValue) -> (curValue != null && Objects.equals(curValue, stopValue)) ? curValue : predicate.test(operationAst)),
             defaultValue, stopValue);
@@ -112,7 +134,7 @@ public class Characteristic<T> {
    */
   public static class AnyMatchCharacteristic extends BooleanCharacteristic {
 
-    public AnyMatchCharacteristic(Predicate<ComponentAst> predicate) {
+    public AnyMatchCharacteristic(Predicate<ComponentAstWithHierarchy> predicate) {
       super(predicate, false, true);
     }
 
@@ -127,8 +149,9 @@ public class Characteristic<T> {
       super(AggregatedNotificationsCharacteristic::aggregator, emptyList(), null);
     }
 
-    private static List<NotificationModel> aggregator(ComponentAst operationAst, List<NotificationModel> notificationModels) {
-      Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
+    private static List<NotificationModel> aggregator(ComponentAstWithHierarchy operationAst,
+                                                      List<NotificationModel> notificationModels) {
+      Optional<OperationModel> operationModel = operationAst.getComponentAst().getModel(OperationModel.class);
       if (notificationModels == null) {
         notificationModels = new ArrayList<>();
       }
@@ -143,21 +166,22 @@ public class Characteristic<T> {
    */
   public static class FilteringCharacteristic<T> extends Characteristic<T> {
 
-    private final Predicate<? super ComponentAst> filterExpression;
-    private final Predicate<? super ComponentAst> ignoreExpression;
+    private final Predicate<? super ComponentAstWithHierarchy> filterExpression;
+    private final Predicate<? super ComponentAstWithHierarchy> ignoreExpression;
 
-    private FilteringCharacteristic(BiFunction<? super ComponentAst, T, T> mapper, T defaultValue, T stopValue,
-                                    Predicate<? super ComponentAst> filter, Predicate<? super ComponentAst> ignore) {
+    private FilteringCharacteristic(BiFunction<ComponentAstWithHierarchy, T, T> mapper, T defaultValue, T stopValue,
+                                    Predicate<? super ComponentAstWithHierarchy> filter,
+                                    Predicate<? super ComponentAstWithHierarchy> ignore) {
       super(mapper, defaultValue, stopValue);
       this.filterExpression = filter;
       this.ignoreExpression = ignore;
     }
 
-    public boolean filterComponent(ComponentAst componentAst) {
+    public boolean filterComponent(ComponentAstWithHierarchy componentAst) {
       return filterExpression.test(componentAst);
     }
 
-    public boolean ignoreComponent(ComponentAst componentAst) {
+    public boolean ignoreComponent(ComponentAstWithHierarchy componentAst) {
       return ignoreExpression.test(componentAst);
     }
   }
@@ -167,8 +191,10 @@ public class Characteristic<T> {
    */
   public static class BooleanFilteringCharacteristic extends FilteringCharacteristic<Boolean> {
 
-    private BooleanFilteringCharacteristic(Predicate<? super ComponentAst> predicate, Boolean defaultValue, Boolean stopValue,
-                                           Predicate<? super ComponentAst> filter, Predicate<? super ComponentAst> ignore) {
+    private BooleanFilteringCharacteristic(Predicate<ComponentAstWithHierarchy> predicate, Boolean defaultValue,
+                                           Boolean stopValue,
+                                           Predicate<ComponentAstWithHierarchy> filter,
+                                           Predicate<ComponentAstWithHierarchy> ignore) {
       super(((operationAst,
               curValue) -> (curValue != null && Objects.equals(curValue, stopValue)) ? curValue : predicate.test(operationAst)),
             defaultValue, stopValue, filter, ignore);
@@ -180,9 +206,9 @@ public class Characteristic<T> {
    */
   public static class AnyMatchFilteringCharacteristic extends BooleanFilteringCharacteristic {
 
-    public AnyMatchFilteringCharacteristic(Predicate<? super ComponentAst> predicate,
-                                           Predicate<? super ComponentAst> filterExpression,
-                                           Predicate<? super ComponentAst> ignoreExpression) {
+    public AnyMatchFilteringCharacteristic(Predicate<ComponentAstWithHierarchy> predicate,
+                                           Predicate<ComponentAstWithHierarchy> filterExpression,
+                                           Predicate<ComponentAstWithHierarchy> ignoreExpression) {
       super(predicate, false, true, filterExpression, ignoreExpression);
     }
   }
@@ -193,8 +219,9 @@ public class Characteristic<T> {
       super(IsBlockingCharacteristic::isBlocking);
     }
 
-    public static boolean isBlocking(ComponentAst operationAst) {
-      return operationAst.getModel(OperationModel.class).map(OperationModel::isBlocking).orElse(false).booleanValue();
+    public static boolean isBlocking(ComponentAstWithHierarchy operationAst) {
+      return operationAst.getComponentAst().getModel(OperationModel.class).map(OperationModel::isBlocking).orElse(false)
+          .booleanValue();
     }
   }
 
@@ -205,60 +232,9 @@ public class Characteristic<T> {
             MuleSdkOperationodelParserUtils::isIgnoredComponentForTx);
     }
 
-    private static boolean isTransactional(ComponentAst operationAst) {
-      return operationAst.getModel(OperationModel.class).map(OperationModel::isTransactional).orElse(false).booleanValue();
-    }
-  }
-
-  /**
-   * {@link Characteristic} that retrieves all the {@link ErrorModelParser} emitted by the inner components of this Model
-   */
-  public static class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorModelParser>> {
-
-    private static final String ERROR_TYPE_PARAM = "type";
-
-    private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
-        builder().namespace(OPERATION_DSL_NAMESPACE).name(RAISE_ERROR).build();
-
-    public AggregatedErrorsCharacteristic() {
-      super(AggregatedErrorsCharacteristic::aggregator, emptyList(), null);
-    }
-
-    private static List<ErrorModelParser> aggregator(ComponentAst operationAst, List<ErrorModelParser> errorModels) {
-      List<ErrorModelParser> models = errorModels;
-      if (models == null) {
-        models = new ArrayList<>(5);
-      }
-
-      if (isRaiseError(operationAst)) {
-        handleRaiseError(operationAst, models);
-      } else {
-        Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
-        if (operationModel.isPresent()) {
-          models.addAll(operationModel.get().getErrorModels().stream().map(MuleSdkErrorModelParser::new).collect(toList()));
-        }
-      }
-
-      return models;
-    }
-
-    private static void handleRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels) {
-      final ComponentParameterAst typeParameter = raiseErrorAst.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_PARAM);
-      if (null == typeParameter) {
-        return;
-      }
-
-      Optional<String> errorId = typeParameter.getValue().<String>getValue();
-      if (!errorId.isPresent()) {
-        return;
-      }
-
-      // TODO: Use the extension parser's namespace.
-      errorModels.add(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null));
-    }
-
-    private static boolean isRaiseError(ComponentAst operationAst) {
-      return operationAst.getIdentifier().equals(RAISE_ERROR_IDENTIFIER);
+    private static boolean isTransactional(ComponentAstWithHierarchy operationAst) {
+      return operationAst.getComponentAst().getModel(OperationModel.class).map(OperationModel::isTransactional).orElse(false)
+          .booleanValue();
     }
   }
 }
