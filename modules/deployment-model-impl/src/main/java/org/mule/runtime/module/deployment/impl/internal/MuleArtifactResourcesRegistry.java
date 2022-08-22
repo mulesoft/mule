@@ -215,6 +215,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                           new LazyValue<>(() -> "containerServerNotificationManager"));
     registerObject(SERVER_NOTIFICATION_MANAGER, serverNotificationManager);
 
+    // TODO: W-11631353: Refactor creation of memory management at container and artifact level
     if (memoryManagementService != null) {
       this.memoryManagementService = memoryManagementService;
     }
