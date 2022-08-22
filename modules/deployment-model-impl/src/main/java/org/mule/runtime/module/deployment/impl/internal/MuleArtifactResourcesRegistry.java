@@ -215,6 +215,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                           new LazyValue<>(() -> "containerServerNotificationManager"));
     registerObject(SERVER_NOTIFICATION_MANAGER, serverNotificationManager);
 
+    // TODO: W-11631353: Refactor creation of memory management at container and artifact level
     if (memoryManagementService != null) {
       this.memoryManagementService = memoryManagementService;
     }
@@ -223,7 +224,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.memoryManagementService.setProfilingService(containerProfilingService);
 
-    MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(memoryManagementService);
+    MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(this.memoryManagementService);
 
     // Registers the memory management so that this can be injected.
     registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, artifactMemoryManagementService);
@@ -281,7 +282,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
                                              runtimeLockFactory,
-                                             memoryManagementService,
+                                             this.memoryManagementService,
                                              artifactConfigurationProcessor);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
@@ -297,7 +298,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        runtimeLockFactory,
-                                                       memoryManagementService,
+                                                       this.memoryManagementService,
                                                        artifactConfigurationProcessor);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
