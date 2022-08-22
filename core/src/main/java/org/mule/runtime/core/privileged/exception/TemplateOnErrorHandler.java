@@ -34,7 +34,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
@@ -357,12 +356,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     Location.Builder builder = Location.builder();
     builder = builder.globalName(builderFromStringRepresentation(location).build().getGlobalName());
     return builder.build();
-  }
-
-  // Todo: we are evaluating if this is needed. If no propagation of the ps is needed we can avoid this (and the overhead
-  // involved).
-  private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
-    return of(new OnRuntimeProcessingStrategy(locator));
   }
 
   @Override
