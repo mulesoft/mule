@@ -508,10 +508,10 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("Validates that ComponentParameterization API can describe a parameter whose type is a map wrapped in a TypedValue wrapped in a ParameterResolver.")
   public void mapInATypedValueInAParameterResolver() throws Exception {
-    ParameterResolver<TypedValue<List<Integer>>> stackedTypeParameter =
-        (ParameterResolver<TypedValue<List<Integer>>>) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
-                                                                                                     STACKED_MAP_PARAMETER_NAME,
-                                                                                                     STACKED_MAP_PARAMETER_VALUE_DECLARER);
+    ParameterResolver<TypedValue<Map<String, Integer>>> stackedTypeParameter =
+        (ParameterResolver<TypedValue<Map<String, Integer>>>) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+                                                                                                            STACKED_MAP_PARAMETER_NAME,
+                                                                                                            STACKED_MAP_PARAMETER_VALUE_DECLARER);
     assertThat(stackedTypeParameter.resolve().getValue(), is(STACKED_MAP_PARAMETER_VALUE));
   }
 
