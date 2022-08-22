@@ -297,7 +297,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        runtimeLockFactory,
-                                                       memoryManagementService,
+                                                       this.memoryManagementService,
                                                        artifactConfigurationProcessor);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
