@@ -167,7 +167,7 @@
         <muleHttpPolicyApiVersion>1.3.0-20220822</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.5.0-20220822</muleMavenClientApi>
         <muleMavenClientImpl>1.5.2-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.5.2-SNAPSHOT</muleMavenClientTest>
+        <muleMavenClientTest>1.5.0-20220822</muleMavenClientTest>
         <mulePolicyApiVersion>1.3.0-20220822</mulePolicyApiVersion>
         <muleApiVersion>1.3.0-20220822</muleApiVersion>
         <muleMetadataModelVersion>1.3.0-20220822</muleMetadataModelVersion>
