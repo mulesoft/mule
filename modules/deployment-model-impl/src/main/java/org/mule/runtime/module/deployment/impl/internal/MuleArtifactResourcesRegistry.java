@@ -281,7 +281,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
                                              runtimeLockFactory,
-                                             memoryManagementService,
+                                             this.memoryManagementService,
                                              artifactConfigurationProcessor);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
