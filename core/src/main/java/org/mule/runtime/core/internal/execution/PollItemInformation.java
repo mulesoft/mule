@@ -9,14 +9,14 @@ package org.mule.runtime.core.internal.execution;
 import java.io.Serializable;
 import java.util.Optional;
 
-public class ItemInformation {
+public class PollItemInformation {
 
   private final String pollId;
   private final String itemId;
   private final Optional<Serializable> watermark;
   private final String componentLocation;
 
-  public ItemInformation(String pollId, String itemId, Optional<Serializable> watermark, String componentLocation) {
+  public PollItemInformation(String pollId, String itemId, Optional<Serializable> watermark, String componentLocation) {
     this.pollId = pollId;
     this.itemId = itemId;
     this.watermark = watermark;

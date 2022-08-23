@@ -17,7 +17,6 @@ import static org.mule.runtime.api.notification.PollingSourceItemNotification.IT
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_WATERMARK;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_FAILURE;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_SUCCESS;
-import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
@@ -36,9 +35,10 @@ import org.mule.runtime.api.notification.PollingSourceNotificationListener;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +46,6 @@ import java.util.Map;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(SOURCES)
@@ -54,9 +53,7 @@ import org.junit.Test;
 public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
-
-  @Rule
-  public SystemProperty emitNotifications = new SystemProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS, "true");
+  private static final int TIMEOUT = 10000;
 
   @Override
   protected boolean mustRegenerateExtensionModels() {
@@ -111,7 +108,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
     try {
       startFlow("oneItemPoll");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.size(), is(2));
       assertThat(sourceNotifications.get(0).getActionName(), is("poll started"));
@@ -135,7 +132,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
     try {
       startFlow("pet-whale");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.size(), is(2));
       assertThat(sourceNotifications.get(0).getActionName(), is("poll started"));
@@ -163,7 +160,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
     try {
       startFlow("oneItemPoll");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.isEmpty(), is(false));
       assertThat(pipelineNotifications.isEmpty(), is(false));
@@ -190,7 +187,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
     try {
       startFlow("idempotent");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.get(0).getActionName(), is("item dispatched to flow"));
       assertThat(sourceNotifications.get(ALL_PETS.size() - 1).getActionName(), is("item dispatched to flow"));
@@ -215,7 +212,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
     try {
       startFlow("watermarkPoll");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.get(0).getActionName(), is("item dispatched to flow"));
       assertThat(sourceNotifications.get(1).getActionName(), is("item rejected due to watermark"));
@@ -238,7 +235,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
     try {
       startFlow("limitOne");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.get(0).getActionName(), is("item dispatched to flow"));
       assertThat(sourceNotifications.get(1).getActionName(), is("item rejected because it exceeded the item limit per poll"));
@@ -249,5 +246,15 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
 
   private void startFlow(String flowName) throws Exception {
     ((Startable) getFlowConstruct(flowName)).start();
+  }
+
+  private static void setFinalStatic(Field field, Object newValue) throws Exception {
+    field.setAccessible(true);
+
+    Field modifiersField = Field.class.getDeclaredField("modifiers");
+    modifiersField.setAccessible(true);
+    modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+    field.set(null, newValue);
   }
 }

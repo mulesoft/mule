@@ -32,7 +32,7 @@ public class SourceResultAdapter {
   private final MediaType mediaType;
   private final Optional<String> correlationId;
   private final PayloadMediaTypeResolver payloadMediaTypeResolver;
-  private final Optional<ItemInformation> itemInformation;
+  private final Optional<PollItemInformation> itemInformation;
   private final DistributedTraceContextGetter distributedTraceContextGetter;
 
   /**
@@ -62,16 +62,16 @@ public class SourceResultAdapter {
    * @param isCollection             whether the {@code result} represents a {@link List} of messages.
    * @param correlationId            the correlationId of the message to be set
    * @param payloadMediaTypeResolver resolver used in case result is a {@link List} of results.
-   * @param itemInformation          additional information about the poll that originated the message
+   * @param pollItemInformation      additional information about the poll that originated the message
    */
   public SourceResultAdapter(Result<?, ?> result,
                              CursorProviderFactory cursorProviderFactory,
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId,
-                             PayloadMediaTypeResolver payloadMediaTypeResolver, ItemInformation itemInformation) {
+                             PayloadMediaTypeResolver payloadMediaTypeResolver, PollItemInformation pollItemInformation) {
     this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
-         emptyTraceContextMapGetter(), itemInformation);
+         emptyTraceContextMapGetter(), pollItemInformation);
   }
 
   public SourceResultAdapter(Result<?, ?> result,
@@ -81,14 +81,14 @@ public class SourceResultAdapter {
                              Optional<String> correlationId,
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
                              DistributedTraceContextGetter distributedTraceContextGetter,
-                             ItemInformation itemInformation) {
+                             PollItemInformation pollItemInformation) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
     this.payloadMediaTypeResolver = payloadMediaTypeResolver;
-    this.itemInformation = ofNullable(itemInformation);
+    this.itemInformation = ofNullable(pollItemInformation);
     this.distributedTraceContextGetter = distributedTraceContextGetter;
   }
 
@@ -133,11 +133,11 @@ public class SourceResultAdapter {
   }
 
   /**
-   * @return information about the polled item that originated the message
+   * @return if the current message originated from a polling source, this will return information about it.
    *
    * @since 4.5.0
    */
-  public Optional<ItemInformation> getItemInformation() {
+  public Optional<PollItemInformation> getPollItemInformation() {
     return itemInformation;
   }
 
