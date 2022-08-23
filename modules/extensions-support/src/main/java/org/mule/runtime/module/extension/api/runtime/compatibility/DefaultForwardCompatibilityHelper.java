@@ -30,7 +30,8 @@ public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHe
       return argumentResolver.resolve(event);
     } else {
       return new DefaultDistributedSourceTraceContext();
-    }  }
+    }
+  }
 
   public DistributedTraceContextManager getDistributedTraceContextManager(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
     if (correlationInfo instanceof ImmutableCorrelationInfo) {
