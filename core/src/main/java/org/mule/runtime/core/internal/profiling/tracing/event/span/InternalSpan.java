@@ -37,9 +37,11 @@ public interface InternalSpan extends Span {
 
 
   /**
-   * Ends the span, previously recording the provided error.
+   * Adds to the Span the provided {@link InternalSpanError}.
+   * 
+   * @param error Error that will be added to the Span.
    */
-  void recordError(InternalSpanError error);
+  void addError(InternalSpanError error);
 
   /**
    * @return the attribute corresponding to the {@param key}
@@ -142,7 +144,7 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public void recordError(InternalSpanError error) {
+    public void addError(InternalSpanError error) {
       // Nothing to do.
     }
 

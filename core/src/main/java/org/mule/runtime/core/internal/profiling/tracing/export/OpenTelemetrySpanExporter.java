@@ -52,6 +52,10 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
   public static final OpenTelemetryParentSpanVisitor.OpenTelemetrySpanVisitor OPEN_TELEMETRY_SPAN_VISITOR =
       new OpenTelemetryParentSpanVisitor.OpenTelemetrySpanVisitor();
+
+
+  // TODO: W-11610439: Track if the semconv dependency (alpha) should be added.
+  public static final String EXCEPTION_EVENT_NAME = "exception";
   public static final AttributeKey<String> EXCEPTION_TYPE_KEY = stringKey("exception.type");
   public static final AttributeKey<String> EXCEPTION_MESSAGE_KEY = stringKey("exception.message");
   public static final AttributeKey<String> EXCEPTION_STACK_TRACE_KEY = stringKey("exception.stacktrace");
@@ -92,7 +96,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
                                                EXCEPTION_STACK_TRACE_KEY,
                                                InternalSpanError.getInternalSpanError(spanError).getErrorStacktrace().toString(),
                                                EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
-    openTelemetrySpan.addEvent("exception", errorAttributes);
+    openTelemetrySpan.addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
   }
 
   private Context resolveParentOpenTelemetrySpan(InternalSpan internalSpan) {
