@@ -63,8 +63,10 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       ComponentAst operationAst = componentAstWithHierarchy.getComponentAst();
       List<ComponentAst> hierarchy = componentAstWithHierarchy.getHierarchy();
       if (isRaiseError(operationAst)) {
+        // The raise error component indicates what error it raises
         handleRaiseError(operationAst, models, hierarchy);
       } else {
+        // The other operations indicate what errors may emit in the OperationModel
         handleOperationOtherThanRaiseError(operationAst, models, hierarchy);
       }
 
@@ -84,7 +86,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
         return;
       }
 
-      Optional<String> errorId = typeParameter.getValue().<String>getValue();
+      Optional<String> errorId = typeParameter.getValue().getValue();
       if (!errorId.isPresent()) {
         return;
       }
@@ -93,7 +95,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       addIfNotSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels, hierarchy);
     }
 
-    private boolean isRaiseError(ComponentAst operationAst) {
+    private static boolean isRaiseError(ComponentAst operationAst) {
       return operationAst.getIdentifier().equals(RAISE_ERROR_IDENTIFIER);
     }
 
@@ -105,25 +107,46 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       }
     }
 
+    /**
+     * Iterates the AST hierarchy starting from the component being handled until the operation:def body, by collecting the errors
+     * that would be caught by an on-error-continue if raised by that component. Those errors won't be raised by the operation
+     * being defined.
+     *
+     * @param hierarchy the list of {@link ComponentAst} in the hierarchy, since the operation:def to the component being handled.
+     * @return the errors that, if raised by the handled component, would be caught by an on-error-continue before reaching the
+     *         operation body.
+     */
     private List<ErrorModelParserMatcher> getSuppressedErrors(List<ComponentAst> hierarchy) {
       if (hierarchy.isEmpty()) {
         return emptyList();
       }
 
-      int containerIndex = hierarchy.size() - 1;
       List<ErrorModelParserMatcher> suppressedErrors = new ArrayList<>();
+
+      // Start by the direct parent, which is the last element in the hierarchy list, and iterate the hierarchy upwards
+      int containerIndex = hierarchy.size() - 1;
       while (containerIndex >= 0) {
         ComponentAst container = hierarchy.get(containerIndex);
         if (container.getIdentifier().equals(TRY_IDENTIFIER)) {
+          // If we find a try scope, then check what errors are caught by an associated on-error-continue
           addSuppressedErrors(container, suppressedErrors);
         } else if (container.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
+          // If we were within an error-handler, skip the parent try scope, since it's like throwing an exception in a
+          // catch clause: it shouldn't be caught by the same catch clause
           --containerIndex;
         }
+        // Move to immediate parent
         --containerIndex;
       }
       return suppressedErrors;
     }
 
+    /**
+     * Given a try scope AST, add all the errors that would be caught by its on-error-continue handlers.
+     *
+     * @param tryScopeAst      the try scope's {@link ComponentAst}
+     * @param suppressedErrors the list where the caught errors must be added
+     */
     private void addSuppressedErrors(ComponentAst tryScopeAst, List<ErrorModelParserMatcher> suppressedErrors) {
       Optional<ComponentAst> errorHandler = tryScopeAst.directChildrenStreamByIdentifier(CORE_PREFIX, ERROR_HANDLER).findFirst();
       if (!errorHandler.isPresent()) {
@@ -144,40 +167,40 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     private boolean isErrorSuppressed(ErrorModelParser errorModelParser, List<ErrorModelParserMatcher> suppressedErrors) {
       return suppressedErrors.stream().anyMatch(matcher -> matcher.matches(errorModelParser));
     }
-  }
 
-  private static ErrorModelParserMatcher createErrorModelParserMatcher(String typesAsString) {
-    if (typesAsString == null) {
-      return ErrorModelParserMatcher.ANY_ERROR_PARSER_MATCHER;
-    }
-    String[] errorTypeIdentifiers = typesAsString.split(",");
-    List<ErrorModelParserMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
-      String parsedIdentifier = identifier.trim();
-      final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
-
-      if (doesErrorTypeContainWildcards(errorTypeComponentIdentifier)) {
-        return new WildcardErrorModelParserMatcher(errorTypeComponentIdentifier);
-      } else {
-        return new SingleErrorModelParserMatcher(errorTypeComponentIdentifier);
+    private static ErrorModelParserMatcher createErrorModelParserMatcher(String typesAsString) {
+      if (typesAsString == null) {
+        return ErrorModelParserMatcher.ANY_ERROR_PARSER_MATCHER;
       }
-    }).collect(toList());
-    return new DisjunctiveErrorModelParserMatcher(matchers);
-  }
+      String[] errorTypeIdentifiers = typesAsString.split(",");
+      List<ErrorModelParserMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
+        String parsedIdentifier = identifier.trim();
+        final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
 
-  private static boolean doesErrorTypeContainWildcards(ComponentIdentifier errorTypeIdentifier) {
-    if (errorTypeIdentifier == null) {
+        if (doesErrorTypeContainWildcards(errorTypeComponentIdentifier)) {
+          return new WildcardErrorModelParserMatcher(errorTypeComponentIdentifier);
+        } else {
+          return new SingleErrorModelParserMatcher(errorTypeComponentIdentifier);
+        }
+      }).collect(toList());
+      return new DisjunctiveErrorModelParserMatcher(matchers);
+    }
+
+    private static boolean doesErrorTypeContainWildcards(ComponentIdentifier errorTypeIdentifier) {
+      if (errorTypeIdentifier == null) {
+        return false;
+      }
+
+      if (Objects.equals(WildcardErrorModelParserMatcher.WILDCARD_TOKEN, errorTypeIdentifier.getName())) {
+        return true;
+      }
+
+      if (Objects.equals(WildcardErrorModelParserMatcher.WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
+        return true;
+      }
+
       return false;
     }
-
-    if (Objects.equals(WildcardErrorModelParserMatcher.WILDCARD_TOKEN, errorTypeIdentifier.getName())) {
-      return true;
-    }
-
-    if (Objects.equals(WildcardErrorModelParserMatcher.WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
-      return true;
-    }
-
-    return false;
   }
 
   private interface ErrorModelParserMatcher {
@@ -185,7 +208,6 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     ErrorModelParserMatcher ANY_ERROR_PARSER_MATCHER = new AggregatedErrorsCharacteristic.AnyErrorModelParserMatcher();
 
     boolean matches(ErrorModelParser errorModelParser);
-
   }
 
   private static class AnyErrorModelParserMatcher implements ErrorModelParserMatcher {
@@ -196,7 +218,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     }
   }
 
-  private static class WildcardErrorModelParserMatcher implements ErrorModelParserMatcher {
+  private static final class WildcardErrorModelParserMatcher implements ErrorModelParserMatcher {
 
     public static final String WILDCARD_TOKEN = "*";
 
@@ -206,7 +228,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
 
     private final boolean namespaceIsWildcard;
 
-    public WildcardErrorModelParserMatcher(ComponentIdentifier errorIdentifier) {
+    private WildcardErrorModelParserMatcher(ComponentIdentifier errorIdentifier) {
       this.errorIdentifier = errorIdentifier;
       this.nameIsWildcard = WILDCARD_TOKEN.equals(errorIdentifier.getName());
       this.namespaceIsWildcard = WILDCARD_TOKEN.equals(errorIdentifier.getNamespace());
@@ -249,11 +271,11 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     }
   }
 
-  private static class SingleErrorModelParserMatcher implements ErrorModelParserMatcher {
+  private static final class SingleErrorModelParserMatcher implements ErrorModelParserMatcher {
 
     private final ComponentIdentifier errorIdentifier;
 
-    public SingleErrorModelParserMatcher(ComponentIdentifier errorIdentifier) {
+    private SingleErrorModelParserMatcher(ComponentIdentifier errorIdentifier) {
       this.errorIdentifier = errorIdentifier;
     }
 
@@ -276,11 +298,11 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     }
   }
 
-  private static class DisjunctiveErrorModelParserMatcher implements ErrorModelParserMatcher {
+  private static final class DisjunctiveErrorModelParserMatcher implements ErrorModelParserMatcher {
 
     private final List<ErrorModelParserMatcher> matchers;
 
-    public DisjunctiveErrorModelParserMatcher(List<ErrorModelParserMatcher> matchers) {
+    private DisjunctiveErrorModelParserMatcher(List<ErrorModelParserMatcher> matchers) {
       this.matchers = new CopyOnWriteArrayList<>(matchers);
     }
 
