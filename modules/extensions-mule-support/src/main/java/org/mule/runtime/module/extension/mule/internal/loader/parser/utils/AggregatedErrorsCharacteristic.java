@@ -39,6 +39,7 @@ import java.util.function.BiFunction;
 /**
  * {@link Characteristic} that retrieves all the {@link ErrorModelParser} emitted by the inner components of this Model
  */
+// TODO: Contemplate the cases identified in W-11640594
 public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorModelParser>> {
 
   private static final String ERROR_TYPE_PARAM = "type";
