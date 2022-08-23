@@ -171,7 +171,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
         }
 
         @Override
-        public void recordError(InternalSpanError error) {
+        public void addError(InternalSpanError error) {
           // Nothing to do.
         }
 

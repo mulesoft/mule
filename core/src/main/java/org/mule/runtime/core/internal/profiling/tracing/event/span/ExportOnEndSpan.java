@@ -80,8 +80,8 @@ public class ExportOnEndSpan implements InternalSpan {
   }
 
   @Override
-  public void recordError(InternalSpanError error) {
-    runtimeInternalSpan.recordError(error);
+  public void addError(InternalSpanError error) {
+    runtimeInternalSpan.addError(error);
   }
 
   @Override

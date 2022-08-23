@@ -82,7 +82,7 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void recordError(InternalSpanError error) {
+  public void addError(InternalSpanError error) {
     this.errors.add(error);
   }
 

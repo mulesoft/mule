@@ -97,7 +97,7 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   @Override
   public void recordErrorAtCurrentSpan(InternalSpanError error) {
     if (currentSpan != null) {
-      currentSpan.recordError(error);
+      currentSpan.addError(error);
     }
   }
 
