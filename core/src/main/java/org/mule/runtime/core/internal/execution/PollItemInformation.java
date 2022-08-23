@@ -9,6 +9,13 @@ package org.mule.runtime.core.internal.execution;
 import java.io.Serializable;
 import java.util.Optional;
 
+/**
+ * Groups information about an item picked by a polling source and dispatched to the runtime for processing. It's main purpose is
+ * to propagate the information until the {@link org.mule.runtime.core.api.event.CoreEvent} is created, so that a
+ * {@link org.mule.runtime.api.notification.PollingSourceItemNotification} can be fired linking the item to the event.
+ *
+ * @since 4.5.0
+ */
 public class PollItemInformation {
 
   private final String pollId;

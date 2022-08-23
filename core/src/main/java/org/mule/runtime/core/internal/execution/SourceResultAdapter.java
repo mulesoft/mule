@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter.emptyTraceContextMapGetter;
 
@@ -50,7 +51,7 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId) {
-    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null, null);
+    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null, empty());
   }
 
   /**
@@ -69,7 +70,8 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId,
-                             PayloadMediaTypeResolver payloadMediaTypeResolver, PollItemInformation pollItemInformation) {
+                             PayloadMediaTypeResolver payloadMediaTypeResolver,
+                             Optional<PollItemInformation> pollItemInformation) {
     this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
          emptyTraceContextMapGetter(), pollItemInformation);
   }
@@ -81,14 +83,14 @@ public class SourceResultAdapter {
                              Optional<String> correlationId,
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
                              DistributedTraceContextGetter distributedTraceContextGetter,
-                             PollItemInformation pollItemInformation) {
+                             Optional<PollItemInformation> pollItemInformation) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
     this.payloadMediaTypeResolver = payloadMediaTypeResolver;
-    this.itemInformation = ofNullable(pollItemInformation);
+    this.itemInformation = pollItemInformation;
     this.distributedTraceContextGetter = distributedTraceContextGetter;
   }
 

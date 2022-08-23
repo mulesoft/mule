@@ -257,7 +257,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context),
-                                (PollItemInformation) context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).orElse(null));
+                                context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(info -> (PollItemInformation) info));
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();

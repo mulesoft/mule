@@ -58,7 +58,7 @@ public abstract class FlowProcessingTemplate implements FlowProcessTemplate {
     // needed either since no value is being communicated to the ResultAdapter. This implies that no content is needed to be
     // streamed.
     return new SourceResultAdapter(Result.builder().build(), null, ANY, false,
-                                   empty(), null, null);
+                                   empty(), null, empty());
   }
 
   @Override
