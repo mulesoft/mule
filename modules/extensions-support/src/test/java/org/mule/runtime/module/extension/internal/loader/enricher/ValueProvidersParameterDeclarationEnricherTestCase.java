@@ -227,6 +227,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter.getExtractionExpression(), is("xmlBody.nested.someTag"));
   }
 
+  @Test
   public void verifySinceMuleVersionModelPropertyAdded() {
     ParameterDeclaration parameterDeclaration =
         getParameterByOperationAndName("withBoundActingParameterField", "parameterWithValues");
