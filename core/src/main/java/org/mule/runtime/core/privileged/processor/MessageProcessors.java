@@ -108,9 +108,17 @@ public class MessageProcessors {
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler) {
+    return buildNewChainWithListOfProcessors(processingStrategy, processors, messagingExceptionHandler, (String) null);
+  }
+
+  public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
+                                                                        List<Processor> processors,
+                                                                        FlowExceptionHandler messagingExceptionHandler,
+                                                                        String name) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
+    defaultMessageProcessorChainBuilder.setName(name);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
