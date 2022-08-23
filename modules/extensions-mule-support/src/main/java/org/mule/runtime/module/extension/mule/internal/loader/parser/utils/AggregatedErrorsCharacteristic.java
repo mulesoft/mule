@@ -15,6 +15,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import static java.util.Arrays.stream;
@@ -124,13 +125,13 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     }
 
     private void addSuppressedErrors(ComponentAst tryScopeAst, List<ErrorModelParserMatcher> suppressedErrors) {
-      Optional<ComponentAst> errorHandler = tryScopeAst.directChildrenStreamByIdentifier(null, ERROR_HANDLER).findFirst();
+      Optional<ComponentAst> errorHandler = tryScopeAst.directChildrenStreamByIdentifier(CORE_PREFIX, ERROR_HANDLER).findFirst();
       if (!errorHandler.isPresent()) {
         return;
       }
 
       Optional<ComponentAst> onErrorContinue =
-          errorHandler.get().directChildrenStreamByIdentifier(null, ON_ERROR_CONTINUE).findFirst();
+          errorHandler.get().directChildrenStreamByIdentifier(CORE_PREFIX, ON_ERROR_CONTINUE).findFirst();
       if (!onErrorContinue.isPresent()) {
         return;
       }
