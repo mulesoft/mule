@@ -7,13 +7,18 @@
 package org.mule.runtime.core.api.exception;
 
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
+
+import static java.util.Collections.emptyMap;
+
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -76,6 +81,15 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
                                      Consumer<CoreEvent> continueCallback,
                                      Consumer<Throwable> propagateCallback) {
     return error -> propagateCallback.accept(error);
+  }
+
+  /**
+   * Get the mapping for the routers associated with the chains for each flow in the global error handler.
+   *
+   * @return the mapping from chains to routers.
+   */
+  default Map<Component, Consumer<Exception>> getRouters() {
+    return emptyMap();
   }
 }
 

@@ -3,6 +3,24 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.util.Map<org.mule.runtime.api.component.Component, java.util.function.Consumer<java.lang.Exception>> org.mule.runtime.core.api.exception.FlowExceptionHandler::getRouters()",
+          "package": "org.mule.runtime.core.api.exception",
+          "classSimpleName": "FlowExceptionHandler",
+          "methodName": "getRouters",
+          "elementKind": "method",
+          "justification": "W-11503016: Reuse reactor chains for global error handlers to use the default processing strategy"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, java.lang.String)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "elementKind": "method",
+          "justification": "W-11503016: Reuse reactor chains for global error handlers to use the default processing strategy"
+        },
+        {
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.context.notification.FlowStackElement::<init>(java.lang.String, org.mule.runtime.api.component.ComponentIdentifier, java.lang.String)",
           "package": "org.mule.runtime.core.api.context.notification",
