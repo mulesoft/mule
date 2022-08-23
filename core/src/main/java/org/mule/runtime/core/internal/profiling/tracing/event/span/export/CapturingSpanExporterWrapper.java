@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.SERVICE_NAME_KEY;
 import static java.lang.String.valueOf;
 
+import org.mule.runtime.core.privileged.profiling.CapturedEventData;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
@@ -20,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
+import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 
@@ -97,6 +100,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
     private static final class SpanDataWrapper implements CapturedExportedSpan {
 
+      public static final String EXCEPTION_EVENT_NAME = "exception";
       private final SpanData spanData;
 
       public SpanDataWrapper(SpanData spanData) {
@@ -125,6 +129,12 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
         return attributes;
       }
 
+      public List<CapturedEventData> getEvents() {
+        return spanData.getEvents().stream().map(
+                                                 EventDataWrapper::new)
+            .collect(Collectors.toList());
+      }
+
       @Override
       public String getServiceName() {
         return spanData.getResource().getAttribute(SERVICE_NAME_KEY);
@@ -134,6 +144,28 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       public String toString() {
         return String.format("a span with name: [%s], ID: [%s] and parent Span ID: [%s]", getName(), getSpanId(),
                              getParentSpanId());
+      }
+    }
+
+    private static final class EventDataWrapper implements CapturedEventData {
+
+      private final EventData eventData;
+
+      public EventDataWrapper(EventData eventData) {
+        this.eventData = eventData;
+      }
+
+      @Override
+      public String getName() {
+        return eventData.getName();
+      }
+
+      @Override
+      public Map<String, Object> getAttributes() {
+        Map<String, Object> events = new HashMap<>();
+        eventData.getAttributes().asMap()
+            .forEach((attributeKey, attributeValue) -> events.put(attributeKey.getKey(), valueOf(attributeValue)));
+        return events;
       }
     }
   }

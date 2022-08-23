@@ -10,16 +10,18 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
+import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
-import org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter;
+import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpanExporter;
 import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A wrapper for a span that exports spans on end.
@@ -30,7 +32,7 @@ public class ExportOnEndSpan implements InternalSpan {
 
   private final InternalSpan runtimeInternalSpan;
   private final InternalSpanExporter spanExporter;
-  private ChildSpanCustomizationInfo childSpanCustomizationInfo;
+  private final ChildSpanCustomizationInfo childSpanCustomizationInfo;
 
   public ExportOnEndSpan(InternalSpan runtimeInternalSpan, EventContext eventContext,
                          InternalSpanExportManager<EventContext> internalSpanExportManager,
@@ -62,9 +64,24 @@ public class ExportOnEndSpan implements InternalSpan {
   }
 
   @Override
+  public Set<SpanError> getErrors() {
+    return runtimeInternalSpan.getErrors();
+  }
+
+  @Override
+  public boolean hasErrors() {
+    return runtimeInternalSpan.hasErrors();
+  }
+
+  @Override
   public void end() {
     runtimeInternalSpan.end();
     spanExporter.export(this);
+  }
+
+  @Override
+  public void recordError(InternalSpanError error) {
+    runtimeInternalSpan.recordError(error);
   }
 
   @Override
@@ -111,8 +128,8 @@ public class ExportOnEndSpan implements InternalSpan {
     }
 
     @Override
-    public InternalSpanExporter accept(OpentelemetrySpanExporter opentelemetrySpanExporter) {
-      opentelemetrySpanExporter.getOpentelemetrySpan().setAttribute(key, value);
+    public InternalSpanExporter accept(OpenTelemetrySpanExporter opentelemetrySpanExporter) {
+      opentelemetrySpanExporter.getOpenTelemetrySpan().setAttribute(key, value);
       return opentelemetrySpanExporter;
     }
   }

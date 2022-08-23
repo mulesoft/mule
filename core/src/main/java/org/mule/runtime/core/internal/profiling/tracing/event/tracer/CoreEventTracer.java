@@ -54,6 +54,8 @@ public interface CoreEventTracer {
    */
   void endCurrentSpan(CoreEvent coreEvent);
 
+  void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan);
+
   /**
    * @param event the event to retrieve the distributed trace context map from
    * @return a map containing the span context to propagate.

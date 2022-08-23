@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.privileged.profiling;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,4 +44,6 @@ public interface CapturedExportedSpan {
    * @return the service name
    */
   String getServiceName();
+
+  List<CapturedEventData> getEvents();
 }

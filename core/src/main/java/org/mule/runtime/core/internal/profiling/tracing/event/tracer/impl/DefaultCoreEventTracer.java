@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecuteWithDefaultOnThrowable;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecute;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError.getInternalSpanError;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -18,13 +20,13 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
@@ -90,6 +92,16 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                 logger);
   }
 
+  @Override
+  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+    EventContext eventContext = coreEvent.getContext();
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext)
+          .getDistributedTraceContext()
+          .recordErrorAtCurrentSpan(getInternalSpanError(coreEvent, isErrorEscapingCurrentSpan));
+    }
+  }
+
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
     EventContext eventContext = coreEvent.getContext();
 
@@ -133,6 +145,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
   }
 
+  private ExportOnEndSpan getInternalSpanOpenTelemetryExecutionSpanFunction(InternalSpan internalSpan) {
   private void endCurrentSpanIfPossible(CoreEvent coreEvent) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
@@ -160,8 +173,6 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     private MuleConfiguration muleConfiguration;
     private InternalSpanExportManager<EventContext> spanExportManager;
     private ArtifactType artifactType;
-    private boolean propagateExceptionsInTracing;
-    private Logger logger;
 
     public DefaultEventTracerBuilder withMuleConfiguration(MuleConfiguration muleConfiguration) {
       this.muleConfiguration = muleConfiguration;

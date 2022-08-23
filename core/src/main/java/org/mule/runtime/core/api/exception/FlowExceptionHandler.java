@@ -71,8 +71,9 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * or success.
    *
    * @param publisherPostProcessor allows to modify the publisher that will handle the error.
-   * @param continueCallback       the callback called in case the error is successfully handled
-   * @param propagateCallback      the callback is called in case the error-handling fails
+   * @param continueCallback       the callback called in case the error is successfully handled (handling logic executed without
+   *                               errors).
+   * @param propagateCallback      the callback is called in case the error-handling fails (handling logic threw an error)
    * @return the router for an error.
    *
    * @since 4.3

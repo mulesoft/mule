@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -76,6 +77,11 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
 
       @Override
       public void endCurrentContextSpan() {
+        // Nothing to do.
+      }
+
+      @Override
+      public void recordErrorAtCurrentSpan(InternalSpanError error) {
         // Nothing to do.
       }
 

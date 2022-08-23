@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel;
 
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter.OPENTELEMETRY_SPAN_VISITOR;
+import static org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpanExporter.OPEN_TELEMETRY_SPAN_VISITOR;
 
 import static java.lang.Boolean.parseBoolean;
 
@@ -168,7 +168,7 @@ public class OpenTelemetryResourcesProvider {
 
     @Override
     public Optional<Context> accept(ExportOnEndSpan exportOnEndSpan) {
-      return Optional.of(Context.current().with(exportOnEndSpan.getSpanExporter().visit(OPENTELEMETRY_SPAN_VISITOR)));
+      return Optional.of(Context.current().with(exportOnEndSpan.getSpanExporter().visit(OPEN_TELEMETRY_SPAN_VISITOR)));
     }
 
     @Override

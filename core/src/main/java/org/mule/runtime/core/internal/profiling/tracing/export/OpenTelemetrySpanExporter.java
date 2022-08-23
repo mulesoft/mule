@@ -13,51 +13,66 @@ import static org.mule.runtime.core.internal.trace.DistributedTraceContext.empty
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
+import static io.opentelemetry.api.common.AttributeKey.booleanKey;
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanVisitor;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapGetter;
 
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 /**
- * A {@link InternalSpanExporter} that exports the {@link InternalSpan}'s as open telemetry spans.
+ * A {@link InternalSpanExporter} that exports the {@link InternalSpan}'s as Open Telemetry spans.
  *
  * @since 4.5.0
  */
-public class OpentelemetrySpanExporter implements InternalSpanExporter {
+public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
-  private static final TextMapGetter<Map<String, String>> OPENTELEMETRY_SPAN_GETTER = new MuleOpenTelemetryRemoteContextGetter();
+  private static final TextMapGetter<Map<String, String>> OPEN_TELEMETRY_SPAN_GETTER = new MuleOpenTelemetryRemoteContextGetter();
 
-  private static final OpentelemetryParentSpanVisitor OPENTELEMETRY_PARENT_SPAN_VISITOR = new OpentelemetryParentSpanVisitor();
+  private static final OpenTelemetryParentSpanVisitor OPEN_TELEMETRY_PARENT_SPAN_VISITOR = new OpenTelemetryParentSpanVisitor();
 
-  public static final OpentelemetryParentSpanVisitor.OpentelemetrySpanVisitor OPENTELEMETRY_SPAN_VISITOR =
-      new OpentelemetryParentSpanVisitor.OpentelemetrySpanVisitor();
+  public static final OpenTelemetryParentSpanVisitor.OpenTelemetrySpanVisitor OPEN_TELEMETRY_SPAN_VISITOR =
+      new OpenTelemetryParentSpanVisitor.OpenTelemetrySpanVisitor();
+  public static final AttributeKey<String> EXCEPTION_TYPE_KEY = stringKey("exception.type");
+  public static final AttributeKey<String> EXCEPTION_MESSAGE_KEY = stringKey("exception.message");
+  public static final AttributeKey<String> EXCEPTION_STACK_TRACE_KEY = stringKey("exception.stacktrace");
+  public static final AttributeKey<Boolean> EXCEPTION_ESCAPED_KEY = booleanKey("exception.escaped");
 
   private final Tracer tracer;
   private final Context remoteContext;
   private final io.opentelemetry.api.trace.Span openTelemetrySpan;
 
-  public OpentelemetrySpanExporter(Tracer tracer, EventContext eventContext,
+  public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
                                    InternalSpan internalSpan) {
     this.tracer = tracer;
     remoteContext = resolveRemoteContext(eventContext);
-    openTelemetrySpan = resolveOpentelemetrySpan(internalSpan);
+    openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan);
   }
 
   @Override
   public void export(InternalSpan internalSpan) {
+    if (internalSpan.hasErrors()) {
+      recordSpanExceptions(internalSpan);
+    }
     openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
@@ -66,17 +81,31 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
     return internalSpanExporterVisitor.accept(this);
   }
 
-  private Context resolveParentOpentelemetrySpan(InternalSpan internalSpan) {
+  private void recordSpanExceptions(InternalSpan internalSpan) {
+    internalSpan.getErrors().forEach(this::recordSpanException);
+  }
+
+  private void recordSpanException(SpanError spanError) {
+    Attributes errorAttributes = Attributes.of(
+                                               EXCEPTION_TYPE_KEY, spanError.getError().getErrorType().toString(),
+                                               EXCEPTION_MESSAGE_KEY, spanError.getError().getDescription(),
+                                               EXCEPTION_STACK_TRACE_KEY,
+                                               InternalSpanError.getInternalSpanError(spanError).getErrorStacktrace().toString(),
+                                               EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
+    openTelemetrySpan.addEvent("exception", errorAttributes);
+  }
+
+  private Context resolveParentOpenTelemetrySpan(InternalSpan internalSpan) {
     InternalSpan parentSpan = getAsInternalSpan(internalSpan.getParent());
 
     if (parentSpan == null) {
       return remoteContext;
     }
 
-    io.opentelemetry.api.trace.Span parentOpentelemetrySpan = parentSpan.visit(OPENTELEMETRY_PARENT_SPAN_VISITOR);
+    io.opentelemetry.api.trace.Span parentOpenTelemetrySpan = parentSpan.visit(OPEN_TELEMETRY_PARENT_SPAN_VISITOR);
 
-    if (parentOpentelemetrySpan != null) {
-      return Context.current().with(parentOpentelemetrySpan);
+    if (parentOpenTelemetrySpan != null) {
+      return Context.current().with(parentOpenTelemetrySpan);
     }
 
     return remoteContext;
@@ -97,11 +126,10 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
     return emptyDistributedEventContext();
   }
 
-
-  private io.opentelemetry.api.trace.Span resolveOpentelemetrySpan(InternalSpan internalSpan) {
+  private io.opentelemetry.api.trace.Span resolveOpenTelemetrySpan(InternalSpan internalSpan) {
     SpanBuilder spanBuilder = tracer.spanBuilder(internalSpan.getName());
 
-    Context parentSpanContext = resolveParentOpentelemetrySpan(internalSpan);
+    Context parentSpanContext = resolveParentOpenTelemetrySpan(internalSpan);
 
     if (parentSpanContext != null) {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
@@ -111,7 +139,7 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
         .startSpan();
   }
 
-  public io.opentelemetry.api.trace.Span getOpentelemetrySpan() {
+  public io.opentelemetry.api.trace.Span getOpenTelemetrySpan() {
     return openTelemetrySpan;
   }
 
@@ -129,23 +157,23 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
 
     @Nullable
     @Override
-    public String get(@Nullable Map<String, String> stringStringMap, String s) {
+    public String get(@Nullable Map<String, String> stringStringMap, @Nullable String key) {
       if (stringStringMap == null) {
         return null;
       }
 
-      return stringStringMap.get(s);
+      return stringStringMap.get(key);
     }
   }
 
   /**
    * A visitor to get the open telemetry span.
    */
-  private static class OpentelemetryParentSpanVisitor implements InternalSpanVisitor<io.opentelemetry.api.trace.Span> {
+  private static class OpenTelemetryParentSpanVisitor implements InternalSpanVisitor<io.opentelemetry.api.trace.Span> {
 
     @Override
     public io.opentelemetry.api.trace.Span accept(ExportOnEndSpan exportOnEndSpan) {
-      return exportOnEndSpan.getSpanExporter().visit(OPENTELEMETRY_SPAN_VISITOR);
+      return exportOnEndSpan.getSpanExporter().visit(OPEN_TELEMETRY_SPAN_VISITOR);
     }
 
     @Override
@@ -158,11 +186,11 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
       return null;
     }
 
-    private static class OpentelemetrySpanVisitor implements InternalSpanExporterVisitor<io.opentelemetry.api.trace.Span> {
+    private static class OpenTelemetrySpanVisitor implements InternalSpanExporterVisitor<io.opentelemetry.api.trace.Span> {
 
       @Override
-      public io.opentelemetry.api.trace.Span accept(OpentelemetrySpanExporter opentelemetrySpanExporter) {
-        return opentelemetrySpanExporter.getOpentelemetrySpan();
+      public io.opentelemetry.api.trace.Span accept(OpenTelemetrySpanExporter opentelemetrySpanExporter) {
+        return opentelemetrySpanExporter.getOpenTelemetrySpan();
       }
     }
   }
