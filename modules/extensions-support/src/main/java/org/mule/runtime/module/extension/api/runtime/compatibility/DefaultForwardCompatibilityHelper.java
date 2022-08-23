@@ -23,8 +23,14 @@ public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHe
   private InternalProfilingService profilingService;
 
   public DistributedTraceContextManager getDistributedTraceContextManager(CorrelationInfo correlationInfo) {
-    return getDistributedTraceContextManager(correlationInfo);
-  }
+    if (correlationInfo instanceof ImmutableCorrelationInfo) {
+      CoreEvent event = ((ImmutableCorrelationInfo) correlationInfo).getEvent();
+      DistributedTraceContextManagerResolver argumentResolver =
+              new DistributedTraceContextManagerResolver(profilingService.getCoreEventTracer());
+      return argumentResolver.resolve(event);
+    } else {
+      return new DefaultDistributedSourceTraceContext();
+    }  }
 
   public DistributedTraceContextManager getDistributedTraceContextManager(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
     if (correlationInfo instanceof ImmutableCorrelationInfo) {
