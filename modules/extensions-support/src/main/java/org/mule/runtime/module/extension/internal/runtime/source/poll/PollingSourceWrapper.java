@@ -796,9 +796,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   }
 
   private int statusToNotificationType(PollContext.PollItemStatus status, boolean currentPollItemLimitApplied) {
-    if (currentPollItemLimitApplied) {
-      return ITEM_REJECTED_LIMIT;
-    }
     switch (status) {
       case ACCEPTED:
         return ITEM_DISPATCHED;
