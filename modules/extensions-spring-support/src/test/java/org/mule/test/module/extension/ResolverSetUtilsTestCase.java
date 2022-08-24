@@ -177,8 +177,8 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private static final String MAP_FIRST_KEY = "first";
   private static final String MAP_SECOND_KEY = "second";
   private static final Consumer<ValueDeclarer> CONNECTION_PROPERTIES_MAP_PARAMETER_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.asMapValue().withEntry(MAP_FIRST_KEY, POJO_VALUE_DECLARER).withEntry(MAP_SECOND_KEY,
-                                                                                                          POJO_VALUE_DECLARER);
+      valueDeclarer -> valueDeclarer.asObjectValue().withField(MAP_FIRST_KEY, POJO_VALUE_DECLARER).withField(MAP_SECOND_KEY,
+                                                                                                             POJO_VALUE_DECLARER);
   private static final Map<String, ConnectionProperties> CONNECTION_PROPERTIES_MAP_PARAMETER_VALUE =
       new HashMap<String, ConnectionProperties>() {
 
@@ -228,8 +228,8 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private static final String STACKED_MAP_PARAMETER_NAME = "stackedTypeMapParameter";
 
   private static final Consumer<ValueDeclarer> STACKED_MAP_PARAMETER_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.asMapValue().withEntry(MAP_FIRST_KEY, FIRST_SOME_NUMBER).withEntry(MAP_SECOND_KEY,
-                                                                                                        SECOND_SOME_NUMBER);
+      valueDeclarer -> valueDeclarer.asObjectValue().withField(MAP_FIRST_KEY, FIRST_SOME_NUMBER).withField(MAP_SECOND_KEY,
+                                                                                                           SECOND_SOME_NUMBER);
   private static final Map<String, Integer> STACKED_MAP_PARAMETER_VALUE =
       new HashMap<String, Integer>() {
 
