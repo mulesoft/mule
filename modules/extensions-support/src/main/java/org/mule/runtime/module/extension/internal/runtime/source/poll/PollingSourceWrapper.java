@@ -120,7 +120,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private final SchedulingStrategy scheduler;
   private final int maxItemsPerPoll;
   private final SystemExceptionHandler systemExceptionHandler;
-  private final boolean EMIT_NOTIFICATIONS = parseBoolean(getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
+  private final boolean emitNotifications = parseBoolean(getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
 
   @Inject
   private LockFactory lockFactory;
@@ -335,7 +335,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           status = FILTERED_BY_WATERMARK;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
-          if (EMIT_NOTIFICATIONS) {
+          if (emitNotifications) {
             callbackContext
                 .addVariable(ACCEPTED_POLL_ITEM_INFORMATION,
                              new PollItemInformation(getPollId(), itemId, pollItem.getWatermark(),
@@ -351,7 +351,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       if (status != ACCEPTED || currentPollItemLimitApplied) {
         LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);
-        if (EMIT_NOTIFICATIONS && !currentPollItemLimitApplied) {
+        if (emitNotifications && !currentPollItemLimitApplied) {
           notificationDispatcher.dispatch(new PollingSourceItemNotification(statusToNotificationType(status,
                                                                                                      currentPollItemLimitApplied),
                                                                             getPollId(), itemId,
@@ -810,7 +810,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   }
 
   private void dispatchPollingSourceNotification(int action, String componentLocation, String pollId) {
-    if (EMIT_NOTIFICATIONS) {
+    if (emitNotifications) {
       notificationDispatcher.dispatch(new PollingSourceNotification(action, componentLocation, pollId));
     }
   }
