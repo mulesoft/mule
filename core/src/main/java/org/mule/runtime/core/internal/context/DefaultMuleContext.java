@@ -53,10 +53,12 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -143,10 +145,13 @@ import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -914,7 +919,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       if (!reuseGlobalErrorHandler()) {
         if (rootContainerName.isPresent()) {
           defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-              .createLocalErrorHandler(fromSingleComponent(rootContainerName.get()));
+              .createLocalErrorHandler(getDefaultComponentLocation(rootContainerName.get()));
         } else {
           try {
             defaultErrorHandler =
@@ -935,6 +940,15 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       ((ErrorHandler) defaultErrorHandler).setRootContainerName(rootContainerName.get());
     }
     return defaultErrorHandler;
+  }
+
+  private DefaultComponentLocation getDefaultComponentLocation(String name) {
+    DefaultLocationPart part = new DefaultLocationPart(name,
+                                                       empty(),
+                                                       empty(),
+                                                       OptionalInt.empty(),
+                                                       OptionalInt.empty());
+    return new DefaultComponentLocation(of(name), singletonList(part));
   }
 
   @Override
