@@ -353,7 +353,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       if (status != ACCEPTED || currentPollItemLimitApplied) {
         LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);
-        if (EMIT_NOTIFICATIONS) {
+        if (EMIT_NOTIFICATIONS && !currentPollItemLimitApplied) {
           notificationDispatcher.dispatch(new PollingSourceItemNotification(statusToNotificationType(status,
                                                                                                      currentPollItemLimitApplied),
                                                                             getPollId(), itemId,
