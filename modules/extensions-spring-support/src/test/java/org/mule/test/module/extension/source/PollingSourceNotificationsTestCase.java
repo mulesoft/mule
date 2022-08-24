@@ -7,18 +7,15 @@
 package org.mule.test.module.extension.source;
 
 import static java.lang.String.valueOf;
-import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_IDEMPOTENCY;
-import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_LIMIT;
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_WATERMARK;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_FAILURE;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_SUCCESS;
 import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
@@ -42,7 +39,6 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
