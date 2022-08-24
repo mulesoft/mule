@@ -40,6 +40,10 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.api.notification.PollingSourceItemNotification;
+import org.mule.runtime.api.notification.PollingSourceItemNotificationListener;
+import org.mule.runtime.api.notification.PollingSourceNotification;
+import org.mule.runtime.api.notification.PollingSourceNotificationListener;
 import org.mule.runtime.api.notification.RoutingNotification;
 import org.mule.runtime.api.notification.RoutingNotificationListener;
 import org.mule.runtime.api.notification.SecurityNotification;
@@ -326,6 +330,8 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(FlowConstructNotificationListener.class, FlowConstructNotification.class);
     manager.addInterfaceToType(ExtensionNotificationListener.class, ExtensionNotification.class);
     manager.addInterfaceToType(ProfilingNotificationListener.class, ProfilingNotification.class);
+    manager.addInterfaceToType(PollingSourceNotificationListener.class, PollingSourceNotification.class);
+    manager.addInterfaceToType(PollingSourceItemNotificationListener.class, PollingSourceItemNotification.class);
     return manager;
   }
 

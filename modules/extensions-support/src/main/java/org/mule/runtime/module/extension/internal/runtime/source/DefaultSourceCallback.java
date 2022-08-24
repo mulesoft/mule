@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.ACCEPTED_POLL_ITEM_INFORMATION;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.execution.PollItemInformation;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
@@ -254,7 +256,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
-                                context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context));
+                                context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context),
+                                context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(info -> (PollItemInformation) info));
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();

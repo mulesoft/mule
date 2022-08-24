@@ -16,6 +16,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_DISPATCHED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
@@ -53,6 +54,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.PollingSourceItemNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.CorrelationIdGenerator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -214,6 +216,12 @@ public class FlowProcessMediator implements Initialisable {
       final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
 
+      template.getSourceMessage().getPollItemInformation().ifPresent(info -> {
+        notificationManager
+            .fireNotification(new PollingSourceItemNotification(ITEM_DISPATCHED, info.getPollId(), info.getItemId(),
+                                                                info.getWatermark().orElse(null),
+                                                                event.getContext().getId(), info.getComponentLocation()));
+      });
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
 

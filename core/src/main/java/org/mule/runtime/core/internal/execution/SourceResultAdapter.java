@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter.emptyTraceContextMapGetter;
 
 import org.mule.runtime.api.metadata.MediaType;
@@ -31,6 +33,7 @@ public class SourceResultAdapter {
   private final MediaType mediaType;
   private final Optional<String> correlationId;
   private final PayloadMediaTypeResolver payloadMediaTypeResolver;
+  private final Optional<PollItemInformation> itemInformation;
   private final DistributedTraceContextGetter distributedTraceContextGetter;
 
   /**
@@ -48,7 +51,7 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId) {
-    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null);
+    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null, empty());
   }
 
   /**
@@ -60,15 +63,17 @@ public class SourceResultAdapter {
    * @param isCollection             whether the {@code result} represents a {@link List} of messages.
    * @param correlationId            the correlationId of the message to be set
    * @param payloadMediaTypeResolver resolver used in case result is a {@link List} of results.
+   * @param pollItemInformation      additional information about the poll that originated the message
    */
   public SourceResultAdapter(Result<?, ?> result,
                              CursorProviderFactory cursorProviderFactory,
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId,
-                             PayloadMediaTypeResolver payloadMediaTypeResolver) {
+                             PayloadMediaTypeResolver payloadMediaTypeResolver,
+                             Optional<PollItemInformation> pollItemInformation) {
     this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
-         emptyTraceContextMapGetter());
+         emptyTraceContextMapGetter(), pollItemInformation);
   }
 
   public SourceResultAdapter(Result<?, ?> result,
@@ -77,13 +82,15 @@ public class SourceResultAdapter {
                              boolean isCollection,
                              Optional<String> correlationId,
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
-                             DistributedTraceContextGetter distributedTraceContextGetter) {
+                             DistributedTraceContextGetter distributedTraceContextGetter,
+                             Optional<PollItemInformation> pollItemInformation) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
     this.payloadMediaTypeResolver = payloadMediaTypeResolver;
+    this.itemInformation = pollItemInformation;
     this.distributedTraceContextGetter = distributedTraceContextGetter;
   }
 
@@ -125,6 +132,15 @@ public class SourceResultAdapter {
    */
   public PayloadMediaTypeResolver getPayloadMediaTypeResolver() {
     return payloadMediaTypeResolver;
+  }
+
+  /**
+   * @return if the current message originated from a polling source, this will return information about it.
+   *
+   * @since 4.5.0
+   */
+  public Optional<PollItemInformation> getPollItemInformation() {
+    return itemInformation;
   }
 
   /**

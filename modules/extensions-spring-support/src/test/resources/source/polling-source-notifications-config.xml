@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <object name="adopt" class="org.mule.test.module.extension.source.PollingSourceNotificationsTestCase$AdoptionProcessor"/>
+
+    <flow name="idempotent" initialState="stopped">
+        <petstore:pet-adoption-source idempotent="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <flow-ref name="adopt"/>
+        <set-payload value="#[java!org::mule::tck::junit4::AbstractMuleContextTestCase::sleepFor(payload, 7000)]"/>
+    </flow>
+
+    <flow name="pet-whale" initialState="stopped">
+        <petstore:pet-filter-source filter="whale">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-filter-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="oneItemPoll" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="1">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="5" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="watermarkPoll" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="1">
+            <scheduling-strategy>
+                <fixed-frequency frequency="1000"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+                <petstore:pet value="Anibal" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="5" />
+                <petstore:watermark value="4" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+</mule>
