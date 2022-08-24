@@ -17,6 +17,7 @@ import static org.mule.runtime.api.notification.PollingSourceItemNotification.IT
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_WATERMARK;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_FAILURE;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_SUCCESS;
+import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
@@ -35,6 +36,7 @@ import org.mule.runtime.api.notification.PollingSourceNotificationListener;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import java.util.Map;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(SOURCES)
@@ -58,24 +61,9 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
   private static final String ITEM_DISPATCHED_MESSAGE = "item dispatched to flow";
   private static final String ITEM_REJECTED_IDEMPOTENCY_MESSAGE = "item rejected due to idempotency";
   private static final String ITEM_REJECTED_WATERMARK_MESSAGE = "item rejected due to watermark";
-  private static final String ITEM_REJECTED_LIMIT_MESSAGE = "item rejected because it exceeded the item limit per poll";
 
-  @Override
-  protected boolean mustRegenerateExtensionModels() {
-    return true;
-  }
-
-  @Override
-  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
-    return singletonMap(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
-  }
-
-  // Since the ENABLE_POLLING_SOURCE_LIMIT_PARAMETER changes the extension model generator, we have to make the parsers cache
-  // aware of this property so that each tests uses the expected parser with the expected extension model definition.
-  @Override
-  protected Map<String, String> artifactProperties() {
-    return singletonMap(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, "true");
-  }
+  @Rule
+  public SystemProperty emitNotifications = new SystemProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS, "true");
 
   public static class AdoptionProcessor implements Processor {
 
@@ -221,29 +209,6 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
       assertThat(timeout, is(false));
       assertThat(sourceNotifications.get(0).getActionName(), is(ITEM_DISPATCHED_MESSAGE));
       assertThat(sourceNotifications.get(1).getActionName(), is(ITEM_REJECTED_WATERMARK_MESSAGE));
-    } finally {
-      notificationListenerRegistry.unregisterListener(sourceListener);
-    }
-  }
-
-  @Test
-  public void itemPollLimitNotifications() throws Exception {
-    final Latch latch = new Latch();
-    final List<PollingSourceItemNotification> sourceNotifications = new ArrayList<>();
-    final PollingSourceItemNotificationListener sourceListener = notification -> {
-      sourceNotifications.add(notification);
-      if (valueOf(ITEM_REJECTED_LIMIT).equals(notification.getAction().getIdentifier())) {
-        latch.release();
-      }
-    };
-    notificationListenerRegistry.registerListener(sourceListener);
-
-    try {
-      startFlow("limitOne");
-      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
-      assertThat(timeout, is(false));
-      assertThat(sourceNotifications.get(0).getActionName(), is(ITEM_DISPATCHED_MESSAGE));
-      assertThat(sourceNotifications.get(1).getActionName(), is(ITEM_REJECTED_LIMIT_MESSAGE));
     } finally {
       notificationListenerRegistry.unregisterListener(sourceListener);
     }

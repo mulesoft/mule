@@ -122,7 +122,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private final SchedulingStrategy scheduler;
   private final int maxItemsPerPoll;
   private final SystemExceptionHandler systemExceptionHandler;
-  private static final boolean EMIT_NOTIFICATIONS = parseBoolean(getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
+  private final boolean EMIT_NOTIFICATIONS = parseBoolean(getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
 
   @Inject
   private LockFactory lockFactory;

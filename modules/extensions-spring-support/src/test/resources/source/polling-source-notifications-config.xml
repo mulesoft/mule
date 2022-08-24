@@ -60,21 +60,4 @@
         <flow-ref name="adopt"/>
     </flow>
 
-    <flow name="limitOne" initialState="stopped">
-        <petstore:pet-adoption-limiting-source maxItemsPerPoll="1">
-            <scheduling-strategy>
-                <fixed-frequency frequency="1000"/>
-            </scheduling-strategy>
-            <petstore:pets>
-                <petstore:pet value="Pet1" />
-                <petstore:pet value="Pet2" />
-            </petstore:pets>
-            <petstore:watermarks>
-                <petstore:watermark value="10" />
-                <petstore:watermark value="10" />
-            </petstore:watermarks>
-        </petstore:pet-adoption-limiting-source>
-        <flow-ref name="adopt"/>
-    </flow>
-
 </mule>

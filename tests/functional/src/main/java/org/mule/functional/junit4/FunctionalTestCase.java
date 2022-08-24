@@ -82,9 +82,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
       new SystemProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "true");
 
-  @Rule
-  public SystemProperty emitNotifications = new SystemProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS, "true");
-
   /**
    * @return
    * @deprecated use getConfigFile instead.
