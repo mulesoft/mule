@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.ComponentAstWithHierarchy;
 
 /**
  * Utils class to check on {@link ComponentAst} particularities for parsing different features (in
@@ -34,16 +35,16 @@ public class MuleSdkOperationodelParserUtils {
    * @param componentAst
    * @return if a component (and children) should be skipped for considered for isTransactional calculation
    */
-  public static boolean isSkippedScopeForTx(ComponentAst componentAst) {
-    if (!componentAst.getComponentType().equals(SCOPE)) {
+  public static boolean isSkippedScopeForTx(ComponentAstWithHierarchy componentAst) {
+    ComponentAst ast = componentAst.getComponentAst();
+    if (!ast.getComponentType().equals(SCOPE)) {
       return false;
     }
-    if (componentAst.getIdentifier().equals(ASYNC_IDENTIFIER)) {
+    if (ast.getIdentifier().equals(ASYNC_IDENTIFIER)) {
       return true;
     }
-    if (isTry(componentAst)) {
-      ComponentParameterAst transactionalAction =
-          componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    if (isTry(ast)) {
+      ComponentParameterAst transactionalAction = ast.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
       return transactionalAction != null && transactionalAction.getValue().getValue().get().equals(ACTION_ALWAYS_BEGIN_STRING);
     }
     return false;
@@ -53,13 +54,13 @@ public class MuleSdkOperationodelParserUtils {
    * @param componentAst
    * @return if this particular component should be ignored for considered for isTransactional calculation
    */
-  public static boolean isIgnoredComponentForTx(ComponentAst componentAst) {
-    if (!componentAst.getModel(ParameterizedModel.class).isPresent()) {
+  public static boolean isIgnoredComponentForTx(ComponentAstWithHierarchy componentAst) {
+    ComponentAst ast = componentAst.getComponentAst();
+    if (!ast.getModel(ParameterizedModel.class).isPresent()) {
       return false;
     }
-    ComponentParameterAst transactionalAction =
-        componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
-    return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
+    ComponentParameterAst transactionalAction = ast.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    return transactionalAction != null && !isTry(ast) && OperationTransactionalAction
         .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
   }
 

@@ -15,12 +15,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
@@ -29,7 +26,6 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -61,14 +57,22 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
 
     // We can't guess what errors will set-payload raise (this operation will raise a "MULE:EXPRESSION" error).
     expectedErrors.put("divisionByZero", emptyList());
+
+    expectedErrors.put("operationSilencingOneSpecificErrorAndRaisingAnother", asList("HEISENBERG:OAUTH2", "THIS:CUSTOM"));
+    expectedErrors.put("operationSilencingAllErrorsAndRaisingAnother", singletonList("THIS:CUSTOM"));
+    expectedErrors.put("operationSilencingAllHeisenbergErrorsAndRaisingAnother", singletonList("THIS:HEALTH"));
+    expectedErrors.put("operationSilencingAllHealthErrorsWithinACatchAll", singletonList("HEISENBERG:OAUTH2"));
   }
 
   @Inject
   private ExtensionManager extensionManager;
 
   @Override
-  protected String getConfigFile() {
-    return "mule-error-handling-operations-config.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {
+        "mule-error-handling-operations-config.xml",
+        "mule-error-handling-with-try-operations-config.xml"
+    };
   }
 
   @Test
@@ -77,7 +81,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     List<String> raisedErrors = getRaisedErrors(extensionModel);
     assertThat(raisedErrors,
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
-                                  "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM"));
+                                  "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH"));
   }
 
   @Test
