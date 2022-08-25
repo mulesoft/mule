@@ -262,6 +262,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
+        // The failing OnErrorPropagateTestCase#handlesTryScope is also failing here, causing problems.
         // Do nothing
         logger.warn(ex.getMessage());
       }
