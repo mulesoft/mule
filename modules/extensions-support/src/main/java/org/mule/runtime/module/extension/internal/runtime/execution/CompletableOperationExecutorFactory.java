@@ -8,13 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.privileged.util.EventUtils.withNullEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNonBlocking;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -50,19 +48,14 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
   public CompletableComponentExecutor<M> createExecutor(M operationModel, Map<String, Object> parameters) {
     DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(implementationClass, new ReflectionCache());
     parameters.forEach((k, v) -> objectBuilder.addPropertyResolver(k, new StaticValueResolver<>(v)));
-    Object delegate;
-    CoreEvent initialiserEvent = null;
-    try {
-      initialiserEvent = getNullEvent();
-      delegate = objectBuilder.build(ValueResolvingContext.builder(initialiserEvent).build());
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
-          + implementationClass.getName()), e);
-    } finally {
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
+    Object delegate = withNullEvent(event -> {
+      try {
+        return objectBuilder.build(ValueResolvingContext.builder(event).build());
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
+            + implementationClass.getName()), e);
       }
-    }
+    });
 
     if (isNonBlocking(operationModel)) {
       return new NonBlockingCompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate);

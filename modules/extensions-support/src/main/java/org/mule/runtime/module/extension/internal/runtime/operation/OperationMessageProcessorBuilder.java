@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -14,20 +15,12 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
-import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
-import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
@@ -62,7 +55,7 @@ public final class OperationMessageProcessorBuilder
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);
     if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      resultTransformer = transformPagingDelegate(extensionConnectionSupplier, supportsOAuth);
+      resultTransformer = getPagingResultTransformer(extensionModel, operationModel, extensionConnectionSupplier, supportsOAuth).orElse(null);
     }
 
     if (supportsOAuth) {
@@ -78,22 +71,5 @@ public final class OperationMessageProcessorBuilder
                                            extensionManager, policyManager, reflectionCache, resultTransformer,
                                            terminationTimeout);
     }
-  }
-
-  private ResultTransformer transformPagingDelegate(ExtensionConnectionSupplier connectionSupplier, boolean supportsOAuth) {
-    return (operationContext, value) -> {
-      if (value == null) {
-        throw new IllegalStateException("Obtained paging delegate cannot be null");
-      }
-      ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
-      Producer<?> producer = new PagingProviderProducer((PagingProvider) value,
-                                                        config,
-                                                        operationContext,
-                                                        connectionSupplier,
-                                                        supportsOAuth);
-      ListConsumer<?> consumer = new ListConsumer(producer);
-      consumer.loadNextPage();
-      return new ConsumerStreamingIterator<>(consumer);
-    };
   }
 }

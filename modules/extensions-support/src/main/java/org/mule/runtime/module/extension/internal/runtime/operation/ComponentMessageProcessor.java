@@ -47,16 +47,14 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
-
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -120,15 +118,12 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.OperationExecutionParams;
-import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.adapter.SdkOperationTransactionalActionUtils;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.ComponentRetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryPolicyTemplateResolver;
@@ -143,27 +138,21 @@ import org.mule.runtime.module.extension.internal.runtime.result.ReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.TargetReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDelegate;
-import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -172,7 +161,6 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.togglz.core.user.FeatureUser;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -1137,44 +1125,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
-                                        componentModel,
-                                        createInterceptorChain(),
-                                        errorTypeRepository,
-                                        muleContext.getExecutionClassLoader(),
-                                        resultTransformer,
-                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
-  }
-
-  protected InterceptorChain createInterceptorChain() {
-    InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
-
-    if (componentModel instanceof ConnectableComponentModel) {
-      if (((ConnectableComponentModel) componentModel).requiresConnection()) {
-        addConnectionInterceptors(chainBuilder);
-      }
-    }
-
-    return chainBuilder.build();
-  }
-
-  private void addConnectionInterceptors(InterceptorChain.Builder chainBuilder) {
-    chainBuilder.addInterceptor(new ConnectionInterceptor(extensionConnectionSupplier));
-
-    addCursorResetInterceptor(chainBuilder);
-  }
-
-  private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
-    Map<ParameterGroupModel, Set<ParameterModel>> streamParameters =
-        IntrospectionUtils.getFilteredParameters(componentModel, getStreamParameterFilter());
-    if (!streamParameters.isEmpty()) {
-      chainBuilder.addInterceptor(new CursorResetInterceptor(streamParameters, reflectionCache));
-    }
-  }
-
-  private Predicate<ParameterModel> getStreamParameterFilter() {
-    return p -> getType(p.getType(), getClassLoader(extensionModel))
-        .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
-        .isPresent();
+        componentModel,
+        createReconnectionInterceptorsChain(extensionModel, componentModel, extensionConnectionSupplier, reflectionCache),
+        errorTypeRepository,
+        muleContext.getExecutionClassLoader(),
+        resultTransformer,
+        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
   }
 
   /**

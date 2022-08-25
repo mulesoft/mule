@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.privileged.util;
 
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 /**
@@ -26,5 +31,28 @@ public final class EventUtils {
    */
   public static EventContext getRoot(EventContext eventContext) {
     return ((BaseEventContext) eventContext).getRootContext();
+  }
+
+  public static void withNullEvent(CheckedConsumer<CoreEvent> consumer) {
+    CoreEvent event = getNullEvent();
+    try {
+      consumer.accept(event);
+      ((BaseEventContext) event.getContext()).success();
+    } catch (RuntimeException e) {
+      ((BaseEventContext) event.getContext()).error(e);
+      throw e;
+    }
+  }
+
+  public static <T> T withNullEvent(CheckedFunction<CoreEvent, T> function) {
+    CoreEvent event = getNullEvent();
+    try {
+      T value = function.apply(event);
+      ((BaseEventContext) event.getContext()).success();
+      return value;
+    } catch (RuntimeException e) {
+      ((BaseEventContext) event.getContext()).error(e);
+      throw e;
+    }
   }
 }

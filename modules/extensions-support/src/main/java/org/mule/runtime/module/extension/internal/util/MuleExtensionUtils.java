@@ -102,12 +102,15 @@ import org.mule.runtime.module.extension.internal.loader.java.property.SdkSource
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
@@ -697,6 +700,17 @@ public class MuleExtensionUtils {
         }
       }
     }
+  }
+
+  public static Optional<ResultTransformer> getPagingResultTransformer(ExtensionModel extensionModel,
+                                                                       OperationModel operationModel,
+                                                                       ExtensionConnectionSupplier extensionConnectionSupplier,
+                                                                       boolean supportsOAuth)  {
+    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+      return of(new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth));
+    }
+
+    return empty();
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
