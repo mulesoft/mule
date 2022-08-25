@@ -98,34 +98,33 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
                  IMPORTED_POJO_BOOLEAN_FIELD_VALUE);
 
   private static final ConnectionProperties POJO_PARAMETER_VALUE =
-      new ConnectionProperties(POJO_CONNECTION_DESCRIPTION_FIELD_VALUE, POJO_CONNECTION_TYPE_FIELD_VALUE,
-                               new Literal<String>() {
+      new ConnectionProperties(POJO_CONNECTION_DESCRIPTION_FIELD_VALUE, POJO_CONNECTION_TYPE_FIELD_VALUE, new Literal<String>() {
 
-                                 @Override
-                                 public Optional<String> getLiteralValue() {
-                                   return of(POJO_CONNECTION_PROPERTY_GRADE_FIELD_VALUE);
-                                 }
+        @Override
+        public Optional<String> getLiteralValue() {
+          return of(POJO_CONNECTION_PROPERTY_GRADE_FIELD_VALUE);
+        }
 
-                                 @Override
-                                 public Class<String> getType() {
-                                   return null;
-                                 }
-                               },
-                               POJO_CONNECTION_TIME_FIELD_VALUE, POJO_CONNECTION_IMPORTED_POJO_FIELD_VALUE);
+        @Override
+        public Class<String> getType() {
+          return null;
+        }
+      }, POJO_CONNECTION_TIME_FIELD_VALUE, POJO_CONNECTION_IMPORTED_POJO_FIELD_VALUE);
 
   private static final Consumer<ValueDeclarer> IMPORTED_POJO_VALUE_DECLARER =
-      importedPojoValueDeclarer -> importedPojoValueDeclarer.asObjectValue()
+      importedPojoValueDeclarer -> importedPojoValueDeclarer.objectValue(objectValueDeclarer -> objectValueDeclarer
           .withField(IMPORTED_POJO_ID_FIELD_NAME, IMPORTED_POJO_ID_FIELD_VALUE)
           .withField(IMPORTED_POJO_NAME_FIELD_NAME, IMPORTED_POJO_NAME_FIELD_VALUE)
           .withField(IMPORTED_POJO_NUMBER_FIELD_NAME, IMPORTED_POJO_NUMBER_FIELD_VALUE.toString())
-          .withField(IMPORTED_POJO_BOOLEAN_FIELD_NAME, String.valueOf(IMPORTED_POJO_BOOLEAN_FIELD_VALUE));
+          .withField(IMPORTED_POJO_BOOLEAN_FIELD_NAME, String.valueOf(IMPORTED_POJO_BOOLEAN_FIELD_VALUE)));
 
-  private static final Consumer<ValueDeclarer> POJO_VALUE_DECLARER = valueDeclarer -> valueDeclarer.asObjectValue()
-      .withField(POJO_CONNECTION_DESCRIPTION_FIELD_NAME, POJO_CONNECTION_DESCRIPTION_FIELD_VALUE)
-      .withField(POJO_CONNECTION_TYPE_FIELD_NAME, POJO_CONNECTION_TYPE_FIELD_VALUE.name())
-      .withField(POJO_CONNECTION_PROPERTY_GRADE_FIELD_NAME, POJO_CONNECTION_PROPERTY_GRADE_FIELD_VALUE)
-      .withField(POJO_CONNECTION_TIME_FIELD_NAME, POJO_CONNECTION_TIME_FIELD_VALUE_AS_STRING)
-      .withField(POJO_CONNECTION_IMPORTED_POJO_FIELD_NAME, IMPORTED_POJO_VALUE_DECLARER);
+  private static final Consumer<ValueDeclarer> POJO_VALUE_DECLARER =
+      valueDeclarer -> valueDeclarer.objectValue(objectValueDeclarer -> objectValueDeclarer
+          .withField(POJO_CONNECTION_DESCRIPTION_FIELD_NAME, POJO_CONNECTION_DESCRIPTION_FIELD_VALUE)
+          .withField(POJO_CONNECTION_TYPE_FIELD_NAME, POJO_CONNECTION_TYPE_FIELD_VALUE.name())
+          .withField(POJO_CONNECTION_PROPERTY_GRADE_FIELD_NAME, POJO_CONNECTION_PROPERTY_GRADE_FIELD_VALUE)
+          .withField(POJO_CONNECTION_TIME_FIELD_NAME, POJO_CONNECTION_TIME_FIELD_VALUE_AS_STRING)
+          .withField(POJO_CONNECTION_IMPORTED_POJO_FIELD_NAME, IMPORTED_POJO_VALUE_DECLARER));
 
   private static String CONNECTION_PROFILE_PARAMETER_GROUP_NAME = "Connection profile";
   private static final String COMPLEX_PARAMETER_NAME_IN_SHOWINDSL_PARAMETER_GROUP = "profileConnectionProperties";
@@ -164,12 +163,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
       asList(new Integer[] {Integer.valueOf(FIRST_SOME_NUMBER), Integer.valueOf(SECOND_SOME_NUMBER),
           Integer.valueOf(THIRD_SOME_NUMBER)});
   private static final Consumer<ValueDeclarer> SOME_NUMBERS_PARAMETER_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.asArrayValue().withItem(FIRST_SOME_NUMBER).withItem(SECOND_SOME_NUMBER)
-          .withItem(THIRD_SOME_NUMBER);
+      valueDeclarer -> valueDeclarer
+          .arrayValue(arrayValueDeclarer -> arrayValueDeclarer.withItem(FIRST_SOME_NUMBER).withItem(SECOND_SOME_NUMBER)
+              .withItem(THIRD_SOME_NUMBER));
 
   private static final String SOME_CONNECTION_PROPERTIES_PARAMETER_NAME = "someOauthConnectionProperties";
   private static final Consumer<ValueDeclarer> SOME_CONNECTION_PROPERTIES_PARAMETER_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.asArrayValue().withItem(POJO_VALUE_DECLARER).withItem(POJO_VALUE_DECLARER);
+      valueDeclarer -> valueDeclarer
+          .arrayValue(arrayValueDeclarer -> arrayValueDeclarer.withItem(POJO_VALUE_DECLARER).withItem(POJO_VALUE_DECLARER));
   private static final List<ConnectionProperties> SOME_CONNECTION_PROPERTIES_PARAMETER_VALUE =
       asList(new ConnectionProperties[] {POJO_PARAMETER_VALUE, POJO_PARAMETER_VALUE});
 
@@ -177,8 +178,12 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private static final String MAP_FIRST_KEY = "first";
   private static final String MAP_SECOND_KEY = "second";
   private static final Consumer<ValueDeclarer> CONNECTION_PROPERTIES_MAP_PARAMETER_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.asObjectValue().withField(MAP_FIRST_KEY, POJO_VALUE_DECLARER).withField(MAP_SECOND_KEY,
-                                                                                                             POJO_VALUE_DECLARER);
+      valueDeclarer -> valueDeclarer
+          .objectValue(objectValueDeclarer -> objectValueDeclarer.withField(MAP_FIRST_KEY, POJO_VALUE_DECLARER)
+              .withField(MAP_SECOND_KEY,
+                         POJO_VALUE_DECLARER)
+              .withField(MAP_FIRST_KEY, POJO_VALUE_DECLARER).withField(MAP_SECOND_KEY,
+                                                                       POJO_VALUE_DECLARER));
   private static final Map<String, ConnectionProperties> CONNECTION_PROPERTIES_MAP_PARAMETER_VALUE =
       new HashMap<String, ConnectionProperties>() {
 
@@ -228,16 +233,16 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private static final String STACKED_MAP_PARAMETER_NAME = "stackedTypeMapParameter";
 
   private static final Consumer<ValueDeclarer> STACKED_MAP_PARAMETER_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.asObjectValue().withField(MAP_FIRST_KEY, FIRST_SOME_NUMBER).withField(MAP_SECOND_KEY,
-                                                                                                           SECOND_SOME_NUMBER);
-  private static final Map<String, Integer> STACKED_MAP_PARAMETER_VALUE =
-      new HashMap<String, Integer>() {
+      valueDeclarer -> valueDeclarer.objectValue(objectValueDeclarer -> objectValueDeclarer
+          .withField(MAP_FIRST_KEY, FIRST_SOME_NUMBER).withField(MAP_SECOND_KEY,
+                                                                 SECOND_SOME_NUMBER));
+  private static final Map<String, Integer> STACKED_MAP_PARAMETER_VALUE = new HashMap<String, Integer>() {
 
-        {
-          put(MAP_FIRST_KEY, Integer.valueOf(FIRST_SOME_NUMBER));
-          put(MAP_SECOND_KEY, Integer.valueOf(SECOND_SOME_NUMBER));
-        }
-      };
+    {
+      put(MAP_FIRST_KEY, Integer.valueOf(FIRST_SOME_NUMBER));
+      put(MAP_SECOND_KEY, Integer.valueOf(SECOND_SOME_NUMBER));
+    }
+  };
 
   private ReflectionCache reflectionCache = new ReflectionCache();
 
