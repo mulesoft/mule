@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -112,14 +113,12 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
                                  JavaAttributesResolverModelParser javaAttributesResolverModelParser,
                                  List<JavaInputResolverModelParser> javaInputResolverModelParsers) {
 
-    org.mule.runtime.api.metadata.resolving.NamedTypeResolver namedTypeResolver =
-        javaOutputResolverModelParser.getOutputResolver();
+    NamedTypeResolver namedTypeResolver = javaOutputResolverModelParser.getOutputResolver();
     if (javaOutputResolverModelParser.hasOutputResolver()) {
       return namedTypeResolver.getCategoryName();
     }
 
-    org.mule.runtime.api.metadata.resolving.NamedTypeResolver namedTypeAttributesResolver =
-        javaAttributesResolverModelParser.getAttributesResolver();
+    NamedTypeResolver namedTypeAttributesResolver = javaAttributesResolverModelParser.getAttributesResolver();
     if (javaAttributesResolverModelParser.hasAttributesResolver()) {
       return namedTypeAttributesResolver.getCategoryName();
     }
