@@ -7,10 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.utils;
 
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
-import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MuleInputTypeResolverAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolverAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MuleTypeKeysResolverAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MuleMetadataTypeResolverAdapter;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
 public class JavaMetadataTypeResolverUtils {
@@ -21,14 +18,8 @@ public class JavaMetadataTypeResolverUtils {
   }
 
   public static Class<?> getEnclosingClass(NamedTypeResolver namedTypeResolver) {
-    if (namedTypeResolver instanceof MuleOutputTypeResolverAdapter) {
-      return ((MuleOutputTypeResolverAdapter) namedTypeResolver).getDelegate().getClass();
-    } else if (namedTypeResolver instanceof MuleAttributesTypeResolverAdapter) {
-      return ((MuleAttributesTypeResolverAdapter) namedTypeResolver).getDelegate().getClass();
-    } else if (namedTypeResolver instanceof MuleTypeKeysResolverAdapter) {
-      return ((MuleTypeKeysResolverAdapter) namedTypeResolver).getDelegate().getClass();
-    } else if (namedTypeResolver instanceof MuleInputTypeResolverAdapter) {
-      return ((MuleInputTypeResolverAdapter) namedTypeResolver).getDelegate().getClass();
+    if (namedTypeResolver instanceof MuleMetadataTypeResolverAdapter) {
+      return ((MuleMetadataTypeResolverAdapter) namedTypeResolver).getDelegateResolverClass();
     } else {
       return namedTypeResolver.getClass();
     }

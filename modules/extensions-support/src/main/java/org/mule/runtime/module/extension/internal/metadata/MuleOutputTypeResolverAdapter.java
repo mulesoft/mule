@@ -21,7 +21,7 @@ import org.mule.sdk.api.metadata.NullMetadataResolver;
  *
  * @since 4.5.0
  */
-public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
+public class MuleOutputTypeResolverAdapter implements OutputTypeResolver, MuleMetadataTypeResolverAdapter {
 
   private final org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate;
 
@@ -61,7 +61,8 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
     return delegate.getOutputType(new SdkMetadataContextAdapter(context), key);
   }
 
-  public org.mule.sdk.api.metadata.resolving.OutputTypeResolver getDelegate() {
-    return delegate;
+  @Override
+  public Class<?> getDelegateResolverClass() {
+    return delegate.getClass();
   }
 }

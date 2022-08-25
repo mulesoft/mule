@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
-public class MuleInputTypeResolverAdapter implements InputTypeResolver {
+public class MuleInputTypeResolverAdapter implements InputTypeResolver, MuleMetadataTypeResolverAdapter {
 
   private final org.mule.sdk.api.metadata.resolving.InputTypeResolver delegate;
 
@@ -57,7 +57,8 @@ public class MuleInputTypeResolverAdapter implements InputTypeResolver {
     return delegate.getCategoryName();
   }
 
-  public org.mule.sdk.api.metadata.resolving.InputTypeResolver getDelegate() {
-    return delegate;
+  @Override
+  public Class<?> getDelegateResolverClass() {
+    return delegate.getClass();
   }
 }
