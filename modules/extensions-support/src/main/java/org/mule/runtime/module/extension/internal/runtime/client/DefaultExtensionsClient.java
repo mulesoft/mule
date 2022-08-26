@@ -133,6 +133,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     ExecutionMediator<OperationModel> mediator = mediatorCache.get(key);
 
     new DefaultExecutionContext<>(key.getExtensionModel(),
+        getConfigurationInstance(key.getConfigurationProvider()),
+        
         )
 
     mediator.execute();
@@ -140,18 +142,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   }
 
   private Optional<ConfigurationInstance> getConfigurationInstance(Optional<ConfigurationProvider> configurationProvider) {
-    return configurationProvider.map(cp -> {
-      CoreEvent event = NullEventFactory.getNullEvent();
-      try {
-        ConfigurationInstance config = cp.get(event);
-        ((BaseEventContext) event).success();
-        return config;
-      } catch (RuntimeException e) {
-        ((BaseEventContext) event).error(e);
-        throw e;
-      }
-    });
-    return configurationProvider.map(p -> withNullEvent((CheckedConsumer<CoreEvent>) event -> p.get(event)));
+    return configurationProvider.map(p -> withNullEvent(event -> p.get(event)));
   }
 
   private OperationKey toKey(String extensionName,
