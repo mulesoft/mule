@@ -61,14 +61,12 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
   private final Function<String, ValueResolver> defaultValueResolver = key -> new RegistryLookupValueResolver<>(key);
 
-  private final DslSyntaxResolver dslSyntaxResolver;
   private final Object defaultValue;
   private final boolean acceptsReferences;
 
-  public ValueResolverFactoryTypeVisitor(DslSyntaxResolver dslSyntaxResolver, String parameterName,
+  public ValueResolverFactoryTypeVisitor(String parameterName,
                                          Object value, Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     super(parameterName, value, expectedClass);
-    this.dslSyntaxResolver = dslSyntaxResolver;
     this.defaultValue = defaultValue;
     this.acceptsReferences = acceptsReferences;
   }
@@ -92,9 +90,8 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
     ValueResolver valueResolver;
     Optional<Function<String, ValueResolver>> delegate = getCustomValueResolver(objectType);
-    Optional<DslElementSyntax> typeDsl = dslSyntaxResolver.resolve(objectType);
 
-    if (delegate.isPresent() && typeDsl.isPresent()) {
+    if (delegate.isPresent()) {
       valueResolver = delegate.get().apply(getValue().toString());
     } else {
       valueResolver = acceptsReferences

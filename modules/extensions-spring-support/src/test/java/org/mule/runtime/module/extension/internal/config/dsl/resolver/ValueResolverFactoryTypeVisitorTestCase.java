@@ -84,7 +84,7 @@ public class ValueResolverFactoryTypeVisitorTestCase {
   }
 
   private ValueResolverFactoryTypeVisitor createValueResolverFactoryTypeVisitor(Object value, Class<?> expectedClass) {
-    return new ValueResolverFactoryTypeVisitor(dslSyntaxResolver, "parameter",
+    return new ValueResolverFactoryTypeVisitor("parameter",
                                                value, null, false, expectedClass);
   }
 

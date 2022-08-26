@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
@@ -81,14 +80,13 @@ public class ResolverSetUtils {
                                                            boolean disableValidations,
                                                            ReflectionCache reflectionCache,
                                                            ExpressionManager expressionManager,
-                                                           String parametersOwner,
-                                                           DslSyntaxResolver dslSyntaxResolver)
+                                                           String parametersOwner)
       throws MuleException {
     return getResolverSetFromComponentParameterization(createComponentParameterization(parameterizedModel, parameters),
                                                        muleContext,
                                                        disableValidations,
                                                        reflectionCache,
-                                                       expressionManager, parametersOwner, dslSyntaxResolver);
+                                                       expressionManager, parametersOwner);
   }
 
   /**
@@ -108,11 +106,10 @@ public class ResolverSetUtils {
                                                                         boolean disableValidations,
                                                                         ReflectionCache reflectionCache,
                                                                         ExpressionManager expressionManager,
-                                                                        String parametersOwner,
-                                                                        DslSyntaxResolver dslSyntaxResolver)
+                                                                        String parametersOwner)
       throws MuleException {
     Map<String, ValueResolver> resolvers = new HashMap<>();
-    ValueResolverFactory valueResolverFactory = new ValueResolverFactory(dslSyntaxResolver);
+    ValueResolverFactory valueResolverFactory = new ValueResolverFactory();
 
     for (ParameterGroupModel parameterGroupModel : componentParameterization.getModel().getParameterGroupModels()) {
       resolvers

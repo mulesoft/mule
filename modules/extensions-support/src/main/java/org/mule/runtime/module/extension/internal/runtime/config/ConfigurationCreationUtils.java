@@ -96,8 +96,7 @@ public final class ConfigurationCreationUtils {
                                                                false,
                                                                reflectionCache,
                                                                expressionManager,
-                                                               parametersOwner,
-                                                               dslSyntaxResolver);
+                                                               parametersOwner);
 
       final ConnectionProviderValueResolver connectionResolver = connectionProviderResolver
           .orElseGet(() -> supportsConnectivity(extensionModel, configurationModel)
@@ -176,8 +175,7 @@ public final class ConfigurationCreationUtils {
                                                                                 false,
                                                                                 reflectionCache,
                                                                                 expressionManager,
-                                                                                parametersOwner,
-                                                                                dslSyntaxResolver);
+                                                                                parametersOwner);
 
     ConnectionProviderObjectBuilder builder;
     if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
