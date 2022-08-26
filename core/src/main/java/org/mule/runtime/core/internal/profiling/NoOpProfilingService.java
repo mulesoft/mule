@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.profiling;
 
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -158,6 +159,11 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
     @Override
     public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error error, boolean isErrorEscapingCurrentSpan) {
       // Nothing to do.
     }
 

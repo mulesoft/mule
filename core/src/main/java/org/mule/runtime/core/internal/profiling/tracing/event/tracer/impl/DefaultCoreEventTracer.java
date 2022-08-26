@@ -17,9 +17,11 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.DefaultSpanError;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
@@ -94,11 +96,19 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   @Override
   public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+    Error spanError = coreEvent.getError()
+        .orElseThrow(() -> new IllegalArgumentException(String.format("Provided coreEvent [%s] does not declare an error.",
+                                                                      coreEvent)));
+    recordErrorAtCurrentSpan(coreEvent, spanError, isErrorEscapingCurrentSpan);
+  }
+
+  @Override
+  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error spanError, boolean isErrorEscapingCurrentSpan) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
       ((DistributedTraceContextAware) eventContext)
           .getDistributedTraceContext()
-          .recordErrorAtCurrentSpan(getInternalSpanError(coreEvent, isErrorEscapingCurrentSpan));
+          .recordErrorAtCurrentSpan(new DefaultSpanError(spanError, coreEvent.getFlowCallStack(), isErrorEscapingCurrentSpan));
     }
   }
 

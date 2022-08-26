@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
@@ -55,6 +56,8 @@ public interface CoreEventTracer {
   void endCurrentSpan(CoreEvent coreEvent);
 
   void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan);
+
+  void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error error, boolean isErrorEscapingCurrentSpan);
 
   /**
    * @param event the event to retrieve the distributed trace context map from
