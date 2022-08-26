@@ -43,6 +43,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.creat
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
+import static org.mule.runtime.core.privileged.util.EventUtils.withNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
@@ -830,19 +831,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
-        new LazyValue<>(() -> {
-          CoreEvent initialiserEvent = null;
-          try {
-            initialiserEvent = getNullEvent();
-            return ValueResolvingContext.builder(initialiserEvent, expressionManager)
-                .withConfig(getStaticConfiguration())
-                .build();
-          } finally {
-            if (initialiserEvent != null) {
-              ((BaseEventContext) initialiserEvent.getContext()).success();
-            }
-          }
-        });
+        new LazyValue<>(() ->
+          withNullEvent(event ->ValueResolvingContext.builder(event, expressionManager)
+              .withConfig(getStaticConfiguration())
+              .build()));
 
     LazyValue<Boolean> dynamicConfig = new LazyValue<>(
                                                        () -> extensionManager
