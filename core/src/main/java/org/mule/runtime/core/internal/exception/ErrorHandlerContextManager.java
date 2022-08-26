@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static com.google.common.collect.ImmutableMap.of;
+
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -16,10 +19,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import static com.google.common.collect.ImmutableMap.of;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-
 
 /**
  * Manages context information. If present, an instance of this class is stored as an {@link InternalEvent} internal parameter,
