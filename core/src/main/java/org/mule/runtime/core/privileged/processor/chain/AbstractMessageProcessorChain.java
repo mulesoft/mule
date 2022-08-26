@@ -54,7 +54,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -80,7 +79,6 @@ import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorA
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
-import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
@@ -470,7 +468,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       postNotification(processor).accept(result);
       setCurrentEvent((PrivilegedEvent) result);
       muleEventTracer.endCurrentSpan(result);
-
 
       // If the processor returns a CursorProvider, then have the StreamingManager manage it
       return updateEventForStreaming(streamingManager).apply(result);

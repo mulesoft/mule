@@ -57,6 +57,7 @@ public interface CoreEventTracer {
 
   void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan);
 
+  // TODO: W-11646448: Compound error handlers are not propagating correct error.
   void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error error, boolean isErrorEscapingCurrentSpan);
 
   /**
