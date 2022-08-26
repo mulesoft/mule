@@ -1010,7 +1010,6 @@
                                                 <exclude>org.mule.tests:test-components</exclude>
                                                 <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
                                                 <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
-                                                <exclude>org.mule.sdk:mule-sdk-api</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
