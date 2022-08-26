@@ -24,7 +24,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class MuleTypeKeysResolverAdapter implements TypeKeysResolver {
+public class MuleTypeKeysResolverAdapter implements TypeKeysResolver, MuleMetadataTypeResolverAdapter {
 
   private final org.mule.sdk.api.metadata.resolving.TypeKeysResolver delegate;
 
@@ -66,5 +66,10 @@ public class MuleTypeKeysResolverAdapter implements TypeKeysResolver {
   @Override
   public String getResolverName() {
     return delegate.getResolverName();
+  }
+
+  @Override
+  public Class<?> getDelegateResolverClass() {
+    return delegate.getClass();
   }
 }

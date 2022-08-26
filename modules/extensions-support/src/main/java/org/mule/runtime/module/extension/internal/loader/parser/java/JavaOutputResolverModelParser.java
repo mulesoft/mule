@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isNullResolver;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
-import org.mule.runtime.module.extension.internal.metadata.SdkOutputTypeResolverAdapter;
-import org.mule.sdk.api.metadata.NullMetadataResolver;
-import org.mule.sdk.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolverAdapter;
 
 /**
  * {@link OutputResolverModelParser} for Java based syntax
@@ -24,16 +24,13 @@ import org.mule.sdk.api.metadata.resolving.OutputTypeResolver;
 public class JavaOutputResolverModelParser implements OutputResolverModelParser {
 
   private final Class<?> outputTypeResolverDeclarationClass;
-  private final boolean muleResolver;
 
-  public JavaOutputResolverModelParser(Class<?> outputTypeResolverDeclarationClass, boolean muleResolver) {
+  public JavaOutputResolverModelParser(Class<?> outputTypeResolverDeclarationClass) {
     this.outputTypeResolverDeclarationClass = outputTypeResolverDeclarationClass;
-    this.muleResolver = muleResolver;
   }
 
   public boolean hasOutputResolver() {
-    return !NullMetadataResolver.class.isAssignableFrom(outputTypeResolverDeclarationClass) &&
-        !org.mule.runtime.extension.api.metadata.NullMetadataResolver.class.isAssignableFrom(outputTypeResolverDeclarationClass);
+    return !isNullResolver(outputTypeResolverDeclarationClass);
   }
 
   public OutputTypeResolver getOutputResolver() {
@@ -43,8 +40,8 @@ public class JavaOutputResolverModelParser implements OutputResolverModelParser 
   private OutputTypeResolver instantiateResolver(Class<?> factoryType) {
     try {
       Object resolver = ClassUtils.instantiateClass(factoryType);
-      if (muleResolver) {
-        return new SdkOutputTypeResolverAdapter((org.mule.runtime.api.metadata.resolving.OutputTypeResolver) resolver);
+      if (resolver instanceof org.mule.sdk.api.metadata.resolving.OutputTypeResolver) {
+        return MuleOutputTypeResolverAdapter.from(resolver);
       } else {
         return (OutputTypeResolver) resolver;
       }

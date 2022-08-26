@@ -15,10 +15,11 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getAllResolvers;
-import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNullResolver;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.getEnclosingClass;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isNullResolver;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isScope;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
@@ -49,6 +50,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
@@ -120,7 +122,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     resolvers.add(resolverFactory.getOutputResolver());
 
     resolvers.stream()
-        .filter(r -> !r.getClass().equals(NullMetadataResolver.class))
+        .filter(r -> !isNullResolver(r.getClass()))
         .forEach(r -> {
           if (isBlank(r.getResolverName())) {
             problemsReporter.addError(new Problem(model,
@@ -129,17 +131,17 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                                                          r.getClass().getSimpleName(), "resolver")));
           } else {
             if (names.get(r.getCategoryName(), r.getResolverName()) != null
-                && names.get(r.getCategoryName(), r.getResolverName()) != r.getClass()) {
+                && names.get(r.getCategoryName(), r.getResolverName()) != getEnclosingClass(r)) {
               problemsReporter
                   .addError(new Problem(model,
                                         format("%s '%s' specifies metadata resolvers with repeated name '%s' for the same category '%s'. Resolver names should be unique for a given category. Affected resolvers are '%s' and '%s'",
                                                capitalize(getComponentModelTypeName(model)), model.getName(),
                                                r.getResolverName(), r.getCategoryName(),
                                                names.get(r.getCategoryName(), r.getResolverName()).getSimpleName(),
-                                               r.getClass().getSimpleName())));
+                                               getEnclosingClass(r).getSimpleName())));
 
             }
-            names.put(r.getCategoryName(), r.getResolverName(), r.getClass());
+            names.put(r.getCategoryName(), r.getResolverName(), getEnclosingClass(r));
           }
         });
   }
@@ -295,7 +297,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                                                                                                  "category"))));
 
     Set<String> names = resolvers.stream()
-        .filter(r -> !isNullResolver(r))
+        .filter(r -> !isNullResolver(r.getClass()) && !r.getClass().equals(NullQueryMetadataResolver.class))
         .map(NamedTypeResolver::getCategoryName)
         .collect(toSet());
 

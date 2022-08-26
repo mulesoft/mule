@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import org.mule.sdk.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 
 /**
  * Parses the syntactic definition of the attributes output metadata so that the semantics reflected in it can be extracted in a

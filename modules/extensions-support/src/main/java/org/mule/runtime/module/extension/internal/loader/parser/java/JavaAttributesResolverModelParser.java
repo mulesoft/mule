@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isNullResolver;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.metadata.SdkAttributesTypeResolverAdapter;
-import org.mule.sdk.api.metadata.NullMetadataResolver;
-import org.mule.sdk.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
 
 /**
  * {@link AttributesResolverModelParser} for Java based syntax
@@ -24,17 +24,13 @@ import org.mule.sdk.api.metadata.resolving.AttributesTypeResolver;
 public class JavaAttributesResolverModelParser implements AttributesResolverModelParser {
 
   private final Class<?> attributesTypeResolverDeclarationClass;
-  private final boolean muleResolver;
 
-  public JavaAttributesResolverModelParser(Class<?> attributesTypeResolverDeclarationClass, boolean muleResolver) {
+  public JavaAttributesResolverModelParser(Class<?> attributesTypeResolverDeclarationClass) {
     this.attributesTypeResolverDeclarationClass = attributesTypeResolverDeclarationClass;
-    this.muleResolver = muleResolver;
   }
 
   public boolean hasAttributesResolver() {
-    return !NullMetadataResolver.class.isAssignableFrom(attributesTypeResolverDeclarationClass) &&
-        !org.mule.runtime.extension.api.metadata.NullMetadataResolver.class
-            .isAssignableFrom(attributesTypeResolverDeclarationClass);
+    return !isNullResolver(attributesTypeResolverDeclarationClass);
   }
 
   public AttributesTypeResolver getAttributesResolver() {
@@ -44,8 +40,8 @@ public class JavaAttributesResolverModelParser implements AttributesResolverMode
   private AttributesTypeResolver instantiateResolver(Class<?> factoryType) {
     try {
       Object resolver = ClassUtils.instantiateClass(factoryType);
-      if (muleResolver) {
-        return SdkAttributesTypeResolverAdapter.from((org.mule.runtime.api.metadata.resolving.AttributesTypeResolver) resolver);
+      if (resolver instanceof org.mule.sdk.api.metadata.resolving.AttributesTypeResolver) {
+        return MuleAttributesTypeResolverAdapter.from(resolver);
       } else {
         return (AttributesTypeResolver) resolver;
       }

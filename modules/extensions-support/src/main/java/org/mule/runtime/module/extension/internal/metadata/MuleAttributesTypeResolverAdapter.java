@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
-public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver {
+public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver, MuleMetadataTypeResolverAdapter {
 
   private final org.mule.sdk.api.metadata.resolving.AttributesTypeResolver delegate;
 
@@ -50,5 +50,15 @@ public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver
   @Override
   public String getCategoryName() {
     return delegate.getCategoryName();
+  }
+
+  @Override
+  public String getResolverName() {
+    return delegate.getResolverName();
+  }
+
+  @Override
+  public Class<?> getDelegateResolverClass() {
+    return delegate.getClass();
   }
 }

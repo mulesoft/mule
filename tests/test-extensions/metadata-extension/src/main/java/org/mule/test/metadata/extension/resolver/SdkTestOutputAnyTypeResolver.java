@@ -17,7 +17,7 @@ import org.mule.sdk.api.metadata.resolving.OutputTypeResolver;
 
 public class SdkTestOutputAnyTypeResolver implements OutputTypeResolver<String> {
 
-  public static final String TEST_OUTPUT_ANY_TYPE_RESOLVER = "TestOutputAnyTypeResolver";
+  public static final String TEST_OUTPUT_ANY_TYPE_RESOLVER = "SdkTestOutputAnyTypeResolver";
   public static final String METADATA_EXTENSION_RESOLVER = "MetadataExtensionResolver";
 
   @Override

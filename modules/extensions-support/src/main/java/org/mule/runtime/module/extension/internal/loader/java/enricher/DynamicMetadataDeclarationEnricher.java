@@ -59,10 +59,8 @@ import org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyId
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolverAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MuleTypeKeysResolverAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
-import org.mule.runtime.module.extension.internal.metadata.SdkOutputTypeResolverAdapter;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -280,13 +278,13 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         }
 
         @Override
-        public org.mule.sdk.api.metadata.resolving.OutputTypeResolver getOutputResolver() {
-          return new SdkOutputTypeResolverAdapter(outputResolver);
+        public OutputTypeResolver getOutputResolver() {
+          return outputResolver;
         }
 
         @Override
-        public org.mule.sdk.api.metadata.resolving.AttributesTypeResolver getAttributesResolver() {
-          return new org.mule.sdk.api.metadata.NullMetadataResolver();
+        public AttributesTypeResolver getAttributesResolver() {
+          return nullMetadataResolver;
         }
       };
       addQueryModelProperties(declaration, query);
@@ -312,8 +310,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     }
 
     private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope) {
-      Supplier<OutputTypeResolver<?>> outputTypeResolverSupplier =
-          () -> MuleOutputTypeResolverAdapter.from(scope.getOutputResolver());
+      Supplier<OutputTypeResolver<?>> outputTypeResolverSupplier = scope::getOutputResolver;
 
       Supplier<AttributesTypeResolver<?>> attributesTypeResolverSupplier =
           () -> MuleAttributesTypeResolverAdapter.from(scope.getAttributesResolver());

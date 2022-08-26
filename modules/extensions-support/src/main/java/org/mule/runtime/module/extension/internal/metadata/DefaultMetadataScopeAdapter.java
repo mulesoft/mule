@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils.parseInputResolversModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.hasMetadataScopeAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.hasOutputResolverAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -20,7 +20,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -32,7 +35,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.JavaAttribu
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaKeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOutputResolverModelParser;
-import org.mule.sdk.api.metadata.resolving.NamedTypeResolver;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,10 +54,10 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
       new JavaKeyIdResolverModelParser(null, null, org.mule.sdk.api.metadata.NullMetadataResolver.class);
 
   private JavaOutputResolverModelParser javaOutputResolverModelParser =
-      new JavaOutputResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class, false);
+      new JavaOutputResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class);
 
   private JavaAttributesResolverModelParser javaAttributesResolverModelParser =
-      new JavaAttributesResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class, false);
+      new JavaAttributesResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class);
 
   private List<JavaInputResolverModelParser> javaInputResolverModelParsers = emptyList();
 
@@ -93,10 +95,10 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
     Optional<Class<?>> componentClass = annotatedType.getDeclaringClass();
 
     if (componentClass.isPresent() && extensionClass.isPresent()) {
-      MetadataScope scope = getAnnotation(componentClass.get(), MetadataScope.class);
-      scope = scope != null ? scope : getAnnotation(extensionClass.get(), MetadataScope.class);
+      boolean hasMetadataScopeAnnotation = hasMetadataScopeAnnotation(componentClass.get()) ||
+          hasMetadataScopeAnnotation(extensionClass.get());
 
-      if (scope != null && !hasCustomStaticType(declaration.getOutput())) {
+      if (hasMetadataScopeAnnotation && !hasCustomStaticType(declaration.getOutput())) {
         this.javaKeyIdResolverModelParser =
             parseKeyIdResolverModelParser(extensionType, annotatedType);
         this.javaOutputResolverModelParser =
@@ -112,12 +114,12 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
                                  List<JavaInputResolverModelParser> javaInputResolverModelParsers) {
 
     NamedTypeResolver namedTypeResolver = javaOutputResolverModelParser.getOutputResolver();
-    if (!(namedTypeResolver instanceof org.mule.sdk.api.metadata.NullMetadataResolver)) {
+    if (javaOutputResolverModelParser.hasOutputResolver()) {
       return namedTypeResolver.getCategoryName();
     }
 
     NamedTypeResolver namedTypeAttributesResolver = javaAttributesResolverModelParser.getAttributesResolver();
-    if (!(namedTypeAttributesResolver instanceof org.mule.sdk.api.metadata.NullMetadataResolver)) {
+    if (javaAttributesResolverModelParser.hasAttributesResolver()) {
       return namedTypeAttributesResolver.getCategoryName();
     }
 
@@ -180,12 +182,12 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
   }
 
   @Override
-  public org.mule.sdk.api.metadata.resolving.OutputTypeResolver getOutputResolver() {
+  public OutputTypeResolver getOutputResolver() {
     return javaOutputResolverModelParser.getOutputResolver();
   }
 
   @Override
-  public org.mule.sdk.api.metadata.resolving.AttributesTypeResolver getAttributesResolver() {
+  public AttributesTypeResolver getAttributesResolver() {
     return javaAttributesResolverModelParser.getAttributesResolver();
   }
 }
