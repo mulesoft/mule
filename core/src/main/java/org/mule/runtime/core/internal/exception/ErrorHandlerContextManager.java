@@ -107,8 +107,6 @@ public class ErrorHandlerContextManager {
   public static void resolveHandling(FlowExceptionHandler handler, CoreEvent result) {
     ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
     MessagingException exception = errorHandlerContext.getException();
-    // End the on error handler component Span.
-    errorHandlerContext.eventTracer.endCurrentSpan(exception.getEvent());
     // A successful handling event does not imply that the exception was handled, but that there were no errors during the
     // handling.
     if (exception.handled()) {
