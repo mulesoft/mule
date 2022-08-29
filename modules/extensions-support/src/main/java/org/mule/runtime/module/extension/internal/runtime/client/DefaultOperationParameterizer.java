@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.DataSize;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -23,13 +24,16 @@ import org.mule.runtime.core.internal.streaming.bytes.FileStoreCursorStreamConfi
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 class DefaultOperationParameterizer implements OperationParameterizer {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
   private String configRef;
-  private ComponentParameterization<OperationModel> parameterization;
+  private final Map<String, Object> rawParameters = new HashMap<>();
+  private final Map<Pair<String, String>, Object> groupedParameters = new HashMap<>();
   private Function<StreamingManager, CursorProviderFactory> cursorProviderFunction = nullCursorProviderFunction();
   private RetryPolicyTemplate retryPolicyTemplate = new NoRetryPolicyTemplate();
 
@@ -40,8 +44,14 @@ class DefaultOperationParameterizer implements OperationParameterizer {
   }
 
   @Override
-  public OperationParameterizer parameters(ComponentParameterization<OperationModel> parameterization) {
-    this.parameterization = parameterization;
+  public OperationParameterizer withParameter(String parameterName, Object value) {
+    rawParameters.put(parameterName, value);
+    return this;
+  }
+
+  @Override
+  public OperationParameterizer withParameter(String parameterGroup, String parameter, Object value) {
+    groupedParameters.put(new Pair<>(parameterGroup, parameter), value);
     return this;
   }
 
@@ -58,7 +68,7 @@ class DefaultOperationParameterizer implements OperationParameterizer {
   }
 
   @Override
-  public OperationParameterizer withDefaultInMemoryRepeatableStreaming() {
+  public OperationParameterizer withDefaultRepeatableStreaming() {
     cursorProviderFunction = sm -> sm.forBytes().getDefaultCursorProviderFactory();
     return this;
   }
@@ -73,16 +83,22 @@ class DefaultOperationParameterizer implements OperationParameterizer {
   }
 
   @Override
-  public OperationParameterizer withInMemoryRepeatableIterables(int initialBufferSize, int bufferSizeIncrement, int maxBufferSize) {
-    cursorProviderFunction = sm -> sm.forObjects().getInMemoryCursorProviderFactory(
-        new InMemoryCursorIteratorConfig(initialBufferSize, bufferSizeIncrement, maxBufferSize));
+  public OperationParameterizer withFileStoreRepeatableStreaming(DataSize maxInMemorySize) {
+    cursorProviderFunction = sm -> sm.forBytes().getFileStoreCursorStreamProviderFactory(
+        new FileStoreCursorStreamConfig(maxInMemorySize));
     return this;
   }
 
   @Override
-  public OperationParameterizer withFileStoreRepeatableStreaming(DataSize maxInMemorySize) {
-    cursorProviderFunction = sm -> sm.forBytes().getFileStoreCursorStreamProviderFactory(
-        new FileStoreCursorStreamConfig(maxInMemorySize));
+  public OperationParameterizer withDefaultRepeatableIterables() {
+    cursorProviderFunction = sm -> sm.forObjects().getDefaultCursorProviderFactory();
+    return this;
+  }
+
+  @Override
+  public OperationParameterizer withInMemoryRepeatableIterables(int initialBufferSize, int bufferSizeIncrement, int maxBufferSize) {
+    cursorProviderFunction = sm -> sm.forObjects().getInMemoryCursorProviderFactory(
+        new InMemoryCursorIteratorConfig(initialBufferSize, bufferSizeIncrement, maxBufferSize));
     return this;
   }
 
@@ -103,16 +119,17 @@ class DefaultOperationParameterizer implements OperationParameterizer {
     return configRef;
   }
 
-  ComponentParameterization<OperationModel> getParameterization() {
-    return parameterization;
-  }
-
   <T> CursorProviderFactory<T> getCursorProviderFactory(StreamingManager streamingManager) {
     return cursorProviderFunction.apply(streamingManager);
   }
 
   RetryPolicyTemplate getRetryPolicyTemplate() {
     return retryPolicyTemplate;
+  }
+
+  void setValuesOn(ComponentParameterization.Builder<OperationModel> builder) {
+    rawParameters.forEach(builder::withParameter);
+    groupedParameters.forEach((pair, value) -> builder.withParameter(pair.getFirst(), pair.getSecond(), value));
   }
 
   private Function<StreamingManager, CursorProviderFactory> nullCursorProviderFunction() {

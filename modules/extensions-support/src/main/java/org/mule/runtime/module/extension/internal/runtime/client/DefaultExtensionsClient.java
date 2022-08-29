@@ -30,7 +30,6 @@ import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -53,7 +52,6 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -135,10 +133,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     parameters.accept(parameterizer);
 
     OperationKey key = toKey(extensionName, operationName, parameterizer);
+
+    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(key.getOperationModel());
+    parameterizer.setValuesOn(paramsBuilder);
+
     ExecutionMediator<OperationModel> mediator = mediatorCache.get(key);
 
     return withNullEvent(event -> {
-      final Map<String, Object> resolvedParams = resolveParameters(key, parameterizer);
+      final Map<String, Object> resolvedParams = resolveParameters(key, paramsBuilder.build());
       OperationModel operationModel = key.getOperationModel();
       CompletableComponentExecutor<OperationModel> executor = getComponentExecutor(operationModel, resolvedParams);
       CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
@@ -206,18 +208,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private Map<String, Object> resolveParameters(OperationKey key, DefaultOperationParameterizer parameterizer) {
-    //TODO: Cache this
-    DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(key.getExtensionModel(), DslResolvingContext.getDefault(extensionManager.getExtensions()));
+  private Map<String, Object> resolveParameters(OperationKey key, ComponentParameterization<OperationModel> parameters) {
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-          parameterizer.getParameterization(),
+          parameters,
           muleContext,
           true,
           reflectionCache,
           expressionManager,
-          "",
-          syntaxResolver);
+          "");
       return (Map) resolverSet.getResolvers();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
@@ -351,18 +350,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final ExtensionModel extensionModel = findExtension(extensionName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
-    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
-    parameters.get().forEach((key, value) -> {
-      if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
-        paramsBuilder.withParameter(key, value);
-      }
-    });
-
     return executeAsync(
         extensionName,
         operationName,
         parameterizer -> {
-          parameterizer.parameters(paramsBuilder.build());
+          parameters.get().forEach((key, value) -> {
+            if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
+              parameterizer.withParameter(key, value);
+            }
+          });
           parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
           configureLegacyRepeatableStreaming(parameterizer, operationModel);
         }
@@ -401,13 +397,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   }
 
   private void setDefaultRepeatableStreaming(OperationParameterizer parameterizer) {
-    //TODO: COnsider EE
-    parameterizer.withDefaultInMemoryRepeatableStreaming();
+    parameterizer.withDefaultRepeatableStreaming();
   }
 
   private void setDefaultRepeatableIterables(OperationParameterizer parameterizer) {
-    //TODO: COnsider EE
-    parameterizer.withDefaultInMemoryRepeatableStreaming();
+    parameterizer.withDefaultRepeatableIterables();
   }
 
   @Override
