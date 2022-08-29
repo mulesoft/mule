@@ -55,7 +55,7 @@ public final class OperationMessageProcessorBuilder
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);
     if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      resultTransformer = getPagingResultTransformer(extensionModel, operationModel, extensionConnectionSupplier, supportsOAuth).orElse(null);
+      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth).orElse(null);
     }
 
     if (supportsOAuth) {

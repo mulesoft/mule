@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
-import static org.mule.runtime.core.privileged.util.EventUtils.withNullEvent;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
@@ -261,7 +261,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
             reflectionCache),
         errorTypeRepository,
         muleContext.getExecutionClassLoader(),
-        getPagingResultTransformer(extensionModel, operationModel, extensionConnectionSupplier, supportsOAuth(extensionModel)).orElse(null),
+        getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth(extensionModel)).orElse(null),
         NULL_PROFILING_DATA_PRODUCER);
 
     try {

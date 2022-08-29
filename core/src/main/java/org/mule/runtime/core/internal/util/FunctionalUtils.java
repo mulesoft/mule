@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.function.Consumer;
 
@@ -54,6 +59,18 @@ public class FunctionalUtils extends org.mule.runtime.api.util.FunctionalUtils {
       task.accept(item);
     } catch (Exception e) {
       exceptionHandler.accept(e);
+    }
+  }
+
+  public static <T> T withNullEvent(CheckedFunction<CoreEvent, T> function) {
+    CoreEvent event = getNullEvent();
+    try {
+      T value = function.apply(event);
+      ((BaseEventContext) event.getContext()).success();
+      return value;
+    } catch (RuntimeException e) {
+      ((BaseEventContext) event.getContext()).error(e);
+      throw e;
     }
   }
 }
