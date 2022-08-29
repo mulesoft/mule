@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * A default implementation for a {@link CoreEventTracer}.
@@ -96,19 +97,20 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   @Override
   public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
-    Error spanError = coreEvent.getError()
+    recordErrorAtCurrentSpan(coreEvent, () -> coreEvent.getError()
         .orElseThrow(() -> new IllegalArgumentException(String.format("Provided coreEvent [%s] does not declare an error.",
-                                                                      coreEvent)));
-    recordErrorAtCurrentSpan(coreEvent, spanError, isErrorEscapingCurrentSpan);
+                                                                      coreEvent))),
+                             isErrorEscapingCurrentSpan);
   }
 
   @Override
-  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error spanError, boolean isErrorEscapingCurrentSpan) {
+  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> spanError, boolean isErrorEscapingCurrentSpan) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
       ((DistributedTraceContextAware) eventContext)
           .getDistributedTraceContext()
-          .recordErrorAtCurrentSpan(new DefaultSpanError(spanError, coreEvent.getFlowCallStack(), isErrorEscapingCurrentSpan));
+          .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
+                                                         isErrorEscapingCurrentSpan));
     }
   }
 

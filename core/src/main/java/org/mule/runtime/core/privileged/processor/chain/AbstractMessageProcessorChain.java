@@ -275,8 +275,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   // TODO: Remove after W-11646448: Compound error handlers are not propagating correct error.
-  private Error resolveError(MessagingException exception) {
-    return exception.getEvent().getError().orElseGet(() -> ErrorBuilder.builder()
+  private Supplier<Error> resolveError(MessagingException exception) {
+    return () -> exception.getEvent().getError().orElseGet(() -> ErrorBuilder.builder()
         .exception(exception)
         .description(exception.getMessage())
         .detailedDescription(exception.getDetailedMessage())

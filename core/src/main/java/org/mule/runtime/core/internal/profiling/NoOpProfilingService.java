@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static java.util.Optional.empty;
+import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -163,7 +165,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
     }
 
     @Override
-    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error error, boolean isErrorEscapingCurrentSpan) {
+    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> error, boolean isErrorEscapingCurrentSpan) {
       // Nothing to do.
     }
 
@@ -208,7 +210,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
         @Override
         public Set<SpanError> getErrors() {
-          return null;
+          return emptySet();
         }
 
         @Override
