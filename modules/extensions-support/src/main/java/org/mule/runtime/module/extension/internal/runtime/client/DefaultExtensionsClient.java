@@ -59,15 +59,18 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -140,7 +143,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     ExecutionMediator<OperationModel> mediator = mediatorCache.get(key);
 
     return withNullEvent(event -> {
-      final Map<String, Object> resolvedParams = resolveParameters(key, paramsBuilder.build());
+      final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build());
       OperationModel operationModel = key.getOperationModel();
       CompletableComponentExecutor<OperationModel> executor = getComponentExecutor(operationModel, resolvedParams);
       CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
@@ -197,7 +200,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private CompletableComponentExecutor<OperationModel> getComponentExecutor(OperationModel operationModel,
                                                                             Map<String, Object> params) {
-    CompletableComponentExecutor<OperationModel> executor = getOperationExecutorFactory(operationModel).createExecutor(operationModel, params);
+    Map<String, Object> initParams = new HashMap<>();
+    operationModel.getAllParameterModels().stream()
+        .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
+        .forEach(p -> {
+          String paramName = p.getName();
+          if (params.containsKey(paramName)) {
+            initParams.put(paramName, params.get(paramName));
+          }
+        });
+    
+    CompletableComponentExecutor<OperationModel> executor = getOperationExecutorFactory(operationModel).createExecutor(operationModel, initParams);
     try {
       initialiseIfNeeded(executor, true, muleContext);
       startIfNeeded(executor);
@@ -208,7 +221,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private Map<String, Object> resolveParameters(OperationKey key, ComponentParameterization<OperationModel> parameters) {
+  private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters) {
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
           parameters,
@@ -217,6 +230,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
           reflectionCache,
           expressionManager,
           "");
+
+      withNullEvent(event -> {
+        try (ValueResolvingContext.builder(event).build()) {
+
+        }
+      })
+
+      resolverSet.resolve(ValueResolvingContext.).
+
       return (Map) resolverSet.getResolvers();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
