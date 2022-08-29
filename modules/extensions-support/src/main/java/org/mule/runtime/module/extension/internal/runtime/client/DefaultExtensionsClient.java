@@ -296,7 +296,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
             }
             return configurationProvider;
           })
-          .orElseThrow(() -> new IllegalArgumentException("Configuration '" + configRef + "' doesn't exist")));
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No configuration [" + configRef + "] found"))));
     }
 
     return empty();
@@ -313,13 +313,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     if (configurationProvider.isPresent()) {
       ConfigurationModel configurationModel = configurationProvider.get().getConfigurationModel();
       return configurationModel.getOperationModel(operationName).orElseThrow(
-          () -> new IllegalArgumentException(format("Operation '%s' not available for config '%s'",
-              operationName, configurationProvider.get().getName())));
+          () -> noSuchOperationException(operationName));
     } else {
       throw new IllegalArgumentException("Operation '" + operationName + "' not found at the extension level");
     }
   }
 
+  private MuleRuntimeException noSuchOperationException(String operationName) {
+    throw new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName)));
+  }
   private OperationModel findOperationModel(ExtensionModel extensionModel, String operationName) {
     for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels()) {
       Optional<OperationModel> operation = configurationModel.getOperationModel(operationName);
@@ -328,8 +330,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       }
     }
 
-    return extensionModel.getOperationModel(operationName)
-        .orElseThrow(() -> new IllegalArgumentException(format("Operation '%s' not found", operationName)));
+    return extensionModel.getOperationModel(operationName).orElseThrow(() -> noSuchOperationException(operationName));
   }
 
   private ExtensionModel findExtension(String extensionName) {

@@ -23,7 +23,7 @@ import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 @Feature("EXTENSIONS_CLIENT")
-public abstract class AbstractExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
+public class ExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static String MESSAGE_TO_ECHO = "Echo this message!";
   private static String ANOTHER_MESSAGE_TO_ECHO = "Echo this another message!";

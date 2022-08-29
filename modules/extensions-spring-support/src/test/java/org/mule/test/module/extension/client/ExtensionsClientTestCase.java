@@ -6,8 +6,6 @@
  */
 package org.mule.test.module.extension.client;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -15,7 +13,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.tck.probe.PollingProber.probe;
@@ -292,11 +289,6 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Checks that an operation disposes the resources after terminated")
   public void disposeAfterExecution() throws Throwable {
     executeSimpleOperation();
-
-    if (usingCachedStrategy()) {
-      muleContext.dispose();
-    }
-
     probe(() -> {
       assertThat(HeisenbergOperations.disposed, is(true));
       return true;
@@ -309,18 +301,11 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     try {
       executeFailureOperation();
     } finally {
-      if (usingCachedStrategy()) {
-        muleContext.dispose();
-      }
 
       probe(() -> {
         assertThat(HeisenbergOperations.disposed, is(true));
         return true;
       });
     }
-  }
-
-  private boolean usingCachedStrategy() {
-    return !parseBoolean(getProperty(MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED));
   }
 }
