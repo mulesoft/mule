@@ -279,7 +279,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     return errorModels.getValue();
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return empty();
   }
 

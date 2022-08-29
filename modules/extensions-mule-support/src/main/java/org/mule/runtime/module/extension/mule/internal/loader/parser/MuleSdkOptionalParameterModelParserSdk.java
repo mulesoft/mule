@@ -44,7 +44,8 @@ public class MuleSdkOptionalParameterModelParserSdk extends MuleSdkParameterMode
     return defaultValue;
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return Optional.empty();
   }
 }

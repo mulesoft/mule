@@ -233,7 +233,8 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
     return empty();
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return empty();
   }
 

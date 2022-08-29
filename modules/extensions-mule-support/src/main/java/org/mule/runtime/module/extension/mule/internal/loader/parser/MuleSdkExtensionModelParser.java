@@ -188,7 +188,8 @@ public class MuleSdkExtensionModelParser implements ExtensionModelParser {
     return APP_LOCAL_EXTENSION_NAMESPACE;
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return empty();
   }
 
