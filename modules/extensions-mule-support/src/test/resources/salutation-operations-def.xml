@@ -13,14 +13,19 @@
 
     <operation:def name="helloWorld" displayName="Hello World operation" summary="Returns a polite greeting">
         <operation:parameters>
-            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+            <operation:parameter name="receiver" type="string">
+                <operation:parameter-metadata summary="The name of the person being greeted" />
+            </operation:parameter>
+            <operation:optional-parameter name="greeting" type="string" defaultValue="Hello, ">
+                <operation:parameter-metadata summary="The greeting message" />
                 <operation:description>The greeting message appended before the receivers name</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+            <operation:optional-parameter name="prefix" type="string" defaultValue="">
+                <operation:parameter-metadata summary="The receiver's prefix" />
                 <operation:description>The prefix added to the receiver</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+            <operation:optional-parameter name="suffix" type="string">
+                <operation:parameter-metadata summary="The receiver's suffix" />
                 <operation:description>The suffix added to the receiver</operation:description>
             </operation:optional-parameter>
         </operation:parameters>
@@ -42,8 +47,12 @@
 
     <operation:def name="introduceMyself" summary="Returns an introductory message. Like a sir." visibility="PUBLIC">
         <operation:parameters>
-            <operation:parameter name="name" type="string" summary="The gentleman's name"/>
-            <operation:parameter name="nationalID" type="string" summary="The gentleman's identification"/>
+            <operation:parameter name="name" type="string">
+                <operation:parameter-metadata summary="The gentleman's name" />
+            </operation:parameter>
+            <operation:parameter name="nationalID" type="string">
+                <operation:parameter-metadata summary="The gentleman's identification" />
+            </operation:parameter>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -65,16 +74,25 @@
 
     <operation:def name="helloAndIntroduce" displayName="Hello and Introduce" summary="Says Hello and introduces itself">
         <operation:parameters>
-            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:parameter name="myName" type="string" summary="The gentleman's name"/>
-            <operation:parameter name="myNationalID" type="string" summary="The gentleman's identification"/>
-            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+            <operation:parameter name="receiver" type="string">
+                <operation:parameter-metadata summary="The name of the person being greeted" />
+            </operation:parameter>
+            <operation:parameter name="myName" type="string">
+                <operation:parameter-metadata summary="The gentleman's name" />
+            </operation:parameter>
+            <operation:parameter name="myNationalID" type="string">
+                <operation:parameter-metadata summary="The gentleman's identification" />
+            </operation:parameter>
+            <operation:optional-parameter name="greeting" type="string" defaultValue="Hello, ">
+                <operation:parameter-metadata summary="The greeting message" />
                 <operation:description>The greeting message appended before the receivers name</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+            <operation:optional-parameter name="prefix" type="string" defaultValue="">
+                <operation:parameter-metadata summary="The receiver's prefix" />
                 <operation:description>The prefix added to the receiver</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+            <operation:optional-parameter name="suffix" type="string">
+                <operation:parameter-metadata summary="The receiver's suffix" />
                 <operation:description>The suffix added to the receiver</operation:description>
             </operation:optional-parameter>
         </operation:parameters>
@@ -101,9 +119,15 @@
 
     <operation:def name="helloPlace" displayName="Hello to a place" summary="Says Hello to a place" visibility="PRIVATE">
         <operation:parameters>
-            <operation:parameter name="greeting" type="string" summary="The greeting message"/>
-            <operation:optional-parameter name="city" type="string" summary="The name of a city to say hello to"/>
-            <operation:optional-parameter name="country" type="string" summary="The name of a country to say hello to"/>
+            <operation:parameter name="greeting" type="string">
+                <operation:parameter-metadata summary="The greeting message" />
+            </operation:parameter>
+            <operation:optional-parameter name="city" type="string">
+                <operation:parameter-metadata summary="The name of a city to say hello to" />
+            </operation:optional-parameter>
+            <operation:optional-parameter name="country" type="string">
+                <operation:parameter-metadata summary="The name of a country to say hello to" />
+            </operation:optional-parameter>
             <operation:exclusive-optionals exclusiveOptionals="city,country" oneRequired="true"/>
         </operation:parameters>
         <operation:output>
@@ -118,14 +142,19 @@
 
     <operation:def name="nonBlockingHelloWorld" displayName="Non Blocking Hello World operation" summary="Returns a polite greeting performed in a non-blocking fashion">
         <operation:parameters>
-            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+            <operation:parameter name="receiver" type="string">
+                <operation:parameter-metadata summary="The name of the person being greeted" />
+            </operation:parameter>
+            <operation:optional-parameter name="greeting" type="string" defaultValue="Hello, ">
+                <operation:parameter-metadata summary="The greeting message" />
                 <operation:description>The greeting message appended before the receivers name</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+            <operation:optional-parameter name="prefix" type="string" defaultValue="">
+                <operation:parameter-metadata summary="The receiver's prefix" />
                 <operation:description>The prefix added to the receiver</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+            <operation:optional-parameter name="suffix" type="string">
+                <operation:parameter-metadata summary="The receiver's suffix" />
                 <operation:description>The suffix added to the receiver</operation:description>
             </operation:optional-parameter>
         </operation:parameters>
@@ -148,14 +177,19 @@
 
     <operation:def name="blockingHelloWorld" displayName="Blocking Hello World operation" summary="Returns a polite greeting performed in a blocking fashion">
         <operation:parameters>
-            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+            <operation:parameter name="receiver" type="string">
+                <operation:parameter-metadata summary="The name of the person being greeted" />
+            </operation:parameter>
+            <operation:optional-parameter name="greeting" type="string" defaultValue="Hello, ">
+                <operation:parameter-metadata summary="The greeting message" />
                 <operation:description>The greeting message appended before the receivers name</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+            <operation:optional-parameter name="prefix" type="string" defaultValue="">
+                <operation:parameter-metadata summary="The receiver's prefix" />
                 <operation:description>The prefix added to the receiver</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+            <operation:optional-parameter name="suffix" type="string">
+                <operation:parameter-metadata summary="The receiver's suffix" />
                 <operation:description>The suffix added to the receiver</operation:description>
             </operation:optional-parameter>
         </operation:parameters>
@@ -181,15 +215,22 @@
     <!-- Implemented recursively for testing purposes -->
     <operation:def name="repeatedHelloWorld" displayName="Recursive Hello World operation" summary="Returns polite greeting repeated a given number of times">
         <operation:parameters>
-            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:parameter name="count" type="number" summary="The number of times to repeat the greeting message"/>
-            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+            <operation:parameter name="receiver" type="string">
+                <operation:parameter-metadata summary="The name of the person being greeted" />
+            </operation:parameter>
+            <operation:parameter name="count" type="number">
+                <operation:parameter-metadata summary="The number of times to repeat the greeting message" />
+            </operation:parameter>
+            <operation:optional-parameter name="greeting" type="string" defaultValue="Hello, ">
+                <operation:parameter-metadata summary="The greeting message" />
                 <operation:description>The greeting message appended before the receivers name</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+            <operation:optional-parameter name="prefix" type="string" defaultValue="">
+                <operation:parameter-metadata summary="The receiver's prefix" />
                 <operation:description>The prefix added to the receiver</operation:description>
             </operation:optional-parameter>
-            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+            <operation:optional-parameter name="suffix" type="string">
+                <operation:parameter-metadata summary="The receiver's suffix" />
                 <operation:description>The suffix added to the receiver</operation:description>
             </operation:optional-parameter>
         </operation:parameters>
@@ -244,7 +285,8 @@
 
     <operation:def name="operationWithDeprecatedParameter">
         <operation:parameters>
-            <operation:parameter name="deprecatedParameter" type="string" summary="Some deprecated param">
+            <operation:parameter name="deprecatedParameter" type="string">
+                <operation:parameter-metadata summary="Some deprecated param" />
                 <operation:deprecated since="1.1.0"
                                       message="Some deprecation message"
                                       toRemoveIn="2.0.0" />

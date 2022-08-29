@@ -25,6 +25,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
                 <xsd:sequence>
+                    <xsd:element name="parameter-metadata" type="parameterMetadataType" minOccurs="0" />
                     <xsd:element name="description" type="xsd:string" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -66,13 +67,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The support level this parameter offers regarding expressions
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="summary" type="mule:nonBlankString">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A very brief overview about the parameter.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -361,4 +355,18 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:complexType name="parameterMetadataType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Parameter metadata including display and layout information
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="summary" type="mule:nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A very brief overview about the parameter.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
 </xsd:schema>

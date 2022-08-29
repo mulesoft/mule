@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.extension;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
@@ -26,6 +25,8 @@ import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTY
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_PAYLOAD_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_STEREOTYPE;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -250,16 +251,14 @@ class MuleOperationExtensionModelDeclarer {
 
     declareDeprecationConstruct(parameterDef, "Defines a parameter's deprecation.");
 
-    final ParameterGroupDeclarer parameterDefParameters = parameterDef.onDefaultParameterGroup();
-    addParameterDeclaration(parameterDefParameters);
+    addParameterDeclaration(parameterDef);
 
     final NestedComponentDeclarer optionalParameterDef = parametersDef.withOptionalComponent("optional-parameter")
         .describedAs("Defines an optional operation parameter")
         .withMinOccurs(0)
         .withMaxOccurs(null);
 
-    final ParameterGroupDeclarer optionalParameterDefParameters = optionalParameterDef.onDefaultParameterGroup();
-    addOptionalParameterDeclaration(optionalParameterDefParameters);
+    addOptionalParameterDeclaration(optionalParameterDef);
 
     final NestedComponentDeclarer exclusiveOptionalDef = parametersDef.withOptionalComponent("exclusive-optionals")
         .describedAs("Defines a set of mutually exclusive parameters")
@@ -279,7 +278,9 @@ class MuleOperationExtensionModelDeclarer {
         .withDisplayModel(display("One required?", "Enforces that one of the parameters must be set at any given time"));
   }
 
-  private void addParameterDeclaration(ParameterGroupDeclarer<?> parameterGroupDeclarer) {
+  private void addParameterDeclaration(ComponentDeclarer parameterDef) {
+    final ParameterGroupDeclarer parameterGroupDeclarer = parameterDef.onDefaultParameterGroup();
+
     parameterGroupDeclarer.withRequiredParameter("name")
         .describedAs("The parameter's name")
         .ofType(STRING_TYPE)
@@ -293,12 +294,6 @@ class MuleOperationExtensionModelDeclarer {
                                   "Detailed description of the parameter, it's semantics, usage and effects"))
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().asText().build());
-
-    parameterGroupDeclarer.withOptionalParameter("summary")
-        .describedAs("A brief description of the parameter")
-        .ofType(STRING_TYPE)
-        .withDisplayModel(display("Summary", "A brief description of the parameter"))
-        .withExpressionSupport(NOT_SUPPORTED);
 
     parameterGroupDeclarer.withOptionalParameter("type")
         .describedAs("The parameter's type")
@@ -319,11 +314,25 @@ class MuleOperationExtensionModelDeclarer {
         .defaultingTo("false")
         .withDisplayModel(display("Config Override", "Whether the parameter should act as a Config Override."))
         .withExpressionSupport(NOT_SUPPORTED);
+
+    addParameterLayoutDeclaration(parameterDef);
   }
 
-  private void addOptionalParameterDeclaration(ParameterGroupDeclarer<?> parameterGroupDeclarer) {
-    addParameterDeclaration(parameterGroupDeclarer);
+  private void addParameterLayoutDeclaration(ComponentDeclarer parameterDef) {
+    NestedComponentDeclarer parameterMetadataDef = parameterDef.withOptionalComponent("parameter-metadata")
+        .describedAs("Parameter metadata including display and layout information");
+    final ParameterGroupDeclarer parameterMetadataAttributes = parameterMetadataDef.onDefaultParameterGroup();
+    parameterMetadataAttributes.withOptionalParameter("summary")
+        .describedAs("A very brief overview about the parameter.")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Summary", "A brief description of the parameter"))
+        .withExpressionSupport(NOT_SUPPORTED);
+  }
 
+  private void addOptionalParameterDeclaration(ComponentDeclarer parameterDef) {
+    addParameterDeclaration(parameterDef);
+
+    final ParameterGroupDeclarer parameterGroupDeclarer = parameterDef.onDefaultParameterGroup();
     parameterGroupDeclarer.withOptionalParameter("defaultValue")
         .describedAs("The parameter's default value if not provided.")
         .ofType(STRING_TYPE)
