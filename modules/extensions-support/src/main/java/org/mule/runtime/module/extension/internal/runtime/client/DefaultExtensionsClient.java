@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.privileged.util.EventUtils.withNullEvent;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
@@ -350,7 +351,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
-    parameters.get().forEach(paramsBuilder::withParameter);
+    parameters.get().forEach((key, value) -> {
+      if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
+        paramsBuilder.withParameter(key, value);
+      }
+    });
 
     return executeAsync(
         extensionName,
@@ -412,13 +417,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Override
   public void dispose() {
+    if (mediatorCache != null) {
+      mediatorCache.invalidateAll();
+    }
+
     if (cacheShutdownExecutor != null) {
       cacheShutdownExecutor.shutdown();
       shutdownAndAwaitTermination(cacheShutdownExecutor, 5, SECONDS);
-    }
-
-    if (mediatorCache != null) {
-      mediatorCache.invalidateAll();
     }
   }
 

@@ -25,18 +25,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.isParameterGroupShowInDsl;
 
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -69,7 +57,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.BackPressureContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
@@ -83,6 +70,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.DistributedTr
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExtensionsClientArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.LegacySourceCallbackContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NotificationHandlerArgumentResolver;
@@ -100,7 +88,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.SdkSecurityCo
 import org.mule.runtime.module.extension.internal.runtime.resolver.SdkSourceResultArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SdkVoidCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.LegacySourceCallbackContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCompletionCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultArgumentResolver;
@@ -108,7 +95,18 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelp
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
 
 
 /**
@@ -176,13 +174,13 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private ReflectionCache reflectionCache;
 
   @Inject
-  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
-
-  @Inject
   private ExpressionManager expressionManager;
 
   @Inject
   private InternalProfilingService profilingService;
+
+  @Inject
+  private ExtensionsClient extensionsClient;
 
   private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
@@ -248,10 +246,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (org.mule.sdk.api.runtime.process.CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (ExtensionsClient.class.equals(parameterType)) {
-        argumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
+        argumentResolver = new ExtensionsClientArgumentResolver(extensionsClient);
       } else if (org.mule.sdk.api.client.ExtensionsClient.class.equals(parameterType)) {
-        argumentResolver =
-            new SdkExtensionsClientArgumentResolver(new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory));
+        argumentResolver = new SdkExtensionsClientArgumentResolver(extensionsClient);
       } else if (RouterCompletionCallback.class.equals(parameterType)) {
         argumentResolver = LEGACY_ROUTER_CALLBACK_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.runtime.process.RouterCompletionCallback.class.equals(parameterType)) {

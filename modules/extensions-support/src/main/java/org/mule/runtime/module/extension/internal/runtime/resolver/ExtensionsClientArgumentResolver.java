@@ -7,15 +7,8 @@
 
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.client.DefaultExtensionsClient;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 
 /**
  * An argument resolver that yields instances of {@link ExtensionsClient}.
@@ -24,22 +17,14 @@ import org.mule.runtime.module.extension.internal.runtime.client.strategy.Extens
  */
 public class ExtensionsClientArgumentResolver implements ArgumentResolver<ExtensionsClient> {
 
-  private final ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
+  private final ExtensionsClient extensionsClient;
 
-  public ExtensionsClientArgumentResolver(ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory) {
-    this.extensionsClientProcessorsStrategyFactory = extensionsClientProcessorsStrategyFactory;
+  public ExtensionsClientArgumentResolver(ExtensionsClient extensionsClient) {
+    this.extensionsClient = extensionsClient;
   }
 
   @Override
   public ExtensionsClient resolve(ExecutionContext executionContext) {
-    ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
-    DefaultExtensionsClient extensionClient =
-        new DefaultExtensionsClient(cxt.getEvent(), extensionsClientProcessorsStrategyFactory);
-    try {
-      extensionClient.initialise();
-    } catch (InitialisationException e) {
-      throw new MuleRuntimeException(createStaticMessage("Failed to initialise Extension Client"), e);
-    }
-    return extensionClient;
+    return extensionsClient;
   }
 }
