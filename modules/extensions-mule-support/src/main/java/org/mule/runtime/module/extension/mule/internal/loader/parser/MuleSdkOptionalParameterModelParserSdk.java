@@ -9,7 +9,10 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+
+import java.util.Optional;
 
 /**
  * {@link ParameterModelParser} implementation for Mule SDK (optional parameters).
@@ -39,5 +42,9 @@ public class MuleSdkOptionalParameterModelParserSdk extends MuleSdkParameterMode
   @Override
   public Object getDefaultValue() {
     return defaultValue;
+  }
+
+  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+    return Optional.empty();
   }
 }

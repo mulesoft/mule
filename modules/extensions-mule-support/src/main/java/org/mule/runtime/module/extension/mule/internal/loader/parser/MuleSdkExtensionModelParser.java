@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
@@ -185,6 +186,10 @@ public class MuleSdkExtensionModelParser implements ExtensionModelParser {
   public String getNamespace() {
     // TODO: Change this when it's an actual extension.
     return APP_LOCAL_EXTENSION_NAMESPACE;
+  }
+
+  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+    return empty();
   }
 
   private List<OperationModelParser> computeOperationModelParsers() {
