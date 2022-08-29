@@ -199,7 +199,7 @@ public class DefaultCoreEventTracerTestCase {
     DistributedTraceContextAware eventContext =
         mock(DistributedTraceContextAware.class, withSettings().extraInterfaces(EventContext.class));
     when(coreEvent.getContext()).thenReturn((EventContext) eventContext);
-    when(((EventContext) eventContext).getCorrelationId()).thenThrow(new RuntimeException());
+    when(((EventContext) eventContext).getCorrelationId()).thenThrow(new TracingErrorPropagationException());
     assertThat(coreEventTracer.getDistributedTraceContextMap(coreEvent), anEmptyMap());
   }
 
@@ -218,7 +218,6 @@ public class DefaultCoreEventTracerTestCase {
     coreEventTracer.endCurrentSpan(coreEvent);
   }
 
-
   private void doTestStartComponentExecutionIfThrowable(boolean enablePropagateTracingErrors) {
     CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
@@ -227,7 +226,7 @@ public class DefaultCoreEventTracerTestCase {
     CoreEvent coreEvent = mock(CoreEvent.class);
     EventContext eventContext = mock(EventContext.class);
     when(coreEvent.getContext()).thenReturn(eventContext);
-    when(eventContext.getCorrelationId()).thenThrow(new RuntimeException());
+    when(eventContext.getCorrelationId()).thenThrow(new TracingErrorPropagationException());
     SpanCustomizationInfo spanCustomizationInfo = mock(SpanCustomizationInfo.class);
     assertThat(coreEventTracer.startComponentSpan(coreEvent, spanCustomizationInfo), IsEmptyOptional.empty());
   }
