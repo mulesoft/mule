@@ -186,14 +186,14 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
     assertThat(domainDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
     assertThat(domainDescriptor.getPlugins(), contains(hasProperty("name", equalTo("Sockets"))));
 
-    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/with-domain", domainBundleDescriptor -> {
-      assertThat(domainBundleDescriptor, equalTo(domainDescriptor.getBundleDescriptor()));
-      return domainDescriptor;
-    });
+    ApplicationDescriptor applicationDescriptor =
+        createApplicationDescriptor("apps/with-domain", (domainName, domainBundleDescriptor) -> {
+          assertThat(domainBundleDescriptor, equalTo(domainDescriptor.getBundleDescriptor()));
+          return domainDescriptor;
+        });
 
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
-               containsInAnyOrder("test-script.dwl", "app.xml"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), hasSize(0));
 
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(4));
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),

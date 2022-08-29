@@ -4,28 +4,29 @@
     "groupId": "com.mycompany",
     "artifactId": "test",
     "version": "1.0.0-SNAPSHOT",
-    "type": "pom"
+    "type": "pom",
+    "classifier": "mule-application"
   },
   "dependencies": [
     {
       "artifactCoordinates": {
         "groupId": "org.mule.connectors",
         "artifactId": "mule-http-connector",
-        "version": "1.0.0-SNAPSHOT",
+        "version": "1.0.0",
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "repository/org/mule/connectors/mule-http-connector/1.0.0-SNAPSHOT/mule-http-connector-1.0.0-SNAPSHOT-mule-plugin.jar"
+      "uri": "repository/org/mule/connectors/mule-http-connector/1.0.0/mule-http-connector-1.0.0-mule-plugin.jar"
     },
     {
       "artifactCoordinates": {
         "groupId": "org.mule.connectors",
         "artifactId": "mule-sockets-connector",
-        "version": "1.0.0-SNAPSHOT",
+        "version": "1.0.0",
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.0.0-SNAPSHOT/mule-sockets-connector-1.0.0-SNAPSHOT-mule-plugin.jar"
+      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.0.0/mule-sockets-connector-1.0.0-mule-plugin.jar"
     },
     {
       "artifactCoordinates": {

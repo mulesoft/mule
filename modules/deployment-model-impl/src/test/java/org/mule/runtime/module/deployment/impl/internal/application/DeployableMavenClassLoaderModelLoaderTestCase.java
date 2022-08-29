@@ -249,7 +249,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
   @Test
   public void patchedApplicationLoadsUpdatedConnector() throws InvalidDescriptorLoaderException, IOException {
-    testPatchedDependency(PATCHED_PLUGIN_APP, 3, "mule-objectstore-connector", "1.0.1");
+    testPatchedDependency(PATCHED_PLUGIN_APP, 3, "mule-objectstore-connector", "1.1.0");
   }
 
   @Test
@@ -259,8 +259,8 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
   @Test
   public void patchedApplicationLoadsUpdatedJarAndPlugin() throws InvalidDescriptorLoaderException, IOException {
-    testPatchedDependency(PATCHED_JAR_AND_PLUGIN_APP, 3, "commons-cli", "1.4");
-    testPatchedDependency(PATCHED_JAR_AND_PLUGIN_APP, 3, "mule-sockets-connector", "1.5.8");
+    testPatchedDependency(PATCHED_JAR_AND_PLUGIN_APP, 2, "commons-cli", "1.4");
+    testPatchedDependency(PATCHED_JAR_AND_PLUGIN_APP, 2, "mule-objectstore-connector", "1.1.0");
   }
 
   @Test

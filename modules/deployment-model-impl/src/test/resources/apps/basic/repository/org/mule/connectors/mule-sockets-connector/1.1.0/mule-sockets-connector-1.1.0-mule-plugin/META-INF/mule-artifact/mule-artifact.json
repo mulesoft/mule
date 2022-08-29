@@ -1,0 +1,31 @@
+{
+  "extensionModelLoaderDescriptor": {
+    "id": "java",
+    "attributes": {
+      "type": "org.mule.extension.socket.api.SocketsExtension",
+      "version": "1.1.0"
+    }
+  },
+  "name": "Sockets",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "privilegedExportedPackages": [],
+      "privilegedArtifactIds": [],
+      "exportedPackages": [
+        "org.mule.extension.socket.api.connection.tcp.protocol",
+        "org.mule.extension.socket.api.socket.tcp",
+        "org.mule.extension.socket.api.socket.udp",
+        "org.mule.extension.socket.api",
+        "org.mule.extension.socket.api.exceptions"
+      ],
+      "exportedResources": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "minMuleVersion": "4.1.0"
+}

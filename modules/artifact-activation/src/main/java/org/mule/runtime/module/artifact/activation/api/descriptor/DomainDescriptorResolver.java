@@ -10,7 +10,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 /**
- * Resolves the {@link DomainDescriptor} described by the {@link BundleDescriptor}, wrapping the logic to obtain it.
+ * Resolves the {@link DomainDescriptor} described by its name and the {@link BundleDescriptor}, wrapping the logic to obtain it.
  *
  * @since 4.5
  */
@@ -20,15 +20,17 @@ public interface DomainDescriptorResolver {
    * @return the default implementation of a {@link DomainDescriptorResolver}.
    */
   static DomainDescriptorResolver noDomainDescriptorResolver() {
-    return bundleDescriptor -> null;
+    return (domainName, bundleDescriptor) -> null;
   }
 
   /**
-   * Holds the logic to obtain a {@link DomainDescriptor} based on the given {@link BundleDescriptor}.
+   * Holds the logic to obtain a {@link DomainDescriptor} based on the given domain name and {@link BundleDescriptor}.
    *
+   *
+   * @param name             domain name.
    * @param bundleDescriptor the bundle descriptor of the domain to get the artifact descriptor for.
    * @return returns a {@link DomainDescriptor} corresponding to the given {@link BundleDescriptor}.
    */
-  DomainDescriptor resolve(BundleDescriptor bundleDescriptor) throws DomainDescriptorResolutionException;
+  DomainDescriptor resolve(String name, BundleDescriptor bundleDescriptor) throws DomainDescriptorResolutionException;
 
 }

@@ -26,6 +26,7 @@ import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesR
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -87,6 +88,7 @@ public class TestDomainFactory extends DefaultDomainFactory {
         new DomainClassLoaderBuilderFactory(artifactClassLoaderResolver);
 
     return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
+                                 DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
                                  pluginDependenciesResolver,
                                  domainClassLoaderBuilderFactory, new MuleExtensionModelLoaderManager(containerClassLoader));
   }
@@ -94,10 +96,11 @@ public class TestDomainFactory extends DefaultDomainFactory {
   private TestDomainFactory(ClassLoaderRepository classLoaderRepository,
                             ServiceRepository serviceRepository,
                             DomainDescriptorFactory domainDescriptorFactory,
+                            DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
                             PluginDependenciesResolver pluginDependenciesResolver,
                             DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                             ExtensionModelLoaderManager extensionModelLoaderManager) {
-    super(domainDescriptorFactory, new DefaultDomainManager(),
+    super(domainDescriptorFactory, deployableArtifactDescriptorFactory, new DefaultDomainManager(),
           classLoaderRepository, serviceRepository,
           pluginDependenciesResolver, domainClassLoaderBuilderFactory,
           extensionModelLoaderManager, mock(LicenseValidator.class),

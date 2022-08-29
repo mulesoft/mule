@@ -13,6 +13,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication.getApplicationDomain;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.lock.LockFactory;
@@ -27,6 +28,8 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolutionException;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -34,8 +37,10 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
@@ -54,9 +59,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+
+import com.google.common.collect.Maps;
 
 /**
  * Creates default mule applications
@@ -64,7 +72,9 @@ import java.util.Set;
 public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory<ApplicationDescriptor, Application>
     implements ArtifactFactory<ApplicationDescriptor, Application> {
 
+  // TODO - W-11086334: remove old application descriptor factory with the migration
   private final ApplicationDescriptorFactory applicationDescriptorFactory;
+  private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory;
   private final DomainRepository domainRepository;
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
   private final ServiceRepository serviceRepository;
@@ -77,6 +87,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
+                                   DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
                                    DomainRepository domainRepository,
                                    ServiceRepository serviceRepository,
                                    ExtensionModelLoaderRepository extensionModelLoaderRepository,
@@ -91,6 +102,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
+    checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");
     checkArgument(extensionModelLoaderRepository != null, "extensionModelLoaderRepository cannot be null");
@@ -104,6 +116,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
     this.applicationDescriptorFactory = applicationDescriptorFactory;
+    this.deployableArtifactDescriptorFactory = deployableArtifactDescriptorFactory;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
@@ -131,20 +144,34 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   @Override
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
-    return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
+    // TODO - W-11086334: remove this conditional during lightweight deployment migration
+    if (MuleDeployableProjectModelBuilder.isHeavyPackage(artifactLocation)) {
+      return deployableArtifactDescriptorFactory
+          .createApplicationDescriptor(createDeployableProjectModel(artifactLocation),
+                                       deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))
+                                           .orElse(emptyMap()),
+                                       (domainName,
+                                        bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
+                                                                                    artifactLocation)
+                                                                                        .getDescriptor());
+    } else {
+      return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
+    }
   }
 
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
     Domain domain = getDomainForDescriptor(descriptor);
 
-    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
-                                           new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
+    // TODO - W-11086334: remove this conditional during lightweight deployment migration
+    if (!MuleDeployableProjectModelBuilder.isHeavyPackage(descriptor.getArtifactLocation())) {
+      List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+          pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
+                                             new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
 
-    // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
-    Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>();
-    resolvedArtifactPlugins.addAll(resolvedArtifactPluginDescriptors);
-    descriptor.setPlugins(resolvedArtifactPlugins);
+      // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
+      Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>(resolvedArtifactPluginDescriptors);
+      descriptor.setPlugins(resolvedArtifactPlugins);
+    }
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
         applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
@@ -154,7 +181,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
             .setArtifactDescriptor(descriptor).build();
 
     List<ArtifactPlugin> artifactPlugins =
-        createArtifactPluginList(applicationClassLoader, resolvedArtifactPluginDescriptors);
+        createArtifactPluginList(applicationClassLoader, new ArrayList<>(descriptor.getPlugins()));
 
     MuleApplicationPolicyProvider applicationPolicyProvider =
         new MuleApplicationPolicyProvider(
@@ -177,14 +204,35 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getDomainForDescriptor(ApplicationDescriptor descriptor) {
+    // TODO - W-11086334: remove this conditional during lightweight deployment migration
+    if (MuleDeployableProjectModelBuilder.isHeavyPackage(descriptor.getArtifactLocation())) {
+      return getDomainForDescriptor(descriptor.getDomainName(), descriptor.getDomainDescriptor().orElse(null),
+                                    descriptor.getArtifactLocation());
+    } else {
+      try {
+        return getApplicationDomain(domainRepository, descriptor);
+      } catch (DomainNotFoundException e) {
+        throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
+                                                                 e.getDomainName(), descriptor.getName())),
+                                      e);
+      } catch (IncompatibleDomainException e) {
+        throw new DeploymentException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"), e);
+      } catch (AmbiguousDomainReferenceException e) {
+        throw new DeploymentException(createStaticMessage("Multiple domains were found"), e);
+      }
+    }
+  }
+
+  private Domain getDomainForDescriptor(String domainName, BundleDescriptor domainBundleDescriptor, File artifactLocation) {
     try {
-      return getApplicationDomain(domainRepository, descriptor);
+      return domainName != null ? domainRepository.getDomain(domainName)
+          : domainRepository.getCompatibleDomain(domainBundleDescriptor);
     } catch (DomainNotFoundException e) {
-      throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
-                                                               e.getDomainName(), descriptor.getName())),
+      throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application in '%s'",
+                                                               e.getDomainName(), artifactLocation.toString())),
                                     e);
-    } catch (IncompatibleDomainException e) {
-      throw new DeploymentException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"), e);
+    } catch (DomainDescriptorResolutionException e) {
+      throw new DeploymentException(createStaticMessage(format("Problems found while retrieving domain '%s'", domainName)), e);
     } catch (AmbiguousDomainReferenceException e) {
       throw new DeploymentException(createStaticMessage("Multiple domains were found"), e);
     }

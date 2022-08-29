@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="listener-config">
+            <description><![CDATA[Config for listener sockets]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+        <config name="request-config">
+            <description><![CDATA[Config for requester sockets]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="tcp-listener">
+            <description><![CDATA[A ConnectionProvider which provides instances of TcpListenerConnection to be used by SocketListener]]></description>
+            <parameters>
+                <parameter name="tlsContext">
+                    <description><![CDATA[Its presence will imply the use of SSLServerSocket instead of plain TCP ServerSocket for accepting new SSL connections.]]></description>
+                </parameter>
+                <parameter name="protocol">
+                    <description><![CDATA[TcpProtocol that knows how the data is going to be read and written. If not specified, the SafeProtocol will be used.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Connection's port number]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Connection's host name]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a blocking operation before failing. <p> A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="sendTcpNoDelay">
+                    <description><![CDATA[If set, transmitted data is not collected together for greater efficiency but sent immediately. <p> Defaults to true even though Socket default is false because optimizing to reduce amount of network traffic over latency is hardly ever a concern today.]]></description>
+                </parameter>
+                <parameter name="linger">
+                    <description><![CDATA[This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.]]></description>
+                </parameter>
+                <parameter name="keepAlive">
+                    <description><![CDATA[Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable. <p> This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept alive before they are recycled.]]></description>
+                </parameter>
+                <parameter name="failOnUnresolvedHost">
+                    <description><![CDATA[Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved. However, it can be set to false to allow unresolved hosts (useful when connecting through a proxy).]]></description>
+                </parameter>
+                <parameter name="serverTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value when the socket is used as a server. This is the timeout that applies to the "accept" operation. A value of 0 (the ServerSocket default) causes the accept to wait indefinitely (if no connection arrives).]]></description>
+                </parameter>
+                <parameter name="receiveBacklog">
+                    <description><![CDATA[The maximum queue length for incoming connections.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="udp-listener">
+            <description><![CDATA[A ConnectionProvider which provides instances of UdpListenerConnection to be used by SocketListener]]></description>
+            <parameters>
+                <parameter name="port">
+                    <description><![CDATA[Connection's port number]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Connection's host name]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a blocking operation before failing. <p> A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="broadcast">
+                    <description><![CDATA[Enable/disable SO_BROADCAST into the DatagramSocket]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="tcp-requester">
+            <description><![CDATA[A ConnectionProvider which provides instances of TcpRequesterConnection to be used by the SocketOperations]]></description>
+            <parameters>
+                <parameter name="tlsContext">
+                    <description><![CDATA[Its presence will imply the use of SSLSocket instead of plain TCP Socket for establishing a connection over SSL.]]></description>
+                </parameter>
+                <parameter name="localAddressSettings">
+                    <description><![CDATA[This configuration parameter refers to the address where the Socket should bind to.]]></description>
+                </parameter>
+                <parameter name="protocol">
+                    <description><![CDATA[TcpProtocol that knows how the data is going to be read and written. If not specified, the SafeProtocol will be used.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Connection's port number]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Connection's host name]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a blocking operation before failing. <p> A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="sendTcpNoDelay">
+                    <description><![CDATA[If set, transmitted data is not collected together for greater efficiency but sent immediately. <p> Defaults to true even though Socket default is false because optimizing to reduce amount of network traffic over latency is hardly ever a concern today.]]></description>
+                </parameter>
+                <parameter name="linger">
+                    <description><![CDATA[This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.]]></description>
+                </parameter>
+                <parameter name="keepAlive">
+                    <description><![CDATA[Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable. <p> This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept alive before they are recycled.]]></description>
+                </parameter>
+                <parameter name="failOnUnresolvedHost">
+                    <description><![CDATA[Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved. However, it can be set to false to allow unresolved hosts (useful when connecting through a proxy).]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Number of milliseconds to wait until an outbound connection to a remote server is successfully created. Defaults to 30 seconds.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="udp-requester">
+            <description><![CDATA[A ConnectionProvider which provides instances of UdpRequesterConnection to be used by the SocketOperations]]></description>
+            <parameters>
+                <parameter name="localAddressSettings">
+                    <description><![CDATA[This configuration parameter refers to the address where the DatagramSocket should bind to.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Connection's port number]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Connection's host name]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a blocking operation before failing. <p> A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="broadcast">
+                    <description><![CDATA[Enable/disable SO_BROADCAST into the DatagramSocket]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Sockets">
+        <description><![CDATA[An extension for sending and receiving connections through both TCP and UDP protocols.]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="send">
+            <description><![CDATA[Sends the data using the client associated to the RequesterConnection.]]></description>
+            <parameters>
+                <parameter name="content">
+                    <description><![CDATA[data that will be serialized and sent through the socket.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sendAndReceive">
+            <description><![CDATA[Sends the data using the client associated to the RequesterConnection and then blocks until a response is received or the timeout is met, in which case the operation will return a null payload.]]></description>
+            <parameters>
+                <parameter name="content">
+                    <description><![CDATA[data that will be serialized and sent through the socket.]]></description>
+                </parameter>
+                <parameter name="outputMimeType">
+                    <description><![CDATA[The mime type of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="outputEncoding">
+                    <description><![CDATA[The encoding of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources>
+        <source name="listener">
+            <description><![CDATA[Listens for socket connections of the given protocol in the configured host and port. <p> Whenever a new connection is received, this Source will schedule a a SocketWorker that will handle the communication for that particular connection.]]></description>
+            <parameters>
+                <parameter name="outputMimeType">
+                    <description><![CDATA[The mime type of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="outputEncoding">
+                    <description><![CDATA[The encoding of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="responseValue">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+    <types>
+        <type name="org.mule.extension.socket.api.SocketAttributes">
+            <description><![CDATA[Canonical representation a connection's metadata attributes.
+ <p>
+ It contains information such as a the port from which the sending endpoint is writing information, its host name and address.
+
+ @since 1.0]]></description>
+            <parameters/>
+        </type>
+        <type name="org.mule.extension.socket.api.SocketConnectionSettings">
+            <description><![CDATA[Groups host and port fields.
+ <p>
+ This can be used for representing where a socket should bind in order to listen for connections, or which address should the
+ socket connect to as well.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="port">
+                    <description><![CDATA[Connection's port number]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Connection's host name]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.AbstractByteProtocol">
+            <description><![CDATA[This Abstract class has been introduced so as to have the byte protocols (i.e. the protocols that had only a single write
+ method taking just an array of bytes as a parameter) to inherit from since they will all behave the same, i.e. if the object is
+ serializable, serialize it into an array of bytes and write it.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.CustomClassLoadingLengthProtocol">
+            <description><![CDATA[A length protocol that uses a specific class loader to load objects from streams
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+                <parameter name="maxMessageLength">
+                    <description><![CDATA[Indicates the maximum length of the message]]></description>
+                </parameter>
+                <parameter name="classLoader">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.CustomProtocol">
+            <description><![CDATA[@since 1.0]]></description>
+            <parameters>
+                <parameter name="class">
+                    <description><![CDATA[Reference to full qualifier class name that should extend TcpProtocol that will be used as a custom protocol]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.DirectProtocol">
+            <description><![CDATA[This protocol is an application level TcpProtocol that does nothing. The socket reads until no more bytes are
+ (momentarily) available (previously the transfer buffer also had to be full on the previous read, which made stronger
+ requirements on the underlying network). On slow networks LengthProtocol may be more reliable.
+ <p>
+ <p>
+ Writing simply writes the data into the socket.
+ </p>
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.EOFProtocol">
+            <description><![CDATA[This protocol is an application level TcpProtocol that does nothing. Reading is terminated by the stream being closed
+ by the client.
+ <p>
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.LengthProtocol">
+            <description><![CDATA[This protocol is an application level TcpProtocol that can be used to transfer large amounts of data without risking
+ some data to be loss. The protocol is defined by sending / reading an integer (the packet length) and then the data to be
+ transferred.
+ <p>
+ <p>
+ Note that use of this protocol must be symmetric - both the sending and receiving connectors must use the same protocol.
+ </p>
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+                <parameter name="maxMessageLength">
+                    <description><![CDATA[Indicates the maximum length of the message]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol">
+            <description><![CDATA[This protocol is an application level TcpProtocol and precedes every message with a cookie. It should probably not be
+ used in production. Should probably change to LengthProtocol. Both sender and receiver must use the same protocol.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+                <parameter name="maxMessageLeght">
+                    <description><![CDATA[Indicates the maximum length of the message]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[Indicates the encoding used for serializing the cookie]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.StreamingProtocol">
+            <description><![CDATA[This protocol is an application level InputStream and does not consume it. This
+ allows the InputStream) to return a
+ InputStream as payload.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.XmlMessageEOFProtocol">
+            <description><![CDATA[Extend XmlMessageProtocol to continue reading until either a new message or EOF is found.]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.connection.tcp.protocol.XmlMessageProtocol">
+            <description><![CDATA[<p>
+ The XmlMessageProtocol is an application level tcp protocol that can be used to read streaming xml documents. The only
+ requirement is that each document include an xml declaration at the beginning of the document of the form "<?xml...". In
+ section 2.8, the xml 1.0 standard contains "Definition: XML documents <strong>SHOULD</strong> begin with an XML declaration
+ which specifies the version of XML being used" while the xml 1.1 standard contains "Definition: XML 1.1 documents
+ <strong>MUST</strong> begin with an XML declaration which specifies the version of XML being used". The SHOULD indicates a
+ recommendation that, if not followed, needs to be carefully checked for unintended consequences. MUST indicates a mandatory
+ requirement for a well-formed document. Please make sure that the xml documents being streamed begin with an xml declaration
+ when using this class.
+ </p>
+ <p>
+ Data are read until a new document is found or there are no more data (momentarily). For slower networks,
+ XmlMessageEOFProtocol may be more reliable.
+ </p>
+ <p>
+ Also, the default character encoding for the platform is used to decode the message bytes when looking for the XML declaration.
+ Some caution with message character encodings is warranted.
+ </p>
+ <p>
+ Finally, this class uses a PushbackInputStream to enable parsing of individual messages. The stream stores any pushed-back
+ bytes into it's own internal buffer and not the original stream. Therefore, the read buffer size is intentionally limited to
+ insure that unread characters remain on the stream so that all data may be read later.
+ </p>]]></description>
+            <parameters>
+                <parameter name="rethrowExceptionOnRead">
+                    <description><![CDATA[Indicates if the exception should be rethrown if there is a failure while reading]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.exceptions.LengthExceededException">
+            <description><![CDATA[Thrown to indicate that there was an attempt of reading or writing more bytes that the allowed limit.
+
+ @since 1.0]]></description>
+            <parameters/>
+        </type>
+        <type name="org.mule.extension.socket.api.exceptions.ReadingTimeoutException">
+            <description><![CDATA[Thrown to indicate that a timeout has been reached while awaiting for new data to arrive and be read.
+
+ @since 1.0]]></description>
+            <parameters/>
+        </type>
+        <type name="org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties">
+            <description><![CDATA[Default immutable implementation of the TcpClientSocketProperties interface.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a
+ blocking operation before failing.
+ <p>
+ A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors
+ when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="sendTcpNoDelay">
+                    <description><![CDATA[If set, transmitted data is not collected together for greater efficiency but sent immediately.
+ <p>
+ Defaults to Socket default is false because optimizing to reduce amount of network traffic
+ over latency is hardly ever a concern today.]]></description>
+                </parameter>
+                <parameter name="linger">
+                    <description><![CDATA[This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any
+ remaining data is transmitted correctly.]]></description>
+                </parameter>
+                <parameter name="keepAlive">
+                    <description><![CDATA[Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long
+ periods and closes them if the connection becomes unavailable.
+ <p>
+ This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept
+ alive before they are recycled.]]></description>
+                </parameter>
+                <parameter name="failOnUnresolvedHost">
+                    <description><![CDATA[Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved. However, it can be set
+ to false to allow unresolved hosts (useful when connecting through a proxy).]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Number of milliseconds to wait until an outbound connection to a remote server is successfully created. Defaults to 30
+ seconds.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.socket.tcp.TcpProtocol">
+            <description><![CDATA[This interface enables to plug different application level protocols into the SocketsExtension.
+
+ @since 1.0]]></description>
+            <parameters/>
+        </type>
+        <type name="org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties">
+            <description><![CDATA[Default immutable implementation of the TcpServerSocketProperties interface.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a
+ blocking operation before failing.
+ <p>
+ A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors
+ when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="sendTcpNoDelay">
+                    <description><![CDATA[If set, transmitted data is not collected together for greater efficiency but sent immediately.
+ <p>
+ Defaults to Socket default is false because optimizing to reduce amount of network traffic
+ over latency is hardly ever a concern today.]]></description>
+                </parameter>
+                <parameter name="linger">
+                    <description><![CDATA[This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any
+ remaining data is transmitted correctly.]]></description>
+                </parameter>
+                <parameter name="keepAlive">
+                    <description><![CDATA[Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long
+ periods and closes them if the connection becomes unavailable.
+ <p>
+ This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept
+ alive before they are recycled.]]></description>
+                </parameter>
+                <parameter name="failOnUnresolvedHost">
+                    <description><![CDATA[Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved. However, it can be set
+ to false to allow unresolved hosts (useful when connecting through a proxy).]]></description>
+                </parameter>
+                <parameter name="serverTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value when the socket is used as a server. This is the timeout that applies to the "accept"
+ operation. A value of 0 (the ServerSocket default) causes the accept to wait indefinitely (if no connection arrives).]]></description>
+                </parameter>
+                <parameter name="receiveBacklog">
+                    <description><![CDATA[The maximum queue length for incoming connections.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="org.mule.extension.socket.api.socket.udp.UdpSocketProperties">
+            <description><![CDATA[Default immutable implementation of the UdpSocketProperties interface.
+
+ @since 1.0]]></description>
+            <parameters>
+                <parameter name="sendBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when sending data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="receiveBufferSize">
+                    <description><![CDATA[The size of the buffer (in bytes) used when receiving data, set on the socket itself.]]></description>
+                </parameter>
+                <parameter name="clientTimeout">
+                    <description><![CDATA[This sets the SO_TIMEOUT value on sockets. Indicates the amount of time (in milliseconds) that the socket will wait in a
+ blocking operation before failing.
+ <p>
+ A value of 0 (the default) means waiting indefinitely.]]></description>
+                </parameter>
+                <parameter name="reuseAddress">
+                    <description><![CDATA[If set (the default), SO_REUSEADDRESS is set on the sockets before binding. This helps reduce "address already in use" errors
+ when a socket is re-used.]]></description>
+                </parameter>
+                <parameter name="broadcast">
+                    <description><![CDATA[Enable/disable SO_BROADCAST into the DatagramSocket]]></description>
+                </parameter>
+            </parameters>
+        </type>
+    </types>
+</extension-documentation>

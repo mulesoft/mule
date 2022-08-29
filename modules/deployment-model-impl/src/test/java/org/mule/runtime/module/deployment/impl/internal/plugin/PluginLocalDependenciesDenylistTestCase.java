@@ -18,7 +18,7 @@ import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
-// TODO W-11086310/W-11086334 - remove this class after these migrations
+// TODO W-11086334 - remove this class after this migration
 @SmallTest
 public class PluginLocalDependenciesDenylistTestCase extends AbstractMuleTestCase {
 

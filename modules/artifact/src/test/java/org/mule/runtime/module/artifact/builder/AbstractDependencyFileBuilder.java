@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
@@ -347,6 +348,36 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
       }
     }
     return new ArrayList<>(allCompileDependencies);
+  }
+
+  /**
+   * @return a collection of all the dependencies of this artifact that must be present in the {@code classloader-model.json}
+   *         file.
+   */
+  public List<AbstractDependencyFileBuilder> getAllClassLoaderModelDependencies() {
+    Set<AbstractDependencyFileBuilder> allClassLoaderModelDependencies = new HashSet<>(dependencies);
+    for (AbstractDependencyFileBuilder dependency : dependencies) {
+      if (dependency.getClassifier() != null && dependency.getClassifier().equals(MULE_PLUGIN_CLASSIFIER)) {
+        allClassLoaderModelDependencies.addAll(getAllPluginDependencies(dependency));
+      }
+    }
+    return new ArrayList<>(allClassLoaderModelDependencies);
+  }
+
+  /**
+   * @return a collection of all the transitive dependencies of the given dependency that are plugins.
+   * @param dependency
+   */
+  private List<AbstractDependencyFileBuilder> getAllPluginDependencies(AbstractDependencyFileBuilder dependency) {
+    Set<AbstractDependencyFileBuilder> allPluginDependencies = new HashSet<>();
+    dependency.getDependencies().forEach(td -> {
+      AbstractDependencyFileBuilder transitiveDependency = (AbstractDependencyFileBuilder) td;
+      if (transitiveDependency.getClassifier() != null && transitiveDependency.getClassifier().equals(MULE_PLUGIN_CLASSIFIER)) {
+        allPluginDependencies.add(transitiveDependency);
+        allPluginDependencies.addAll(getAllPluginDependencies(transitiveDependency));
+      }
+    });
+    return new ArrayList<>(allPluginDependencies);
   }
 
   protected boolean isShared(AbstractDependencyFileBuilder dependencyFileBuilder) {

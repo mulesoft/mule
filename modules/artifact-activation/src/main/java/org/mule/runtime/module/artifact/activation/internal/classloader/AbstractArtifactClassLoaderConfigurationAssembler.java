@@ -7,7 +7,13 @@
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -15,6 +21,7 @@ import static java.util.Collections.emptyList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployableClassLoaderConfigurationBuilder;
@@ -29,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -44,20 +52,29 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   private static final String MULE_RUNTIME_GROUP_ID = "org.mule.runtime";
   private static final String MULE_RUNTIME_MODULES_GROUP_ID = "com.mulesoft.mule.runtime.modules";
 
-  protected final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+  private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+  private final MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor;
 
-  public AbstractArtifactClassLoaderConfigurationAssembler(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
+  public AbstractArtifactClassLoaderConfigurationAssembler(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+                                                           MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     this.packagerClassLoaderModel = packagerClassLoaderModel;
+    this.muleArtifactLoaderDescriptor = muleArtifactLoaderDescriptor;
   }
 
   public ClassLoaderModel createClassLoaderModel() {
     ClassLoaderModelBuilder classLoaderConfigurationBuilder = getClassLoaderConfigurationBuilder();
 
-    classLoaderConfigurationBuilder
-        .exportingPackages(newHashSet(packagerClassLoaderModel.getPackages()))
-        .exportingResources(newHashSet(packagerClassLoaderModel.getResources()));
+    if (muleArtifactLoaderDescriptor != null) {
+      classLoaderConfigurationBuilder
+          .exportingPackages(newHashSet(getAttribute(muleArtifactLoaderDescriptor.getAttributes(), EXPORTED_PACKAGES)))
+          .exportingResources(newHashSet(getAttribute(muleArtifactLoaderDescriptor.getAttributes(), EXPORTED_RESOURCES)))
+          .exportingPrivilegedPackages(new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
+                                                                  PRIVILEGED_EXPORTED_PACKAGES)),
+                                       new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
+                                                                  PRIVILEGED_ARTIFACTS_IDS)));
+    }
 
-    List<BundleDependency> bundleDependencies = getProcessedBundleDependencies();
+    List<BundleDependency> bundleDependencies = getBundleDependencies();
 
     final List<URL> dependenciesArtifactsUrls =
         loadUrls(getProjectFolder(), bundleDependencies, classLoaderConfigurationBuilder);
@@ -72,14 +89,21 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     return classLoaderConfigurationBuilder.build();
   }
 
+  private List<String> getAttribute(Map<String, Object> attributes, String attribute) {
+    if (attributes == null) {
+      return emptyList();
+    }
+
+    final Object attributeObject = attributes.getOrDefault(attribute, new ArrayList<String>());
+    checkArgument(attributeObject instanceof List, format("The '%s' attribute must be of '%s', found '%s'", attribute,
+                                                          List.class.getName(), attributeObject.getClass().getName()));
+    return (List<String>) attributeObject;
+  }
+
   protected abstract ClassLoaderModelBuilder getClassLoaderConfigurationBuilder();
 
   protected boolean shouldPopulateLocalPackages() {
     return true;
-  }
-
-  protected List<BundleDependency> getProcessedBundleDependencies() {
-    return getBundleDependencies();
   }
 
   /**
@@ -161,8 +185,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     }
   }
 
-  private void populateLocalPackages(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                     ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+  protected void populateLocalPackages(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+                                       ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
     if (packagerClassLoaderModel.getPackages() != null) {
       packagesSetBuilder.add(packagerClassLoaderModel.getPackages());
@@ -173,17 +197,29 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
       resourcesSetBuilder.add(packagerClassLoaderModel.getResources());
     }
 
-    packagerClassLoaderModel.getDependencies().stream().forEach(artifact -> {
-      if (artifact.getPackages() != null) {
-        packagesSetBuilder.add(artifact.getPackages());
-      }
-      if (artifact.getResources() != null) {
-        resourcesSetBuilder.add(artifact.getResources());
+    packagerClassLoaderModel.getDependencies().forEach(artifact -> {
+      if (!MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
+          && !MULE_DOMAIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
+          && !validateMuleRuntimeSharedLibrary(artifact.getArtifactCoordinates().getGroupId(),
+                                               artifact.getArtifactCoordinates().getArtifactId(),
+                                               packagerClassLoaderModel.getArtifactCoordinates()
+                                                   .getArtifactId())
+          && artifact.getUri() != null) {
+        if (artifact.getPackages() != null) {
+          packagesSetBuilder.add(artifact.getPackages());
+        }
+        if (artifact.getResources() != null) {
+          resourcesSetBuilder.add(artifact.getResources());
+        }
       }
     });
 
     classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
     classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
+  }
+
+  protected org.mule.tools.api.classloader.model.ClassLoaderModel getPackagerClassLoaderModel() {
+    return packagerClassLoaderModel;
   }
 
   protected abstract List<BundleDependency> getBundleDependencies();

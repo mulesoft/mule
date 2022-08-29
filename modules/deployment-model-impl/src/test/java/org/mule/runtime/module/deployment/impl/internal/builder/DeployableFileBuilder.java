@@ -165,7 +165,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     ClassLoaderModel classLoaderModel = new ClassLoaderModel(classloaderModelVersion, artifactCoordinates);
 
     List<Artifact> artifactDependencies = new LinkedList<>();
-    List<AbstractDependencyFileBuilder> dependencies = dependencyFileBuilder.getDependencies();
+    List<AbstractDependencyFileBuilder> dependencies = dependencyFileBuilder.getAllClassLoaderModelDependencies();
     for (AbstractDependencyFileBuilder fileBuilderDependency : dependencies) {
       artifactDependencies.add(getArtifact(fileBuilderDependency, isShared(fileBuilderDependency)));
     }
@@ -200,7 +200,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     ClassLoaderModel classLoaderModel = new ClassLoaderModel(classloaderModelVersion, artifactCoordinates);
 
     List<Artifact> artifactDependencies = new LinkedList<>();
-    for (AbstractDependencyFileBuilder fileBuilderDependency : getDependencies()) {
+    for (AbstractDependencyFileBuilder fileBuilderDependency : getAllClassLoaderModelDependencies()) {
       artifactDependencies.add(getArtifact(fileBuilderDependency, isShared(fileBuilderDependency)));
     }
 

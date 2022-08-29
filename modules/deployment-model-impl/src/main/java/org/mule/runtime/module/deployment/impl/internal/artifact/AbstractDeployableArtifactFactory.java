@@ -12,6 +12,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
@@ -102,6 +103,16 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
    */
   public ArtifactConfigurationProcessor getArtifactConfigurationProcessor() {
     return artifactConfigurationProcessor;
+  }
+
+  /**
+   * Creates a {@link DeployableProjectModel} representing the structure of the artifact in {@code artifactLocation}.
+   *
+   * @param artifactLocation the artifact location.
+   * @return the {@link DeployableProjectModel} representing the structure of the artifact.
+   */
+  protected DeployableProjectModel createDeployableProjectModel(File artifactLocation) {
+    return new MuleDeployableProjectModelBuilder(artifactLocation).build();
   }
 
 }

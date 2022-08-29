@@ -72,6 +72,9 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   public void createDeployableProjectModelWithSharedLibrary() throws URISyntaxException {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/shared-lib");
 
+    // checks there are no packages in the project
+    assertThat(deployableProjectModel.getPackages(), hasSize(0));
+
     assertThat(deployableProjectModel.getSharedLibraries(), contains(hasProperty("artifactId", equalTo("derby"))));
   }
 
@@ -87,9 +90,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   public void createDeployableProjectModelWithAdditionalPluginDependency() throws URISyntaxException {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/additional-plugin-dependency");
 
-    assertThat(deployableProjectModel.getPackages(), hasSize(0));
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
-
     assertThat(deployableProjectModel.getDependencies(),
                hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
@@ -103,9 +104,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   public void createDeployableProjectModelWithAdditionalPluginDependencyAndDependency() throws URISyntaxException {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/additional-plugin-dependency-and-dep");
 
-    assertThat(deployableProjectModel.getPackages(), hasSize(0));
     assertThat(deployableProjectModel.getDependencies(), hasSize(4));
-
     assertThat(deployableProjectModel.getDependencies(),
                hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
                         hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
@@ -120,9 +119,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   public void createDeployableProjectModelWithTransitiveAdditionalPluginDependency() throws URISyntaxException {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/additional-plugin-dependency-transitive");
 
-    assertThat(deployableProjectModel.getPackages(), hasSize(0));
     assertThat(deployableProjectModel.getDependencies(), hasSize(1));
-
     assertThat(deployableProjectModel.getDependencies(),
                hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-spring-module")))));
 

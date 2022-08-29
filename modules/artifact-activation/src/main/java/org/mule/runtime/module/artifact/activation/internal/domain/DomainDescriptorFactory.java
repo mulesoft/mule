@@ -17,10 +17,12 @@ import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolve
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +49,11 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
   @Override
   protected void doValidation(DomainDescriptor descriptor) {
     super.doValidation(descriptor);
-    getPluginDependenciesResolver().resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), true);
+    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+        getPluginDependenciesResolver().resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), true);
+
+    // Refreshes the list of plugins on the descriptor with the resolved from transitive plugin dependencies
+    descriptor.setPlugins(new LinkedHashSet<>(resolvedArtifactPluginDescriptors));
   }
 
   @Override
@@ -57,12 +63,7 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    DomainDescriptor domainDescriptor =
-        new DomainDescriptor(getBundleDescriptor().getArtifactId() + "-" + getBundleDescriptor().getVersion() + "-mule-domain",
-                             getDeploymentProperties());
-    if (getArtifactLocation().isDirectory()) {
-      domainDescriptor.setRootFolder(getArtifactLocation());
-    }
-    return domainDescriptor;
+    return new DomainDescriptor(getArtifactLocation().getName(),
+                                getDeploymentProperties());
   }
 }

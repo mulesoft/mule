@@ -34,6 +34,10 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.
 
   public DeployableClassLoaderConfigurationBuilder(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                    File artifactFolder) {
+    if (!(packagerClassLoaderModel instanceof AppClassLoaderModel)) {
+      throw new IllegalArgumentException("Class loader model must be an 'AppClassLoaderModel' for deployables.");
+    }
+
     this.packagerClassLoaderModel = packagerClassLoaderModel;
     this.artifactFolder = artifactFolder;
   }
@@ -62,11 +66,9 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.
   }
 
   private void processAdditionalPluginLibraries() {
-    if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
-      AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
-      appClassLoaderModel.getAdditionalPluginDependencies()
-          .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
-    }
+    AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
+    appClassLoaderModel.getAdditionalPluginDependencies()
+        .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
   }
 
   private void updateDependency(org.mule.tools.api.classloader.model.Plugin plugin) {
