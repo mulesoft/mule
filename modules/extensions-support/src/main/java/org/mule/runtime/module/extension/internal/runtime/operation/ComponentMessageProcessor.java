@@ -831,10 +831,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
-        new LazyValue<>(() ->
-          withNullEvent(event ->ValueResolvingContext.builder(event, expressionManager)
-              .withConfig(getStaticConfiguration())
-              .build()));
+        new LazyValue<>(() -> withNullEvent(event -> ValueResolvingContext.builder(event, expressionManager)
+            .withConfig(getStaticConfiguration())
+            .build()));
 
     LazyValue<Boolean> dynamicConfig = new LazyValue<>(
                                                        () -> extensionManager
@@ -1117,12 +1116,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
-        componentModel,
-        createReconnectionInterceptorsChain(extensionModel, componentModel, extensionConnectionSupplier, reflectionCache),
-        errorTypeRepository,
-        muleContext.getExecutionClassLoader(),
-        resultTransformer,
-        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
+                                        componentModel,
+                                        createReconnectionInterceptorsChain(extensionModel, componentModel,
+                                                                            extensionConnectionSupplier, reflectionCache),
+                                        errorTypeRepository,
+                                        muleContext.getExecutionClassLoader(),
+                                        resultTransformer,
+                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
   }
 
   /**

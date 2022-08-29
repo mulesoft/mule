@@ -145,7 +145,8 @@ public class ReconnectionUtils {
                                                 ExtensionModel extensionModel,
                                                 ComponentModel componentModel,
                                                 ReflectionCache reflectionCache) {
-    Map<ParameterGroupModel, Set<ParameterModel>> streamParameters = getFilteredParameters(componentModel, getStreamParameterFilter(extensionModel));
+    Map<ParameterGroupModel, Set<ParameterModel>> streamParameters =
+        getFilteredParameters(componentModel, getStreamParameterFilter(extensionModel));
     if (!streamParameters.isEmpty()) {
       chainBuilder.addInterceptor(new CursorResetInterceptor(streamParameters, reflectionCache));
     }
@@ -154,7 +155,7 @@ public class ReconnectionUtils {
   private static Predicate<ParameterModel> getStreamParameterFilter(ExtensionModel extensionModel) {
     ClassLoader extensionClassLoader = getClassLoader(extensionModel);
     return p -> getType(p.getType(), extensionClassLoader)
-          .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
-          .isPresent();
+        .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
+        .isPresent();
   }
 }

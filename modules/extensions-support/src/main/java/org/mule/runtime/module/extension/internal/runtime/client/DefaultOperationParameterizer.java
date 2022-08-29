@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.object.FileStoreCursorIteratorConfig;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
-import org.mule.runtime.core.internal.streaming.bytes.FileStoreCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 
@@ -78,14 +78,16 @@ class DefaultOperationParameterizer implements OperationParameterizer {
                                                                 DataSize bufferSizeIncrement,
                                                                 DataSize maxBufferSize) {
     cursorProviderFunction = sm -> sm.forBytes().getInMemoryCursorProviderFactory(
-        new InMemoryCursorStreamConfig(initialBufferSize, bufferSizeIncrement, maxBufferSize));
+                                                                                  new InMemoryCursorStreamConfig(initialBufferSize,
+                                                                                                                 bufferSizeIncrement,
+                                                                                                                 maxBufferSize));
     return this;
   }
 
   @Override
   public OperationParameterizer withFileStoreRepeatableStreaming(DataSize maxInMemorySize) {
     cursorProviderFunction = sm -> sm.forBytes().getFileStoreCursorStreamProviderFactory(
-        new FileStoreCursorStreamConfig(maxInMemorySize));
+                                                                                         new FileStoreCursorStreamConfig(maxInMemorySize));
     return this;
   }
 
@@ -96,16 +98,19 @@ class DefaultOperationParameterizer implements OperationParameterizer {
   }
 
   @Override
-  public OperationParameterizer withInMemoryRepeatableIterables(int initialBufferSize, int bufferSizeIncrement, int maxBufferSize) {
+  public OperationParameterizer withInMemoryRepeatableIterables(int initialBufferSize, int bufferSizeIncrement,
+                                                                int maxBufferSize) {
     cursorProviderFunction = sm -> sm.forObjects().getInMemoryCursorProviderFactory(
-        new InMemoryCursorIteratorConfig(initialBufferSize, bufferSizeIncrement, maxBufferSize));
+                                                                                    new InMemoryCursorIteratorConfig(initialBufferSize,
+                                                                                                                     bufferSizeIncrement,
+                                                                                                                     maxBufferSize));
     return this;
   }
 
   @Override
   public OperationParameterizer withFileStoreRepeatableIterables(int maxInMemoryInstances) {
     cursorProviderFunction = sm -> sm.forObjects().getFileStoreCursorIteratorProviderFactory(
-        new FileStoreCursorIteratorConfig(maxInMemoryInstances));
+                                                                                             new FileStoreCursorIteratorConfig(maxInMemoryInstances));
     return this;
   }
 

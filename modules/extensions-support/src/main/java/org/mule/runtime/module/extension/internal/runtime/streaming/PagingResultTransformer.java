@@ -32,10 +32,10 @@ public class PagingResultTransformer implements ResultTransformer {
     }
     ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
     Producer<?> producer = new PagingProviderProducer((PagingProvider) value,
-        config,
-        operationContext,
-        connectionSupplier,
-        supportsOAuth);
+                                                      config,
+                                                      operationContext,
+                                                      connectionSupplier,
+                                                      supportsOAuth);
 
     ListConsumer<?> consumer = new ListConsumer(producer);
     consumer.loadNextPage();

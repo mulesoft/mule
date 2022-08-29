@@ -150,19 +150,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
       try {
         ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
-            key.getExtensionModel(),
-            getConfigurationInstance(key.getConfigurationProvider()),
-            resolvedParams,
-            operationModel,
-            event,
-            cursorProviderFactory,
-            streamingManager,
-            NULL_COMPONENT,
-            parameterizer.getRetryPolicyTemplate(),
-            IMMEDIATE_SCHEDULER,
-            empty(),
-            muleContext
-        );
+                                                                                        key.getExtensionModel(),
+                                                                                        getConfigurationInstance(key
+                                                                                            .getConfigurationProvider()),
+                                                                                        resolvedParams,
+                                                                                        operationModel,
+                                                                                        event,
+                                                                                        cursorProviderFactory,
+                                                                                        streamingManager,
+                                                                                        NULL_COMPONENT,
+                                                                                        parameterizer.getRetryPolicyTemplate(),
+                                                                                        IMMEDIATE_SCHEDULER,
+                                                                                        empty(),
+                                                                                        muleContext);
 
         CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
         mediator.execute(executor, context, new ExecutorCallback() {
@@ -210,7 +210,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
           }
         });
 
-    CompletableComponentExecutor<OperationModel> executor = getOperationExecutorFactory(operationModel).createExecutor(operationModel, initParams);
+    CompletableComponentExecutor<OperationModel> executor =
+        getOperationExecutorFactory(operationModel).createExecutor(operationModel, initParams);
     try {
       initialiseIfNeeded(executor, true, muleContext);
       startIfNeeded(executor);
@@ -224,12 +225,12 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-          parameters,
-          muleContext,
-          true,
-          reflectionCache,
-          expressionManager,
-          "");
+                                                                            parameters,
+                                                                            muleContext,
+                                                                            true,
+                                                                            reflectionCache,
+                                                                            expressionManager,
+                                                                            "");
 
       try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
         return resolverSet.resolve(ctx).asMap();
@@ -261,7 +262,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         // Ref: https://github.com/ben-manes/caffeine/issues/104#issuecomment-238068997
         .executor(cacheShutdownExecutor)
         .expireAfterAccess(5, MINUTES)
-        .removalListener((key, mediator, cause) -> disposeMediator((OperationKey) key, (ExecutionMediator<OperationModel>) mediator))
+        .removalListener((key, mediator, cause) -> disposeMediator((OperationKey) key,
+                                                                   (ExecutionMediator<OperationModel>) mediator))
         .build(this::createExecutionMediator);
   }
 
@@ -269,16 +271,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
-        extensionModel,
-        operationModel,
-        createReconnectionInterceptorsChain(extensionModel,
-            operationModel,
-            extensionConnectionSupplier,
-            reflectionCache),
-        errorTypeRepository,
-        muleContext.getExecutionClassLoader(),
-        getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth(extensionModel)).orElse(null),
-        NULL_PROFILING_DATA_PRODUCER);
+                                                                                extensionModel,
+                                                                                operationModel,
+                                                                                createReconnectionInterceptorsChain(extensionModel,
+                                                                                                                    operationModel,
+                                                                                                                    extensionConnectionSupplier,
+                                                                                                                    reflectionCache),
+                                                                                errorTypeRepository,
+                                                                                muleContext.getExecutionClassLoader(),
+                                                                                getPagingResultTransformer(operationModel,
+                                                                                                           extensionConnectionSupplier,
+                                                                                                           supportsOAuth(extensionModel))
+                                                                                                               .orElse(null),
+                                                                                NULL_PROFILING_DATA_PRODUCER);
 
     try {
       initialiseIfNeeded(mediator, true, muleContext);
@@ -328,7 +333,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     if (configurationProvider.isPresent()) {
       ConfigurationModel configurationModel = configurationProvider.get().getConfigurationModel();
       return configurationModel.getOperationModel(operationName).orElseThrow(
-          () -> noSuchOperationException(operationName));
+                                                                             () -> noSuchOperationException(operationName));
     } else {
       throw new IllegalArgumentException("Operation '" + operationName + "' not found at the extension level");
     }
@@ -368,18 +373,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     return executeAsync(
-        extensionName,
-        operationName,
-        parameterizer -> {
-          parameters.get().forEach((key, value) -> {
-            if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
-              parameterizer.withParameter(key, value);
-            }
-          });
-          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-          configureLegacyRepeatableStreaming(parameterizer, operationModel);
-        }
-    );
+                        extensionName,
+                        operationName,
+                        parameterizer -> {
+                          parameters.get().forEach((key, value) -> {
+                            if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
+                              parameterizer.withParameter(key, value);
+                            }
+                          });
+                          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+                          configureLegacyRepeatableStreaming(parameterizer, operationModel);
+                        });
   }
 
   /**
@@ -486,14 +490,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     @Override
     public String toString() {
       return format("[Extension: %s; Operation: %s, ConfigName: %s",
-          extensionModel.getName(), operationModel.getName(), configName);
+                    extensionModel.getName(), operationModel.getName(), configName);
     }
   }
 
-  private static class NullProfilingDataProducer implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {
+  private static class NullProfilingDataProducer
+      implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {
 
-    private NullProfilingDataProducer() {
-    }
+    private NullProfilingDataProducer() {}
 
     @Override
     public void triggerProfilingEvent(ComponentThreadingProfilingEventContext profilerEventContext) {
@@ -501,7 +505,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
 
     @Override
-    public void triggerProfilingEvent(CoreEvent sourceData, Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
+    public void triggerProfilingEvent(CoreEvent sourceData,
+                                      Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
 
     }
   }
