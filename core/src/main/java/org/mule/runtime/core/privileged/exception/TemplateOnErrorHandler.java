@@ -177,7 +177,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
                 ErrorHandlerContext errorHandlerContext = ErrorHandlerContextManager.from(TemplateOnErrorHandler.this, result);
                 fireEndNotification(errorHandlerContext.getOriginalEvent(), result, errorHandlerContext.getException());
               })
-              .doOnNext(result -> ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result))))
+              .doOnNext(result -> {
+                if (getMessageProcessors().isEmpty()) {
+                  profilingService.getCoreEventTracer().endCurrentSpan(result);
+                }
+                ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result);
+              })))
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
       if (processingStrategy.isPresent()) {
