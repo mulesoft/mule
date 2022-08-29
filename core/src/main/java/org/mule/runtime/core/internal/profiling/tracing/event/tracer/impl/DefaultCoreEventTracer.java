@@ -88,9 +88,11 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   }
 
   @Override
-  public Map<String, String> getDistributedTraceContextMap(CoreEvent event) {
-    if (event instanceof DistributedTraceContextAware) {
-      DistributedTraceContext distributedTraceContext = ((DistributedTraceContextAware) event).getDistributedTraceContext();
+  public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
+    EventContext eventContext = coreEvent.getContext();
+    if (eventContext instanceof DistributedTraceContextAware) {
+      DistributedTraceContext distributedTraceContext =
+          ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
       ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
                                                                           e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
           .orElse(null);
