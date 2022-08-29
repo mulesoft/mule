@@ -8,10 +8,24 @@ package org.mule.runtime.core.privileged.profiling;
 
 import java.util.Map;
 
+/**
+ * Encapsulates data corresponding to a captured exported span event. This is only used for testing purposes and is not exposed as
+ * general API.
+ *
+ * @see ExportedSpanCapturer
+ *
+ * @since 4.5.0
+ */
 public interface CapturedEventData {
 
+  /**
+   * @return The name of the event.
+   */
   String getName();
 
+  /**
+   * @return The attributes of the event.
+   */
   Map<String, Object> getAttributes();
 
 }

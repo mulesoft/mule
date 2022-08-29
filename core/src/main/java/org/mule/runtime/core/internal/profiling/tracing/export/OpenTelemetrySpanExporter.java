@@ -16,8 +16,6 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static io.opentelemetry.api.common.AttributeKey.booleanKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
@@ -32,6 +30,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;

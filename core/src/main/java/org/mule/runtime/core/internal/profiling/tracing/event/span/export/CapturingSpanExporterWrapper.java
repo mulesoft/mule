@@ -29,7 +29,7 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 
 /**
- * A {@link SpanExporter} that captures the exported spans.
+ * A {@link SpanExporter} that captures Open Telemetry exported spans.
  *
  * @since 4.5.0
  */
@@ -131,7 +131,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
       public List<CapturedEventData> getEvents() {
         return spanData.getEvents().stream().map(
-                                                 EventDataWrapper::new)
+                                                 OpenTelemetryEventDataWrapper::new)
             .collect(Collectors.toList());
       }
 
@@ -147,11 +147,14 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       }
     }
 
-    private static final class EventDataWrapper implements CapturedEventData {
+    /**
+     * Allows capturing the Open Telemetry Span events.
+     */
+    private static final class OpenTelemetryEventDataWrapper implements CapturedEventData {
 
       private final EventData eventData;
 
-      public EventDataWrapper(EventData eventData) {
+      public OpenTelemetryEventDataWrapper(EventData eventData) {
         this.eventData = eventData;
       }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.tracer;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.tracing.Span;
+import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
@@ -55,13 +56,29 @@ public interface CoreEventTracer {
    */
   void endCurrentSpan(CoreEvent coreEvent);
 
+  /**
+   * Records a {@link SpanError} as part of the current {@link Span}.
+   * 
+   * @param coreEvent                  The event to retrieve the distributed trace context from.
+   * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
+   *                                   {@link Span} containing the error represents.
+   */
   void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan);
 
+
+  /**
+   * Records a {@link SpanError} as part of the current {@link Span}.
+   * 
+   * @param coreEvent                  The event to retrieve the distributed trace context from.
+   * @param error                      The {@link Error} that occurred.
+   * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
+   *                                   {@link Span} containing the error represents.
+   */
   // TODO: W-11646448: Compound error handlers are not propagating correct error.
   void recordErrorAtCurrentSpan(CoreEvent coreEvent, Error error, boolean isErrorEscapingCurrentSpan);
 
   /**
-   * @param event the event to retrieve the distributed trace context map from
+   * @param event The event to retrieve the distributed trace context from.
    * @return a map containing the span context to propagate.
    */
   default Map<String, String> getDistributedTraceContextMap(CoreEvent event) {

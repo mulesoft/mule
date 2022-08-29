@@ -9,10 +9,22 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 
+/**
+ * Extends the {@link SpanError} API with mule core internal operations.
+ */
 public interface InternalSpanError extends SpanError {
 
+  /**
+   * @return The call stack trace of the error.
+   */
   FlowCallStack getErrorStacktrace();
 
+  /**
+   * Converts an API {@link SpanError} into an {@link InternalSpanError}.
+   * 
+   * @param apiSpanError A {@link SpanError} instance.
+   * @return {@link InternalSpanError} instance.
+   */
   static InternalSpanError getInternalSpanError(SpanError apiSpanError) {
     if (apiSpanError instanceof InternalSpanError) {
       return (InternalSpanError) apiSpanError;
