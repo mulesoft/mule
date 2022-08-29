@@ -12,6 +12,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
@@ -38,10 +40,16 @@ import java.util.Optional;
  */
 public class DefaultCoreEventTracer implements CoreEventTracer {
 
+  /**
+   * logger used by this class.
+   */
+  private static final Logger LOGGER = getLogger(DefaultCoreEventTracer.class);
+
   private final CoreEventSpanFactory coreEventSpanFactory;
   private final MuleConfiguration muleConfiguration;
   private final ArtifactType artifactType;
   private final boolean propagationOfExceptionsInTracing;
+  private final Logger logger;
 
   /**
    * @return a builder for a {@link DefaultCoreEventTracer}.
@@ -53,11 +61,13 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   private DefaultCoreEventTracer(MuleConfiguration muleConfiguration,
                                  ArtifactType artifactType,
                                  InternalSpanExportManager<EventContext> spanExportManager,
-                                 boolean propagationOfExceptionsInTracing) {
+                                 boolean propagationOfExceptionsInTracing,
+                                 Logger logger) {
     this.muleConfiguration = muleConfiguration;
     this.artifactType = artifactType;
     this.coreEventSpanFactory = new ExportOnEndCoreEventSpanFactory(spanExportManager);
     this.propagationOfExceptionsInTracing = propagationOfExceptionsInTracing;
+    this.logger = logger;
   }
 
   @Override
@@ -70,12 +80,14 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                                                                                               spanCustomizationInfo))),
                                              empty(),
                                              "Error when starting a component span",
-                                             propagationOfExceptionsInTracing);
+                                             propagationOfExceptionsInTracing,
+                                             logger);
   }
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent) {
-    safeExecute(() -> endCurrentSpanIfPossible(coreEvent), "Error on ending current span", propagationOfExceptionsInTracing);
+    safeExecute(() -> endCurrentSpanIfPossible(coreEvent), "Error on ending current span", propagationOfExceptionsInTracing,
+                logger);
   }
 
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
@@ -96,7 +108,8 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     if (eventContext instanceof DistributedTraceContextAware) {
       return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap((DistributedTraceContextAware) eventContext),
                                                emptyMap(),
-                                               "Error on getting distributed trace context", propagationOfExceptionsInTracing);
+                                               "Error on getting distributed trace context", propagationOfExceptionsInTracing,
+                                               logger);
     } else {
       return emptyMap();
     }
@@ -147,6 +160,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     private InternalSpanExportManager<EventContext> spanExportManager;
     private ArtifactType artifactType;
     private boolean propagateExceptionsInTracing;
+    private Logger logger;
 
     public DefaultEventTracerBuilder withMuleConfiguration(MuleConfiguration muleConfiguration) {
       this.muleConfiguration = muleConfiguration;
@@ -163,13 +177,27 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       return this;
     }
 
-    public DefaultCoreEventTracer build() {
-      return new DefaultCoreEventTracer(muleConfiguration, artifactType, spanExportManager, propagateExceptionsInTracing);
+    public DefaultEventTracerBuilder withLogger(Logger logger) {
+      this.logger = logger;
+      return this;
     }
 
     public DefaultEventTracerBuilder withPropagationOfExceptionsInTracing(boolean propagateExceptionsInTracing) {
       this.propagateExceptionsInTracing = propagateExceptionsInTracing;
       return this;
+    }
+
+    public DefaultCoreEventTracer build() {
+      return new DefaultCoreEventTracer(muleConfiguration, artifactType, spanExportManager, propagateExceptionsInTracing,
+                                        resolveLogger());
+    }
+
+    private Logger resolveLogger() {
+      if (logger != null) {
+        return logger;
+      } else {
+        return LOGGER;
+      }
     }
   }
 }

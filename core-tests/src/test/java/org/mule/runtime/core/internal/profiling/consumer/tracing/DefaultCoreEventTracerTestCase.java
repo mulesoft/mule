@@ -28,6 +28,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
@@ -59,16 +61,16 @@ import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
-import org.mule.tck.junit4.matcher.IsEmptyOptional;
-
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
@@ -81,6 +83,7 @@ public class DefaultCoreEventTracerTestCase {
   public static final String TEST_APP = "test_app";
   public static final String KEY_1 = "key1";
   public static final String VALUE_1 = "value1";
+
 
   @Test
   public void testStartComponentExecution() {
@@ -103,6 +106,7 @@ public class DefaultCoreEventTracerTestCase {
 
     CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
+                               mock(Logger.class),
                                mockedMuleConfiguration);
 
     InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, new SpanCustomizationInfo() {
@@ -135,6 +139,7 @@ public class DefaultCoreEventTracerTestCase {
     when(mockedMuleConfiguration.getId()).thenReturn(TEST_APP);
     CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
+                               mock(Logger.class),
                                mockedMuleConfiguration);
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
     coreEventTracer.endCurrentSpan(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
@@ -162,7 +167,8 @@ public class DefaultCoreEventTracerTestCase {
 
   @Test
   public void testStartComponentExecutionIfThrowable() {
-    doTestStartComponentExecutionIfThrowable(false);
+    doTestErrorPropagation(false, "Error when starting a component span", (coreEventTracer, coreEvent) -> coreEventTracer
+        .startComponentSpan(coreEvent, new TestSpanCustomizationInfo()));
   }
 
   @Test(expected = TracingErrorPropagationException.class)
@@ -172,73 +178,59 @@ public class DefaultCoreEventTracerTestCase {
 
   @Test
   public void testEndCurrentSpanIfThrowable() {
-    doTestEndCurrentSpanifThrowable(false);
+    doTestErrorPropagation(false, "Error on ending current span", CoreEventTracer::endCurrentSpan);
   }
 
   @Test(expected = TracingErrorPropagationException.class)
   public void testEndCurrentSpanIfThrowableWithTracingErrorPropagationEnabled() {
-    doTestEndCurrentSpanifThrowable(true);
+    doTestErrorPropagation(true, null, CoreEventTracer::endCurrentSpan);
   }
 
   @Test
   public void testGetDistributedTraceContextMapIfThrowable() {
-    doTestGetDistributedTraceContextMapIfThrowable(false);
+    doTestErrorPropagation(false, "Error on getting distributed trace context", CoreEventTracer::getDistributedTraceContextMap);
   }
 
   @Test(expected = TracingErrorPropagationException.class)
   public void testGetDistributedTraceContextMapIfThrowableWithTracingErrorPropagationEnabled() {
-    doTestGetDistributedTraceContextMapIfThrowable(true);
-  }
-
-  private void doTestGetDistributedTraceContextMapIfThrowable(boolean enablePropagateTracingErrors) {
-    CoreEventTracer coreEventTracer =
-        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
-                               mock(MuleConfiguration.class),
-                               enablePropagateTracingErrors);
-    CoreEvent coreEvent = mock(CoreEvent.class);
-    DistributedTraceContextAware eventContext =
-        mock(DistributedTraceContextAware.class, withSettings().extraInterfaces(EventContext.class));
-    when(coreEvent.getContext()).thenReturn((EventContext) eventContext);
-    when(((EventContext) eventContext).getCorrelationId()).thenThrow(new TracingErrorPropagationException());
-    assertThat(coreEventTracer.getDistributedTraceContextMap(coreEvent), anEmptyMap());
+    doTestErrorPropagation(true, null, CoreEventTracer::getDistributedTraceContextMap);
   }
 
   private CoreEventTracer getTestCoreEventTracer(InternalSpanExportManager<EventContext> mockedSpanExporterManager,
+                                                 Logger logger,
                                                  MuleConfiguration mockedMuleConfiguration) {
-    return getTestCoreEventTracer(mockedSpanExporterManager, mockedMuleConfiguration, false);
+    return getTestCoreEventTracer(mockedSpanExporterManager, mockedMuleConfiguration, logger, false);
   }
 
-  private void doTestEndCurrentSpanifThrowable(boolean enablePropagateTracingErrors) {
+  private void doTestErrorPropagation(boolean enablePropagateTracingErrors,
+                                      String expectedLoggedMesage,
+                                      BiConsumer<CoreEventTracer, CoreEvent> consumerToExecute) {
+    Logger logger = mock(Logger.class);
+    when(logger.isWarnEnabled()).thenReturn(true);
     CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                mock(MuleConfiguration.class),
+                               logger,
                                enablePropagateTracingErrors);
     CoreEvent coreEvent = mock(CoreEvent.class);
     when(coreEvent.getContext()).thenThrow(new TracingErrorPropagationException());
-    coreEventTracer.endCurrentSpan(coreEvent);
-  }
+    consumerToExecute.accept(coreEventTracer, coreEvent);
 
-  private void doTestStartComponentExecutionIfThrowable(boolean enablePropagateTracingErrors) {
-    CoreEventTracer coreEventTracer =
-        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
-                               mock(MuleConfiguration.class),
-                               enablePropagateTracingErrors);
-    CoreEvent coreEvent = mock(CoreEvent.class);
-    EventContext eventContext = mock(EventContext.class);
-    when(coreEvent.getContext()).thenReturn(eventContext);
-    when(eventContext.getCorrelationId()).thenThrow(new TracingErrorPropagationException());
-    SpanCustomizationInfo spanCustomizationInfo = mock(SpanCustomizationInfo.class);
-    assertThat(coreEventTracer.startComponentSpan(coreEvent, spanCustomizationInfo), IsEmptyOptional.empty());
+    if (!enablePropagateTracingErrors) {
+      verify(logger).warn(eq(expectedLoggedMesage), any(TracingErrorPropagationException.class));
+    }
   }
 
   @NotNull
   private CoreEventTracer getTestCoreEventTracer(InternalSpanExportManager<EventContext> mockedSpanExporterManager,
                                                  MuleConfiguration mockedMuleConfiguration,
+                                                 Logger logger,
                                                  boolean enablePropagateTracingErrors) {
     return getCoreEventTracerBuilder()
         .withSpanExporterManager(mockedSpanExporterManager)
         .withMuleConfiguration(mockedMuleConfiguration)
         .withArtifactType(APP)
+        .withLogger(logger)
         .withPropagationOfExceptionsInTracing(enablePropagateTracingErrors)
         .build();
   }
@@ -396,5 +388,21 @@ public class DefaultCoreEventTracerTestCase {
    */
   private static class TracingErrorPropagationException extends RuntimeException {
 
+  }
+
+  /**
+   * A {@link SpanCustomizationInfo} used for testing purposes.
+   */
+  private static class TestSpanCustomizationInfo implements SpanCustomizationInfo {
+
+    @Override
+    public String getName(CoreEvent coreEvent) {
+      return "test";
+    }
+
+    @Override
+    public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
+      return getDefaultChildSpanInfo();
+    }
   }
 }
