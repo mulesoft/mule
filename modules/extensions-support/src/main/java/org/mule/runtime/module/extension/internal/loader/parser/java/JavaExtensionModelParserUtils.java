@@ -469,7 +469,9 @@ public final class JavaExtensionModelParserUtils {
     return stringValue.flatMap(str -> booleanValue.map(bool -> new MediaTypeModelProperty(str, bool)));
   }
 
-  private static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(WithAnnotations element, String elementType, String elementName) {
+  private static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(WithAnnotations element,
+                                                                                          String elementType,
+                                                                                          String elementName) {
     return empty();
   }
 
@@ -490,7 +492,8 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(ConnectionProviderElement connectionProviderElement) {
-    return getSinceMuleVersionModelProperty(connectionProviderElement, "Connection provider", connectionProviderElement.getName());
+    return getSinceMuleVersionModelProperty(connectionProviderElement, "Connection provider",
+                                            connectionProviderElement.getName());
   }
 
   public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(ComponentElement componentElement) {

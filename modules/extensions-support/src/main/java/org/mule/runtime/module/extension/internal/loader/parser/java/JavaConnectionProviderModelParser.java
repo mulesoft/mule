@@ -225,11 +225,12 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
     return JavaExtensionModelParserUtils.getDisplayModel(element, "connection provider", element.getName());
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(element);
   }
 
-	@Override
+  @Override
   public Set<String> getSemanticTerms() {
     Set<String> terms = new LinkedHashSet<>();
     terms.addAll(getConnectionTermsFromAnnotations(element::isAnnotatedWith));

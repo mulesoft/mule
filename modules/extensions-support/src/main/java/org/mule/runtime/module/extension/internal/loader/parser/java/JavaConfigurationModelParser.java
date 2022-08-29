@@ -181,7 +181,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     return JavaExtensionModelParserUtils.getDeprecationModel(configElement);
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(configElement);
   }
 }

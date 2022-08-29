@@ -306,7 +306,8 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     return new SourceClusterSupportModelProperty(resultingSourceClusterSupport);
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(sourceElement);
   }
 

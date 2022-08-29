@@ -382,7 +382,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     return namespace;
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(extensionElement);
   }
 
