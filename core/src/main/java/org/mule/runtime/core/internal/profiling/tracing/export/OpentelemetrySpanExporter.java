@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling.tracing.export;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getPropagator;
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanV
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
@@ -28,7 +28,6 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapGetter;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -71,7 +70,7 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
     InternalSpan parentSpan = getAsInternalSpan(internalSpan.getParent());
 
     if (parentSpan == null) {
-      return null;
+      return remoteContext;
     }
 
     io.opentelemetry.api.trace.Span parentOpentelemetrySpan = parentSpan.visit(OPENTELEMETRY_PARENT_SPAN_VISITOR);
@@ -86,7 +85,7 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
   private Context resolveRemoteContext(EventContext eventContext) {
     DistributedTraceContext distributedTraceContext = resolveDistributedTraceContext(eventContext);
 
-    return GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
+    return getPropagator().getTextMapPropagator()
         .extract(Context.current(), distributedTraceContext.tracingFieldsAsMap(), OPENTELEMETRY_SPAN_GETTER);
   }
 
