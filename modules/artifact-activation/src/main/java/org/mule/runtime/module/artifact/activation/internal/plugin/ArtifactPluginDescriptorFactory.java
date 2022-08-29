@@ -72,7 +72,8 @@ public class ArtifactPluginDescriptorFactory
 
   @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    return new PluginClassLoaderConfigurationAssembler(bundleDependency, sharedProjectDependencies,
+    return new PluginClassLoaderConfigurationAssembler(bundleDependency,
+                                                       sharedProjectDependencies,
                                                        getArtifactLocation(),
                                                        muleArtifactLoaderDescriptor,
                                                        bundleDependencies,

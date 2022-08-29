@@ -85,8 +85,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
       ownerDescriptor.getClassLoaderModel().getDependencies().stream()
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
-              .equals(this.bundleDependency.getDescriptor().getGroupId())
-              && bundleDescriptor.getDescriptor().getArtifactId().equals(this.bundleDependency.getDescriptor().getArtifactId()))
+              .equals(bundleDependency.getDescriptor().getGroupId())
+              && bundleDescriptor.getDescriptor().getArtifactId().equals(bundleDependency.getDescriptor().getArtifactId()))
           .filter(bundleDependency -> bundleDependency.getAdditionalDependenciesList() != null
               && !bundleDependency.getAdditionalDependenciesList().isEmpty())
           .forEach(bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency,

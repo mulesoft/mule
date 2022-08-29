@@ -10,7 +10,8 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 /**
- * Resolves the {@link DomainDescriptor} described by its name and the {@link BundleDescriptor}, wrapping the logic to obtain it.
+ * Resolves the {@link DomainDescriptor} corresponding to the given name and {@link BundleDescriptor}, wrapping the logic to
+ * obtain it.
  *
  * @since 4.5
  */
