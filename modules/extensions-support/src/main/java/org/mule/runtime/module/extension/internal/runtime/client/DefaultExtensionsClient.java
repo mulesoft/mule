@@ -143,7 +143,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     ExecutionMediator<OperationModel> mediator = mediatorCache.get(key);
 
     return withNullEvent(event -> {
-      final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build());
+      final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build(), event);
       OperationModel operationModel = key.getOperationModel();
       CompletableComponentExecutor<OperationModel> executor = getComponentExecutor(operationModel, resolvedParams);
       CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
@@ -209,7 +209,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
             initParams.put(paramName, params.get(paramName));
           }
         });
-    
+
     CompletableComponentExecutor<OperationModel> executor = getOperationExecutorFactory(operationModel).createExecutor(operationModel, initParams);
     try {
       initialiseIfNeeded(executor, true, muleContext);
@@ -221,7 +221,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters) {
+  private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
           parameters,
@@ -231,15 +231,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
           expressionManager,
           "");
 
-      withNullEvent(event -> {
-        try (ValueResolvingContext.builder(event).build()) {
-
-        }
-      })
-
-      resolverSet.resolve(ValueResolvingContext.).
-
-      return (Map) resolverSet.getResolvers();
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
+        return resolverSet.resolve(ctx).asMap();
+      }
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
@@ -343,6 +337,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private MuleRuntimeException noSuchOperationException(String operationName) {
     throw new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName)));
   }
+
   private OperationModel findOperationModel(ExtensionModel extensionModel, String operationName) {
     for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels()) {
       Optional<OperationModel> operation = configurationModel.getOperationModel(operationName);
