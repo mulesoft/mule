@@ -48,7 +48,7 @@ public class OpentelemetrySpanExporterTestCase {
     when(distributedTraceContext.tracingFieldsAsMap())
         .thenReturn(ImmutableMap.of(TRACEPARENT_KEY, "00-" + PARENT_TRACE_ID + "-" + PARENT_SPAN_ID + "-01"));
 
-    // mock fot the internal mule span
+    // mock for the internal mule span
     InternalSpan internalMuleSpan = mock(InternalSpan.class);
     SpanDuration spanDuration = mock(SpanDuration.class);
 
