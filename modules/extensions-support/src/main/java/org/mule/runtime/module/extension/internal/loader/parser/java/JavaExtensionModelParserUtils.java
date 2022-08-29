@@ -12,10 +12,13 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getAnnotationFromHierarchy;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -40,6 +43,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -468,4 +472,35 @@ public final class JavaExtensionModelParserUtils {
     return stringValue.flatMap(str -> booleanValue.map(bool -> new MediaTypeModelProperty(str, bool)));
   }
 
+  private static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(WithAnnotations element, String elementType, String elementName) {
+    return empty();
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(ExtensionParameter extensionParameter) {
+    return getSinceMuleVersionModelProperty(extensionParameter, "Parameter", extensionParameter.getName());
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(FunctionElement functionElement) {
+    return getSinceMuleVersionModelProperty(functionElement, "Function", functionElement.getName());
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(OperationElement operationElement) {
+    return getSinceMuleVersionModelProperty(operationElement, "Operation", operationElement.getName());
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(SourceElement sourceElement) {
+    return getSinceMuleVersionModelProperty(sourceElement, "Source", sourceElement.getName());
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(ConnectionProviderElement connectionProviderElement) {
+    return getSinceMuleVersionModelProperty(connectionProviderElement, "Connection provider", connectionProviderElement.getName());
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(ComponentElement componentElement) {
+    return getSinceMuleVersionModelProperty(componentElement, "Component", componentElement.getName());
+  }
+
+  public static Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty(ExtensionElement extensionElement) {
+    return getSinceMuleVersionModelProperty(extensionElement, "Extension", extensionElement.getName());
+  }
 }

@@ -81,6 +81,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       parser.getDeprecationModel().ifPresent(sourceDeclarer::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> sourceDeclarer.getDeclaration().setDisplayModel(d));
       parser.getSourceFactoryModelProperty().ifPresent(sourceDeclarer::withModelProperty);
+      parser.getSinceMuleVersionModelProperty().ifPresent(sourceDeclarer::withModelProperty);
 
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
