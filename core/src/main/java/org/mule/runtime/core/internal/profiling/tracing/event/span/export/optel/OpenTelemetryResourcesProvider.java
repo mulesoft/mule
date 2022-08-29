@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.export.Openteleme
 import static java.lang.Boolean.parseBoolean;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.context.propagation.ContextPropagators.create;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
@@ -140,9 +141,14 @@ public class OpenTelemetryResourcesProvider {
     }
   }
 
-  private static ContextPropagators getPropagator() {
+  /**
+   * Gets the default propagator.
+   *
+   * @return the propagator defined by default.
+   */
+  public static ContextPropagators getPropagator() {
     if (propagator == null) {
-      propagator = ContextPropagators.create(W3CTraceContextPropagator.getInstance());
+      propagator = create(W3CTraceContextPropagator.getInstance());
     }
     return propagator;
   }
