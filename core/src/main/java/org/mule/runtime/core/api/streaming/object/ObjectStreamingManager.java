@@ -27,6 +27,16 @@ public interface ObjectStreamingManager {
   CursorIteratorProviderFactory getInMemoryCursorProviderFactory(InMemoryCursorIteratorConfig config);
 
   /**
+   * Creates a {@link CursorIteratorProviderFactory} which buffers in disk
+   *
+   * @param config the configuration for the produced {@link CursorIteratorProvider} instances
+   * @return a new {@link CursorIteratorProviderFactory}
+   */
+  default CursorIteratorProviderFactory getFileStoreCursorIteratorProviderFactory(FileStoreCursorIteratorConfig config) {
+    throw new UnsupportedOperationException("Only supported in EE edition");
+  }
+
+  /**
    * Creates a null object implementation of {@link CursorIteratorProviderFactory}
    *
    * @return a new {@link CursorIteratorProviderFactory}

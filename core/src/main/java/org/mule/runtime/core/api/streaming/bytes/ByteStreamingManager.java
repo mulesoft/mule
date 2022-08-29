@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.streaming.bytes;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.bytes.FileStoreCursorStreamConfig;
 
 /**
  * Manages components in charge of streaming bytes so that the runtime can keep track of them, enforce policies and make sure that
@@ -37,4 +38,14 @@ public interface ByteStreamingManager {
    * @return The default implementation of {@link CursorStreamProviderFactory}
    */
   CursorStreamProviderFactory getDefaultCursorProviderFactory();
+
+  /**
+   * Creates a {@link CursorStreamProviderFactory} which buffers in disk
+   *
+   * @param config the configuration for the produced {@link CursorStreamProvider} instances
+   * @return a new {@link CursorStreamProviderFactory}
+   */
+  default CursorStreamProviderFactory getFileStoreCursorStreamProviderFactory(FileStoreCursorStreamConfig config) {
+    throw new UnsupportedOperationException("Only supported in EE edition");
+  }
 }
