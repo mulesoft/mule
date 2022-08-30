@@ -20,7 +20,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import static org.hamcrest.Matchers.aMapWithSize;
-import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.hasEntry;
@@ -29,7 +28,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
@@ -153,6 +151,7 @@ public class DefaultCoreEventTracerTestCase {
     when(mockedMuleConfiguration.getId()).thenReturn(TEST_APP);
     CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
+                               mock(Logger.class),
                                mockedMuleConfiguration);
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
     when(distributedTraceContext.tracingFieldsAsMap()).thenReturn(ImmutableMap.of(KEY_1, VALUE_1));
@@ -173,7 +172,8 @@ public class DefaultCoreEventTracerTestCase {
 
   @Test(expected = TracingErrorPropagationException.class)
   public void testStartComponentExecutionIfThrowableWithTracingErrorPropagationEnabled() {
-    doTestStartComponentExecutionIfThrowable(true);
+    doTestErrorPropagation(true, "Error when starting a component span", (coreEventTracer, coreEvent) -> coreEventTracer
+        .startComponentSpan(coreEvent, new TestSpanCustomizationInfo()));
   }
 
   @Test

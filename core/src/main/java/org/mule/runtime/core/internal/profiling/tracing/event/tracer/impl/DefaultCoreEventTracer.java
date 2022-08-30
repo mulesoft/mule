@@ -104,32 +104,33 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   @Override
   public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
+    return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
+                                             emptyMap(),
+                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
+                                             logger);
+  }
+
+  private Map<String, String> doGetDistributedTraceContextMap(CoreEvent coreEvent) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
-      return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap((DistributedTraceContextAware) eventContext),
-                                               emptyMap(),
-                                               "Error on getting distributed trace context", propagationOfExceptionsInTracing,
-                                               logger);
+      DistributedTraceContext distributedTraceContext =
+          ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
+      ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
+                                                                          this::getInternalSpanOpentelemetryExecutionSpanFunction)
+          .orElse(null);
+
+      if (span == null) {
+        return emptyMap();
+      }
+
+      Map<String, String> contextMap = OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span);
+      contextMap.putAll(distributedTraceContext.tracingFieldsAsMap());
+      contextMap.putAll(distributedTraceContext.baggageItemsAsMap());
+
+      return contextMap;
     } else {
       return emptyMap();
     }
-  }
-
-  private Map<String, String> doGetDistributedTraceContextMap(DistributedTraceContextAware event) {
-    DistributedTraceContext distributedTraceContext = event.getDistributedTraceContext();
-    ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
-                                                                        this::getInternalSpanOpentelemetryExecutionSpanFunction)
-        .orElse(null);
-
-    if (span == null) {
-      return emptyMap();
-    }
-
-    Map<String, String> contextMap = OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span);
-    contextMap.putAll(distributedTraceContext.tracingFieldsAsMap());
-    contextMap.putAll(distributedTraceContext.baggageItemsAsMap());
-
-    return contextMap;
   }
 
   private void endCurrentSpanIfPossible(CoreEvent coreEvent) {

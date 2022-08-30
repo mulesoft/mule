@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.consumer.tracing;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -61,6 +63,17 @@ public class TracingErrorPropagationEnablementTestCase extends AbstractMuleConte
   @Test(expected = TracingErrorException.class)
   @Description("This test shows that the propagation of tracing errors are enabled in tests based on mule contexts")
   public void testEnablementOfDefaultProfilingServiceCoreEventTracerThroughSystemProperty() throws Exception {
+    doTestCoreEventTracer();
+  }
+
+  @Test
+  @Description("This test shows that the propagation of tracing errors are enabled in tests based on mule contexts")
+  public void testDisablementOfDefaultProfilingServiceCoreEventTracerThroughSystemProperty() throws Exception {
+    System.setProperty(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING, "false");
+    doTestCoreEventTracer();
+  }
+
+  private void doTestCoreEventTracer() throws MuleException {
     DefaultProfilingService defaultProfilingService = new DefaultProfilingService();
     muleContext.getInjector().inject(defaultProfilingService);
     CoreEvent coreEvent = Mockito.mock(CoreEvent.class);
@@ -70,6 +83,8 @@ public class TracingErrorPropagationEnablementTestCase extends AbstractMuleConte
     when(eventContext.getDistributedTraceContext()).thenThrow(new TracingErrorException());
     coreEventTracerMethodToExecute.accept(defaultProfilingService.getCoreEventTracer(), coreEvent);
   }
+
+
 
   /**
    * A {@link TracingErrorException} used for testing the enablement of the error propagation.
