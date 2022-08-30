@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -19,11 +18,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
@@ -59,7 +57,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
@@ -70,9 +67,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -126,6 +121,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, ExecutionMediator<OperationModel>> mediatorCache;
+  private OperationExecutorSupplier executorSupplier;
 
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extensionName,
@@ -145,46 +141,38 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     return withNullEvent(event -> {
       final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build(), event);
       OperationModel operationModel = key.getOperationModel();
-      CompletableComponentExecutor<OperationModel> executor = getComponentExecutor(operationModel, resolvedParams);
+      CompletableComponentExecutor<OperationModel> executor = executorSupplier.getComponentExecutor(key, resolvedParams);
       CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
 
-      try {
-        ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
-                                                                                        key.getExtensionModel(),
-                                                                                        getConfigurationInstance(key
-                                                                                            .getConfigurationProvider()),
-                                                                                        resolvedParams,
-                                                                                        operationModel,
-                                                                                        event,
-                                                                                        cursorProviderFactory,
-                                                                                        streamingManager,
-                                                                                        NULL_COMPONENT,
-                                                                                        parameterizer.getRetryPolicyTemplate(),
-                                                                                        IMMEDIATE_SCHEDULER,
-                                                                                        empty(),
-                                                                                        muleContext);
+      ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
+          key.getExtensionModel(),
+          getConfigurationInstance(key.getConfigurationProvider()),
+          resolvedParams,
+          operationModel,
+          event,
+          cursorProviderFactory,
+          streamingManager,
+          NULL_COMPONENT,
+          parameterizer.getRetryPolicyTemplate(),
+          IMMEDIATE_SCHEDULER,
+          empty(),
+          muleContext);
 
-        CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
-        mediator.execute(executor, context, new ExecutorCallback() {
+      CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
+      mediator.execute(executor, context, new ExecutorCallback() {
 
-          @Override
-          public void complete(Object value) {
-            future.complete(asResult(value, operationModel, context, cursorProviderFactory));
-          }
-
-          @Override
-          public void error(Throwable e) {
-            future.completeExceptionally(e);
-          }
-        });
-
-        return future;
-      } finally {
-        if (executor != null) {
-          stopIfNeeded(executor);
-          disposeIfNeeded(executor, LOGGER);
+        @Override
+        public void complete(Object value) {
+          future.complete(asResult(value, operationModel, context, cursorProviderFactory));
         }
-      }
+
+        @Override
+        public void error(Throwable e) {
+          future.completeExceptionally(e);
+        }
+      });
+
+      return future;
     });
   }
 
@@ -198,39 +186,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     return (Result<T, A>) Result.builder(resultEvent.getMessage()).build();
   }
 
-  private CompletableComponentExecutor<OperationModel> getComponentExecutor(OperationModel operationModel,
-                                                                            Map<String, Object> params) {
-    Map<String, Object> initParams = new HashMap<>();
-    operationModel.getAllParameterModels().stream()
-        .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
-        .forEach(p -> {
-          String paramName = p.getName();
-          if (params.containsKey(paramName)) {
-            initParams.put(paramName, params.get(paramName));
-          }
-        });
-
-    CompletableComponentExecutor<OperationModel> executor =
-        getOperationExecutorFactory(operationModel).createExecutor(operationModel, initParams);
-    try {
-      initialiseIfNeeded(executor, true, muleContext);
-      startIfNeeded(executor);
-
-      return executor;
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
   private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-                                                                            parameters,
-                                                                            muleContext,
-                                                                            true,
-                                                                            reflectionCache,
-                                                                            expressionManager,
-                                                                            "");
+          parameters,
+          muleContext,
+          true,
+          reflectionCache,
+          expressionManager,
+          "");
 
       try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
         return resolverSet.resolve(ctx).asMap();
@@ -263,7 +227,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         .executor(cacheShutdownExecutor)
         .expireAfterAccess(5, MINUTES)
         .removalListener((key, mediator, cause) -> disposeMediator((OperationKey) key,
-                                                                   (ExecutionMediator<OperationModel>) mediator))
+            (ExecutionMediator<OperationModel>) mediator))
         .build(this::createExecutionMediator);
   }
 
@@ -271,19 +235,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
-                                                                                extensionModel,
-                                                                                operationModel,
-                                                                                createReconnectionInterceptorsChain(extensionModel,
-                                                                                                                    operationModel,
-                                                                                                                    extensionConnectionSupplier,
-                                                                                                                    reflectionCache),
-                                                                                errorTypeRepository,
-                                                                                muleContext.getExecutionClassLoader(),
-                                                                                getPagingResultTransformer(operationModel,
-                                                                                                           extensionConnectionSupplier,
-                                                                                                           supportsOAuth(extensionModel))
-                                                                                                               .orElse(null),
-                                                                                NULL_PROFILING_DATA_PRODUCER);
+        extensionModel,
+        operationModel,
+        createReconnectionInterceptorsChain(extensionModel,
+            operationModel,
+            extensionConnectionSupplier,
+            reflectionCache),
+        errorTypeRepository,
+        muleContext.getExecutionClassLoader(),
+        getPagingResultTransformer(operationModel,
+            extensionConnectionSupplier,
+            supportsOAuth(extensionModel))
+            .orElse(null),
+        NULL_PROFILING_DATA_PRODUCER);
 
     try {
       initialiseIfNeeded(mediator, true, muleContext);
@@ -333,7 +297,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     if (configurationProvider.isPresent()) {
       ConfigurationModel configurationModel = configurationProvider.get().getConfigurationModel();
       return configurationModel.getOperationModel(operationName).orElseThrow(
-                                                                             () -> noSuchOperationException(operationName));
+          () -> noSuchOperationException(operationName));
     } else {
       throw new IllegalArgumentException("Operation '" + operationName + "' not found at the extension level");
     }
@@ -373,17 +337,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     return executeAsync(
-                        extensionName,
-                        operationName,
-                        parameterizer -> {
-                          parameters.get().forEach((key, value) -> {
-                            if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
-                              parameterizer.withParameter(key, value);
-                            }
-                          });
-                          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                          configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                        });
+        extensionName,
+        operationName,
+        parameterizer -> {
+          parameters.get().forEach((key, value) -> {
+            if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
+              parameterizer.withParameter(key, value);
+            }
+          });
+          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+          configureLegacyRepeatableStreaming(parameterizer, operationModel);
+        });
   }
 
   /**
@@ -429,6 +393,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public void initialise() throws InitialisationException {
     cacheShutdownExecutor = new ShutdownExecutor();
     mediatorCache = createMediatorCache();
+    executorSupplier = new OperationExecutorSupplier(muleContext);
   }
 
   @Override
@@ -441,63 +406,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       cacheShutdownExecutor.shutdown();
       shutdownAndAwaitTermination(cacheShutdownExecutor, 5, SECONDS);
     }
-  }
 
-  private static class OperationKey {
-
-    private final ExtensionModel extensionModel;
-    private final Optional<ConfigurationProvider> configurationProvider;
-    private final OperationModel operationModel;
-    private final String configName;
-
-    public OperationKey(ExtensionModel extensionModel,
-                        Optional<ConfigurationProvider> configurationProvider,
-                        OperationModel operationModel) {
-      this.extensionModel = extensionModel;
-      this.configurationProvider = configurationProvider;
-      this.operationModel = operationModel;
-      configName = configurationProvider.map(ConfigurationProvider::getName).orElse(null);
-    }
-
-    public ExtensionModel getExtensionModel() {
-      return extensionModel;
-    }
-
-    public Optional<ConfigurationProvider> getConfigurationProvider() {
-      return configurationProvider;
-    }
-
-    public OperationModel getOperationModel() {
-      return operationModel;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (o instanceof OperationKey) {
-        OperationKey that = (OperationKey) o;
-        return Objects.equals(extensionModel.getName(), that.extensionModel.getName()) &&
-            Objects.equals(operationModel.getName(), that.operationModel.getName()) &&
-            Objects.equals(configName, that.configName);
-      }
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return hash(extensionModel.getName(), operationModel.getName(), configName);
-    }
-
-    @Override
-    public String toString() {
-      return format("[Extension: %s; Operation: %s, ConfigName: %s",
-                    extensionModel.getName(), operationModel.getName(), configName);
-    }
+    executorSupplier.dispose();
   }
 
   private static class NullProfilingDataProducer
       implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {
 
-    private NullProfilingDataProducer() {}
+    private NullProfilingDataProducer() {
+    }
 
     @Override
     public void triggerProfilingEvent(ComponentThreadingProfilingEventContext profilerEventContext) {
