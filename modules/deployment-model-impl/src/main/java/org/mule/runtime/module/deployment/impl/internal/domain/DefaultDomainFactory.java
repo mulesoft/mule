@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
 import static java.lang.String.format;
@@ -118,7 +119,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     }
 
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (MuleDeployableProjectModelBuilder.isHeavyPackage(domainLocation)) {
+    if (isHeavyPackage(domainLocation)) {
       return deployableArtifactDescriptorFactory
           .createDomainDescriptor(createDeployableProjectModel(domainLocation),
                                   deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))
@@ -175,7 +176,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors = new ArrayList<>(domainDescriptor.getPlugins());
 
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (!MuleDeployableProjectModelBuilder.isHeavyPackage(domainLocation)) {
+    if (!isHeavyPackage(domainLocation)) {
       resolvedArtifactPluginDescriptors =
           pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(domainDescriptor.getPlugins()), true);
     }
@@ -202,7 +203,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
   @Override
   public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
-    if (MuleDeployableProjectModelBuilder.isHeavyPackage(artifactLocation)) {
+    if (isHeavyPackage(artifactLocation)) {
       return deployableArtifactDescriptorFactory
           .createDomainDescriptor(createDeployableProjectModel(artifactLocation),
                                   deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))

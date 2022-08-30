@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication.getApplicationDomain;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
@@ -145,7 +146,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   @Override
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (MuleDeployableProjectModelBuilder.isHeavyPackage(artifactLocation)) {
+    if (isHeavyPackage(artifactLocation)) {
       return deployableArtifactDescriptorFactory
           .createApplicationDescriptor(createDeployableProjectModel(artifactLocation),
                                        deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))
@@ -163,7 +164,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     Domain domain = getDomainForDescriptor(descriptor);
 
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (!MuleDeployableProjectModelBuilder.isHeavyPackage(descriptor.getArtifactLocation())) {
+    if (!isHeavyPackage(descriptor.getArtifactLocation())) {
       List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
           pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
                                              new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
@@ -205,7 +206,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   private Domain getDomainForDescriptor(ApplicationDescriptor descriptor) {
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (MuleDeployableProjectModelBuilder.isHeavyPackage(descriptor.getArtifactLocation())) {
+    if (isHeavyPackage(descriptor.getArtifactLocation())) {
       return getDomainForDescriptor(descriptor.getDomainName(), descriptor.getDomainDescriptor().orElse(null),
                                     descriptor.getArtifactLocation());
     } else {

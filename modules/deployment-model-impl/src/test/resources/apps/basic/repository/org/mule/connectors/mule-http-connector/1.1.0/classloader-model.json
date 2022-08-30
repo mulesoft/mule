@@ -1,1 +1,540 @@
-{"version":"1.2.0","artifactCoordinates":{"groupId":"org.mule.connectors","artifactId":"mule-http-connector","version":"1.1.0","type":"jar","classifier":"mule-plugin"},"dependencies":[{"artifactCoordinates":{"groupId":"org.mule.connectors","artifactId":"mule-sockets-connector","version":"1.1.0","type":"jar","classifier":"mule-plugin"},"uri":"repository/org/mule/connectors/mule-sockets-connector/1.1.0/mule-sockets-connector-1.1.0-mule-plugin.jar"},{"artifactCoordinates":{"groupId":"org.mule.modules","artifactId":"mule-module-cors-kernel","version":"1.1.0","type":"jar"},"uri":"repository/org/mule/modules/mule-module-cors-kernel/1.1.0/mule-module-cors-kernel-1.1.0.jar","packages":["org.mule.modules.cors","org.mule.modules.cors.api.configuration.origin","org.mule.modules.cors.configuration","org.mule.modules.cors.configuration.exception","org.mule.modules.cors.configuration.parser","org.mule.modules.cors.request","org.mule.modules.cors.request.attributes","org.mule.modules.cors.request.builder","org.mule.modules.cors.request.checker","org.mule.modules.cors.request.visitor","org.mule.modules.cors.response","org.mule.modules.cors.response.visitor","org.mule.modules.parser"],"resources":["META-INF/MANIFEST.MF","META-INF/maven/org.mule.modules/mule-module-cors-kernel/pom.properties","META-INF/maven/org.mule.modules/mule-module-cors-kernel/pom.xml"]},{"artifactCoordinates":{"groupId":"commons-codec","artifactId":"commons-codec","version":"1.9","type":"jar"},"uri":"repository/commons-codec/commons-codec/1.9/commons-codec-1.9.jar","packages":["org.apache.commons.codec","org.apache.commons.codec.binary","org.apache.commons.codec.digest","org.apache.commons.codec.language","org.apache.commons.codec.language.bm","org.apache.commons.codec.net"],"resources":["META-INF/LICENSE.txt","META-INF/MANIFEST.MF","META-INF/NOTICE.txt","META-INF/maven/commons-codec/commons-codec/pom.properties","META-INF/maven/commons-codec/commons-codec/pom.xml","org/apache/commons/codec/language/bm/ash_approx_any.txt","org/apache/commons/codec/language/bm/ash_approx_common.txt","org/apache/commons/codec/language/bm/ash_approx_cyrillic.txt","org/apache/commons/codec/language/bm/ash_approx_english.txt","org/apache/commons/codec/language/bm/ash_approx_french.txt","org/apache/commons/codec/language/bm/ash_approx_german.txt","org/apache/commons/codec/language/bm/ash_approx_hebrew.txt","org/apache/commons/codec/language/bm/ash_approx_hungarian.txt","org/apache/commons/codec/language/bm/ash_approx_polish.txt","org/apache/commons/codec/language/bm/ash_approx_romanian.txt","org/apache/commons/codec/language/bm/ash_approx_russian.txt","org/apache/commons/codec/language/bm/ash_approx_spanish.txt","org/apache/commons/codec/language/bm/ash_exact_any.txt","org/apache/commons/codec/language/bm/ash_exact_approx_common.txt","org/apache/commons/codec/language/bm/ash_exact_common.txt","org/apache/commons/codec/language/bm/ash_exact_cyrillic.txt","org/apache/commons/codec/language/bm/ash_exact_english.txt","org/apache/commons/codec/language/bm/ash_exact_french.txt","org/apache/commons/codec/language/bm/ash_exact_german.txt","org/apache/commons/codec/language/bm/ash_exact_hebrew.txt","org/apache/commons/codec/language/bm/ash_exact_hungarian.txt","org/apache/commons/codec/language/bm/ash_exact_polish.txt","org/apache/commons/codec/language/bm/ash_exact_romanian.txt","org/apache/commons/codec/language/bm/ash_exact_russian.txt","org/apache/commons/codec/language/bm/ash_exact_spanish.txt","org/apache/commons/codec/language/bm/ash_hebrew_common.txt","org/apache/commons/codec/language/bm/ash_languages.txt","org/apache/commons/codec/language/bm/ash_rules_any.txt","org/apache/commons/codec/language/bm/ash_rules_cyrillic.txt","org/apache/commons/codec/language/bm/ash_rules_english.txt","org/apache/commons/codec/language/bm/ash_rules_french.txt","org/apache/commons/codec/language/bm/ash_rules_german.txt","org/apache/commons/codec/language/bm/ash_rules_hebrew.txt","org/apache/commons/codec/language/bm/ash_rules_hungarian.txt","org/apache/commons/codec/language/bm/ash_rules_polish.txt","org/apache/commons/codec/language/bm/ash_rules_romanian.txt","org/apache/commons/codec/language/bm/ash_rules_russian.txt","org/apache/commons/codec/language/bm/ash_rules_spanish.txt","org/apache/commons/codec/language/bm/gen_approx_any.txt","org/apache/commons/codec/language/bm/gen_approx_arabic.txt","org/apache/commons/codec/language/bm/gen_approx_common.txt","org/apache/commons/codec/language/bm/gen_approx_cyrillic.txt","org/apache/commons/codec/language/bm/gen_approx_czech.txt","org/apache/commons/codec/language/bm/gen_approx_dutch.txt","org/apache/commons/codec/language/bm/gen_approx_english.txt","org/apache/commons/codec/language/bm/gen_approx_french.txt","org/apache/commons/codec/language/bm/gen_approx_german.txt","org/apache/commons/codec/language/bm/gen_approx_greek.txt","org/apache/commons/codec/language/bm/gen_approx_greeklatin.txt","org/apache/commons/codec/language/bm/gen_approx_hebrew.txt","org/apache/commons/codec/language/bm/gen_approx_hungarian.txt","org/apache/commons/codec/language/bm/gen_approx_italian.txt","org/apache/commons/codec/language/bm/gen_approx_polish.txt","org/apache/commons/codec/language/bm/gen_approx_portuguese.txt","org/apache/commons/codec/language/bm/gen_approx_romanian.txt","org/apache/commons/codec/language/bm/gen_approx_russian.txt","org/apache/commons/codec/language/bm/gen_approx_spanish.txt","org/apache/commons/codec/language/bm/gen_approx_turkish.txt","org/apache/commons/codec/language/bm/gen_exact_any.txt","org/apache/commons/codec/language/bm/gen_exact_approx_common.txt","org/apache/commons/codec/language/bm/gen_exact_arabic.txt","org/apache/commons/codec/language/bm/gen_exact_common.txt","org/apache/commons/codec/language/bm/gen_exact_cyrillic.txt","org/apache/commons/codec/language/bm/gen_exact_czech.txt","org/apache/commons/codec/language/bm/gen_exact_dutch.txt","org/apache/commons/codec/language/bm/gen_exact_english.txt","org/apache/commons/codec/language/bm/gen_exact_french.txt","org/apache/commons/codec/language/bm/gen_exact_german.txt","org/apache/commons/codec/language/bm/gen_exact_greek.txt","org/apache/commons/codec/language/bm/gen_exact_greeklatin.txt","org/apache/commons/codec/language/bm/gen_exact_hebrew.txt","org/apache/commons/codec/language/bm/gen_exact_hungarian.txt","org/apache/commons/codec/language/bm/gen_exact_italian.txt","org/apache/commons/codec/language/bm/gen_exact_polish.txt","org/apache/commons/codec/language/bm/gen_exact_portuguese.txt","org/apache/commons/codec/language/bm/gen_exact_romanian.txt","org/apache/commons/codec/language/bm/gen_exact_russian.txt","org/apache/commons/codec/language/bm/gen_exact_spanish.txt","org/apache/commons/codec/language/bm/gen_exact_turkish.txt","org/apache/commons/codec/language/bm/gen_hebrew_common.txt","org/apache/commons/codec/language/bm/gen_languages.txt","org/apache/commons/codec/language/bm/gen_rules_any.txt","org/apache/commons/codec/language/bm/gen_rules_arabic.txt","org/apache/commons/codec/language/bm/gen_rules_cyrillic.txt","org/apache/commons/codec/language/bm/gen_rules_czech.txt","org/apache/commons/codec/language/bm/gen_rules_dutch.txt","org/apache/commons/codec/language/bm/gen_rules_english.txt","org/apache/commons/codec/language/bm/gen_rules_french.txt","org/apache/commons/codec/language/bm/gen_rules_german.txt","org/apache/commons/codec/language/bm/gen_rules_greek.txt","org/apache/commons/codec/language/bm/gen_rules_greeklatin.txt","org/apache/commons/codec/language/bm/gen_rules_hebrew.txt","org/apache/commons/codec/language/bm/gen_rules_hungarian.txt","org/apache/commons/codec/language/bm/gen_rules_italian.txt","org/apache/commons/codec/language/bm/gen_rules_polish.txt","org/apache/commons/codec/language/bm/gen_rules_portuguese.txt","org/apache/commons/codec/language/bm/gen_rules_romanian.txt","org/apache/commons/codec/language/bm/gen_rules_russian.txt","org/apache/commons/codec/language/bm/gen_rules_spanish.txt","org/apache/commons/codec/language/bm/gen_rules_turkish.txt","org/apache/commons/codec/language/bm/lang.txt","org/apache/commons/codec/language/bm/sep_approx_any.txt","org/apache/commons/codec/language/bm/sep_approx_common.txt","org/apache/commons/codec/language/bm/sep_approx_french.txt","org/apache/commons/codec/language/bm/sep_approx_hebrew.txt","org/apache/commons/codec/language/bm/sep_approx_italian.txt","org/apache/commons/codec/language/bm/sep_approx_portuguese.txt","org/apache/commons/codec/language/bm/sep_approx_spanish.txt","org/apache/commons/codec/language/bm/sep_exact_any.txt","org/apache/commons/codec/language/bm/sep_exact_approx_common.txt","org/apache/commons/codec/language/bm/sep_exact_common.txt","org/apache/commons/codec/language/bm/sep_exact_french.txt","org/apache/commons/codec/language/bm/sep_exact_hebrew.txt","org/apache/commons/codec/language/bm/sep_exact_italian.txt","org/apache/commons/codec/language/bm/sep_exact_portuguese.txt","org/apache/commons/codec/language/bm/sep_exact_spanish.txt","org/apache/commons/codec/language/bm/sep_hebrew_common.txt","org/apache/commons/codec/language/bm/sep_languages.txt","org/apache/commons/codec/language/bm/sep_rules_any.txt","org/apache/commons/codec/language/bm/sep_rules_french.txt","org/apache/commons/codec/language/bm/sep_rules_hebrew.txt","org/apache/commons/codec/language/bm/sep_rules_italian.txt","org/apache/commons/codec/language/bm/sep_rules_portuguese.txt","org/apache/commons/codec/language/bm/sep_rules_spanish.txt"]},{"artifactCoordinates":{"groupId":"org.apache.commons","artifactId":"commons-lang3","version":"3.6","type":"jar"},"uri":"repository/org/apache/commons/commons-lang3/3.6/commons-lang3-3.6.jar","packages":["org.apache.commons.lang3","org.apache.commons.lang3.arch","org.apache.commons.lang3.builder","org.apache.commons.lang3.concurrent","org.apache.commons.lang3.event","org.apache.commons.lang3.exception","org.apache.commons.lang3.math","org.apache.commons.lang3.mutable","org.apache.commons.lang3.reflect","org.apache.commons.lang3.text","org.apache.commons.lang3.text.translate","org.apache.commons.lang3.time","org.apache.commons.lang3.tuple"],"resources":["META-INF/LICENSE.txt","META-INF/MANIFEST.MF","META-INF/NOTICE.txt","META-INF/maven/org.apache.commons/commons-lang3/pom.properties","META-INF/maven/org.apache.commons/commons-lang3/pom.xml"]},{"artifactCoordinates":{"groupId":"commons-io","artifactId":"commons-io","version":"2.4","type":"jar"},"uri":"repository/commons-io/commons-io/2.4/commons-io-2.4.jar","packages":["org.apache.commons.io","org.apache.commons.io.comparator","org.apache.commons.io.filefilter","org.apache.commons.io.input","org.apache.commons.io.monitor","org.apache.commons.io.output"],"resources":["META-INF/LICENSE.txt","META-INF/MANIFEST.MF","META-INF/NOTICE.txt","META-INF/maven/commons-io/commons-io/pom.properties","META-INF/maven/commons-io/commons-io/pom.xml"]},{"artifactCoordinates":{"groupId":"io.projectreactor","artifactId":"reactor-core","version":"3.2.0.M1","type":"jar"},"uri":"repository/io/projectreactor/reactor-core/3.2.0.M1/reactor-core-3.2.0.M1.jar","packages":["reactor.adapter","reactor.core","reactor.core.publisher","reactor.core.scheduler","reactor.util","reactor.util.annotation","reactor.util.concurrent","reactor.util.context","reactor.util.function"],"resources":["META-INF/MANIFEST.MF","META-INF/reactor-core.kotlin_module"]},{"artifactCoordinates":{"groupId":"org.reactivestreams","artifactId":"reactive-streams","version":"1.0.2","type":"jar"},"uri":"repository/org/reactivestreams/reactive-streams/1.0.2/reactive-streams-1.0.2.jar","packages":["org.reactivestreams"],"resources":["META-INF/MANIFEST.MF"]},{"artifactCoordinates":{"groupId":"com.google.guava","artifactId":"guava","version":"23.5-jre","type":"jar"},"uri":"repository/com/google/guava/guava/23.5-jre/guava-23.5-jre.jar","packages":["com.google.common.annotations","com.google.common.base","com.google.common.base.internal","com.google.common.cache","com.google.common.collect","com.google.common.escape","com.google.common.eventbus","com.google.common.graph","com.google.common.hash","com.google.common.html","com.google.common.io","com.google.common.math","com.google.common.net","com.google.common.primitives","com.google.common.reflect","com.google.common.util.concurrent","com.google.common.xml","com.google.thirdparty.publicsuffix"],"resources":["META-INF/MANIFEST.MF","META-INF/maven/com.google.guava/guava/pom.properties","META-INF/maven/com.google.guava/guava/pom.xml"]},{"artifactCoordinates":{"groupId":"com.google.code.findbugs","artifactId":"jsr305","version":"1.3.9","type":"jar"},"uri":"repository/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar","packages":["javax.annotation","javax.annotation.concurrent","javax.annotation.meta"],"resources":["META-INF/MANIFEST.MF","javax/annotation/CheckForNull.java","javax/annotation/CheckForSigned.java","javax/annotation/CheckReturnValue.java","javax/annotation/Detainted.java","javax/annotation/MatchesPattern.java","javax/annotation/Nonnegative.java","javax/annotation/Nonnull.java","javax/annotation/Nullable.java","javax/annotation/OverridingMethodsMustInvokeSuper.java","javax/annotation/ParametersAreNonnullByDefault.java","javax/annotation/ParametersAreNullableByDefault.java","javax/annotation/PropertyKey.java","javax/annotation/RegEx.java","javax/annotation/Signed.java","javax/annotation/Syntax.java","javax/annotation/Tainted.java","javax/annotation/Untainted.java","javax/annotation/WillClose.java","javax/annotation/WillCloseWhenClosed.java","javax/annotation/WillNotClose.java","javax/annotation/concurrent/GuardedBy.java","javax/annotation/concurrent/Immutable.java","javax/annotation/concurrent/NotThreadSafe.java","javax/annotation/concurrent/ThreadSafe.java","javax/annotation/meta/Exclusive.java","javax/annotation/meta/Exhaustive.java","javax/annotation/meta/TypeQualifier.java","javax/annotation/meta/TypeQualifierDefault.java","javax/annotation/meta/TypeQualifierNickname.java","javax/annotation/meta/TypeQualifierValidator.java","javax/annotation/meta/When.java"]},{"artifactCoordinates":{"groupId":"org.checkerframework","artifactId":"checker-qual","version":"2.0.0","type":"jar"},"uri":"repository/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar","packages":["afu.org.checkerframework.checker.compilermsgs.qual","afu.org.checkerframework.checker.experimental.tainting_qual.qual","afu.org.checkerframework.checker.fenum.qual","afu.org.checkerframework.checker.formatter","afu.org.checkerframework.checker.formatter.qual","afu.org.checkerframework.checker.guieffect.qual","afu.org.checkerframework.checker.i18n.qual","afu.org.checkerframework.checker.i18nformatter.qual","afu.org.checkerframework.checker.igj.qual","afu.org.checkerframework.checker.initialization.qual","afu.org.checkerframework.checker.interning.qual","afu.org.checkerframework.checker.javari.qual","afu.org.checkerframework.checker.linear.qual","afu.org.checkerframework.checker.lock.qual","afu.org.checkerframework.checker.nullness","afu.org.checkerframework.checker.nullness.qual","afu.org.checkerframework.checker.oigj.qual","afu.org.checkerframework.checker.propkey.qual","afu.org.checkerframework.checker.regex","afu.org.checkerframework.checker.regex.classic.qual","afu.org.checkerframework.checker.regex.qual","afu.org.checkerframework.checker.signature.qual","afu.org.checkerframework.checker.tainting.classic.qual","afu.org.checkerframework.checker.tainting.qual","afu.org.checkerframework.checker.units","afu.org.checkerframework.checker.units.qual","afu.org.checkerframework.common.aliasing.qual","afu.org.checkerframework.common.reflection.qual","afu.org.checkerframework.common.util.report.qual","afu.org.checkerframework.common.value.qual","afu.org.checkerframework.dataflow.qual","afu.org.checkerframework.framework.qual","afu.org.checkerframework.qualframework.poly.qual","afu.plume","org.checkerframework.checker.compilermsgs.qual","org.checkerframework.checker.experimental.tainting_qual.qual","org.checkerframework.checker.fenum.qual","org.checkerframework.checker.formatter","org.checkerframework.checker.formatter.qual","org.checkerframework.checker.guieffect.qual","org.checkerframework.checker.i18n.qual","org.checkerframework.checker.i18nformatter.qual","org.checkerframework.checker.initialization.qual","org.checkerframework.checker.interning.qual","org.checkerframework.checker.linear.qual","org.checkerframework.checker.lock.qual","org.checkerframework.checker.nullness","org.checkerframework.checker.nullness.qual","org.checkerframework.checker.propkey.qual","org.checkerframework.checker.regex","org.checkerframework.checker.regex.classic.qual","org.checkerframework.checker.regex.qual","org.checkerframework.checker.signature.qual","org.checkerframework.checker.tainting.classic.qual","org.checkerframework.checker.tainting.qual","org.checkerframework.checker.units","org.checkerframework.checker.units.qual","org.checkerframework.common.aliasing.qual","org.checkerframework.common.reflection.qual","org.checkerframework.common.util.report.qual","org.checkerframework.common.value.qual","org.checkerframework.dataflow.qual","org.checkerframework.framework.qual","org.checkerframework.qualframework.poly.qual"],"resources":["META-INF/MANIFEST.MF"]},{"artifactCoordinates":{"groupId":"com.google.errorprone","artifactId":"error_prone_annotations","version":"2.0.18","type":"jar"},"uri":"repository/com/google/errorprone/error_prone_annotations/2.0.18/error_prone_annotations-2.0.18.jar","packages":["com.google.errorprone.annotations","com.google.errorprone.annotations.concurrent"],"resources":["META-INF/MANIFEST.MF","META-INF/maven/com.google.errorprone/error_prone_annotations/pom.properties","META-INF/maven/com.google.errorprone/error_prone_annotations/pom.xml"]},{"artifactCoordinates":{"groupId":"com.google.j2objc","artifactId":"j2objc-annotations","version":"1.1","type":"jar"},"uri":"repository/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar","packages":["com.google.j2objc.annotations"],"resources":["META-INF/MANIFEST.MF","META-INF/maven/com.google.j2objc/j2objc-annotations/pom.properties","META-INF/maven/com.google.j2objc/j2objc-annotations/pom.xml"]},{"artifactCoordinates":{"groupId":"org.codehaus.mojo","artifactId":"animal-sniffer-annotations","version":"1.14","type":"jar"},"uri":"repository/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar","packages":["org.codehaus.mojo.animal_sniffer"],"resources":["META-INF/MANIFEST.MF","META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.properties","META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.xml"]}],"packages":["org.mule.extension.http.api","org.mule.extension.http.api.error","org.mule.extension.http.api.listener","org.mule.extension.http.api.listener.builder","org.mule.extension.http.api.listener.intercepting.cors","org.mule.extension.http.api.listener.server","org.mule.extension.http.api.notification","org.mule.extension.http.api.policy","org.mule.extension.http.api.request","org.mule.extension.http.api.request.authentication","org.mule.extension.http.api.request.builder","org.mule.extension.http.api.request.client","org.mule.extension.http.api.request.proxy","org.mule.extension.http.api.request.validator","org.mule.extension.http.api.streaming","org.mule.extension.http.internal","org.mule.extension.http.internal.filter","org.mule.extension.http.internal.listener","org.mule.extension.http.internal.listener.intercepting","org.mule.extension.http.internal.listener.intercepting.cors","org.mule.extension.http.internal.listener.server","org.mule.extension.http.internal.request","org.mule.extension.http.internal.request.builder","org.mule.extension.http.internal.request.client","org.mule.extension.http.internal.temporary"],"resources":["META-INF/http-extension-descriptions.xml","META-INF/maven/org.mule.connectors/mule-http-connector/pom.xml","META-INF/mime.types","META-INF/mule-artifact/icon.svg","META-INF/mule-artifact/mule-artifact.json","META-INF/org/mule/runtime/core/config/registry-bootstrap.properties"]}
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.connectors",
+    "artifactId": "mule-http-connector",
+    "version": "1.1.0",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-sockets-connector",
+        "version": "1.1.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.1.0/mule-sockets-connector-1.1.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.modules",
+        "artifactId": "mule-module-cors-kernel",
+        "version": "1.1.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/mule/modules/mule-module-cors-kernel/1.1.0/mule-module-cors-kernel-1.1.0.jar",
+      "packages": [
+        "org.mule.modules.cors",
+        "org.mule.modules.cors.api.configuration.origin",
+        "org.mule.modules.cors.configuration",
+        "org.mule.modules.cors.configuration.exception",
+        "org.mule.modules.cors.configuration.parser",
+        "org.mule.modules.cors.request",
+        "org.mule.modules.cors.request.attributes",
+        "org.mule.modules.cors.request.builder",
+        "org.mule.modules.cors.request.checker",
+        "org.mule.modules.cors.request.visitor",
+        "org.mule.modules.cors.response",
+        "org.mule.modules.cors.response.visitor",
+        "org.mule.modules.parser"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/maven/org.mule.modules/mule-module-cors-kernel/pom.properties",
+        "META-INF/maven/org.mule.modules/mule-module-cors-kernel/pom.xml"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-codec",
+        "artifactId": "commons-codec",
+        "version": "1.9",
+        "type": "jar"
+      },
+      "uri": "repository/commons-codec/commons-codec/1.9/commons-codec-1.9.jar",
+      "packages": [
+        "org.apache.commons.codec",
+        "org.apache.commons.codec.binary",
+        "org.apache.commons.codec.digest",
+        "org.apache.commons.codec.language",
+        "org.apache.commons.codec.language.bm",
+        "org.apache.commons.codec.net"
+      ],
+      "resources": [
+        "META-INF/LICENSE.txt",
+        "META-INF/MANIFEST.MF",
+        "META-INF/NOTICE.txt",
+        "META-INF/maven/commons-codec/commons-codec/pom.properties",
+        "META-INF/maven/commons-codec/commons-codec/pom.xml",
+        "org/apache/commons/codec/language/bm/ash_approx_any.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_common.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_cyrillic.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_english.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_french.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_german.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_hebrew.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_hungarian.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_polish.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_romanian.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_russian.txt",
+        "org/apache/commons/codec/language/bm/ash_approx_spanish.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_any.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_approx_common.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_common.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_cyrillic.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_english.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_french.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_german.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_hebrew.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_hungarian.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_polish.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_romanian.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_russian.txt",
+        "org/apache/commons/codec/language/bm/ash_exact_spanish.txt",
+        "org/apache/commons/codec/language/bm/ash_hebrew_common.txt",
+        "org/apache/commons/codec/language/bm/ash_languages.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_any.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_cyrillic.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_english.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_french.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_german.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_hebrew.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_hungarian.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_polish.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_romanian.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_russian.txt",
+        "org/apache/commons/codec/language/bm/ash_rules_spanish.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_any.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_arabic.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_common.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_cyrillic.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_czech.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_dutch.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_english.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_french.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_german.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_greek.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_greeklatin.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_hebrew.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_hungarian.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_italian.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_polish.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_portuguese.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_romanian.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_russian.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_spanish.txt",
+        "org/apache/commons/codec/language/bm/gen_approx_turkish.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_any.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_approx_common.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_arabic.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_common.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_cyrillic.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_czech.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_dutch.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_english.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_french.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_german.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_greek.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_greeklatin.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_hebrew.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_hungarian.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_italian.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_polish.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_portuguese.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_romanian.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_russian.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_spanish.txt",
+        "org/apache/commons/codec/language/bm/gen_exact_turkish.txt",
+        "org/apache/commons/codec/language/bm/gen_hebrew_common.txt",
+        "org/apache/commons/codec/language/bm/gen_languages.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_any.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_arabic.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_cyrillic.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_czech.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_dutch.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_english.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_french.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_german.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_greek.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_greeklatin.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_hebrew.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_hungarian.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_italian.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_polish.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_portuguese.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_romanian.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_russian.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_spanish.txt",
+        "org/apache/commons/codec/language/bm/gen_rules_turkish.txt",
+        "org/apache/commons/codec/language/bm/lang.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_any.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_common.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_french.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_hebrew.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_italian.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_portuguese.txt",
+        "org/apache/commons/codec/language/bm/sep_approx_spanish.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_any.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_approx_common.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_common.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_french.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_hebrew.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_italian.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_portuguese.txt",
+        "org/apache/commons/codec/language/bm/sep_exact_spanish.txt",
+        "org/apache/commons/codec/language/bm/sep_hebrew_common.txt",
+        "org/apache/commons/codec/language/bm/sep_languages.txt",
+        "org/apache/commons/codec/language/bm/sep_rules_any.txt",
+        "org/apache/commons/codec/language/bm/sep_rules_french.txt",
+        "org/apache/commons/codec/language/bm/sep_rules_hebrew.txt",
+        "org/apache/commons/codec/language/bm/sep_rules_italian.txt",
+        "org/apache/commons/codec/language/bm/sep_rules_portuguese.txt",
+        "org/apache/commons/codec/language/bm/sep_rules_spanish.txt"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-lang3",
+        "version": "3.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-lang3/3.6/commons-lang3-3.6.jar",
+      "packages": [
+        "org.apache.commons.lang3",
+        "org.apache.commons.lang3.arch",
+        "org.apache.commons.lang3.builder",
+        "org.apache.commons.lang3.concurrent",
+        "org.apache.commons.lang3.event",
+        "org.apache.commons.lang3.exception",
+        "org.apache.commons.lang3.math",
+        "org.apache.commons.lang3.mutable",
+        "org.apache.commons.lang3.reflect",
+        "org.apache.commons.lang3.text",
+        "org.apache.commons.lang3.text.translate",
+        "org.apache.commons.lang3.time",
+        "org.apache.commons.lang3.tuple"
+      ],
+      "resources": [
+        "META-INF/LICENSE.txt",
+        "META-INF/MANIFEST.MF",
+        "META-INF/NOTICE.txt",
+        "META-INF/maven/org.apache.commons/commons-lang3/pom.properties",
+        "META-INF/maven/org.apache.commons/commons-lang3/pom.xml"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.4",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.4/commons-io-2.4.jar",
+      "packages": [
+        "org.apache.commons.io",
+        "org.apache.commons.io.comparator",
+        "org.apache.commons.io.filefilter",
+        "org.apache.commons.io.input",
+        "org.apache.commons.io.monitor",
+        "org.apache.commons.io.output"
+      ],
+      "resources": [
+        "META-INF/LICENSE.txt",
+        "META-INF/MANIFEST.MF",
+        "META-INF/NOTICE.txt",
+        "META-INF/maven/commons-io/commons-io/pom.properties",
+        "META-INF/maven/commons-io/commons-io/pom.xml"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "io.projectreactor",
+        "artifactId": "reactor-core",
+        "version": "3.2.0.M1",
+        "type": "jar"
+      },
+      "uri": "repository/io/projectreactor/reactor-core/3.2.0.M1/reactor-core-3.2.0.M1.jar",
+      "packages": [
+        "reactor.adapter",
+        "reactor.core",
+        "reactor.core.publisher",
+        "reactor.core.scheduler",
+        "reactor.util",
+        "reactor.util.annotation",
+        "reactor.util.concurrent",
+        "reactor.util.context",
+        "reactor.util.function"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/reactor-core.kotlin_module"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.reactivestreams",
+        "artifactId": "reactive-streams",
+        "version": "1.0.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/reactivestreams/reactive-streams/1.0.2/reactive-streams-1.0.2.jar",
+      "packages": [
+        "org.reactivestreams"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.guava",
+        "artifactId": "guava",
+        "version": "23.5-jre",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/guava/guava/23.5-jre/guava-23.5-jre.jar",
+      "packages": [
+        "com.google.common.annotations",
+        "com.google.common.base",
+        "com.google.common.base.internal",
+        "com.google.common.cache",
+        "com.google.common.collect",
+        "com.google.common.escape",
+        "com.google.common.eventbus",
+        "com.google.common.graph",
+        "com.google.common.hash",
+        "com.google.common.html",
+        "com.google.common.io",
+        "com.google.common.math",
+        "com.google.common.net",
+        "com.google.common.primitives",
+        "com.google.common.reflect",
+        "com.google.common.util.concurrent",
+        "com.google.common.xml",
+        "com.google.thirdparty.publicsuffix"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/maven/com.google.guava/guava/pom.properties",
+        "META-INF/maven/com.google.guava/guava/pom.xml"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.code.findbugs",
+        "artifactId": "jsr305",
+        "version": "1.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar",
+      "packages": [
+        "javax.annotation",
+        "javax.annotation.concurrent",
+        "javax.annotation.meta"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "javax/annotation/CheckForNull.java",
+        "javax/annotation/CheckForSigned.java",
+        "javax/annotation/CheckReturnValue.java",
+        "javax/annotation/Detainted.java",
+        "javax/annotation/MatchesPattern.java",
+        "javax/annotation/Nonnegative.java",
+        "javax/annotation/Nonnull.java",
+        "javax/annotation/Nullable.java",
+        "javax/annotation/OverridingMethodsMustInvokeSuper.java",
+        "javax/annotation/ParametersAreNonnullByDefault.java",
+        "javax/annotation/ParametersAreNullableByDefault.java",
+        "javax/annotation/PropertyKey.java",
+        "javax/annotation/RegEx.java",
+        "javax/annotation/Signed.java",
+        "javax/annotation/Syntax.java",
+        "javax/annotation/Tainted.java",
+        "javax/annotation/Untainted.java",
+        "javax/annotation/WillClose.java",
+        "javax/annotation/WillCloseWhenClosed.java",
+        "javax/annotation/WillNotClose.java",
+        "javax/annotation/concurrent/GuardedBy.java",
+        "javax/annotation/concurrent/Immutable.java",
+        "javax/annotation/concurrent/NotThreadSafe.java",
+        "javax/annotation/concurrent/ThreadSafe.java",
+        "javax/annotation/meta/Exclusive.java",
+        "javax/annotation/meta/Exhaustive.java",
+        "javax/annotation/meta/TypeQualifier.java",
+        "javax/annotation/meta/TypeQualifierDefault.java",
+        "javax/annotation/meta/TypeQualifierNickname.java",
+        "javax/annotation/meta/TypeQualifierValidator.java",
+        "javax/annotation/meta/When.java"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.checkerframework",
+        "artifactId": "checker-qual",
+        "version": "2.0.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar",
+      "packages": [
+        "afu.org.checkerframework.checker.compilermsgs.qual",
+        "afu.org.checkerframework.checker.experimental.tainting_qual.qual",
+        "afu.org.checkerframework.checker.fenum.qual",
+        "afu.org.checkerframework.checker.formatter",
+        "afu.org.checkerframework.checker.formatter.qual",
+        "afu.org.checkerframework.checker.guieffect.qual",
+        "afu.org.checkerframework.checker.i18n.qual",
+        "afu.org.checkerframework.checker.i18nformatter.qual",
+        "afu.org.checkerframework.checker.igj.qual",
+        "afu.org.checkerframework.checker.initialization.qual",
+        "afu.org.checkerframework.checker.interning.qual",
+        "afu.org.checkerframework.checker.javari.qual",
+        "afu.org.checkerframework.checker.linear.qual",
+        "afu.org.checkerframework.checker.lock.qual",
+        "afu.org.checkerframework.checker.nullness",
+        "afu.org.checkerframework.checker.nullness.qual",
+        "afu.org.checkerframework.checker.oigj.qual",
+        "afu.org.checkerframework.checker.propkey.qual",
+        "afu.org.checkerframework.checker.regex",
+        "afu.org.checkerframework.checker.regex.classic.qual",
+        "afu.org.checkerframework.checker.regex.qual",
+        "afu.org.checkerframework.checker.signature.qual",
+        "afu.org.checkerframework.checker.tainting.classic.qual",
+        "afu.org.checkerframework.checker.tainting.qual",
+        "afu.org.checkerframework.checker.units",
+        "afu.org.checkerframework.checker.units.qual",
+        "afu.org.checkerframework.common.aliasing.qual",
+        "afu.org.checkerframework.common.reflection.qual",
+        "afu.org.checkerframework.common.util.report.qual",
+        "afu.org.checkerframework.common.value.qual",
+        "afu.org.checkerframework.dataflow.qual",
+        "afu.org.checkerframework.framework.qual",
+        "afu.org.checkerframework.qualframework.poly.qual",
+        "afu.plume",
+        "org.checkerframework.checker.compilermsgs.qual",
+        "org.checkerframework.checker.experimental.tainting_qual.qual",
+        "org.checkerframework.checker.fenum.qual",
+        "org.checkerframework.checker.formatter",
+        "org.checkerframework.checker.formatter.qual",
+        "org.checkerframework.checker.guieffect.qual",
+        "org.checkerframework.checker.i18n.qual",
+        "org.checkerframework.checker.i18nformatter.qual",
+        "org.checkerframework.checker.initialization.qual",
+        "org.checkerframework.checker.interning.qual",
+        "org.checkerframework.checker.linear.qual",
+        "org.checkerframework.checker.lock.qual",
+        "org.checkerframework.checker.nullness",
+        "org.checkerframework.checker.nullness.qual",
+        "org.checkerframework.checker.propkey.qual",
+        "org.checkerframework.checker.regex",
+        "org.checkerframework.checker.regex.classic.qual",
+        "org.checkerframework.checker.regex.qual",
+        "org.checkerframework.checker.signature.qual",
+        "org.checkerframework.checker.tainting.classic.qual",
+        "org.checkerframework.checker.tainting.qual",
+        "org.checkerframework.checker.units",
+        "org.checkerframework.checker.units.qual",
+        "org.checkerframework.common.aliasing.qual",
+        "org.checkerframework.common.reflection.qual",
+        "org.checkerframework.common.util.report.qual",
+        "org.checkerframework.common.value.qual",
+        "org.checkerframework.dataflow.qual",
+        "org.checkerframework.framework.qual",
+        "org.checkerframework.qualframework.poly.qual"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.errorprone",
+        "artifactId": "error_prone_annotations",
+        "version": "2.0.18",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/errorprone/error_prone_annotations/2.0.18/error_prone_annotations-2.0.18.jar",
+      "packages": [
+        "com.google.errorprone.annotations",
+        "com.google.errorprone.annotations.concurrent"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/maven/com.google.errorprone/error_prone_annotations/pom.properties",
+        "META-INF/maven/com.google.errorprone/error_prone_annotations/pom.xml"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.j2objc",
+        "artifactId": "j2objc-annotations",
+        "version": "1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar",
+      "packages": [
+        "com.google.j2objc.annotations"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/maven/com.google.j2objc/j2objc-annotations/pom.properties",
+        "META-INF/maven/com.google.j2objc/j2objc-annotations/pom.xml"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.mojo",
+        "artifactId": "animal-sniffer-annotations",
+        "version": "1.14",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar",
+      "packages": [
+        "org.codehaus.mojo.animal_sniffer"
+      ],
+      "resources": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.properties",
+        "META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.xml"
+      ]
+    }
+  ],
+  "packages": [
+    "org.mule.extension.http.api",
+    "org.mule.extension.http.api.error",
+    "org.mule.extension.http.api.listener",
+    "org.mule.extension.http.api.listener.builder",
+    "org.mule.extension.http.api.listener.intercepting.cors",
+    "org.mule.extension.http.api.listener.server",
+    "org.mule.extension.http.api.notification",
+    "org.mule.extension.http.api.policy",
+    "org.mule.extension.http.api.request",
+    "org.mule.extension.http.api.request.authentication",
+    "org.mule.extension.http.api.request.builder",
+    "org.mule.extension.http.api.request.client",
+    "org.mule.extension.http.api.request.proxy",
+    "org.mule.extension.http.api.request.validator",
+    "org.mule.extension.http.api.streaming",
+    "org.mule.extension.http.internal",
+    "org.mule.extension.http.internal.filter",
+    "org.mule.extension.http.internal.listener",
+    "org.mule.extension.http.internal.listener.intercepting",
+    "org.mule.extension.http.internal.listener.intercepting.cors",
+    "org.mule.extension.http.internal.listener.server",
+    "org.mule.extension.http.internal.request",
+    "org.mule.extension.http.internal.request.builder",
+    "org.mule.extension.http.internal.request.client",
+    "org.mule.extension.http.internal.temporary"
+  ],
+  "resources": [
+    "META-INF/http-extension-descriptions.xml",
+    "META-INF/maven/org.mule.connectors/mule-http-connector/pom.xml",
+    "META-INF/mime.types",
+    "META-INF/mule-artifact/icon.svg",
+    "META-INF/mule-artifact/mule-artifact.json",
+    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties"
+  ]
+}

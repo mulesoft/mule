@@ -25,6 +25,7 @@ import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -120,9 +121,9 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
     Set<BundleDescriptor> sharedLibraries = getSharedLibraries(packagerClassLoaderModel, bundleDescriptors);
 
     List<String> packages =
-        packagerClassLoaderModel.getPackages() != null ? Arrays.asList(packagerClassLoaderModel.getPackages()) : emptyList();
+        packagerClassLoaderModel.getPackages() != null ? asList(packagerClassLoaderModel.getPackages()) : emptyList();
     List<String> resources =
-        packagerClassLoaderModel.getResources() != null ? Arrays.asList(packagerClassLoaderModel.getResources()) : emptyList();
+        packagerClassLoaderModel.getResources() != null ? asList(packagerClassLoaderModel.getResources()) : emptyList();
 
     return new DeployableProjectModel(packages,
                                       resources,
@@ -136,27 +137,26 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
                                                                                         Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
     return packagerClassLoaderModel
         .getAdditionalPluginDependencies().map(
-                                               apds -> apds
-                                                   .stream().collect(toMap(
-                                                                           plugin -> packagerClassLoaderModel
-                                                                               .getDependencies().stream()
-                                                                               .filter(pluginDependency -> StringUtils
-                                                                                   .equals(pluginDependency
-                                                                                       .getArtifactCoordinates().getGroupId(),
-                                                                                           plugin.getGroupId())
-                                                                                   && StringUtils.equals(pluginDependency
-                                                                                       .getArtifactCoordinates()
-                                                                                       .getArtifactId(), plugin.getArtifactId()))
-                                                                               .map(artifact -> bundleDescriptors
-                                                                                   .get(artifact.getArtifactCoordinates()))
-                                                                               .findFirst()
-                                                                               .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Couldn't find plugin '%s' among dependencies",
-                                                                                                                                                      plugin)))),
-                                                                           plugin -> plugin.getAdditionalDependencies()
-                                                                               .stream()
-                                                                               .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
-                                                                                   .apply(artifact))
-                                                                               .collect(toList()))))
+                                               apds -> apds.stream().collect(
+                                                                             toMap(plugin -> packagerClassLoaderModel
+                                                                                 .getDependencies().stream()
+                                                                                 .filter(pluginDependency -> StringUtils
+                                                                                     .equals(pluginDependency
+                                                                                         .getArtifactCoordinates().getGroupId(),
+                                                                                             plugin.getGroupId())
+                                                                                     && StringUtils.equals(pluginDependency
+                                                                                         .getArtifactCoordinates()
+                                                                                         .getArtifactId(), plugin.getArtifactId()))
+                                                                                 .map(artifact -> bundleDescriptors
+                                                                                     .get(artifact.getArtifactCoordinates()))
+                                                                                 .findFirst()
+                                                                                 .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Couldn't find plugin '%s' among dependencies",
+                                                                                                                                                        plugin)))),
+                                                                                   plugin -> plugin.getAdditionalDependencies()
+                                                                                       .stream()
+                                                                                       .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
+                                                                                           .apply(artifact))
+                                                                                       .collect(toList()))))
         .orElse(emptyMap());
   }
 

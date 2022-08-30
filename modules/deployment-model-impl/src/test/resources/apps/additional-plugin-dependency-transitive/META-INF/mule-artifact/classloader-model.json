@@ -1,1 +1,314 @@
-{"version":"1.2.0","artifactCoordinates":{"groupId":"com.test","artifactId":"test-app","version":"1.0.0-SNAPSHOT","type":"jar","classifier":"mule-application"},"dependencies":[{"artifactCoordinates":{"groupId":"org.mule.modules","artifactId":"mule-spring-module","version":"1.3.6","type":"jar","classifier":"mule-plugin"},"uri":"repository/org/mule/modules/mule-spring-module/1.3.6/mule-spring-module-1.3.6-mule-plugin.jar"}],"resources":["app.xml","tmp"],"additionalPluginDependencies":[{"groupId":"org.mule.modules","artifactId":"mule-spring-module","additionalDependencies":[{"artifactCoordinates":{"groupId":"org.springframework","artifactId":"spring-context","version":"5.1.0.RELEASE","type":"jar"},"uri":"repository/org/springframework/spring-context/5.1.0.RELEASE/spring-context-5.1.0.RELEASE.jar","packages":["org.springframework.cache","org.springframework.cache.annotation","org.springframework.cache.concurrent","org.springframework.cache.config","org.springframework.cache.interceptor","org.springframework.cache.support","org.springframework.context","org.springframework.context.annotation","org.springframework.context.config","org.springframework.context.event","org.springframework.context.expression","org.springframework.context.i18n","org.springframework.context.index","org.springframework.context.support","org.springframework.context.weaving","org.springframework.ejb.access","org.springframework.ejb.config","org.springframework.format","org.springframework.format.annotation","org.springframework.format.datetime","org.springframework.format.datetime.joda","org.springframework.format.datetime.standard","org.springframework.format.number","org.springframework.format.number.money","org.springframework.format.support","org.springframework.instrument.classloading","org.springframework.instrument.classloading.glassfish","org.springframework.instrument.classloading.jboss","org.springframework.instrument.classloading.tomcat","org.springframework.instrument.classloading.weblogic","org.springframework.instrument.classloading.websphere","org.springframework.jmx","org.springframework.jmx.access","org.springframework.jmx.export","org.springframework.jmx.export.annotation","org.springframework.jmx.export.assembler","org.springframework.jmx.export.metadata","org.springframework.jmx.export.naming","org.springframework.jmx.export.notification","org.springframework.jmx.support","org.springframework.jndi","org.springframework.jndi.support","org.springframework.remoting","org.springframework.remoting.rmi","org.springframework.remoting.soap","org.springframework.remoting.support","org.springframework.scheduling","org.springframework.scheduling.annotation","org.springframework.scheduling.concurrent","org.springframework.scheduling.config","org.springframework.scheduling.support","org.springframework.scripting","org.springframework.scripting.bsh","org.springframework.scripting.config","org.springframework.scripting.groovy","org.springframework.scripting.support","org.springframework.stereotype","org.springframework.ui","org.springframework.ui.context","org.springframework.ui.context.support","org.springframework.validation","org.springframework.validation.annotation","org.springframework.validation.beanvalidation","org.springframework.validation.support"],"resources":["META-INF/MANIFEST.MF","META-INF/license.txt","META-INF/notice.txt","META-INF/spring-context.kotlin_module","META-INF/spring.handlers","META-INF/spring.schemas","META-INF/spring.tooling","org/springframework/cache/config/spring-cache.gif","org/springframework/cache/config/spring-cache.xsd","org/springframework/context/config/spring-context.gif","org/springframework/context/config/spring-context.xsd","org/springframework/ejb/config/spring-jee.gif","org/springframework/ejb/config/spring-jee.xsd","org/springframework/remoting/rmi/RmiInvocationWrapperRTD.xml","org/springframework/scheduling/config/spring-task.gif","org/springframework/scheduling/config/spring-task.xsd","org/springframework/scripting/config/spring-lang.gif","org/springframework/scripting/config/spring-lang.xsd"]},{"artifactCoordinates":{"groupId":"org.springframework","artifactId":"spring-aop","version":"5.1.0.RELEASE","type":"jar"},"uri":"repository/org/springframework/spring-aop/5.1.0.RELEASE/spring-aop-5.1.0.RELEASE.jar","packages":["org.aopalliance.aop","org.aopalliance.intercept","org.springframework.aop","org.springframework.aop.aspectj","org.springframework.aop.aspectj.annotation","org.springframework.aop.aspectj.autoproxy","org.springframework.aop.config","org.springframework.aop.framework","org.springframework.aop.framework.adapter","org.springframework.aop.framework.autoproxy","org.springframework.aop.framework.autoproxy.target","org.springframework.aop.interceptor","org.springframework.aop.scope","org.springframework.aop.support","org.springframework.aop.support.annotation","org.springframework.aop.target","org.springframework.aop.target.dynamic"],"resources":["META-INF/MANIFEST.MF","META-INF/license.txt","META-INF/notice.txt","META-INF/spring.handlers","META-INF/spring.schemas","META-INF/spring.tooling","org/springframework/aop/config/spring-aop.gif","org/springframework/aop/config/spring-aop.xsd"]},{"artifactCoordinates":{"groupId":"org.springframework","artifactId":"spring-beans","version":"5.1.0.RELEASE","type":"jar"},"uri":"repository/org/springframework/spring-beans/5.1.0.RELEASE/spring-beans-5.1.0.RELEASE.jar","packages":["org.springframework.beans","org.springframework.beans.annotation","org.springframework.beans.factory","org.springframework.beans.factory.annotation","org.springframework.beans.factory.config","org.springframework.beans.factory.groovy","org.springframework.beans.factory.parsing","org.springframework.beans.factory.serviceloader","org.springframework.beans.factory.support","org.springframework.beans.factory.wiring","org.springframework.beans.factory.xml","org.springframework.beans.propertyeditors","org.springframework.beans.support"],"resources":["META-INF/MANIFEST.MF","META-INF/license.txt","META-INF/notice.txt","META-INF/spring-beans.kotlin_module","META-INF/spring.factories","META-INF/spring.handlers","META-INF/spring.schemas","META-INF/spring.tooling","org/springframework/beans/factory/xml/spring-beans.dtd","org/springframework/beans/factory/xml/spring-beans.gif","org/springframework/beans/factory/xml/spring-beans.xsd","org/springframework/beans/factory/xml/spring-tool.xsd","org/springframework/beans/factory/xml/spring-util.gif","org/springframework/beans/factory/xml/spring-util.xsd"]},{"artifactCoordinates":{"groupId":"org.springframework","artifactId":"spring-core","version":"5.1.0.RELEASE","type":"jar"},"uri":"repository/org/springframework/spring-core/5.1.0.RELEASE/spring-core-5.1.0.RELEASE.jar","packages":["org.springframework.asm","org.springframework.cglib","org.springframework.cglib.beans","org.springframework.cglib.core","org.springframework.cglib.core.internal","org.springframework.cglib.proxy","org.springframework.cglib.reflect","org.springframework.cglib.transform","org.springframework.cglib.transform.impl","org.springframework.cglib.util","org.springframework.core","org.springframework.core.annotation","org.springframework.core.codec","org.springframework.core.convert","org.springframework.core.convert.converter","org.springframework.core.convert.support","org.springframework.core.env","org.springframework.core.io","org.springframework.core.io.buffer","org.springframework.core.io.support","org.springframework.core.log","org.springframework.core.serializer","org.springframework.core.serializer.support","org.springframework.core.style","org.springframework.core.task","org.springframework.core.task.support","org.springframework.core.type","org.springframework.core.type.classreading","org.springframework.core.type.filter","org.springframework.lang","org.springframework.objenesis","org.springframework.objenesis.instantiator","org.springframework.objenesis.instantiator.android","org.springframework.objenesis.instantiator.annotations","org.springframework.objenesis.instantiator.basic","org.springframework.objenesis.instantiator.gcj","org.springframework.objenesis.instantiator.perc","org.springframework.objenesis.instantiator.sun","org.springframework.objenesis.instantiator.util","org.springframework.objenesis.strategy","org.springframework.util","org.springframework.util.backoff","org.springframework.util.comparator","org.springframework.util.concurrent","org.springframework.util.function","org.springframework.util.unit","org.springframework.util.xml"],"resources":["META-INF/MANIFEST.MF","META-INF/license.txt","META-INF/notice.txt","META-INF/spring-core.kotlin_module","org/springframework/cglib/util/words.txt"]},{"artifactCoordinates":{"groupId":"org.springframework","artifactId":"spring-jcl","version":"5.1.0.RELEASE","type":"jar"},"uri":"repository/org/springframework/spring-jcl/5.1.0.RELEASE/spring-jcl-5.1.0.RELEASE.jar","packages":["org.apache.commons.logging","org.apache.commons.logging.impl"],"resources":["META-INF/MANIFEST.MF","META-INF/license.txt","META-INF/notice.txt","META-INF/services/org.apache.commons.logging.LogFactory"]},{"artifactCoordinates":{"groupId":"org.springframework","artifactId":"spring-expression","version":"5.1.0.RELEASE","type":"jar"},"uri":"repository/org/springframework/spring-expression/5.1.0.RELEASE/spring-expression-5.1.0.RELEASE.jar","packages":["org.springframework.expression","org.springframework.expression.common","org.springframework.expression.spel","org.springframework.expression.spel.ast","org.springframework.expression.spel.standard","org.springframework.expression.spel.support"],"resources":["META-INF/MANIFEST.MF","META-INF/license.txt","META-INF/notice.txt","org/springframework/expression/spel/generated/SpringExpressions.g"]}]}]}
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "com.test",
+    "artifactId": "test-app",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.modules",
+        "artifactId": "mule-spring-module",
+        "version": "1.3.6",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/modules/mule-spring-module/1.3.6/mule-spring-module-1.3.6-mule-plugin.jar"
+    }
+  ],
+  "resources": [
+    "app.xml",
+    "tmp"
+  ],
+  "additionalPluginDependencies": [
+    {
+      "groupId": "org.mule.modules",
+      "artifactId": "mule-spring-module",
+      "additionalDependencies": [
+        {
+          "artifactCoordinates": {
+            "groupId": "org.springframework",
+            "artifactId": "spring-context",
+            "version": "5.1.0.RELEASE",
+            "type": "jar"
+          },
+          "uri": "repository/org/springframework/spring-context/5.1.0.RELEASE/spring-context-5.1.0.RELEASE.jar",
+          "packages": [
+            "org.springframework.cache",
+            "org.springframework.cache.annotation",
+            "org.springframework.cache.concurrent",
+            "org.springframework.cache.config",
+            "org.springframework.cache.interceptor",
+            "org.springframework.cache.support",
+            "org.springframework.context",
+            "org.springframework.context.annotation",
+            "org.springframework.context.config",
+            "org.springframework.context.event",
+            "org.springframework.context.expression",
+            "org.springframework.context.i18n",
+            "org.springframework.context.index",
+            "org.springframework.context.support",
+            "org.springframework.context.weaving",
+            "org.springframework.ejb.access",
+            "org.springframework.ejb.config",
+            "org.springframework.format",
+            "org.springframework.format.annotation",
+            "org.springframework.format.datetime",
+            "org.springframework.format.datetime.joda",
+            "org.springframework.format.datetime.standard",
+            "org.springframework.format.number",
+            "org.springframework.format.number.money",
+            "org.springframework.format.support",
+            "org.springframework.instrument.classloading",
+            "org.springframework.instrument.classloading.glassfish",
+            "org.springframework.instrument.classloading.jboss",
+            "org.springframework.instrument.classloading.tomcat",
+            "org.springframework.instrument.classloading.weblogic",
+            "org.springframework.instrument.classloading.websphere",
+            "org.springframework.jmx",
+            "org.springframework.jmx.access",
+            "org.springframework.jmx.export",
+            "org.springframework.jmx.export.annotation",
+            "org.springframework.jmx.export.assembler",
+            "org.springframework.jmx.export.metadata",
+            "org.springframework.jmx.export.naming",
+            "org.springframework.jmx.export.notification",
+            "org.springframework.jmx.support",
+            "org.springframework.jndi",
+            "org.springframework.jndi.support",
+            "org.springframework.remoting",
+            "org.springframework.remoting.rmi",
+            "org.springframework.remoting.soap",
+            "org.springframework.remoting.support",
+            "org.springframework.scheduling",
+            "org.springframework.scheduling.annotation",
+            "org.springframework.scheduling.concurrent",
+            "org.springframework.scheduling.config",
+            "org.springframework.scheduling.support",
+            "org.springframework.scripting",
+            "org.springframework.scripting.bsh",
+            "org.springframework.scripting.config",
+            "org.springframework.scripting.groovy",
+            "org.springframework.scripting.support",
+            "org.springframework.stereotype",
+            "org.springframework.ui",
+            "org.springframework.ui.context",
+            "org.springframework.ui.context.support",
+            "org.springframework.validation",
+            "org.springframework.validation.annotation",
+            "org.springframework.validation.beanvalidation",
+            "org.springframework.validation.support"
+          ],
+          "resources": [
+            "META-INF/MANIFEST.MF",
+            "META-INF/license.txt",
+            "META-INF/notice.txt",
+            "META-INF/spring-context.kotlin_module",
+            "META-INF/spring.handlers",
+            "META-INF/spring.schemas",
+            "META-INF/spring.tooling",
+            "org/springframework/cache/config/spring-cache.gif",
+            "org/springframework/cache/config/spring-cache.xsd",
+            "org/springframework/context/config/spring-context.gif",
+            "org/springframework/context/config/spring-context.xsd",
+            "org/springframework/ejb/config/spring-jee.gif",
+            "org/springframework/ejb/config/spring-jee.xsd",
+            "org/springframework/remoting/rmi/RmiInvocationWrapperRTD.xml",
+            "org/springframework/scheduling/config/spring-task.gif",
+            "org/springframework/scheduling/config/spring-task.xsd",
+            "org/springframework/scripting/config/spring-lang.gif",
+            "org/springframework/scripting/config/spring-lang.xsd"
+          ]
+        },
+        {
+          "artifactCoordinates": {
+            "groupId": "org.springframework",
+            "artifactId": "spring-aop",
+            "version": "5.1.0.RELEASE",
+            "type": "jar"
+          },
+          "uri": "repository/org/springframework/spring-aop/5.1.0.RELEASE/spring-aop-5.1.0.RELEASE.jar",
+          "packages": [
+            "org.aopalliance.aop",
+            "org.aopalliance.intercept",
+            "org.springframework.aop",
+            "org.springframework.aop.aspectj",
+            "org.springframework.aop.aspectj.annotation",
+            "org.springframework.aop.aspectj.autoproxy",
+            "org.springframework.aop.config",
+            "org.springframework.aop.framework",
+            "org.springframework.aop.framework.adapter",
+            "org.springframework.aop.framework.autoproxy",
+            "org.springframework.aop.framework.autoproxy.target",
+            "org.springframework.aop.interceptor",
+            "org.springframework.aop.scope",
+            "org.springframework.aop.support",
+            "org.springframework.aop.support.annotation",
+            "org.springframework.aop.target",
+            "org.springframework.aop.target.dynamic"
+          ],
+          "resources": [
+            "META-INF/MANIFEST.MF",
+            "META-INF/license.txt",
+            "META-INF/notice.txt",
+            "META-INF/spring.handlers",
+            "META-INF/spring.schemas",
+            "META-INF/spring.tooling",
+            "org/springframework/aop/config/spring-aop.gif",
+            "org/springframework/aop/config/spring-aop.xsd"
+          ]
+        },
+        {
+          "artifactCoordinates": {
+            "groupId": "org.springframework",
+            "artifactId": "spring-beans",
+            "version": "5.1.0.RELEASE",
+            "type": "jar"
+          },
+          "uri": "repository/org/springframework/spring-beans/5.1.0.RELEASE/spring-beans-5.1.0.RELEASE.jar",
+          "packages": [
+            "org.springframework.beans",
+            "org.springframework.beans.annotation",
+            "org.springframework.beans.factory",
+            "org.springframework.beans.factory.annotation",
+            "org.springframework.beans.factory.config",
+            "org.springframework.beans.factory.groovy",
+            "org.springframework.beans.factory.parsing",
+            "org.springframework.beans.factory.serviceloader",
+            "org.springframework.beans.factory.support",
+            "org.springframework.beans.factory.wiring",
+            "org.springframework.beans.factory.xml",
+            "org.springframework.beans.propertyeditors",
+            "org.springframework.beans.support"
+          ],
+          "resources": [
+            "META-INF/MANIFEST.MF",
+            "META-INF/license.txt",
+            "META-INF/notice.txt",
+            "META-INF/spring-beans.kotlin_module",
+            "META-INF/spring.factories",
+            "META-INF/spring.handlers",
+            "META-INF/spring.schemas",
+            "META-INF/spring.tooling",
+            "org/springframework/beans/factory/xml/spring-beans.dtd",
+            "org/springframework/beans/factory/xml/spring-beans.gif",
+            "org/springframework/beans/factory/xml/spring-beans.xsd",
+            "org/springframework/beans/factory/xml/spring-tool.xsd",
+            "org/springframework/beans/factory/xml/spring-util.gif",
+            "org/springframework/beans/factory/xml/spring-util.xsd"
+          ]
+        },
+        {
+          "artifactCoordinates": {
+            "groupId": "org.springframework",
+            "artifactId": "spring-core",
+            "version": "5.1.0.RELEASE",
+            "type": "jar"
+          },
+          "uri": "repository/org/springframework/spring-core/5.1.0.RELEASE/spring-core-5.1.0.RELEASE.jar",
+          "packages": [
+            "org.springframework.asm",
+            "org.springframework.cglib",
+            "org.springframework.cglib.beans",
+            "org.springframework.cglib.core",
+            "org.springframework.cglib.core.internal",
+            "org.springframework.cglib.proxy",
+            "org.springframework.cglib.reflect",
+            "org.springframework.cglib.transform",
+            "org.springframework.cglib.transform.impl",
+            "org.springframework.cglib.util",
+            "org.springframework.core",
+            "org.springframework.core.annotation",
+            "org.springframework.core.codec",
+            "org.springframework.core.convert",
+            "org.springframework.core.convert.converter",
+            "org.springframework.core.convert.support",
+            "org.springframework.core.env",
+            "org.springframework.core.io",
+            "org.springframework.core.io.buffer",
+            "org.springframework.core.io.support",
+            "org.springframework.core.log",
+            "org.springframework.core.serializer",
+            "org.springframework.core.serializer.support",
+            "org.springframework.core.style",
+            "org.springframework.core.task",
+            "org.springframework.core.task.support",
+            "org.springframework.core.type",
+            "org.springframework.core.type.classreading",
+            "org.springframework.core.type.filter",
+            "org.springframework.lang",
+            "org.springframework.objenesis",
+            "org.springframework.objenesis.instantiator",
+            "org.springframework.objenesis.instantiator.android",
+            "org.springframework.objenesis.instantiator.annotations",
+            "org.springframework.objenesis.instantiator.basic",
+            "org.springframework.objenesis.instantiator.gcj",
+            "org.springframework.objenesis.instantiator.perc",
+            "org.springframework.objenesis.instantiator.sun",
+            "org.springframework.objenesis.instantiator.util",
+            "org.springframework.objenesis.strategy",
+            "org.springframework.util",
+            "org.springframework.util.backoff",
+            "org.springframework.util.comparator",
+            "org.springframework.util.concurrent",
+            "org.springframework.util.function",
+            "org.springframework.util.unit",
+            "org.springframework.util.xml"
+          ],
+          "resources": [
+            "META-INF/MANIFEST.MF",
+            "META-INF/license.txt",
+            "META-INF/notice.txt",
+            "META-INF/spring-core.kotlin_module",
+            "org/springframework/cglib/util/words.txt"
+          ]
+        },
+        {
+          "artifactCoordinates": {
+            "groupId": "org.springframework",
+            "artifactId": "spring-jcl",
+            "version": "5.1.0.RELEASE",
+            "type": "jar"
+          },
+          "uri": "repository/org/springframework/spring-jcl/5.1.0.RELEASE/spring-jcl-5.1.0.RELEASE.jar",
+          "packages": [
+            "org.apache.commons.logging",
+            "org.apache.commons.logging.impl"
+          ],
+          "resources": [
+            "META-INF/MANIFEST.MF",
+            "META-INF/license.txt",
+            "META-INF/notice.txt",
+            "META-INF/services/org.apache.commons.logging.LogFactory"
+          ]
+        },
+        {
+          "artifactCoordinates": {
+            "groupId": "org.springframework",
+            "artifactId": "spring-expression",
+            "version": "5.1.0.RELEASE",
+            "type": "jar"
+          },
+          "uri": "repository/org/springframework/spring-expression/5.1.0.RELEASE/spring-expression-5.1.0.RELEASE.jar",
+          "packages": [
+            "org.springframework.expression",
+            "org.springframework.expression.common",
+            "org.springframework.expression.spel",
+            "org.springframework.expression.spel.ast",
+            "org.springframework.expression.spel.standard",
+            "org.springframework.expression.spel.support"
+          ],
+          "resources": [
+            "META-INF/MANIFEST.MF",
+            "META-INF/license.txt",
+            "META-INF/notice.txt",
+            "org/springframework/expression/spel/generated/SpringExpressions.g"
+          ]
+        }
+      ]
+    }
+  ]
+}
