@@ -7,25 +7,29 @@
 
 package org.mule.runtime.core.internal.profiling.tracing;
 
-import static org.junit.Assert.assertTrue;
+
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
+import static java.lang.Thread.sleep;
 import static java.time.Instant.ofEpochMilli;
+
+import static org.junit.Assert.assertTrue;
+
+import java.time.Instant;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-
-import java.time.Instant;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
 public class SystemNanotimeClockTestCase {
 
   @Test
-  public void testClock() {
+  public void testClock() throws Exception {
     Instant instant = ofEpochMilli(System.currentTimeMillis());
+    sleep(1L);
     Instant nanoTime1 = Instant.ofEpochSecond(0L, Clock.getDefault().now());
     Instant nanoTime2 = Instant.ofEpochSecond(0L, Clock.getDefault().now());
     assertTrue(instant.isBefore(nanoTime1));
