@@ -17,6 +17,8 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
+import static com.google.common.collect.Maps.fromProperties;
+
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -149,7 +151,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     if (isHeavyPackage(artifactLocation)) {
       return deployableArtifactDescriptorFactory
           .createApplicationDescriptor(createDeployableProjectModel(artifactLocation),
-                                       deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))
+                                       deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
                                            .orElse(emptyMap()),
                                        (domainName,
                                         bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,

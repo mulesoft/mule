@@ -18,6 +18,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
+import static com.google.common.collect.Maps.fromProperties;
+
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -122,7 +124,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     if (isHeavyPackage(domainLocation)) {
       return deployableArtifactDescriptorFactory
           .createDomainDescriptor(createDeployableProjectModel(domainLocation),
-                                  deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))
+                                  deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
                                       .orElse(emptyMap()));
     } else {
       return domainDescriptorFactory.create(domainLocation, deploymentProperties);
@@ -206,7 +208,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     if (isHeavyPackage(artifactLocation)) {
       return deployableArtifactDescriptorFactory
           .createDomainDescriptor(createDeployableProjectModel(artifactLocation),
-                                  deploymentProperties.map(dp -> (Map<String, String>) Maps.fromProperties(dp))
+                                  deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
                                       .orElse(emptyMap()));
     } else {
       return domainDescriptorFactory.create(artifactLocation, deploymentProperties);
