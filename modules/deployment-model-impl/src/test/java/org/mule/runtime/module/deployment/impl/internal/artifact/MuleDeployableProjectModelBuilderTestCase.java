@@ -43,7 +43,7 @@ import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
-public class MuleDeployableProjectModelTestCase extends AbstractMuleTestCase {
+public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createBasicDeployableProjectModel() throws Exception {
