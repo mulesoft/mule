@@ -7,13 +7,14 @@
 
 package org.mule.runtime.core.internal.profiling;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 
 import static java.util.Optional.empty;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataCo
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer;
-import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
@@ -60,6 +61,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private static InternalSpanExportManager<EventContext> SPAN_EXPORT_MANAGER = getDefaultSpanExporterManager();
 
+  private final boolean propagateExceptionsInTracing;
+
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
 
@@ -75,6 +78,10 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private final Map<ProfilingEventType<?>, Map<ProfilingProducerScope, ResettableProfilingDataProducer<?, ?>>> profilingDataProducers =
       new ConcurrentHashMap<>();
+
+  public DefaultProfilingService() {
+    this.propagateExceptionsInTracing = getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
+  }
 
   @Override
   public <T extends ProfilingEventContext, S> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
@@ -100,6 +107,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
     this.eventTracer = getCoreEventTracerBuilder()
         .withSpanExporterManager(SPAN_EXPORT_MANAGER)
         .withMuleConfiguration(muleContext.getConfiguration())
+        .withPropagationOfExceptionsInTracing(propagateExceptionsInTracing)
         .withArtifactType(muleContext.getArtifactType())
         .build();
   }

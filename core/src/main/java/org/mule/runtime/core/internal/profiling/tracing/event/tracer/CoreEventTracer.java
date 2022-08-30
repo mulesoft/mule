@@ -9,11 +9,11 @@ package org.mule.runtime.core.internal.profiling.tracing.event.tracer;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
 
@@ -43,10 +43,11 @@ public interface CoreEventTracer {
    *
    * @param coreEvent             the {@link CoreEvent} that has hit the {@link Component}
    * @param spanCustomizationInfo the {@link SpanCustomizationInfo} used for customizing the span.
-   * @return the span generated for the context of the {@link CoreEvent} when it hits the {@param component}
+   * @return the span generated for the context of the {@link CoreEvent} when it hits the {@param component} if it could be
+   *         created.
    */
-  InternalSpan startComponentSpan(CoreEvent coreEvent,
-                                  SpanCustomizationInfo spanCustomizationInfo);
+  Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent,
+                                            SpanCustomizationInfo spanCustomizationInfo);
 
   /**
    * @param coreEvent ends the current context {@link Span}.

@@ -20,6 +20,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.notNullValue;
@@ -56,6 +57,8 @@ import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExpor
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
+
+import org.mule.tck.junit4.matcher.IsEmptyOptional;
 
 import java.time.Instant;
 import java.util.Map;
@@ -112,7 +115,7 @@ public class DefaultCoreEventTracerTestCase {
       public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
         return getDefaultChildSpanInfo();
       }
-    });
+    }).orElse(null);
 
     assertThat(span.getName(), equalTo(getSpanName(component.getIdentifier())));
     assertThat(span.getParent(), nullValue());
@@ -153,6 +156,39 @@ public class DefaultCoreEventTracerTestCase {
         coreEventTracer.getDistributedTraceContextMap(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
     assertThat(distributedTraceContextMap, hasEntry(KEY_1, VALUE_1));
     assertThat(distributedTraceContextMap, aMapWithSize(1));
+  }
+
+  @Test
+  public void testStartComponentExecutionIfThrowable() {
+    CoreEventTracer coreEventTracer =
+        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
+                               mock(MuleConfiguration.class));
+    CoreEvent coreEvent = mock(CoreEvent.class);
+    when(coreEvent.getCorrelationId()).thenThrow(new RuntimeException());
+    SpanCustomizationInfo spanCustomizationInfo = mock(SpanCustomizationInfo.class);
+    assertThat(coreEventTracer.startComponentSpan(coreEvent, spanCustomizationInfo), IsEmptyOptional.empty());
+  }
+
+  @Test
+  public void testEndCurrentSpanIfThrowable() {
+    CoreEventTracer coreEventTracer =
+        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
+                               mock(MuleConfiguration.class));
+    CoreEvent coreEvent = mock(CoreEvent.class);
+    when(coreEvent.getCorrelationId()).thenThrow(new RuntimeException());
+    SpanCustomizationInfo spanCustomizationInfo = mock(SpanCustomizationInfo.class);
+    coreEventTracer.endCurrentSpan(coreEvent);
+  }
+
+  @Test
+  public void testGetDistributedTraceContextMapifThrowable() {
+    CoreEventTracer coreEventTracer =
+        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
+                               mock(MuleConfiguration.class));
+    CoreEvent coreEvent = mock(CoreEvent.class);
+    when(coreEvent.getCorrelationId()).thenThrow(new RuntimeException());
+    SpanCustomizationInfo spanCustomizationInfo = mock(SpanCustomizationInfo.class);
+    assertThat(coreEventTracer.getDistributedTraceContextMap(coreEvent), anEmptyMap());
   }
 
   @NotNull

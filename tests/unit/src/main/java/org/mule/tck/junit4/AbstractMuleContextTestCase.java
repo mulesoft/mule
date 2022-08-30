@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -43,6 +44,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -181,6 +183,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   @Before
   public final void setUpMuleContext() throws Exception {
+    System.setProperty(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING, "true");
     if (!logConfigured) {
       configureLoggingForTest(getClass());
       logConfigured = true;
