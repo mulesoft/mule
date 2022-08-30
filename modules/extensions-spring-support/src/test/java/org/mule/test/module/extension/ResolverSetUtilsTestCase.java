@@ -22,6 +22,8 @@ import static org.mule.runtime.module.extension.internal.resources.BaseExtension
 import static org.mule.test.oauth.ConnectionType.DUO;
 import static org.mule.test.oauth.ConnectionType.HYPER;
 
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -50,10 +52,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUt
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.test.metadata.extension.model.shapes.Circle;
 import org.mule.test.oauth.ConnectionProfile;
 import org.mule.test.oauth.ConnectionProperties;
 import org.mule.test.oauth.ConnectionType;
 import org.mule.test.oauth.TestOAuthExtension;
+import org.mule.test.subtypes.extension.ParentShape;
+import org.mule.test.subtypes.extension.Square;
 import org.mule.test.values.extension.MyPojo;
 
 import java.io.InputStream;
@@ -425,6 +430,15 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
 
   private static final String XML_ORDER_FILE_PATH = "resolver/order.xml";
 
+  private static final String SUBTYPED_PARAMETER_NAME = "subTypedParameter";
+  private static final ParentShape SUBTYPED_PARAMETER_VALUE = new Square() {
+
+    {
+      setArea(4);
+      setSide(2);
+    }
+  };
+
   private ReflectionCache reflectionCache = new ReflectionCache();
 
   private ExpressionManager expressionManager;
@@ -772,6 +786,22 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
                                                                                                DataType.XML_STRING)),
                                                                getOperationModel(XML_STRING_OPERATION_NAME));
     XMLAssert.assertXMLEqual(parameterValue, getFileString(XML_ORDER_FILE_PATH));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is defined with a SubtypeMapping.")
+  public void subtypedParameter() throws Exception {
+    // ObjectType valueObjectType = testOAuthExtensionModel.getImportedTypes().stream()
+    // .filter(importedTypeModel -> importedTypeModel.getImportedType().getAnnotation(TypeIdAnnotation.class)
+    // .map(typeIdAnnotation -> typeIdAnnotation.getValue().contains("Square")).orElse(false))
+    // .findFirst().get().getImportedType();
+    // Consumer<ValueDeclarer> subtypedParameterValueDeclarer = valueDeclarer -> valueDeclarer
+    // .objectValue(objectValueDeclarer -> objectValueDeclarer.withField("area", "4").withField("side", 2), valueObjectType);
+    // ParentShape shapeParameter =
+    // (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+    // SUBTYPED_PARAMETER_NAME,
+    // subtypedParameterValueDeclarer);
+    // assertThat(shapeParameter, is(SUBTYPED_PARAMETER_VALUE));
   }
 
   private void testComponentParameterization(String parameterGroupName, String parameterName,

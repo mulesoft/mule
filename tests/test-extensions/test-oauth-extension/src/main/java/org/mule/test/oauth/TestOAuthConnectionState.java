@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.sdk.api.annotation.semantics.security.TenantIdentifier;
+import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.values.extension.MyPojo;
 
 import java.time.ZonedDateTime;
@@ -121,6 +122,10 @@ public abstract class TestOAuthConnectionState {
   @Optional
   private ParameterResolver<TypedValue<Map<String, Integer>>> stackedTypeMapParameter;
 
+  @Parameter
+  @Optional
+  private ParentShape subTypedParameter;
+
   public Double getApiVersion() {
     return apiVersion;
   }
@@ -215,4 +220,7 @@ public abstract class TestOAuthConnectionState {
     return stackedTypeMapParameter;
   }
 
+  public ParentShape getSubTypedParameter() {
+    return subTypedParameter;
+  }
 }

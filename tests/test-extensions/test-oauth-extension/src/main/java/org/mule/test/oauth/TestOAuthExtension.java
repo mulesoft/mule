@@ -10,6 +10,9 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.test.subtypes.extension.ParentShape;
+import org.mule.test.subtypes.extension.Square;
+import org.mule.test.subtypes.extension.Triangle;
 import org.mule.test.values.extension.MyPojo;
 
 @Extension(name = TestOAuthExtension.TEST_OAUTH_EXTENSION_NAME)
@@ -17,6 +20,9 @@ import org.mule.test.values.extension.MyPojo;
     WithValidationThatNeedsRefreshConfig.class})
 @Xml(prefix = "test-oauth")
 @Import(type = MyPojo.class)
+@Import(type = ParentShape.class)
+@Import(type = Square.class)
+@Import(type = Triangle.class)
 public class TestOAuthExtension {
 
   public static final String TEST_OAUTH_EXTENSION_NAME = "Test OAuth Extension";
