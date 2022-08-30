@@ -14,6 +14,7 @@ import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNam
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_XSD_FILE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
@@ -53,6 +54,22 @@ class MuleOperationExtensionModelDeclarer {
   private static final MetadataType EXPRESSION_SUPPORT_TYPE = BASE_TYPE_BUILDER.stringType()
       .enumOf("SUPPORTED", "NOT_SUPPORTED", "REQUIRED")
       .build();
+  private static final MetadataType PATH_TYPE = BASE_TYPE_BUILDER.stringType()
+      .enumOf("DIRECTORY", "FILE", "ANY")
+      .build();
+  private static final MetadataType PATH_LOCATION_TYPE = BASE_TYPE_BUILDER.stringType()
+      .enumOf("EMBEDDED", "EXTERNAL", "ANY")
+      .build();
+
+  private static final String PARAMETER_DISPLAY_NAME_DESCRIPTION =
+      "Allows to specify a custom label for the element and/or field to be used in the UI. If a value is not specified, the name is inferred from the annotated element's name.";
+  private static final String PARAMETER_SUMMARY_NAME_DESCRIPTION = "A very brief overview about the parameter.";
+  private static final String PARAMETER_EXAMPLE_DESCRIPTION =
+      "Allows to specify an example for a parameter to be used in the UI. This example is not related to the default value of an optional parameter, it's only for the purpose of showing how does a possible value look like.";
+  private static final String PARAMETER_IS_TEXT_DESCRIPTION =
+      "Marks a parameter as one that supports a multi line string input both in the editor (when it is populated from the UI) and in the DSL. This tag should only be used with string parameters.";
+  private static final String PARAMETER_PLACEMENT_ORDER_DESCRIPTION =
+      "Gives the annotated parameter a relative order within its group. The value provided may be repeated and in that case the order is not guaranteed. The value is relative meaning that the element with order 10 is on top than one with value 25.";
 
   ExtensionDeclarer declareExtensionModel() {
     ExtensionDeclarer declarer = new ExtensionDeclarer()
@@ -321,11 +338,64 @@ class MuleOperationExtensionModelDeclarer {
   private void addParameterLayoutDeclaration(ComponentDeclarer parameterDef) {
     NestedComponentDeclarer parameterMetadataDef = parameterDef.withOptionalComponent("parameter-metadata")
         .describedAs("Parameter metadata including display and layout information");
+
     final ParameterGroupDeclarer parameterMetadataAttributes = parameterMetadataDef.onDefaultParameterGroup();
-    parameterMetadataAttributes.withOptionalParameter("summary")
-        .describedAs("A very brief overview about the parameter.")
+    parameterMetadataAttributes.withOptionalParameter("displayName")
+        .describedAs(PARAMETER_DISPLAY_NAME_DESCRIPTION)
         .ofType(STRING_TYPE)
-        .withDisplayModel(display("Summary", "A brief description of the parameter"))
+        .withDisplayModel(display("Display Name", PARAMETER_DISPLAY_NAME_DESCRIPTION))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterMetadataAttributes.withOptionalParameter("summary")
+        .describedAs(PARAMETER_SUMMARY_NAME_DESCRIPTION)
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Summary", PARAMETER_SUMMARY_NAME_DESCRIPTION))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterMetadataAttributes.withOptionalParameter("example")
+        .describedAs(PARAMETER_EXAMPLE_DESCRIPTION)
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Example", PARAMETER_EXAMPLE_DESCRIPTION))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterMetadataAttributes.withOptionalParameter("text")
+        .describedAs(PARAMETER_IS_TEXT_DESCRIPTION)
+        .ofType(BOOLEAN_TYPE)
+        .withDisplayModel(display("Text", PARAMETER_IS_TEXT_DESCRIPTION))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterMetadataAttributes.withOptionalParameter("order")
+        .describedAs(PARAMETER_PLACEMENT_ORDER_DESCRIPTION)
+        .ofType(INTEGER_TYPE)
+        .withDisplayModel(display("Placement Order", PARAMETER_PLACEMENT_ORDER_DESCRIPTION))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    addPathDeclaration(parameterMetadataDef);
+  }
+
+  private void addPathDeclaration(ComponentDeclarer parameterMetadataDef) {
+    NestedComponentDeclarer pathDef = parameterMetadataDef.withOptionalComponent("path")
+        .describedAs("Marks parameter as a path to a file or directory. This tag should only be used with string parameters.");
+
+    final ParameterGroupDeclarer pathAttributes = pathDef.onDefaultParameterGroup();
+    pathAttributes.withOptionalParameter("type")
+        .describedAs("Whether the path is to a directory or a file. The possible values are DIRECTORY, FILE, and ANY.")
+        .ofType(PATH_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    pathAttributes.withOptionalParameter("acceptsUrls")
+        .describedAs("Whether the path parameter also supports urls.")
+        .ofType(BOOLEAN_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    pathAttributes.withOptionalParameter("location")
+        .describedAs("A classifier for the path's generic location. The possible values are EMBEDDED, EXTERNAL, and ANY.")
+        .ofType(PATH_LOCATION_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    pathAttributes.withOptionalParameter("acceptedFileExtensions")
+        .describedAs("Comma separated enumeration of the file extensions that this path handles. Only valid when the path type isn't a DIRECTORY")
+        .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
   }
 

@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -22,10 +17,7 @@ import org.mule.runtime.api.meta.model.display.PathModel.Location;
 import org.mule.runtime.api.meta.model.display.PathModel.Type;
 import org.mule.runtime.ast.api.ComponentAst;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
 
@@ -41,7 +33,6 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   private static final String LOCATION = "location";
   private static final String ACCEPTED_FILE_EXTENSIONS = "acceptedFileExtensions";
   private static final String[] EMPTY_ARRAY = {};
-  private static final String PLACEMENT = "placement";
   private static final String ORDER = "order";
 
   private final ComponentAst parameterAst;
@@ -72,14 +63,10 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
     // TODO: Check semantic terms...
     getOptionalParameter(metadataAst, SECRET).ifPresent(secret -> layoutModelBuilder.asPassword());
 
-    getSingleChild(metadataAst, PLACEMENT).map(this::parsePlacementOrder).ifPresent(layoutModelBuilder::order);
+    layoutModelBuilder.order(getOptionalParameter(metadataAst, ORDER).map(Integer.class::cast).orElse(-1));
 
     displayModel = displayModelBuilder.build();
     layoutModel = layoutModelBuilder.build();
-  }
-
-  private Integer parsePlacementOrder(ComponentAst placementAst) {
-    return getOptionalParameter(placementAst, ORDER).map(asString -> Integer.valueOf((String) asString)).orElse(-1);
   }
 
   private PathModel parsePathModel(ComponentAst pathAst) {
@@ -87,7 +74,7 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
         .map(asString -> Enum.valueOf(Type.class, (String) asString))
         .orElse(Type.ANY);
     Boolean acceptsUrls = getOptionalParameter(pathAst, ACCEPTS_URLS)
-        .map(asString -> Boolean.valueOf((String) asString))
+        .map(Boolean.class::cast)
         .orElse(false);
     Location location = getOptionalParameter(pathAst, LOCATION)
         .map(asString -> Enum.valueOf(Location.class, (String) asString))
