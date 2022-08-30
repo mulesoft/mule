@@ -136,22 +136,15 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
   private Map<BundleDescriptor, List<BundleDependency>> getAdditionalPluginDependencies(AppClassLoaderModel packagerClassLoaderModel,
                                                                                         Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
     return packagerClassLoaderModel
-        .getAdditionalPluginDependencies().map(
-                                               apds -> apds.stream().collect(
-                                                                             toMap(plugin -> packagerClassLoaderModel
-                                                                                 .getDependencies().stream()
-                                                                                 .filter(pluginDependency -> StringUtils
-                                                                                     .equals(pluginDependency
-                                                                                         .getArtifactCoordinates().getGroupId(),
-                                                                                             plugin.getGroupId())
-                                                                                     && StringUtils.equals(pluginDependency
-                                                                                         .getArtifactCoordinates()
-                                                                                         .getArtifactId(), plugin.getArtifactId()))
-                                                                                 .map(artifact -> bundleDescriptors
-                                                                                     .get(artifact.getArtifactCoordinates()))
-                                                                                 .findFirst()
-                                                                                 .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Couldn't find plugin '%s' among dependencies",
-                                                                                                                                                        plugin)))),
+        .getAdditionalPluginDependencies().map(apds -> apds.stream().collect(toMap(plugin -> packagerClassLoaderModel
+            .getDependencies().stream()
+            .filter(pluginDependency -> StringUtils.equals(pluginDependency.getArtifactCoordinates().getGroupId(),
+                                                           plugin.getGroupId())
+                && StringUtils.equals(pluginDependency.getArtifactCoordinates().getArtifactId(), plugin.getArtifactId()))
+            .map(artifact -> bundleDescriptors.get(artifact.getArtifactCoordinates()))
+            .findFirst()
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Couldn't find plugin '%s' among dependencies",
+                                                                                   plugin)))),
                                                                                    plugin -> plugin.getAdditionalDependencies()
                                                                                        .stream()
                                                                                        .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
