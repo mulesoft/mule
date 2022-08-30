@@ -31,7 +31,7 @@ import java.io.InputStream;
  */
 public class NullStreamingManager implements StreamingManager {
 
-  public static NullStreamingManager INSTANCE = new NullStreamingManager();
+  public static final NullStreamingManager INSTANCE = new NullStreamingManager();
 
   private final ByteStreamingManager byteStreamingManager;
   private final ObjectStreamingManager objectStreamingManager;
