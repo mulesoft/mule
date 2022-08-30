@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecuteWithDefaultOnThrowable;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecute;
+
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -22,8 +28,10 @@ import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.slf4j.Logger;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A default implementation for a {@link CoreEventTracer}.
@@ -32,9 +40,16 @@ import java.util.Map;
  */
 public class DefaultCoreEventTracer implements CoreEventTracer {
 
+  /**
+   * logger used by this class.
+   */
+  private static final Logger LOGGER = getLogger(DefaultCoreEventTracer.class);
+
   private final CoreEventSpanFactory coreEventSpanFactory;
   private final MuleConfiguration muleConfiguration;
   private final ArtifactType artifactType;
+  private final boolean propagationOfExceptionsInTracing;
+  private final Logger logger;
 
   /**
    * @return a builder for a {@link DefaultCoreEventTracer}.
@@ -45,25 +60,34 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   private DefaultCoreEventTracer(MuleConfiguration muleConfiguration,
                                  ArtifactType artifactType,
-                                 InternalSpanExportManager<EventContext> spanExportManager) {
+                                 InternalSpanExportManager<EventContext> spanExportManager,
+                                 boolean propagationOfExceptionsInTracing,
+                                 Logger logger) {
     this.muleConfiguration = muleConfiguration;
     this.artifactType = artifactType;
     this.coreEventSpanFactory = new ExportOnEndCoreEventSpanFactory(spanExportManager);
+    this.propagationOfExceptionsInTracing = propagationOfExceptionsInTracing;
+    this.logger = logger;
   }
 
   @Override
-  public InternalSpan startComponentSpan(CoreEvent coreEvent,
-                                         SpanCustomizationInfo spanCustomizationInfo) {
-    return startCurrentSpanIfPossible(coreEvent,
-                                      coreEventSpanFactory.getSpan(coreEvent,
-                                                                   muleConfiguration,
-                                                                   artifactType,
-                                                                   spanCustomizationInfo));
+  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent,
+                                                   SpanCustomizationInfo spanCustomizationInfo) {
+    return safeExecuteWithDefaultOnThrowable(() -> of(startCurrentSpanIfPossible(coreEvent,
+                                                                                 coreEventSpanFactory.getSpan(coreEvent,
+                                                                                                              muleConfiguration,
+                                                                                                              artifactType,
+                                                                                                              spanCustomizationInfo))),
+                                             empty(),
+                                             "Error when starting a component span",
+                                             propagationOfExceptionsInTracing,
+                                             logger);
   }
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent) {
-    endCurrentSpanIfPossible(coreEvent);
+    safeExecute(() -> endCurrentSpanIfPossible(coreEvent), "Error on ending current span", propagationOfExceptionsInTracing,
+                logger);
   }
 
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
@@ -78,23 +102,21 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     return currentSpan;
   }
 
-  private void endCurrentSpanIfPossible(CoreEvent coreEvent) {
-    EventContext eventContext = coreEvent.getContext();
-    if (eventContext instanceof DistributedTraceContextAware) {
-      ((DistributedTraceContextAware) eventContext)
-          .getDistributedTraceContext()
-          .endCurrentContextSpan();
-    }
-  }
-
   @Override
   public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
+    return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
+                                             emptyMap(),
+                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
+                                             logger);
+  }
+
+  private Map<String, String> doGetDistributedTraceContextMap(CoreEvent coreEvent) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
       DistributedTraceContext distributedTraceContext =
           ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
       ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
-                                                                          e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
+                                                                          this::getInternalSpanOpentelemetryExecutionSpanFunction)
           .orElse(null);
 
       if (span == null) {
@@ -108,6 +130,15 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       return contextMap;
     } else {
       return emptyMap();
+    }
+  }
+
+  private void endCurrentSpanIfPossible(CoreEvent coreEvent) {
+    EventContext eventContext = coreEvent.getContext();
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext)
+          .getDistributedTraceContext()
+          .endCurrentContextSpan();
     }
   }
 
@@ -129,6 +160,8 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     private MuleConfiguration muleConfiguration;
     private InternalSpanExportManager<EventContext> spanExportManager;
     private ArtifactType artifactType;
+    private boolean propagateExceptionsInTracing;
+    private Logger logger;
 
     public DefaultEventTracerBuilder withMuleConfiguration(MuleConfiguration muleConfiguration) {
       this.muleConfiguration = muleConfiguration;
@@ -145,8 +178,27 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       return this;
     }
 
+    public DefaultEventTracerBuilder withLogger(Logger logger) {
+      this.logger = logger;
+      return this;
+    }
+
+    public DefaultEventTracerBuilder withPropagationOfExceptionsInTracing(boolean propagateExceptionsInTracing) {
+      this.propagateExceptionsInTracing = propagateExceptionsInTracing;
+      return this;
+    }
+
     public DefaultCoreEventTracer build() {
-      return new DefaultCoreEventTracer(muleConfiguration, artifactType, spanExportManager);
+      return new DefaultCoreEventTracer(muleConfiguration, artifactType, spanExportManager, propagateExceptionsInTracing,
+                                        resolveLogger());
+    }
+
+    private Logger resolveLogger() {
+      if (logger != null) {
+        return logger;
+      } else {
+        return LOGGER;
+      }
     }
   }
 }
