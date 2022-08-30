@@ -109,7 +109,7 @@ public final class EventQuickCopy {
     }
   }
 
-  private static class EventQuickCopyContextDecorator extends BaseEventDecorator implements DistributedTraceContextAware {
+  private static class EventQuickCopyContextDecorator extends BaseEventDecorator {
 
     private static final long serialVersionUID = -2674520914985642327L;
 
@@ -133,20 +133,6 @@ public final class EventQuickCopy {
     @Override
     public String getCorrelationId() {
       return getLegacyCorrelationId() != null ? getLegacyCorrelationId() : getContext().getCorrelationId();
-    }
-
-    @Override
-    public DistributedTraceContext getDistributedTraceContext() {
-      if (context instanceof DistributedTraceContextAware) {
-        return ((DistributedTraceContextAware) context).getDistributedTraceContext();
-      }
-
-      return emptyDistributedEventContext();
-    }
-
-    @Override
-    public void setDistributedTraceContext(DistributedTraceContext distributedTraceContext) {
-
     }
   }
 
