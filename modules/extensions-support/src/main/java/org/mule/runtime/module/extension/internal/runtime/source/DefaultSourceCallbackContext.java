@@ -62,19 +62,18 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private boolean dispatched = false;
   private final List<NotificationFunction> notificationFunctions = new LinkedList<>();
 
-  @Inject
-  private ProfilingService profilingService;
-
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
   private DistributedTraceContextManager sourceDistributedTraceContext = new DefaultDistributedSourceTraceContext();
+  private final ProfilingService profilingService;
 
   /**
    * Creates a new instance
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
    */
-  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
+  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback, ProfilingService profilingService) {
     this.sourceCallback = sourceCallback;
+    this.profilingService = profilingService;
   }
 
   /**
