@@ -82,7 +82,6 @@ public class DefaultCoreEventTracerTestCase {
   public static final String KEY_1 = "key1";
   public static final String VALUE_1 = "value1";
 
-
   @Test
   public void testStartComponentExecution() {
     MuleConfiguration mockedMuleConfiguration = mock(MuleConfiguration.class);
@@ -381,7 +380,6 @@ public class DefaultCoreEventTracerTestCase {
       this.distributedTraceContext = distributedTraceContext;
     }
   }
-
 
   /**
    * A {@link RuntimeException} to test propagation of tracing exceptions.

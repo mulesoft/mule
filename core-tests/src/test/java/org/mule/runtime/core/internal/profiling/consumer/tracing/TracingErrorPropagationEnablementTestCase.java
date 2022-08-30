@@ -84,14 +84,11 @@ public class TracingErrorPropagationEnablementTestCase extends AbstractMuleConte
     coreEventTracerMethodToExecute.accept(defaultProfilingService.getCoreEventTracer(), coreEvent);
   }
 
-
-
   /**
    * A {@link TracingErrorException} used for testing the enablement of the error propagation.
    */
   private static class TracingErrorException extends RuntimeException {
   }
-
 
   /**
    * A {@link SpanCustomizationInfo} used for testing purposes.
