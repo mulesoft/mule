@@ -33,26 +33,32 @@ public class NullStreamingManager implements StreamingManager {
 
   public static NullStreamingManager INSTANCE = new NullStreamingManager();
 
+  private final ByteStreamingManager byteStreamingManager;
+  private final ObjectStreamingManager objectStreamingManager;
+  private final StreamingStatistics streamingStatistics;
   private final Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> pair;
 
   private NullStreamingManager() {
+    this.byteStreamingManager = new NullByteStreamingManager(this);
+    this.objectStreamingManager = new NullObjectStreamingManager(this);
+    this.streamingStatistics = new NullStreamingStatistics();
     this.pair = new Pair<>(new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), this),
                            new NullCursorIteratorProviderFactory(this));
   }
 
   @Override
   public ByteStreamingManager forBytes() {
-    return new NullByteStreamingManager(this);
+    return byteStreamingManager;
   }
 
   @Override
   public ObjectStreamingManager forObjects() {
-    return new NullObjectStreamingManager(this);
+    return objectStreamingManager;
   }
 
   @Override
   public StreamingStatistics getStreamingStatistics() {
-    return new NullStreamingStatistics();
+    return streamingStatistics;
   }
 
   @Override
