@@ -9,8 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
-import static java.util.Collections.emptyMap;
-
 import static com.google.common.collect.ImmutableMap.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -25,18 +23,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
-import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
