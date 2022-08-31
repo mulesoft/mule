@@ -123,7 +123,7 @@ public class AdditionalPluginDependenciesResolver {
                                                                   .getArtifactId(), plugin.getArtifactId()))
         .map(Map.Entry::getValue)
         .findFirst()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find ClassLoaderModel resolved for plugin: "
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find dependencies for plugin: "
             + plugin)));
   }
 

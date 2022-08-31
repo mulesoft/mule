@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -38,27 +39,36 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
 
   private final File artifactLocation;
   private final List<BundleDependency> bundleDependencies;
-  private final BundleDescriptor bundleDescriptor;
+  private final BundleDependency bundleDependency;
   private final DeployableArtifactDescriptor ownerDescriptor;
   private final PluginPatchesResolver pluginPatchesResolver;
 
-  public PluginClassLoaderConfigurationAssembler(ArtifactCoordinates artifactCoordinates,
-                                                 List<BundleDependency> projectDependencies,
+  public PluginClassLoaderConfigurationAssembler(BundleDependency bundleDependency,
                                                  Set<BundleDescriptor> sharedProjectDependencies,
                                                  File artifactLocation,
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
-                                                 BundleDescriptor bundleDescriptor,
                                                  DeployableArtifactDescriptor ownerDescriptor,
                                                  PluginPatchesResolver pluginPatchesResolver) {
-    super(new ClassLoaderModelAssembler(artifactCoordinates, projectDependencies,
-                                        sharedProjectDependencies, muleArtifactLoaderDescriptor)
-                                            .createClassLoaderModel());
+    super(new ClassLoaderModelAssembler(new ArtifactCoordinates(bundleDependency.getDescriptor().getGroupId(),
+                                                                bundleDependency.getDescriptor().getArtifactId(),
+                                                                bundleDependency.getDescriptor().getVersion(),
+                                                                bundleDependency.getDescriptor().getType(),
+                                                                bundleDependency.getDescriptor().getClassifier().orElse(null)),
+                                        bundleDependencies,
+                                        sharedProjectDependencies, attributeToList(bundleDependency.getPackages()),
+                                        attributeToList(bundleDependency.getResources()))
+                                            .createClassLoaderModel(),
+          muleArtifactLoaderDescriptor);
     this.artifactLocation = artifactLocation;
     this.bundleDependencies = bundleDependencies;
-    this.bundleDescriptor = bundleDescriptor;
+    this.bundleDependency = bundleDependency;
     this.ownerDescriptor = ownerDescriptor;
     this.pluginPatchesResolver = pluginPatchesResolver;
+  }
+
+  private static List<String> attributeToList(Set<String> attribute) {
+    return attribute != null ? new ArrayList<>(attribute) : emptyList();
   }
 
   @Override
@@ -66,7 +76,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     // Patches resolution is done just for plugins because this should be the use case, but in the implementation previously used
     // in the Runtime (AbstractMavenClassLoaderModelLoader in versions <= 4.4), it's done for deployables (applications and
     // domains) as well
-    pluginPatchesResolver.resolve(packagerClassLoaderModel.getArtifactCoordinates())
+    pluginPatchesResolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
         .forEach(classLoaderConfigurationBuilder::containing);
 
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
@@ -75,8 +85,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
       ownerDescriptor.getClassLoaderModel().getDependencies().stream()
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
-              .equals(this.bundleDescriptor.getGroupId())
-              && bundleDescriptor.getDescriptor().getArtifactId().equals(this.bundleDescriptor.getArtifactId()))
+              .equals(bundleDependency.getDescriptor().getGroupId())
+              && bundleDescriptor.getDescriptor().getArtifactId().equals(bundleDependency.getDescriptor().getArtifactId()))
           .filter(bundleDependency -> bundleDependency.getAdditionalDependenciesList() != null
               && !bundleDependency.getAdditionalDependenciesList().isEmpty())
           .forEach(bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency,
@@ -87,7 +97,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                                                        dependencyArtifactUrl = uri.toURL();
                                                                                      } catch (MalformedURLException e) {
                                                                                        throw new ArtifactActivationException(createStaticMessage(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
-                                                                                                                                                        bundleDescriptor
+                                                                                                                                                        PluginClassLoaderConfigurationAssembler.this.bundleDependency
+                                                                                                                                                            .getDescriptor()
                                                                                                                                                             .getArtifactFileName(),
                                                                                                                                                         uri)),
                                                                                                                              e);
@@ -128,6 +139,6 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
 
   @Override
   protected boolean shouldPopulateLocalPackages() {
-    return !isDenylisted(bundleDescriptor);
+    return !isDenylisted(bundleDependency.getDescriptor());
   }
 }

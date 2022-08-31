@@ -10,11 +10,15 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.Maps.fromProperties;
 
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -28,25 +32,33 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import com.google.common.collect.Maps;
 
 public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<DomainDescriptor, Domain> {
 
   private final DomainManager domainManager;
+  // TODO - W-11086334: remove old domain descriptor factory with the migration
   private final DomainDescriptorFactory domainDescriptorFactory;
+  private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory;
   private final ClassLoaderRepository classLoaderRepository;
   private final ServiceRepository serviceRepository;
   private final PluginDependenciesResolver pluginDependenciesResolver;
@@ -57,17 +69,20 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   /**
    * Creates a new domain factory
    *
-   * @param domainDescriptorFactory         creates descriptors for the new domains. Non null.
-   * @param domainManager                   tracks the domains deployed on the container. Non null.
-   * @param classLoaderRepository           contains all the class loaders in the container. Non null.
-   * @param serviceRepository               repository of available services. Non null.
-   * @param pluginDependenciesResolver      resolver for the plugins on which the {@code artifactPluginDescriptor} declares it
-   *                                        depends. Non null.
-   * @param domainClassLoaderBuilderFactory creates builders to build the classloaders for each domain. Non null.
-   * @param extensionModelLoaderManager     manager capable of resolve {@link ExtensionModel extension models}. Non null.
-   * @param artifactConfigurationProcessor  the processor to use for building the application model. Non null.
+   * @param domainDescriptorFactory             creates descriptors for the new domains in case of a lightweight deployment. Non
+   *                                            null.
+   * @param deployableArtifactDescriptorFactory creates descriptors for the new domains. Non null.
+   * @param domainManager                       tracks the domains deployed on the container. Non null.
+   * @param classLoaderRepository               contains all the class loaders in the container. Non null.
+   * @param serviceRepository                   repository of available services. Non null.
+   * @param pluginDependenciesResolver          resolver for the plugins on which the {@code artifactPluginDescriptor} declares it
+   *                                            depends. Non null.
+   * @param domainClassLoaderBuilderFactory     creates builders to build the classloaders for each domain. Non null.
+   * @param extensionModelLoaderManager         manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param artifactConfigurationProcessor      the processor to use for building the application model. Non null.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
+                              DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
                               DomainManager domainManager,
                               ClassLoaderRepository classLoaderRepository,
                               ServiceRepository serviceRepository,
@@ -82,6 +97,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
+    checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
@@ -91,6 +107,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     this.classLoaderRepository = classLoaderRepository;
     this.domainDescriptorFactory = domainDescriptorFactory;
+    this.deployableArtifactDescriptorFactory = deployableArtifactDescriptorFactory;
     this.domainManager = domainManager;
     this.serviceRepository = serviceRepository;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
@@ -98,15 +115,20 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     this.extensionModelLoaderManager = extensionModelLoaderManager;
   }
 
-  private DomainDescriptor findDomain(String domainName, File domainLocation, Optional<Properties> deploymentProperties)
-      throws IOException {
+  private DomainDescriptor findDomain(String domainName, File domainLocation, Optional<Properties> deploymentProperties) {
     if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
       return new EmptyDomainDescriptor(new File(getMuleDomainsDir(), DEFAULT_DOMAIN_NAME));
     }
 
-    DomainDescriptor descriptor = domainDescriptorFactory.create(domainLocation, deploymentProperties);
-
-    return descriptor;
+    // TODO - W-11086334: remove this conditional during lightweight deployment migration
+    if (isHeavyPackage(domainLocation)) {
+      return deployableArtifactDescriptorFactory
+          .createDomainDescriptor(createDeployableProjectModel(domainLocation),
+                                  deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
+                                      .orElse(emptyMap()));
+    } else {
+      return domainDescriptorFactory.create(domainLocation, deploymentProperties);
+    }
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader domainClassLoader,
@@ -153,8 +175,13 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
-    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()), true);
+    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors = new ArrayList<>(domainDescriptor.getPlugins());
+
+    // TODO - W-11086334: remove this conditional during lightweight deployment migration
+    if (!isHeavyPackage(domainLocation)) {
+      resolvedArtifactPluginDescriptors =
+          pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(domainDescriptor.getPlugins()), true);
+    }
 
     DomainClassLoaderBuilder artifactClassLoaderBuilder =
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
@@ -178,6 +205,13 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
   @Override
   public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
-    return domainDescriptorFactory.create(artifactLocation, deploymentProperties);
+    if (isHeavyPackage(artifactLocation)) {
+      return deployableArtifactDescriptorFactory
+          .createDomainDescriptor(createDeployableProjectModel(artifactLocation),
+                                  deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
+                                      .orElse(emptyMap()));
+    } else {
+      return domainDescriptorFactory.create(artifactLocation, deploymentProperties);
+    }
   }
 }

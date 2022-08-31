@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import static java.util.Optional.empty;
@@ -17,11 +18,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -29,6 +34,8 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
@@ -44,6 +51,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
@@ -57,11 +65,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultApplicationFactory.class})
+@PowerMockIgnore({"javax.management.*", "javax.script.*"})
+class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String DOMAIN_NAME = "test-domain";
   private static final String APP_NAME = "test-app";
@@ -72,7 +89,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
       mock(ApplicationClassLoaderBuilderFactory.class);
   private final DefaultDomainManager domainRepository = spy(new DefaultDomainManager());
-  private final ApplicationDescriptorFactory applicationDescriptorFactory = mock(ApplicationDescriptorFactory.class);
+  private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
+      mock(DeployableArtifactDescriptorFactory.class);
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final ClassLoaderRepository classLoaderRepository = mock(ClassLoaderRepository.class);
@@ -81,7 +99,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
   private final DefaultApplicationFactory applicationFactory =
-      new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
+      new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, mock(ApplicationDescriptorFactory.class),
+                                    deployableArtifactDescriptorFactory,
                                     domainRepository, serviceRepository,
                                     extensionModelLoaderRepository,
                                     classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
@@ -91,15 +110,29 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     mock(MemoryManagementService.class),
                                     mock(ArtifactConfigurationProcessor.class));
 
+  public DefaultApplicationFactoryTestCase() {}
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Before
+  public void setUp() throws Exception {
+    mockStatic(MuleDeployableProjectModelBuilder.class);
+    given(isHeavyPackage(any())).willReturn(true);
+    DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
+    doNothing().when(deployableProjectModelMock).validate();
+    MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
+        PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
+    when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
+    whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
+  }
 
   @Test
   public void createsApplication() throws Exception {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
     final File[] resourceFiles = new File[] {new File("mule-config.xml")};
-    when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory.createApplicationDescriptor(any(), any(), any())).thenReturn(descriptor);
 
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = new ArtifactPluginDescriptor(FAKE_ARTIFACT_PLUGIN);
     coreArtifactPluginDescriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().build());
@@ -139,8 +172,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     assertThat(application.getArtifactName(), is(APP_NAME));
     assertThat(application.getResourceFiles(), is(resourceFiles));
 
-    verify(domainRepository, times(1)).getCompatibleDomain(any());
-    verify(domainRepository, times(1)).getDomain(any());
+    verify(domainRepository, times(2)).getCompatibleDomain(any());
     verify(applicationClassLoaderBuilderMock)
         .setDomainParentClassLoader((ArtifactClassLoader) domain.getArtifactClassLoader().getClassLoader().getParent());
     verify(applicationClassLoaderBuilderMock).setArtifactDescriptor(descriptor);
@@ -180,7 +212,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   public void applicationDeployFailDueToDomainNotDeployed() throws Exception {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
-    when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
+    descriptor.setArtifactLocation(new File("some/location"));
+    when(deployableArtifactDescriptorFactory.createApplicationDescriptor(any(), any(), any())).thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());
   }

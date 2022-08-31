@@ -13,6 +13,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -32,7 +33,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -86,7 +86,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   private Optional<Properties> asProperties(Map<String, String> deploymentProperties) {
     Properties properties = new Properties();
     properties.putAll(deploymentProperties);
-    return of(properties);
+    return properties.isEmpty() ? empty() : of(properties);
   }
 
   protected Optional<Properties> getDeploymentProperties() {
@@ -95,7 +95,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    return new DeployableClassLoaderConfigurationAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
+    return new DeployableClassLoaderConfigurationAssembler(deployableProjectModel, muleArtifactLoaderDescriptor)
         .createClassLoaderModel();
   }
 
@@ -116,6 +116,10 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   protected void doDescriptorConfig(T descriptor) {
     descriptor.setArtifactLocation(getArtifactLocation());
     descriptor.setRedeploymentEnabled(getArtifactModel().isRedeploymentEnabled());
+
+    if (getArtifactLocation().isDirectory()) {
+      descriptor.setRootFolder(getArtifactLocation());
+    }
 
     Set<String> configs = getArtifactModel().getConfigs();
     if (configs != null && !configs.isEmpty()) {
@@ -170,12 +174,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                  pluginModelResolver.resolve(bundlePluginDependency),
                                                  descriptor,
                                                  bundleDependencies,
-                                                 new ArtifactCoordinates(pluginDescriptor.getGroupId(),
-                                                                         pluginDescriptor.getArtifactId(),
-                                                                         pluginDescriptor.getVersion(),
-                                                                         pluginDescriptor.getType(),
-                                                                         pluginDescriptor.getClassifier().orElse(null)),
-                                                 deployableProjectModel.getDependencies(),
                                                  deployableProjectModel.getSharedLibraries())));
         }
       }
@@ -188,29 +186,23 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   /**
    * Creates a descriptor for a plugin.
    *
-   * @param bundleDependency          description of the plugin on a bundle.
-   * @param pluginModel               description of the model of the plugin.
-   * @param ownerDescriptor           descriptor of the artifact that owns the plugin.
-   * @param bundleDependencies        plugin dependencies on a bundle.
-   * @param pluginArtifactCoordinates plugin coordinates.
-   * @param pluginDependencies        the dependencies on the deployable artifact.
-   * @param sharedPluginDependencies  the dependencies on the deployable artifact that are shared to plugins.
+   * @param bundleDependency         description of the plugin on a bundle.
+   * @param pluginModel              description of the model of the plugin.
+   * @param ownerDescriptor          descriptor of the artifact that owns the plugin.
+   * @param pluginBundleDependencies plugin dependencies on a bundle.
+   * @param sharedPluginDependencies the dependencies on the deployable artifact that are shared to plugins.
    * 
    * @return a descriptor for a plugin.
    */
   private ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
                                                           MulePluginModel pluginModel,
                                                           DeployableArtifactDescriptor ownerDescriptor,
-                                                          List<BundleDependency> bundleDependencies,
-                                                          ArtifactCoordinates pluginArtifactCoordinates,
-                                                          List<BundleDependency> pluginDependencies,
+                                                          List<BundleDependency> pluginBundleDependencies,
                                                           Set<BundleDescriptor> sharedPluginDependencies) {
     return new ArtifactPluginDescriptorFactory(bundleDependency,
                                                pluginModel,
                                                ownerDescriptor,
-                                               bundleDependencies,
-                                               pluginArtifactCoordinates,
-                                               pluginDependencies,
+                                               pluginBundleDependencies,
                                                sharedPluginDependencies,
                                                pluginPatchesResolver,
                                                ArtifactDescriptorValidatorBuilder.builder())

@@ -32,7 +32,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -101,14 +100,16 @@ public class ApplicationDescriptorFactory
                                              configuredDomainName));
     }
 
-    DomainDescriptor domainDescriptor = domainDescriptorResolver.resolve(domainBundleDescriptor.get());
+    DomainDescriptor domainDescriptor = domainDescriptorResolver.resolve(configuredDomainName, domainBundleDescriptor.get());
 
     if (domainDescriptor == null) {
       throw new IllegalStateException(format("Domain '%s' couldn't be fetched", configuredDomainName));
     }
 
     if (!isCompatibleBundle(domainDescriptor.getBundleDescriptor(), domainBundleDescriptor.get())) {
-      throw new DomainDescriptorResolutionException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"));
+      throw new DomainDescriptorResolutionException(createStaticMessage("A domain with name '%s' was found, but its bundle descriptor is not compatible with the application declared dependency. The found domain bundle descriptor is '%s'",
+                                                                        configuredDomainName,
+                                                                        domainDescriptor.getBundleDescriptor()));
     }
 
     return of(domainDescriptor);
@@ -150,7 +151,6 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected ApplicationDescriptor doCreateArtifactDescriptor() {
-    return new ApplicationDescriptor(getBundleDescriptor().getArtifactId() + "-" + getBundleDescriptor().getVersion()
-        + "-mule-application", getDeploymentProperties());
+    return new ApplicationDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
   }
 }

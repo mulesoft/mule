@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -18,18 +17,15 @@ import java.util.List;
 
 /**
  * Assembles the class loader configuration for a deployable artifact.
- *
- * @param <M> type of the model of the artifact owning the class loader configuration.
  */
-public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployableModel>
-    extends AbstractArtifactClassLoaderConfigurationAssembler {
+public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifactClassLoaderConfigurationAssembler {
 
   DeployableProjectModel deployableProjectModel;
 
   public DeployableClassLoaderConfigurationAssembler(DeployableProjectModel deployableProjectModel,
                                                      MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    super(new DeployableClassLoaderModelAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
-        .createClassLoaderModel());
+    super(new DeployableClassLoaderModelAssembler(deployableProjectModel)
+        .createClassLoaderModel(), muleArtifactLoaderDescriptor);
     this.deployableProjectModel = deployableProjectModel;
   }
 
@@ -45,13 +41,7 @@ public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployabl
 
   @Override
   protected ClassLoaderModel.ClassLoaderModelBuilder getClassLoaderConfigurationBuilder() {
-    return new DeployableClassLoaderConfigurationBuilder(packagerClassLoaderModel, getProjectFolder());
-  }
-
-  @Override
-  protected List<BundleDependency> getProcessedBundleDependencies() {
-    // TODO W-11202346 - analyze patched dependencies in classloader-model-patch.json
-    return super.getProcessedBundleDependencies();
+    return new DeployableClassLoaderConfigurationBuilder(getPackagerClassLoaderModel(), getProjectFolder());
   }
 
 }

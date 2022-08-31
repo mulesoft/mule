@@ -25,9 +25,9 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -131,7 +131,7 @@ public final class DeployableProjectModel {
     }
 
     return repeatedDependencies.entrySet().stream().filter(entry -> entry.getValue().size() > 1)
-        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(toMap(Entry::getKey, Entry::getValue));
   }
 
   /**

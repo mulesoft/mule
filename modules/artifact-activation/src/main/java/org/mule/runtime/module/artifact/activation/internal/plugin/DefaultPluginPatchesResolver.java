@@ -42,7 +42,7 @@ import org.slf4j.Logger;
  *
  * @since 4.5
  */
-// TODO W-11086310 - move out of this module as part of the migration of the Runtime to use the descriptors generation API
+// TODO W-11086334 - move out of this module as part of the migration of the Runtime to use the descriptors generation API
 public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
 
   private static final Logger LOGGER = getLogger(DefaultPluginPatchesResolver.class);

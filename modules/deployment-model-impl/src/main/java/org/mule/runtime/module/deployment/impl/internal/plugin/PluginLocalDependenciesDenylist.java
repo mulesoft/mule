@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.2.2
  */
-// TODO W-11086310/W-11086334 - remove this class after these migrations
+// TODO W-11086334 - remove this class after this migration
 public class PluginLocalDependenciesDenylist {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginLocalDependenciesDenylist.class);

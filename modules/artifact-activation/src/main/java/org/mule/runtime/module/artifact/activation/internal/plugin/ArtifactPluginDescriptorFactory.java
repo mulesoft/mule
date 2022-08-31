@@ -19,7 +19,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.util.List;
@@ -32,11 +31,9 @@ public class ArtifactPluginDescriptorFactory
     extends AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> {
 
   private final MulePluginModel pluginModel;
-  private final BundleDescriptor bundleDescriptor;
+  private final BundleDependency bundleDependency;
   private final DeployableArtifactDescriptor ownerDescriptor;
   private final List<BundleDependency> bundleDependencies;
-  private final ArtifactCoordinates pluginArtifactCoordinates;
-  private final List<BundleDependency> projectDependencies;
   private final Set<BundleDescriptor> sharedProjectDependencies;
   private final PluginPatchesResolver pluginPatchesResolver;
 
@@ -44,19 +41,15 @@ public class ArtifactPluginDescriptorFactory
                                          MulePluginModel pluginModel,
                                          DeployableArtifactDescriptor ownerDescriptor,
                                          List<BundleDependency> bundleDependencies,
-                                         ArtifactCoordinates pluginArtifactCoordinates,
-                                         List<BundleDependency> projectDependencies,
                                          Set<BundleDescriptor> sharedProjectDependencies,
                                          PluginPatchesResolver pluginPatchesResolver,
                                          ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(new File(bundleDependency.getBundleUri()), artifactDescriptorValidatorBuilder);
 
     this.pluginModel = pluginModel;
-    this.bundleDescriptor = bundleDependency.getDescriptor();
+    this.bundleDependency = bundleDependency;
     this.ownerDescriptor = ownerDescriptor;
     this.bundleDependencies = bundleDependencies;
-    this.pluginArtifactCoordinates = pluginArtifactCoordinates;
-    this.projectDependencies = projectDependencies;
     this.sharedProjectDependencies = sharedProjectDependencies;
     this.pluginPatchesResolver = pluginPatchesResolver;
   }
@@ -79,13 +72,11 @@ public class ArtifactPluginDescriptorFactory
 
   @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    return new PluginClassLoaderConfigurationAssembler(pluginArtifactCoordinates,
-                                                       projectDependencies,
+    return new PluginClassLoaderConfigurationAssembler(bundleDependency,
                                                        sharedProjectDependencies,
                                                        getArtifactLocation(),
                                                        muleArtifactLoaderDescriptor,
                                                        bundleDependencies,
-                                                       bundleDescriptor,
                                                        ownerDescriptor,
                                                        pluginPatchesResolver)
                                                            .createClassLoaderModel();
@@ -93,7 +84,7 @@ public class ArtifactPluginDescriptorFactory
 
   @Override
   protected BundleDescriptor getBundleDescriptor() {
-    return bundleDescriptor;
+    return bundleDependency.getDescriptor();
   }
 
   @Override

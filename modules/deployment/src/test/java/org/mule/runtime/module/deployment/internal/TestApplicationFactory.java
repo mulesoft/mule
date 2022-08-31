@@ -23,6 +23,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
@@ -60,6 +61,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   private boolean failOnDisposeApplication;
 
   private TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
+                                 DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
                                  ApplicationDescriptorFactory applicationDescriptorFactory,
                                  DomainRepository domainRepository,
                                  ServiceRepository serviceRepository,
@@ -68,7 +70,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                  PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                  PluginDependenciesResolver pluginDependenciesResolver,
                                  ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
-    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository,
+    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, deployableArtifactDescriptorFactory,
+          domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
           pluginDependenciesResolver, artifactPluginDescriptorLoader,
           discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
@@ -102,7 +105,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
 
-    return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
+    return new TestApplicationFactory(applicationClassLoaderBuilderFactory,
+                                      DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
+                                      applicationDescriptorFactory,
                                       domainManager, serviceRepository,
                                       extensionModelLoaderRepository, artifactClassLoaderManager,
                                       mock(PolicyTemplateClassLoaderBuilderFactory.class), pluginDependenciesResolver,

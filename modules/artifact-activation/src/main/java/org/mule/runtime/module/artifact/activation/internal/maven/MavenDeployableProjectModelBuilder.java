@@ -182,7 +182,7 @@ public class MavenDeployableProjectModelBuilder
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
-  protected Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
+  private Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> applicationModelResolver().resolve(projectFolder);
     } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
@@ -406,7 +406,7 @@ public class MavenDeployableProjectModelBuilder
     return pomFile;
   }
 
-  protected Optional<org.apache.maven.model.Plugin> findArtifactPackagerPlugin(Model model, List<String> activeProfiles) {
+  private Optional<org.apache.maven.model.Plugin> findArtifactPackagerPlugin(Model model, List<String> activeProfiles) {
     Stream<org.apache.maven.model.Plugin> basePlugin = Stream.empty();
     Build build = model.getBuild();
     if (build != null) {
