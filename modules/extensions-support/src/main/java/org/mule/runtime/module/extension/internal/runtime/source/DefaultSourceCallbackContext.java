@@ -36,7 +36,6 @@ import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
-import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,18 +59,17 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private boolean dispatched = false;
   private final List<NotificationFunction> notificationFunctions = new LinkedList<>();
 
-  @Inject
-  private ProfilingService profilingService;
-
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
+  private final ProfilingService profilingService;
 
   /**
    * Creates a new instance
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
    */
-  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
+  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback, ProfilingService profilingService) {
     this.sourceCallback = sourceCallback;
+    this.profilingService = profilingService;
   }
 
   /**
