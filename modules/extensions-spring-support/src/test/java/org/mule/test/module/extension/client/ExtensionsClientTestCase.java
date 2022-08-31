@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
-import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
@@ -280,19 +279,5 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void longOperation() throws Throwable {
     OperationParameters params = builder().build();
     assertThat(doExecute(VEGAN, "longDigest", params), not(nullValue()));
-  }
-
-  @Test
-  @Description("Checks that an operation disposes the resources when an error occurred while executing")
-  public void disposeOnFailureOperation() throws Throwable {
-    try {
-      executeFailureOperation();
-    } finally {
-
-      probe(() -> {
-        assertThat(HeisenbergOperations.disposed, is(true));
-        return true;
-      });
-    }
   }
 }

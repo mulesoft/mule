@@ -8,9 +8,12 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -36,6 +39,7 @@ class DefaultOperationParameterizer implements OperationParameterizer {
   private final Map<Pair<String, String>, Object> groupedParameters = new HashMap<>();
   private Function<StreamingManager, CursorProviderFactory> cursorProviderFunction = nullCursorProviderFunction();
   private RetryPolicyTemplate retryPolicyTemplate = new NoRetryPolicyTemplate();
+  private CoreEvent contextEvent;
 
   @Override
   public OperationParameterizer withConfigRef(String configRef) {
@@ -120,6 +124,13 @@ class DefaultOperationParameterizer implements OperationParameterizer {
     return this;
   }
 
+  @Override
+  public OperationParameterizer inTheContextOf(Event event) {
+    Preconditions.checkArgument(event instanceof CoreEvent, "event must be an instance of " + CoreEvent.class.getSimpleName());
+    this.contextEvent = (CoreEvent) event;
+    return this;
+  }
+
   String getConfigRef() {
     return configRef;
   }
@@ -130,6 +141,10 @@ class DefaultOperationParameterizer implements OperationParameterizer {
 
   RetryPolicyTemplate getRetryPolicyTemplate() {
     return retryPolicyTemplate;
+  }
+
+  public CoreEvent getContextEvent() {
+    return contextEvent;
   }
 
   void setValuesOn(ComponentParameterization.Builder<OperationModel> builder) {

@@ -18,16 +18,15 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
+import static org.mule.runtime.module.extension.internal.runtime.client.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
-import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,8 +37,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,19 +49,14 @@ import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
-import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -73,7 +65,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -95,8 +86,6 @@ import org.slf4j.Logger;
 public final class DefaultExtensionsClient implements ExtensionsClient, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultExtensionsClient.class);
-  private static final NullComponent NULL_COMPONENT = new NullComponent();
-  private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
 
   @Inject
   private ExtensionManager extensionManager;
@@ -120,8 +109,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private MuleContext muleContext;
 
   private ExecutorService cacheShutdownExecutor;
-  private LoadingCache<OperationKey, ExecutionMediator<OperationModel>> mediatorCache;
-  private OperationExecutorSupplier executorSupplier;
+  private LoadingCache<OperationKey, OperationClient> clientCache;
 
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extensionName,
@@ -136,54 +124,34 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(key.getOperationModel());
     parameterizer.setValuesOn(paramsBuilder);
 
-    ExecutionMediator<OperationModel> mediator = mediatorCache.get(key);
+    OperationClient client = clientCache.get(key);
 
-    return withNullEvent(event -> {
-      final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build(), event);
-      OperationModel operationModel = key.getOperationModel();
-      CompletableComponentExecutor<OperationModel> executor = executorSupplier.getComponentExecutor(key, resolvedParams);
-      CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
+    CoreEvent contextEvent = parameterizer.getContextEvent();
+    boolean shouldCompleteEvent = false;
+    if (contextEvent == null) {
+      contextEvent = getNullEvent(muleContext);
+      shouldCompleteEvent = true;
+    }
 
-      ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
-          key.getExtensionModel(),
-          getConfigurationInstance(key.getConfigurationProvider()),
-          resolvedParams,
-          operationModel,
-          event,
-          cursorProviderFactory,
-          streamingManager,
-          NULL_COMPONENT,
-          parameterizer.getRetryPolicyTemplate(),
-          IMMEDIATE_SCHEDULER,
-          empty(),
-          muleContext);
+    final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build(), contextEvent);
+    OperationModel operationModel = key.getOperationModel();
+    CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
 
-      CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
-      mediator.execute(executor, context, new ExecutorCallback() {
+    ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
+        key.getExtensionModel(),
+        getConfigurationInstance(key.getConfigurationProvider()),
+        resolvedParams,
+        operationModel,
+        contextEvent,
+        cursorProviderFactory,
+        streamingManager,
+        NULL_COMPONENT,
+        parameterizer.getRetryPolicyTemplate(),
+        IMMEDIATE_SCHEDULER,
+        empty(),
+        muleContext);
 
-        @Override
-        public void complete(Object value) {
-          future.complete(asResult(value, operationModel, context, cursorProviderFactory));
-        }
-
-        @Override
-        public void error(Throwable e) {
-          future.completeExceptionally(e);
-        }
-      });
-
-      return future;
-    });
-  }
-
-  private <T, A> Result<T, A> asResult(Object value,
-                                       OperationModel operationModel,
-                                       ExecutionContextAdapter<OperationModel> context,
-                                       CursorProviderFactory cursorProviderFactory) {
-
-    ValueReturnDelegate delegate = new ValueReturnDelegate(operationModel, cursorProviderFactory, muleContext);
-    CoreEvent resultEvent = delegate.asReturnValue(value, context);
-    return (Result<T, A>) Result.builder(resultEvent.getMessage()).build();
+    return client.execute(context, shouldCompleteEvent);
   }
 
   private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
@@ -219,53 +187,44 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     return new OperationKey(extensionModel, configurationProvider, operationModel);
   }
 
-  private LoadingCache<OperationKey, ExecutionMediator<OperationModel>> createMediatorCache() {
+  private LoadingCache<OperationKey, OperationClient> createClientCache() {
     return Caffeine.newBuilder()
         // Since the removal listener runs asynchronously, force waiting for all cleanup tasks to be complete before proceeding
         // (and finalizing) the context disposal.
         // Ref: https://github.com/ben-manes/caffeine/issues/104#issuecomment-238068997
         .executor(cacheShutdownExecutor)
         .expireAfterAccess(5, MINUTES)
-        .removalListener((key, mediator, cause) -> disposeMediator((OperationKey) key,
-            (ExecutionMediator<OperationModel>) mediator))
-        .build(this::createExecutionMediator);
+        .removalListener((key, mediator, cause) -> disposeClient((OperationKey) key, (OperationClient) mediator))
+        .build(this::createOperationClient);
   }
 
-  private ExecutionMediator<OperationModel> createExecutionMediator(OperationKey key) {
-    final ExtensionModel extensionModel = key.getExtensionModel();
-    final OperationModel operationModel = key.getOperationModel();
-    ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
-        extensionModel,
-        operationModel,
-        createReconnectionInterceptorsChain(extensionModel,
-            operationModel,
-            extensionConnectionSupplier,
-            reflectionCache),
+  private OperationClient createOperationClient(OperationKey key) {
+    OperationClient client = from(
+        key,
+        extensionManager,
+        expressionManager,
+        extensionConnectionSupplier,
         errorTypeRepository,
-        muleContext.getExecutionClassLoader(),
-        getPagingResultTransformer(operationModel,
-            extensionConnectionSupplier,
-            supportsOAuth(extensionModel))
-            .orElse(null),
-        NULL_PROFILING_DATA_PRODUCER);
+        reflectionCache,
+        muleContext);
 
     try {
-      initialiseIfNeeded(mediator, true, muleContext);
-      startIfNeeded(mediator);
-
-      return mediator;
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create mediator for operation " + key), e);
+      initialiseIfNeeded(client);
+      startIfNeeded(client);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Exception found creating operation client: " + e.getMessage()), e);
     }
+
+    return client;
   }
 
-  private void disposeMediator(OperationKey identifier, ExecutionMediator<OperationModel> mediator) {
+  private void disposeClient(OperationKey identifier, OperationClient client) {
     try {
-      stopIfNeeded(mediator);
+      stopIfNeeded(client);
     } catch (Exception e) {
-      LOGGER.error("Exception found trying to stop ExtensionClient mediator for operation " + identifier);
+      LOGGER.error("Exception found trying to stop operation client for operation " + identifier);
     } finally {
-      disposeIfNeeded(mediator, LOGGER);
+      disposeIfNeeded(client, LOGGER);
     }
   }
 
@@ -392,42 +351,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Override
   public void initialise() throws InitialisationException {
     cacheShutdownExecutor = new ShutdownExecutor();
-    mediatorCache = createMediatorCache();
-    executorSupplier = new OperationExecutorSupplier(muleContext);
+    clientCache = createClientCache();
   }
 
   @Override
   public void dispose() {
-    if (mediatorCache != null) {
-      mediatorCache.invalidateAll();
+    if (clientCache != null) {
+      clientCache.invalidateAll();
     }
 
     if (cacheShutdownExecutor != null) {
       cacheShutdownExecutor.shutdown();
       shutdownAndAwaitTermination(cacheShutdownExecutor, 5, SECONDS);
     }
-
-    executorSupplier.dispose();
   }
 
-  private static class NullProfilingDataProducer
-      implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {
-
-    private NullProfilingDataProducer() {
-    }
-
-    @Override
-    public void triggerProfilingEvent(ComponentThreadingProfilingEventContext profilerEventContext) {
-
-    }
-
-    @Override
-    public void triggerProfilingEvent(CoreEvent sourceData,
-                                      Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
-
-    }
-  }
-
-  private static class NullComponent extends AbstractComponent {
-  }
 }

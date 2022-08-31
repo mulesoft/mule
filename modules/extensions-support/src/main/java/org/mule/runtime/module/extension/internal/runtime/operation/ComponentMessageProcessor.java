@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -15,7 +16,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -43,15 +43,14 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.creat
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
-import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory.extractExecutorInitialisationParams;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
@@ -115,11 +114,11 @@ import org.mule.runtime.module.extension.api.loader.java.property.CompletableCom
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.OperationExecutionParams;
@@ -145,7 +144,6 @@ import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -314,7 +312,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void removeSdkInternalContextFromResult(final ComponentLocation location, Either<Throwable, CoreEvent> result) {
     result.apply(me -> removeSdkInternalContext(location, ((MessagingException) me).getEvent()),
-                 response -> removeSdkInternalContext(location, response));
+        response -> removeSdkInternalContext(location, response));
   }
 
   private void removeSdkInternalContext(final ComponentLocation location, final CoreEvent event) {
@@ -366,10 +364,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   // That's why an `Either` is used here,
                   // so the error can be propagated afterwards in a way consistent with our expected error handling.
                   errorSwitchSinkSinkRef.next(left(
-                                                   // Force the error mapper from the chain to be used.
-                                                   // When using Mono.create with sink.error, the error mapper from the
-                                                   // context is ignored, so it has to be explicitly used here.
-                                                   localOperatorErrorHook.apply(e, event), CoreEvent.class));
+                      // Force the error mapper from the chain to be used.
+                      // When using Mono.create with sink.error, the error mapper from the
+                      // context is ignored, so it has to be explicitly used here.
+                      localOperatorErrorHook.apply(e, event), CoreEvent.class));
                 }
 
                 @Override
@@ -392,18 +390,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         // In this case, the flux will be complete when there are no more inflight operations.
         || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
       return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
-                                      () -> errorSwitchSinkSinkRef.complete(),
-                                      t -> errorSwitchSinkSinkRef.error(t)));
+          () -> errorSwitchSinkSinkRef.complete(),
+          t -> errorSwitchSinkSinkRef.error(t)));
     } else {
       // For fluxes, the only way they would complete is when the flow that owns the flux is stopped.
       // In that case we need to enforce the timeout configured in the app so that the stop of the flow doesn't take more than
       // that time.
       return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
-                                      () -> errorSwitchSinkSinkRef.complete(),
-                                      t -> errorSwitchSinkSinkRef.error(t),
-                                      outerFluxTerminationTimeout,
-                                      outerFluxCompletionScheduler,
-                                      getDslSource()));
+          () -> errorSwitchSinkSinkRef.complete(),
+          t -> errorSwitchSinkSinkRef.error(t),
+          outerFluxTerminationTimeout,
+          outerFluxCompletionScheduler,
+          getDslSource()));
     }
   }
 
@@ -441,7 +439,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 : executorCallback;
 
         sdkInternalContext.getPolicyToApply(location, eventId).process(event, operationExecutionFunction, () -> resolutionResult,
-                                                                       location, effectiveCallback);
+            location, effectiveCallback);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
@@ -569,9 +567,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                             CoreEvent event, Scheduler currentScheduler) {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
-                                         getCursorProviderFactory(), streamingManager, this,
-                                         retryPolicyResolver.apply(configuration), currentScheduler, transactionConfig,
-                                         muleContext);
+        getCursorProviderFactory(), streamingManager, this,
+        retryPolicyResolver.apply(configuration), currentScheduler, transactionConfig,
+        muleContext);
   }
 
   @Override
@@ -627,74 +625,74 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
     // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
-      final ComponentInnerProcessor innerProcessor = new ComponentInnerProcessor() {
+          final ComponentInnerProcessor innerProcessor = new ComponentInnerProcessor() {
 
-        @Override
-        public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-          return subscriberContext()
-              .flatMapMany(ctx -> {
-                final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
+            @Override
+            public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+              return subscriberContext()
+                  .flatMapMany(ctx -> {
+                    final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
 
-                return from(propagateCompletion(from(publisher), emitter.flux(),
-                                                pub -> from(pub)
-                                                    .doOnNext(innerEventDispatcher(emitter))
-                                                    .map(e -> Either.empty()),
-                                                () -> emitter.complete(), e -> emitter.error(e)))
-                                                    .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
-              });
-        }
+                    return from(propagateCompletion(from(publisher), emitter.flux(),
+                        pub -> from(pub)
+                            .doOnNext(innerEventDispatcher(emitter))
+                            .map(e -> Either.empty()),
+                        () -> emitter.complete(), e -> emitter.error(e)))
+                        .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
+                  });
+            }
 
-        private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
-          return event -> prepareAndExecuteOperation(event,
-                                                     // The callback must be listened to within the
-                                                     // processingStrategy's onProcessor, so that any thread
-                                                     // switch that may occur after the operation (for
-                                                     // instance, getting away from the selector thread after
-                                                     // a non-blocking operation) is actually performed.
-                                                     () -> new ExecutorCallback() {
+            private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
+              return event -> prepareAndExecuteOperation(event,
+                  // The callback must be listened to within the
+                  // processingStrategy's onProcessor, so that any thread
+                  // switch that may occur after the operation (for
+                  // instance, getting away from the selector thread after
+                  // a non-blocking operation) is actually performed.
+                  () -> new ExecutorCallback() {
 
-                                                       @Override
-                                                       public void complete(Object value) {
-                                                         emitter.next(right((CoreEvent) value));
-                                                       }
+                    @Override
+                    public void complete(Object value) {
+                      emitter.next(right((CoreEvent) value));
+                    }
 
-                                                       @Override
-                                                       public void error(Throwable e) {
-                                                         // if `sink.error` is called here, it will cancel
-                                                         // the flux altogether.
-                                                         // That's why an `Either` is used here,
-                                                         // so the error can be propagated afterwards in a
-                                                         // way consistent with our expected error handling.
-                                                         emitter.next(left(new EventProcessingException(event, e, false)));
-                                                       }
-                                                     });
-        }
+                    @Override
+                    public void error(Throwable e) {
+                      // if `sink.error` is called here, it will cancel
+                      // the flux altogether.
+                      // That's why an `Either` is used here,
+                      // so the error can be propagated afterwards in a
+                      // way consistent with our expected error handling.
+                      emitter.next(left(new EventProcessingException(event, e, false)));
+                    }
+                  });
+            }
 
-        @Override
-        public ProcessingType getProcessingType() {
-          return getInnerProcessingType();
-        }
+            @Override
+            public ProcessingType getProcessingType() {
+              return getInnerProcessingType();
+            }
 
-        @Override
-        public boolean isBlocking() {
-          return ComponentMessageProcessor.this.isBlocking();
-        }
+            @Override
+            public boolean isBlocking() {
+              return ComponentMessageProcessor.this.isBlocking();
+            }
 
-        @Override
-        public ComponentLocation resolveLocation() {
-          return ComponentMessageProcessor.this.getLocation();
-        }
-      };
+            @Override
+            public ComponentLocation resolveLocation() {
+              return ComponentMessageProcessor.this.getLocation();
+            }
+          };
 
-      return from(processingStrategy
-          .configureInternalPublisher(from(p)
-              .transform(processingStrategy.onProcessor(innerProcessor))
-              .doOnNext(result -> getOperationExecutionParams(result)
-                  .getCallback().complete(result))
-              .onErrorContinue((t, result) -> getOperationExecutionParams(((EventProcessingException) t).getEvent())
-                  .getCallback().error(t.getCause()))));
-    },
-                                                getRuntime().availableProcessors());
+          return from(processingStrategy
+              .configureInternalPublisher(from(p)
+                  .transform(processingStrategy.onProcessor(innerProcessor))
+                  .doOnNext(result -> getOperationExecutionParams(result)
+                      .getCallback().complete(result))
+                  .onErrorContinue((t, result) -> getOperationExecutionParams(((EventProcessingException) t).getEvent())
+                      .getCallback().error(t.getCause()))));
+        },
+        getRuntime().availableProcessors());
   }
 
   protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
@@ -704,7 +702,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } catch (NullPointerException npe) {
       throw propagateWrappingFatal(new EventProcessingException(createStaticMessage("Maybe the non-blocking operation @ '"
           + getLocation().getLocation() + "' used its callback more than once?"),
-                                                                event, npe));
+          event, npe));
     }
   }
 
@@ -728,7 +726,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
         if (ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
           innerChainCtx = innerChainCtx.put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS,
-                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
+              ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
         }
         return innerChainCtx;
       });
@@ -767,13 +765,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       operationContext.changeEvent(event);
     } else {
       operationContext = createExecutionContext(configuration,
-                                                parameters,
-                                                operationEvent,
-                                                currentScheduler);
+          parameters,
+          operationEvent,
+          currentScheduler);
     }
 
     sdkInternalContext.setOperationExecutionParams(location, event.getContext().getId(), configuration, parameters,
-                                                   operationEvent, callback, operationContext);
+        operationEvent, callback, operationContext);
 
   }
 
@@ -787,7 +785,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     boolean wasProcessorPathSet = setCurrentLocation();
     try {
       executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
-                                                isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
+          isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
     } finally {
       unsetCurrentLocation(wasProcessorPathSet);
     }
@@ -828,62 +826,23 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
-    Map<String, Object> params = new HashMap<>();
-
-    LazyValue<ValueResolvingContext> resolvingContext =
-        new LazyValue<>(() -> withNullEvent(event -> ValueResolvingContext.builder(event, expressionManager)
-            .withConfig(getStaticConfiguration())
-            .build()));
-
-    LazyValue<Boolean> dynamicConfig = new LazyValue<>(
-                                                       () -> extensionManager
-                                                           .getConfigurationProvider(extensionModel, componentModel,
-                                                                                     resolvingContext.get().getEvent())
-                                                           .map(ConfigurationProvider::isDynamic)
-                                                           .orElse(false));
-
-    try {
-      for (ParameterGroupModel group : componentModel.getParameterGroupModels()) {
-        if (group.getName().equals(DEFAULT_GROUP_NAME)) {
-          for (ParameterModel p : group.getParameterModels()) {
-            if (!p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent()) {
-              continue;
-            }
-
-            ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
-            if (resolver != null) {
-              params.put(getMemberName(p), resolveComponentExecutorParam(resolvingContext, dynamicConfig, p, resolver));
-            }
-          }
-        } else {
-          ParameterGroupDescriptor groupDescriptor = group.getModelProperty(ParameterGroupModelProperty.class)
-              .map(g -> g.getDescriptor())
-              .orElse(null);
-
-          if (groupDescriptor == null) {
-            continue;
-          }
-
-          List<ParameterModel> fieldParameters = getGroupsOfFieldParameters(group);
-
-          if (fieldParameters.isEmpty()) {
-            continue;
-          }
-
-          ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
-
-          try {
-            params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }
-      }
-
-      return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
-    } finally {
-      resolvingContext.ifComputed(ValueResolvingContext::close);
+    Map<String, Object> params;
+    CompletableComponentExecutorFactory<T> operationExecutorFactory = getOperationExecutorFactory(componentModel);
+    if (operationExecutorFactory instanceof CompletableOperationExecutorFactory) {
+      params = extractExecutorInitialisationParams(
+          extensionModel,
+          componentModel,
+          resolverSet.getResolvers(),
+          this,
+          getStaticConfiguration(),
+          extensionManager,
+          expressionManager,
+          reflectionCache);
+    } else {
+      params = emptyMap();
     }
+
+    return operationExecutorFactory.createExecutor(componentModel, params);
   }
 
   private Object resolveComponentExecutorParam(LazyValue<ValueResolvingContext> resolvingContext,
@@ -899,12 +858,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           if (dynamicConfig.get()) {
             final ComponentLocation location = getLocation();
             String message = format(
-                                    "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
-                                        + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
-                                        + "or don't set the parameter.",
-                                    location != null ? location.getComponentIdentifier().getIdentifier().toString() : toString(),
-                                    toString(),
-                                    p.getName());
+                "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
+                    + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
+                    + "or don't set the parameter.",
+                location != null ? location.getComponentIdentifier().getIdentifier().toString() : toString(),
+                toString(),
+                p.getName());
             throw new InitialisationException(createStaticMessage(message), this);
           } else {
             resolvedValue = resolver.resolve(resolvingContext.get());
@@ -963,7 +922,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return new PayloadTargetReturnDelegate(target, componentModel, cursorProviderFactory, muleContext);
     }
     return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext,
-                                    streamingManager);
+        streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
@@ -977,12 +936,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     if (muleContext.getExpressionManager().isExpression(target)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
-                                                 componentModel.getName(),
-                                                 "an expression", TARGET_PARAMETER_NAME));
+          componentModel.getName(),
+          "an expression", TARGET_PARAMETER_NAME));
     } else if (!muleContext.getExpressionManager().isExpression(targetValue)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
-                                                 componentModel.getName(), "something that is not an expression",
-                                                 TARGET_VALUE_PARAMETER_NAME));
+          componentModel.getName(), "something that is not an expression",
+          TARGET_VALUE_PARAMETER_NAME));
     }
 
     return true;
@@ -1065,7 +1024,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     if (outerFluxTerminationTimeout >= 0 && outerFluxCompletionScheduler != null) {
       LOGGER.debug("Stopping outerFluxCompletionScheduler ({}) of component '{}'...", outerFluxCompletionScheduler,
-                   processorPath);
+          processorPath);
       outerFluxCompletionScheduler.stop();
       outerFluxCompletionScheduler = null;
     }
@@ -1116,13 +1075,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
-                                        componentModel,
-                                        createReconnectionInterceptorsChain(extensionModel, componentModel,
-                                                                            extensionConnectionSupplier, reflectionCache),
-                                        errorTypeRepository,
-                                        muleContext.getExecutionClassLoader(),
-                                        resultTransformer,
-                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
+        componentModel,
+        createReconnectionInterceptorsChain(extensionModel, componentModel,
+            extensionConnectionSupplier, reflectionCache),
+        errorTypeRepository,
+        muleContext.getExecutionClassLoader(),
+        resultTransformer,
+        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
   }
 
   /**
@@ -1234,9 +1193,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         (ValueResolver<Object>) resolverSet.getResolvers().get(TRANSACTIONAL_ACTION_PARAMETER_NAME);
     if (resolver == null) {
       throw new IllegalArgumentException(
-                                         format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
-                                                componentModel.getName(),
-                                                extensionModel.getName()));
+          format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
+              componentModel.getName(),
+              extensionModel.getName()));
     }
 
     CoreEvent initializerEvent = NullEventFactory.getNullEvent(muleContext);
