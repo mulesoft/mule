@@ -63,6 +63,6 @@ class OperationKey {
   @Override
   public String toString() {
     return format("[Extension: %s; Operation: %s, ConfigName: %s",
-        extensionModel.getName(), operationModel.getName(), configName);
+                  extensionModel.getName(), operationModel.getName(), configName);
   }
 }

@@ -64,7 +64,7 @@ abstract class ComponentExecutorResolver {
     return initParameterModels.isEmpty()
         ? new StaticComponentExecutorResolver(key, extensionManager, expressionManager, reflectionCache, muleContext)
         : new WithInitParamsComponentExecutorResolver(initParameterModels, key, extensionManager,
-        expressionManager, reflectionCache, muleContext);
+                                                      expressionManager, reflectionCache, muleContext);
   }
 
   private ComponentExecutorResolver(OperationKey key,
@@ -88,18 +88,19 @@ abstract class ComponentExecutorResolver {
     if (operationExecutorFactory instanceof CompletableOperationExecutorFactory) {
       try {
         initParams = extractExecutorInitialisationParams(
-            key.getExtensionModel(),
-            operationModel,
-            initParams,
-            NULL_COMPONENT,
-            empty(),
-            extensionManager,
-            expressionManager,
-            reflectionCache
-        );
+                                                         key.getExtensionModel(),
+                                                         operationModel,
+                                                         initParams,
+                                                         NULL_COMPONENT,
+                                                         empty(),
+                                                         extensionManager,
+                                                         expressionManager,
+                                                         reflectionCache);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage(
-            "Exception found resolving parameters for operation client: " + e.getMessage()), e);
+                                                           "Exception found resolving parameters for operation client: "
+                                                               + e.getMessage()),
+                                       e);
       }
     }
 
@@ -195,7 +196,8 @@ abstract class ComponentExecutorResolver {
     private final CompletableComponentExecutor<OperationModel> executor;
     private final CompletableComponentExecutor.ExecutorCallback delegate;
 
-    public SelfDestructingExecutorCallbackDecorator(CompletableComponentExecutor<OperationModel> executor, CompletableComponentExecutor.ExecutorCallback delegate) {
+    public SelfDestructingExecutorCallbackDecorator(CompletableComponentExecutor<OperationModel> executor,
+                                                    CompletableComponentExecutor.ExecutorCallback delegate) {
       this.executor = executor;
       this.delegate = delegate;
     }

@@ -95,14 +95,15 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
   }
 
   public static <C extends Component & Initialisable> Map<String, Object> extractExecutorInitialisationParams(
-      ExtensionModel extensionModel,
-      ComponentModel componentModel,
-      Map<String, ? extends Object> operationParameters,
-      C actingComponent,
-      Optional<ConfigurationInstance> staticConfig,
-      ExtensionManager extensionManager,
-      ExpressionManager expressionManager,
-      ReflectionCache reflectionCache) throws InitialisationException {
+                                                                                                              ExtensionModel extensionModel,
+                                                                                                              ComponentModel componentModel,
+                                                                                                              Map<String, ? extends Object> operationParameters,
+                                                                                                              C actingComponent,
+                                                                                                              Optional<ConfigurationInstance> staticConfig,
+                                                                                                              ExtensionManager extensionManager,
+                                                                                                              ExpressionManager expressionManager,
+                                                                                                              ReflectionCache reflectionCache)
+      throws InitialisationException {
 
     Map<String, Object> initParams = new HashMap<>();
 
@@ -112,9 +113,11 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
             .build()));
 
     LazyValue<Boolean> dynamicConfig = new LazyValue<>(
-        () -> extensionManager.getConfigurationProvider(extensionModel, componentModel, resolvingContext.get().getEvent())
-            .map(ConfigurationProvider::isDynamic)
-            .orElse(false));
+                                                       () -> extensionManager
+                                                           .getConfigurationProvider(extensionModel, componentModel,
+                                                                                     resolvingContext.get().getEvent())
+                                                           .map(ConfigurationProvider::isDynamic)
+                                                           .orElse(false));
 
     try {
       for (ParameterGroupModel group : componentModel.getParameterGroupModels()) {
@@ -127,11 +130,11 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
             Object value = operationParameters.get(p.getName());
             if (value != null) {
               initParams.put(getMemberName(p), resolveComponentExecutorParam(
-                  resolvingContext,
-                  dynamicConfig,
-                  p,
-                  actingComponent,
-                  value));
+                                                                             resolvingContext,
+                                                                             dynamicConfig,
+                                                                             p,
+                                                                             actingComponent,
+                                                                             value));
             }
           }
         } else {
@@ -150,9 +153,9 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
           }
 
           ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(
-              groupDescriptor,
-              operationParameters,
-              fieldParameters, reflectionCache);
+                                                                        groupDescriptor,
+                                                                        operationParameters,
+                                                                        fieldParameters, reflectionCache);
 
           try {
             initParams.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
@@ -169,10 +172,11 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
   }
 
   private static <C extends Component & Initialisable> Object resolveComponentExecutorParam(LazyValue<ValueResolvingContext> resolvingContext,
-                                                      Supplier<Boolean> dynamicConfig,
-                                                      ParameterModel p,
-                                                      C actingComponent,
-                                                      Object value) throws InitialisationException {
+                                                                                            Supplier<Boolean> dynamicConfig,
+                                                                                            ParameterModel p,
+                                                                                            C actingComponent,
+                                                                                            Object value)
+      throws InitialisationException {
     Object resolvedValue;
     try {
       if (value instanceof ConfigOverrideValueResolverWrapper) {
@@ -181,12 +185,13 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
           if (dynamicConfig.get()) {
             final ComponentLocation location = actingComponent.getLocation();
             String message = format(
-                "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
-                    + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
-                    + "or don't set the parameter.",
-                location != null ? location.getComponentIdentifier().getIdentifier().toString() : actingComponent,
-                actingComponent,
-                p.getName());
+                                    "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
+                                        + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
+                                        + "or don't set the parameter.",
+                                    location != null ? location.getComponentIdentifier().getIdentifier().toString()
+                                        : actingComponent,
+                                    actingComponent,
+                                    p.getName());
             throw new InitialisationException(createStaticMessage(message), actingComponent);
           }
         }
