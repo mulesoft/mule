@@ -42,6 +42,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
@@ -137,6 +138,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
+
+  @Inject
+  private ProfilingService profilingService;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -319,7 +323,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private SourceCallbackFactory createSourceCallbackFactory() {
-    return completionHandlerFactory -> DefaultSourceCallback.builder()
+    return completionHandlerFactory -> DefaultSourceCallback.builder(profilingService)
         .setExceptionCallback(this)
         .setSourceModel(sourceModel)
         .setConfigurationInstance(getConfigurationInstance().orElse(null))

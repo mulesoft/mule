@@ -26,6 +26,7 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -55,7 +56,8 @@ import java.util.Set;
 import javax.transaction.TransactionManager;
 
 /**
- * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
+ * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder(ProfilingService)}
+ * method.
  *
  * @param <T> the generic type of the output values of the generated results
  * @param <A> the generic type of the attributes of the generated results
@@ -71,9 +73,11 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   static class Builder<T, A> {
 
-    private Builder() {}
+    private final DefaultSourceCallback<T, A> product;
 
-    private final DefaultSourceCallback<T, A> product = new DefaultSourceCallback();
+    private Builder(ProfilingService profilingService) {
+      product = new DefaultSourceCallback<>(profilingService);
+    }
 
     public Builder<T, A> setSourceModel(SourceModel sourceModel) {
       product.sourceModel = sourceModel;
@@ -181,8 +185,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   /**
    * @return a new {@link Builder}
    */
-  static Builder builder() {
-    return new Builder();
+  static Builder builder(ProfilingService profilingService) {
+    return new Builder(profilingService);
   }
 
   private SourceModel sourceModel;
@@ -203,13 +207,16 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private boolean returnsListOfMessages = false;
   private MediaType defaultMediaType;
   private TransactionSourceBinder transactionSourceBinder;
+  private final ProfilingService profilingService;
 
   private Charset defaultEncoding;
 
   private MediaType mimeTypeInitParam;
   private Charset encodingParam;
 
-  private DefaultSourceCallback() {}
+  private DefaultSourceCallback(ProfilingService profilingService) {
+    this.profilingService = profilingService;
+  }
 
   private final RunOnce resolveInitializationParams = Once.of(() -> {
     defaultEncoding = getDefaultEncoding(muleContext);
@@ -329,13 +336,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public SourceCallbackContext createContext() {
-    SourceCallbackContext context = new DefaultSourceCallbackContext(this);
-    try {
-      muleContext.getInjector().inject(context);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
-    return context;
+    return new DefaultSourceCallbackContext(this, profilingService);
   }
 
   /**

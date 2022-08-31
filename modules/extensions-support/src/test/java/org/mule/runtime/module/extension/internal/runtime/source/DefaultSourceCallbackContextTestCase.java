@@ -12,8 +12,10 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -25,6 +27,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
+
+  private ProfilingService profilingService = new NoOpProfilingService();
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -43,7 +47,7 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
     when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(Optional.empty());
     when(sourceCallback.getSourceConnectionManager()).thenReturn(sourceConnMgr);
 
-    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback);
+    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService);
 
     expected.expect(TransactionException.class);
     try {
@@ -74,7 +78,7 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
                                       .thenThrow(TransactionException.class);
     when(sourceCallback.getTransactionSourceBinder()).thenReturn(binder);
 
-    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback);
+    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService);
 
     expected.expect(TransactionException.class);
     try {
