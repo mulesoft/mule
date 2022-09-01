@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabular
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECURITY_TOKEN;
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.TOKEN_ID;
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.TOKEN_URL;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECRET;
 
 import static java.util.Optional.ofNullable;
 
@@ -40,7 +41,7 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   private static final String EXAMPLE = "example";
   private static final String SUMMARY = "summary";
   private static final String TEXT = "text";
-  private static final String SECRET = "secret";
+  private static final String SECRET_TYPE = "secret";
   private static final String PATH = "path";
   private static final String TYPE = "type";
   private static final String ACCEPTS_URLS = "acceptsUrls";
@@ -116,7 +117,7 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   }
 
   private boolean setSecretIfNeeded(ComponentAst metadataAst, LayoutModelBuilder layoutModelBuilder) {
-    Optional<String> secret = getOptionalParameter(metadataAst, SECRET);
+    Optional<String> secret = getOptionalParameter(metadataAst, SECRET_TYPE);
     if (secret.isPresent()) {
       semanticTerms.add(toSemanticTerm(secret.get()));
       layoutModelBuilder.asPassword();
@@ -127,7 +128,7 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   }
 
   private String toSemanticTerm(String secretType) {
-    return SECRET_TYPE_TO_SEMANTIC_TERM.getOrDefault(secretType, SECRET);
+    return SECRET_TYPE_TO_SEMANTIC_TERM.getOrDefault(secretType, SECRET_TYPE);
   }
 
   private boolean setOrderIfNeeded(ComponentAst metadataAst, LayoutModelBuilder layoutModelBuilder) {
