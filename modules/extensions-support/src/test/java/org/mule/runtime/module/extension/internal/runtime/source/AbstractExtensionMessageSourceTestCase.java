@@ -47,6 +47,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -86,6 +87,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.util.Collections;
+
+import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
@@ -182,6 +185,9 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
 
+  @Inject
+  private ProfilingService profilingService;
+
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected boolean primaryNodeOnly = false;
   protected SourceAdapter sourceAdapter;
@@ -189,6 +195,11 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected ExtensionMessageSource messageSource;
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
   protected NotificationDispatcher notificationDispatcher;
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 
   @Before
   public void before() throws Exception {
@@ -269,7 +280,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     messageSource = getNewExtensionMessageSourceInstance();
 
-    sourceCallback = DefaultSourceCallback.builder()
+    sourceCallback = DefaultSourceCallback.builder(profilingService)
         .setSourceModel(sourceModel)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
