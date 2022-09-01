@@ -177,7 +177,7 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
                                                                                             C actingComponent,
                                                                                             Object value)
       throws InitialisationException {
-    Object resolvedValue;
+    Object resolvedValue = null;
     try {
       if (value instanceof ConfigOverrideValueResolverWrapper) {
         resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) value).resolveWithoutConfig(resolvingContext.get());
@@ -195,10 +195,14 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
             throw new InitialisationException(createStaticMessage(message), actingComponent);
           }
         }
-      } else if (value instanceof ValueResolver) {
-        resolvedValue = resolveValue((ValueResolver<? extends Object>) value, resolvingContext.get());
-      } else {
-        resolvedValue = value;
+      }
+
+      if (resolvedValue == null) {
+        if (value instanceof ValueResolver) {
+          resolvedValue = resolveValue((ValueResolver<? extends Object>) value, resolvingContext.get());
+        } else {
+          resolvedValue = value;
+        }
       }
 
       return resolvedValue;

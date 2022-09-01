@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.util.concurrent.ForwardingExecutorService;
 
-public final class ShutdownExecutor extends ForwardingExecutorService {
+final class ShutdownExecutor extends ForwardingExecutorService {
 
   private final AtomicInteger tasks = new AtomicInteger();
   private final Semaphore semaphore = new Semaphore(0);
