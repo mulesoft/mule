@@ -104,13 +104,23 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   @Override
   public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> spanError, boolean isErrorEscapingCurrentSpan) {
-    EventContext eventContext = coreEvent.getContext();
-    if (eventContext instanceof DistributedTraceContextAware) {
-      ((DistributedTraceContextAware) eventContext)
-          .getDistributedTraceContext()
-          .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
-                                                         isErrorEscapingCurrentSpan));
-    }
+    safeExecute(() -> {
+      EventContext eventContext = coreEvent.getContext();
+      if (eventContext instanceof DistributedTraceContextAware) {
+        ((DistributedTraceContextAware) eventContext)
+            .getDistributedTraceContext()
+            .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
+                                                           isErrorEscapingCurrentSpan));
+      }
+    }, "Error recording a span error at current span", propagationOfExceptionsInTracing, logger);
+  }
+
+  @Override
+  public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
+    return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
+                                             emptyMap(),
+                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
+                                             logger);
   }
 
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
@@ -123,14 +133,6 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
 
     return currentSpan;
-  }
-
-  @Override
-  public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
-    return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
-                                             emptyMap(),
-                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
-                                             logger);
   }
 
   private Map<String, String> doGetDistributedTraceContextMap(CoreEvent coreEvent) {

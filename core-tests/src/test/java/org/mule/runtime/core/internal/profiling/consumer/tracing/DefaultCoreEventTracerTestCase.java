@@ -32,7 +32,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.ImmutableMap;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -64,6 +63,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import com.google.common.collect.ImmutableMap;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
@@ -183,6 +183,29 @@ public class DefaultCoreEventTracerTestCase {
   @Test(expected = TracingErrorPropagationException.class)
   public void testEndCurrentSpanIfThrowableWithTracingErrorPropagationEnabled() {
     doTestErrorPropagation(true, null, CoreEventTracer::endCurrentSpan);
+  }
+
+  @Test
+  public void testRecordErrorAtCurrentSpanIfThrowable() {
+    doTestErrorPropagation(false, "Error recording a span error at current span",
+                           (coreEventTracer, coreEvent) -> coreEventTracer.recordErrorAtCurrentSpan(coreEvent, true));
+  }
+
+  @Test(expected = TracingErrorPropagationException.class)
+  public void testRecordErrorAtCurrentSpanIfThrowableWithTracingErrorPropagationEnabled() {
+    doTestErrorPropagation(true, null, (coreEventTracer, coreEvent) -> coreEventTracer.recordErrorAtCurrentSpan(coreEvent, true));
+  }
+
+  @Test
+  public void testRecordSpecifiedErrorAtCurrentSpanIfThrowable() {
+    doTestErrorPropagation(false, "Error recording a span error at current span", (coreEventTracer, coreEvent) -> coreEventTracer
+        .recordErrorAtCurrentSpan(coreEvent, () -> mock(Error.class), true));
+  }
+
+  @Test(expected = TracingErrorPropagationException.class)
+  public void testRecordSpecifiedErrorAtCurrentSpanIfThrowableWithTracingErrorPropagationEnabled() {
+    doTestErrorPropagation(true, null, (coreEventTracer, coreEvent) -> coreEventTracer
+        .recordErrorAtCurrentSpan(coreEvent, () -> mock(Error.class), true));
   }
 
   @Test
