@@ -44,7 +44,6 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 
@@ -129,8 +128,7 @@ public class OpenTelemetryResourcesProvider {
   }
 
   private static SpanProcessor resolveExporterProcessor(SpanExporterConfiguration spanExporterConfiguration) {
-    return BatchSpanProcessor.builder(createExporter(spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP)))
-        .build();
+    return SimpleSpanProcessor.create(createExporter(spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP)));
   }
 
   private static SpanExporter createExporter(String endpoint) {
