@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
@@ -119,7 +118,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     DistributedTraceContext distributedTraceContext = resolveDistributedTraceContext(eventContext);
 
     return getPropagator().getTextMapPropagator()
-        .extract(Context.current(), distributedTraceContext.tracingFieldsAsMap(), OPENTELEMETRY_SPAN_GETTER);
+        .extract(Context.current(), distributedTraceContext.tracingFieldsAsMap(), OPEN_TELEMETRY_SPAN_GETTER);
   }
 
   private DistributedTraceContext resolveDistributedTraceContext(EventContext eventContext) {
