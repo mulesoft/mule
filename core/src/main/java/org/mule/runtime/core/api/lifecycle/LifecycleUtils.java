@@ -42,6 +42,8 @@ import org.slf4j.Logger;
  */
 public class LifecycleUtils {
 
+  private static DisposedObjectsTracker tracker = new DisposedObjectsTracker();
+
   private LifecycleUtils() {}
 
   /**
@@ -231,6 +233,7 @@ public class LifecycleUtils {
    */
   public static void disposeIfNeeded(Object object, Logger logger) {
     object = unwrap(object);
+    tracker.markThatShouldBeCollected(object);
     if (object instanceof Disposable) {
       try {
         ((Disposable) object).dispose();
