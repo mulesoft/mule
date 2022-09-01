@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader;
 
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.CLIENT_SECRET;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
 
@@ -58,9 +59,12 @@ public class ParameterLayoutExtensionModelTestCase extends AbstractMuleSdkExtens
 
     assertThat(layoutModel.getOrder().get(), is(4));
     assertThat(layoutModel.isText(), is(true));
+    assertThat(layoutModel.isPassword(), is(true));
+    assertThat(parameterModel.getSemanticTerms().contains(CLIENT_SECRET), is(true));
 
     // These things aren't configurable, and they won't
     assertThat(displayModel.getClassValueModel().isPresent(), is(false));
     assertThat(layoutModel.getTabName().isPresent(), is(false));
+    assertThat(layoutModel.isQuery(), is(false));
   }
 }

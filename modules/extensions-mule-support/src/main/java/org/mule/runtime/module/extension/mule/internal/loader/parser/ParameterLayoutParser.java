@@ -6,6 +6,16 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.API_KEY;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.CLIENT_ID;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.CLIENT_SECRET;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.PASSWORD;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECRET_TOKEN;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECURITY_TOKEN;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.TOKEN_ID;
+import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.TOKEN_URL;
+
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -17,7 +27,11 @@ import org.mule.runtime.api.meta.model.display.PathModel.Location;
 import org.mule.runtime.api.meta.model.display.PathModel.Type;
 import org.mule.runtime.ast.api.ComponentAst;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
 
@@ -35,12 +49,30 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   private static final String[] EMPTY_ARRAY = {};
   private static final String ORDER = "order";
 
+  private static final Map<String, String> SECRET_TYPE_TO_SEMANTIC_TERM = new HashMap<>();
+
+  static {
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("CLIENT_ID", CLIENT_ID);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("CLIENT_SECRET", CLIENT_SECRET);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("TOKEN_ID", TOKEN_ID);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("PASSWORD", PASSWORD);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("TOKEN_URL_TEMPLATE", TOKEN_URL);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("TOKEN_SECRET", SECRET_TOKEN);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("API_KEY", API_KEY);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("SECRET_TOKEN", SECRET_TOKEN);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("SECURITY_TOKEN", SECURITY_TOKEN);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("RSA_PRIVATE_KEY", SECRET);
+    SECRET_TYPE_TO_SEMANTIC_TERM.put("SECRET", SECRET);
+  }
+
   private final ComponentAst parameterAst;
 
   private LayoutModel layoutModel = null;
   private DisplayModel displayModel = null;
+  private final Set<String> semanticTerms;
 
   public ParameterLayoutParser(ComponentAst parameterAst) {
+    this.semanticTerms = new HashSet<>(1);
     this.parameterAst = parameterAst;
     parseStructure();
   }
@@ -53,20 +85,99 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
     DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
     LayoutModelBuilder layoutModelBuilder = LayoutModel.builder();
 
-    getOptionalParameter(metadataAst, DISPLAY_NAME)
-        .ifPresent(displayName -> displayModelBuilder.displayName((String) displayName));
-    getOptionalParameter(metadataAst, EXAMPLE).ifPresent(example -> displayModelBuilder.example((String) example));
-    getOptionalParameter(metadataAst, SUMMARY).ifPresent(summary -> displayModelBuilder.summary((String) summary));
-    getSingleChild(metadataAst, PATH).map(this::parsePathModel).ifPresent(displayModelBuilder::path);
+    boolean wasSomeDisplayModelParamSet = setDisplayNameIfNeeded(metadataAst, displayModelBuilder);
+    wasSomeDisplayModelParamSet |= setExampleIfNeeded(metadataAst, displayModelBuilder);
+    wasSomeDisplayModelParamSet |= setSummaryIfNeeded(metadataAst, displayModelBuilder);
+    wasSomeDisplayModelParamSet |= setPathIfNeeded(metadataAst, displayModelBuilder);
 
-    getOptionalParameter(metadataAst, TEXT).filter(Boolean.class::cast).ifPresent(isText -> layoutModelBuilder.asText());
-    // TODO: Check semantic terms...
-    getOptionalParameter(metadataAst, SECRET).ifPresent(secret -> layoutModelBuilder.asPassword());
+    boolean wasSomeLayoutModelParamSet = setTextIfNeeded(metadataAst, layoutModelBuilder);
+    wasSomeLayoutModelParamSet |= setSecretIfNeeded(metadataAst, layoutModelBuilder);
+    wasSomeLayoutModelParamSet |= setOrderIfNeeded(metadataAst, layoutModelBuilder);
 
-    layoutModelBuilder.order(getOptionalParameter(metadataAst, ORDER).map(Integer.class::cast).orElse(-1));
+    if (wasSomeDisplayModelParamSet) {
+      displayModel = displayModelBuilder.build();
+    }
 
-    displayModel = displayModelBuilder.build();
-    layoutModel = layoutModelBuilder.build();
+    if (wasSomeLayoutModelParamSet) {
+      layoutModel = layoutModelBuilder.build();
+    }
+  }
+
+  private boolean setTextIfNeeded(ComponentAst metadataAst, LayoutModelBuilder layoutModelBuilder) {
+    Optional<Boolean> isText = getOptionalParameter(metadataAst, TEXT);
+    if (isText.isPresent()) {
+      if (isText.get().booleanValue()) {
+        layoutModelBuilder.asText();
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean setSecretIfNeeded(ComponentAst metadataAst, LayoutModelBuilder layoutModelBuilder) {
+    Optional<String> secret = getOptionalParameter(metadataAst, SECRET);
+    if (secret.isPresent()) {
+      semanticTerms.add(toSemanticTerm(secret.get()));
+      layoutModelBuilder.asPassword();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private String toSemanticTerm(String secretType) {
+    return SECRET_TYPE_TO_SEMANTIC_TERM.getOrDefault(secretType, SECRET);
+  }
+
+  private boolean setOrderIfNeeded(ComponentAst metadataAst, LayoutModelBuilder layoutModelBuilder) {
+    Optional<Integer> order = getOptionalParameter(metadataAst, ORDER);
+    if (order.isPresent()) {
+      layoutModelBuilder.order(order.get());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean setDisplayNameIfNeeded(ComponentAst metadataAst, DisplayModelBuilder displayModelBuilder) {
+    Optional<String> displayName = getOptionalParameter(metadataAst, DISPLAY_NAME);
+    if (displayName.isPresent() && !isBlank(displayName.get())) {
+      displayModelBuilder.displayName(displayName.get());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean setExampleIfNeeded(ComponentAst metadataAst, DisplayModelBuilder displayModelBuilder) {
+    Optional<String> example = getOptionalParameter(metadataAst, EXAMPLE);
+    if (example.isPresent() && !isBlank(example.get())) {
+      displayModelBuilder.example(example.get());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean setSummaryIfNeeded(ComponentAst metadataAst, DisplayModelBuilder displayModelBuilder) {
+    Optional<String> summary = getOptionalParameter(metadataAst, SUMMARY);
+    if (summary.isPresent() && !isBlank(summary.get())) {
+      displayModelBuilder.summary(summary.get());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean setPathIfNeeded(ComponentAst metadataAst, DisplayModelBuilder displayModelBuilder) {
+    Optional<PathModel> pathModel = getSingleChild(metadataAst, PATH).map(this::parsePathModel);
+    if (pathModel.isPresent()) {
+      displayModelBuilder.path(pathModel.get());
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private PathModel parsePathModel(ComponentAst pathAst) {
@@ -91,11 +202,10 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   }
 
   public Optional<DisplayModel> getDisplayModel() {
-    // TODO: Remove this param...
-    // String summary = getParameter(parameterAst, "summary");
-    // if (!isBlank(summary)) {
-    // return of(DisplayModel.builder().summary(summary).build());
-    // }
     return ofNullable(displayModel);
+  }
+
+  public Set<String> getSemanticTerms() {
+    return semanticTerms;
   }
 }

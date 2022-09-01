@@ -60,6 +60,10 @@ class MuleOperationExtensionModelDeclarer {
   private static final MetadataType PATH_LOCATION_TYPE = BASE_TYPE_BUILDER.stringType()
       .enumOf("EMBEDDED", "EXTERNAL", "ANY")
       .build();
+  private static final MetadataType SECRET_TYPE = BASE_TYPE_BUILDER.stringType()
+      .enumOf("CLIENT_ID", "CLIENT_SECRET", "TOKEN_ID", "TOKEN_URL_TEMPLATE", "TOKEN_SECRET", "API_KEY", "SECRET_TOKEN",
+              "SECURITY_TOKEN", "RSA_PRIVATE_KEY", "SECRET")
+      .build();
 
   private static final String PARAMETER_DISPLAY_NAME_DESCRIPTION =
       "Allows to specify a custom label for the element and/or field to be used in the UI. If a value is not specified, the name is inferred from the annotated element's name.";
@@ -68,6 +72,8 @@ class MuleOperationExtensionModelDeclarer {
       "Allows to specify an example for a parameter to be used in the UI. This example is not related to the default value of an optional parameter, it's only for the purpose of showing how does a possible value look like.";
   private static final String PARAMETER_IS_TEXT_DESCRIPTION =
       "Marks a parameter as one that supports a multi line string input both in the editor (when it is populated from the UI) and in the DSL. This tag should only be used with string parameters.";
+  private static final String PARAMETER_SECRET_TYPE_DESCRIPTION =
+      "If present, it indicates the secret type. UI elements accessing the annotated parameter should implement masking. This annotation should only be used with parameters.";
   private static final String PARAMETER_PLACEMENT_ORDER_DESCRIPTION =
       "Gives the annotated parameter a relative order within its group. The value provided may be repeated and in that case the order is not guaranteed. The value is relative meaning that the element with order 10 is on top than one with value 25.";
 
@@ -362,6 +368,12 @@ class MuleOperationExtensionModelDeclarer {
         .describedAs(PARAMETER_IS_TEXT_DESCRIPTION)
         .ofType(BOOLEAN_TYPE)
         .withDisplayModel(display("Text", PARAMETER_IS_TEXT_DESCRIPTION))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterMetadataAttributes.withOptionalParameter("secret")
+        .describedAs(PARAMETER_SECRET_TYPE_DESCRIPTION)
+        .ofType(SECRET_TYPE)
+        .withDisplayModel(display("Secret", PARAMETER_SECRET_TYPE_DESCRIPTION))
         .withExpressionSupport(NOT_SUPPORTED);
 
     parameterMetadataAttributes.withOptionalParameter("order")

@@ -12,6 +12,7 @@
                                               example="The example"
                                               summary="The summary"
                                               text="true"
+                                              secret="CLIENT_SECRET"
                                               order="4">
                     <operation:path type="FILE"
                                     acceptsUrls="false"

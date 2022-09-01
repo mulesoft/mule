@@ -396,6 +396,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="secret" type="secretType" />
         <xsd:attribute name="order" type="xsd:int">
             <xsd:annotation>
                 <xsd:documentation>
@@ -489,6 +490,27 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="secretType">
+        <xsd:annotation>
+            <xsd:documentation>
+                If present, it indicates the secret type.
+                UI elements accessing the annotated parameter should implement masking.
+                This annotation should only be used with parameters.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CLIENT_ID" />
+            <xsd:enumeration value="CLIENT_SECRET" />
+            <xsd:enumeration value="TOKEN_ID" />
+            <xsd:enumeration value="TOKEN_URL_TEMPLATE" />
+            <xsd:enumeration value="TOKEN_SECRET" />
+            <xsd:enumeration value="API_KEY" />
+            <xsd:enumeration value="SECRET_TOKEN" />
+            <xsd:enumeration value="SECURITY_TOKEN" />
+            <xsd:enumeration value="RSA_PRIVATE_KEY" />
+            <xsd:enumeration value="SECRET" />
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>
