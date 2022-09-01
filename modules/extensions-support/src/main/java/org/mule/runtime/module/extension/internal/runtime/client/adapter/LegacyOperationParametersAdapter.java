@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.adapter;
 
+import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.extension.api.client.OperationParameters;
+import org.mule.runtime.extension.internal.client.InternalOperationParameters;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,9 +20,10 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class LegacyOperationParametersAdapter implements OperationParameters {
+public class LegacyOperationParametersAdapter implements InternalOperationParameters {
 
   private final org.mule.sdk.api.client.OperationParameters delegate;
+  private Event contextEvent;
 
   public LegacyOperationParametersAdapter(org.mule.sdk.api.client.OperationParameters delegate) {
     this.delegate = delegate;
@@ -32,5 +37,21 @@ public class LegacyOperationParametersAdapter implements OperationParameters {
   @Override
   public Map<String, Object> get() {
     return delegate.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<Event> getContextEvent() {
+    return ofNullable(contextEvent);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setContextEvent(Event contextEvent) {
+    this.contextEvent = contextEvent;
   }
 }

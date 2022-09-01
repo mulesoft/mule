@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
@@ -50,6 +49,7 @@ import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.internal.client.InternalOperationParameters;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
@@ -126,8 +126,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
     OperationClient client = clientCache.get(key);
 
-    CoreEvent contextEvent = parameterizer.getContextEvent();
     boolean shouldCompleteEvent = false;
+    CoreEvent contextEvent = parameterizer.getContextEvent().orElse(null);
     if (contextEvent == null) {
       contextEvent = getNullEvent(muleContext);
       shouldCompleteEvent = true;
@@ -139,8 +139,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
     ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
                                                                                     key.getExtensionModel(),
-                                                                                    getConfigurationInstance(key
-                                                                                        .getConfigurationProvider()),
+                                                                                    getConfigurationInstance(
+                                                                                        key.getConfigurationProvider(),
+                                                                                        contextEvent),
                                                                                     resolvedParams,
                                                                                     operationModel,
                                                                                     contextEvent,
@@ -173,8 +174,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private Optional<ConfigurationInstance> getConfigurationInstance(Optional<ConfigurationProvider> configurationProvider) {
-    return configurationProvider.map(config -> withNullEvent(config::get));
+  private Optional<ConfigurationInstance> getConfigurationInstance(Optional<ConfigurationProvider> configurationProvider,
+                                                                   CoreEvent contextEvent) {
+    return configurationProvider.map(config -> config.get(contextEvent));
   }
 
   private OperationKey toKey(String extensionName,
@@ -307,6 +309,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                           });
                           parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
                           configureLegacyRepeatableStreaming(parameterizer, operationModel);
+                          setContextEvent(parameterizer, parameters);
                         });
   }
 
@@ -338,6 +341,12 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       setDefaultRepeatableIterables(parameterizer);
     } else if (operationModel.supportsStreaming()) {
       setDefaultRepeatableStreaming(parameterizer);
+    }
+  }
+
+  private void setContextEvent(OperationParameterizer parameterizer, OperationParameters parameters) {
+    if (parameters instanceof InternalOperationParameters) {
+      ((InternalOperationParameters) parameters).getContextEvent().ifPresent(parameterizer::inTheContextOf);
     }
   }
 

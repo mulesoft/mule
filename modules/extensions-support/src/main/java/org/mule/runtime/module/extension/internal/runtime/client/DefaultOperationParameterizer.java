@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 
 import org.mule.runtime.api.event.Event;
@@ -29,9 +30,10 @@ import org.mule.runtime.extension.api.component.ComponentParameterization;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
-class DefaultOperationParameterizer implements OperationParameterizer {
+class DefaultOperationParameterizer implements InternalOperationParameterizer {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
   private String configRef;
@@ -143,8 +145,8 @@ class DefaultOperationParameterizer implements OperationParameterizer {
     return retryPolicyTemplate;
   }
 
-  public CoreEvent getContextEvent() {
-    return contextEvent;
+  public Optional<CoreEvent> getContextEvent() {
+    return ofNullable(contextEvent);
   }
 
   void setValuesOn(ComponentParameterization.Builder<OperationModel> builder) {

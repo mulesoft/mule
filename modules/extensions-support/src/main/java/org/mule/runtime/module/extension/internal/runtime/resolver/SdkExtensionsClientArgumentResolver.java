@@ -18,14 +18,14 @@ import org.mule.runtime.module.extension.internal.runtime.client.adapter.SdkExte
  */
 public class SdkExtensionsClientArgumentResolver implements ArgumentResolver<org.mule.sdk.api.client.ExtensionsClient> {
 
-  private final ExtensionsClient extensionsClient;
+  private final ExtensionsClientArgumentResolver delegate;
 
   public SdkExtensionsClientArgumentResolver(ExtensionsClient extensionsClient) {
-    this.extensionsClient = extensionsClient;
+    delegate = new ExtensionsClientArgumentResolver(extensionsClient);
   }
 
   @Override
   public org.mule.sdk.api.client.ExtensionsClient resolve(ExecutionContext executionContext) {
-    return new SdkExtensionsClientAdapter(extensionsClient);
+    return new SdkExtensionsClientAdapter(delegate.resolve(executionContext));
   }
 }
