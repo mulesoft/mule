@@ -16,6 +16,8 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static io.opentelemetry.api.common.AttributeKey.booleanKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
@@ -37,6 +39,7 @@ import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapGetter;
+import org.slf4j.Logger;
 
 /**
  * A {@link InternalSpanExporter} that exports the {@link InternalSpan}'s as Open Telemetry spans.
@@ -60,6 +63,8 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   public static final AttributeKey<String> EXCEPTION_STACK_TRACE_KEY = stringKey("exception.stacktrace");
   public static final AttributeKey<Boolean> EXCEPTION_ESCAPED_KEY = booleanKey("exception.escaped");
 
+  private static final Logger LOGGER = getLogger(OpentelemetrySpanExporter.class);
+
   private final Tracer tracer;
   private final Context remoteContext;
   private final io.opentelemetry.api.trace.Span openTelemetrySpan;
@@ -77,6 +82,8 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       recordSpanExceptions(internalSpan);
     }
     openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
+    LOGGER.error("ENDING " + internalSpan.getName() + " span: " + internalSpan.getIdentifier() +
+        " Correlation id: " + internalSpan.getAttribute("correlationId"));
   }
 
   @Override
@@ -138,8 +145,12 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
     }
 
-    return spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
+    io.opentelemetry.api.trace.Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
+    LOGGER.error("Open telemetry span: " + internalSpan.getName() + " span id: " + span.getSpanContext().getSpanId()
+        + " Trace id: " + span.getSpanContext().getTraceId() +
+        " Correlation id: " + internalSpan.getAttribute("correlationId"));
+    return span;
   }
 
   public io.opentelemetry.api.trace.Span getOpenTelemetrySpan() {
