@@ -450,6 +450,8 @@ public class CompilerUtils {
 
       options.addAll(processProperties);
 
+      options.addAll(Arrays.asList("--release", "8"));
+
       return options;
     }
   }
