@@ -450,6 +450,8 @@ public class CompilerUtils {
 
       options.addAll(processProperties);
 
+      // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing what
+      // happens when deploying.
       options.addAll(Arrays.asList("--release", "8"));
 
       return options;
