@@ -34,6 +34,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Parser for the parameter metadata, including the {@link DisplayModel}, the {@link LayoutModel}, and the semantic terms.
+ *
+ * @since 4.5.0
+ */
 public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
 
   private static final String PARAMETER_LAYOUT_DSL_KEY = "parameter-metadata";
