@@ -29,13 +29,14 @@ import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
+import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.delegate.ParameterModelsLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
@@ -47,10 +48,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
-import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Extension;
+import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +69,8 @@ public class SinceMuleVersionTestCase {
 	}
 
 	private JavaExtensionModelParserFactory createExtensionParserFactoryForSinceMuleVersionModelProperty(DefaultExtensionLoadingContext loadingContext, Optional<SinceMuleVersionModelProperty> property) {
-		DefaultAnyType anyType = new DefaultAnyType(MetadataFormat.JAVA, ImmutableMap.of());
+		DefaultAnyType defaultAnyType = new DefaultAnyType(MetadataFormat.JAVA, ImmutableMap.of());
+		DefaultOutputModelParser defaultOutputModelParser = new DefaultOutputModelParser(defaultAnyType, false);
 
 		ConnectionProviderModelParser connectionProviderModelParser = mock(ConnectionProviderModelParser.class);
 		when(connectionProviderModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
@@ -82,7 +85,6 @@ public class SinceMuleVersionTestCase {
 		OperationModelParser operationModelParser = mock(OperationModelParser.class);
 		when(operationModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
 		when(operationModelParser.getName()).thenReturn(this.getClass().getName());
-		DefaultOutputModelParser defaultOutputModelParser = new DefaultOutputModelParser(anyType, false);
 		when(operationModelParser.getOutputType()).thenReturn(defaultOutputModelParser);
 		when(operationModelParser.getAttributesOutputType()).thenReturn(defaultOutputModelParser);
 
@@ -90,7 +92,7 @@ public class SinceMuleVersionTestCase {
 		when(parameterModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
 		when(parameterModelParser.getName()).thenReturn(this.getClass().getName());
 		when(parameterModelParser.getRole()).thenReturn(ParameterRole.PRIMARY_CONTENT);
-		when(parameterModelParser.getType()).thenReturn(anyType);
+		when(parameterModelParser.getType()).thenReturn(defaultAnyType);
 		ParameterGroupModelParser parameterGroupModelParser = mock(ParameterGroupModelParser.class);
 		when(parameterGroupModelParser.getParameterParsers()).thenReturn(ImmutableList.of(parameterModelParser));
 		when(parameterGroupModelParser.getName()).thenReturn(this.getClass().getName());
@@ -103,6 +105,13 @@ public class SinceMuleVersionTestCase {
 		when(configurationModelParser.getParameterGroupParsers()).thenReturn(ImmutableList.of(parameterGroupModelParser));
 		when(configurationModelParser.getConfigurationFactoryModelProperty()).thenReturn(configurationFactoryModelProperty);
 
+		SourceModelParser sourceModelParser = mock(SourceModelParser.class);
+		when(sourceModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+		when(sourceModelParser.getName()).thenReturn(this.getClass().getName());
+		when(sourceModelParser.getOutputType()).thenReturn(defaultOutputModelParser);
+		when(sourceModelParser.getAttributesOutputType()).thenReturn(defaultOutputModelParser);
+		when(sourceModelParser.getSourceClusterSupportModelProperty()).thenReturn(new SourceClusterSupportModelProperty(SourceClusterSupport.NOT_SUPPORTED));
+
 		ExtensionElement extensionElement = JavaExtensionModelParserFactory.getExtensionElement(loadingContext);
 		StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(loadingContext);
 		ExtensionModelParser parser = spy(new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, loadingContext));
@@ -110,6 +119,7 @@ public class SinceMuleVersionTestCase {
 		when(parser.getFunctionModelParsers()).thenReturn(ImmutableList.of(functionModelParser));
 		when(parser.getOperationModelParsers()).thenReturn(ImmutableList.of(operationModelParser));
 		when(parser.getConfigurationParsers()).thenReturn(ImmutableList.of(configurationModelParser));
+		when(parser.getSourceModelParsers()).thenReturn(ImmutableList.of(sourceModelParser));
 		when(parser.getSinceMuleVersionModelProperty()).thenReturn(property);
 
 		JavaExtensionModelParserFactory parserFactory = mock(JavaExtensionModelParserFactory.class);
@@ -206,6 +216,17 @@ public class SinceMuleVersionTestCase {
 		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
 	}
 
+	private void assertSourceDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+
+		List<SourceDeclaration> sourceDeclarationList = extensionDeclaration.getMessageSources();
+		assertThat(sourceDeclarationList.size()).isEqualTo(1);
+		SourceDeclaration sourceDeclaration = sourceDeclarationList.get(0);
+
+		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = sourceDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+	}
+
 	@Test
 	public void testExtensionDeclarationWithSinceMuleVersionModelProperty() {
 		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
@@ -276,6 +297,18 @@ public class SinceMuleVersionTestCase {
 	public void testParameterDeclarationWithoutSinceMuleVersionModelProperty() {
 		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
 		assertParameterDeclarationForSinceMuleVersionModelProperty(property);
+	}
+
+	@Test
+	public void testSourceDeclarationWithSinceMuleVersionModelProperty() {
+		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+		assertSourceDeclarationForSinceMuleVersionModelProperty(property);
+	}
+
+	@Test
+	public void testSourceDeclarationWithoutSinceMuleVersionModelProperty() {
+		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+		assertSourceDeclarationForSinceMuleVersionModelProperty(property);
 	}
 
 	@Extension(name = DummyExtension.NAME, category = SELECT)
