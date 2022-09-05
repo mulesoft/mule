@@ -33,7 +33,7 @@
 
     <operation:def name="operationWithOneBlockingChild" displayName="Operation with one BLOCKING child" summary="Operation with one BLOCKING child">
         <operation:parameters>
-            <operation:parameter name="blockingChildKey" type="string" summary="One operation key to track threads where the BLOCKING child is executed"/>
+            <operation:parameter name="blockingChildKey" type="string"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -45,7 +45,7 @@
 
     <operation:def name="operationWithOneNonBlockingChild" displayName="Operation with one NON-BLOCKING child" summary="Operation with one NON-BLOCKING child">
         <operation:parameters>
-            <operation:parameter name="nonBlockingChildKey" type="string" summary="One operation key to track threads where the NON-BLOCKING child is executed"/>
+            <operation:parameter name="nonBlockingChildKey" type="string"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -57,8 +57,8 @@
 
     <operation:def name="operationWithOneBlockingAndOneCpuLiteChildren" displayName="Operation with one BLOCKING and one CPU_LITE children" summary="Operation with one BLOCKING and one CPU_LITE children">
         <operation:parameters>
-            <operation:parameter name="blockingChildKey" type="string" summary="One operation key to track threads where the BLOCKING child is executed"/>
-            <operation:parameter name="cpuLiteChildKey" type="string" summary="One operation key to track threads where the CPU_LITE child is executed"/>
+            <operation:parameter name="blockingChildKey" type="string"/>
+            <operation:parameter name="cpuLiteChildKey" type="string"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -71,8 +71,8 @@
 
     <operation:def name="operationWithOneCpuLiteAndOneNonBlockingChildren" displayName="Operation with one CPU_LITE and one NON-BLOCKING children" summary="Operation with one CPU_LITE and one NON-BLOCKING children">
         <operation:parameters>
-            <operation:parameter name="cpuLiteChildKey" type="string" summary="One operation key to track threads where the CPU_LITE child is executed"/>
-            <operation:parameter name="nonBlockingChildKey" type="string" summary="One operation key to track threads where the NON-BLOCKING child is executed"/>
+            <operation:parameter name="cpuLiteChildKey" type="string"/>
+            <operation:parameter name="nonBlockingChildKey" type="string"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>

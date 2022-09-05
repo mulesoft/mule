@@ -25,6 +25,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
                 <xsd:sequence>
+                    <xsd:element name="parameter-metadata" type="parameterMetadataType" minOccurs="0" />
                     <xsd:element name="description" type="xsd:string" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -66,13 +67,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The support level this parameter offers regarding expressions
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="summary" type="mule:nonBlankString">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A very brief overview about the parameter.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -361,4 +355,162 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:complexType name="parameterMetadataType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Parameter metadata including display and layout information
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="path" type="pathComplexType" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="displayName" type="mule:nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Allows to specify a custom label for the element and/or field to be used in the UI. If a value is
+                    not specified, the name is inferred from the annotated element's name.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="summary" type="mule:nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A very brief overview about the parameter.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="example" type="mule:nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Allows to specify an example for a parameter to be used in the UI. This example is not related to
+                    the default value of an optional parameter, it's only for the purpose of showing how does a possible
+                    value look like.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="text" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Marks a parameter as one that supports a multi line string input both in the editor (when it is
+                    populated from the UI) and in the DSL. This tag should only be used with string parameters.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="secret" type="secretType" />
+        <xsd:attribute name="order" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Gives the annotated parameter a relative order within its group. The value provided may be repeated
+                    and in that case the order is not guaranteed.
+                    The value is relative meaning that the element with order 10 is on top than one with value 25.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    <xsd:complexType name="pathComplexType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Marks parameter as a path to a file or directory. This tag should only be used with string parameters.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="type" type="pathType" />
+        <xsd:attribute name="acceptsUrls" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Whether the path parameter also supports urls.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="location" type="pathLocation" />
+        <xsd:attribute name="acceptedFileExtensions" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Comma separated enumeration of the file extensions that this path handles. Only valid when the path
+                    type isn't a DIRECTORY.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:simpleType name="pathType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Whether the path is to a directory or a file. The possible values are DIRECTORY, FILE, and ANY.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="DIRECTORY" >
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Indicates that the path value only accepts directory paths.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="FILE" >
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Indicates that the path value only accepts specific file paths.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ANY" >
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Indicates that the path value accepts both file or directory paths.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="pathLocation">
+        <xsd:annotation>
+            <xsd:documentation>
+                A classifier for the path's generic location. The possible values are EMBEDDED, EXTERNAL, and ANY.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="EMBEDDED" >
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The path points to a resource embedded into the Mule application.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="EXTERNAL" >
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The path points to a resource outside of the Mule application.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ANY" >
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The path can be embedded or external.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="secretType">
+        <xsd:annotation>
+            <xsd:documentation>
+                If present, it indicates the secret type.
+                UI elements accessing the annotated parameter should implement masking.
+                This annotation should only be used with parameters.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CLIENT_ID" />
+            <xsd:enumeration value="CLIENT_SECRET" />
+            <xsd:enumeration value="TOKEN_ID" />
+            <xsd:enumeration value="TOKEN_URL_TEMPLATE" />
+            <xsd:enumeration value="TOKEN_SECRET" />
+            <xsd:enumeration value="API_KEY" />
+            <xsd:enumeration value="SECRET_TOKEN" />
+            <xsd:enumeration value="SECURITY_TOKEN" />
+            <xsd:enumeration value="RSA_PRIVATE_KEY" />
+            <xsd:enumeration value="SECRET" />
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

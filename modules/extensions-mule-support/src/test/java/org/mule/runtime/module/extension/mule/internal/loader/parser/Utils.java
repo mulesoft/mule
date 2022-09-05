@@ -59,9 +59,9 @@ final class Utils {
    * @return the mock {@link ComponentAst}.
    */
   public static ComponentAst mockDeprecatedAst(String since, String message, String toRemoveIn) {
-    ComponentParameterAst sinceAst = stringParameterAst(since);
-    ComponentParameterAst messageAst = stringParameterAst(message);
-    ComponentParameterAst toRemoveInAst = stringParameterAst(toRemoveIn);
+    ComponentParameterAst sinceAst = singleParameterAst(since);
+    ComponentParameterAst messageAst = singleParameterAst(message);
+    ComponentParameterAst toRemoveInAst = singleParameterAst(toRemoveIn);
 
     ComponentAst deprecatedAst = mock(ComponentAst.class);
     when(deprecatedAst.getParameter(DEFAULT_GROUP_NAME, "since")).thenReturn(sinceAst);
@@ -72,13 +72,13 @@ final class Utils {
   }
 
   /**
-   * Creates a mock {@link ComponentParameterAst} with a single String.
+   * Creates a mock {@link ComponentParameterAst} with a single value.
    *
-   * @param value the String value.
+   * @param value the value.
    *
    * @return the mock {@link ComponentParameterAst}.
    */
-  public static ComponentParameterAst stringParameterAst(String value) {
+  public static <T> ComponentParameterAst singleParameterAst(T value) {
     ComponentParameterAst parameterAst = mock(ComponentParameterAst.class);
     when(parameterAst.getValue()).thenReturn(right(value));
     return parameterAst;
@@ -113,7 +113,7 @@ final class Utils {
   private static void mockTypeElement(ComponentAst outputAst, String elementName, String typeName) {
     when(outputAst.directChildrenStreamByIdentifier(null, elementName)).thenAnswer(invocation -> {
       if (typeName != null) {
-        ComponentParameterAst attributesTypeParameterAst = stringParameterAst(typeName);
+        ComponentParameterAst attributesTypeParameterAst = singleParameterAst(typeName);
         ComponentAst attributesTypeAst = mock(ComponentAst.class);
         when(attributesTypeAst.getIdentifier())
             .thenReturn(ComponentIdentifier.builder().namespace("this").name(elementName).build());

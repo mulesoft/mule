@@ -11,15 +11,13 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAnnotation;
@@ -64,6 +62,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   private String name;
   private MetadataType type;
   private List<StereotypeModel> allowedStereotypes = emptyList();
+  private ParameterLayoutParser parameterLayoutParser;
 
   public MuleSdkParameterModelParserSdk(ComponentAst parameterAst, TypeLoader typeLoader,
                                         ExtensionModelHelper extensionModelHelper) {
@@ -75,8 +74,17 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   }
 
   private void parseStructure() {
-    name = getParameter(parameterAst, "name");
+    parseName();
     parseType();
+    parseLayout();
+  }
+
+  private void parseLayout() {
+    parameterLayoutParser = new ParameterLayoutParser(parameterAst);
+  }
+
+  private void parseName() {
+    name = getParameter(parameterAst, "name");
   }
 
   private void parseType() {
@@ -185,7 +193,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Optional<LayoutModel> getLayoutModel() {
-    return empty();
+    return parameterLayoutParser.getLayoutModel();
   }
 
   @Override
@@ -220,11 +228,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    String summary = getParameter(parameterAst, "summary");
-    if (!isBlank(summary)) {
-      return of(DisplayModel.builder().summary(summary).build());
-    }
-    return empty();
+    return parameterLayoutParser.getDisplayModel();
   }
 
   @Override
@@ -234,6 +238,6 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Set<String> getSemanticTerms() {
-    return emptySet();
+    return unmodifiableSet(parameterLayoutParser.getSemanticTerms());
   }
 }
