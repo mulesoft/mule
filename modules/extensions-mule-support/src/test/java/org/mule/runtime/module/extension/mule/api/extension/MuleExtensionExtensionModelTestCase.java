@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.rules.ExpectedException.none;
@@ -35,14 +34,12 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -78,10 +75,14 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
     ArtifactAst extensionAst = getArtifactAst();
     ComponentAst extensionComponentAst = getRootComponent(extensionAst);
 
-    // In this test config there is only one operation
-    assertThat(extensionComponentAst.directChildren(), hasSize(1));
+    List<ComponentAst> operationsComponentAst = extensionComponentAst.directChildrenStream()
+        .filter(c -> c.getComponentType() == OPERATION_DEF)
+        .collect(Collectors.toList());
 
-    ComponentAst operationComponentAst = extensionComponentAst.directChildren().get(0);
+    // In this test config there is only one operation
+    assertThat(operationsComponentAst, hasSize(1));
+
+    ComponentAst operationComponentAst = operationsComponentAst.get(0);
     assertThat(operationComponentAst.getIdentifier(), is(buildFromStringRepresentation("operation:def")));
     assertThat(operationComponentAst.getComponentType(), is(OPERATION_DEF));
     assertThat(operationComponentAst.getExtensionModel().getName(), is("Mule Operations DSL"));
@@ -93,17 +94,19 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
 
     ComponentAst extensionComponentAst = getRootComponent(extensionAst);
 
-    Map<String, Matcher<Object>> expectedParameters = new LinkedHashMap<>();
-    expectedParameters.put("name", is("Fully Parameterized Extension"));
-    expectedParameters.put("category", is("PREMIUM"));
-    expectedParameters.put("vendor", is("Extension Producers Inc."));
-    expectedParameters.put("requiredEntitlement", is("Premium Extension"));
-    expectedParameters.put("requiresEnterpriseLicense", is(true));
-    expectedParameters.put("allowsEvaluationLicense", is(false));
-    expectedParameters.put("namespace", is("http://www.mulesoft.org/schema/a/different/path/mule/fully-parameterized"));
-    expectedParameters.put("prefix", is("fully-param"));
+    ComponentAst descriptionComponentAst = getChild(extensionComponentAst, "description");
+    ComponentAst licensingComponentAst = getChild(descriptionComponentAst, "licensing");
+    ComponentAst xmlDslAttributesComponentAst = getChild(descriptionComponentAst, "xml-dsl-attributes");
 
-    assertThatParametersAreExactly(extensionComponentAst, expectedParameters);
+    assertThat(getParameterValue(descriptionComponentAst, "name"), is("Fully Parameterized Extension"));
+    assertThat(getParameterValue(descriptionComponentAst, "category"), is("PREMIUM"));
+    assertThat(getParameterValue(descriptionComponentAst, "vendor"), is("Extension Producers Inc."));
+    assertThat(getParameterValue(licensingComponentAst, "requiredEntitlement"), is("Premium Extension"));
+    assertThat(getParameterValue(licensingComponentAst, "requiresEnterpriseLicense"), is(true));
+    assertThat(getParameterValue(licensingComponentAst, "allowsEvaluationLicense"), is(false));
+    assertThat(getParameterValue(xmlDslAttributesComponentAst, "namespace"),
+               is("http://www.mulesoft.org/schema/a/different/path/mule/fully-parameterized"));
+    assertThat(getParameterValue(xmlDslAttributesComponentAst, "prefix"), is("fully-param"));
   }
 
   @Test
@@ -112,23 +115,29 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
 
     ComponentAst extensionComponentAst = getRootComponent(extensionAst);
 
-    Map<String, Matcher<Object>> expectedParameters = new LinkedHashMap<>();
-    expectedParameters.put("name", is("Minimally Parameterized Extension"));
-    expectedParameters.put("category", is(COMMUNITY.name()));
-    expectedParameters.put("vendor", is(MULESOFT));
-    expectedParameters.put("requiredEntitlement", is(nullValue()));
-    expectedParameters.put("requiresEnterpriseLicense", is(false));
-    expectedParameters.put("allowsEvaluationLicense", is(true));
-    expectedParameters.put("namespace", is(nullValue()));
-    expectedParameters.put("prefix", is(nullValue()));
+    ComponentAst descriptionComponentAst = getChild(extensionComponentAst, "description");
+    Optional<ComponentAst> licensingComponentAst = getOptionalChild(descriptionComponentAst, "licensing");
+    Optional<ComponentAst> xmlDslAttributesComponentAst = getOptionalChild(descriptionComponentAst, "xml-dsl-attributes");
 
-    assertThatParametersAreExactly(extensionComponentAst, expectedParameters);
+    assertThat(getParameterValue(descriptionComponentAst, "name"), is("Minimally Parameterized Extension"));
+    assertThat(getParameterValue(descriptionComponentAst, "category"), is(COMMUNITY.name()));
+    assertThat(getParameterValue(descriptionComponentAst, "vendor"), is(MULESOFT));
+
+    assertThat(licensingComponentAst.isPresent(), is(false));
+    assertThat(xmlDslAttributesComponentAst.isPresent(), is(false));
+  }
+
+  @Test
+  public void extensionWithoutDescriptionFailsWhenParsing() {
+    expected.expect(MuleRuntimeException.class);
+    expected.expectMessage(containsString("The content of element 'extension' is not complete"));
+    getArtifactAst("extensions/extension-without-description.xml");
   }
 
   @Test
   public void extensionWithoutNameFailsWhenParsing() {
     expected.expect(MuleRuntimeException.class);
-    expected.expectMessage(containsString("Attribute 'name' must appear on element 'extension'"));
+    expected.expectMessage(containsString("Attribute 'name' must appear on element 'description'"));
     getArtifactAst("extensions/extension-without-name.xml");
   }
 
@@ -160,13 +169,6 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
     assertThat(extensionIdentifier.getNamespaceUri(), is("http://www.mulesoft.org/schema/mule/mule-extension"));
 
     return onlyTopLevelComponent;
-  }
-
-  private void assertThatParametersAreExactly(ComponentAst componentAst, Map<String, Matcher<Object>> expectedParameters) {
-    assertThat(componentAst.getParameters(), hasSize(expectedParameters.size()));
-    for (Entry<String, Matcher<Object>> entry : expectedParameters.entrySet()) {
-      assertThat(getParameterValue(componentAst, entry.getKey()), entry.getValue());
-    }
   }
 
   private <T> T getParameterValue(ComponentAst componentAst, String paramName) {

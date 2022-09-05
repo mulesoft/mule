@@ -87,9 +87,16 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   @Test
-  public void whenExtensionIsNotValidThenFailsDuringParsingValidations() {
+  public void whenExtensionWithoutDescriptionThenFailsDuringParsingValidations() {
     expectedException.expect(RuntimeException.class);
-    expectedException.expectMessage("Attribute 'name' must appear on element 'extension'");
+    expectedException.expectMessage("The content of element 'extension' is not complete.");
+    getExtensionModelFrom("extensions/extension-without-description.xml");
+  }
+
+  @Test
+  public void whenExtensionDoesNotHaveNameThenFailsDuringParsingValidations() {
+    expectedException.expect(RuntimeException.class);
+    expectedException.expectMessage("Attribute 'name' must appear on element 'description'");
     getExtensionModelFrom("extensions/extension-without-name.xml");
   }
 

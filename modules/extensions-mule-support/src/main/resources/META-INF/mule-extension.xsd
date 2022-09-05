@@ -20,14 +20,12 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="extensionDefType">
+    <xsd:complexType name="extensionDescriptionType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
-                <xsd:sequence maxOccurs="unbounded" minOccurs="1">
-                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                        <!-- configs, connections, sources and functions may be added here eventually /-->
-                        <xsd:element ref="operation:def" />
-                    </xsd:choice>
+                <xsd:sequence maxOccurs="unbounded">
+                    <xsd:element name="licensing" type="extensionLicensingType" minOccurs="0"/>
+                    <xsd:element name="xml-dsl-attributes" type="extensionXmlDslAttributesType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
@@ -50,6 +48,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="extensionLicensingType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
                 <xsd:attribute name="requiredEntitlement" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -71,7 +76,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- DSL XML attributes -->
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="extensionXmlDslAttributesType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
                 <xsd:attribute name="namespace" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -89,6 +100,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="extensionDefType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence maxOccurs="unbounded">
+                    <xsd:element name="description" type="extensionDescriptionType"/>
+                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                        <!-- configs, connections, sources and functions may be added here eventually /-->
+                        <xsd:element ref="operation:def"/>
+                    </xsd:choice>
+                </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
