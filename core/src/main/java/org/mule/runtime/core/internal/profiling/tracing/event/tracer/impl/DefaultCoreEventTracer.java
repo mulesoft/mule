@@ -12,26 +12,30 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.DefaultSpanError;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
+import org.slf4j.Logger;
 
 /**
  * A default implementation for a {@link CoreEventTracer}.
@@ -90,6 +94,35 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                 logger);
   }
 
+  @Override
+  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+    recordErrorAtCurrentSpan(coreEvent, () -> coreEvent.getError()
+        .orElseThrow(() -> new IllegalArgumentException(String.format("Provided coreEvent [%s] does not declare an error.",
+                                                                      coreEvent))),
+                             isErrorEscapingCurrentSpan);
+  }
+
+  @Override
+  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> spanError, boolean isErrorEscapingCurrentSpan) {
+    safeExecute(() -> {
+      EventContext eventContext = coreEvent.getContext();
+      if (eventContext instanceof DistributedTraceContextAware) {
+        ((DistributedTraceContextAware) eventContext)
+            .getDistributedTraceContext()
+            .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
+                                                           isErrorEscapingCurrentSpan));
+      }
+    }, "Error recording a span error at current span", propagationOfExceptionsInTracing, logger);
+  }
+
+  @Override
+  public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
+    return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
+                                             emptyMap(),
+                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
+                                             logger);
+  }
+
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
     EventContext eventContext = coreEvent.getContext();
 
@@ -102,21 +135,13 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     return currentSpan;
   }
 
-  @Override
-  public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
-    return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
-                                             emptyMap(),
-                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
-                                             logger);
-  }
-
   private Map<String, String> doGetDistributedTraceContextMap(CoreEvent coreEvent) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
       DistributedTraceContext distributedTraceContext =
           ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
       ExportOnEndSpan span = distributedTraceContext.getCurrentSpan().map(
-                                                                          this::getInternalSpanOpentelemetryExecutionSpanFunction)
+                                                                          this::getInternalSpanOpenTelemetryExecutionSpanFunction)
           .orElse(null);
 
       if (span == null) {
@@ -142,7 +167,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
   }
 
-  private ExportOnEndSpan getInternalSpanOpentelemetryExecutionSpanFunction(InternalSpan internalSpan) {
+  private ExportOnEndSpan getInternalSpanOpenTelemetryExecutionSpanFunction(InternalSpan internalSpan) {
     if (internalSpan instanceof ExportOnEndSpan) {
       return (ExportOnEndSpan) internalSpan;
     }

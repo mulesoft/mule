@@ -15,9 +15,9 @@ package org.mule.runtime.core.internal.profiling.tracing.export;
 public interface InternalSpanExporterVisitor<T> {
 
   /**
-   * @param opentelemetrySpanExporter the {@link OpentelemetrySpanExporter} to accept
+   * @param opentelemetrySpanExporter the {@link OpenTelemetrySpanExporter} to accept
    * @return the result of visiting the instnce.
    */
-  T accept(OpentelemetrySpanExporter opentelemetrySpanExporter);
+  T accept(OpenTelemetrySpanExporter opentelemetrySpanExporter);
 
 }

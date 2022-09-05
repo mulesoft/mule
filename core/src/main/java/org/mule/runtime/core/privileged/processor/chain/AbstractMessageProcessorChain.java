@@ -53,6 +53,7 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -71,6 +72,7 @@ import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
@@ -209,19 +211,21 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
       return subscriberContext()
           .flatMapMany(ctx -> {
-            // take into account events that might still be in an error handler to keep the flux from completing until those are
+            // Take into account events that might still be in an error handler to keep the flux from completing until those are
             // finished.
             final AtomicInteger inflightEvents = new AtomicInteger();
 
             final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> {
-                          // End MessageProcessor chain span.
+                          // End current (MessageProcessor chain) Span.
                           muleEventTracer.endCurrentSpan(handled);
                           errorSwitchSinkSinkRef.next(right(handled));
                         },
                         rethrown -> {
-                          // End MessageProcessor chain span.
+                          // Record the error and end current (MessageProcessor chain) Span.
+                          muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) rethrown).getEvent(),
+                                                                   resolveError((MessagingException) rethrown), true);
                           muleEventTracer.endCurrentSpan(((MessagingException) rethrown).getEvent());
                           errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
                         }));
@@ -229,7 +233,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
                   inflightEvents.incrementAndGet();
-                  // End current Processor span.
+                  // Record the error and end current (Processor) Span.
+                  muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(), true);
                   muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
                   routeError(errorRouter, throwable);
                 }));
@@ -258,13 +263,26 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     } else {
       return doApply(publisher, interceptors, (context, throwable) -> {
-        // End current Processor span.
+        // Record the error and end current (Processor) Span.
+        muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(), true);
         muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
-        // End MessageProcessor chain span.
+        // Record the error and end current (MessageProcessor chain) Span.
+        muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(), true);
         muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
         context.error(throwable);
       });
     }
+  }
+
+  // TODO: Remove after W-11646448: Compound error handlers are not propagating correct error.
+  private Supplier<Error> resolveError(MessagingException exception) {
+    return () -> exception.getEvent().getError().orElseGet(() -> ErrorBuilder.builder()
+        .exception(exception)
+        .description(exception.getMessage())
+        .detailedDescription(exception.getDetailedMessage())
+        .errorType(exception.getExceptionInfo().getErrorType())
+        .failingComponent(exception.getFailingComponent())
+        .build());
   }
 
   private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier) {
@@ -450,7 +468,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       postNotification(processor).accept(result);
       setCurrentEvent((PrivilegedEvent) result);
       muleEventTracer.endCurrentSpan(result);
-
 
       // If the processor returns a CursorProvider, then have the StreamingManager manage it
       return updateEventForStreaming(streamingManager).apply(result);

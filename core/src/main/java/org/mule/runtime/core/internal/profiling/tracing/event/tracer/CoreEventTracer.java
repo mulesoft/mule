@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.tracing.Span;
+import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
@@ -16,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
+import java.util.function.Supplier;
 
 /**
  * A tracer for {@link CoreEvent}'s.
@@ -55,7 +60,27 @@ public interface CoreEventTracer {
   void endCurrentSpan(CoreEvent coreEvent);
 
   /**
-   * @param event the event to retrieve the distributed trace context map from
+   * Records a {@link SpanError} as part of the current {@link Span}.
+   * 
+   * @param coreEvent                  The event to retrieve the distributed trace context from.
+   * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
+   *                                   {@link Span} containing the error represents.
+   */
+  void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan);
+
+  /**
+   * Records a {@link SpanError} as part of the current {@link Span}.
+   * 
+   * @param coreEvent                  The event to retrieve the distributed trace context from.
+   * @param errorSupplier              Supplier of the {@link Error} that occurred.
+   * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
+   *                                   {@link Span} containing the error represents.
+   */
+  // TODO: W-11646448: Compound error handlers are not propagating correct error.
+  void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan);
+
+  /**
+   * @param event The event to retrieve the distributed trace context from.
    * @return a map containing the span context to propagate.
    */
   default Map<String, String> getDistributedTraceContextMap(CoreEvent event) {

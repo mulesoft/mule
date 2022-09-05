@@ -14,6 +14,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.Intern
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
 
@@ -90,6 +91,13 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
     if (currentSpan != null) {
       currentSpan.end();
       currentSpan = resolveParentAsInternalSpan();
+    }
+  }
+
+  @Override
+  public void recordErrorAtCurrentSpan(InternalSpanError error) {
+    if (currentSpan != null) {
+      currentSpan.addError(error);
     }
   }
 

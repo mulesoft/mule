@@ -12,12 +12,15 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
+import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.internal.profiling.tracing.Clock;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
@@ -32,6 +35,7 @@ public class ExecutionSpan implements InternalSpan {
   private final Long startTime;
   private Long endTime;
   private final Map<String, String> attributes = new HashMap<>();
+  private final Set<SpanError> errors = new HashSet<>();
 
   public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime,
                        InternalSpan parent) {
@@ -63,8 +67,23 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
+  public Set<SpanError> getErrors() {
+    return errors;
+  }
+
+  @Override
+  public boolean hasErrors() {
+    return !errors.isEmpty();
+  }
+
+  @Override
   public void end() {
     this.endTime = Clock.getDefault().now();
+  }
+
+  @Override
+  public void addError(InternalSpanError error) {
+    this.errors.add(error);
   }
 
   @Override

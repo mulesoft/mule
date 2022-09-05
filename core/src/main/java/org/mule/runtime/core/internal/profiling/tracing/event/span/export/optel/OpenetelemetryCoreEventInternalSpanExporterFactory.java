@@ -14,15 +14,11 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.export
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractDefaultAttributesResolvingSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
-import org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter;
+import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
-
-import io.opentelemetry.api.trace.Tracer;
 
 /**
  * A factory for exporting spans associated to events.
@@ -52,7 +48,7 @@ public class OpenetelemetryCoreEventInternalSpanExporterFactory {
    * @return the result exporter.
    */
   public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, InternalSpan internalSpan) {
-    return new OpentelemetrySpanExporter(getOpenTelemetryTracer(CONFIGURATION, muleConfiguration.getId()), eventContext,
+    return new OpenTelemetrySpanExporter(getOpenTelemetryTracer(CONFIGURATION, muleConfiguration.getId()), eventContext,
                                          internalSpan);
   }
 

@@ -7,23 +7,33 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static java.util.Optional.empty;
+import static java.util.Collections.emptySet;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
+import org.mule.runtime.api.profiling.tracing.Span;
+import org.mule.runtime.api.profiling.tracing.SpanDuration;
+import org.mule.runtime.api.profiling.tracing.SpanError;
+import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanVisitor;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -148,6 +158,67 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
     @Override
     public void endCurrentSpan(CoreEvent coreEvent) {
       // Nothing to do.
+    }
+
+    @Override
+    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> error, boolean isErrorEscapingCurrentSpan) {
+      // Nothing to do.
+    }
+
+    private static class NoOpInternalSpan {
+
+      public static final InternalSpan INSTANCE = new InternalSpan() {
+
+        @Override
+        public void end() {
+          // Nothing to do.
+        }
+
+        @Override
+        public void addError(InternalSpanError error) {
+          // Nothing to do.
+        }
+
+        @Override
+        public <T> T visit(InternalSpanVisitor<T> visitor) {
+          return null;
+        }
+
+        @Override
+        public Span getParent() {
+          return this;
+        }
+
+        @Override
+        public SpanIdentifier getIdentifier() {
+          return null;
+        }
+
+        @Override
+        public String getName() {
+          return "no-op";
+        }
+
+        @Override
+        public SpanDuration getDuration() {
+          return null;
+        }
+
+        @Override
+        public Set<SpanError> getErrors() {
+          return emptySet();
+        }
+
+        @Override
+        public boolean hasErrors() {
+          return false;
+        }
+      };
     }
   }
 }

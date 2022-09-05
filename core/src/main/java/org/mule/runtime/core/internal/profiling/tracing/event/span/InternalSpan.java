@@ -14,11 +14,13 @@ import static java.util.Optional.empty;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
+import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A {@link InternalSpan }used internally by the runtime. It defines an extension of the span contract that is only used
@@ -32,6 +34,14 @@ public interface InternalSpan extends Span {
    * Ends the span.
    */
   void end();
+
+
+  /**
+   * Adds to the Span the provided {@link InternalSpanError}.
+   * 
+   * @param error Error that will be added to the Span.
+   */
+  void addError(InternalSpanError error);
 
   /**
    * @return the attribute corresponding to the {@param key}
@@ -119,7 +129,22 @@ public interface InternalSpan extends Span {
     }
 
     @Override
+    public Set<SpanError> getErrors() {
+      return span.getErrors();
+    }
+
+    @Override
+    public boolean hasErrors() {
+      return span.hasErrors();
+    }
+
+    @Override
     public void end() {
+      // Nothing to do.
+    }
+
+    @Override
+    public void addError(InternalSpanError error) {
       // Nothing to do.
     }
 
