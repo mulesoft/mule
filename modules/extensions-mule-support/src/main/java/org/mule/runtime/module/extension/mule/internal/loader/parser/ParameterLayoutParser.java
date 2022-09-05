@@ -133,7 +133,7 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   }
 
   private String toSemanticTerm(String secretType) {
-    return SECRET_TYPE_TO_SEMANTIC_TERM.getOrDefault(secretType, SECRET_TYPE);
+    return SECRET_TYPE_TO_SEMANTIC_TERM.getOrDefault(secretType, SECRET);
   }
 
   private boolean setOrderIfNeeded(ComponentAst metadataAst, LayoutModelBuilder layoutModelBuilder) {
