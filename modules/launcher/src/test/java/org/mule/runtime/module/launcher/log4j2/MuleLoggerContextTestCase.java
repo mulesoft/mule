@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.util.CollectableReference.collectedByGc;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -16,7 +19,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.util.CollectableReference;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
@@ -85,6 +91,21 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
     context.updateLoggers(context.getConfiguration());
     logger.error(MESSAGE);
     assertLogged();
+  }
+
+  @Test
+  @Issue("W-11698561")
+  @Description("The MuleLoggerContext does not keep a reference to a ContextSelector which could cause a MuleArtifactClassLoader leak.")
+  public void contextDoesNotLeakContextSelectorAfterStop() {
+    contextSelector = new SimpleContextSelector();
+    context = getDefaultContext(true);
+
+    CollectableReference<ContextSelector> collectableReference = new CollectableReference<>(contextSelector);
+
+    contextSelector = null;
+    context.stop();
+
+    assertThat(collectableReference, is(eventually(collectedByGc())));
   }
 
   private void assertLogged() {

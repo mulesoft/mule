@@ -44,7 +44,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   private final URI configFile;
   private final boolean standalone;
   private final boolean logSeparationEnabled;
-  private final ContextSelector contextSelector;
+  private ContextSelector contextSelector;
   private final boolean artifactClassloader;
   private final boolean applicationClassloader;
   private final String artifactName;
@@ -168,6 +168,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     super.stop();
     // Clean up reference to avoid class loader leaks
     this.artifactDescriptor = null;
+    this.contextSelector = null;
   }
 
   @Override
@@ -175,6 +176,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     boolean result = super.stop(timeout, timeUnit);
     // Clean up reference to avoid class loader leaks
     this.artifactDescriptor = null;
+    this.contextSelector = null;
     return result;
   }
 }
