@@ -28,9 +28,9 @@ public class DisposedObjectsTracker {
   public DisposedObjectsTracker() {
     disposedObjects = new HashSet<>();
 
-    Thread maintainerThread = new Thread(this::maintain);
-    maintainerThread.start();
+    Thread maintainerThread = new Thread(this::maintainEach15Seconds);
     maintainerThread.setDaemon(true);
+    maintainerThread.start();
   }
 
   public synchronized void markThatShouldBeCollected(Object object) {
@@ -38,6 +38,17 @@ public class DisposedObjectsTracker {
       return;
     }
     disposedObjects.add(new LeakTrackReference(object));
+  }
+
+  void maintainEach15Seconds() {
+    while (true) {
+      maintain();
+      try {
+        Thread.sleep(15000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   synchronized void maintain() {
@@ -51,6 +62,7 @@ public class DisposedObjectsTracker {
                     POSSIBLE_LEAK_TIMEOUT);
       }
     }
+    disposedObjects = notYetCollected;
   }
 
   private static class LeakTrackReference<T> {
