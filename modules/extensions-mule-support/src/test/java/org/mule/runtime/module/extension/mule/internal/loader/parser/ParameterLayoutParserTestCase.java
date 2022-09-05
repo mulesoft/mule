@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.Util
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
 
+import static java.lang.String.format;
 import static java.util.stream.Stream.of;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -26,6 +27,10 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
@@ -33,6 +38,22 @@ import org.junit.Test;
 @Feature(REUSE)
 @Story(PARAMETERS)
 public class ParameterLayoutParserTestCase extends AbstractMuleTestCase {
+
+  private static final Map<String, String> EXPECTED_SEMANTIC_TERM = new HashMap<>();
+
+  static {
+    EXPECTED_SEMANTIC_TERM.put("CLIENT_ID", "connectivity.clientId");
+    EXPECTED_SEMANTIC_TERM.put("CLIENT_SECRET", "connectivity.clientSecret");
+    EXPECTED_SEMANTIC_TERM.put("TOKEN_ID", "connectivity.tokenId");
+    EXPECTED_SEMANTIC_TERM.put("PASSWORD", "connectivity.password");
+    EXPECTED_SEMANTIC_TERM.put("TOKEN_URL_TEMPLATE", "core.tokenUrlTemplate");
+    EXPECTED_SEMANTIC_TERM.put("TOKEN_SECRET", "connectivity.secretToken");
+    EXPECTED_SEMANTIC_TERM.put("API_KEY", "connectivity.apiKey");
+    EXPECTED_SEMANTIC_TERM.put("SECRET_TOKEN", "connectivity.secretToken");
+    EXPECTED_SEMANTIC_TERM.put("SECURITY_TOKEN", "connectivity.securityToken");
+    EXPECTED_SEMANTIC_TERM.put("RSA_PRIVATE_KEY", "connectivity.secret");
+    EXPECTED_SEMANTIC_TERM.put("SECRET", "connectivity.secret");
+  }
 
   @Test
   public void whenTheParameterAstHasNotMetadataThenParsedLayoutModelAndDisplayModelAreNotPresent() {
@@ -185,6 +206,24 @@ public class ParameterLayoutParserTestCase extends AbstractMuleTestCase {
     assertThat(parser.getLayoutModel().isPresent(), is(true));
     assertThat(parser.getLayoutModel().get().getOrder().isPresent(), is(true));
     assertThat(parser.getLayoutModel().get().getOrder().get(), is(3));
+  }
+
+  @Test
+  public void expectedSemanticTerms() {
+    for (Entry<String, String> entry : EXPECTED_SEMANTIC_TERM.entrySet()) {
+      assertExpectedSemanticTerm(entry.getKey(), entry.getValue());
+    }
+  }
+
+  private void assertExpectedSemanticTerm(String configuredValue, String expectedTerm) {
+    ComponentAst parameterAst = mockParameterWithLayoutAst(new MockLayoutAstBuilder().withSecret(configuredValue).build());
+    ParameterLayoutParser parser = new ParameterLayoutParser(parameterAst);
+
+    assertThat(parser.getDisplayModel().isPresent(), is(false));
+    assertThat(parser.getLayoutModel().isPresent(), is(true));
+    assertThat(parser.getLayoutModel().get().isPassword(), is(true));
+    assertThat(format("Semantic term for %s didn't match", configuredValue), parser.getSemanticTerms(),
+               containsInAnyOrder(expectedTerm));
   }
 
   private static ComponentAst emptyParameterAst() {
