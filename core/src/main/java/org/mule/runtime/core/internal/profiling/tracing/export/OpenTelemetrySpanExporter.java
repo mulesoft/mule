@@ -63,7 +63,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   public static final AttributeKey<String> EXCEPTION_STACK_TRACE_KEY = stringKey("exception.stacktrace");
   public static final AttributeKey<Boolean> EXCEPTION_ESCAPED_KEY = booleanKey("exception.escaped");
 
-  private static final Logger LOGGER = getLogger(OpentelemetrySpanExporter.class);
+  private static final Logger LOGGER = getLogger(OpenTelemetrySpanExporter.class);
 
   private final Tracer tracer;
   private final Context remoteContext;
