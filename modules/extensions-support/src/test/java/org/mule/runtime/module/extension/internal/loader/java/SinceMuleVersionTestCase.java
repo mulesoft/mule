@@ -59,277 +59,293 @@ import java.util.Optional;
 
 public class SinceMuleVersionTestCase {
 
-	private DefaultExtensionLoadingContext createExtensionLoadingContext() {
-		ClassLoader classLoader = getClass().getClassLoader();
-		DslResolvingContext resolvingContext = getDefault(emptySet());
-		DefaultExtensionLoadingContext loadingContext = new DefaultExtensionLoadingContext(classLoader, resolvingContext);
-		loadingContext.addParameter(VERSION, getProductVersion());
-		loadingContext.addParameter(EXTENSION_TYPE, DummyExtension.class);
-		return loadingContext;
-	}
+  private DefaultExtensionLoadingContext createExtensionLoadingContext() {
+    ClassLoader classLoader = getClass().getClassLoader();
+    DslResolvingContext resolvingContext = getDefault(emptySet());
+    DefaultExtensionLoadingContext loadingContext = new DefaultExtensionLoadingContext(classLoader, resolvingContext);
+    loadingContext.addParameter(VERSION, getProductVersion());
+    loadingContext.addParameter(EXTENSION_TYPE, DummyExtension.class);
+    return loadingContext;
+  }
 
-	private JavaExtensionModelParserFactory createExtensionParserFactoryForSinceMuleVersionModelProperty(DefaultExtensionLoadingContext loadingContext, Optional<SinceMuleVersionModelProperty> property) {
-		DefaultAnyType defaultAnyType = new DefaultAnyType(MetadataFormat.JAVA, ImmutableMap.of());
-		DefaultOutputModelParser defaultOutputModelParser = new DefaultOutputModelParser(defaultAnyType, false);
+  private JavaExtensionModelParserFactory createExtensionParserFactoryForSinceMuleVersionModelProperty(DefaultExtensionLoadingContext loadingContext,
+                                                                                                       Optional<SinceMuleVersionModelProperty> property) {
+    DefaultAnyType defaultAnyType = new DefaultAnyType(MetadataFormat.JAVA, ImmutableMap.of());
+    DefaultOutputModelParser defaultOutputModelParser = new DefaultOutputModelParser(defaultAnyType, false);
 
-		ConnectionProviderModelParser connectionProviderModelParser = mock(ConnectionProviderModelParser.class);
-		when(connectionProviderModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
-		when(connectionProviderModelParser.getName()).thenReturn(this.getClass().getName());
+    ConnectionProviderModelParser connectionProviderModelParser = mock(ConnectionProviderModelParser.class);
+    when(connectionProviderModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    when(connectionProviderModelParser.getName()).thenReturn(this.getClass().getName());
 
-		FunctionModelParser functionModelParser = mock(FunctionModelParser.class);
-		when(functionModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
-		when(functionModelParser.getName()).thenReturn(this.getClass().getName());
-		when(functionModelParser.getOutputType()).thenReturn(mock(OutputModelParser.class));
-		when(functionModelParser.getAdditionalModelProperties()).thenReturn(ImmutableList.of());
+    FunctionModelParser functionModelParser = mock(FunctionModelParser.class);
+    when(functionModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    when(functionModelParser.getName()).thenReturn(this.getClass().getName());
+    when(functionModelParser.getOutputType()).thenReturn(mock(OutputModelParser.class));
+    when(functionModelParser.getAdditionalModelProperties()).thenReturn(ImmutableList.of());
 
-		OperationModelParser operationModelParser = mock(OperationModelParser.class);
-		when(operationModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
-		when(operationModelParser.getName()).thenReturn(this.getClass().getName());
-		when(operationModelParser.getOutputType()).thenReturn(defaultOutputModelParser);
-		when(operationModelParser.getAttributesOutputType()).thenReturn(defaultOutputModelParser);
+    OperationModelParser operationModelParser = mock(OperationModelParser.class);
+    when(operationModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    when(operationModelParser.getName()).thenReturn(this.getClass().getName());
+    when(operationModelParser.getOutputType()).thenReturn(defaultOutputModelParser);
+    when(operationModelParser.getAttributesOutputType()).thenReturn(defaultOutputModelParser);
 
-		ParameterModelParser parameterModelParser = mock(ParameterModelParser.class);
-		when(parameterModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
-		when(parameterModelParser.getName()).thenReturn(this.getClass().getName());
-		when(parameterModelParser.getRole()).thenReturn(ParameterRole.PRIMARY_CONTENT);
-		when(parameterModelParser.getType()).thenReturn(defaultAnyType);
-		ParameterGroupModelParser parameterGroupModelParser = mock(ParameterGroupModelParser.class);
-		when(parameterGroupModelParser.getParameterParsers()).thenReturn(ImmutableList.of(parameterModelParser));
-		when(parameterGroupModelParser.getName()).thenReturn(this.getClass().getName());
+    ParameterModelParser parameterModelParser = mock(ParameterModelParser.class);
+    when(parameterModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    when(parameterModelParser.getName()).thenReturn(this.getClass().getName());
+    when(parameterModelParser.getRole()).thenReturn(ParameterRole.PRIMARY_CONTENT);
+    when(parameterModelParser.getType()).thenReturn(defaultAnyType);
+    ParameterGroupModelParser parameterGroupModelParser = mock(ParameterGroupModelParser.class);
+    when(parameterGroupModelParser.getParameterParsers()).thenReturn(ImmutableList.of(parameterModelParser));
+    when(parameterGroupModelParser.getName()).thenReturn(this.getClass().getName());
 
-		ConfigurationFactory configurationFactory = mock(ConfigurationFactory.class);
-		ConfigurationFactoryModelProperty configurationFactoryModelProperty = new ConfigurationFactoryModelProperty(configurationFactory);
-		ConfigurationModelParser configurationModelParser = mock(ConfigurationModelParser.class);
-		when(configurationModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
-		when(configurationModelParser.getName()).thenReturn(this.getClass().getName());
-		when(configurationModelParser.getParameterGroupParsers()).thenReturn(ImmutableList.of(parameterGroupModelParser));
-		when(configurationModelParser.getConfigurationFactoryModelProperty()).thenReturn(configurationFactoryModelProperty);
+    ConfigurationFactory configurationFactory = mock(ConfigurationFactory.class);
+    ConfigurationFactoryModelProperty configurationFactoryModelProperty =
+        new ConfigurationFactoryModelProperty(configurationFactory);
+    ConfigurationModelParser configurationModelParser = mock(ConfigurationModelParser.class);
+    when(configurationModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    when(configurationModelParser.getName()).thenReturn(this.getClass().getName());
+    when(configurationModelParser.getParameterGroupParsers()).thenReturn(ImmutableList.of(parameterGroupModelParser));
+    when(configurationModelParser.getConfigurationFactoryModelProperty()).thenReturn(configurationFactoryModelProperty);
 
-		SourceModelParser sourceModelParser = mock(SourceModelParser.class);
-		when(sourceModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
-		when(sourceModelParser.getName()).thenReturn(this.getClass().getName());
-		when(sourceModelParser.getOutputType()).thenReturn(defaultOutputModelParser);
-		when(sourceModelParser.getAttributesOutputType()).thenReturn(defaultOutputModelParser);
-		when(sourceModelParser.getSourceClusterSupportModelProperty()).thenReturn(new SourceClusterSupportModelProperty(SourceClusterSupport.NOT_SUPPORTED));
+    SourceModelParser sourceModelParser = mock(SourceModelParser.class);
+    when(sourceModelParser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    when(sourceModelParser.getName()).thenReturn(this.getClass().getName());
+    when(sourceModelParser.getOutputType()).thenReturn(defaultOutputModelParser);
+    when(sourceModelParser.getAttributesOutputType()).thenReturn(defaultOutputModelParser);
+    when(sourceModelParser.getSourceClusterSupportModelProperty())
+        .thenReturn(new SourceClusterSupportModelProperty(SourceClusterSupport.NOT_SUPPORTED));
 
-		ExtensionElement extensionElement = JavaExtensionModelParserFactory.getExtensionElement(loadingContext);
-		StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(loadingContext);
-		ExtensionModelParser parser = spy(new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, loadingContext));
-		when(parser.getConnectionProviderModelParsers()).thenReturn(ImmutableList.of(connectionProviderModelParser));
-		when(parser.getFunctionModelParsers()).thenReturn(ImmutableList.of(functionModelParser));
-		when(parser.getOperationModelParsers()).thenReturn(ImmutableList.of(operationModelParser));
-		when(parser.getConfigurationParsers()).thenReturn(ImmutableList.of(configurationModelParser));
-		when(parser.getSourceModelParsers()).thenReturn(ImmutableList.of(sourceModelParser));
-		when(parser.getSinceMuleVersionModelProperty()).thenReturn(property);
+    ExtensionElement extensionElement = JavaExtensionModelParserFactory.getExtensionElement(loadingContext);
+    StereotypeModelLoaderDelegate stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(loadingContext);
+    ExtensionModelParser parser =
+        spy(new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, loadingContext));
+    when(parser.getConnectionProviderModelParsers()).thenReturn(ImmutableList.of(connectionProviderModelParser));
+    when(parser.getFunctionModelParsers()).thenReturn(ImmutableList.of(functionModelParser));
+    when(parser.getOperationModelParsers()).thenReturn(ImmutableList.of(operationModelParser));
+    when(parser.getConfigurationParsers()).thenReturn(ImmutableList.of(configurationModelParser));
+    when(parser.getSourceModelParsers()).thenReturn(ImmutableList.of(sourceModelParser));
+    when(parser.getSinceMuleVersionModelProperty()).thenReturn(property);
 
-		JavaExtensionModelParserFactory parserFactory = mock(JavaExtensionModelParserFactory.class);
-		when(parserFactory.createParser(any())).thenReturn(parser);
+    JavaExtensionModelParserFactory parserFactory = mock(JavaExtensionModelParserFactory.class);
+    when(parserFactory.createParser(any())).thenReturn(parser);
 
-		return parserFactory;
-	}
+    return parserFactory;
+  }
 
 
-	private ExtensionDeclaration createExtensionDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		DefaultExtensionLoadingContext loadingContext = createExtensionLoadingContext();
-		JavaExtensionModelParserFactory parserFactory = createExtensionParserFactoryForSinceMuleVersionModelProperty(loadingContext, property);
+  private ExtensionDeclaration createExtensionDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    DefaultExtensionLoadingContext loadingContext = createExtensionLoadingContext();
+    JavaExtensionModelParserFactory parserFactory =
+        createExtensionParserFactoryForSinceMuleVersionModelProperty(loadingContext, property);
 
-		DefaultExtensionModelLoaderDelegate delegate = new DefaultExtensionModelLoaderDelegate(getProductVersion());
-		ExtensionDeclarer extensionDeclarer = delegate.declare(parserFactory, loadingContext);
-		return extensionDeclarer.getDeclaration();
-	}
+    DefaultExtensionModelLoaderDelegate delegate = new DefaultExtensionModelLoaderDelegate(getProductVersion());
+    ExtensionDeclarer extensionDeclarer = delegate.declare(parserFactory, loadingContext);
+    return extensionDeclarer.getDeclaration();
+  }
 
-	private void assertOptionalsAreEqual(Optional<?> p1, Optional<?> p2) {
-		assertThat(p1.isPresent()).isEqualTo(p2.isPresent());
-		if (p1.isPresent() && p2.isPresent()) {
-			assertThat(p1.get()).isEqualTo(p2.get());
-		}
-	}
+  private void assertOptionalsAreEqual(Optional<?> p1, Optional<?> p2) {
+    assertThat(p1.isPresent()).isEqualTo(p2.isPresent());
+    if (p1.isPresent() && p2.isPresent()) {
+      assertThat(p1.get()).isEqualTo(p2.get());
+    }
+  }
 
-	private void assertExtensionDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertExtensionDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = extensionDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
-	}
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        extensionDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+  }
 
-	private void assertOperationDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertOperationDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		List<OperationDeclaration> operationDeclarationList = extensionDeclaration.getOperations();
-		assertThat(operationDeclarationList.size()).isEqualTo(1);
-		OperationDeclaration operationDeclaration = operationDeclarationList.get(0);
+    List<OperationDeclaration> operationDeclarationList = extensionDeclaration.getOperations();
+    assertThat(operationDeclarationList.size()).isEqualTo(1);
+    OperationDeclaration operationDeclaration = operationDeclarationList.get(0);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = operationDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
-	}
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        operationDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+  }
 
-	private void assertFunctionDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertFunctionDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		List<FunctionDeclaration> functionDeclarationList = extensionDeclaration.getFunctions();
-		assertThat(functionDeclarationList.size()).isEqualTo(1);
-		FunctionDeclaration functionDeclaration = functionDeclarationList.get(0);
+    List<FunctionDeclaration> functionDeclarationList = extensionDeclaration.getFunctions();
+    assertThat(functionDeclarationList.size()).isEqualTo(1);
+    FunctionDeclaration functionDeclaration = functionDeclarationList.get(0);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = functionDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        functionDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
 
-	}
+  }
 
-	private void assertConnectionProviderDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertConnectionProviderDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		List<ConnectionProviderDeclaration> connectionProviderDeclarationList = extensionDeclaration.getConnectionProviders();
-		assertThat(connectionProviderDeclarationList.size()).isEqualTo(1);
-		ConnectionProviderDeclaration connectionProviderDeclaration = connectionProviderDeclarationList.get(0);
+    List<ConnectionProviderDeclaration> connectionProviderDeclarationList = extensionDeclaration.getConnectionProviders();
+    assertThat(connectionProviderDeclarationList.size()).isEqualTo(1);
+    ConnectionProviderDeclaration connectionProviderDeclaration = connectionProviderDeclarationList.get(0);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = connectionProviderDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
-	}
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        connectionProviderDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+  }
 
-	private void assertConfigurationDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertConfigurationDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		List<ConfigurationDeclaration> configurationDeclarationList = extensionDeclaration.getConfigurations();
-		assertThat(configurationDeclarationList.size()).isEqualTo(1);
-		ConfigurationDeclaration configurationDeclaration = configurationDeclarationList.get(0);
+    List<ConfigurationDeclaration> configurationDeclarationList = extensionDeclaration.getConfigurations();
+    assertThat(configurationDeclarationList.size()).isEqualTo(1);
+    ConfigurationDeclaration configurationDeclaration = configurationDeclarationList.get(0);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = configurationDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
-	}
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        configurationDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+  }
 
-	private void assertParameterDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertParameterDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		List<ConfigurationDeclaration> configurationDeclarationList = extensionDeclaration.getConfigurations();
-		assertThat(configurationDeclarationList.size()).isEqualTo(1);
-		ConfigurationDeclaration configurationDeclaration = configurationDeclarationList.get(0);
+    List<ConfigurationDeclaration> configurationDeclarationList = extensionDeclaration.getConfigurations();
+    assertThat(configurationDeclarationList.size()).isEqualTo(1);
+    ConfigurationDeclaration configurationDeclaration = configurationDeclarationList.get(0);
 
-		List<ParameterGroupDeclaration> parameterGroupDeclarationList = configurationDeclaration.getParameterGroups();
-		assertThat(parameterGroupDeclarationList.size()).isEqualTo(1);
-		ParameterGroupDeclaration parameterGroupDeclaration = parameterGroupDeclarationList.get(0);
+    List<ParameterGroupDeclaration> parameterGroupDeclarationList = configurationDeclaration.getParameterGroups();
+    assertThat(parameterGroupDeclarationList.size()).isEqualTo(1);
+    ParameterGroupDeclaration parameterGroupDeclaration = parameterGroupDeclarationList.get(0);
 
-		List<ParameterDeclaration> parameterDeclarationList = parameterGroupDeclaration.getParameters();
-		assertThat(parameterDeclarationList.size()).isEqualTo(1);
-		ParameterDeclaration parameterDeclaration = parameterDeclarationList.get(0);
+    List<ParameterDeclaration> parameterDeclarationList = parameterGroupDeclaration.getParameters();
+    assertThat(parameterDeclarationList.size()).isEqualTo(1);
+    ParameterDeclaration parameterDeclaration = parameterDeclarationList.get(0);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parameterDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
-	}
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        parameterDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+  }
 
-	private void assertSourceDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
-		ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  private void assertSourceDeclarationForSinceMuleVersionModelProperty(Optional<SinceMuleVersionModelProperty> property) {
+    ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
-		List<SourceDeclaration> sourceDeclarationList = extensionDeclaration.getMessageSources();
-		assertThat(sourceDeclarationList.size()).isEqualTo(1);
-		SourceDeclaration sourceDeclaration = sourceDeclarationList.get(0);
+    List<SourceDeclaration> sourceDeclarationList = extensionDeclaration.getMessageSources();
+    assertThat(sourceDeclarationList.size()).isEqualTo(1);
+    SourceDeclaration sourceDeclaration = sourceDeclarationList.get(0);
 
-		Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = sourceDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
-		assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
-	}
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
+        sourceDeclaration.getModelProperty(SinceMuleVersionModelProperty.class);
+    assertOptionalsAreEqual(sinceMuleVersionModelProperty, property);
+  }
 
-	@Test
-	public void testExtensionDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertExtensionDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testExtensionDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testExtensionDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertExtensionDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testExtensionDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertExtensionDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testConnectionProviderDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertConnectionProviderDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testConnectionProviderDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertConnectionProviderDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testConnectionProviderDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertConnectionProviderDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testConnectionProviderDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertConnectionProviderDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testFunctionDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertFunctionDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testFunctionDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertFunctionDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testFunctionDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertFunctionDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testFunctionDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertFunctionDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testOperationDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertOperationDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testOperationDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertOperationDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testOperationDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertOperationDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testOperationDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertOperationDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testConfigurationDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertConfigurationDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testConfigurationDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertConfigurationDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testConfigurationDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertConfigurationDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testConfigurationDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertConfigurationDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testParameterDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertParameterDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testParameterDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertParameterDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testParameterDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertParameterDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testParameterDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertParameterDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testSourceDeclarationWithSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
-		assertSourceDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testSourceDeclarationWithSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.of(new SinceMuleVersionModelProperty("4.5.0"));
+    assertSourceDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Test
-	public void testSourceDeclarationWithoutSinceMuleVersionModelProperty() {
-		Optional<SinceMuleVersionModelProperty> property = Optional.empty();
-		assertSourceDeclarationForSinceMuleVersionModelProperty(property);
-	}
+  @Test
+  public void testSourceDeclarationWithoutSinceMuleVersionModelProperty() {
+    Optional<SinceMuleVersionModelProperty> property = Optional.empty();
+    assertSourceDeclarationForSinceMuleVersionModelProperty(property);
+  }
 
-	@Extension(name = DummyExtension.NAME, category = SELECT)
-	public static class DummyExtension implements Lifecycle {
+  @Extension(name = DummyExtension.NAME, category = SELECT)
+  public static class DummyExtension implements Lifecycle {
 
-		public static final String NAME = "Dummy";
+    public static final String NAME = "Dummy";
 
-		@Override public void dispose() {
+    @Override
+    public void dispose() {
 
-		}
+    }
 
-		@Override public void initialise() throws InitialisationException {
+    @Override
+    public void initialise() throws InitialisationException {
 
-		}
+    }
 
-		@Override public void start() throws MuleException {
+    @Override
+    public void start() throws MuleException {
 
-		}
+    }
 
-		@Override public void stop() throws MuleException {
+    @Override
+    public void stop() throws MuleException {
 
-		}
-	}
+    }
+  }
 }

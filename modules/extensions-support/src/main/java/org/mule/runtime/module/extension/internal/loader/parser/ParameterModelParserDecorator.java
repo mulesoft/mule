@@ -128,7 +128,8 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
     return decoratee.getOAuthParameterModelProperty();
   }
 
-  @Override public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return decoratee.getSinceMuleVersionModelProperty();
   }
 }
