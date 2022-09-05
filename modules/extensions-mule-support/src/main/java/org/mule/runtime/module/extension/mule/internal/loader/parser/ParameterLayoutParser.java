@@ -55,7 +55,7 @@ public class ParameterLayoutParser extends BaseMuleSdkExtensionModelParser {
   private static final String[] EMPTY_ARRAY = {};
   private static final String ORDER = "order";
 
-  private static final Map<String, String> SECRET_TYPE_TO_SEMANTIC_TERM = new HashMap<>();
+  private static final Map<String, String> SECRET_TYPE_TO_SEMANTIC_TERM = new HashMap<>(11);
 
   static {
     SECRET_TYPE_TO_SEMANTIC_TERM.put("CLIENT_ID", CLIENT_ID);

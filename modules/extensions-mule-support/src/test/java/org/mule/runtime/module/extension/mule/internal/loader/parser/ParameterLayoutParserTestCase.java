@@ -39,7 +39,7 @@ import org.junit.Test;
 @Story(PARAMETERS)
 public class ParameterLayoutParserTestCase extends AbstractMuleTestCase {
 
-  private static final Map<String, String> EXPECTED_SEMANTIC_TERM = new HashMap<>();
+  private static final Map<String, String> EXPECTED_SEMANTIC_TERM = new HashMap<>(11);
 
   static {
     EXPECTED_SEMANTIC_TERM.put("CLIENT_ID", "connectivity.clientId");
