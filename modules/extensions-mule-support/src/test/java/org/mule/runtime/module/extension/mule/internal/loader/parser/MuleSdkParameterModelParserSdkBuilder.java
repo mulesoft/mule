@@ -10,7 +10,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockTypeLoader;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.setMockAstChild;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.singleParameterAst;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -118,10 +118,10 @@ class MuleSdkParameterModelParserSdkBuilder {
 
     final ComponentAst componentAst = mock(ComponentAst.class);
 
-    final ComponentParameterAst parameterNameAst = stringParameterAst(name);
+    final ComponentParameterAst parameterNameAst = singleParameterAst(name);
     when(componentAst.getParameter(DEFAULT_GROUP_NAME, "name")).thenReturn(parameterNameAst);
 
-    final ComponentParameterAst typeParameterAst = stringParameterAst(type);
+    final ComponentParameterAst typeParameterAst = singleParameterAst(type);
     when(componentAst.getParameter(DEFAULT_GROUP_NAME, "type")).thenReturn(typeParameterAst);
 
     if (deprecatedAst != null) {

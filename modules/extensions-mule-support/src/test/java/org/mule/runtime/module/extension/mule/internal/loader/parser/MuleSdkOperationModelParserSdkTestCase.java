@@ -11,7 +11,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.setMockAstChild;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockOutputAst;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.singleParameterAst;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
@@ -55,7 +55,7 @@ public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Before
   public void setup() {
-    ComponentParameterAst operationName = stringParameterAst("mockName");
+    ComponentParameterAst operationName = singleParameterAst("mockName");
 
     operationAst = mock(ComponentAst.class);
     when(operationAst.getParameter(DEFAULT_GROUP_NAME, "name")).thenReturn(operationName);
