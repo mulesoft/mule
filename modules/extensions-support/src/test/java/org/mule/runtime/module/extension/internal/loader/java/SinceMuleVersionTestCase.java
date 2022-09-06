@@ -1,7 +1,8 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Collections.emptySet;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -144,9 +145,10 @@ public class SinceMuleVersionTestCase {
   }
 
   private void assertOptionalsAreEqual(Optional<?> p1, Optional<?> p2) {
-    assertThat(p1.isPresent()).isEqualTo(p2.isPresent());
+    assertThat(p1, equalTo(p2));
+    assertThat(p1.isPresent(), equalTo(p2.isPresent()));
     if (p1.isPresent() && p2.isPresent()) {
-      assertThat(p1.get()).isEqualTo(p2.get());
+      assertThat(p1.get(), equalTo(p2.get()));
     }
   }
 
@@ -162,7 +164,7 @@ public class SinceMuleVersionTestCase {
     ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
     List<OperationDeclaration> operationDeclarationList = extensionDeclaration.getOperations();
-    assertThat(operationDeclarationList.size()).isEqualTo(1);
+    assertThat(operationDeclarationList.size(), equalTo(1));
     OperationDeclaration operationDeclaration = operationDeclarationList.get(0);
 
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
@@ -174,7 +176,7 @@ public class SinceMuleVersionTestCase {
     ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
     List<FunctionDeclaration> functionDeclarationList = extensionDeclaration.getFunctions();
-    assertThat(functionDeclarationList.size()).isEqualTo(1);
+    assertThat(functionDeclarationList.size(), equalTo(1));
     FunctionDeclaration functionDeclaration = functionDeclarationList.get(0);
 
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
@@ -187,7 +189,7 @@ public class SinceMuleVersionTestCase {
     ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
     List<ConnectionProviderDeclaration> connectionProviderDeclarationList = extensionDeclaration.getConnectionProviders();
-    assertThat(connectionProviderDeclarationList.size()).isEqualTo(1);
+    assertThat(connectionProviderDeclarationList.size(), equalTo(1));
     ConnectionProviderDeclaration connectionProviderDeclaration = connectionProviderDeclarationList.get(0);
 
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
@@ -199,7 +201,7 @@ public class SinceMuleVersionTestCase {
     ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
     List<ConfigurationDeclaration> configurationDeclarationList = extensionDeclaration.getConfigurations();
-    assertThat(configurationDeclarationList.size()).isEqualTo(1);
+    assertThat(configurationDeclarationList.size(), equalTo(1));
     ConfigurationDeclaration configurationDeclaration = configurationDeclarationList.get(0);
 
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
@@ -211,15 +213,15 @@ public class SinceMuleVersionTestCase {
     ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
     List<ConfigurationDeclaration> configurationDeclarationList = extensionDeclaration.getConfigurations();
-    assertThat(configurationDeclarationList.size()).isEqualTo(1);
+    assertThat(configurationDeclarationList.size(), equalTo(1));
     ConfigurationDeclaration configurationDeclaration = configurationDeclarationList.get(0);
 
     List<ParameterGroupDeclaration> parameterGroupDeclarationList = configurationDeclaration.getParameterGroups();
-    assertThat(parameterGroupDeclarationList.size()).isEqualTo(1);
+    assertThat(parameterGroupDeclarationList.size(), equalTo(1));
     ParameterGroupDeclaration parameterGroupDeclaration = parameterGroupDeclarationList.get(0);
 
     List<ParameterDeclaration> parameterDeclarationList = parameterGroupDeclaration.getParameters();
-    assertThat(parameterDeclarationList.size()).isEqualTo(1);
+    assertThat(parameterDeclarationList.size(), equalTo(1));
     ParameterDeclaration parameterDeclaration = parameterDeclarationList.get(0);
 
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
@@ -231,7 +233,7 @@ public class SinceMuleVersionTestCase {
     ExtensionDeclaration extensionDeclaration = createExtensionDeclarationForSinceMuleVersionModelProperty(property);
 
     List<SourceDeclaration> sourceDeclarationList = extensionDeclaration.getMessageSources();
-    assertThat(sourceDeclarationList.size()).isEqualTo(1);
+    assertThat(sourceDeclarationList.size(), equalTo(1));
     SourceDeclaration sourceDeclaration = sourceDeclarationList.get(0);
 
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
