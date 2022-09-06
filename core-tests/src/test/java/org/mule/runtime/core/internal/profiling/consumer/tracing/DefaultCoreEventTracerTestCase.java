@@ -19,6 +19,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static io.opentelemetry.api.trace.TraceState.getDefault;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -31,6 +32,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -64,8 +66,13 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.ImmutableMap;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.context.Context;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.hamcrest.core.StringContains;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -81,6 +88,9 @@ public class DefaultCoreEventTracerTestCase {
   public static final String TEST_APP = "test_app";
   public static final String KEY_1 = "key1";
   public static final String VALUE_1 = "value1";
+  public static final String TRACEPARENT_KEY = "traceparent";
+  public static final String TRACE_ID_SPAN_VALUE = "traceIdSpan";
+  public static final String SPAN_ID_SPAN_VALUE = "spanIdSpan";
 
   @Test
   public void testStartComponentExecution() {
@@ -153,14 +163,27 @@ public class DefaultCoreEventTracerTestCase {
                                mock(Logger.class),
                                mockedMuleConfiguration);
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
-    when(distributedTraceContext.tracingFieldsAsMap()).thenReturn(ImmutableMap.of(KEY_1, VALUE_1));
+    when(distributedTraceContext.tracingFieldsAsMap())
+        .thenReturn(ImmutableMap.of(KEY_1, VALUE_1, TRACEPARENT_KEY, "traceparentvalue"));
     ExportOnEndSpan currentSpan = mock(ExportOnEndSpan.class);
     when(distributedTraceContext.getCurrentSpan()).thenReturn(of(currentSpan));
-    when(currentSpan.visit(any())).thenReturn(empty());
+    Context mockedContext = mock(Context.class);
+    when(currentSpan.visit(any())).thenReturn(of(mockedContext));
+    Span span = mock(Span.class);
+    when(mockedContext.get(any())).thenReturn(span);
+    SpanContext spanContext = mock(SpanContext.class);
+    when(span.getSpanContext()).thenReturn(spanContext);
+    when(spanContext.getTraceId()).thenReturn(TRACE_ID_SPAN_VALUE);
+    when(spanContext.getSpanId()).thenReturn(SPAN_ID_SPAN_VALUE);
+    when(spanContext.getTraceFlags()).thenReturn(TraceFlags.getDefault());
+    when(spanContext.getTraceState()).thenReturn(getDefault());
+    when(spanContext.isValid()).thenReturn(true);
     Map<String, String> distributedTraceContextMap =
         coreEventTracer.getDistributedTraceContextMap(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
     assertThat(distributedTraceContextMap, hasEntry(KEY_1, VALUE_1));
-    assertThat(distributedTraceContextMap, aMapWithSize(1));
+    assertThat(distributedTraceContextMap.get(TRACEPARENT_KEY), StringContains.containsString(TRACE_ID_SPAN_VALUE));
+    assertThat(distributedTraceContextMap.get(TRACEPARENT_KEY), StringContains.containsString(SPAN_ID_SPAN_VALUE));
+    assertThat(distributedTraceContextMap, aMapWithSize(2));
   }
 
   @Test
