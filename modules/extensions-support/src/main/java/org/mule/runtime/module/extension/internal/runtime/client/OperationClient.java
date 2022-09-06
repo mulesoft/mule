@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
@@ -22,15 +21,21 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.streaming.NullCursorProviderFactory;
+import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -65,16 +70,16 @@ class OperationClient implements Lifecycle {
                                      MuleContext muleContext) {
 
     return new OperationClient(
-                               createExecutionMediator(
-                                                       key,
-                                                       extensionConnectionSupplier,
-                                                       errorTypeRepository,
-                                                       reflectionCache,
-                                                       muleContext),
-                               ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
-                                                              muleContext),
-                               new ValueReturnDelegate(key.getOperationModel(), new NullCursorProviderFactory(), muleContext),
-                               muleContext);
+        createExecutionMediator(
+            key,
+            extensionConnectionSupplier,
+            errorTypeRepository,
+            reflectionCache,
+            muleContext),
+        ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
+            muleContext),
+        new ValueReturnDelegate(key.getOperationModel(), muleContext),
+        muleContext);
   }
 
   private OperationClient(ExecutionMediator<OperationModel> mediator,
@@ -119,17 +124,13 @@ class OperationClient implements Lifecycle {
 
       @Override
       public void complete(Object value) {
-        if (value != null) {
-          value = streamingContent(value,
-                                   ctx.getCursorProviderFactory(),
-                                   ctx.getEvent(),
-                                   ctx.getEvent().getContext().getOriginatingLocation());
-        }
+        EventCompletingValue<Result<T, A>> result = asEventCompletingResult(value, ctx, shouldCompleteEvent);
+
         try {
-          future.complete(asResult(value, ctx));
+          future.complete(result.value);
         } finally {
-          if (shouldCompleteEvent) {
-            ((BaseEventContext) ctx.getEvent()).success();
+          if (result.shouldCompleteEvent) {
+            ((BaseEventContext) ctx.getEvent().getContext()).success();
           }
         }
       }
@@ -139,13 +140,9 @@ class OperationClient implements Lifecycle {
         try {
           future.completeExceptionally(e);
         } finally {
-          maybeCompleteEvent(e);
-        }
-      }
-
-      private void maybeCompleteEvent(Throwable e) {
-        if (shouldCompleteEvent) {
-          ((BaseEventContext) ctx.getEvent().getContext()).error(e);
+          if (shouldCompleteEvent) {
+            ((BaseEventContext) ctx.getEvent().getContext()).error(e);
+          }
         }
       }
     };
@@ -154,36 +151,65 @@ class OperationClient implements Lifecycle {
     return future;
   }
 
-  private <T, A> Result<T, A> asResult(Object value,
-                                       ExecutionContextAdapter<OperationModel> context) {
+  private <T, A> EventCompletingValue<Result<T, A>> asEventCompletingResult(Object value,
+                                                                            ExecutionContextAdapter<OperationModel> context,
+                                                                            boolean shouldCompleteEvent) {
 
-    CoreEvent resultEvent = returnDelegate.asReturnValue(value, context);
-    return (Result<T, A>) Result.builder(resultEvent.getMessage()).build();
+    Message message = returnDelegate.asReturnValue(value, context).getMessage();
+    TypedValue payload = message.getPayload();
+    TypedValue attributes = message.getAttributes();
+
+    EventCompletingValue<Object> completingPayload = asEventCompletingValue(payload.getValue(), context, shouldCompleteEvent);
+    shouldCompleteEvent = shouldCompleteEvent && completingPayload.shouldCompleteEvent;
+
+    EventCompletingValue<Object>  completingAttributes = asEventCompletingValue(attributes.getValue(), context, shouldCompleteEvent);
+    shouldCompleteEvent = shouldCompleteEvent && completingAttributes.shouldCompleteEvent;
+
+    Result<T, A> result = (Result<T, A>) Result.builder()
+        .output(completingPayload.value)
+        .mediaType(payload.getDataType().getMediaType())
+        .attributes(completingAttributes.value)
+        .attributesMediaType(attributes.getDataType().getMediaType())
+        .build();
+
+    return new EventCompletingValue<>(result, shouldCompleteEvent);
+  }
+
+  private EventCompletingValue<Object> asEventCompletingValue(Object value, ExecutionContextAdapter ctx, boolean shouldCompleteEvent) {
+    if (shouldCompleteEvent) {
+      if (value instanceof CursorIteratorProvider) {
+        return new EventCompletingValue<>(new EventCompletingCursorIteratorProviderDecorator((CursorProvider) value, ctx.getEvent()), false);
+      } else if (value instanceof CursorProvider) {
+        return new EventCompletingValue<>(new EventCompletingCursorProviderDecorator<>((CursorProvider) value, ctx.getEvent()), false);
+      }
+    }
+
+    return new EventCompletingValue<>(value, shouldCompleteEvent);
   }
 
   private static ExecutionMediator<OperationModel> createExecutionMediator(
-                                                                           OperationKey key,
-                                                                           ExtensionConnectionSupplier extensionConnectionSupplier,
-                                                                           ErrorTypeRepository errorTypeRepository,
-                                                                           ReflectionCache reflectionCache,
-                                                                           MuleContext muleContext) {
+      OperationKey key,
+      ExtensionConnectionSupplier extensionConnectionSupplier,
+      ErrorTypeRepository errorTypeRepository,
+      ReflectionCache reflectionCache,
+      MuleContext muleContext) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
-                                                                                extensionModel,
-                                                                                operationModel,
-                                                                                createReconnectionInterceptorsChain(extensionModel,
-                                                                                                                    operationModel,
-                                                                                                                    extensionConnectionSupplier,
-                                                                                                                    reflectionCache),
-                                                                                errorTypeRepository,
-                                                                                muleContext.getExecutionClassLoader(),
-                                                                                getPagingResultTransformer(operationModel,
-                                                                                                           extensionConnectionSupplier,
-                                                                                                           supportsOAuth(extensionModel))
-                                                                                                               .orElse(null),
-                                                                                NULL_PROFILING_DATA_PRODUCER);
+        extensionModel,
+        operationModel,
+        createReconnectionInterceptorsChain(extensionModel,
+            operationModel,
+            extensionConnectionSupplier,
+            reflectionCache),
+        errorTypeRepository,
+        muleContext.getExecutionClassLoader(),
+        getPagingResultTransformer(operationModel,
+            extensionConnectionSupplier,
+            supportsOAuth(extensionModel))
+            .orElse(null),
+        NULL_PROFILING_DATA_PRODUCER);
 
     try {
       initialiseIfNeeded(mediator, true, muleContext);
@@ -195,10 +221,49 @@ class OperationClient implements Lifecycle {
     }
   }
 
+  private static class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {
+
+    private final CoreEvent event;
+
+    public EventCompletingCursorProviderDecorator(CursorProvider delegate, CoreEvent event) {
+      super(delegate);
+      this.event = event;
+    }
+
+    @Override
+    public void close() {
+      try {
+        super.close();
+      } finally {
+        ((BaseEventContext) event.getContext()).success();
+      }
+    }
+  }
+
+  private static class EventCompletingCursorIteratorProviderDecorator
+      extends EventCompletingCursorProviderDecorator<CursorIterator> implements CursorIteratorProvider {
+
+    public EventCompletingCursorIteratorProviderDecorator(CursorProvider delegate, CoreEvent event) {
+      super(delegate, event);
+    }
+  }
+
+  private static class EventCompletingValue<T> {
+
+    private final T value;
+    private final boolean shouldCompleteEvent;
+
+    private EventCompletingValue(T value, boolean shouldCompleteEvent) {
+      this.value = value;
+      this.shouldCompleteEvent = shouldCompleteEvent;
+    }
+  }
+
   private static class NullProfilingDataProducer
       implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {
 
-    private NullProfilingDataProducer() {}
+    private NullProfilingDataProducer() {
+    }
 
     @Override
     public void triggerProfilingEvent(ComponentThreadingProfilingEventContext profilerEventContext) {

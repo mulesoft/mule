@@ -125,6 +125,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     when(operationContext.getComponentModel()).thenReturn(componentModel);
     when(operationContext.getComponent()).thenReturn(component);
     when(operationContext.getVariable(contains(CONNECTION_PARAM))).thenReturn(connectionHandler);
+    when(operationContext.getCursorProviderFactory()).thenReturn(getCursorProviderFactory());
   }
 
   @After

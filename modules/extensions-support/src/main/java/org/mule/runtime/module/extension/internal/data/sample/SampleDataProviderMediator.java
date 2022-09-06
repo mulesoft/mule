@@ -78,7 +78,7 @@ public class SampleDataProviderMediator {
     this.reflectionCache = reflectionCache;
     this.streamingManager = streamingManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
-    returnDelegate = new ValueReturnDelegate(componentModel, cursorProviderFactory, muleContext);
+    returnDelegate = new ValueReturnDelegate(componentModel, muleContext);
   }
 
   /**

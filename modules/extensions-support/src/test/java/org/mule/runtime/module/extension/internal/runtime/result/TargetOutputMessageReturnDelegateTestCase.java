@@ -78,12 +78,13 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);
     when(operationContext.getComponent()).thenReturn(component);
+    when(operationContext.getCursorProviderFactory()).thenReturn(getDefaultCursorStreamProviderFactory());
     when(componentModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
   }
 
   private TargetReturnDelegate createDelegate(String expression) {
     return new TargetReturnDelegate(TARGET, expression, componentModel, expressionManager,
-                                    getDefaultCursorStreamProviderFactory(), muleContext, streamingManager);
+                                    muleContext, streamingManager);
   }
 
   @Test

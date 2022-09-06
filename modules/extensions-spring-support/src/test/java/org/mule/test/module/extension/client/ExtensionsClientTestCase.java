@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.client;
 
 import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -22,7 +23,9 @@ import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -115,6 +118,21 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   }
 
   @Test
+  public void executeInputStreamOperation() throws Throwable {
+    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
+    Result<CursorStreamProvider, Object> result = doExecute(HEISENBERG_EXT_NAME, "nameAsStream", params);
+
+    CursorStreamProvider streamProvider = result.getOutput();
+    String value = IOUtils.toString(streamProvider);
+    try {
+      assertThat(value, equalTo("6"));
+    } finally {
+      closeQuietly((Closeable) streamProvider);
+      result.getOutput().close();
+    }
+  }
+
+  @Test
   @Description("Executes a simple operation twice using the client and checks the output")
   public void executeSimpleOperationTwice() throws Throwable {
     executeSimpleOperation();
@@ -125,7 +143,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Executes a simple operation with an expression as parameter using the client and checks the output")
   public void executeSimpleOperationWithExpression() throws Throwable {
     OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("victim", "#[mel:'Juani']")
+        .addParameter("victim", "#['Juani']")
         .addParameter("goodbyeMessage", "ADIOS")
         .build();
     Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);

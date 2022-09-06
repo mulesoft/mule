@@ -845,14 +845,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ReturnDelegate getTargetReturnDelegate() {
     if (isSanitizedPayload(sanitize(targetValue))) {
-      return new PayloadTargetReturnDelegate(target, componentModel, cursorProviderFactory, muleContext);
+      return new PayloadTargetReturnDelegate(target, componentModel, muleContext);
     }
-    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext,
-                                    streamingManager);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, muleContext, streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
-    return new ValueReturnDelegate(componentModel, cursorProviderFactory, muleContext);
+    return new ValueReturnDelegate(componentModel, muleContext);
   }
 
   protected boolean isTargetPresent() {
