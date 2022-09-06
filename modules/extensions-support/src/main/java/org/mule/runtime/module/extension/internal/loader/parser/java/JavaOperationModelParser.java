@@ -39,6 +39,7 @@ import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
@@ -398,6 +399,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
     return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(operationElement, "Operation", getName());
+  }
+
+  @Override
+  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
+    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(operationElement);
   }
 
   @Override
