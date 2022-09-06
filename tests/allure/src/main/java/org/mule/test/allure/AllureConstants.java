@@ -331,6 +331,7 @@ public interface AllureConstants {
     interface ReuseStory {
 
       String APPLICATION_EXTENSION_MODEL = "Application Extension Model";
+      String EXTENSION_EXTENSION_MODEL = "Extension Extension Model";
       String OPERATIONS = "Operations";
       String PARAMETERS = "Parameters";
       String TYPES_CATALOG = "Types Catalog";
