@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.client;
+package org.mule.runtime.module.extension.internal.runtime.client.operation;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-class DefaultOperationParameterizer implements InternalOperationParameterizer {
+public class DefaultOperationParameterizer implements InternalOperationParameterizer {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
   private String configRef;
@@ -133,15 +133,15 @@ class DefaultOperationParameterizer implements InternalOperationParameterizer {
     return this;
   }
 
-  String getConfigRef() {
+  public String getConfigRef() {
     return configRef;
   }
 
-  <T> CursorProviderFactory<T> getCursorProviderFactory(StreamingManager streamingManager) {
+  public <T> CursorProviderFactory<T> getCursorProviderFactory(StreamingManager streamingManager) {
     return cursorProviderFunction.apply(streamingManager);
   }
 
-  RetryPolicyTemplate getRetryPolicyTemplate() {
+  public RetryPolicyTemplate getRetryPolicyTemplate() {
     return retryPolicyTemplate;
   }
 
@@ -149,7 +149,7 @@ class DefaultOperationParameterizer implements InternalOperationParameterizer {
     return ofNullable(contextEvent);
   }
 
-  void setValuesOn(ComponentParameterization.Builder<OperationModel> builder) {
+  public void setValuesOn(ComponentParameterization.Builder<OperationModel> builder) {
     rawParameters.forEach(builder::withParameter);
     groupedParameters.forEach((pair, value) -> builder.withParameter(pair.getFirst(), pair.getSecond(), value));
   }

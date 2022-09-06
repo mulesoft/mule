@@ -90,8 +90,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel        the component which produces the return value
-   * @param muleContext           the {@link MuleContext} of the owning application
+   * @param componentModel the component which produces the return value
+   * @param muleContext    the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
     if (componentModel instanceof HasOutputModel) {
@@ -211,7 +211,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
               .streamingContent(new ConnectedInputStreamWrapper((InputStream) result.getOutput(),
                                                                 connectionHandler,
                                                                 getDecrementActiveComponentTask(operationContext)),
-                  operationContext.getCursorProviderFactory(), event,
+                                operationContext.getCursorProviderFactory(), event,
                                 operationContext.getComponent().getLocation()))
               .build();
         }

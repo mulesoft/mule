@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.client;
+package org.mule.runtime.module.extension.internal.runtime.client.operation;
 
 import static java.lang.String.format;
 import static java.util.Objects.hash;
@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import java.util.Objects;
 import java.util.Optional;
 
-class OperationKey {
+public class OperationKey {
 
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationProvider> configurationProvider;

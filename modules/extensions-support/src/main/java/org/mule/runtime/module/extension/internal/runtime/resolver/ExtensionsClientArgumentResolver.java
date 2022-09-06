@@ -13,9 +13,9 @@ import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.internal.client.InternalOperationParameters;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.client.InternalOperationParameterizer;
+import org.mule.runtime.module.extension.internal.runtime.client.operation.EventedOperationsParameterDecorator;
+import org.mule.runtime.module.extension.internal.runtime.client.operation.InternalOperationParameterizer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -47,15 +47,16 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
     }
 
     @Override
-    public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
-      setEvent(parameters);
-      return extensionsClient.executeAsync(extension, operation, parameters);
+    public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation,
+                                                               OperationParameters parameters) {
+      return extensionsClient.executeAsync(extension, operation,
+                                           new EventedOperationsParameterDecorator(parameters, executionContext.getEvent()));
     }
 
     @Override
     public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters parameters) throws MuleException {
-      setEvent(parameters);
-      return extensionsClient.execute(extension, operation, parameters);
+      return extensionsClient.execute(extension, operation,
+                                      new EventedOperationsParameterDecorator(parameters, executionContext.getEvent()));
     }
 
     @Override
@@ -70,12 +71,6 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
           }
         }
       });
-    }
-
-    private void setEvent(OperationParameters parameters) {
-      if (parameters instanceof InternalOperationParameters) {
-        ((InternalOperationParameters) parameters).setContextEvent(executionContext.getEvent());
-      }
     }
   }
 }

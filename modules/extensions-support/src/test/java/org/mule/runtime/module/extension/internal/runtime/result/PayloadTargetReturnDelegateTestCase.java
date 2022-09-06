@@ -18,7 +18,7 @@ public class PayloadTargetReturnDelegateTestCase extends TargetReturnDelegateTes
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new PayloadTargetReturnDelegate(TARGET, componentModel,  muleContext);
+    return new PayloadTargetReturnDelegate(TARGET, componentModel, muleContext);
   }
 
   @Override

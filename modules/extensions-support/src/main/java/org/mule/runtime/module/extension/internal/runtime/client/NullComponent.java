@@ -10,9 +10,9 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 
-class NullComponent extends AbstractComponent implements Initialisable {
+public class NullComponent extends AbstractComponent implements Initialisable {
 
-  static final NullComponent NULL_COMPONENT = new NullComponent();
+  public static final NullComponent NULL_COMPONENT = new NullComponent();
 
   @Override
   public void initialise() throws InitialisationException {
