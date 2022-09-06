@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
+import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
 
@@ -19,14 +21,18 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -69,7 +75,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          MuleContext muleContext) {
     super(prototypeClass, providerModel, resolverSet, expressionManager, muleContext);
     this.providerModel = providerModel;
-    this.poolingProfile = poolingProfile;
+    this.poolingProfile = computePoolingProfile(poolingProfile, resolverSet);
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
     this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
@@ -86,10 +92,6 @@ public abstract class ConnectionProviderObjectBuilder<C>
          reconnectionConfig, extensionModel, expressionManager, muleContext);
   }
 
-  private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
-    return reconnectionConfig != null ? reconnectionConfig : ReconnectionConfig.getDefault();
-  }
-
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                          Class<?> prototypeClass,
                                          ResolverSet resolverSet,
@@ -104,6 +106,29 @@ public abstract class ConnectionProviderObjectBuilder<C>
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
     this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
+  }
+
+  private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
+    return reconnectionConfig != null ? reconnectionConfig : ReconnectionConfig.getDefault();
+  }
+
+  private PoolingProfile computePoolingProfile(PoolingProfile poolingProfile, ResolverSet resolverSet) {
+    if (poolingProfile != null) {
+      return poolingProfile;
+    }
+    if (providerModel.getConnectionManagementType() == POOLING) {
+      Map<String, ValueResolver<?>> valueResolverMap = resolverSet.getResolvers();
+      if (valueResolverMap.containsKey(POOLING_PROFILE_PARAMETER_NAME)) {
+        try {
+          return (PoolingProfile) valueResolverMap.get(POOLING_PROFILE_PARAMETER_NAME)
+              .resolve(ValueResolvingContext.builder(NullEventFactory.getNullEvent()).build());
+        } catch (MuleException e) {
+          // Log failure and return null
+          return null;
+        }
+      }
+    }
+    return null;
   }
 
   /**

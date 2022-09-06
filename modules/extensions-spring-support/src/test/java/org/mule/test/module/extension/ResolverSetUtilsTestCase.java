@@ -16,14 +16,19 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.component.value.PoolingProfileValueDeclarer.ExhaustedAction.WHEN_EXHAUSTED_GROW;
+import static org.mule.runtime.extension.api.component.value.PoolingProfileValueDeclarer.InitialisationPolicy.INITIALISE_ALL;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 import static org.mule.test.oauth.ConnectionType.DUO;
 import static org.mule.test.oauth.ConnectionType.HYPER;
 
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -34,6 +39,7 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.extension.api.component.value.PoolingProfileValueDeclarer;
 import org.mule.runtime.extension.api.component.value.ValueDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
@@ -244,12 +250,34 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     }
   };
 
+  private static final String CONNECTION_PARAMETER_GROUP_NAME = "Connection";
+
+  private static final int POOLING_PROFILE_MAX_IDLE = 10;
+  private static final int POOLING_PROFILE_MAX_ACTIVE = 20;
+  private static final int POOLING_PROFILE_MAX_WAIT = 3000;
+  private static final int POOLING_PROFILE_EVICTION_CHECK = 10000;
+  private static final int POOLING_PROFILE_MIN_EVICTION = 120000;
+  private static final PoolingProfileValueDeclarer.ExhaustedAction POOLING_PROFILE_EXHAUSTED_ACTION = WHEN_EXHAUSTED_GROW;
+  private static final PoolingProfileValueDeclarer.InitialisationPolicy POOLING_PROFILE_INITIALIZATION_POLICY = INITIALISE_ALL;
+
+  private static final int POOLING_PROFILE_EXHAUSTED_ACTION_INT = PoolingProfile.WHEN_EXHAUSTED_GROW;
+  private static final int POOLING_PROFILE_INITIALIZATION_POLICY_INT = PoolingProfile.INITIALISE_ALL;
+
+  private static final Consumer<ValueDeclarer> POOLING_PROFILE_PARAMETER_VALUE_DECLARER =
+      valueDeclarer -> valueDeclarer.poolingProfile(poolingProfileValueDeclarer -> poolingProfileValueDeclarer
+          .exhaustedAction(POOLING_PROFILE_EXHAUSTED_ACTION).maxActive(POOLING_PROFILE_MAX_ACTIVE)
+          .maxIdle(POOLING_PROFILE_MAX_IDLE).maxWait(POOLING_PROFILE_MAX_WAIT)
+          .evictionCheckIntervalMillis(POOLING_PROFILE_EVICTION_CHECK)
+          .minEvictionMillis(POOLING_PROFILE_MIN_EVICTION)
+          .initialisationPolicy(POOLING_PROFILE_INITIALIZATION_POLICY));
+
   private ReflectionCache reflectionCache = new ReflectionCache();
 
   private ExpressionManager expressionManager;
 
   private ExtensionModel testOAuthExtensionModel;
   private ParameterizedModel testParameterizedModel;
+  private ConnectionProviderModel testPooledConnectionProviderModel;
 
   @Before
   public void setup() throws Exception {
@@ -257,6 +285,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
 
     expressionManager = muleContext.getExpressionManager();
     testParameterizedModel = testOAuthExtensionModel.getConfigurationModels().get(0).getConnectionProviders().get(0);
+    testPooledConnectionProviderModel = testOAuthExtensionModel.getConfigurationModels().get(3).getConnectionProviders().get(0);
     MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
     muleRegistry.registerObject("Extensions Manager Mock", mock(ExtensionManager.class));
   }
@@ -520,6 +549,23 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     assertThat(stackedTypeParameter.resolve().getValue(), is(STACKED_MAP_PARAMETER_VALUE));
   }
 
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a Pooling Profile parameter.")
+  public void poolingProfileParameter() throws Exception {
+    PoolingProfile poolingProfileParameterValue =
+        new PoolingProfile(POOLING_PROFILE_MAX_ACTIVE, POOLING_PROFILE_MAX_IDLE, POOLING_PROFILE_MAX_WAIT,
+                           POOLING_PROFILE_EXHAUSTED_ACTION_INT, POOLING_PROFILE_INITIALIZATION_POLICY_INT);
+    poolingProfileParameterValue.setEvictionCheckIntervalMillis(POOLING_PROFILE_EVICTION_CHECK);
+    poolingProfileParameterValue.setMinEvictionMillis(POOLING_PROFILE_MIN_EVICTION);
+
+    PoolingProfile poolingProfileParameter =
+        (PoolingProfile) getResolvedValueFromComponentParameterization(CONNECTION_PARAMETER_GROUP_NAME,
+                                                                       POOLING_PROFILE_PARAMETER_NAME,
+                                                                       POOLING_PROFILE_PARAMETER_VALUE_DECLARER,
+                                                                       testPooledConnectionProviderModel);
+    assertThat(poolingProfileParameter, is(poolingProfileParameterValue));
+  }
+
   private void testComponentParameterization(String parameterGroupName, String parameterName,
                                              Consumer<ValueDeclarer> valueDeclarer, Object valueToCompare)
       throws Exception {
@@ -540,15 +586,34 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private Object getResolvedValueFromComponentParameterization(String parameterGroupName, String parameterName,
                                                                Consumer<ValueDeclarer> valueDeclarerConsumer)
       throws Exception {
+    return getResolvedValueFromComponentParameterization(parameterGroupName, parameterName, valueDeclarerConsumer,
+                                                         testParameterizedModel);
+  }
+
+  /**
+   * This method creates a component parameterization with only the given parameter information and then resolves its value with
+   * an empty event.
+   *
+   * @param parameterGroupName    the name of the parameter group the parameter belongs to
+   * @param parameterName         the name of the parameter
+   * @param valueDeclarerConsumer the consumer of value declarer that represents the value of the parameter
+   * @param parameterizedModel    the parameterized model that contains the parameter
+   * @return the resolved value of the paremeter, or the whole parameter group if the parameter belongs to a showInDsl parameter
+   *         group
+   */
+  private Object getResolvedValueFromComponentParameterization(String parameterGroupName, String parameterName,
+                                                               Consumer<ValueDeclarer> valueDeclarerConsumer,
+                                                               ParameterizedModel parameterizedModel)
+      throws Exception {
     ResolverSet resolverSet =
         ResolverSetUtils.getResolverSetFromComponentParameterization(
-                                                                     ComponentParameterization.builder(testParameterizedModel)
+                                                                     ComponentParameterization.builder(parameterizedModel)
                                                                          .withParameter(parameterGroupName, parameterName,
                                                                                         valueDeclarerConsumer)
                                                                          .build(),
                                                                      muleContext, true, reflectionCache, expressionManager,
-                                                                     testParameterizedModel.getName());
-    ParameterGroupModel parameterGroupModel = testParameterizedModel.getParameterGroupModels().stream()
+                                                                     parameterizedModel.getName());
+    ParameterGroupModel parameterGroupModel = parameterizedModel.getParameterGroupModels().stream()
         .filter(pgm -> pgm.getName().equals(parameterGroupName)).findAny().get();
     ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(NullEventFactory.getNullEvent()).build();
     ResolverSetResult resolverSetResult = resolverSet.resolve(valueResolvingContext);
