@@ -10,8 +10,9 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocat
 import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
+import org.mule.runtime.ast.internal.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -30,20 +31,11 @@ public class MuleSdkExtensionDslNamespaceInfoProvider implements XmlNamespaceInf
   public static final String MULE_EXTENSION_DSL_SCHEMA_LOCATION =
       buildSchemaLocation(MULE_EXTENSION_DSL_NAMESPACE, MULE_EXTENSION_DSL_XSD_FILE_NAME);
 
+  private static final Collection<XmlNamespaceInfo> XML_NAMESPACE_INFO =
+      singletonList(new StaticXmlNamespaceInfo(MULE_EXTENSION_DSL_NAMESPACE_URI, MULE_EXTENSION_DSL_NAMESPACE));
+
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
-
-    return asList(new XmlNamespaceInfo() {
-
-      @Override
-      public String getNamespaceUriPrefix() {
-        return MULE_EXTENSION_DSL_NAMESPACE_URI;
-      }
-
-      @Override
-      public String getNamespace() {
-        return MULE_EXTENSION_DSL_NAMESPACE;
-      }
-    });
+    return XML_NAMESPACE_INFO;
   }
 }

@@ -6,26 +6,27 @@
  */
 package org.mule.runtime.module.extension.mule.api.extension;
 
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
 import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE;
 import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE_URI;
 import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_XSD_FILE_NAME;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.api.annotation.Extension;
 
 import java.util.Arrays;
 
@@ -37,7 +38,7 @@ import java.util.Arrays;
 public class MuleSdkExtensionExtensionModelDeclarer {
 
   public ExtensionDeclarer declareExtensionModel() {
-    final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
+    final BaseTypeBuilder typeBuilder = create(JAVA);
 
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named("Mule Extension DSL")
@@ -82,7 +83,7 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .describedAs("Vendor of the extension.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .defaultingTo(Extension.MULESOFT);
+        .defaultingTo(MULESOFT);
 
     params.withOptionalParameter("requiredEntitlement")
         .describedAs("The required entitlement in the customer extension license.")

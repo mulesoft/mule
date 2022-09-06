@@ -10,6 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
 
@@ -25,11 +26,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -106,7 +107,7 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
     Map<String, Matcher<Object>> expectedParameters = new LinkedHashMap<>();
     expectedParameters.put("name", is("Minimally Parameterized Extension"));
     expectedParameters.put("category", is(COMMUNITY.name()));
-    expectedParameters.put("vendor", is(Extension.MULESOFT));
+    expectedParameters.put("vendor", is(MULESOFT));
     expectedParameters.put("requiredEntitlement", is(nullValue()));
     expectedParameters.put("requiresEnterpriseLicense", is(false));
     expectedParameters.put("allowsEvaluationLicense", is(true));
@@ -140,7 +141,7 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
 
   private void assertThatParametersAreExactly(ComponentAst componentAst, Map<String, Matcher<Object>> expectedParameters) {
     assertThat(componentAst.getParameters(), hasSize(expectedParameters.size()));
-    for (Map.Entry<String, Matcher<Object>> entry : expectedParameters.entrySet()) {
+    for (Entry<String, Matcher<Object>> entry : expectedParameters.entrySet()) {
       assertThat(getParameterValue(componentAst, entry.getKey()), entry.getValue());
     }
   }

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.api.extension;
 
-
-
 import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelProvider.getExtensionModel;
 
 import org.mule.api.annotation.NoInstantiate;
@@ -26,5 +24,4 @@ public class MuleSdkExtensionRuntimeExtensionModelProvider implements RuntimeExt
   public ExtensionModel createExtensionModel() {
     return getExtensionModel();
   }
-
 }
