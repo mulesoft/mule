@@ -115,9 +115,9 @@ public class ErrorHandlerContextManager {
       errorHandlerContext.successCallback.accept(result);
     } else {
       // If the error was "not handled" by the On Error handler, then it must be further propagated.
-      // if (exception.getEvent() != result) {
-      // exception.setProcessedEvent(result);
-      // }
+      if (result.getError().isPresent()) {
+        exception.setProcessedEvent(result);
+      }
       errorHandlerContext.errorCallback.accept(exception);
     }
   }
