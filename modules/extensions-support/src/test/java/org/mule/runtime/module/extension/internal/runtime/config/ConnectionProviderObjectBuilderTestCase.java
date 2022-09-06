@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -53,6 +54,7 @@ public class ConnectionProviderObjectBuilderTestCase {
     connectionProviderFactoryModelProperty = new ConnectionProviderFactoryModelProperty(connectionProviderFactoryMock);
     when(connectionProviderModelMock.getModelProperty(ConnectionProviderFactoryModelProperty.class))
         .thenReturn(of(connectionProviderFactoryModelProperty));
+    when(connectionProviderModelMock.getConnectionManagementType()).thenReturn(POOLING);
   }
 
   @Test

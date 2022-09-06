@@ -102,7 +102,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          MuleContext muleContext) {
     super(prototypeClass, providerModel, resolverSet, expressionManager, muleContext);
     this.providerModel = providerModel;
-    this.poolingProfile = poolingProfile;
+    this.poolingProfile = computePoolingProfile(poolingProfile, resolverSet);
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
     this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
