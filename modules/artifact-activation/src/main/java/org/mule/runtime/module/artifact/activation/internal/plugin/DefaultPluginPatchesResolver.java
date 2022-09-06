@@ -93,15 +93,9 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
                                                          e);
                         }
                       })) {
-                    try {
-                      LOGGER.info("Patching artifact '{}' with patch file '{}'", artifactId, patchFilePath);
+                    LOGGER.info("Patching artifact '{}' with patch file '{}'", artifactId, patchFilePath);
 
-                      return new File(getMuleHomeFolder(),
-                                      patchFilePath.toString())
-                                          .toURL();
-                    } catch (MalformedURLException e) {
-                      throw new MuleRuntimeException(e);
-                    }
+                    return patchFilePath.toFile().toURI().toURL();
                   }
                 }
               } catch (IOException e) {

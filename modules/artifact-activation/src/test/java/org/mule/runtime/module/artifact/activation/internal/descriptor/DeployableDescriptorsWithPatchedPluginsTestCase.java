@@ -14,11 +14,9 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -38,6 +36,8 @@ import org.junit.runners.Parameterized.Parameters;
 @Story(PATCHED_ARTIFACT_DESCRIPTORS)
 @RunWith(Parameterized.class)
 public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
+
+  private static final String PATCHES_LOCATION = "/lib/patches/mule-artifact-patches";
 
   private final String deployableProjectFolder;
   private final Boolean isApplication;
@@ -69,8 +69,8 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .findFirst()
         .get();
 
-    assertThat(stream(httpPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               hasItem(endsWith("http-patch.jar")));
+    assertThat(stream(httpPlugin.getClassLoaderModel().getUrls()).collect(toList()),
+               hasItem(getClass().getClassLoader().getResource(deployableProjectFolder + PATCHES_LOCATION + "/http-patch.jar")));
 
     ArtifactPluginDescriptor dbPlugin = deployableArtifactDescriptor.getPlugins()
         .stream()
@@ -79,7 +79,8 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .get();
 
     assertThat(stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               not(hasItem(endsWith("db-patch.jar"))));
+               not(hasItem(getClass().getClassLoader()
+                   .getResource(deployableProjectFolder + PATCHES_LOCATION + "/db-patch.jar"))));
   }
 
   private DeployableArtifactDescriptor getDeployableArtifactDescriptor() throws URISyntaxException {
