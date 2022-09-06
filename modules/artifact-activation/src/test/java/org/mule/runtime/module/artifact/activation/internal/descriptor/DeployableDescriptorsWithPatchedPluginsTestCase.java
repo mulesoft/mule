@@ -14,11 +14,9 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -81,7 +79,8 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .get();
 
     assertThat(stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               not(hasItem(endsWith(deployableProjectFolder + PATCHES_LOCATION + "/db-patch.jar"))));
+               not(hasItem(getClass().getClassLoader()
+                   .getResource(deployableProjectFolder + PATCHES_LOCATION + "/db-patch.jar"))));
   }
 
   private DeployableArtifactDescriptor getDeployableArtifactDescriptor() throws URISyntaxException {
