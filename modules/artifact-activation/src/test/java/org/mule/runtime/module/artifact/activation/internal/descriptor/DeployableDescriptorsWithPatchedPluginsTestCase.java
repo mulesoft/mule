@@ -39,6 +39,8 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
 
+  private static final String PATCHES_LOCATION = "/lib/patches/mule-artifact-patches";
+
   private final String deployableProjectFolder;
   private final Boolean isApplication;
 
@@ -69,8 +71,8 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .findFirst()
         .get();
 
-    assertThat(stream(httpPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               hasItem(endsWith("http-patch.jar")));
+    assertThat(stream(httpPlugin.getClassLoaderModel().getUrls()).collect(toList()),
+               hasItem(getClass().getClassLoader().getResource(deployableProjectFolder + PATCHES_LOCATION + "/http-patch.jar")));
 
     ArtifactPluginDescriptor dbPlugin = deployableArtifactDescriptor.getPlugins()
         .stream()
@@ -79,7 +81,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .get();
 
     assertThat(stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               not(hasItem(endsWith("db-patch.jar"))));
+               not(hasItem(endsWith(deployableProjectFolder + PATCHES_LOCATION + "/db-patch.jar"))));
   }
 
   private DeployableArtifactDescriptor getDeployableArtifactDescriptor() throws URISyntaxException {
