@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
@@ -49,13 +50,16 @@ import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.extension.internal.client.InternalOperationParameters;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -64,6 +68,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -133,38 +138,38 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       shouldCompleteEvent = true;
     }
 
-    final Map<String, Object> resolvedParams = resolveParameters(paramsBuilder.build(), contextEvent);
+    final Map<String, Object> resolvedParams = resolveLegacyParameters(paramsBuilder.build(), contextEvent);
     OperationModel operationModel = key.getOperationModel();
     CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
 
     ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
-                                                                                    key.getExtensionModel(),
-                                                                                    getConfigurationInstance(
-                                                                                        key.getConfigurationProvider(),
-                                                                                        contextEvent),
-                                                                                    resolvedParams,
-                                                                                    operationModel,
-                                                                                    contextEvent,
-                                                                                    cursorProviderFactory,
-                                                                                    streamingManager,
-                                                                                    NULL_COMPONENT,
-                                                                                    parameterizer.getRetryPolicyTemplate(),
-                                                                                    IMMEDIATE_SCHEDULER,
-                                                                                    empty(),
-                                                                                    muleContext);
+        key.getExtensionModel(),
+        getConfigurationInstance(
+            key.getConfigurationProvider(),
+            contextEvent),
+        resolvedParams,
+        operationModel,
+        contextEvent,
+        cursorProviderFactory,
+        streamingManager,
+        NULL_COMPONENT,
+        parameterizer.getRetryPolicyTemplate(),
+        IMMEDIATE_SCHEDULER,
+        empty(),
+        muleContext);
 
     return client.execute(context, shouldCompleteEvent);
   }
 
-  private Map<String, Object> resolveParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
+  private Map<String, Object> resolveLegacyParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-                                                                            parameters,
-                                                                            muleContext,
-                                                                            true,
-                                                                            reflectionCache,
-                                                                            expressionManager,
-                                                                            "");
+          parameters,
+          muleContext,
+          true,
+          reflectionCache,
+          expressionManager,
+          "");
 
       try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
         return resolverSet.resolve(ctx).asMap();
@@ -203,13 +208,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private OperationClient createOperationClient(OperationKey key) {
     OperationClient client = from(
-                                  key,
-                                  extensionManager,
-                                  expressionManager,
-                                  extensionConnectionSupplier,
-                                  errorTypeRepository,
-                                  reflectionCache,
-                                  muleContext);
+        key,
+        extensionManager,
+        expressionManager,
+        extensionConnectionSupplier,
+        errorTypeRepository,
+        reflectionCache,
+        muleContext);
 
     try {
       initialiseIfNeeded(client);
@@ -259,7 +264,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     if (configurationProvider.isPresent()) {
       ConfigurationModel configurationModel = configurationProvider.get().getConfigurationModel();
       return configurationModel.getOperationModel(operationName).orElseThrow(
-                                                                             () -> noSuchOperationException(operationName));
+          () -> noSuchOperationException(operationName));
     } else {
       throw new IllegalArgumentException("Operation '" + operationName + "' not found at the extension level");
     }
@@ -299,18 +304,45 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     return executeAsync(
-                        extensionName,
-                        operationName,
-                        parameterizer -> {
-                          parameters.get().forEach((key, value) -> {
-                            if (!CONFIG_ATTRIBUTE_NAME.equals(key)) {
-                              parameterizer.withParameter(key, value);
-                            }
-                          });
-                          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                          configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                          setContextEvent(parameterizer, parameters);
-                        });
+        extensionName,
+        operationName,
+        parameterizer -> {
+          setContextEvent(parameterizer, parameters);
+          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+          resolveLegacyParameters(parameterizer, parameters);
+          configureLegacyRepeatableStreaming(parameterizer, operationModel);
+        });
+  }
+
+  protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
+    resolveLegacyParameters(legacyParameters.get(), parameterizer::withParameter);
+  }
+
+  private void resolveLegacyParameters(Map<String, Object> parameters,
+                                       BiConsumer<String, Object> resolvedValueConsumer) {
+    parameters.forEach((paramName, value) -> {
+      if (CONFIG_ATTRIBUTE_NAME.equals(paramName)) {
+        return;
+      }
+
+      if (value instanceof ComplexParameter) {
+        ComplexParameter complex = (ComplexParameter) value;
+        DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
+        resolveLegacyParameters(complex.getParameters(), (propertyName, propertyValue) ->
+            builder.addPropertyResolver(propertyName, new StaticValueResolver<>(propertyValue))
+        );
+
+        value = withNullEvent(event -> {
+          try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
+            return builder.build(ctx);
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", paramName)), e);
+          }
+        });
+      }
+
+      resolvedValueConsumer.accept(paramName, value);
+    });
   }
 
   /**
@@ -344,18 +376,18 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private void setContextEvent(OperationParameterizer parameterizer, OperationParameters parameters) {
-    if (parameters instanceof InternalOperationParameters) {
-      ((InternalOperationParameters) parameters).getContextEvent().ifPresent(parameterizer::inTheContextOf);
-    }
-  }
-
   private void setDefaultRepeatableStreaming(OperationParameterizer parameterizer) {
     parameterizer.withDefaultRepeatableStreaming();
   }
 
   private void setDefaultRepeatableIterables(OperationParameterizer parameterizer) {
     parameterizer.withDefaultRepeatableIterables();
+  }
+
+  private void setContextEvent(OperationParameterizer parameterizer, OperationParameters parameters) {
+    if (parameters instanceof InternalOperationParameters) {
+      ((InternalOperationParameters) parameters).getContextEvent().ifPresent(parameterizer::inTheContextOf);
+    }
   }
 
   @Override
