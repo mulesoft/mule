@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.lock;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lock.LockFactory;
 
@@ -30,9 +32,7 @@ public class ServerLockFactory implements LockFactory, Disposable {
 
   @Override
   public void dispose() {
-    if (lockGroup != null) {
-      lockGroup.dispose();
-    }
+    disposeIfNeeded(lockGroup);
   }
 
   private static class LockAdapter implements Lock {

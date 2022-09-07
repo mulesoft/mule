@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.lifecycle;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -25,6 +27,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -41,6 +44,8 @@ import org.slf4j.Logger;
  * @since 3.7.0
  */
 public class LifecycleUtils {
+
+  private static final Logger LOGGER = getLogger(DefaultMuleContext.class);
 
   private static DisposedObjectsTracker tracker = new DisposedObjectsTracker();
 
@@ -245,6 +250,16 @@ public class LifecycleUtils {
         }
       }
     }
+  }
+
+  /**
+   * Invokes {@link Disposable#dispose()} on {@code object} if it implements the {@link Disposable} interface. If the dispose
+   * operation fails, then the exception will be silently logged using the provided {@code logger}
+   *
+   * @param object the object you're trying to dispose
+   */
+  public static void disposeIfNeeded(Object object) {
+    disposeIfNeeded(object, LOGGER);
   }
 
   /**

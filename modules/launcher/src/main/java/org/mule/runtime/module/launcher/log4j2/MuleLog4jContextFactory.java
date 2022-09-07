@@ -10,6 +10,7 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler;
@@ -101,11 +102,9 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
   @Override
   public void dispose() {
     ContextSelector selector = getSelector();
-    if (selector instanceof Disposable) {
-      ((Disposable) selector).dispose();
-    }
+    disposeIfNeeded(selector);
     MuleShutdownCallbackRegistry shutdownCallbackRegistry = (MuleShutdownCallbackRegistry) getShutdownCallbackRegistry();
-    shutdownCallbackRegistry.dispose();
+    disposeIfNeeded(shutdownCallbackRegistry);
   }
 
   private static class MuleShutdownCallbackRegistry implements ShutdownCallbackRegistry, Disposable {

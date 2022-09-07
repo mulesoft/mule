@@ -12,11 +12,13 @@ import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToB
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 
 import static java.lang.System.getProperty;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -49,7 +51,11 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+
 public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
+
+  private static final Logger LOGGER = getLogger(DataWeaveExpressionLanguageAdaptor.class);
 
   public static final String SERVER = "server";
   public static final String MULE = "mule";
@@ -109,8 +115,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, newContext));
     }
   }
-
-
 
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event, BindingContext context)
@@ -243,7 +247,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Override
   public void dispose() {
-    expressionExecutor.dispose();
+    disposeIfNeeded(expressionExecutor, LOGGER);
   }
 
   @Override

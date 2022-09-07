@@ -11,9 +11,14 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
@@ -47,6 +52,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -56,6 +62,8 @@ import org.reactivestreams.Publisher;
 @NoExtend
 public class PolicyChain extends AbstractComponent
     implements Initialisable, Startable, Stoppable, Disposable, Processor {
+
+  private static Logger LOGGER = getLogger(PolicyChain.class);
 
   @Inject
   private MuleContext muleContext;
@@ -109,25 +117,17 @@ public class PolicyChain extends AbstractComponent
   public void start() throws MuleException {
     chainActiveSink = new FluxSinkRecorder();
     processingStrategy.registerInternalSink(chainActiveSink.flux(), flowStackEntryName);
-
-    if (processorChain != null) {
-      processorChain.start();
-    }
+    startIfNeeded(processorChain);
   }
 
   @Override
   public void dispose() {
-    if (processorChain != null) {
-      processorChain.dispose();
-    }
+    disposeIfNeeded(processorChain, LOGGER);
   }
 
   @Override
   public void stop() throws MuleException {
-    if (processorChain != null) {
-      processorChain.stop();
-    }
-
+    stopIfNeeded(processorChain);
     chainActiveSink.complete();
   }
 

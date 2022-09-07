@@ -9,6 +9,8 @@ package org.mule.runtime.module.launcher.log4j2;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Thread.currentThread;
+
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -150,7 +152,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
 
   @Override
   public void dispose() {
-    cache.dispose();
+    disposeIfNeeded(cache);
   }
 
   public void destroyLoggersFor(ClassLoader classLoader) {

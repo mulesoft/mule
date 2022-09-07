@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.lang.Runtime.getRuntime;
+
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
@@ -70,14 +72,12 @@ class CommonSourcePolicy {
   }
 
   public void dispose() {
-    policySink.dispose();
+    disposeIfNeeded(policySink);
   }
 
   public Disposable deferredDispose() {
     final FluxSinkSupplier<CoreEvent> sink = policySink;
-    return () -> {
-      sink.dispose();
-    };
+    return () -> disposeIfNeeded(sink);
   }
 
 }

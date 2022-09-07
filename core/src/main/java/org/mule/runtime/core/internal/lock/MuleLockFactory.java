@@ -7,6 +7,9 @@
 package org.mule.runtime.core.internal.lock;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -19,7 +22,11 @@ import java.util.concurrent.locks.Lock;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+
 public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
+
+  private static final Logger LOGGER = getLogger(MuleLockFactory.class);
 
   private LockGroup lockGroup;
   private LockProvider lockProvider;
@@ -34,9 +41,7 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
   @Override
   public void dispose() {
-    if (lockGroup != null) {
-      lockGroup.dispose();
-    }
+    disposeIfNeeded(lockGroup, LOGGER);
   }
 
   @Override

@@ -519,7 +519,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much
         // abstraction?
         if (muleRegistryHelper != null) {
-          safely(() -> muleRegistryHelper.dispose());
+          safely(() -> disposeIfNeeded(muleRegistryHelper, LOGGER));
         }
       } catch (Exception e) {
         LOGGER.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
