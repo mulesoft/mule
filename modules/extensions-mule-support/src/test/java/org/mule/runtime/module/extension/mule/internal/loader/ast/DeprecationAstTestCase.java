@@ -26,7 +26,7 @@ import org.junit.Test;
 @Feature(REUSE)
 @Stories({@Story(APPLICATION_EXTENSION_MODEL), @Story(OPERATIONS)})
 @Issue("W-11292607")
-public class DeprecationAstTestCase extends AbstractApplicationAstTestCase {
+public class DeprecationAstTestCase extends AbstractMuleSdkAstTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -35,7 +35,7 @@ public class DeprecationAstTestCase extends AbstractApplicationAstTestCase {
 
   @Test
   public void operationDeprecation() {
-    ArtifactAst appAst = getApplicationAst();
+    ArtifactAst appAst = getArtifactAst();
     ComponentAst deprecatedOperationAst = getTopLevelComponent(appAst, "deprecatedOperation");
     ComponentAst deprecationAst = getChild(deprecatedOperationAst, "deprecated");
     ComponentModel deprecationComponentModel = deprecationAst.getModel(ComponentModel.class).get();
@@ -44,7 +44,7 @@ public class DeprecationAstTestCase extends AbstractApplicationAstTestCase {
 
   @Test
   public void parameterDeprecation() {
-    ArtifactAst appAst = getApplicationAst();
+    ArtifactAst appAst = getArtifactAst();
     ComponentAst operationWithDeprecatedParameter = getTopLevelComponent(appAst, "operationWithDeprecatedParameter");
     ComponentAst parametersAst = getChild(operationWithDeprecatedParameter, "parameters");
     ComponentAst deprecatedParameterAst = getChild(parametersAst, "parameter");

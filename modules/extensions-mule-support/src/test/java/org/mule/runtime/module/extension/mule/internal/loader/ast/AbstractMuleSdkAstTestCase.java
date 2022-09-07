@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 /**
  * Extend this class to make assertions on the AST generated from an application's XML config file.
  */
-public abstract class AbstractApplicationAstTestCase extends AbstractMuleTestCase {
+public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   private ClassLoader classLoader;
   private AstXmlParser parser;
@@ -58,9 +58,13 @@ public abstract class AbstractApplicationAstTestCase extends AbstractMuleTestCas
     classLoader = this.getClass().getClassLoader();
 
     Builder astParserBuilder = builder()
-        .withSchemaValidationsDisabled()
         .withExtensionModels(runtimeExtensionModels)
         .withPropertyResolver(propertyKey -> properties.getOrDefault(propertyKey, propertyKey));
+
+    if (!validateSchema()) {
+      astParserBuilder.withSchemaValidationsDisabled();
+    }
+
     customizeAstParserBuilder(astParserBuilder);
     parser = astParserBuilder.build();
   }
@@ -70,8 +74,16 @@ public abstract class AbstractApplicationAstTestCase extends AbstractMuleTestCas
     // model)
   }
 
-  protected ArtifactAst getApplicationAst() {
+  protected boolean validateSchema() {
+    return false;
+  }
+
+  protected ArtifactAst getArtifactAst() {
     return parser.parse(classLoader.getResource(getConfigFile()));
+  }
+
+  protected ArtifactAst getArtifactAst(String configFile) {
+    return parser.parse(classLoader.getResource(configFile));
   }
 
   protected ComponentAst getTopLevelComponent(ArtifactAst ast, String componentName) {
