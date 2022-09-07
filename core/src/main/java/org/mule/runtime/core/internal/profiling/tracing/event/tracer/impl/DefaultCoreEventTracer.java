@@ -32,6 +32,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.export.Intern
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -148,9 +149,13 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
         return emptyMap();
       }
 
-      Map<String, String> contextMap = OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span);
+      Map<String, String> contextMap = new HashMap<>();
+
+      // First the remote context
       contextMap.putAll(distributedTraceContext.tracingFieldsAsMap());
       contextMap.putAll(distributedTraceContext.baggageItemsAsMap());
+      // Then the current span. So that it will overwrite the common properties.
+      contextMap.putAll(OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span));
 
       return contextMap;
     } else {
