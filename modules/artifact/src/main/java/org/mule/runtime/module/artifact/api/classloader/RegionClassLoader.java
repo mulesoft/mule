@@ -436,6 +436,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       }
     });
     descriptorMapping.clear();
+    packageMapping.clear();
+    resourceMapping.clear();
+
     disposeClassLoader(ownerClassLoader);
     super.dispose();
 

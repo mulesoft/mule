@@ -7,11 +7,23 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static com.google.common.collect.Sets.newHashSet;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.REGION_OWNER_CANNOT_BE_REMOVED_ERROR;
+import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createCannotRemoveClassLoaderError;
+import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
+import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
+import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
+import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.util.CollectableReference.collectedByGc;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.list;
 import static java.util.Collections.singleton;
+
+import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -26,14 +38,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.REGION_OWNER_CANNOT_BE_REMOVED_ERROR;
-import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createCannotRemoveClassLoaderError;
-import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
-import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
-import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -42,6 +46,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.util.CollectableReference;
 import org.mule.tck.util.EnumerationMatcher;
 
 import java.io.IOException;
@@ -54,6 +59,8 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -643,6 +650,28 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                                ImmutableList.of("SomeClass.class", "SomeOtherClass.class"),
                                ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
                                                 new URL("http://com.mycompany/SomeOtherClass.class")));
+  }
+
+  @Test
+  @Issue("W-11698566")
+  @Description("The RegionClassLoader does not keep a reference to packages and resources mappings, which could cause a MuleArtifactClassLoader leak.")
+  public void regionClassLoaderDoesNotLeakPackageMappingsAfterDispose() throws ClassNotFoundException {
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(regionClassLoader);
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
+    pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
+
+    CollectableReference<TestArtifactClassLoader> collectableReference = new CollectableReference<>(pluginClassLoader);
+
+    pluginClassLoader = null;
+    regionClassLoader.dispose();
+
+    assertThat(collectableReference, is(eventually(collectedByGc())));
   }
 
   private void findExportedPackageAsResource(String resource, URL resourceExpectedUrl, String resourcePackage) {
