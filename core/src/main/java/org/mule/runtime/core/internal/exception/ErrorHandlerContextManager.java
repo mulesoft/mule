@@ -34,7 +34,7 @@ public class ErrorHandlerContextManager {
   /**
    * The key used to store a {@link ErrorHandlerContextManager} as an {@link InternalEvent} internal parameter.
    * 
-   * @see {@link InternalEvent#getInternalParameter(String)}
+   * @see InternalEvent#getInternalParameter(String)
    */
   public static final String ERROR_HANDLER_CONTEXT = "error.context";
   private final Map<String, Deque<ErrorHandlerContext>> items = new SmallMap<>();
@@ -72,7 +72,9 @@ public class ErrorHandlerContextManager {
    * @param handler         The OnError handler invoking this method.
    * @param exception       The {@link MessagingException} being handled.
    * @param successCallback Callback that will be invoked if the exception is successfully handled by the OnError handler.
-   * @param errorCallback   Callback that will be invoked if the exception is could not be handled by the OnError handler.
+   * @param errorCallback   Callback that will be invoked if the exception was not handled by the OnError handler (this can be
+   *                        caused by the On Error handler intentionally propagating the exception or if it fails during its
+   *                        execution, generating a new exception).
    * @return The {@link CoreEvent} whose processing caused the {@link MessagingException}.
    * @see #resolveHandling(FlowExceptionHandler, CoreEvent)
    * @see #resolveHandling(FlowExceptionHandler, MessagingException)
@@ -104,12 +106,12 @@ public class ErrorHandlerContextManager {
   public static void resolveHandling(FlowExceptionHandler handler, CoreEvent result) {
     ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
     MessagingException exception = errorHandlerContext.getException();
-    // A successful handling event does not imply that the exception was handled, but that there were no errors during the
-    // handling.
     if (exception.handled()) {
+      // If the error was "handled" by the On Error handler, then it must not be further propagated.
       errorHandlerContext.successCallback.accept(result);
     } else {
-      if (exception.getEvent() != result) {
+      // If the error was "not handled" by the On Error handler, then it must be further propagated.
+      if (result.getError().isPresent()) {
         exception.setProcessedEvent(result);
       }
       errorHandlerContext.errorCallback.accept(exception);
@@ -118,13 +120,13 @@ public class ErrorHandlerContextManager {
 
   /**
    * <p>
-   * Used by OnError handlers to communicate the result of an unsuccessful {@link MessagingException} handling attempt.
+   * Used by On Error handlers to communicate the result of an unsuccessful {@link MessagingException} handling attempt.
    * </p>
    * <p>
    * Note that {@link #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)} must be previously invoked.
    * </p>
    * 
-   * @param handler   The OnErrorHandler invoking this method.
+   * @param handler   The On Error handler invoking this method.
    * @param exception The {@link MessagingException} resultant from the handling attempt.
    */
   public static void resolveHandling(FlowExceptionHandler handler, MessagingException exception) {
