@@ -40,7 +40,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
