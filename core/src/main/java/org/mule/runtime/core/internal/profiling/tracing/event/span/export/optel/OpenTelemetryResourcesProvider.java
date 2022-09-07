@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -131,7 +130,6 @@ public class OpenTelemetryResourcesProvider {
 
   private static SpanProcessor resolveExporterProcessor(SpanExporterConfiguration spanExporterConfiguration) {
     return BatchSpanProcessor.builder(createExporter(spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP)))
-        .setExporterTimeout(3, TimeUnit.SECONDS)
         .build();
   }
 
