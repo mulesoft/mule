@@ -49,54 +49,60 @@ public class ScalaClassValueReleaser implements ResourceReleaser {
   @Override
   public void release() {
     try {
-      WeakHashMap classValueMap = getClassValueMap();
-
-      if (classValueMap != null) {
-        Object[] cache = getCache(classValueMap);
-
-        for (int i = 0; i < cache.length; i++) {
-          Object object = cache[i];
-
-          if (object != null) {
-            final Object value = resolveValue(object);
-
-            LOGGER.trace("Checking class value entry '{}' from '{}'...", value.getClass(), value.getClass().getClassLoader());
-
-            if (value.getClass().getClassLoader() instanceof MuleDeployableArtifactClassLoader
-                || (value.getClass().getClassLoader() != null
-                    && value.getClass().getClassLoader().getParent() instanceof RegionClassLoader)) {
-              LOGGER.debug("Removing class value entry '{}' from '{}'", value.getClass(), value.getClass().getClassLoader());
-
-              Object key = null;
-              final Set<Entry> entrySet = classValueMap.entrySet();
-              for (Entry entry : entrySet) {
-                if (resolveValue(entry.getValue()) == value) {
-                  key = entry.getKey();
-                  break;
-                }
-              }
-
-              classValueMap.remove(key);
-              cache[i] = null;
-            } else {
-              LOGGER.trace("NOT Removing class value entry '{}' from '{}'", value.getClass(), value.getClass().getClassLoader());
-            }
-          }
-        }
-      }
+      removeClassValueMap(String.class);
+      removeClassValueMap(Object.class);
     } catch (Throwable t) {
       LOGGER.warn("Unable to clean Scala's ClassValues", t);
     }
   }
 
-  private WeakHashMap getClassValueMap() throws IllegalAccessException {
+  private void removeClassValueMap(Class cls)
+      throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
+    WeakHashMap classValueMap = getClassValueMap(cls);
+
+    if (classValueMap != null) {
+      Object[] cache = getCache(classValueMap);
+
+      for (int i = 0; i < cache.length; i++) {
+        Object object = cache[i];
+
+        if (object != null) {
+          final Object value = resolveValue(object);
+
+          LOGGER.trace("Checking class value entry '{}' from '{}'...", value.getClass(), value.getClass().getClassLoader());
+
+          if (value.getClass().getClassLoader() instanceof MuleDeployableArtifactClassLoader
+              || (value.getClass().getClassLoader() != null
+                  && value.getClass().getClassLoader().getParent() instanceof RegionClassLoader)) {
+            LOGGER.debug("Removing class value entry '{}' from '{}'", value.getClass(), value.getClass().getClassLoader());
+
+            Object key = null;
+            final Set<Entry> entrySet = classValueMap.entrySet();
+            for (Entry entry : entrySet) {
+              if (resolveValue(entry.getValue()) == value) {
+                key = entry.getKey();
+                break;
+              }
+            }
+
+            classValueMap.remove(key);
+            cache[i] = null;
+          } else {
+            LOGGER.trace("NOT Removing class value entry '{}' from '{}'", value.getClass(), value.getClass().getClassLoader());
+          }
+        }
+      }
+    }
+  }
+
+  private WeakHashMap getClassValueMap(Class cls) throws IllegalAccessException {
     if (classValueMapField == null) {
       return null;
     }
 
     classValueMapField.setAccessible(true);
     try {
-      return (WeakHashMap) classValueMapField.get(String.class);
+      return (WeakHashMap) classValueMapField.get(cls);
     } finally {
       classValueMapField.setAccessible(false);
     }
