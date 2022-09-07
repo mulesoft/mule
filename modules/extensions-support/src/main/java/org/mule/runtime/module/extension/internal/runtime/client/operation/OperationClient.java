@@ -186,7 +186,8 @@ public class OperationClient implements Lifecycle {
                                                                                              ctx.getEvent()),
                                           false);
       } else if (value instanceof CursorStreamProvider) {
-        return new EventCompletingValue<>(new EventCompletingCursorStreamProviderDecorator((CursorStreamProvider) value, ctx.getEvent()),
+        return new EventCompletingValue<>(new EventCompletingCursorStreamProviderDecorator((CursorStreamProvider) value,
+                                                                                           ctx.getEvent()),
                                           false);
       }
     }
