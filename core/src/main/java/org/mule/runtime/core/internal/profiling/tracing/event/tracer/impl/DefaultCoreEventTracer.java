@@ -103,8 +103,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                              isErrorEscapingCurrentSpan);
   }
 
-  @Override
-  public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> spanError, boolean isErrorEscapingCurrentSpan) {
+  private void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> spanError, boolean isErrorEscapingCurrentSpan) {
     safeExecute(() -> {
       EventContext eventContext = coreEvent.getContext();
       if (eventContext instanceof DistributedTraceContextAware) {
