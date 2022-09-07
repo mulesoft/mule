@@ -125,10 +125,9 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     CursorStreamProvider streamProvider = result.getOutput();
     String value = IOUtils.toString(streamProvider);
     try {
-      assertThat(value, equalTo("6"));
+      assertThat(value, equalTo("Heisenberg"));
     } finally {
-      closeQuietly((Closeable) streamProvider);
-      result.getOutput().close();
+      streamProvider.close();
     }
   }
 

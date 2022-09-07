@@ -29,6 +29,8 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.MuleContext;
@@ -180,11 +182,11 @@ public class OperationClient implements Lifecycle {
                                                               boolean shouldCompleteEvent) {
     if (shouldCompleteEvent) {
       if (value instanceof CursorIteratorProvider) {
-        return new EventCompletingValue<>(new EventCompletingCursorIteratorProviderDecorator((CursorProvider) value,
+        return new EventCompletingValue<>(new EventCompletingCursorIteratorProviderDecorator((CursorIteratorProvider) value,
                                                                                              ctx.getEvent()),
                                           false);
-      } else if (value instanceof CursorProvider) {
-        return new EventCompletingValue<>(new EventCompletingCursorProviderDecorator<>((CursorProvider) value, ctx.getEvent()),
+      } else if (value instanceof CursorStreamProvider) {
+        return new EventCompletingValue<>(new EventCompletingCursorStreamProviderDecorator((CursorStreamProvider) value, ctx.getEvent()),
                                           false);
       }
     }
@@ -226,11 +228,11 @@ public class OperationClient implements Lifecycle {
     }
   }
 
-  private static class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {
+  private static abstract class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {
 
     private final CoreEvent event;
 
-    public EventCompletingCursorProviderDecorator(CursorProvider delegate, CoreEvent event) {
+    private EventCompletingCursorProviderDecorator(CursorProvider delegate, CoreEvent event) {
       super(delegate);
       this.event = event;
     }
@@ -245,10 +247,18 @@ public class OperationClient implements Lifecycle {
     }
   }
 
+  private static class EventCompletingCursorStreamProviderDecorator
+      extends EventCompletingCursorProviderDecorator<CursorStream> implements CursorStreamProvider {
+
+    public EventCompletingCursorStreamProviderDecorator(CursorStreamProvider delegate, CoreEvent event) {
+      super(delegate, event);
+    }
+  }
+
   private static class EventCompletingCursorIteratorProviderDecorator
       extends EventCompletingCursorProviderDecorator<CursorIterator> implements CursorIteratorProvider {
 
-    public EventCompletingCursorIteratorProviderDecorator(CursorProvider delegate, CoreEvent event) {
+    public EventCompletingCursorIteratorProviderDecorator(CursorIteratorProvider delegate, CoreEvent event) {
       super(delegate, event);
     }
   }
