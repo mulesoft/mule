@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.lang.Thread.currentThread;
+
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
 
@@ -63,7 +66,7 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
 
   @Override
   public void dispose() {
-    delegate.dispose();
+    disposeIfNeeded(delegate);
     sinks.invalidateAll();
   }
 }

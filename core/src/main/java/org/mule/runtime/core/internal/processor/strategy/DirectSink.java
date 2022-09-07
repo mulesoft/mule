@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.Flow;
@@ -58,6 +60,6 @@ class DirectSink implements Sink, Disposable {
   @Override
   public void dispose() {
     reactorSink.prepareDispose();
-    reactorSink.dispose();
+    disposeIfNeeded(reactorSink);
   }
 }

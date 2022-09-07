@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.config.FeatureFlaggingUtils.isFeatureEnabled;
 
@@ -199,7 +200,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   @Override
   public void dispose() {
     if (policyContext != null) {
-      policyContext.getMuleContext().dispose();
+      disposeIfNeeded(policyContext.getMuleContext());
     }
   }
 

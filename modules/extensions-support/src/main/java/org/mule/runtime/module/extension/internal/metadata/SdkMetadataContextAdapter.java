@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -24,7 +26,7 @@ public class SdkMetadataContextAdapter implements MetadataContext {
 
   @Override
   public void dispose() {
-    delegate.dispose();
+    disposeIfNeeded(delegate);
   }
 
   @Override

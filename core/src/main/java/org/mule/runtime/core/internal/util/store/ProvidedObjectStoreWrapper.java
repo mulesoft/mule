@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -76,8 +78,8 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> extends Template
 
   @Override
   public void dispose() {
-    if (!provided && wrapped != null && wrapped instanceof Disposable) {
-      ((Disposable) wrapped).dispose();
+    if (!provided) {
+      disposeIfNeeded(wrapped);
     }
     wrapped = null;
   }

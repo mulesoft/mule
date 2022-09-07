@@ -19,6 +19,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
@@ -386,8 +387,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
       @Override
       public void dispose() {
-        fluxSinks.stream().forEach(sink -> sink.prepareDispose());
-        fluxSinks.stream().forEach(sink -> sink.dispose());
+        fluxSinks.stream().forEach(ReactorSink::prepareDispose);
+        fluxSinks.stream().forEach(sink -> disposeIfNeeded(sink, LOGGER));
       }
 
       @Override

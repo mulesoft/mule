@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -51,21 +54,21 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   @Override
   public void start() throws MuleException {
     for (ProcessorRoute route : routes) {
-      route.start();
+      startIfNeeded(route);
     }
   }
 
   @Override
   public void stop() throws MuleException {
     for (ProcessorRoute route : routes) {
-      route.stop();
+      stopIfNeeded(route);
     }
   }
 
   @Override
   public void dispose() {
     for (ProcessorRoute route : routes) {
-      route.dispose();
+      disposeIfNeeded(route);
     }
   }
 

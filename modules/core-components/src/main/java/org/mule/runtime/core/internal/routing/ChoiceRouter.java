@@ -8,7 +8,10 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
@@ -82,7 +85,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   @Override
   public void start() throws MuleException {
     for (ProcessorRoute route : routes) {
-      route.start();
+      startIfNeeded(route);
     }
 
     started.set(true);
@@ -91,7 +94,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   @Override
   public void stop() throws MuleException {
     for (ProcessorRoute route : routes) {
-      route.stop();
+      stopIfNeeded(route);
     }
 
     started.set(false);
@@ -100,7 +103,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   @Override
   public void dispose() {
     for (ProcessorRoute route : routes) {
-      route.dispose();
+      disposeIfNeeded(route);
     }
   }
 

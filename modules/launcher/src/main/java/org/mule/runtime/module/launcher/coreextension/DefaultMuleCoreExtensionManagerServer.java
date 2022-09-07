@@ -8,6 +8,8 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -71,7 +73,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
       if (initializedCoreExtensions.contains(extension)) {
         try {
-          extension.dispose();
+          disposeIfNeeded(extension, LOGGER);
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Core extension '{}' disposed", extension.toString());
           }

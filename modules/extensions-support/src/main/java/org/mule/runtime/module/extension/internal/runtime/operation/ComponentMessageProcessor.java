@@ -968,7 +968,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     if (fluxSupplier != null) {
       synchronized (fluxSupplierDisposeLock) {
         if (fluxSupplier != null) {
-          fluxSupplier.dispose();
+          disposeIfNeeded(fluxSupplier, LOGGER);
           fluxSupplier = null;
         }
       }

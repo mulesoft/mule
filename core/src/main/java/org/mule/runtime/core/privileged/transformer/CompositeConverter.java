@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.privileged.transformer;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -115,14 +118,14 @@ public final class CompositeConverter extends AbstractComponent implements Conve
   @Override
   public void dispose() {
     for (Converter converter : chain) {
-      converter.dispose();
+      disposeIfNeeded(converter);
     }
   }
 
   @Override
   public void initialise() throws InitialisationException {
     for (Converter converter : chain) {
-      converter.initialise();
+      initialiseIfNeeded(converter, muleContext);
     }
   }
 

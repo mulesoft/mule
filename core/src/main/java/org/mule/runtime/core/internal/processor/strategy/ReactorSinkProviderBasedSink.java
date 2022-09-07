@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -49,6 +51,6 @@ public class ReactorSinkProviderBasedSink implements Sink, Disposable {
   @Override
   public void dispose() {
     disposing = true;
-    sinkProvider.dispose();
+    disposeIfNeeded(sinkProvider);
   }
 }

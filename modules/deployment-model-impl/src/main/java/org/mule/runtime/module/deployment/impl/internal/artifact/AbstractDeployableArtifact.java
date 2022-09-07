@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
@@ -138,7 +139,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       LOGGER.error(format("Error stopping %s '%s'", artifactType, getArtifactName()), e);
     }
 
-    artifactContext.getMuleContext().dispose();
+    disposeIfNeeded(artifactContext.getMuleContext(), LOGGER);
     artifactContext = null;
   }
 

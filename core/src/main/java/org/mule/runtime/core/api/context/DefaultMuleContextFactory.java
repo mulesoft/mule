@@ -11,6 +11,7 @@ import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -177,7 +178,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
     } catch (ConfigurationException e) {
       if (muleContext != null && !muleContext.isDisposed()) {
         try {
-          muleContext.dispose();
+          disposeIfNeeded(muleContext, logger);
         } catch (Exception e1) {
           logger.warn("Can not dispose context. {}", getMessage(e1));
           if (logger.isDebugEnabled()) {

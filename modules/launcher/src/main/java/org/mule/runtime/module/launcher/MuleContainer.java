@@ -14,10 +14,13 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.internal.logging.LogUtil.LOGGER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
@@ -351,36 +354,26 @@ public class MuleContainer {
   public void stop() throws MuleException {
     MuleContainerBootstrap.dispose();
 
-    if (deploymentService != null) {
-      deploymentService.stop();
-    }
+    stopIfNeeded(deploymentService);
 
-    if (muleLockFactory != null) {
-      muleLockFactory.dispose();
-    }
+    disposeIfNeeded(muleLockFactory);
 
-    if (extensionModelLoaderManager != null) {
-      extensionModelLoaderManager.stop();
-    }
+    stopIfNeeded(extensionModelLoaderManager);
 
-    coreExtensionManager.stop();
-    coreExtensionManager.dispose();
+    stopIfNeeded(coreExtensionManager);
+    disposeIfNeeded(coreExtensionManager, logger);
 
-    if (serviceManager != null) {
-      serviceManager.stop();
-    }
+    stopIfNeeded(serviceManager);
 
-    if (toolingService != null) {
-      toolingService.stop();
-    }
+    stopIfNeeded(toolingService);
 
     LoggerContextFactory defaultLogManagerFactory = LogManager.getFactory();
     if (defaultLogManagerFactory instanceof MuleLog4jContextFactory) {
-      ((MuleLog4jContextFactory) defaultLogManagerFactory).dispose();
+      disposeIfNeeded(defaultLogManagerFactory, logger);
     }
 
     if (log4jContextFactory != null && log4jContextFactory != defaultLogManagerFactory) {
-      log4jContextFactory.dispose();
+      disposeIfNeeded(log4jContextFactory, logger);
     }
   }
 

@@ -7,6 +7,10 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -159,10 +163,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     if (profilingService == null) {
       initialiseProfilingService();
     }
-
-    if (profilingService instanceof Disposable) {
-      ((Disposable) profilingService).dispose();
-    }
+    disposeIfNeeded(profilingService);
   }
 
   @Override
@@ -170,10 +171,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     if (profilingService == null) {
       initialiseProfilingService();
     }
-
-    if (profilingService instanceof Initialisable) {
-      ((Initialisable) profilingService).initialise();
-    }
+    initialiseIfNeeded(profilingService);
   }
 
   @Override
@@ -188,10 +186,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     if (profilingService == null) {
       initialiseProfilingService();
     }
-
-    if (profilingService instanceof Startable) {
-      ((Startable) profilingService).start();
-    }
+    startIfNeeded(profilingService);
   }
 
   @Override
@@ -199,9 +194,6 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     if (profilingService == null) {
       initialiseProfilingService();
     }
-
-    if (profilingService instanceof Stoppable) {
-      ((Stoppable) profilingService).stop();
-    }
+    stopIfNeeded(profilingService);
   }
 }

@@ -497,7 +497,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
     @Override
     public void dispose() {
-      deferredDispose.dispose();
+      disposeIfNeeded(deferredDispose);
     }
 
     /*

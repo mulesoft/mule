@@ -11,6 +11,7 @@ import static java.lang.Integer.compare;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -149,7 +150,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       // Run callback before disposing the policy to be able to dispose Composite Policies before policy schedulers are shutdown
       policiesChangedCallback.run();
 
-      provider.getApplicationPolicyInstance().dispose();
+      disposeIfNeeded(provider.getApplicationPolicyInstance());
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
           .filter(p -> p.policyTemplate.equals(provider.getApplicationPolicyInstance().getPolicyTemplate()))
@@ -248,7 +249,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   public void dispose() {
 
     for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-      registeredPolicyInstanceProvider.getApplicationPolicyInstance().dispose();
+      disposeIfNeeded(registeredPolicyInstanceProvider.getApplicationPolicyInstance());
     }
     registeredPolicyInstanceProviders.clear();
 

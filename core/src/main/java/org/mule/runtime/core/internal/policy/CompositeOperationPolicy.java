@@ -12,6 +12,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPIN
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -110,7 +111,7 @@ public class CompositeOperationPolicy
     Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this, featureFlaggingService);
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
-          value.dispose();
+          disposeIfNeeded(value, LOGGER);
         })
         .build(componentLocation -> {
           return new TransactionAwareFluxSinkSupplier<>(factory,

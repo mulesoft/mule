@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
@@ -110,9 +111,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
       } catch (Exception e) {
         return failure(newFailure(e).onKeys());
       } finally {
-        if (metadataContext != null) {
-          metadataContext.dispose();
-        }
+        disposeIfNeeded(metadataContext);
       }
     });
   }

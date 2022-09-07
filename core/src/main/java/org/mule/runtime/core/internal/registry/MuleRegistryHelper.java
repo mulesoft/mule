@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -53,7 +54,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   @Override
   public void dispose() {
-    registry.dispose();
+    disposeIfNeeded(registry);
   }
 
   @Override
@@ -61,7 +62,7 @@ public class MuleRegistryHelper implements MuleRegistry {
     if (Initialisable.PHASE_NAME.equals(phase)) {
       registry.initialise();
     } else if (Disposable.PHASE_NAME.equals(phase)) {
-      registry.dispose();
+      disposeIfNeeded(registry);
     } else {
       registry.fireLifecycle(phase);
     }

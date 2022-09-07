@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -104,8 +105,6 @@ public abstract class ProcessingStrategyDecorator implements ProcessingStrategy,
 
   @Override
   public void dispose() {
-    if (delegate instanceof Disposable) {
-      ((Disposable) delegate).dispose();
-    }
+    disposeIfNeeded(delegate);
   }
 }

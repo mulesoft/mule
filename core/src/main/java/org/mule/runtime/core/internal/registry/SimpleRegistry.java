@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstan
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 
 import static java.lang.String.format;
@@ -151,11 +152,11 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   private void disposeLostObjects() {
     for (Object obj : registryMap.getLostObjects()) {
       try {
-        ((Disposable) obj).dispose();
+        disposeIfNeeded(obj, logger);
       } catch (Exception e) {
-        logger.warn("Can not dispose object. " + getMessage(e));
+        logger.warn("Can not dispose object. {}", getMessage(e));
         if (logger.isDebugEnabled()) {
-          logger.debug("Can not dispose object. " + getStackTrace(e));
+          logger.debug("Can not dispose object. {}", getStackTrace(e));
         }
       }
     }
