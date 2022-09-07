@@ -91,11 +91,12 @@ public class ErrorHandlerContextManager {
   public static void resolveHandling(FlowExceptionHandler handler, CoreEvent result) {
     ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
     MessagingException exception = errorHandlerContext.getException();
-    // A successful handling event does not imply that the exception was handled, but that there were no errors during the handling.
     if (exception.handled()) {
+      // If the error was "handled" by the On Error handler, then it must not be further propagated.
       errorHandlerContext.successCallback.accept(result);
     } else {
-      if (exception.getEvent() != result) {
+      // If the error was "not handled" by the On Error handler, then it must be further propagated.
+      if (result.getError().isPresent()) {
         exception.setProcessedEvent(result);
       }
       errorHandlerContext.errorCallback.accept(exception);
