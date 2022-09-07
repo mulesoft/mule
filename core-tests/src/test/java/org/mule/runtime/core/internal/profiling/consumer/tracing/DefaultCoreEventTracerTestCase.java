@@ -199,13 +199,13 @@ public class DefaultCoreEventTracerTestCase {
   @Test
   public void testRecordSpecifiedErrorAtCurrentSpanIfThrowable() {
     doTestErrorPropagation(false, "Error recording a span error at current span", (coreEventTracer, coreEvent) -> coreEventTracer
-        .recordErrorAtCurrentSpan(coreEvent, () -> mock(Error.class), true));
+        .recordErrorAtCurrentSpan(coreEvent, true));
   }
 
   @Test(expected = TracingErrorPropagationException.class)
   public void testRecordSpecifiedErrorAtCurrentSpanIfThrowableWithTracingErrorPropagationEnabled() {
     doTestErrorPropagation(true, null, (coreEventTracer, coreEvent) -> coreEventTracer
-        .recordErrorAtCurrentSpan(coreEvent, () -> mock(Error.class), true));
+        .recordErrorAtCurrentSpan(coreEvent, true));
   }
 
   @Test

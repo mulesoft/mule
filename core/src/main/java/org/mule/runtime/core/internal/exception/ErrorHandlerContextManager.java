@@ -13,7 +13,6 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -34,11 +33,10 @@ public class ErrorHandlerContextManager {
   /**
    * The key used to store a {@link ErrorHandlerContextManager} as an {@link InternalEvent} internal parameter.
    * 
-   * @see {@link InternalEvent#getInternalParameter(String)}
+   * @see InternalEvent#getInternalParameter(String)
    */
   public static final String ERROR_HANDLER_CONTEXT = "error.context";
   private final Map<String, Deque<ErrorHandlerContext>> items = new SmallMap<>();
-  private CoreEventTracer muleEventTracer;
 
   /**
    * Extracts an {@link ErrorHandlerContextManager} instance from the given {@link CoreEvent}.
@@ -81,8 +79,7 @@ public class ErrorHandlerContextManager {
    * @see #resolveHandling(FlowExceptionHandler, MessagingException)
    */
   public static CoreEvent addContext(FlowExceptionHandler handler, MessagingException exception,
-                                     Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback,
-                                     CoreEventTracer coreEventTracer) {
+                                     Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback) {
     CoreEvent originalEvent = exception.getEvent();
     ErrorHandlerContextManager errorHandlerContextManager = ErrorHandlerContextManager.from(exception.getEvent());
     if (errorHandlerContextManager == null) {
@@ -90,7 +87,7 @@ public class ErrorHandlerContextManager {
       originalEvent = quickCopy(originalEvent, of(ERROR_HANDLER_CONTEXT, errorHandlerContextManager));
     }
     errorHandlerContextManager.items.computeIfAbsent(getParameterId(originalEvent, handler), key -> new ArrayDeque<>(1))
-        .addFirst(new ErrorHandlerContext(exception, originalEvent, successCallback, errorCallback, coreEventTracer));
+        .addFirst(new ErrorHandlerContext(exception, originalEvent, successCallback, errorCallback));
     return originalEvent;
   }
 
@@ -160,16 +157,13 @@ public class ErrorHandlerContextManager {
     private final CoreEvent originalEvent;
     private final Consumer<CoreEvent> successCallback;
     private final Consumer<Throwable> errorCallback;
-    private final CoreEventTracer eventTracer;
 
     public ErrorHandlerContext(MessagingException exception, CoreEvent originalEvent,
-                               Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback,
-                               CoreEventTracer eventTracer) {
+                               Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback) {
       this.exception = exception;
       this.originalEvent = originalEvent;
       this.successCallback = successCallback;
       this.errorCallback = errorCallback;
-      this.eventTracer = eventTracer;
     }
 
     public MessagingException getException() {
