@@ -128,12 +128,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     parameters.accept(parameterizer);
 
     OperationKey key = toKey(extensionName, operationName, parameterizer);
-
-    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(key.getOperationModel());
-    parameterizer.setValuesOn(paramsBuilder);
-
-    OperationClient client = clientCache.get(key);
-
     boolean shouldCompleteEvent = false;
     CoreEvent contextEvent = parameterizer.getContextEvent().orElse(null);
     if (contextEvent == null) {
@@ -141,15 +135,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       shouldCompleteEvent = true;
     }
 
-    final Map<String, Object> resolvedParams = resolveLegacyParameters(paramsBuilder.build(), contextEvent);
     OperationModel operationModel = key.getOperationModel();
+    Optional<ConfigurationInstance> configurationInstance =
+        getConfigurationInstance(key.getConfigurationProvider(), contextEvent);
+
+    final Map<String, Object> resolvedParams =
+        resolveOperationParameters(operationModel, configurationInstance, parameterizer, contextEvent);
     CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
 
     ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
                                                                                     key.getExtensionModel(),
-                                                                                    getConfigurationInstance(
-                                                                                                             key.getConfigurationProvider(),
-                                                                                                             contextEvent),
+                                                                                    configurationInstance,
                                                                                     resolvedParams,
                                                                                     operationModel,
                                                                                     contextEvent,
@@ -161,20 +157,29 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                                                     empty(),
                                                                                     muleContext);
 
-    return client.execute(context, shouldCompleteEvent);
+    return clientCache.get(key).execute(context, shouldCompleteEvent);
   }
 
-  private Map<String, Object> resolveLegacyParameters(ComponentParameterization<OperationModel> parameters, CoreEvent event) {
+  private Map<String, Object> resolveOperationParameters(OperationModel operationModel,
+                                                         Optional<ConfigurationInstance> configurationInstance,
+                                                         DefaultOperationParameterizer parameterizer,
+                                                         CoreEvent event) {
+    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
+    parameterizer.setValuesOn(paramsBuilder);
+
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-                                                                            parameters,
+                                                                            paramsBuilder.build(),
                                                                             muleContext,
                                                                             true,
                                                                             reflectionCache,
                                                                             expressionManager,
                                                                             "");
 
-      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
+      ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
+      configurationInstance.ifPresent(ctxBuilder::withConfig);
+
+      try (ValueResolvingContext ctx = ctxBuilder.build()) {
         return resolverSet.resolve(ctx).asMap();
       }
     } catch (Exception e) {
