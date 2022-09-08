@@ -235,7 +235,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isAutoPaging() {
-    // TODO: MULE-20081
+    // Due to composition, reusable operations will never be considered to support auto paging.
     return false;
   }
 
