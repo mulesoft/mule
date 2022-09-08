@@ -39,7 +39,6 @@ import static java.util.stream.Collectors.toMap;
 
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -319,7 +318,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
         .transform(routeThroughProcessingStrategyTransformer())
-        .compose(clearSubscribersErrorStrategy());
+        .transformDeferred(clearSubscribersErrorStrategy());
   }
 
   /**
@@ -341,7 +340,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
-    return eventPublisher -> from(eventPublisher).compose(pipelineUpstream -> subscriberContext().flatMapMany(reactorContext -> {
+    return eventPublisher -> from(eventPublisher).transformDeferredContextual((pipelineUpstream, reactorContext) -> {
       if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
         return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
@@ -357,7 +356,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                             muleContext.getConfiguration().getShutdownTimeout(),
                                                             completionCallbackScheduler, getDslSource())));
       }
-    }));
+    });
   }
 
   private Flux<Either<Throwable, CoreEvent>> splicePipeline(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,

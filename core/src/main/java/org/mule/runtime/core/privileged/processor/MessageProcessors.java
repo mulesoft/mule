@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
@@ -19,9 +16,13 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -504,37 +505,36 @@ public class MessageProcessors {
                                                                     ReactiveProcessor processor,
                                                                     boolean completeParentIfEmpty, boolean propagateErrors) {
     return Flux.from(eventChildCtxPub)
-        .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> {
-              if (ctx.getOrDefault(WITHIN_PROCESS_WITH_CHILD_CONTEXT, false)
-                  || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
-                // This is a workaround for https://github.com/reactor/reactor-core/issues/1705
-                // If this processor is already wrapped in a Mono, there is no gain in using a Flux, and this way the issue
-                // mentioned above is avoided.
+        .transformDeferredContextual((eventPub, ctx) -> {
+          if (ctx.getOrDefault(WITHIN_PROCESS_WITH_CHILD_CONTEXT, false)
+              || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+            // This is a workaround for https://github.com/reactor/reactor-core/issues/1705
+            // If this processor is already wrapped in a Mono, there is no gain in using a Flux, and this way the issue
+            // mentioned above is avoided.
 
-                return eventPub
-                    .flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty, propagateErrors));
-              } else {
-                FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-                final FluxSinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRefAdapter =
-                    new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
+            return eventPub
+                .flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty, propagateErrors));
+          } else {
+            FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+            final FluxSinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRefAdapter =
+                new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
 
-                final Flux<Either<MessagingException, CoreEvent>> upstream = Flux.from(eventChildCtxPub)
-                    .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
-                                                                           completeParentIfEmpty, propagateErrors))
-                    .transform(processor)
-                    // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-                    // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                    .map(event -> right(MessagingException.class, event));
+            final Flux<Either<MessagingException, CoreEvent>> upstream = Flux.from(eventChildCtxPub)
+                .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
+                                                                       completeParentIfEmpty, propagateErrors))
+                .transform(processor)
+                // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
+                // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
+                .map(event -> right(MessagingException.class, event));
 
-                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
-                                                            completeSuccessEitherIfNeeded(),
-                                                            errorSwitchSinkSinkRef::error,
-                                                            errorSwitchSinkSinkRef::complete)
-                                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
-                                                                    .andThen(MessageProcessors::toParentContext));
-              }
-            }));
+            return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
+                                                        completeSuccessEitherIfNeeded(),
+                                                        errorSwitchSinkSinkRef::error,
+                                                        errorSwitchSinkSinkRef::complete)
+                                                            .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
+                                                                .andThen(MessageProcessors::toParentContext));
+          }
+        });
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,

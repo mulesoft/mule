@@ -126,7 +126,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       return from(publisher)
           .doOnNext(this::pushSubFlowFlowStackElement)
           // To avoid recursive transformation when there are flowref cycles, the chain is lazily transformed
-          .compose(super::apply)
+          .transformDeferred(super::apply)
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 

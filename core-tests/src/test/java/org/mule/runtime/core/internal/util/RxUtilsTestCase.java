@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.tck.probe.PollingProber.probe;
+
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
-import static org.mule.tck.probe.PollingProber.probe;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.reactivestreams.Publisher;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,7 +38,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -175,11 +177,10 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
       sink.next("Hello");
       sink.complete();
     })
-        .compose(pub -> subscriberContext()
-            .flatMapMany(ctx -> {
-              contexts.add(ctx.get("key"));
-              return pub;
-            }))
+        .transformDeferredContextual((pub, ctx) -> {
+          contexts.add(ctx.get("key"));
+          return pub;
+        })
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
@@ -187,7 +188,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
-        .subscriberContext(ctx -> ctx.put("key", "value"))
+        .contextWrite(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
         },
                    e -> e.printStackTrace(),
@@ -211,11 +212,10 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
       sink.next("Hello");
       sink.error(expected);
     })
-        .compose(pub -> subscriberContext()
-            .flatMapMany(ctx -> {
-              contexts.add(ctx.get("key"));
-              return pub;
-            }))
+        .transformDeferredContextual((pub, ctx) -> {
+          contexts.add(ctx.get("key"));
+          return pub;
+        })
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
@@ -223,7 +223,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
-        .subscriberContext(ctx -> ctx.put("key", "value"))
+        .contextWrite(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
         },
                    e -> completeWithError.set(true));

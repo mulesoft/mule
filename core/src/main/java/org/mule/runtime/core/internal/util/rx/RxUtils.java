@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.function.UnaryOperator.identity;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+
+import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.function.UnaryOperator.identity;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.Component;
@@ -117,10 +118,10 @@ public class RxUtils {
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer) {
     return triggeringSubscriber
-        .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber
-                .subscriberContext(ctx)
-                .subscribe(consumer, errorConsumer, completeConsumer))));
+        .transformDeferredContextual((eventPub, ctx) -> eventPub
+            .doOnSubscribe(s -> deferredSubscriber
+                .contextWrite(ctx)
+                .subscribe(consumer, errorConsumer, completeConsumer)));
   }
 
   /**

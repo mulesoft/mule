@@ -95,6 +95,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -162,7 +163,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       // This optimization omits the execution of the on error handler MessageProcessorChain when it does not have any Processor
       // (empty chain).
       if (!getMessageProcessors().isEmpty()) {
-        onErrorFlux = onErrorFlux.compose(TemplateOnErrorHandler.this::route);
+        onErrorFlux = onErrorFlux.transformDeferred(TemplateOnErrorHandler.this::route);
       } else {
         // We need to start the tracing that would be started by the on error handler MessageProcessorChain.
         onErrorFlux = onErrorFlux.doOnNext(coreEvent -> profilingService.getCoreEventTracer()
