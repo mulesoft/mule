@@ -640,6 +640,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
+  @Test
   public void reconnectAndLogSuccessMessage() throws Exception {
     start();
     ArrayList<String> infoMessages = new ArrayList<>();
