@@ -7,16 +7,25 @@
 
 package org.mule.runtime.core.internal.event.trace;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventTraceExtractors.getDefaultBaggageExtractor;
 import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventTraceExtractors.getDefaultTraceContextFieldsExtractor;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.ofNullable;
+
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition.NO_CONDITION;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecute;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +42,9 @@ import java.util.Optional;
  */
 public class EventDistributedTraceContext implements DistributedTraceContext {
 
+  private static final Logger LOGGER = getLogger(EventDistributedTraceContext.class);
+
+  private final boolean propagationOfExceptionsInTracing;
   private Map<String, String> tracingFields = new HashMap<>();
   private Map<String, String> baggageItems = new HashMap<>();
   private InternalSpan currentSpan;
@@ -42,20 +54,25 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   }
 
   public static DistributedTraceContext emptyDistributedTraceContext() {
-    return new EventDistributedTraceContext(new HashMap<>(), new HashMap<>());
+    return new EventDistributedTraceContext(new HashMap<>(), new HashMap<>(),
+                                            getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING));
   }
 
   private EventDistributedTraceContext(TraceContextFieldExtractor tracingFieldExtractor,
                                        TraceContextFieldExtractor baggageItemsExtractor,
-                                       DistributedTraceContextGetter getter) {
+                                       DistributedTraceContextGetter getter,
+                                       boolean propagationOfExceptionsInTracing) {
     tracingFields.putAll(tracingFieldExtractor.extract(getter));
     baggageItems.putAll(baggageItemsExtractor.extract(getter));
+    this.propagationOfExceptionsInTracing = propagationOfExceptionsInTracing;
   }
 
   private EventDistributedTraceContext(Map<String, String> tracingFields,
-                                       Map<String, String> baggageItems) {
+                                       Map<String, String> baggageItems,
+                                       boolean propagationOfExceptionsInTracing) {
     this.tracingFields = tracingFields;
     this.baggageItems = baggageItems;
+    this.propagationOfExceptionsInTracing = propagationOfExceptionsInTracing;
   }
 
   @Override
@@ -81,13 +98,16 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   @Override
   public DistributedTraceContext copy() {
     EventDistributedTraceContext eventDistributedTraceContext =
-        new EventDistributedTraceContext(tracingFields, baggageItems);
-    eventDistributedTraceContext.setCurrentSpan(currentSpan);
+        new EventDistributedTraceContext(tracingFields, baggageItems, propagationOfExceptionsInTracing);
+    eventDistributedTraceContext.setCurrentSpan(currentSpan, NO_CONDITION);
     return eventDistributedTraceContext;
   }
 
   @Override
-  public void endCurrentContextSpan() {
+  public void endCurrentContextSpan(TracingCondition tracingCondition) {
+    safeExecute(() -> tracingCondition.assertOnCurrentSpan(currentSpan), "Error on tracing condition verification: ",
+                propagationOfExceptionsInTracing, LOGGER);
+
     if (currentSpan != null) {
       currentSpan.end();
       currentSpan = resolveParentAsInternalSpan();
@@ -106,8 +126,10 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   }
 
   @Override
-  public void setCurrentSpan(InternalSpan currentSpan) {
-    this.currentSpan = currentSpan;
+  public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) throws TracingConditionNotMetException {
+    safeExecute(() -> tracingCondition.assertOnCurrentSpan(currentSpan),
+                "Error on tracing condition verification: ", propagationOfExceptionsInTracing, LOGGER);
+    this.currentSpan = span;
   }
 
   @Override
@@ -123,6 +145,7 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   public static final class EventDistributedContextBuilder {
 
     private DistributedTraceContextGetter distributedTraceContextMapGetter;
+    private boolean propagationOfExceptionsInTracing;
 
     private EventDistributedContextBuilder() {}
 
@@ -131,10 +154,18 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
       return this;
     }
 
+
+    public EventDistributedContextBuilder withPropagationOfExceptionsInTracing(boolean propagationOfExceptionsInTracing) {
+      this.propagationOfExceptionsInTracing = propagationOfExceptionsInTracing;
+      return this;
+    }
+
     public DistributedTraceContext build() {
       return new EventDistributedTraceContext(getDefaultTraceContextFieldsExtractor(),
                                               getDefaultBaggageExtractor(),
-                                              distributedTraceContextMapGetter);
+                                              distributedTraceContextMapGetter,
+                                              propagationOfExceptionsInTracing);
     }
+
   }
 }

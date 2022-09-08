@@ -73,6 +73,7 @@ import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.CurrentSpanNameTracingCondition;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -108,6 +109,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   public static Boolean reuseGlobalErrorHandler;
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
+  private final NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo spanCustomizationInfo =
+      new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(TemplateOnErrorHandler.this);
 
   private boolean fromGlobalErrorHandler = false;
 
@@ -164,7 +167,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         // We need to start the tracing that would be started by the on error handler MessageProcessorChain.
         onErrorFlux = onErrorFlux.doOnNext(coreEvent -> profilingService.getCoreEventTracer()
             .startComponentSpan(coreEvent,
-                                new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(TemplateOnErrorHandler.this)));
+                                spanCustomizationInfo));
       }
 
       onErrorFlux = Flux.from(publisherPostProcessor
@@ -177,7 +180,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
               })
               .doOnNext(result -> {
                 if (getMessageProcessors().isEmpty()) {
-                  profilingService.getCoreEventTracer().endCurrentSpan(result);
+                  // We end the current span verifying that the name of the current span is the expected.
+                  profilingService.getCoreEventTracer()
+                      .endCurrentSpan(result, new CurrentSpanNameTracingCondition(spanCustomizationInfo.getName(result)));
                 }
                 ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result);
               })))
