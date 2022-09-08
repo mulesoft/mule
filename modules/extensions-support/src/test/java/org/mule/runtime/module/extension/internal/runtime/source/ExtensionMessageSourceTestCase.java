@@ -36,6 +36,7 @@ import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockL
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.slf4j.event.Level.DEBUG;
@@ -359,6 +360,8 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Test
   public void start() throws Exception {
     initialise();
+    ArrayList<String> infoMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(infoMessages, INFO));
     if (!messageSource.getLifecycleState().isStarted()) {
       messageSource.start();
     }
@@ -371,6 +374,15 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       inOrder.verify(source).onStart(sourceCallback);
       return true;
     }));
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verifyLogMessage(infoMessages, "Message source 'source' on flow 'appleFlow' successfully started");
+      return true;
+    }));
+    checkNot(TEST_POLL_DELAY, TEST_TIMEOUT, () -> {
+      verifyLogMessage(infoMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      return true;
+    });
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
@@ -629,9 +641,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   }
 
   public void reconnectAndLogSuccessMessage() throws Exception {
+    start();
     ArrayList<String> infoMessages = new ArrayList<>();
     Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(infoMessages, INFO));
-    start();
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {

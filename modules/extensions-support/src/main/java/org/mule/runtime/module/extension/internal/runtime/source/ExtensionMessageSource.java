@@ -216,7 +216,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Consumer<Throwable> onFailure;
     SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
     if (retryPolicyTemplate.isAsync()) {
-      onSuccess = this::onReconnectionSuccessful;
+      onSuccess = getSuccessRunnable(restarting);
       onFailure = (t) -> {
         RetryPolicyExhaustedException exception = t instanceof RetryPolicyExhaustedException ? (RetryPolicyExhaustedException) t
             : new RetryPolicyExhaustedException(t, ExtensionMessageSource.this);
@@ -246,7 +246,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     try {
       if (!retryPolicyTemplate.isAsync()) {
         future.get();
-        this.onReconnectionSuccessful();
+        getSuccessRunnable(restarting).run();
       }
     } catch (ExecutionException exception) {
       RetryPolicyExhaustedException retryPolicyExhaustedException =
@@ -377,9 +377,21 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
+  private Runnable getSuccessRunnable(boolean restarting) {
+    return restarting ? this::onReconnectionSuccessful : this::onStartSuccessful;
+  }
+
   private void onReconnectionSuccessful() {
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("Message source '{}' on flow '{}' successfully reconnected",
+                  sourceModel.getName(), getLocation().getRootContainerName());
+    }
+    reconnecting.set(false);
+  }
+
+  private void onStartSuccessful() {
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Message source '{}' on flow '{}' successfully started",
                   sourceModel.getName(), getLocation().getRootContainerName());
     }
     reconnecting.set(false);
