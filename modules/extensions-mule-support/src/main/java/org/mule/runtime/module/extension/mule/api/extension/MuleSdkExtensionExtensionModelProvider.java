@@ -30,10 +30,7 @@ public class MuleSdkExtensionExtensionModelProvider {
       .create(contextFor(new MuleSdkExtensionExtensionModelDeclarer().declareExtensionModel())));
 
   private static ExtensionLoadingContext contextFor(ExtensionDeclarer declarer) {
-    ExtensionLoadingContext context = new DefaultExtensionLoadingContext(declarer, loadingRequest());
-    context.addParameter(FORCE_EXTENSION_VALIDATION_PROPERTY_NAME, true);
-
-    return context;
+    return new DefaultExtensionLoadingContext(declarer, loadingRequest());
   }
 
   private static ExtensionModelLoadingRequest loadingRequest() {
