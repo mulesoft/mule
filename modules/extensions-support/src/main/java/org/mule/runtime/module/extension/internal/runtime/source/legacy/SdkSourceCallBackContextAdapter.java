@@ -90,6 +90,9 @@ public class SdkSourceCallBackContextAdapter implements SourceCallbackContextAda
 
   @Override
   public DistributedTraceContextManager getDistributedSourceTraceContext() {
+    if (delegate instanceof LegacySourceCallbackContextAdapter) {
+      return ((LegacySourceCallbackContextAdapter) delegate).getDistributedSourceTraceContext();
+    }
     return distributedSourceTraceContext;
   }
 

@@ -20,4 +20,33 @@
         <flow-ref name="collector"/>
     </flow>
 
+    <flow name="traceContextPropagationThroughHelper" initialState="stopped">
+        <petstore:pet-source-list birds="Primate" outputMimeType="pet/plain"/>
+        <petstore:get-pet-trace-context-propagator-through-forward-compatibility-helper />
+        <flow-ref name="collector"/>
+    </flow>
+
+    <flow name="traceContextPropagationThroughHelperSdkApi" initialState="stopped">
+        <petstore:pet-source-list birds="Primate" outputMimeType="pet/plain"/>
+        <petstore:get-pet-trace-context-propagator-through-forward-compatibility-helper-sdk-api />
+        <flow-ref name="collector"/>
+    </flow>
+
+    <flow name="traceContextPropagationLegacyCallback" initialState="stopped">
+        <petstore:pet-source-list-legacy-callback birds="Primate" outputMimeType="pet/plain"/>
+        <petstore:get-pet-trace-context-propagator />
+        <flow-ref name="collector"/>
+    </flow>
+
+    <flow name="traceContextPropagationLegacyCallbackThroughHelper" initialState="stopped">
+        <petstore:pet-source-list-legacy-callback birds="Primate" outputMimeType="pet/plain"/>
+        <petstore:get-pet-trace-context-propagator-through-forward-compatibility-helper />
+        <flow-ref name="collector"/>
+    </flow>
+
+    <flow name="traceContextPropagationLegacyCallbackThroughHelperSdkApiCorrelationInfo" initialState="stopped">
+        <petstore:pet-source-list-legacy-callback birds="Primate" outputMimeType="pet/plain"/>
+        <petstore:get-pet-trace-context-propagator-through-forward-compatibility-helper-sdk-api />
+        <flow-ref name="collector"/>
+    </flow>
 </mule>

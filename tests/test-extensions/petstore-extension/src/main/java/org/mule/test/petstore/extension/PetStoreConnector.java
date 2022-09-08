@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
     PetAdoptionSchedulerInParamSource.class, PetStoreStreamSource.class, PartialPetAdoptionSource.class,
     ConnectedPetAdoptionSource.class, PetFailingPollingSource.class, PetFilterPollingSource.class,
-    PetStoreSimpleSourceWithSdkApi.class})
+    PetStoreSimpleSourceWithSdkApi.class, PetStoreListSourceLegacyCallback.class})
 @org.mule.sdk.api.annotation.Sources({NumberPetAdoptionSource.class, WatermarkingPetAdoptionSource.class,
     PetStoreListSource.class, PetAdoptionLimitingSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
