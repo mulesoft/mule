@@ -83,6 +83,7 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.message.TransformingLegacyResultAdapterCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -149,6 +150,7 @@ public class FlowProcessMediator implements Initialisable {
   private NotificationHelper notificationHelper;
   private final List<SourceInterceptor> sourceInterceptors = new LinkedList<>();
   private Optional<CorrelationIdGenerator> correlationIdGenerator;
+  private CoreEventTracer coreEventTracer;
 
   public FlowProcessMediator(PolicyManager policyManager, PhaseResultNotifier phaseResultNotifier) {
     this.policyManager = policyManager;
@@ -157,6 +159,7 @@ public class FlowProcessMediator implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    this.coreEventTracer = profilingService.getCoreEventTracer();
     this.notificationHelper =
         new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
 
@@ -588,14 +591,7 @@ public class FlowProcessMediator implements Initialisable {
                                        FlowConstruct flowConstruct, String correlationId,
                                        DistributedTraceContextGetter distributedTraceContextGetter) {
     EventContext eventContext = create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion));
-
-    if (eventContext instanceof DistributedTraceContextAware) {
-      ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
-                                                                               EventDistributedTraceContext.builder()
-                                                                                   .withGetter(distributedTraceContextGetter)
-                                                                                   .build());
-    }
-
+    coreEventTracer.injectDistributedTraceContext(eventContext, distributedTraceContextGetter);
     return eventContext;
   }
 

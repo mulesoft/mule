@@ -11,10 +11,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CurrentSpanAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public interface DistributedTraceContext extends CurrentSpanAware {
    */
   DistributedTraceContext copy();
 
-  void endCurrentContextSpan();
+  void endCurrentContextSpan(TracingCondition tracingCondition);
 
   void recordErrorAtCurrentSpan(InternalSpanError error);
 
@@ -97,7 +97,7 @@ public interface DistributedTraceContext extends CurrentSpanAware {
       }
 
       @Override
-      public void endCurrentContextSpan() {
+      public void endCurrentContextSpan(TracingCondition tracingCondition) {
         // Nothing to do.
       }
 
@@ -107,7 +107,9 @@ public interface DistributedTraceContext extends CurrentSpanAware {
       }
 
       @Override
-      public void setCurrentSpan(InternalSpan span) {}
+      public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) {
+        // Nothing to do.
+      }
 
       @Override
       public Optional<InternalSpan> getCurrentSpan() {

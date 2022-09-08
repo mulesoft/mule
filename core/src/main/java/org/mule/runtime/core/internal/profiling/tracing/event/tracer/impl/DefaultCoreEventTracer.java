@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition.NO_CONDITION;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecuteWithDefaultOnThrowable;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracerUtils.safeExecute;
 
@@ -20,7 +21,11 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
+import org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.DefaultSpanError;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
@@ -77,11 +82,18 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   @Override
   public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent,
                                                    SpanCustomizationInfo spanCustomizationInfo) {
+    return startComponentSpan(coreEvent, spanCustomizationInfo, NO_CONDITION);
+  }
+
+  @Override
+  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, SpanCustomizationInfo spanCustomizationInfo,
+                                                   TracingCondition tracingCondition) {
     return safeExecuteWithDefaultOnThrowable(() -> of(startCurrentSpanIfPossible(coreEvent,
                                                                                  coreEventSpanFactory.getSpan(coreEvent,
                                                                                                               muleConfiguration,
                                                                                                               artifactType,
-                                                                                                              spanCustomizationInfo))),
+                                                                                                              spanCustomizationInfo),
+                                                                                 tracingCondition)),
                                              empty(),
                                              "Error when starting a component span",
                                              propagationOfExceptionsInTracing,
@@ -90,7 +102,13 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent) {
-    safeExecute(() -> endCurrentSpanIfPossible(coreEvent), "Error on ending current span", propagationOfExceptionsInTracing,
+    endCurrentSpan(coreEvent, NO_CONDITION);
+  }
+
+  @Override
+  public void endCurrentSpan(CoreEvent coreEvent, TracingCondition condition) {
+    safeExecute(() -> endCurrentSpanIfPossible(coreEvent, condition), "Error on ending current span",
+                propagationOfExceptionsInTracing,
                 logger);
   }
 
@@ -100,6 +118,18 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
         .orElseThrow(() -> new IllegalArgumentException(String.format("Provided coreEvent [%s] does not declare an error.",
                                                                       coreEvent))),
                              isErrorEscapingCurrentSpan);
+  }
+
+  @Override
+  public void injectDistributedTraceContext(EventContext eventContext,
+                                            DistributedTraceContextGetter distributedTraceContextGetter) {
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
+                                                                               EventDistributedTraceContext.builder()
+                                                                                   .withGetter(distributedTraceContextGetter)
+                                                                                   .withPropagationOfExceptionsInTracing(propagationOfExceptionsInTracing)
+                                                                                   .build());
+    }
   }
 
   @Override
@@ -123,13 +153,15 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                              logger);
   }
 
-  private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
+  private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan,
+                                                  TracingCondition tracingCondition)
+      throws TracingConditionNotMetException {
     EventContext eventContext = coreEvent.getContext();
 
     if (eventContext instanceof DistributedTraceContextAware) {
       ((DistributedTraceContextAware) eventContext)
           .getDistributedTraceContext()
-          .setCurrentSpan(currentSpan);
+          .setCurrentSpan(currentSpan, tracingCondition);
     }
 
     return currentSpan;
@@ -158,12 +190,12 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
   }
 
-  private void endCurrentSpanIfPossible(CoreEvent coreEvent) {
+  private void endCurrentSpanIfPossible(CoreEvent coreEvent, TracingCondition condition) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
       ((DistributedTraceContextAware) eventContext)
           .getDistributedTraceContext()
-          .endCurrentContextSpan();
+          .endCurrentContextSpan(condition);
     }
   }
 
