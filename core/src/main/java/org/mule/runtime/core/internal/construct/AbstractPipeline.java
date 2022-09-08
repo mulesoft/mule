@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.System.getProperty;
-import static java.util.Arrays.stream;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -27,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
+import static org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics.isApiKitFlow;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
@@ -34,6 +26,17 @@ import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -60,6 +63,7 @@ import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -127,6 +131,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private Scheduler completionCallbackScheduler;
   private Map<BackPressureReason, FlowBackPressureException> backPressureExceptions;
   private final int maxConcurrency;
+  private final FlowsSummaryStatistics flowsSummaryStatistics;
+  private final boolean triggerFlow;
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
@@ -134,7 +140,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          Integer maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                          Integer maxConcurrency,
+                          FlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
@@ -151,6 +158,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     this.componentInitialStateManager = componentInitialStateManager;
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency != null ? maxConcurrency : DEFAULT_MAX_CONCURRENCY;
+    this.flowsSummaryStatistics = flowsSummaryStatistics;
+    this.triggerFlow = source != null || isApiKitFlow(getName());
 
     this.processingStrategyFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
     if (this.processingStrategyFactory instanceof AsyncProcessingStrategyFactory) {
@@ -263,6 +272,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .collect(toList()), muleContext.getInjector()));
 
     doInitialiseProcessingStrategy();
+
+    if (triggerFlow) {
+      flowsSummaryStatistics.incrementDeclaredTriggerFlow();
+    } else {
+      flowsSummaryStatistics.incrementDeclaredPrivateFlow();
+    }
   }
 
   @Override
@@ -541,6 +556,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         stopOnFailure(e);
       }
     }
+
+    if (triggerFlow) {
+      flowsSummaryStatistics.incrementActiveTriggerFlow();
+    } else {
+      flowsSummaryStatistics.incrementActivePrivateFlow();
+    }
   }
 
   private void stopOnFailure(Exception e) throws MuleException {
@@ -583,6 +604,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
+    if (triggerFlow) {
+      flowsSummaryStatistics.decrementActiveTriggerFlow();
+    } else {
+      flowsSummaryStatistics.decrementActivePrivateFlow();
+    }
+
     if (source != null) {
       stopSafely(() -> {
         if (componentInitialStateManager.mustStartMessageSource(source)) {
@@ -612,6 +639,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doDispose() {
+    if (triggerFlow) {
+      flowsSummaryStatistics.decrementDeclaredTriggerFlow();
+    } else {
+      flowsSummaryStatistics.decrementDeclaredPrivateFlow();
+    }
+
     if (errorRouterForSourceResponseError != null) {
       synchronized (this) {
         if (errorRouterForSourceResponseError != null) {

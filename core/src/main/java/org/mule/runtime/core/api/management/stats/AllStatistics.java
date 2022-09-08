@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
+
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoExtend;
@@ -18,6 +19,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,6 +35,7 @@ public class AllStatistics {
 
   private long startTime;
   private final ApplicationStatistics appStats;
+  private final FlowsSummaryStatistics flowSummaryStatistics;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
   private final Map<String, PayloadStatistics> payloadStatistics = emptyMap();
 
@@ -42,6 +45,7 @@ public class AllStatistics {
   public AllStatistics() {
     clear();
     appStats = new ApplicationStatistics(this);
+    flowSummaryStatistics = new DefaultFlowsSummaryStatistics(isStatisticsEnabled);
     appStats.setEnabled(isStatisticsEnabled);
     add(appStats);
   }
@@ -108,6 +112,10 @@ public class AllStatistics {
 
   public FlowConstructStatistics getApplicationStatistics() {
     return appStats;
+  }
+
+  public FlowsSummaryStatistics getFlowSummaryStatistics() {
+    return flowSummaryStatistics;
   }
 
   /**
