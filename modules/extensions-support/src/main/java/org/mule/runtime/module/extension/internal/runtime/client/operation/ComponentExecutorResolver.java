@@ -32,7 +32,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
@@ -85,23 +84,21 @@ abstract class ComponentExecutorResolver {
     final OperationModel operationModel = key.getOperationModel();
 
     CompletableComponentExecutorFactory<OperationModel> operationExecutorFactory = getOperationExecutorFactory(operationModel);
-    if (operationExecutorFactory instanceof CompletableOperationExecutorFactory) {
-      try {
-        initParams = extractExecutorInitialisationParams(
-                                                         key.getExtensionModel(),
-                                                         operationModel,
-                                                         initParams,
-                                                         NULL_COMPONENT,
-                                                         empty(),
-                                                         extensionManager,
-                                                         expressionManager,
-                                                         reflectionCache);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage(
-                                                           "Exception found resolving parameters for operation client: "
-                                                               + e.getMessage()),
-                                       e);
-      }
+    try {
+      initParams.putAll(extractExecutorInitialisationParams(
+                                                            key.getExtensionModel(),
+                                                            operationModel,
+                                                            initParams,
+                                                            NULL_COMPONENT,
+                                                            empty(),
+                                                            extensionManager,
+                                                            expressionManager,
+                                                            reflectionCache));
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(
+                                                         "Exception found resolving parameters for operation client: "
+                                                             + e.getMessage()),
+                                     e);
     }
 
     CompletableComponentExecutor<OperationModel> executor = operationExecutorFactory.createExecutor(operationModel, initParams);

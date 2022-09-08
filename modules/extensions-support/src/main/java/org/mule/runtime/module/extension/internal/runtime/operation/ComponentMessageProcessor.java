@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -110,7 +109,6 @@ import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContex
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.OperationExecutionParams;
@@ -813,23 +811,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
-    Map<String, Object> params;
-    CompletableComponentExecutorFactory<T> operationExecutorFactory = getOperationExecutorFactory(componentModel);
-    if (operationExecutorFactory instanceof CompletableOperationExecutorFactory) {
-      params = extractExecutorInitialisationParams(
-                                                   extensionModel,
-                                                   componentModel,
-                                                   resolverSet.getResolvers(),
-                                                   this,
-                                                   getStaticConfiguration(),
-                                                   extensionManager,
-                                                   expressionManager,
-                                                   reflectionCache);
-    } else {
-      params = emptyMap();
-    }
+    Map<String, Object> params = extractExecutorInitialisationParams(
+                                                                     extensionModel,
+                                                                     componentModel,
+                                                                     resolverSet.getResolvers(),
+                                                                     this,
+                                                                     getStaticConfiguration(),
+                                                                     extensionManager,
+                                                                     expressionManager,
+                                                                     reflectionCache);
 
-    return operationExecutorFactory.createExecutor(componentModel, params);
+    return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
   }
 
   protected ReturnDelegate createReturnDelegate() {
