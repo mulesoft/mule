@@ -51,9 +51,9 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
     when(mockExtensionModel.getName()).thenReturn(MOCK_EXTENSION_NAME);
 
     ObjectType mockType = create(JAVA).objectType()
-            .id(FULL_CLASS_NAME_FOR_MOCK_TYPE)
-            .with(new TypeAliasAnnotation(MOCK_TYPE_ALIAS))
-            .build();
+        .id(FULL_CLASS_NAME_FOR_MOCK_TYPE)
+        .with(new TypeAliasAnnotation(MOCK_TYPE_ALIAS))
+        .build();
     when(mockExtensionModel.getTypes()).thenReturn(singleton(mockType));
 
     applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel));
