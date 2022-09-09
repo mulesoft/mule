@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
@@ -20,6 +17,10 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -46,6 +47,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.BatchChainCustomizationInfo;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
@@ -119,6 +121,15 @@ public class MessageProcessors {
           return getDefaultChildSpanInfo();
         }
       });
+    }
+  }
+
+  public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
+                                               String name, ComponentLocation location) {
+    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
+      return (MessageProcessorChain) processors.get(0);
+    } else {
+      return buildNewChainWithListOfProcessors(processingStrategy, processors, new BatchChainCustomizationInfo(name, location));
     }
   }
 

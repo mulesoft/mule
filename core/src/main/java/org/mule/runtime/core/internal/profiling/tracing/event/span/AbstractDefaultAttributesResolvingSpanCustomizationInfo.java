@@ -40,7 +40,7 @@ public abstract class AbstractDefaultAttributesResolvingSpanCustomizationInfo im
     attributes.put(ARTIFACT_TYPE_ID, artifactType.getAsString());
     attributes.put(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
     attributes.put(THREAD_START_NAME_KEY, Thread.currentThread().getName());
-    addLogggingVariablesAsAttributes(coreEvent, attributes);
+    addLoggingVariablesAsAttributes(coreEvent, attributes);
     return attributes;
   }
 
@@ -52,7 +52,7 @@ public abstract class AbstractDefaultAttributesResolvingSpanCustomizationInfo im
   public abstract String getLocationAsString(CoreEvent coreEvent);
 
 
-  private void addLogggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+  private void addLoggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
     if (coreEvent instanceof PrivilegedEvent) {
       Optional<Map<String, String>> loggingVariables = ((PrivilegedEvent) coreEvent).getLoggingVariables();
       if (loggingVariables.isPresent()) {
