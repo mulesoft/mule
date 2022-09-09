@@ -31,6 +31,7 @@ import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.config.internal.el.DataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.el.DefaultExpressionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.SchedulerBaseConfigFactory;
+import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
@@ -74,6 +75,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   private final ArtifactType artifactType;
   private final OptionalObjectsController optionalObjectsController;
   private final ConfigurationProperties configurationProperties;
+  private final boolean enableLazyInit;
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   public BaseSpringMuleContextServiceConfigurator(MuleContext muleContext,
@@ -82,13 +84,15 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
                                                   OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
                                                   Registry serviceLocator,
-                                                  org.mule.runtime.core.internal.registry.Registry originalRegistry) {
+                                                  org.mule.runtime.core.internal.registry.Registry originalRegistry,
+                                                  boolean enableLazyInit) {
     super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.artifactType = artifactType;
     this.optionalObjectsController = optionalObjectsController;
     this.originalRegistry = originalRegistry;
+    this.enableLazyInit = enableLazyInit;
   }
 
   void createArtifactServices() {
@@ -112,8 +116,8 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
       registerBeanDefinition(OBJECT_TRANSFORMERS_REGISTRY, getBeanDefinition(DefaultTransformersRegistry.class));
     }
 
-    registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
-                           getBeanDefinition(DataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
+    registerLazyInitialisationAwareBeans();
+
     registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class));
     registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(DefaultExpressionManagerFactoryBean.class));
 
@@ -126,6 +130,16 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     createRuntimeServices();
     createBootstrapBeanDefinitions();
     absorbOriginalRegistry();
+  }
+
+  private void registerLazyInitialisationAwareBeans() {
+    if (enableLazyInit) {
+      registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
+                             getBeanDefinition(LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
+    } else {
+      registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
+                             getBeanDefinition(DataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
+    }
   }
 
   protected void createBootstrapBeanDefinitions() {

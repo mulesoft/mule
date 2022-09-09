@@ -205,7 +205,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                                                         applicationObjectController,
                                                                                         parentConfigurationProperties,
                                                                                         getArtifactProperties(),
-                                                                                        artifactType);
+                                                                                        artifactType,
+                                                                                        enableLazyInit);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
       ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
     }

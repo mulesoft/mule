@@ -15,6 +15,7 @@ import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXP
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
@@ -48,7 +49,7 @@ public class LazyExpressionLanguageAdaptorTestCase extends AbstractMuleTestCase 
   @Mock
   private BindingContext b2;
 
-  @Mock
+  @Mock(extraInterfaces = Disposable.class)
   private ExtendedExpressionLanguageAdaptor delegate;
 
   private LazyExpressionLanguageAdaptor lazyAdaptor;
@@ -84,6 +85,13 @@ public class LazyExpressionLanguageAdaptorTestCase extends AbstractMuleTestCase 
 
     t1.join();
     t2.join();
+  }
+
+  @Test
+  public void delegateIsDisposedWhenAdaptorDisposed() {
+    evaluate();
+    lazyAdaptor.dispose();
+    verify(((Disposable) delegate)).dispose();
   }
 
   @Test

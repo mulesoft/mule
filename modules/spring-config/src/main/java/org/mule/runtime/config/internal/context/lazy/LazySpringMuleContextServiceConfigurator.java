@@ -18,7 +18,6 @@ import static org.mule.runtime.config.internal.bean.lazy.LazyValueProviderServic
 import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
@@ -37,7 +36,6 @@ import org.mule.runtime.config.internal.bean.lazy.LazyMetadataService;
 import org.mule.runtime.config.internal.bean.lazy.LazySampleDataService;
 import org.mule.runtime.config.internal.bean.lazy.LazyValueProviderService;
 import org.mule.runtime.config.internal.context.SpringMuleContextServiceConfigurator;
-import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -96,8 +94,6 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
   protected void createArtifactServices() {
     super.createArtifactServices();
 
-    registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
-                           getBeanDefinition(LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
     registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, getMemoryManagementService());
 
