@@ -8,7 +8,8 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
-import static org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics.isApiKitFlow;
+import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.PRICING_METRICS;
+import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.FlowSummaryStory.ACTIVE_FLOWS_SUMMARY;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -47,8 +48,8 @@ import io.qameta.allure.Story;
  *
  */
 @SmallTest
-@Feature("")
-@Story("")
+@Feature(PRICING_METRICS)
+@Story(ACTIVE_FLOWS_SUMMARY)
 public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase {
 
   @Override
@@ -57,10 +58,6 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
 
     muleContext = spy(muleContext);
   }
-
-  ///////////////
-  // Flow lifecycle tests
-  ///////////////
 
   @Test
   public void triggerFlow() throws MuleException {
@@ -290,71 +287,6 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     public ComponentLocation getLocation() {
       return mock(ComponentLocation.class, RETURNS_DEEP_STUBS);
     }
-  }
-
-  ///////////////
-  // ApiKit naming tests
-  ///////////////
-
-  @Test
-  public void noApikitFlowSimpleName() {
-    assertThat(isApiKitFlow("privateFlow"), is(false));
-  }
-
-  @Test
-  // TODO can this also have a content type?
-  public void apikitSoapFlowMethod() {
-    assertThat(isApiKitFlow("ListInventory:\\config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodGet() {
-    assertThat(isApiKitFlow("get:\\reservation:api-config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodPost() {
-    assertThat(isApiKitFlow("post:\\reservation:api-config"), is(true));
-  }
-
-  /**
-   * The HTTP methods may be anything, not just the commonly used ones. So, since APIKIT may route a request with any method, the
-   * flows handling these methods are valid and must be considered as APIKIT flows.
-   */
-  @Test
-  public void apikitFlowMethodAnything() {
-    assertThat(isApiKitFlow("randomize:\\reservation:api-config"), is(true));
-
-  }
-
-  @Test
-  public void apikitFlowWithContentType() {
-    assertThat(isApiKitFlow("put:\\accounts:application\\json:account-domain-api-config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodPathWithMorePathParts() {
-    assertThat(isApiKitFlow("delete:\\accounts\\myAccount:account-domain-api-config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodPathWithParamPathPart() {
-    assertThat(isApiKitFlow("delete:\\accounts\\(id):account-domain-api-config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodPathWithPathPartWithNumbers() {
-    assertThat(isApiKitFlow("delete:\\accounts101\\(id):account-domain-api-config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodPathWithPathPartWithSpecialChars() {
-    assertThat(isApiKitFlow("delete:\\accounts.-_~!$&'()*+,;=:@\\(id):account-domain-api-config"), is(true));
-  }
-
-  @Test
-  public void apikitFlowMethodPathWithPathPartWithEncodedChars() {
-    assertThat(isApiKitFlow("delete:\\accounts\\(id)\\%00:account-domain-api-config"), is(true));
   }
 
 }
