@@ -16,11 +16,9 @@ import static org.mule.test.allure.AllureConstants.EventContextFeature.EventCont
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.hamcrest.collection.IsMapWithSize;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
@@ -30,7 +28,6 @@ import io.qameta.allure.Story;
 
 import org.junit.Test;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +35,18 @@ import java.util.List;
 @Story(DISTRIBUTED_TRACE_CONTEXT)
 public class DistributedTraceContextPropagationTestCase extends AbstractExtensionFunctionalTestCase {
 
+  private static final List<CoreEvent> EVENTS = new LinkedList<>();
+
   public static final String TRACE_CONTEXT_PROPAGATION = "traceContextPropagation";
+  public static final String TRACE_CONTEXT_PROPAGATION_THROUGH_HELPER = "traceContextPropagationThroughHelper";
+  public static final String TRACE_CONTEXT_PROPAGATION_THROUGH_HELPER_SDK_API_CORRELATION_INFO =
+      "traceContextPropagationThroughHelperSdkApi";
+
+  public static final String TRACE_CONTEXT_PROPAGATION_LEGACY_CALLBACK = "traceContextPropagationLegacyCallback";
+  public static final String TRACE_CONTEXT_PROPAGATION_LEGACY_CALLBACK_THROUGH_HELPER =
+      "traceContextPropagationLegacyCallbackThroughHelper";
+  public static final String TRACE_CONTEXT_PROPAGATION_LEGACY_CALLBACK_THROUGH_HELPER_SDK_API_CORRELATION_INFO =
+      "traceContextPropagationLegacyCallbackThroughHelperSdkApiCorrelationInfo";
 
   private static final long PROBER_TIMEOUT = 15000;
   private static final long PROBER_FREQUENCY = 1000;
@@ -48,12 +56,68 @@ public class DistributedTraceContextPropagationTestCase extends AbstractExtensio
     return "distributed-trace-context-propagation-test.xml";
   }
 
-  @Test
-  public void defaultTraceContextPropagator() throws Exception {
-    startFlow();
-    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> EventCollectorProcessor.getEvents().size() == 1);
+  @Override
+  protected void doTearDown() throws Exception {
+    EVENTS.clear();
+  }
 
-    for (CoreEvent event : EventCollectorProcessor.getEvents()) {
+  @Test
+  public void defaultTraceContextPropagatorThroughImplicitParameter() throws Exception {
+    startFlow(TRACE_CONTEXT_PROPAGATION);
+    checkEventProcessed();
+    assertEventPayload(EVENTS);
+  }
+
+  @Test
+  public void defaultTraceContextPropagatorThroughForwardCompatibilityHelper() throws Exception {
+    startFlow(TRACE_CONTEXT_PROPAGATION_THROUGH_HELPER);
+    checkEventProcessed();
+    assertEventPayload(EVENTS);
+  }
+
+  @Test
+  public void defaultTraceContextPropagatorThroughForwardCompatibilityHelperWithSdkApiCorrelationInfo() throws Exception {
+    startFlow(TRACE_CONTEXT_PROPAGATION_THROUGH_HELPER_SDK_API_CORRELATION_INFO);
+    checkEventProcessed();
+    assertEventPayload(EVENTS);
+  }
+
+  @Test
+  public void defaultTraceContextPropagatorThroughImplicitParameterWithLegacySourceCallback() throws Exception {
+    startFlow(TRACE_CONTEXT_PROPAGATION_LEGACY_CALLBACK);
+    checkEventProcessed();
+    assertEventPayload(EVENTS);
+  }
+
+  @Test
+  public void defaultTraceContextPropagatorThroughForwardCompatibilityHelperWithLegacySourceCallback() throws Exception {
+    startFlow(TRACE_CONTEXT_PROPAGATION_LEGACY_CALLBACK_THROUGH_HELPER);
+    checkEventProcessed();
+    assertEventPayload(EVENTS);
+  }
+
+  @Test
+  public void defaultTraceContextPropagatorThroughForwardCompatibilityHelperWithLegacySourceCallbackWithSdkApiCorrelationInfo()
+      throws Exception {
+    startFlow(TRACE_CONTEXT_PROPAGATION_LEGACY_CALLBACK_THROUGH_HELPER_SDK_API_CORRELATION_INFO);
+    checkEventProcessed();
+    assertEventPayload(EVENTS);
+  }
+
+  private void startFlow(String flowName) throws Exception {
+    ((Startable) getFlowConstruct(flowName)).start();
+  }
+
+  private void checkEventProcessed() {
+    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> {
+      synchronized (EVENTS) {
+        return EVENTS.size() == 1;
+      }
+    });
+  }
+
+  private void assertEventPayload(List<CoreEvent> events) {
+    for (CoreEvent event : events) {
       DistributedTraceContextManager distributedTraceContextManager =
           (DistributedTraceContextManager) event.getMessage().getPayload().getValue();
       assertThat(distributedTraceContextManager.getClass().getName(),
@@ -63,25 +127,17 @@ public class DistributedTraceContextPropagationTestCase extends AbstractExtensio
     }
   }
 
-  private void startFlow() throws Exception {
-    ((Startable) getFlowConstruct(TRACE_CONTEXT_PROPAGATION)).start();
-  }
-
   /**
    * An event collector for testing.
    */
   private static class EventCollectorProcessor extends AbstractComponent implements Processor {
 
-    private final static List<CoreEvent> EVENTS = new LinkedList<>();
-
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
-      EVENTS.add(event);
+      synchronized (EVENTS) {
+        EVENTS.add(event);
+      }
       return event;
-    }
-
-    public static List<CoreEvent> getEvents() {
-      return EVENTS;
     }
   }
 }

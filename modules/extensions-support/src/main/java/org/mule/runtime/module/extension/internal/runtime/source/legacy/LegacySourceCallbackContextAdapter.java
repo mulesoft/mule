@@ -17,6 +17,8 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.legacy.LegacyTransactionHandle;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -107,4 +109,7 @@ public class LegacySourceCallbackContextAdapter implements AugmentedLegacySource
     return emptyList();
   }
 
+  public DistributedTraceContextManager getDistributedSourceTraceContext() {
+    return delegate.getDistributedSourceTraceContext();
+  }
 }

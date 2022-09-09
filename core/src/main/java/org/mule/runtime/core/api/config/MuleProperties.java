@@ -159,6 +159,12 @@ public class MuleProperties {
   public static final String MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE = "_muleContainerFeatureManagementService";
 
   /**
+   * Key under which the {@link org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper} can be found in the
+   * {@link org.mule.runtime.api.artifact.Registry}
+   */
+  public static final String FORWARD_COMPATIBILITY_HELPER_KEY = "_muleForwardCompatibilityHelper";
+
+  /**
    * Registry key for {@link DefaultConnectivityTesterFactory}
    *
    * @since 4.4

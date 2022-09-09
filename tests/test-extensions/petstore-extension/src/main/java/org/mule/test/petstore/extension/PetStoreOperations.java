@@ -49,6 +49,7 @@ import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -82,6 +83,9 @@ public class PetStoreOperations {
   @Inject
   @Named(FEATURE_FLAGGING_SERVICE_KEY)
   private FeatureFlaggingService ffService;
+
+  @Inject
+  private java.util.Optional<ForwardCompatibilityHelper> forwardCompatibilityHelper;
 
   public Long getConnectionAge(@Connection PetStoreClient client,
                                @Config PetStoreConnector config) {
@@ -253,6 +257,16 @@ public class PetStoreOperations {
   @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
   public DistributedTraceContextManager getPetTraceContextPropagator(DistributedTraceContextManager distributedTraceContextManager) {
     return distributedTraceContextManager;
+  }
+
+  @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
+  public DistributedTraceContextManager getPetTraceContextPropagatorThroughForwardCompatibilityHelper(CorrelationInfo correlationInfo) {
+    return forwardCompatibilityHelper.map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo)).orElse(null);
+  }
+
+  @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
+  public DistributedTraceContextManager getPetTraceContextPropagatorThroughForwardCompatibilityHelperSdkApi(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
+    return forwardCompatibilityHelper.map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo)).orElse(null);
   }
 
   @OutputResolver(output = CorrelationInfoOutputResolver.class)

@@ -82,6 +82,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-compatibility-api</artifactId>
+        </dependency>
         
         <!-- Add logging libraries required by spring -->
         <dependency>

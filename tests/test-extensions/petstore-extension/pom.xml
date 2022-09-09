@@ -19,5 +19,14 @@
     <properties>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+        <muleSdkCompatibilityApi>1.0.0-SNAPSHOT</muleSdkCompatibilityApi>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-compatibility-api</artifactId>
+            <version>${muleSdkCompatibilityApi}</version>
+        </dependency>
+    </dependencies>
 </project>
