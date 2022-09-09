@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
-import static org.mule.runtime.extension.internal.loader.enricher.ConfigRefDeclarationEnricher.getConfigType;
+import static org.mule.runtime.extension.internal.declaration.type.MetadataTypeConstants.CONFIG_TYPE;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -140,7 +140,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
     }
 
     // Sets the type as the string primitive and the allowed stereotype to the one from the configuration model
-    this.type = getConfigType();
+    this.type = CONFIG_TYPE;
     this.dslConfiguration = of(ParameterDslConfiguration.builder().allowsReferences(true).build());
     this.allowedStereotypes = singletonList(configurationModel.get().getStereotype());
     return true;
