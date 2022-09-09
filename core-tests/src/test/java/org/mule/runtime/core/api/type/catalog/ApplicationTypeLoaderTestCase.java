@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.api.type.catalog;
 
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES_CATALOG;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -20,16 +20,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
-import org.mule.metadata.api.annotation.TypeAnnotation;
-import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -56,10 +50,10 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
 
     when(mockExtensionModel.getName()).thenReturn(MOCK_EXTENSION_NAME);
 
-    Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotationMap = new HashMap<>(2);
-    annotationMap.put(TypeAliasAnnotation.class, new TypeAliasAnnotation(MOCK_TYPE_ALIAS));
-    annotationMap.put(TypeIdAnnotation.class, new TypeIdAnnotation(FULL_CLASS_NAME_FOR_MOCK_TYPE));
-    ObjectType mockType = new DefaultObjectType(emptyList(), false, null, JAVA, annotationMap);
+    ObjectType mockType = create(JAVA).objectType()
+            .id(FULL_CLASS_NAME_FOR_MOCK_TYPE)
+            .with(new TypeAliasAnnotation(MOCK_TYPE_ALIAS))
+            .build();
     when(mockExtensionModel.getTypes()).thenReturn(singleton(mockType));
 
     applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel));
