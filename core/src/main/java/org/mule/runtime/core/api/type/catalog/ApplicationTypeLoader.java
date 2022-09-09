@@ -68,6 +68,7 @@ public class ApplicationTypeLoader implements TypeLoader {
   // The string format can be the full name of the type, or a string with syntax <extension-prefix>:<type-alias> if
   // the type has an alias. This format is temporal in order to use the types from the test operations, but may change
   // when the type catalog using dataweave is fully implemented.
+  // TODO (W-11706194 and W-11706243): Adapt the syntax when the type resolution is delegated to DW.
   private Optional<MetadataType> getFromDependency(String typeIdentifier) {
     ComponentIdentifier componentIdentifier = buildFromStringRepresentation(typeIdentifier);
     String extensionName = extensionModelNamesByPrefix.get(componentIdentifier.getNamespace());
@@ -88,11 +89,7 @@ public class ApplicationTypeLoader implements TypeLoader {
   }
 
   private static boolean matchesAlias(String expectedAlias, MetadataType metadataType) {
-    Optional<TypeAliasAnnotation> aliasAnnotation = metadataType.getAnnotation(TypeAliasAnnotation.class);
-    if (aliasAnnotation.isPresent()) {
-      return aliasAnnotation.get().getValue().equals(expectedAlias);
-    } else {
-      return false;
-    }
+    return metadataType.getAnnotation(TypeAliasAnnotation.class)
+        .map(typeAliasAnnotation -> typeAliasAnnotation.getValue().equals(expectedAlias)).orElse(false);
   }
 }
