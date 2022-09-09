@@ -431,13 +431,6 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private static final String XML_ORDER_FILE_PATH = "resolver/order.xml";
 
   private static final String SUBTYPED_PARAMETER_NAME = "subTypedParameter";
-  private static final ParentShape SUBTYPED_PARAMETER_VALUE = new Square() {
-
-    {
-      setArea(4);
-      setSide(2);
-    }
-  };
 
   private ReflectionCache reflectionCache = new ReflectionCache();
 
@@ -791,17 +784,23 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("Validates that ComponentParameterization API can describe a parameter whose type is defined with a SubtypeMapping.")
   public void subtypedParameter() throws Exception {
-    // ObjectType valueObjectType = testOAuthExtensionModel.getImportedTypes().stream()
-    // .filter(importedTypeModel -> importedTypeModel.getImportedType().getAnnotation(TypeIdAnnotation.class)
-    // .map(typeIdAnnotation -> typeIdAnnotation.getValue().contains("Square")).orElse(false))
-    // .findFirst().get().getImportedType();
-    // Consumer<ValueDeclarer> subtypedParameterValueDeclarer = valueDeclarer -> valueDeclarer
-    // .objectValue(objectValueDeclarer -> objectValueDeclarer.withField("area", "4").withField("side", 2), valueObjectType);
-    // ParentShape shapeParameter =
-    // (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
-    // SUBTYPED_PARAMETER_NAME,
-    // subtypedParameterValueDeclarer);
-    // assertThat(shapeParameter, is(SUBTYPED_PARAMETER_VALUE));
+//    Integer squareArea = 4;
+//    Integer squareSide = 2;
+//    Square subtypedParameterValue = new Square();
+//    subtypedParameterValue.setArea(squareArea);
+//    subtypedParameterValue.setSide(squareSide);
+//    ObjectType valueObjectType = testOAuthExtensionModel.getImportedTypes().stream()
+//        .filter(importedTypeModel -> importedTypeModel.getImportedType().getAnnotation(TypeIdAnnotation.class)
+//            .map(typeIdAnnotation -> typeIdAnnotation.getValue().contains("Square")).orElse(false))
+//        .findFirst().get().getImportedType();
+//    Consumer<ValueDeclarer> subtypedParameterValueDeclarer = valueDeclarer -> valueDeclarer
+//        .objectValue(objectValueDeclarer -> objectValueDeclarer.withField("area", squareArea.toString())
+//            .withField("side", squareSide.toString()), valueObjectType);
+//    ParentShape shapeParameter =
+//        (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+//                                                                    SUBTYPED_PARAMETER_NAME,
+//                                                                    subtypedParameterValueDeclarer);
+//    assertThat(shapeParameter, is(subtypedParameterValue));
   }
 
   private void testComponentParameterization(String parameterGroupName, String parameterName,

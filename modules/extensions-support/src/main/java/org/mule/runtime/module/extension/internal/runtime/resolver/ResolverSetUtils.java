@@ -335,10 +335,11 @@ public class ResolverSetUtils {
     if (pojoClass.isPresent() && value instanceof Map) {
       ObjectType metadataType = (ObjectType) (((Map) value).get("METADATATYPE"));
       if (metadataType != null) {
+        objectType = metadataType;
         pojoClass = getType(metadataType);
       }
       DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(pojoClass.get(), reflectionCache);
-      for (ObjectFieldType objectFieldType : metadataType.getFields()) {
+      for (ObjectFieldType objectFieldType : objectType.getFields()) {
         Map valuesMap = (Map) value;
         if (valuesMap.containsKey(objectFieldType.getKey().getName().toString())) {
           objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
