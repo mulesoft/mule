@@ -122,13 +122,13 @@ public final class ArtifactAstUtils {
 
     Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
     if (loader.isPresent()) {
+      Set<ExtensionModel> dependenciesExtensionModels = muleContext.getExtensionManager().getExtensions();
       return of(loader.get()
-          .loadExtensionModel(builder(artifactClassLoader, getDefault(muleContext.getExtensionManager().getExtensions()))
+          .loadExtensionModel(builder(artifactClassLoader, getDefault(dependenciesExtensionModels))
               .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
-                            muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
+              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
+              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels))
               .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);

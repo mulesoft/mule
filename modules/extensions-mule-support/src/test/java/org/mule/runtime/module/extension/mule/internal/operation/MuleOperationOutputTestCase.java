@@ -11,6 +11,7 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERA
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingStatistics;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.subtypes.extension.CarDoor;
 
 import javax.inject.Inject;
 
@@ -76,7 +78,19 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
     assertThat(cursorIteratorProvider, is(instanceOf(CursorIteratorProvider.class)));
   }
 
+  @Test
+  @Description("An operation declaring an output payload type belonging to another extension")
+  public void returningTypeFromDependency() throws Exception {
+    CoreEvent resultEvent = flowRunner("returningDoorFlow").run();
+    assertThat(resultEvent.getMessage().getPayload().getDataType().getType(), is(CarDoor.class));
+  }
+
   private void assertAllStreamingResourcesClosed() {
+    if (streamingManager == null) {
+      // This null check isn't needed on a happy path, but on startup failure it can raise an NPE, making the test
+      // failure message unreadable.
+      return;
+    }
     StreamingStatistics stats = streamingManager.getStreamingStatistics();
     new PollingProber(10000L, 100L).check(new JUnitLambdaProbe(() -> {
       assertThat("There are still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
