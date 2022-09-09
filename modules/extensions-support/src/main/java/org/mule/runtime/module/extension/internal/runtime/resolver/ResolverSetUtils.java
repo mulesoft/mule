@@ -42,6 +42,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.extension.internal.component.value.HasObjectType;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
@@ -333,10 +334,9 @@ public class ResolverSetUtils {
     Optional<Class<Object>> pojoClass = getType(objectType);
 
     if (pojoClass.isPresent() && value instanceof Map) {
-      ObjectType metadataType = (ObjectType) (((Map) value).get("METADATATYPE"));
-      if (metadataType != null) {
-        objectType = metadataType;
-        pojoClass = getType(metadataType);
+      if (value instanceof HasObjectType) {
+        objectType = ((HasObjectType) value).getObjectType();
+        pojoClass = getType(objectType);
       }
       DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(pojoClass.get(), reflectionCache);
       for (ObjectFieldType objectFieldType : objectType.getFields()) {
