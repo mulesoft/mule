@@ -33,6 +33,8 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.client.EventedExtensionsClientDecorator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
@@ -81,7 +83,10 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
       Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
       SoapRequest request = getRequest(context, customHeaders);
       SoapClient soapClient = connection.getSoapClient(serviceId);
-      SoapResponse response = connection.getExtensionsClientDispatcher(() -> extensionsClient)
+      SoapResponse response = connection
+          .getExtensionsClientDispatcher(() -> new EventedExtensionsClientDecorator(extensionsClient,
+                                                                                    ((ExecutionContextAdapter) context)
+                                                                                        .getEvent()))
           .map(d -> soapClient.consume(request, d))
           .orElseGet(() -> soapClient.consume(request));
 
