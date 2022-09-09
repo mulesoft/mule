@@ -31,10 +31,9 @@ public class OptionalParameterWithExpressionDefaultTestCase extends AbstractConf
 
   @Test
   @Description("Optional parameters can't declare an expression as defaultValue")
-  public void operationCanNotUseCoreRaiseError() throws Exception {
+  public void optionalParameterDefaultValueCanNotBeAnExpression() throws Exception {
     expected.expect(ConfigurationException.class);
-    expected
-        .expectMessage("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition (operation:def)");
+    expected.expectMessage("An expression was given for 'defaultValue' of the optional parameter 'someparam'");
     parseConfig("validation/optional-parameter-with-expression-default.xml");
   }
 }
