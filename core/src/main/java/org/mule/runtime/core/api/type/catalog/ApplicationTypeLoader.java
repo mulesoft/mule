@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.type.catalog;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.type.TypeCatalog.getDefault;
 
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -42,10 +41,6 @@ public class ApplicationTypeLoader implements TypeLoader {
   private final Map<String, String> extensionModelNamesByPrefix;
   private final TypeCatalog dependenciesTypeCatalog;
 
-  public ApplicationTypeLoader() {
-    this(emptySet());
-  }
-
   public ApplicationTypeLoader(Set<ExtensionModel> extensionModels) {
     this.dependenciesTypeCatalog = getDefault(extensionModels);
 
@@ -70,7 +65,7 @@ public class ApplicationTypeLoader implements TypeLoader {
     return getFromDependency(typeIdentifier);
   }
 
-  // The string format can be the full name of the type, or a string with syntax  <extension-prefix>:<type-alias> if
+  // The string format can be the full name of the type, or a string with syntax <extension-prefix>:<type-alias> if
   // the type has an alias. This format is temporal in order to use the types from the test operations, but may change
   // when the type catalog using dataweave is fully implemented.
   private Optional<MetadataType> getFromDependency(String typeIdentifier) {
