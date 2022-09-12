@@ -11,8 +11,12 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.core.api.extension.MuleOperationExtensionModelDeclarer.OPERATION_NAMESPACE;
+import static org.mule.runtime.core.api.extension.MuleOperationExtensionModelDeclarer.OPTIONAL_PARAMETER;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -35,10 +39,8 @@ public class OperationParameterDefaultValueDoesntSupportExpressions implements V
   private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
   private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
 
-  private static final String OPERATION = "operation";
-  private static final String OPTIONAL_PARAMETER = "optional-parameter";
   private static final ComponentIdentifier OPTIONAL_PARAMETER_IDENTIFIER =
-      builder().namespace(OPERATION).name(OPTIONAL_PARAMETER).build();
+      builder().namespace(OPERATION_NAMESPACE).name(OPTIONAL_PARAMETER).build();
 
   @Override
   public String getName() {
@@ -65,20 +67,20 @@ public class OperationParameterDefaultValueDoesntSupportExpressions implements V
     ComponentParameterAst defaultValueAst = component.getParameter(DEFAULT_GROUP_NAME, "defaultValue");
     Optional<String> defaultValue = defaultValueAst.getValue().getValue();
     if (isExpression(defaultValue)) {
-      return validationFailed(component);
+      String parameterName = component.getParameter(DEFAULT_GROUP_NAME, "name").getValue().<String>getValue()
+              .orElseThrow(() -> new IllegalStateException(format("Parameter in location '%s' doesn't have name", component.getLocation())));
+      return validationFailed(component, parameterName);
     } else {
       return validationOk();
     }
   }
 
-  private Optional<ValidationResultItem> validationFailed(ComponentAst component) {
-    return component.getParameter(DEFAULT_GROUP_NAME, "name").getValue().getValue()
-        .map(name -> create(component, this,
-                            format("An expression was given for 'defaultValue' of the optional parameter '%s'", name)));
+  private Optional<ValidationResultItem> validationFailed(ComponentAst component, String name) {
+    return of(create(component, this, format("An expression was given for 'defaultValue' of the optional parameter '%s'", name)));
   }
 
   private static Optional<ValidationResultItem> validationOk() {
-    return Optional.empty();
+    return empty();
   }
 
   private static boolean isExpression(Optional<String> defaultValue) {
