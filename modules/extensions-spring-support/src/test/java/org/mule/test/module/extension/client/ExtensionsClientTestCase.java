@@ -38,6 +38,7 @@ import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
 
 import java.io.Closeable;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -84,7 +85,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"vegan-config.xml", "heisenberg-config.xml"};
+    return new String[]{"vegan-config.xml", "heisenberg-config.xml"};
   }
 
   abstract <T, A> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
@@ -118,6 +119,17 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   }
 
   @Test
+  public void executeNonRepeatablePagedOperation() throws Throwable {
+    Result<Iterator<Message>, Object> result = client.<Iterator<Message>, Object>
+        executeAsync(HEISENBERG_EXT_NAME, "getPagedBlocklist", params ->
+        params.withConfigRef(HEISENBERG_CONFIG).withNonRepeatableStreaming()).get();
+
+    AtomicInteger count = new AtomicInteger(0);
+    result.getOutput().forEachRemaining(m -> count.addAndGet(1));
+    assertThat(count.get(), is(6));
+  }
+
+  @Test
   public void executeInputStreamOperation() throws Throwable {
     OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
     Result<CursorStreamProvider, Object> result = doExecute(HEISENBERG_EXT_NAME, "nameAsStream", params);
@@ -128,6 +140,21 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
       assertThat(value, equalTo("Heisenberg"));
     } finally {
       streamProvider.close();
+    }
+  }
+
+  @Test
+  public void executeNonRepeatableInputStreamOperation() throws Throwable {
+    Result<InputStream, Object> result = client.<InputStream, Object>
+        executeAsync(HEISENBERG_EXT_NAME, "nameAsStream", params ->
+        params.withConfigRef(HEISENBERG_CONFIG).withNonRepeatableStreaming()).get();
+
+
+    String value = IOUtils.toString(result.getOutput());
+    try {
+      assertThat(value, equalTo("Heisenberg"));
+    } finally {
+      closeQuietly(result.getOutput());
     }
   }
 
