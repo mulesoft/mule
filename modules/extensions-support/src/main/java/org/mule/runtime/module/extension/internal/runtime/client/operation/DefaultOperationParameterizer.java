@@ -62,8 +62,8 @@ public class DefaultOperationParameterizer implements InternalOperationParameter
   }
 
   @Override
-  public OperationParameterizer withSimpleReconnection(int frequency, int count) {
-    retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
+  public OperationParameterizer withSimpleReconnection(int frequency, int maxAttempts) {
+    retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, maxAttempts);
     return this;
   }
 

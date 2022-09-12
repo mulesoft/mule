@@ -123,7 +123,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void executeNonRepeatablePagedOperation() throws Throwable {
     Result<Iterator<Message>, Object> result = client
         .<Iterator<Message>, Object>executeAsync(HEISENBERG_EXT_NAME, "getPagedBlocklist",
-                                                 params -> params.withConfigRef(HEISENBERG_CONFIG).withNonRepeatableStreaming())
+                                                 params -> params.withConfigRef(HEISENBERG_CONFIG))
         .get();
 
     AtomicInteger count = new AtomicInteger(0);
@@ -150,7 +150,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     Result<InputStream, Object> result =
         client
             .<InputStream, Object>executeAsync(HEISENBERG_EXT_NAME, "nameAsStream",
-                                               params -> params.withConfigRef(HEISENBERG_CONFIG).withNonRepeatableStreaming())
+                                               params -> params.withConfigRef(HEISENBERG_CONFIG))
             .get();
 
 
