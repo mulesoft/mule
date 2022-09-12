@@ -69,7 +69,7 @@ public class DefaultOperationParameterizer implements InternalOperationParameter
 
   @Override
   public OperationParameterizer reconnectingForever(int frequency) {
-    retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, RETRY_COUNT_FOREVER);
+    withSimpleReconnection(frequency, RETRY_COUNT_FOREVER);
     return this;
   }
 
