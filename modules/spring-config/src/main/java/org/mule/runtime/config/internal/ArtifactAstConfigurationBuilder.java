@@ -133,7 +133,8 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                                                         applicationObjectController,
                                                                                         parentConfigurationProperties,
                                                                                         getArtifactProperties(),
-                                                                                        artifactType);
+                                                                                        artifactType,
+                                                                                        enableLazyInit);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
       ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
     }

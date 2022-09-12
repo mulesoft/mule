@@ -96,8 +96,6 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
   protected void createArtifactServices() {
     super.createArtifactServices();
 
-    registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
-                           getBeanDefinition(LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
     registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, getMemoryManagementService());
 
