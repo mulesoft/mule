@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 
 import org.mule.runtime.api.event.EventContext;
@@ -41,7 +42,7 @@ import io.qameta.allure.Feature;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-@Feature("EXTENSIONS_CLIENT")
+@Feature(EXTENSIONS_CLIENT)
 public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeisenbergConfigTestCase {
 
   private static final String HEISENBERG_EXT_NAME = HEISENBERG;
