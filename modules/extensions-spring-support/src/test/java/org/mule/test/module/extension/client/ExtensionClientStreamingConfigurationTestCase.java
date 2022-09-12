@@ -47,6 +47,8 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
   private static final String HEISENBERG_EXT_NAME = HEISENBERG;
   private static final String HEISENBERG_CONFIG = "heisenberg";
+  private static final String ITERABLE_OPERATION = "getPagedBlocklist";
+  private static final String STREAMING_OPERATION = "nameAsStream";
 
   @Inject
   private ExtensionsClient client;
@@ -87,7 +89,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
     ArgumentCaptor<InMemoryCursorIteratorConfig> captor = forClass(InMemoryCursorIteratorConfig.class);
 
-    client.executeAsync(HEISENBERG_EXT_NAME, "getPagedBlocklist", params -> params.withConfigRef(HEISENBERG_CONFIG)
+    client.executeAsync(HEISENBERG_EXT_NAME, ITERABLE_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
         .withInMemoryRepeatableIterables(initialBufferSize, initialBufferSizeIncrement, maxBufferSize))
         .get();
 
@@ -105,7 +107,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
     ArgumentCaptor<FileStoreCursorIteratorConfig> captor = forClass(FileStoreCursorIteratorConfig.class);
 
     client
-        .executeAsync(HEISENBERG_EXT_NAME, "getPagedBlocklist",
+        .executeAsync(HEISENBERG_EXT_NAME, ITERABLE_OPERATION,
                       params -> params.withConfigRef(HEISENBERG_CONFIG).withFileStoreRepeatableIterables(maxBufferSize))
         .get();
 
@@ -122,7 +124,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
     ArgumentCaptor<InMemoryCursorStreamConfig> captor = forClass(InMemoryCursorStreamConfig.class);
 
-    client.executeAsync(HEISENBERG_EXT_NAME, "nameAsStream", params -> params.withConfigRef(HEISENBERG_CONFIG)
+    client.executeAsync(HEISENBERG_EXT_NAME, STREAMING_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
         .withInMemoryRepeatableStreaming(initialBufferSize, initialBufferSizeIncrement, maxBufferSize))
         .get();
 
@@ -140,7 +142,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
     ArgumentCaptor<FileStoreCursorStreamConfig> captor = forClass(FileStoreCursorStreamConfig.class);
 
-    client.executeAsync(HEISENBERG_EXT_NAME, "nameAsStream", params -> params.withConfigRef(HEISENBERG_CONFIG)
+    client.executeAsync(HEISENBERG_EXT_NAME, STREAMING_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
         .withFileStoreRepeatableStreaming(maxInMemorySize))
         .get();
 
