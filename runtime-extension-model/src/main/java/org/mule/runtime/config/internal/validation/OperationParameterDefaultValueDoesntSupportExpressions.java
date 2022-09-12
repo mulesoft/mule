@@ -67,12 +67,16 @@ public class OperationParameterDefaultValueDoesntSupportExpressions implements V
     ComponentParameterAst defaultValueAst = component.getParameter(DEFAULT_GROUP_NAME, "defaultValue");
     Optional<String> defaultValue = defaultValueAst.getValue().getValue();
     if (isExpression(defaultValue)) {
-      String parameterName = component.getParameter(DEFAULT_GROUP_NAME, "name").getValue().<String>getValue()
-              .orElseThrow(() -> new IllegalStateException(format("Parameter in location '%s' doesn't have name", component.getLocation())));
-      return validationFailed(component, parameterName);
+      return validationFailed(component, getParameterName(component));
     } else {
       return validationOk();
     }
+  }
+
+  private static String getParameterName(ComponentAst component) {
+    return component.getParameter(DEFAULT_GROUP_NAME, "name").getValue().<String>getValue()
+        .orElseThrow(() -> new IllegalStateException(format("Parameter in location '%s' doesn't have name",
+                                                            component.getLocation())));
   }
 
   private Optional<ValidationResultItem> validationFailed(ComponentAst component, String name) {
