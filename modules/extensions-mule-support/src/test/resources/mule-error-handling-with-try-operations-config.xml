@@ -91,4 +91,33 @@
             </try>
         </operation:body>
     </operation:def>
+
+    <operation:def name="operationWithMultipleOnErrorContinues" >
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <try>
+                <heisenberg:cure-cancer />
+                <error-handler>
+                    <on-error-continue type="HEISENBERG:HEALTH" />
+                    <on-error-continue type="HEISENBERG:OAUTH2" />
+                </error-handler>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationCatchingAllButWithWhen" >
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <try>
+                <heisenberg:cure-cancer />
+                <error-handler>
+                    <on-error-continue type="HEISENBERG:*" when="#[someCondition()]" />
+                </error-handler>
+            </try>
+        </operation:body>
+    </operation:def>
 </mule>
