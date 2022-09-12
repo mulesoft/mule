@@ -96,6 +96,7 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
   }
 
   private static Object mapParameterValue(Object parameterValue) {
+    // We don't want to expose the ConfigurationProvider to the inside of the operation, only its name.
     return parameterValue instanceof ConfigurationProvider ? ((ConfigurationProvider) parameterValue).getName() : parameterValue;
   }
 
