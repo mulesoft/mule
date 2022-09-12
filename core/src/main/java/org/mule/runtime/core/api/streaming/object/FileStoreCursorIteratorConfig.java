@@ -15,7 +15,7 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 /**
  * Configuration for FileStore based {@link CursorIteratorProvider} implementations.
  * <p>
- * This functionality has been available since 4.1, but only made available through this module since 4.5.0
+ * This functionality has been available since 4.0, but only made available through this module since 4.5.0
  *
  * @since 4.5.0
  */
