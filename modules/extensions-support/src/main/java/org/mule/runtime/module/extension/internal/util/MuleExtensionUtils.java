@@ -702,6 +702,15 @@ public class MuleExtensionUtils {
     }
   }
 
+  /**
+   * Returns a {@link ResultTransformer} if the given {@code operationModel} supports auto paging.
+   *
+   * @param operationModel              the {@link OperationModel}
+   * @param extensionConnectionSupplier the connection supplier
+   * @param supportsOAuth               whether the given operation supports OAuth authentication
+   * @return an {@link Optional} {@link ResultTransformer}
+   * @since 4.5.0
+   */
   public static Optional<ResultTransformer> getPagingResultTransformer(OperationModel operationModel,
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
                                                                        boolean supportsOAuth) {

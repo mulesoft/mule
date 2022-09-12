@@ -15,8 +15,15 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.ForwardingExecutorService;
 
+/**
+ * Executor meant to be used in {@link LoadingCache} disposal operations, as explained in
+ * {@code https://github.com/ben-manes/caffeine/issues/104#issuecomment-238068997}
+ *
+ * @since 4.5.0
+ */
 final class ShutdownExecutor extends ForwardingExecutorService {
 
   private final AtomicInteger tasks = new AtomicInteger();

@@ -12,6 +12,11 @@ import org.mule.runtime.extension.api.client.OperationParameters;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Decorates a {@link OperationParameters} instance so that it carries a context {@link Event}
+ *
+ * @since 4.5.0
+ */
 public class EventedOperationsParameterDecorator implements OperationParameters {
 
   private final OperationParameters delegate;

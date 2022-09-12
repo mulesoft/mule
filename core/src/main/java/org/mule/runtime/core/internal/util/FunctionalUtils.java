@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.function.Consumer;
@@ -62,6 +63,18 @@ public class FunctionalUtils extends org.mule.runtime.api.util.FunctionalUtils {
     }
   }
 
+  /**
+   * Executes the given {@code function} using an event obtained through {@link NullEventFactory#getNullEvent()}.
+   * <p>
+   * The event context is automatically completed (either with success or error) depending on the function providing a result or
+   * throwing an exception.
+   *
+   * @param function the function to execute
+   * @param <T>      the generic type of the functions return value
+   * @return the function's value
+   * @throws RuntimeException if the function itself throws one.
+   * @since 4.5.0
+   */
   public static <T> T withNullEvent(CheckedFunction<CoreEvent, T> function) {
     CoreEvent event = getNullEvent();
     try {

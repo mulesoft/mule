@@ -117,6 +117,16 @@ public class ReconnectionUtils {
     return false;
   }
 
+  /**
+   * Creates an {@link InterceptorChain} that enables reconnection for connected components
+   *
+   * @param extensionModel     the {@link ExtensionModel}
+   * @param componentModel     the {@link ComponentModel}
+   * @param connectionSupplier the connection supplier
+   * @param reflectionCache    a {@link ReflectionCache}
+   * @return a new {@link InterceptorChain}
+   * @since 4.5.0
+   */
   public static InterceptorChain createReconnectionInterceptorsChain(ExtensionModel extensionModel,
                                                                      ComponentModel componentModel,
                                                                      ExtensionConnectionSupplier connectionSupplier,

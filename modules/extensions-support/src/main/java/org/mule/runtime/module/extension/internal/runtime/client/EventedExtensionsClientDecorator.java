@@ -18,6 +18,12 @@ import org.mule.runtime.module.extension.internal.runtime.client.operation.Inter
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+/**
+ * Decorates an {@link ExtensionsClient} instance so that all its operations are executed in the context of a given
+ * {@link #event}, unless another context event has been explicitly defined.
+ *
+ * @since 4.5.0
+ */
 public class EventedExtensionsClientDecorator implements ExtensionsClient {
 
   private final ExtensionsClient extensionsClient;

@@ -94,6 +94,26 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
     return new CompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate);
   }
 
+  /**
+   * Receives a {@link Map} with the execution parameters of an operation and returns a new one with the ones that should be used
+   * to initialize it.
+   * <p>
+   * This is <b>ONLY</b> valid for extensions written with the Java SDK.
+   *
+   * @param extensionModel      the {@link ExtensionModel}
+   * @param componentModel      the {@link ComponentModel}
+   * @param operationParameters the operation's parameters in form of a map
+   * @param actingComponent     the {@link Component} executing the operation
+   * @param staticConfig        the static {@link ConfigurationInstance} if one exists. Use {@link Optional#empty()} if no config
+   *                            or dynamic
+   * @param extensionManager    the {@link ExtensionManager}
+   * @param expressionManager   the {@link ExtensionManager}
+   * @param reflectionCache     a {@link ReflectionCache}
+   * @param <C>                 the component's generic type
+   * @return a {@link Map} with the initialization parameters
+   * @throws InitialisationException
+   * @since 4.5.0
+   */
   public static <C extends Component & Initialisable> Map<String, Object> extractExecutorInitialisationParams(
                                                                                                               ExtensionModel extensionModel,
                                                                                                               ComponentModel componentModel,

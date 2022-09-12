@@ -40,6 +40,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+/**
+ * Resolves the appropriate {@link CompletableComponentExecutor} for a given {@link OperationKey}
+ *
+ * @since 4.5.0
+ */
 abstract class ComponentExecutorResolver {
 
   protected static final Logger LOGGER = getLogger(ComponentExecutorResolver.class);
@@ -50,6 +55,9 @@ abstract class ComponentExecutorResolver {
   private final ReflectionCache reflectionCache;
   protected final MuleContext muleContext;
 
+  /**
+   * Factory method to obtain instances of this class
+   */
   static ComponentExecutorResolver from(OperationKey key,
                                         ExtensionManager extensionManager,
                                         ExpressionManager expressionManager,

@@ -15,6 +15,12 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 
+/**
+ * {@link ResultTransformer} implementation that transforms {@link PagingProvider} instances into
+ * {@link ConsumerStreamingIterator} ones
+ *
+ * @since 4.5.0
+ */
 public class PagingResultTransformer implements ResultTransformer {
 
   private final ExtensionConnectionSupplier connectionSupplier;
@@ -26,7 +32,7 @@ public class PagingResultTransformer implements ResultTransformer {
   }
 
   @Override
-  public Object applyChecked(ExecutionContextAdapter operationContext, Object value) throws Throwable {
+  public Object applyChecked(ExecutionContextAdapter operationContext, Object value) {
     if (value == null) {
       throw new IllegalStateException("Obtained paging delegate cannot be null");
     }

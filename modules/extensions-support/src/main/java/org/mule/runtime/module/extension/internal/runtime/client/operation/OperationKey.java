@@ -11,11 +11,18 @@ import static java.util.Objects.hash;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Identifies an extension operation and its referenced {@link ConfigurationProvider} to be executed in the context of a
+ * {@link ExtensionsClient}
+ *
+ * @since 4.5.0
+ */
 public class OperationKey {
 
   private final ExtensionModel extensionModel;

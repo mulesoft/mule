@@ -39,6 +39,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -53,6 +54,11 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 
+/**
+ * {@link ExtensionsClient} delegate class for executing extension operations
+ *
+ * @since 4.5.0
+ */
 public class OperationClient implements Lifecycle {
 
   private static Logger LOGGER = getLogger(OperationClient.class);

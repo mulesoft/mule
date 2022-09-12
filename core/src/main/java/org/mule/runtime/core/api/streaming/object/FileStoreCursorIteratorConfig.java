@@ -9,7 +9,18 @@ package org.mule.runtime.core.api.streaming.object;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_MAX_BUFFER_SIZE;
 
-public class FileStoreCursorIteratorConfig {
+import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+
+/**
+ * Configuration for FileStore based {@link CursorIteratorProvider} implementations.
+ * <p>
+ * This functionality has been available since 4.1, but only made available through this module since 4.5.0
+ *
+ * @since 4.5.0
+ */
+@NoInstantiate
+public final class FileStoreCursorIteratorConfig {
 
   private final int maxInMemoryInstances;
 

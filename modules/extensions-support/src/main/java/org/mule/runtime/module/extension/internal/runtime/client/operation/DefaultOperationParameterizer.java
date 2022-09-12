@@ -33,13 +33,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Default implementation of {@link OperationParameterizer}
+ *
+ * @since 4.5.0
+ */
 public class DefaultOperationParameterizer implements InternalOperationParameterizer {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
+
   private String configRef;
   private final Map<String, Object> rawParameters = new HashMap<>();
   private final Map<Pair<String, String>, Object> groupedParameters = new HashMap<>();
-  private Function<StreamingManager, CursorProviderFactory> cursorProviderFunction = nullCursorProviderFunction();
+  private Function<StreamingManager, CursorProviderFactory> cursorProviderFunction = sm -> NULL_CURSOR_PROVIDER_FACTORY;
   private RetryPolicyTemplate retryPolicyTemplate = new NoRetryPolicyTemplate();
   private CoreEvent contextEvent;
 
@@ -121,12 +127,6 @@ public class DefaultOperationParameterizer implements InternalOperationParameter
   }
 
   @Override
-  public OperationParameterizer withNonRepeatableStreaming() {
-    cursorProviderFunction = nullCursorProviderFunction();
-    return this;
-  }
-
-  @Override
   public OperationParameterizer inTheContextOf(Event event) {
     Preconditions.checkArgument(event instanceof CoreEvent, "event must be an instance of " + CoreEvent.class.getSimpleName());
     this.contextEvent = (CoreEvent) event;
@@ -152,9 +152,5 @@ public class DefaultOperationParameterizer implements InternalOperationParameter
   public void setValuesOn(ComponentParameterization.Builder<OperationModel> builder) {
     rawParameters.forEach(builder::withParameter);
     groupedParameters.forEach((pair, value) -> builder.withParameter(pair.getFirst(), pair.getSecond(), value));
-  }
-
-  private Function<StreamingManager, CursorProviderFactory> nullCursorProviderFunction() {
-    return sm -> NULL_CURSOR_PROVIDER_FACTORY;
   }
 }
