@@ -214,7 +214,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   @Test
   public void testStartComponentExecutionIfCurrentSpanNameVerificationFails() {
     // The Start Component Span Must Fail with the following Error
-    expectTracingConditionNotException("The current span has name: " + NON_EXPECTED_SPAN_NAME + ".  Expected a span with name: "
+    expectTracingConditionNotException("The span has name: " + NON_EXPECTED_SPAN_NAME + ".  Expected a span with name: "
         + EXPECTED_SPAN_NAME);
 
     // Creating a Core Event Tracer that propagates Exceptions.
@@ -244,7 +244,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   @Test
   public void testStartExecutionIfCurrentSpanNotSetConditionFails() {
     // The Start Component Span Must Fail with the following Error
-    expectTracingConditionNotException("The current span is null. Expected a span with name: " + EXPECTED_SPAN_NAME);
+    expectTracingConditionNotException("The span is null. Expected a span with name: " + EXPECTED_SPAN_NAME);
 
     // Creating a Core Event Tracer that propagates exceptions
     CoreEventTracer coreEventTracer = getTestCoreEventTracer(mock(Logger.class), true);
@@ -278,7 +278,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   @Test
   public void testEndSpanIfCurrentSpanNotSetConditionFails() {
     // The End Current Span operation must fail with the following exception.
-    expectTracingConditionNotException("The current span is null. Expected a span with name: " + EXPECTED_SPAN_NAME);
+    expectTracingConditionNotException("The span is null. Expected a span with name: " + EXPECTED_SPAN_NAME);
 
     // Creating a Core Event Tracer that propagates exceptions.
     CoreEventTracer coreEventTracer = getTestCoreEventTracer(mock(Logger.class), true);
@@ -312,8 +312,8 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   @Test
   public void testStartComponentExecutionIfCurrentSpanNotSetConditionFail() {
     // We expect an exception indicating that there is a current when no span was expected.
-    expectTracingConditionNotException("Current span with name: " + NON_EXPECTED_SPAN_NAME
-        + " was found while no current span was expected.");
+    expectTracingConditionNotException("Span with name: " + NON_EXPECTED_SPAN_NAME
+        + " was found while no span was expected.");
 
     // Creating a Core Event Tracer that propagates exceptions.
     CoreEventTracer coreEventTracer = getTestCoreEventTracer(mock(Logger.class), true);
@@ -342,7 +342,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   @Test
   public void testStartComponentExecutionIfCurrentSpanSetConditionFail() {
     // We expect this exception.
-    expectTracingConditionNotException("No current span set");
+    expectTracingConditionNotException("No span set");
 
     // Creating a core event tracer that propagates exceptions.
     CoreEventTracer coreEventTracer = getTestCoreEventTracer(mock(Logger.class), true);
