@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNullSpanTracingCondition;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -36,7 +36,7 @@ public class NullSpanTracingConditionTestCase {
 
   @Test
   public void assertOk() {
-    TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
+    TracingCondition condition = getNullSpanTracingCondition();
     condition.assertOnSpan(null);
   }
 
@@ -44,7 +44,7 @@ public class NullSpanTracingConditionTestCase {
   public void assertFail() {
     expectedException.expect(TracingConditionNotMetException.class);
     expectedException.expectMessage("Span with name: expectedSpanName was found while no span was expected.");
-    TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
+    TracingCondition condition = getNullSpanTracingCondition();
     InternalSpan span = mock(InternalSpan.class);
     when(span.getName()).thenReturn(EXPECTED_SPAN_NAME);
     condition.assertOnSpan(span);

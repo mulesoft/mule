@@ -12,7 +12,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCond
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
 /**
- * A {@link TracingCondition} that fails if there is no current span set.
+ * A {@link TracingCondition} that fails if there is no span set.
  *
  * @since 4.5.0
  */

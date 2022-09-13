@@ -12,7 +12,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCond
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
 /**
- * A {@link TracingCondition} that verifies that there is no current span set.
+ * A {@link TracingCondition} that verifies that there is no span set.
  *
  * @since 4.5.0
  */
@@ -20,7 +20,7 @@ public class NullSpanTracingCondition implements TracingCondition {
 
   private static final TracingCondition INSTANCE = new NullSpanTracingCondition();
 
-  public static TracingCondition getNoMuleCurrentSpanSetTracingCondition() {
+  public static TracingCondition getNullSpanTracingCondition() {
     return INSTANCE;
   }
 

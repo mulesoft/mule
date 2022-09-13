@@ -14,7 +14,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.Trac
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getNotNullSpanTracingCondition;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNullSpanTracingCondition;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
@@ -302,7 +302,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
 
     // Starts a Span with the tracing condition that no current span should be set.
     coreEventTracer.startComponentSpan(coreEvent, new TestSpanCustomizationInfo(),
-                                       getNoMuleCurrentSpanSetTracingCondition());
+                                       getNullSpanTracingCondition());
 
     // We verify that now there is a current span.
     assertThat(((DistributedTraceContextAware) coreEvent.getContext()).getDistributedTraceContext().getCurrentSpan().isPresent(),
@@ -321,7 +321,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     // Creating a mock core event.
     CoreEvent coreEvent = getCoreEventForTracingConditionTesting(NON_EXPECTED_SPAN_NAME);
 
-    coreEventTracer.startComponentSpan(coreEvent, new TestSpanCustomizationInfo(), getNoMuleCurrentSpanSetTracingCondition());
+    coreEventTracer.startComponentSpan(coreEvent, new TestSpanCustomizationInfo(), getNullSpanTracingCondition());
   }
 
   @Test
