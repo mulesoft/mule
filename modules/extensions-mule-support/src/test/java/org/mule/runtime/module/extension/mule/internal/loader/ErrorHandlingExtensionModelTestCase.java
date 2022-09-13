@@ -62,6 +62,9 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     expectedErrors.put("operationSilencingAllErrorsAndRaisingAnother", singletonList("THIS:CUSTOM"));
     expectedErrors.put("operationSilencingAllHeisenbergErrorsAndRaisingAnother", singletonList("THIS:HEALTH"));
     expectedErrors.put("operationSilencingAllHealthErrorsWithinACatchAll", singletonList("HEISENBERG:OAUTH2"));
+
+    expectedErrors.put("operationWithMultipleOnErrorContinues", emptyList());
+    expectedErrors.put("operationCatchingAllButWithWhen", asList("HEISENBERG:OAUTH2", "HEISENBERG:OAUTH2"));
   }
 
   @Inject
@@ -100,7 +103,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     assertThat(format("Actual list for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors,
                hasSize(expectedListOfErrors.size()));
     for (String item : expectedListOfErrors) {
-      assertThat(actualRaisedErrors, hasItem(item));
+      assertThat(format("Actual list for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors, hasItem(item));
     }
   }
 

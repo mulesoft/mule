@@ -43,6 +43,7 @@ import java.util.function.BiFunction;
 public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorModelParser>> {
 
   private static final String ERROR_TYPE_PARAM = "type";
+  private static final String WHEN_PARAM = "when";
 
   private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
       builder().namespace(OPERATION_DSL_NAMESPACE).name(RAISE_ERROR).build();
@@ -154,15 +155,16 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
         return;
       }
 
-      Optional<ComponentAst> onErrorContinue =
-          errorHandler.get().directChildrenStreamByIdentifier(CORE_PREFIX, ON_ERROR_CONTINUE).findFirst();
-      if (!onErrorContinue.isPresent()) {
-        return;
-      }
-
-      String typeAsString =
-          (String) onErrorContinue.get().getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_PARAM).getValue().getValue().orElse(null);
-      suppressedErrors.add(createErrorModelParserMatcher(typeAsString));
+      errorHandler.get().directChildrenStreamByIdentifier(CORE_PREFIX, ON_ERROR_CONTINUE)
+          // If it has a "when" parameter specified, it would raise the errors when the expression evaluates to false.
+          .filter(onErrorContinue -> !onErrorContinue.getParameter(DEFAULT_GROUP_NAME, WHEN_PARAM).getValue().getValue()
+              .isPresent())
+          // An error-handler may have multiple on-error-continues.
+          .forEach(onErrorContinue -> {
+            String typeAsString =
+                (String) onErrorContinue.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_PARAM).getValue().getValue().orElse(null);
+            suppressedErrors.add(createErrorModelParserMatcher(typeAsString));
+          });
     }
 
     private boolean isErrorSuppressed(ErrorModelParser errorModelParser, List<ErrorModelParserMatcher> suppressedErrors) {
