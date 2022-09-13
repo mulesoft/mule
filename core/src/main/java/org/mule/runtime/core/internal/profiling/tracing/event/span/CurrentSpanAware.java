@@ -7,7 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
 import java.util.Optional;
 
@@ -19,9 +20,12 @@ import java.util.Optional;
 public interface CurrentSpanAware {
 
   /**
-   * @param span set the current {@link InternalSpan}
+   * @param span             set the current {@link InternalSpan}
+   * @param tracingCondition the tracing condition to assert on setting the current span
+   *
+   * @throws TracingConditionNotMetException indicates that the condition is not met.
    */
-  void setCurrentSpan(InternalSpan span);
+  void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition);
 
   /**
    * @return the owned {@link InternalSpan}

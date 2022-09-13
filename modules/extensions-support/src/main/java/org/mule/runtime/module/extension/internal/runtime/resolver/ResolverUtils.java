@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
@@ -267,7 +268,7 @@ public class ResolverUtils {
       }
 
       @Override
-      public void endCurrentContextSpan() {
+      public void endCurrentContextSpan(TracingCondition tracingCondition) {
         // Nothing to do.
       }
 
@@ -277,7 +278,7 @@ public class ResolverUtils {
       }
 
       @Override
-      public void setCurrentSpan(InternalSpan span) {
+      public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) {
         // Nothing to do.
       }
 

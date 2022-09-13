@@ -20,6 +20,8 @@ import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo
     extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
 
+  public static final String SPAN_NAME_SEPARATOR = ":";
+
   protected Component component;
 
   public AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo(Component component) {
@@ -43,8 +45,6 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
   static class ChildSpanCustomizationInfoResolver {
 
     public static final String UNTIL_SUCCESSFUL = "until-successful";
-
-    public static final String SPAN_NAME_SEPARATOR = ":";
 
     public static ChildSpanCustomizationInfo getChildSpanCustomizationInfo(Component component) {
       if (component.getIdentifier().getName().equals(UNTIL_SUCCESSFUL)) {
