@@ -47,7 +47,14 @@ import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
  *
  * @since 4.5.0
  */
-class MuleOperationExtensionModelDeclarer {
+public class MuleOperationExtensionModelDeclarer {
+
+  public static final String OPERATION_NAMESPACE = OPERATION_DSL_NAMESPACE;
+  public static final String PARAMETERS = "parameters";
+  public static final String PARAMETER = "parameter";
+  public static final String OPTIONAL_PARAMETER = "optional-parameter";
+  public static final String EXCLUSIVE_OPTIONALS = "exclusive-optionals";
+  public static final String TYPE = "type";
 
   private static final String TYPE_EXAMPLE = "string or number or http:request-config";
 
@@ -262,12 +269,12 @@ class MuleOperationExtensionModelDeclarer {
   }
 
   private void addParametersDeclaration(ConstructDeclarer def) {
-    final NestedComponentDeclarer parametersDef = def.withOptionalComponent("parameters")
+    final NestedComponentDeclarer parametersDef = def.withOptionalComponent(PARAMETERS)
         .describedAs("The operation's parameters")
         .withMinOccurs(0)
         .withMaxOccurs(1);
 
-    final NestedComponentDeclarer parameterDef = parametersDef.withComponent("parameter")
+    final NestedComponentDeclarer parameterDef = parametersDef.withComponent(PARAMETER)
         .describedAs("Defines an operation parameter")
         .withMinOccurs(1)
         .withMaxOccurs(null);
@@ -276,14 +283,14 @@ class MuleOperationExtensionModelDeclarer {
 
     addParameterDeclaration(parameterDef);
 
-    final NestedComponentDeclarer optionalParameterDef = parametersDef.withOptionalComponent("optional-parameter")
+    final NestedComponentDeclarer optionalParameterDef = parametersDef.withOptionalComponent(OPTIONAL_PARAMETER)
         .describedAs("Defines an optional operation parameter")
         .withMinOccurs(0)
         .withMaxOccurs(null);
 
     addOptionalParameterDeclaration(optionalParameterDef);
 
-    final NestedComponentDeclarer exclusiveOptionalDef = parametersDef.withOptionalComponent("exclusive-optionals")
+    final NestedComponentDeclarer exclusiveOptionalDef = parametersDef.withOptionalComponent(EXCLUSIVE_OPTIONALS)
         .describedAs("Defines a set of mutually exclusive parameters")
         .withMinOccurs(0)
         .withMaxOccurs(1);
@@ -318,7 +325,7 @@ class MuleOperationExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().asText().build());
 
-    parameterGroupDeclarer.withOptionalParameter("type")
+    parameterGroupDeclarer.withOptionalParameter(TYPE)
         .describedAs("The parameter's type")
         .ofType(STRING_TYPE)
         .withDisplayModel(display("Parameter type", "The Parameter's type", TYPE_EXAMPLE))

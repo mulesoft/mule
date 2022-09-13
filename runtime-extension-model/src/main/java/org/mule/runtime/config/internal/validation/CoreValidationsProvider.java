@@ -64,6 +64,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService),
+                                                          new OperationParameterDefaultValueDoesntSupportExpressions(),
                                                           new NoExpressionsInNoExpressionsSupportedParams(),
                                                           new DynamicConfigWithStatefulOperationConfigurationOverride(),
                                                           new PollingSourceHasSchedulingStrategy(),
