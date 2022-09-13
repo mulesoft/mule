@@ -142,11 +142,13 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   }
 
   @Test
+  @Issue("W-11745207")
   public void baseRegistryWithLazyInitialisation() throws Exception {
     doTestBaseRegistryExpressionLanguageAdapter(true, LazyExpressionLanguageAdaptor.class);
   }
 
   @Test
+  @Issue("W-11745207")
   public void baseRegistryWithEagerInitialisation() throws Exception {
     doTestBaseRegistryExpressionLanguageAdapter(false, DataWeaveExpressionLanguageAdaptor.class);
   }

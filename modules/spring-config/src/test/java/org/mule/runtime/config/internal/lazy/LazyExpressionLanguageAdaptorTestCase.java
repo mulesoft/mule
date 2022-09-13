@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -88,6 +89,7 @@ public class LazyExpressionLanguageAdaptorTestCase extends AbstractMuleTestCase 
   }
 
   @Test
+  @Issue("W-11745207")
   public void delegateIsDisposedWhenAdaptorDisposed() {
     evaluate();
     lazyAdaptor.dispose();

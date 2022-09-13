@@ -23,6 +23,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.junit.rules.ExpectedException.none;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -78,11 +79,13 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
   }
 
   @Test
+  @Issue("W-11745207")
   public void baseRegistryWithLazyInitialisation() throws Exception {
     doTestBaseRegistryExpressionLanguageAdapter(true, LazyExpressionLanguageAdaptor.class);
   }
 
   @Test
+  @Issue("W-11745207")
   public void baseRegistryWithEagerInitialisation() throws Exception {
     doTestBaseRegistryExpressionLanguageAdapter(false, DataWeaveExpressionLanguageAdaptor.class);
   }
