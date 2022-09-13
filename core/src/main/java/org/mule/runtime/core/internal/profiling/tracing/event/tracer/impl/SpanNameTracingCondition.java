@@ -12,30 +12,30 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCond
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
 /**
- * A {@link TracingCondition} that verifies that the current span has a certain name.
+ * A {@link TracingCondition} that verifies that the span has a certain name.
  *
  * @since 4.5.0
  */
 public class SpanNameTracingCondition implements TracingCondition {
 
-  private final String currentSpanExpectedName;
+  private final String spanExpectedName;
 
-  public SpanNameTracingCondition(String currentSpanExpectedName) {
-    this.currentSpanExpectedName = currentSpanExpectedName;
+  public SpanNameTracingCondition(String spanExpectedName) {
+    this.spanExpectedName = spanExpectedName;
   }
 
   @Override
   public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
     if (span == null) {
       throw new TracingConditionNotMetException("The span is null. Expected a span with name: "
-          + currentSpanExpectedName);
+          + spanExpectedName);
     }
 
-    String currentSpanName = span.getName();
+    String spanName = span.getName();
 
-    if (!currentSpanExpectedName.equals(currentSpanName)) {
-      throw new TracingConditionNotMetException("The span has name: " + currentSpanName + ".  Expected a span with name: "
-          + currentSpanExpectedName);
+    if (!spanExpectedName.equals(spanName)) {
+      throw new TracingConditionNotMetException("The span has name: " + spanName + ".  Expected a span with name: "
+          + spanExpectedName);
     }
   }
 }

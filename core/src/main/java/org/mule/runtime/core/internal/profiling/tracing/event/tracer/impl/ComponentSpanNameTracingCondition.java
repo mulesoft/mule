@@ -22,11 +22,11 @@ public class ComponentSpanNameTracingCondition implements TracingCondition {
   private final TracingCondition delegate;
 
   /**
-   * @param expectedCurrentSpanName the expected current span name.
+   * @param expectedSpanName the expected span name.
    */
-  public ComponentSpanNameTracingCondition(String expectedCurrentSpanName) {
-    if (expectedCurrentSpanName != null) {
-      this.delegate = new SpanNameTracingCondition(expectedCurrentSpanName);
+  public ComponentSpanNameTracingCondition(String expectedSpanName) {
+    if (expectedSpanName != null) {
+      this.delegate = new SpanNameTracingCondition(expectedSpanName);
     } else {
       this.delegate = NO_CONDITION;
     }
