@@ -58,7 +58,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   private final CoreEventSpanFactory coreEventSpanFactory;
   private final MuleConfiguration muleConfiguration;
   private final ArtifactType artifactType;
-  private final boolean propagationOfExceptionsInTracing;
+  private final boolean propagateTracingExceptions;
   private final Logger customLogger;
 
   /**
@@ -71,12 +71,12 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   private DefaultCoreEventTracer(MuleConfiguration muleConfiguration,
                                  ArtifactType artifactType,
                                  InternalSpanExportManager<EventContext> spanExportManager,
-                                 boolean propagationOfExceptionsInTracing,
+                                 boolean propagateTracingExceptions,
                                  Logger customLogger) {
     this.muleConfiguration = muleConfiguration;
     this.artifactType = artifactType;
     this.coreEventSpanFactory = new ExportOnEndCoreEventSpanFactory(spanExportManager);
-    this.propagationOfExceptionsInTracing = propagationOfExceptionsInTracing;
+    this.propagateTracingExceptions = propagateTracingExceptions;
     this.customLogger = customLogger;
   }
 
@@ -97,7 +97,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                                                                  tracingCondition)),
                                              empty(),
                                              "Error when starting a component span",
-                                             propagationOfExceptionsInTracing,
+                                             propagateTracingExceptions,
                                              customLogger);
   }
 
@@ -109,7 +109,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   @Override
   public void endCurrentSpan(CoreEvent coreEvent, TracingCondition condition) {
     safeExecute(() -> endCurrentSpanIfPossible(coreEvent, condition), "Error on ending current span",
-                propagationOfExceptionsInTracing,
+                propagateTracingExceptions,
                 customLogger);
   }
 
@@ -130,7 +130,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
             .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
                                                            isErrorEscapingCurrentSpan));
       }
-    }, "Error recording a span error at current span", propagationOfExceptionsInTracing, customLogger);
+    }, "Error recording a span error at current span", propagateTracingExceptions, customLogger);
   }
 
   @Override
@@ -140,7 +140,8 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
                                                                                EventDistributedTraceContext.builder()
                                                                                    .withGetter(distributedTraceContextGetter)
-                                                                                   .withPropagateTracingExceptions(propagationOfExceptionsInTracing)
+                                                                                   .withPropagateTracingExceptions(
+                                                                                     propagateTracingExceptions)
                                                                                    .build());
     }
   }
@@ -149,7 +150,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   public Map<String, String> getDistributedTraceContextMap(CoreEvent coreEvent) {
     return safeExecuteWithDefaultOnThrowable(() -> doGetDistributedTraceContextMap(coreEvent),
                                              emptyMap(),
-                                             "Error on getting distributed trace context", propagationOfExceptionsInTracing,
+                                             "Error on getting distributed trace context", propagateTracingExceptions,
                                              customLogger);
   }
 
@@ -244,7 +245,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       return this;
     }
 
-    public DefaultEventTracerBuilder withPropagationOfExceptionsInTracing(boolean propagateExceptionsInTracing) {
+    public DefaultEventTracerBuilder withPropagateTracingExceptions(boolean propagateExceptionsInTracing) {
       this.propagateExceptionsInTracing = propagateExceptionsInTracing;
       return this;
     }

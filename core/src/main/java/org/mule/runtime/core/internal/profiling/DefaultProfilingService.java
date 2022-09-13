@@ -60,7 +60,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private static InternalSpanExportManager<EventContext> SPAN_EXPORT_MANAGER = getDefaultSpanExporterManager();
 
-  private final boolean propagateExceptionsInTracing;
+  private final boolean propagateTracingExceptions;
 
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
@@ -79,7 +79,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
       new ConcurrentHashMap<>();
 
   public DefaultProfilingService() {
-    this.propagateExceptionsInTracing = getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
+    this.propagateTracingExceptions = getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
   }
 
   @Override
@@ -106,7 +106,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
     this.eventTracer = getCoreEventTracerBuilder()
         .withSpanExporterManager(SPAN_EXPORT_MANAGER)
         .withMuleConfiguration(muleContext.getConfiguration())
-        .withPropagationOfExceptionsInTracing(propagateExceptionsInTracing)
+        .withPropagateTracingExceptions(propagateTracingExceptions)
         .withArtifactType(muleContext.getArtifactType())
         .build();
   }

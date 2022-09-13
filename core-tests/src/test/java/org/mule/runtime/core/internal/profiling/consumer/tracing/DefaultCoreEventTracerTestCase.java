@@ -472,7 +472,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
         .withMuleConfiguration(mockedMuleConfiguration)
         .withArtifactType(APP)
         .withLogger(logger)
-        .withPropagationOfExceptionsInTracing(enablePropagateTracingErrors)
+        .withPropagateTracingExceptions(enablePropagateTracingErrors)
         .build();
   }
 
