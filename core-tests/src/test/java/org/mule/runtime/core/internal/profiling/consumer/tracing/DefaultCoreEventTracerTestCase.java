@@ -13,7 +13,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.Compon
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition.NO_CONDITION;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getExistingCurrentSpanTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
@@ -333,7 +333,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     CoreEvent coreEvent = getCoreEventForTracingConditionTesting(EXPECTED_SPAN_NAME);
 
     // Starting a component span.
-    coreEventTracer.startComponentSpan(coreEvent, new TestSpanCustomizationInfo(), getExistingCurrentSpanTracingCondition());
+    coreEventTracer.startComponentSpan(coreEvent, new TestSpanCustomizationInfo(), getNotNullSpanTracingCondition());
 
     assertThat(((DistributedTraceContextAware) coreEvent.getContext()).getDistributedTraceContext().getCurrentSpan().isPresent(),
                equalTo(TRUE));
@@ -351,7 +351,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     CoreEvent coreEvent = getCoreEventForTracingConditionTesting(null);
 
     coreEventTracer.startComponentSpan(coreEvent, new TestSpanCustomizationInfo(),
-                                       getExistingCurrentSpanTracingCondition());
+                                       getNotNullSpanTracingCondition());
   }
 
   @Test(expected = TracingErrorPropagationException.class)

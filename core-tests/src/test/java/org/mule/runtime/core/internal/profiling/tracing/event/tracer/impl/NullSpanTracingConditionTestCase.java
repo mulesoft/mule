@@ -43,7 +43,7 @@ public class NullSpanTracingConditionTestCase {
   @Test
   public void assertFail() {
     expectedException.expect(TracingConditionNotMetException.class);
-    expectedException.expectMessage("Current span with name: expectedSpanName was found while no current span was expected.");
+    expectedException.expectMessage("Span with name: expectedSpanName was found while no span was expected.");
     TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
     InternalSpan span = mock(InternalSpan.class);
     when(span.getName()).thenReturn(EXPECTED_SPAN_NAME);

@@ -26,7 +26,7 @@ import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentM
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getExistingCurrentSpanTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -255,7 +255,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                     muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(), true);
                     // We verify that there is processor span to end.
                     muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent(),
-                                                   getExistingCurrentSpanTracingCondition());
+                                                   getNotNullSpanTracingCondition());
                   }
                   routeError(errorRouter, throwable);
                 }));
@@ -288,7 +288,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         CoreEvent coreEvent = ((MessagingException) throwable).getEvent();
         muleEventTracer.recordErrorAtCurrentSpan(coreEvent, true);
         // We verify that there is a processor span to end on ending the current span.
-        muleEventTracer.endCurrentSpan(coreEvent, getExistingCurrentSpanTracingCondition());
+        muleEventTracer.endCurrentSpan(coreEvent, getNotNullSpanTracingCondition());
         // Record the error and end current (MessageProcessor chain) Span. We verify that is the chain span.
         muleEventTracer.endCurrentSpan(coreEvent,
                                        new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(coreEvent)));

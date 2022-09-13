@@ -23,7 +23,7 @@ public class NotNullSpanTracingCondition implements TracingCondition {
   /**
    * @return an instance of {@link NotNullSpanTracingCondition}.
    */
-  public static TracingCondition getExistingCurrentSpanTracingCondition() {
+  public static TracingCondition getNotNullSpanTracingCondition() {
     return INSTANCE;
   }
 
@@ -32,7 +32,7 @@ public class NotNullSpanTracingCondition implements TracingCondition {
   @Override
   public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
     if (span == null) {
-      throw new TracingConditionNotMetException("No current span set");
+      throw new TracingConditionNotMetException("No span set");
     }
   }
 }

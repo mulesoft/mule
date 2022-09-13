@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getExistingCurrentSpanTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getNotNullSpanTracingCondition;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -35,15 +35,15 @@ public class NotNullSpanTracingConditionTestCase {
 
   @Test
   public void assertOk() {
-    TracingCondition condition = getExistingCurrentSpanTracingCondition();
+    TracingCondition condition = getNotNullSpanTracingCondition();
     condition.assertOnSpan(mock(InternalSpan.class));
   }
 
   @Test
   public void assertFail() {
     expectedException.expect(TracingConditionNotMetException.class);
-    expectedException.expectMessage("No current span set");
-    TracingCondition condition = getExistingCurrentSpanTracingCondition();
+    expectedException.expectMessage("No span set");
+    TracingCondition condition = getNotNullSpanTracingCondition();
     condition.assertOnSpan(null);
   }
 

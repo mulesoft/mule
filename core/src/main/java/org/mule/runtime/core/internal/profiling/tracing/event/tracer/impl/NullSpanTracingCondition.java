@@ -29,8 +29,8 @@ public class NullSpanTracingCondition implements TracingCondition {
   @Override
   public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
     if (span != null) {
-      throw new TracingConditionNotMetException("Current span with name: " + span.getName()
-          + " was found while no current span was expected.");
+      throw new TracingConditionNotMetException("Span with name: " + span.getName()
+          + " was found while no span was expected.");
     }
   }
 }
