@@ -27,14 +27,14 @@ public class SpanNameTracingCondition implements TracingCondition {
   @Override
   public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
     if (span == null) {
-      throw new TracingConditionNotMetException("The current span is null. Expected a span with name: "
+      throw new TracingConditionNotMetException("The span is null. Expected a span with name: "
           + currentSpanExpectedName);
     }
 
     String currentSpanName = span.getName();
 
     if (!currentSpanExpectedName.equals(currentSpanName)) {
-      throw new TracingConditionNotMetException("The current span has name: " + currentSpanName + ".  Expected a span with name: "
+      throw new TracingConditionNotMetException("The span has name: " + currentSpanName + ".  Expected a span with name: "
           + currentSpanExpectedName);
     }
   }
