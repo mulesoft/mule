@@ -24,10 +24,14 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractDefaultAttributesResolvingSpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
+
+import org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractDefaultAttributesResolvingSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 
 import java.util.HashMap;
@@ -37,8 +41,6 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.reactivestreams.Publisher;
 
 /**
