@@ -34,7 +34,7 @@ public class SpanNameTracingConditionTestCase {
   public ExpectedException expectedException = none();
 
   @Test
-  public void assertOnCurrentSpanOk() {
+  public void assertOnSpanOk() {
     SpanNameTracingCondition spanNameTracingCondition = new SpanNameTracingCondition(EXPECTED_NAME);
     InternalSpan mockSpan = mock(InternalSpan.class);
     when(mockSpan.getName()).thenReturn(EXPECTED_NAME);
@@ -42,18 +42,18 @@ public class SpanNameTracingConditionTestCase {
   }
 
   @Test
-  public void assertOnCurrentSpanNull() {
+  public void assertOnSpanNull() {
     expectedException.expect(TracingConditionNotMetException.class);
-    expectedException.expectMessage("The current span is null. Expected a span with name: " + EXPECTED_NAME);
+    expectedException.expectMessage("The span is null. Expected a span with name: " + EXPECTED_NAME);
     SpanNameTracingCondition spanNameTracingCondition = new SpanNameTracingCondition(EXPECTED_NAME);
     spanNameTracingCondition.assertOnSpan(null);
   }
 
   @Test
-  public void assertOnCurrentSpanDifferentName() {
+  public void assertOnSpanDifferentName() {
     expectedException.expect(TracingConditionNotMetException.class);
     expectedException
-        .expectMessage("The current span has name: " + NON_EXPECTED_NAME + ".  Expected a span with name: " + EXPECTED_NAME);
+        .expectMessage("The span has name: " + NON_EXPECTED_NAME + ".  Expected a span with name: " + EXPECTED_NAME);
     InternalSpan mockSpan = mock(InternalSpan.class);
     when(mockSpan.getName()).thenReturn(NON_EXPECTED_NAME);
     SpanNameTracingCondition spanNameTracingCondition = new SpanNameTracingCondition(EXPECTED_NAME);
