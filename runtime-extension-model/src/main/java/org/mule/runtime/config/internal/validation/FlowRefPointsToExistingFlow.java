@@ -13,6 +13,7 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equals
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Optional.empty;
@@ -35,9 +36,6 @@ import java.util.function.Predicate;
 public class FlowRefPointsToExistingFlow implements Validation {
 
   private static final String FLOW_REF_ELEMENT = "flow-ref";
-
-  private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
-  private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
 
   public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
@@ -69,8 +67,7 @@ public class FlowRefPointsToExistingFlow implements Validation {
     return param.getValue()
         .reduce(l -> empty(),
                 nameAttribute -> {
-                  if (((String) nameAttribute).startsWith(DEFAULT_EXPRESSION_PREFIX)
-                      && ((String) nameAttribute).endsWith(DEFAULT_EXPRESSION_SUFFIX)) {
+                  if (isExpression((String) nameAttribute)) {
                     // According to the extension model, flow-ref cannot be dynamic,
                     // But this check is needed to avoid breaking on legacy cases that use dynamic flow-refs.
                     return empty();

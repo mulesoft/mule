@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
@@ -37,8 +38,6 @@ import java.util.function.Predicate;
  */
 public class ExpressionsInRequiredExpressionsParams implements Validation {
 
-  private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
-  private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
   private static final String CONFIGURATION_NAME = "configuration";
 
   protected static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
@@ -93,9 +92,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
         .filter(param -> {
           if (param.getValueOrResolutionError().isRight() && param.getResolvedRawValue() instanceof String) {
             final String stringValue = param.getResolvedRawValue();
-
-            if (!stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
-                || !stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX)) {
+            if (!isExpression(stringValue)) {
               if (param.getModel().getName().equals("targetValue")) {
                 return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_REQUIRED_EXPRESSION_VALIDATION)).orElse(true);
               }
@@ -110,5 +107,4 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
                                     param.getRawValue(), param.getModel().getName())))
         .collect(toList());
   }
-
 }

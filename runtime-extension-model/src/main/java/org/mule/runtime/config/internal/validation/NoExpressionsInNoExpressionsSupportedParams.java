@@ -12,6 +12,7 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.lang.String.format;
@@ -34,9 +35,6 @@ import java.util.function.Predicate;
 public class NoExpressionsInNoExpressionsSupportedParams implements Validation {
 
   private static final String FLOW_REF_ELEMENT = "flow-ref";
-
-  private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
-  private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
 
   private static final ComponentIdentifier FLOW_REF_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
@@ -73,12 +71,7 @@ public class NoExpressionsInNoExpressionsSupportedParams implements Validation {
             && param.getResolvedRawValue() instanceof String)
         .filter(param -> NOT_SUPPORTED.equals(param.getModel().getExpressionSupport())
             && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent())
-        .filter(param -> {
-          final String stringValue = param.getResolvedRawValue();
-
-          return stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
-              && stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX);
-        })
+        .filter(param -> isExpression(param.getResolvedRawValue()))
         .map(param -> create(component, param, this,
                              format("An expression value was given for parameter '%s' but it doesn't support expressions",
                                     param.getModel().getName())))

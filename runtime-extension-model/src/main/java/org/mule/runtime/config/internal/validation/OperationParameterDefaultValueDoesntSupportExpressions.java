@@ -13,6 +13,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.core.api.extension.MuleOperationExtensionModelDeclarer.OPERATION_NAMESPACE;
 import static org.mule.runtime.core.api.extension.MuleOperationExtensionModelDeclarer.OPTIONAL_PARAMETER;
+import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -35,9 +36,6 @@ import java.util.function.Predicate;
  * @since 4.5
  */
 public class OperationParameterDefaultValueDoesntSupportExpressions implements Validation {
-
-  private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
-  private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
 
   private static final ComponentIdentifier OPTIONAL_PARAMETER_IDENTIFIER =
       builder().namespace(OPERATION_NAMESPACE).name(OPTIONAL_PARAMETER).build();
@@ -66,7 +64,7 @@ public class OperationParameterDefaultValueDoesntSupportExpressions implements V
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     ComponentParameterAst defaultValueAst = component.getParameter(DEFAULT_GROUP_NAME, "defaultValue");
     Optional<String> defaultValue = defaultValueAst.getValue().getValue();
-    if (isExpression(defaultValue)) {
+    if (isExpression(defaultValue.orElse(null))) {
       return validationFailed(component, getParameterName(component));
     } else {
       return validationOk();
@@ -85,15 +83,5 @@ public class OperationParameterDefaultValueDoesntSupportExpressions implements V
 
   private static Optional<ValidationResultItem> validationOk() {
     return empty();
-  }
-
-  private static boolean isExpression(Optional<String> defaultValue) {
-    if (!defaultValue.isPresent()) {
-      return false;
-    }
-
-    String stringValue = defaultValue.get();
-    return stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
-        && stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX);
   }
 }
