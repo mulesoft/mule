@@ -141,7 +141,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                                                                EventDistributedTraceContext.builder()
                                                                                    .withGetter(distributedTraceContextGetter)
                                                                                    .withPropagateTracingExceptions(
-                                                                                     propagateTracingExceptions)
+                                                                                                                   propagateTracingExceptions)
                                                                                    .build());
     }
   }

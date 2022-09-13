@@ -20,7 +20,8 @@ import java.util.Optional;
 public interface CurrentSpanAware {
 
   /**
-   * @param span set the current {@link InternalSpan}
+   * @param span             set the current {@link InternalSpan}
+   * @param tracingCondition the tracing condition to assert on setting the current span
    *
    * @throws TracingConditionNotMetException indicates that the condition is not met.
    */
