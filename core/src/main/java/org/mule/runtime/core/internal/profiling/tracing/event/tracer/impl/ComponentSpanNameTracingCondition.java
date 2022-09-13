@@ -11,8 +11,6 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
-import java.util.Optional;
-
 /**
  * A {@link TracingCondition} that indicates that the current span name must be the one indicated. If it is not, a
  * {@link TracingConditionNotMetException} will be raised.
@@ -28,7 +26,7 @@ public class ComponentSpanNameTracingCondition implements TracingCondition {
    */
   public ComponentSpanNameTracingCondition(String expectedCurrentSpanName) {
     if (expectedCurrentSpanName != null) {
-      this.delegate = new CurrentSpanNameTracingCondition(expectedCurrentSpanName);
+      this.delegate = new SpanNameTracingCondition(expectedCurrentSpanName);
     } else {
       this.delegate = NO_CONDITION;
     }
@@ -36,7 +34,7 @@ public class ComponentSpanNameTracingCondition implements TracingCondition {
   }
 
   @Override
-  public void assertOnCurrentSpan(InternalSpan currentSpan) throws TracingConditionNotMetException {
-    delegate.assertOnCurrentSpan(currentSpan);
+  public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
+    delegate.assertOnSpan(span);
   }
 }

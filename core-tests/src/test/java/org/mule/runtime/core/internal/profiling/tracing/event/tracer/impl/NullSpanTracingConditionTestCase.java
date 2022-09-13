@@ -7,13 +7,13 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.ExistingCurrentSpanTracingCondition.getExistingCurrentSpanTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
-import static org.junit.rules.ExpectedException.none;
-
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
@@ -28,24 +28,26 @@ import org.junit.rules.ExpectedException;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class ExistingCurrentSpanTracingConditionTestCase {
+public class NullSpanTracingConditionTestCase {
 
+  public static final String EXPECTED_SPAN_NAME = "expectedSpanName";
   @Rule
   public ExpectedException expectedException = none();
 
-
   @Test
   public void assertOk() {
-    TracingCondition condition = getExistingCurrentSpanTracingCondition();
-    condition.assertOnCurrentSpan(mock(InternalSpan.class));
+    TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
+    condition.assertOnSpan(null);
   }
 
   @Test
   public void assertFail() {
     expectedException.expect(TracingConditionNotMetException.class);
-    expectedException.expectMessage("No current span set");
-    TracingCondition condition = getExistingCurrentSpanTracingCondition();
-    condition.assertOnCurrentSpan(null);
+    expectedException.expectMessage("Current span with name: expectedSpanName was found while no current span was expected.");
+    TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
+    InternalSpan span = mock(InternalSpan.class);
+    when(span.getName()).thenReturn(EXPECTED_SPAN_NAME);
+    condition.assertOnSpan(span);
   }
 
 }

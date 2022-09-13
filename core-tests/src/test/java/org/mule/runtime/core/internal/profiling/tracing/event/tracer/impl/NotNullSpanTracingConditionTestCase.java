@@ -7,13 +7,13 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NoMuleCurrentSpanSetTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getExistingCurrentSpanTracingCondition;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.rules.ExpectedException.none;
+
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
@@ -28,26 +28,24 @@ import org.junit.rules.ExpectedException;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class NoMuleCurrentSpanSetTracingConditionTestCase {
+public class NotNullSpanTracingConditionTestCase {
 
-  public static final String EXPECTED_SPAN_NAME = "expectedSpanName";
   @Rule
   public ExpectedException expectedException = none();
 
+
   @Test
   public void assertOk() {
-    TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
-    condition.assertOnCurrentSpan(null);
+    TracingCondition condition = getExistingCurrentSpanTracingCondition();
+    condition.assertOnSpan(mock(InternalSpan.class));
   }
 
   @Test
   public void assertFail() {
     expectedException.expect(TracingConditionNotMetException.class);
-    expectedException.expectMessage("Current span with name: expectedSpanName was found while no current span was expected.");
-    TracingCondition condition = getNoMuleCurrentSpanSetTracingCondition();
-    InternalSpan span = mock(InternalSpan.class);
-    when(span.getName()).thenReturn(EXPECTED_SPAN_NAME);
-    condition.assertOnCurrentSpan(span);
+    expectedException.expectMessage("No current span set");
+    TracingCondition condition = getExistingCurrentSpanTracingCondition();
+    condition.assertOnSpan(null);
   }
 
 }

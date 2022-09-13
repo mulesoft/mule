@@ -16,26 +16,22 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCond
  *
  * @since 4.5.0
  */
-public class CurrentSpanNameTracingCondition implements TracingCondition {
+public class SpanNameTracingCondition implements TracingCondition {
 
   private final String currentSpanExpectedName;
 
-  public CurrentSpanNameTracingCondition(String currentSpanExpectedName) {
+  public SpanNameTracingCondition(String currentSpanExpectedName) {
     this.currentSpanExpectedName = currentSpanExpectedName;
   }
 
   @Override
-  public void assertOnCurrentSpan(InternalSpan currentSpan) throws TracingConditionNotMetException {
-    if (currentSpanExpectedName.equals("mule:flow:route")) {
-      return;
-    }
-
-    if (currentSpan == null) {
+  public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
+    if (span == null) {
       throw new TracingConditionNotMetException("The current span is null. Expected a span with name: "
           + currentSpanExpectedName);
     }
 
-    String currentSpanName = currentSpan.getName();
+    String currentSpanName = span.getName();
 
     if (!currentSpanExpectedName.equals(currentSpanName)) {
       throw new TracingConditionNotMetException("The current span has name: " + currentSpanName + ".  Expected a span with name: "

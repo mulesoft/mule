@@ -12,27 +12,25 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCond
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
 /**
- * A {@link TracingCondition} that fails if there is no current span set.
+ * A {@link TracingCondition} that verifies that there is no current span set.
  *
  * @since 4.5.0
  */
-public class ExistingCurrentSpanTracingCondition implements TracingCondition {
+public class NullSpanTracingCondition implements TracingCondition {
 
-  private static final TracingCondition INSTANCE = new ExistingCurrentSpanTracingCondition();
+  private static final TracingCondition INSTANCE = new NullSpanTracingCondition();
 
-  /**
-   * @return an instance of {@link ExistingCurrentSpanTracingCondition}.
-   */
-  public static TracingCondition getExistingCurrentSpanTracingCondition() {
+  public static TracingCondition getNoMuleCurrentSpanSetTracingCondition() {
     return INSTANCE;
   }
 
-  private ExistingCurrentSpanTracingCondition() {}
+  private NullSpanTracingCondition() {}
 
   @Override
-  public void assertOnCurrentSpan(InternalSpan currentSpan) throws TracingConditionNotMetException {
-    if (currentSpan == null) {
-      throw new TracingConditionNotMetException("No current span set");
+  public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
+    if (span != null) {
+      throw new TracingConditionNotMetException("Current span with name: " + span.getName()
+          + " was found while no current span was expected.");
     }
   }
 }

@@ -73,7 +73,7 @@ import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.CurrentSpanNameTracingCondition;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -182,7 +182,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
                 if (getMessageProcessors().isEmpty()) {
                   // We end the current span verifying that the name of the current span is the expected.
                   profilingService.getCoreEventTracer()
-                      .endCurrentSpan(result, new CurrentSpanNameTracingCondition(spanCustomizationInfo.getName(result)));
+                      .endCurrentSpan(result, new SpanNameTracingCondition(spanCustomizationInfo.getName(result)));
                 }
                 ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result);
               })))

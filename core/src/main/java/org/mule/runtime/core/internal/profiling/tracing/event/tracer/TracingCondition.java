@@ -19,18 +19,18 @@ public interface TracingCondition {
   TracingCondition NO_CONDITION = new TracingCondition() {
 
     @Override
-    public void assertOnCurrentSpan(InternalSpan currentSpan) throws TracingConditionNotMetException {
+    public void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException {
 
     }
   };
 
   /**
-   * Assertion to perform on the current span. If the current span when the operation is performed does not meet certain
-   * conditions an exception must be raised. This will be invoked internally by the {@link CoreEventTracer}.
+   * Assertion to perform on the span. If the span does not meet certain conditions an exception must be raised. This will be
+   * invoked internally by the {@link CoreEventTracer}.
    *
-   * @param currentSpan the parentSpan.
+   * @param span the span.
    *
    * @throws TracingConditionNotMetException thrown if the condition was not met.
    */
-  void assertOnCurrentSpan(InternalSpan currentSpan) throws TracingConditionNotMetException;
+  void assertOnSpan(InternalSpan span) throws TracingConditionNotMetException;
 }

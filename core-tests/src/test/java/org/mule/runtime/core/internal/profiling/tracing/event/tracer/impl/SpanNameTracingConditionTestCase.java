@@ -19,14 +19,13 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCond
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class CurrentSpanNameTracingConditionTestCase {
+public class SpanNameTracingConditionTestCase {
 
   public static final String EXPECTED_NAME = "expectedName";
   public static final String NON_EXPECTED_NAME = "nonExpectedName";
@@ -36,18 +35,18 @@ public class CurrentSpanNameTracingConditionTestCase {
 
   @Test
   public void assertOnCurrentSpanOk() {
-    CurrentSpanNameTracingCondition currentSpanNameTracingCondition = new CurrentSpanNameTracingCondition(EXPECTED_NAME);
+    SpanNameTracingCondition spanNameTracingCondition = new SpanNameTracingCondition(EXPECTED_NAME);
     InternalSpan mockSpan = mock(InternalSpan.class);
     when(mockSpan.getName()).thenReturn(EXPECTED_NAME);
-    currentSpanNameTracingCondition.assertOnCurrentSpan(mockSpan);
+    spanNameTracingCondition.assertOnSpan(mockSpan);
   }
 
   @Test
   public void assertOnCurrentSpanNull() {
     expectedException.expect(TracingConditionNotMetException.class);
     expectedException.expectMessage("The current span is null. Expected a span with name: " + EXPECTED_NAME);
-    CurrentSpanNameTracingCondition currentSpanNameTracingCondition = new CurrentSpanNameTracingCondition(EXPECTED_NAME);
-    currentSpanNameTracingCondition.assertOnCurrentSpan(null);
+    SpanNameTracingCondition spanNameTracingCondition = new SpanNameTracingCondition(EXPECTED_NAME);
+    spanNameTracingCondition.assertOnSpan(null);
   }
 
   @Test
@@ -57,8 +56,8 @@ public class CurrentSpanNameTracingConditionTestCase {
         .expectMessage("The current span has name: " + NON_EXPECTED_NAME + ".  Expected a span with name: " + EXPECTED_NAME);
     InternalSpan mockSpan = mock(InternalSpan.class);
     when(mockSpan.getName()).thenReturn(NON_EXPECTED_NAME);
-    CurrentSpanNameTracingCondition currentSpanNameTracingCondition = new CurrentSpanNameTracingCondition(EXPECTED_NAME);
-    currentSpanNameTracingCondition.assertOnCurrentSpan(mockSpan);
+    SpanNameTracingCondition spanNameTracingCondition = new SpanNameTracingCondition(EXPECTED_NAME);
+    spanNameTracingCondition.assertOnSpan(mockSpan);
   }
 
 }

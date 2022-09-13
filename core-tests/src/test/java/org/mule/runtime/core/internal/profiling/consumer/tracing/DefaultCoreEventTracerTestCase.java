@@ -13,8 +13,8 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.Compon
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition.NO_CONDITION;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.ExistingCurrentSpanTracingCondition.getExistingCurrentSpanTracingCondition;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NoMuleCurrentSpanSetTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getExistingCurrentSpanTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNoMuleCurrentSpanSetTracingCondition;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
@@ -24,8 +24,6 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
-import static org.mockito.Mockito.withSettings;
 
 import static io.opentelemetry.api.trace.TraceState.getDefault;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -41,6 +39,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -64,7 +63,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.CurrentSpanNameTracingCondition;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
@@ -84,9 +83,9 @@ import io.opentelemetry.api.trace.TraceFlags;
 import io.opentelemetry.context.Context;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.hamcrest.core.StringContains;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-import org.hamcrest.core.StringContains;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -225,7 +224,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     // span has other name.
     coreEventTracer.startComponentSpan(getCoreEventForTracingConditionTesting(NON_EXPECTED_SPAN_NAME),
                                        new TestSpanCustomizationInfo(),
-                                       new CurrentSpanNameTracingCondition(EXPECTED_SPAN_NAME));
+                                       new SpanNameTracingCondition(EXPECTED_SPAN_NAME));
   }
 
   @Test
@@ -237,7 +236,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     // be created
     Optional<InternalSpan> span = coreEventTracer.startComponentSpan(getCoreEventForTracingConditionTesting(EXPECTED_SPAN_NAME),
                                                                      new TestSpanCustomizationInfo(),
-                                                                     new CurrentSpanNameTracingCondition(EXPECTED_SPAN_NAME));
+                                                                     new SpanNameTracingCondition(EXPECTED_SPAN_NAME));
 
     assertThat(span.isPresent(), equalTo(TRUE));
   }
@@ -251,8 +250,8 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     CoreEventTracer coreEventTracer = getTestCoreEventTracer(mock(Logger.class), true);
 
     coreEventTracer.startComponentSpan(getCoreEventForTracingConditionTesting(null), new TestSpanCustomizationInfo(),
-                                       new CurrentSpanNameTracingCondition(
-                                                                           EXPECTED_SPAN_NAME));
+                                       new SpanNameTracingCondition(
+                                                                    EXPECTED_SPAN_NAME));
   }
 
   @Test
@@ -268,7 +267,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
                equalTo(TRUE));
 
     // Ending the current span, indicating the expected current span must have the current name.
-    coreEventTracer.endCurrentSpan(coreEvent, new CurrentSpanNameTracingCondition(EXPECTED_SPAN_NAME));
+    coreEventTracer.endCurrentSpan(coreEvent, new SpanNameTracingCondition(EXPECTED_SPAN_NAME));
 
     // As the expected current span name is the same as the one indicated in the tracing condition, no exception occurs and
     // there is no current span (it was ended).
@@ -286,7 +285,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
 
     // The End Current Span must fail because we expect a span with the following name and there is no current span.
     coreEventTracer.endCurrentSpan(getCoreEventForTracingConditionTesting(null),
-                                   new CurrentSpanNameTracingCondition(EXPECTED_SPAN_NAME));
+                                   new SpanNameTracingCondition(EXPECTED_SPAN_NAME));
   }
 
   @Test
@@ -405,10 +404,10 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   }
 
   @NotNull
-  private CoreEventTracer getTestCoreEventTracer(Logger mock, boolean enablePropagateTracingErrors) {
+  private CoreEventTracer getTestCoreEventTracer(Logger loggerMock, boolean enablePropagateTracingErrors) {
     return getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                   mock(MuleConfiguration.class),
-                                  mock,
+                                  loggerMock,
                                   enablePropagateTracingErrors);
   }
 
@@ -429,8 +428,8 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
         mock(DistributedTraceContextAware.class, withSettings().extraInterfaces(EventContext.class));
     when(coreEvent.getContext()).thenReturn((EventContext) eventContext);
     DistributedTraceContext distributedTraceContext = EventDistributedTraceContext.builder()
-        .withPropagationOfExceptionsInTracing(true).withGetter(
-                                                               emptyTraceContextMapGetter())
+        .withPropagateTracingExceptions(true).withGetter(
+                                                         emptyTraceContextMapGetter())
         .build();
     when(eventContext.getDistributedTraceContext()).thenReturn(distributedTraceContext);
 
