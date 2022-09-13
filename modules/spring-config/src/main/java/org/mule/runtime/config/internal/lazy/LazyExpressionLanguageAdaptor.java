@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.config.internal.lazy;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -22,6 +25,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Defers the creation of an {@link ExpressionLanguageSessionAdaptor} until the moment in which it's actually asked to resolve an
  * expression.
@@ -31,7 +37,9 @@ import java.util.List;
  *
  * @since 4.2.0
  */
-public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
+public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LazyExpressionLanguageAdaptor.class);
 
   private List<BindingContext> globalBindings = new LinkedList<>();
   private volatile boolean initialised = false;
@@ -144,5 +152,12 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
   public ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event,
                                                       BindingContext context) {
     return delegate().openSession(componentLocation, event, context);
+  }
+
+  @Override
+  public void dispose() {
+    if (delegate != null) {
+      disposeIfNeeded(delegate, LOGGER);
+    }
   }
 }

@@ -45,17 +45,21 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final ArtifactType artifactType;
   private final OptionalObjectsController optionalObjectsController;
   private final PropertiesResolverConfigurationProperties configurationProperties;
+  private final boolean enableLazyInit;
 
   /**
    * Configures the context.
    *
-   * @param muleContext the {@link MuleContext} that own this context
+   * @param muleContext                   the {@link MuleContext} that own this context
+   * @param optionalObjectsController     the {@link OptionalObjectsController} for this context
+   * @param parentConfigurationProperties optional {@link ConfigurationProperties}
+   * @param artifactProperties            the artifact properties
+   * @param artifactType                  the {@link ArtifactType}
+   * @param enableLazyInit                whether lazy init is enabled
    */
-  public BaseMuleArtifactContext(MuleContext muleContext,
-                                 OptionalObjectsController optionalObjectsController,
+  public BaseMuleArtifactContext(MuleContext muleContext, OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
-                                 Map<String, String> artifactProperties,
-                                 ArtifactType artifactType) {
+                                 Map<String, String> artifactProperties, ArtifactType artifactType, boolean enableLazyInit) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.originalRegistry = ((MuleRegistryHelper) (((MuleContextWithRegistry) muleContext).getRegistry())).getDelegate();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
@@ -66,6 +70,8 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
                                                                         artifactProperties,
                                                                         new ClassLoaderResourceProvider(muleContext
                                                                             .getExecutionClassLoader()));
+
+    this.enableLazyInit = enableLazyInit;
   }
 
   @Override
@@ -91,7 +97,8 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
                                                  optionalObjectsController,
                                                  beanFactory,
                                                  serviceDiscoverer,
-                                                 originalRegistry)
+                                                 originalRegistry,
+                                                 enableLazyInit)
                                                      .createArtifactServices();
   }
 

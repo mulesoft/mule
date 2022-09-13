@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.config.internal.context.BaseSpringMuleContextServiceConfigurator.DISABLE_TRANSFORMERS_SUPPORT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -16,6 +17,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -24,6 +26,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -32,8 +36,13 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.internal.lazy.LazyExpressionLanguageAdaptor;
+import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -44,16 +53,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import io.qameta.allure.Issue;
+import org.mockito.ArgumentCaptor;
 
 public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
@@ -121,7 +131,7 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   public void configureWithResourceOutsideClasspathPreservesResourceName() throws ConfigurationException, IOException {
     copyResourceToTemp("simple.xml");
     final SpringXmlConfigurationBuilder configurationBuilder =
-        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"});
+        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"}, false);
 
     configurationBuilder.configure(muleContext);
     final ArtifactContext artifactContext = configurationBuilder.createArtifactContext();
@@ -131,10 +141,43 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   }
 
   @Test
+  @Issue("W-11745207")
+  public void baseRegistryWithLazyInitialisation() throws Exception {
+    doTestBaseRegistryExpressionLanguageAdapter(true, LazyExpressionLanguageAdaptor.class);
+  }
+
+  @Test
+  @Issue("W-11745207")
+  public void baseRegistryWithEagerInitialisation() throws Exception {
+    doTestBaseRegistryExpressionLanguageAdapter(false, DataWeaveExpressionLanguageAdaptor.class);
+  }
+
+  private void doTestBaseRegistryExpressionLanguageAdapter(boolean lazyInit, Class expectedClass)
+      throws IOException, ConfigurationException {
+    final SpringXmlConfigurationBuilder configurationBuilder =
+        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"}, lazyInit);
+    ArgumentCaptor<Registry> registryCaptor = ArgumentCaptor.forClass(Registry.class);
+    configurationBuilder.configure(muleContext);
+
+    verify(muleContext, atLeastOnce()).setRegistry(registryCaptor.capture());
+
+    List<Registry> registries = registryCaptor.getAllValues();
+
+    assertThat(registries.get(0), instanceOf(BaseSpringRegistry.class));
+
+    BaseSpringRegistry baseSpringRegistry = (BaseSpringRegistry) registries.get(0);
+    ExpressionLanguageAdaptor dataWeaveExpressionLanguageAdaptor =
+        baseSpringRegistry.get(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER);
+
+    assertThat(dataWeaveExpressionLanguageAdaptor, is(notNullValue()));
+    assertThat(dataWeaveExpressionLanguageAdaptor, instanceOf(expectedClass));
+  }
+
+  @Test
   public void memoryManagementCanBeInjectedInBean() throws MuleException, IOException {
     copyResourceToTemp("simple.xml");
     final SpringXmlConfigurationBuilder configurationBuilder =
-        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"});
+        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"}, false);
 
     configurationBuilder.configure(muleContext);
     final ArtifactContext artifactContext = configurationBuilder.createArtifactContext();
@@ -151,10 +194,11 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
     copyURLToFile(originalResource, simpleAppFileOutsideClassPath);
   }
 
-  private SpringXmlConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, String[] resources)
+  private SpringXmlConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, String[] resources,
+                                                                              boolean enableLazyInit)
       throws IOException {
     return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
-                                  () -> new SpringXmlConfigurationBuilder(resources, emptyMap(), APP, false,
+                                  () -> new SpringXmlConfigurationBuilder(resources, emptyMap(), APP, enableLazyInit,
                                                                           false));
   }
 
