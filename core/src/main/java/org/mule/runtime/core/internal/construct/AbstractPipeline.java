@@ -63,7 +63,6 @@ import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -78,6 +77,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessor;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.interceptor.FlowInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -131,7 +131,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private Scheduler completionCallbackScheduler;
   private Map<BackPressureReason, FlowBackPressureException> backPressureExceptions;
   private final int maxConcurrency;
-  private final FlowsSummaryStatistics flowsSummaryStatistics;
+  private final DefaultFlowsSummaryStatistics flowsSummaryStatistics;
   private final boolean triggerFlow;
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
@@ -141,7 +141,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           Integer maxConcurrency,
-                          FlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
+                          DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 

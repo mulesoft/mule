@@ -29,11 +29,11 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
@@ -187,7 +187,8 @@ public class DefaultFlowBuilder implements Builder {
 
     flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,
-                           statistics.getFlowSummaryStatistics(), createFlowStatistics(name, statistics),
+                           (DefaultFlowsSummaryStatistics) statistics.getFlowSummaryStatistics(),
+                           createFlowStatistics(name, statistics),
                            componentInitialStateManager);
 
     return flow;
@@ -208,7 +209,7 @@ public class DefaultFlowBuilder implements Builder {
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           Integer maxConcurrency,
-                          FlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
+                          DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
             flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);

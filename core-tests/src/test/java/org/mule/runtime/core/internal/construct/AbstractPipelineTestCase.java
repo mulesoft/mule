@@ -25,10 +25,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -50,7 +50,7 @@ public class AbstractPipelineTestCase extends AbstractMuleContextTestCase {
                         Optional<FlowExceptionHandler> exceptionListener,
                         Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                         Integer maxConcurrency,
-                        FlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
+                        DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                         ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
             flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
@@ -69,7 +69,7 @@ public class AbstractPipelineTestCase extends AbstractMuleContextTestCase {
     super.doSetUp();
 
     MessageSource messageSource = mock(MessageSource.class);
-    FlowsSummaryStatistics flowSummaryStatistics = mock(FlowsSummaryStatistics.class);
+    DefaultFlowsSummaryStatistics flowSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     FlowConstructStatistics flowConstructStatistics = mock(FlowConstructStatistics.class);
     ComponentInitialStateManager componentInitialStateManager = mock(ComponentInitialStateManager.class);
     abstractPipeline = new TestPipeline(

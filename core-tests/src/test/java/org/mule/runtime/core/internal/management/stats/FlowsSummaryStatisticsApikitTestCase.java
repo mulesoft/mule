@@ -36,8 +36,8 @@ public class FlowsSummaryStatisticsApikitTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  // TODO can this also have a content type?
   public void apikitSoapFlowMethod() {
+    // APiKit soap does not consider content type
     assertThat(isApiKitFlow("ListInventory:\\config"), is(true));
   }
 

@@ -38,13 +38,13 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -157,7 +157,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
 
     public RecordingFlow(String name, MuleContext muleContext) {
       super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY,
-            mock(FlowsSummaryStatistics.class), null,
+            new DefaultFlowsSummaryStatistics(true), null,
             new ComponentInitialStateManager() {
 
               @Override

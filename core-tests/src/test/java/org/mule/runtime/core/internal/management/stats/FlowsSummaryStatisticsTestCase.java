@@ -27,7 +27,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -277,7 +276,7 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                         Optional<FlowExceptionHandler> exceptionListener,
                         Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                         Integer maxConcurrency,
-                        FlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
+                        DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                         ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
             flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
