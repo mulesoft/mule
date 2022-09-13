@@ -23,7 +23,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.junit.rules.ExpectedException.none;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -49,6 +48,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

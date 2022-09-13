@@ -57,14 +57,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
-
-import io.qameta.allure.Issue;
 
 public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
