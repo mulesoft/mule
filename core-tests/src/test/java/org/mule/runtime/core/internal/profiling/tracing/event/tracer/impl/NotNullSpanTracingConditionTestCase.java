@@ -12,7 +12,6 @@ import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
 import static org.junit.rules.ExpectedException.none;
-
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
