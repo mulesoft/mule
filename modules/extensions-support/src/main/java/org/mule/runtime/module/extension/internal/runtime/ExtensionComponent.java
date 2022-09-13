@@ -161,7 +161,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected StreamingManager streamingManager;
 
   @Inject
-  protected MuleMetadataService metadataService;
+  protected Optional<MuleMetadataService> metadataService;
 
   protected ConfigurationComponentLocator componentLocator;
 
@@ -485,6 +485,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
+  // TODO move elsewhere
   public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
@@ -496,6 +497,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
+  // TODO move elsewhere
   public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
@@ -510,6 +512,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * {@inheritDoc}
    */
   @Override
+  // TODO move elsewhere
   public Set<Value> getValues(String parameterName) throws org.mule.runtime.extension.api.values.ValueResolvingException {
     // TODO: MULE-19298 - throws org.mule.sdk.api.values.ValueResolvingException
     try {
@@ -541,6 +544,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
+  // TODO move elsewhere
   @Override
   public Set<Value> getValues(String parameterName, String targetSelector)
       throws org.mule.runtime.extension.api.values.ValueResolvingException {
@@ -575,6 +579,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * {@inheritDoc}
    */
   @Override
+  // TODO move elsewhere
   public Message getSampleData() throws SampleDataException {
     try {
       return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
@@ -593,16 +598,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
+  // TODO move elsewhere
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
     try {
       MetadataCacheId cacheId = getMetadataCacheId();
-      MetadataCache metadataCache = metadataService.getMetadataCache(cacheId.getValue());
+      MetadataCache metadataCache = metadataService.get().getMetadataCache(cacheId.getValue());
       context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
       MetadataResult<R> result = contextConsumer.apply(context);
       if (result.isSuccess()) {
-        metadataService.saveCache(cacheId.getValue(), metadataCache);
+        metadataService.get().saveCache(cacheId.getValue(), metadataCache);
       }
 
       return result;
@@ -622,6 +628,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
+  // TODO move elsewhere
   private MetadataCacheId getMetadataCacheId() {
     return cacheIdGenerator.getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
         .map(id -> {
@@ -648,6 +655,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return result;
   }
 
+  // TODO move elsewhere
   private MetadataContext getMetadataContext(MetadataCache cache)
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
