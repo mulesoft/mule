@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.Scope;
+import org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
@@ -143,7 +145,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
+    if (delegateBuilder instanceof AbstractMessageProcessorChainBuilder) {
+      ((AbstractMessageProcessorChainBuilder) delegateBuilder)
+          .setSpanCustomizationInfo(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
+    }
     delegate = delegateBuilder.build();
+
     initialiseIfNeeded(delegate, getMuleContext());
 
     backpressureHandler = new QueueBackpressureHandler(schedulerService, () -> muleContext.getSchedulerBaseConfig(),

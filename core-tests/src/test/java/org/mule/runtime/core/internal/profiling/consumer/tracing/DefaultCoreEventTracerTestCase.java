@@ -7,14 +7,17 @@
 
 package org.mule.runtime.core.internal.profiling.consumer.tracing;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter.emptyTraceContextMapGetter;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition.NO_CONDITION;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NullSpanTracingCondition.getNullSpanTracingCondition;
+import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
@@ -61,6 +64,7 @@ import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextA
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
@@ -113,14 +117,42 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testStartComponentExecution() {
+    ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
+    InternalSpan span = doTestStartComponentExecution(new SpanCustomizationInfo() {
+
+      @Override
+      public String getName(CoreEvent coreEvent) {
+        return getSpanName(componentIdentifier);
+      }
+
+      @Override
+      public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
+        return getDefaultChildSpanInfo();
+      }
+    }, componentIdentifier);
+
+    assertThat(span.getName(), equalTo(getSpanName(componentIdentifier)));
+  }
+
+  @Test
+  public void testStartComponentExecution2() {
+    ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
+    InternalSpan span = doTestStartComponentExecution(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo(),
+                                                      componentIdentifier);
+    assertThat(span, instanceOf(ExportOnEndSpan.class));
+    assertThat(((ExportOnEndSpan) span).getSpanExporter(), instanceOf(NoOpInternalSpanExporter.class));
+  }
+
+
+  private InternalSpan doTestStartComponentExecution(SpanCustomizationInfo spanCustomizationInfo,
+                                                     ComponentIdentifier componentIdentifier) {
     MuleConfiguration mockedMuleConfiguration = mock(MuleConfiguration.class);
     when(mockedMuleConfiguration.getId()).thenReturn(TEST_APP);
     CoreEvent coreEvent = mock(CoreEvent.class);
-    EventContext eventContext = mock(EventContext.class);
+    EventContext eventContext = mock(EventContext.class, withSettings().extraInterfaces(DistributedTraceContextAware.class));
+    when(((DistributedTraceContextAware) eventContext).getDistributedTraceContext()).thenReturn(emptyDistributedEventContext());
     Component component = mock(Component.class);
-    ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
     ComponentLocation componentLocation = mock(ComponentLocation.class);
-
     when(coreEvent.getCorrelationId()).thenReturn(CORRELATION_ID);
     when(coreEvent.getContext()).thenReturn(eventContext);
     when(eventContext.getCorrelationId()).thenReturn(CORRELATION_ID);
@@ -135,21 +167,9 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
                                mock(Logger.class),
                                mockedMuleConfiguration);
 
-    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, new SpanCustomizationInfo() {
-
-      @Override
-      public String getName(CoreEvent coreEvent) {
-        return getSpanName(componentIdentifier);
-      }
-
-      @Override
-      public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
-        return getDefaultChildSpanInfo();
-      }
-    }).orElse(null);
+    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, spanCustomizationInfo).orElse(null);
 
     assertThat(span, is(notNullValue()));
-    assertThat(span.getName(), equalTo(getSpanName(component.getIdentifier())));
     assertThat(span.getParent(), nullValue());
     assertThat(span.getIdentifier(), equalTo(
                                              componentSpanIdentifierFrom(mockedMuleConfiguration.getId(),
@@ -157,6 +177,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     assertThat(span.getParent(), nullValue());
     assertThat(span.getDuration().getStart(), notNullValue());
     assertThat(span.getDuration().getEnd(), nullValue());
+    return span;
   }
 
   @Test
