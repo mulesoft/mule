@@ -27,9 +27,12 @@ import java.util.Optional;
 public class SpecialTypesTypeLoader implements TypeLoader {
 
   public static final String VOID = "void";
+  public static final String OBJECT = "object";
 
   private static final Map<String, MetadataType> SPECIAL_TYPES =
-      unmodifiableMap(SmallMap.of(VOID, create(JAVA).voidType().build()));
+      unmodifiableMap(SmallMap.of(
+              VOID, create(JAVA).voidType().build(),
+              OBJECT, create(JAVA).objectType().build()));
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {

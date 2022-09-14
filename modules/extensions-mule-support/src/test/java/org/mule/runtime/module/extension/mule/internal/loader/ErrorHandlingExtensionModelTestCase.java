@@ -66,7 +66,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     expectedErrors.put("operationRaisingUniqueErrorAndCatchingIt", emptySet());
 
     expectedErrors.put("operationWithMultipleOnErrorContinues", emptySet());
-    expectedErrors.put("operationCatchingAllButWithWhen", asSet("HEISENBERG:OAUTH2", "HEISENBERG:HEALTH"));
+    expectedErrors.put("operationCatchingAllButWithWhen", asSet("HEISENBERG:HEALTH", "HEISENBERG:HEALTH"));
   }
 
   @Inject

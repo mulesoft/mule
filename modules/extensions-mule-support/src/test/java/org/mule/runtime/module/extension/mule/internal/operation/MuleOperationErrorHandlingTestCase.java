@@ -26,7 +26,8 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   protected String[] getConfigFiles() {
     return new String[] {
         "mule-error-handling-operations-config.xml",
-        "mule-error-handling-with-try-operations-config.xml"
+        "mule-error-handling-with-try-operations-config.xml",
+        "reusing-error-handling-mule-config.xml"
     };
   }
 
@@ -69,5 +70,10 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   public void callingOperationThatSilencesErrors() throws Exception {
     flowRunner("flowCallingOperationThatSilencesOneSpecificErrorAndRaisesAnother")
         .runExpectingException(errorType("THIS", "CUSTOM"));
+  }
+
+  @Test
+  public void reusableErrorHandlerAsAnOperation() throws Exception {
+    flowRunner("reusableErrorHandlerAsAnOperationFlow").run();
   }
 }
