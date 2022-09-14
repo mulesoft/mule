@@ -24,11 +24,13 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -85,9 +87,17 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
   }
 
   private Map<String, ?> buildOperationParameters(CoreEvent inputEvent, ExecutionContextAdapter<ComponentModel> ctx) {
-    return from(inputEvent)
+    Map<String, Object> parameters = new HashMap<>();
+    from(inputEvent)
         .getOperationExecutionParams(ctx.getComponent().getLocation(), inputEvent.getContext().getId())
-        .getParameters();
+        .getParameters()
+        .forEach((key, value) -> parameters.put(key, mapParameterValue(value)));
+    return parameters;
+  }
+
+  private Object mapParameterValue(Object parameterValue) {
+    // We don't want to expose the ConfigurationProvider to the inside of the operation, only its name.
+    return parameterValue instanceof ConfigurationProvider ? ((ConfigurationProvider) parameterValue).getName() : parameterValue;
   }
 
   private static Throwable tryCreateTypedExceptionFrom(Throwable exception) {
