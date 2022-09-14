@@ -6,11 +6,20 @@
  */
 package org.mule.tck.util;
 
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
@@ -19,13 +28,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -55,6 +57,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -66,11 +69,11 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
@@ -183,6 +186,9 @@ public class MuleContextUtils {
              withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class).lenient());
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
+
+    AllStatistics allStatistics = new AllStatistics();
+    when(muleContext.getStatistics()).thenReturn(allStatistics);
 
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
