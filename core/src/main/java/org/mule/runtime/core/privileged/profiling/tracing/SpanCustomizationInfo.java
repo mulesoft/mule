@@ -53,4 +53,11 @@ public interface SpanCustomizationInfo {
    */
   ChildSpanCustomizationInfo getChildSpanCustomizationInfo();
 
+  /**
+   * @return if the span should be exported.
+   */
+  default boolean isExportable(CoreEvent coreEvent) {
+    return true;
+  }
+
 }
