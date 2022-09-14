@@ -6,6 +6,8 @@
  */
 package org.mule.test.allure;
 
+import org.mule.test.allure.AllureConstants.PricingMetricsFeature.NetworkUsageMonitoringStory;
+
 public interface AllureConstants {
 
   interface DbFeature {
@@ -1061,10 +1063,35 @@ public interface AllureConstants {
     }
   }
 
+  interface PricingMetricsFeature {
+
+    String PRICING_METRICS = "Pricing Metrics";
+
+    interface NetworkUsageMonitoringStory {
+
+      String MONITOR_NET_BYTES_USED = "Monitor net bytes used";
+    }
+
+    interface FlowSummaryStory {
+
+      String ACTIVE_FLOWS_SUMMARY = "Active flows summary";
+      String DETECT_APIKIT_FLOWS_AS_TRIGGERS = "Detect APiKit flows as triggers";
+
+    }
+  }
+
+  /**
+   * @deprecated Use {@link PricingMetricsFeature} or {@link NetworkUsageMonitoringStory} instead.
+   */
+  @Deprecated
   interface MonitoringSideCar {
 
     String MONITOR_NET_BYTES_USED = "Monitor net bytes used";
 
+    /**
+     * @deprecated Use {@link PricingMetricsFeature} or {@link NetworkUsageMonitoringStory} instead.
+     */
+    @Deprecated
     interface MonitoringSideCarStory {
 
       String ANYPOINT_MONITORING_SIDECAR = "Anypoint monitoring sidecar";

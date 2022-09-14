@@ -6,20 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy.processor;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
@@ -33,6 +19,22 @@ import static org.mule.runtime.core.internal.processor.rector.profiling.Profilin
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServicesWithProfilingService;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
@@ -58,13 +60,14 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
-import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -80,6 +83,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import org.mockito.ArgumentMatcher;
 
 @RunWith(Parameterized.class)
@@ -236,7 +240,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     public TestPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
                         ErrorHandler errorHandler) {
       super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED,
-            DEFAULT_MAX_CONCURRENCY, createFlowStatistics(name, muleContext), new ComponentInitialStateManager() {
+            DEFAULT_MAX_CONCURRENCY,
+            new DefaultFlowsSummaryStatistics(true), createFlowStatistics(name, muleContext.getStatistics()),
+            new ComponentInitialStateManager() {
 
               @Override
               public boolean mustStartMessageSource(Component component) {
