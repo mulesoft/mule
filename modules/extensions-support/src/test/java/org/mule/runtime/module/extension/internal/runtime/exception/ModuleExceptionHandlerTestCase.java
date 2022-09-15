@@ -190,25 +190,29 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   public void suppressMessagingException() {
     when(event.getError()).thenReturn(Optional.empty());
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
+
+    MessagingException messagingException = new MessagingException(
+                                                                   createStaticMessage("Suppressed exception"),
+                                                                   event);
+    ModuleException moduleException =
+        new ModuleException(CONNECTIVITY, messagingException);
+
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     typeRepository.addErrorType(builder()
         .name(CONNECTIVITY_ERROR_IDENTIFIER)
         .namespace(ERROR_NAMESPACE)
-        .build(),
-                                getCoreErrorTypeRepo().getAnyErrorType());
+        .build(), getCoreErrorTypeRepo().getAnyErrorType());
 
-    ModuleException moduleException =
-        new ModuleException(CONNECTIVITY, new RuntimeException(new MessagingException(
-                                                                                      createStaticMessage("Suppressed exception"),
-                                                                                      event)));
     Throwable exception = handler.processException(moduleException);
 
+    assertThat(exception, is(instanceOf(TypedException.class)));
     if (suppressErrors) {
       assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
       assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
-                 is(instanceOf(MessagingException.class)));
+                 is(messagingException));
     } else {
       assertThat(exception.getCause(), is(not(instanceOf(SuppressedMuleException.class))));
+      assertThat(exception.getCause(), is(messagingException));
     }
   }
 

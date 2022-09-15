@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.singletonList;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
+import static java.util.Collections.singletonList;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -24,9 +27,9 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +56,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
@@ -108,7 +114,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return new UntilSuccessfulRouter(this, publisher, nestedChain, processingStrategy, expressionManager, shouldRetry, timer,
-                                     maxRetries, millisBetweenRetries)
+                                     maxRetries, millisBetweenRetries, featureFlaggingService.isEnabled(SUPPRESS_ERRORS))
                                          .getDownstreamPublisher();
   }
 

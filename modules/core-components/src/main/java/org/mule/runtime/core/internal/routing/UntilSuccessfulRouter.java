@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.Integer.parseInt;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -17,12 +15,17 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
+
+import static java.lang.Integer.parseInt;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -36,6 +39,7 @@ import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +53,6 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -71,6 +74,7 @@ class UntilSuccessfulRouter {
   private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
 
   private final Component owner;
+  private final boolean suppressErrors;
   private final Predicate<CoreEvent> shouldRetry;
   private final ConditionalExecutorServiceDecorator delayScheduler;
 
@@ -97,8 +101,9 @@ class UntilSuccessfulRouter {
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, Processor nestedChain,
                         ProcessingStrategy processingStrategy, ExtendedExpressionManager expressionManager,
                         Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
-                        String maxRetries, String millisBetweenRetries) {
+                        String maxRetries, String millisBetweenRetries, boolean suppressErrors) {
     this.owner = owner;
+    this.suppressErrors = suppressErrors;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
     this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
@@ -278,7 +283,7 @@ class UntilSuccessfulRouter {
       // Prevent any MuleException from replacing the retry exhausted error message or error type
       // (see MessagingExceptionResolver#findRoot)
       Throwable retryPolicyExhaustionCause =
-          suppressIfPresent(throwable, MuleException.class);
+          suppressMuleException(throwable);
       RetryPolicyExhaustedException retryPolicyExhaustedException =
           new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG),
                                             retryPolicyExhaustionCause,
@@ -288,6 +293,21 @@ class UntilSuccessfulRouter {
       }
       return new MessagingException(exceptionEvent, retryPolicyExhaustedException, owner);
     };
+  }
+
+  /**
+   * Suppresses MuleExceptions if the {@link MuleRuntimeFeature#SUPPRESS_ERRORS} feature is enabled.
+   * 
+   * @param throwable Throwable where the suppression will be done.
+   * @return Throwable with the result of the suppression.
+   * @see SuppressedMuleException
+   */
+  private Throwable suppressMuleException(Throwable throwable) {
+    if (suppressErrors) {
+      return suppressIfPresent(throwable, MuleException.class);
+    } else {
+      return throwable;
+    }
   }
 
   /**
