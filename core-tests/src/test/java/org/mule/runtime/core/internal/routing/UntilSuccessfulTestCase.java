@@ -386,7 +386,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
     final UntilSuccessfulRouter router = new UntilSuccessfulRouter(flow, emitter.flux(), e -> e, ps,
                                                                    muleContext.getExpressionManager(), null, null,
-                                                                   "1", MILLIS_BETWEEN_RETRIES);
+                                                                   "1", MILLIS_BETWEEN_RETRIES, true);
     // Assert that the inner flux was registered in the ps.
     verify(ps).configureInternalPublisher(any());
 
