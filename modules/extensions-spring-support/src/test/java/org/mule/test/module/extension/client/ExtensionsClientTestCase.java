@@ -22,6 +22,7 @@ import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEA
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -278,16 +279,17 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   }
 
   @Test
-  @Description("Executes an operation that fails using the client and checks the throwed exception")
+  @Description("Executes an operation that fails using the client and checks the threw exception")
   public void executeFailureOperation() throws Throwable {
-    exception.expect(ConnectionException.class);
+    exception.expect(MuleException.class);
+    exception.expectCause(instanceOf(ConnectionException.class));
     exception.expectMessage("You are not allowed to speak with gus.");
     OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
     doExecute(HEISENBERG_EXT_NAME, "callGusFring", params);
   }
 
   @Test
-  @Description("Executes an operation that fails using the client and checks the throwed exception")
+  @Description("Executes an operation that fails using the client and checks the threw exception")
   public void executeFailureNonBlockingOperation() throws Throwable {
     exception.expect(ConnectionException.class);
     exception.expectMessage("You are not allowed to speak with gus.");
