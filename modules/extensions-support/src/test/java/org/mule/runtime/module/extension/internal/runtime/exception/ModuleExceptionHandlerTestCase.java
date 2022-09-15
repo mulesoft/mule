@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
@@ -25,6 +28,7 @@ import static org.mule.runtime.module.extension.internal.runtime.exception.TestE
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -42,6 +46,7 @@ import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -49,33 +54,39 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(Parameterized.class)
 public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
   private static final String SPECIFIED_ERROR_MESSAGE = "This is the module exception message";
   private static final String SPECIFIED_CAUSE_ERROR_MESSAGE = "This is the cause message";
   private static final String ERROR_NAMESPACE = "TEST-EXTENSION";
 
-  @Mock
   private OperationModel operationModel;
 
-  @Mock
   private ExtensionModel extensionModel;
 
-  @Mock
-  CoreEvent event;
+  private CoreEvent event;
 
   private final ErrorTypeRepository typeRepository = new DefaultErrorTypeRepository();
 
+  @Parameterized.Parameter
+  public boolean suppressErrors;
+
+  @Parameterized.Parameters(name = "Suppress errors: {0}")
+  public static Collection<Boolean> parameters() {
+    return asList(true, false);
+  }
+
   @Before
   public void setUp() {
+    operationModel = mock(OperationModel.class);
+    extensionModel = mock(ExtensionModel.class);
+    event = mock(CoreEvent.class);
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     when(extensionModel.getName()).thenReturn("Test Extension");
     when(operationModel.getName()).thenReturn("testOperation");
@@ -87,7 +98,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
                                 getCoreErrorTypeRepo().getAnyErrorType());
     when(operationModel.getErrorModels())
         .thenReturn(singleton(newError(TRANSFORMATION_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     ModuleException moduleException =
         new ModuleException(CONNECTIVITY, new RuntimeException());
 
@@ -109,7 +120,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     typeRepository.addErrorType(getIdentifier(child), parentErrorType);
 
     when(operationModel.getErrorModels()).thenReturn(errors);
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     ModuleException moduleException = new ModuleException(CHILD, new RuntimeException());
 
     Throwable throwable = handler.processException(moduleException);
@@ -122,7 +133,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void handleThrowingOfNotRegisteredErrorType() {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     ModuleException moduleException =
         new ModuleException(CONNECTIVITY, new RuntimeException());
 
@@ -136,7 +147,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void handleLegacyModuleExceptionAndCreateTypedException() {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     typeRepository.addErrorType(builder()
         .name(CONNECTIVITY_ERROR_IDENTIFIER)
         .namespace(ERROR_NAMESPACE)
@@ -156,7 +167,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void handleSdkModuleExceptionAndCreateTypedException() {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     typeRepository.addErrorType(builder()
         .name(CONNECTIVITY_ERROR_IDENTIFIER)
         .namespace(ERROR_NAMESPACE)
@@ -179,7 +190,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   public void suppressMessagingException() {
     when(event.getError()).thenReturn(Optional.empty());
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     typeRepository.addErrorType(builder()
         .name(CONNECTIVITY_ERROR_IDENTIFIER)
         .namespace(ERROR_NAMESPACE)
@@ -192,9 +203,13 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
                                                                                       event)));
     Throwable exception = handler.processException(moduleException);
 
-    assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
-    assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
-               is(instanceOf(MessagingException.class)));
+    if (suppressErrors) {
+      assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
+      assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
+                 is(instanceOf(MessagingException.class)));
+    } else {
+      assertThat(exception.getCause(), is(not(instanceOf(SuppressedMuleException.class))));
+    }
   }
 
   @Test
@@ -208,7 +223,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     typeRepository.addErrorType(getIdentifier(parent), getCoreErrorTypeRepo().getAnyErrorType());
 
     when(operationModel.getErrorModels()).thenReturn(errors);
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     ModuleException moduleException =
         new ModuleException(SPECIFIED_ERROR_MESSAGE, PARENT, new SpecificRuntimeException());
 
@@ -229,7 +244,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     typeRepository.addErrorType(getIdentifier(parent), getCoreErrorTypeRepo().getAnyErrorType());
 
     when(operationModel.getErrorModels()).thenReturn(errors);
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     ModuleException moduleException =
         new ModuleException(SPECIFIED_ERROR_MESSAGE, PARENT, new SpecificRuntimeException(SPECIFIED_CAUSE_ERROR_MESSAGE));
 
