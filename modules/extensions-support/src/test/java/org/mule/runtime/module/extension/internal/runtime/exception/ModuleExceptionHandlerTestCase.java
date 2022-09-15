@@ -6,16 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -28,7 +18,18 @@ import static org.mule.runtime.module.extension.internal.runtime.exception.TestE
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
-import org.junit.runners.Parameterized;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -51,12 +52,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)

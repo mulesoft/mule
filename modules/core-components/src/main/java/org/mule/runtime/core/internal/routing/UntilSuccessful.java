@@ -63,6 +63,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
+  private boolean suppressErrors;
   private Predicate<CoreEvent> shouldRetry;
   private Scheduler timer;
   private List<Processor> processors;
@@ -80,6 +81,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     super.initialise();
 
     timer = schedulerService.cpuLightScheduler();
+    suppressErrors = featureFlaggingService.isEnabled(SUPPRESS_ERRORS);
     shouldRetry = event -> event.getError().isPresent();
 
     final Optional<ProcessingStrategy> processingStrategyFromRootContainer = getProcessingStrategy(componentLocator, this);
@@ -114,7 +116,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return new UntilSuccessfulRouter(this, publisher, nestedChain, processingStrategy, expressionManager, shouldRetry, timer,
-                                     maxRetries, millisBetweenRetries, featureFlaggingService.isEnabled(SUPPRESS_ERRORS))
+                                     maxRetries, millisBetweenRetries, suppressErrors)
                                          .getDownstreamPublisher();
   }
 
