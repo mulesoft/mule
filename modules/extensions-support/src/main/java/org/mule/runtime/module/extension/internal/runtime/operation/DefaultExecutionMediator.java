@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -46,10 +45,11 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
-import org.slf4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
 
 /**
  * Default implementation of {@link ExecutionMediator}.
@@ -78,11 +78,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
 
   private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
-
-  @FunctionalInterface
-  public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
-
-  }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterOrDefault;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -17,7 +18,6 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
                                    ParameterModel parameterModel) {
     // TODO MULE-19446: Fix ExecutionContext API to correctly handle parameters value retrieval when defined within a parameter
     // group with showInDsl=true
-    Object value = IntrospectionUtils.getParameterOrDefault(ctx, parameterGroupModel, parameterModel, null, reflectionCache);
+    Object value = getParameterOrDefault(ctx, parameterGroupModel, parameterModel, null, reflectionCache);
     if (value instanceof TypedValue) {
       value = ((TypedValue) value).getValue();
     }

@@ -15,8 +15,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
-import io.qameta.allure.Issue;
-import org.apache.commons.io.IOUtils;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,14 +22,16 @@ import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.After;
-import org.junit.Test;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import io.qameta.allure.Issue;
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Test;
 
 @SmallTest
 public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
@@ -41,7 +41,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   @Override
   protected ReturnDelegate createReturnDelegate() {
     return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
-                                    getCursorProviderFactory(), muleContext, streamingManager);
+                                    muleContext, streamingManager);
   }
 
   @After
@@ -77,7 +77,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
     when(componentModel.supportsStreaming()).thenReturn(true);
 
     delegate = new TargetReturnDelegate(TARGET, "#[payload.token]", componentModel, muleContext.getExpressionManager(),
-                                        getCursorProviderFactory(), muleContext, streamingManager);
+                                        muleContext, streamingManager);
 
     MediaType mediaType = APPLICATION_JSON.withCharset(Charset.defaultCharset());
     Result<Object, Object> value = Result.builder()

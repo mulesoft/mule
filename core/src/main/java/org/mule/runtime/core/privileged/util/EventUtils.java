@@ -27,4 +27,5 @@ public final class EventUtils {
   public static EventContext getRoot(EventContext eventContext) {
     return ((BaseEventContext) eventContext).getRootContext();
   }
+
 }

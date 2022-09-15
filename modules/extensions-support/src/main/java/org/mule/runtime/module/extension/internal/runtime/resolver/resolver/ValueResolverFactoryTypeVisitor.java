@@ -23,8 +23,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.config.resolver.BasicTypeValueResolverFactoryTypeVisitor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
@@ -42,11 +40,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -58,8 +53,6 @@ import org.joda.time.format.ISODateTimeFormat;
  * @since 4.2
  */
 public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFactoryTypeVisitor {
-
-  private final Function<String, ValueResolver> defaultValueResolver = key -> new RegistryLookupValueResolver<>(key);
 
   private final Object defaultValue;
   private final boolean acceptsReferences;
@@ -88,16 +81,9 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
       return;
     }
 
-    ValueResolver valueResolver;
-    Optional<Function<String, ValueResolver>> delegate = getCustomValueResolver(objectType);
-
-    if (delegate.isPresent()) {
-      valueResolver = delegate.get().apply(getValue().toString());
-    } else {
-      valueResolver = acceptsReferences
-          ? defaultValueResolver.apply(getValue().toString())
-          : new StaticValueResolver<>(getValue());
-    }
+    ValueResolver valueResolver = getCustomValueResolver(objectType)
+        .map(func -> func.apply(getValue().toString()))
+        .orElseGet(() -> getDefaultResolver(getValue()));
 
     setResolver(valueResolver);
   }
@@ -106,11 +92,17 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
   protected void defaultVisit(MetadataType metadataType) {
     ValueResolver delegateResolver = getCustomValueResolver(metadataType)
         .map(delegate -> delegate.apply(getValue().toString()))
-        .orElseGet(() -> acceptsReferences
-            ? defaultValueResolver.apply(getValue().toString())
-            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass()));
+        .orElseGet(() -> getDefaultResolver(getValue()));
 
     setResolver(delegateResolver);
+  }
+
+  private ValueResolver getDefaultResolver(Object value) {
+    if (acceptsReferences && value instanceof String) {
+      return new RegistryLookupValueResolver((String) value);
+    } else {
+      return new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass());
+    }
   }
 
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {

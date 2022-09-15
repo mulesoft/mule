@@ -24,8 +24,7 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
 
   @Override
   protected ReturnDelegate createReturnDelegate() throws InitialisationException {
-    return new ValueReturnDelegate(componentModel,
-                                   getCursorProviderFactory(), muleContext);
+    return new ValueReturnDelegate(componentModel, muleContext);
   }
 
   @Override

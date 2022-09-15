@@ -29,12 +29,13 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.client.EventedExtensionsClientDecorator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ExtensionsClientArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.soap.api.client.SoapClient;
@@ -64,12 +65,11 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
   private TransformationService transformationService;
 
   @Inject
-  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
+  private ExtensionsClient extensionsClient;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
   private final StreamingHelperArgumentResolver streamingHelperArgumentResolver = new StreamingHelperArgumentResolver();
   private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
-  private ExtensionsClientArgumentResolver extensionsClientArgumentResolver;
   private CompiledExpression headersExpression;
 
   /**
@@ -83,8 +83,10 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
       Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
       SoapRequest request = getRequest(context, customHeaders);
       SoapClient soapClient = connection.getSoapClient(serviceId);
-      SoapResponse response = connection.getExtensionsClientDispatcher(() -> extensionsClientArgumentResolver
-          .resolve(context))
+      SoapResponse response = connection
+          .getExtensionsClientDispatcher(() -> new EventedExtensionsClientDecorator(extensionsClient,
+                                                                                    ((ExecutionContextAdapter) context)
+                                                                                        .getEvent()))
           .map(d -> soapClient.consume(request, d))
           .orElseGet(() -> soapClient.consume(request));
 
@@ -99,7 +101,6 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
   }
 
   public void initialise() {
-    this.extensionsClientArgumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
     headersExpression = expressionExecutor.compile(
                                                    "%dw 2.0 \n"
                                                        + "output application/java \n"

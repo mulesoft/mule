@@ -81,7 +81,6 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private boolean returnsListOfMessages = false;
-  private final CursorProviderFactory cursorProviderFactory;
   private final MediaType defaultMediaType;
   private boolean isSpecialHandling = false;
   private ReturnHandler returnHandler = nullHandler();
@@ -91,15 +90,10 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel        the component which produces the return value
-   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
-   *                              {@code null}
-   * @param muleContext           the {@link MuleContext} of the owning application
+   * @param componentModel the component which produces the return value
+   * @param muleContext    the {@link MuleContext} of the owning application
    */
-  protected AbstractReturnDelegate(ComponentModel componentModel,
-                                   CursorProviderFactory cursorProviderFactory,
-                                   MuleContext muleContext) {
-
+  protected AbstractReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
     if (componentModel instanceof HasOutputModel) {
       HasOutputModel hasOutputModel = (HasOutputModel) componentModel;
       returnsListOfMessages = returnsListOfMessages(hasOutputModel);
@@ -116,7 +110,6 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     this.muleContext = muleContext;
-    this.cursorProviderFactory = cursorProviderFactory;
 
     defaultEncoding = getDefaultEncoding(muleContext);
     defaultMediaType = getDefaultMediaType(componentModel);
@@ -136,6 +129,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
     Charset contextEncodingParam = getContextEncoding(params);
     final MediaType mediaType = resolveMediaType(value, contextMimeTypeParam, contextEncodingParam);
     final CoreEvent event = operationContext.getEvent();
+    final CursorProviderFactory cursorProviderFactory = operationContext.getCursorProviderFactory();
 
     ComponentLocation originatingLocation = operationContext.getComponent().getLocation();
 
@@ -217,7 +211,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
               .streamingContent(new ConnectedInputStreamWrapper((InputStream) result.getOutput(),
                                                                 connectionHandler,
                                                                 getDecrementActiveComponentTask(operationContext)),
-                                cursorProviderFactory, event,
+                                operationContext.getCursorProviderFactory(), event,
                                 operationContext.getComponent().getLocation()))
               .build();
         }

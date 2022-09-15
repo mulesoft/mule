@@ -37,4 +37,17 @@ public interface ByteStreamingManager {
    * @return The default implementation of {@link CursorStreamProviderFactory}
    */
   CursorStreamProviderFactory getDefaultCursorProviderFactory();
+
+  /**
+   * Creates a {@link CursorStreamProviderFactory} which buffers in disk.
+   * <p>
+   * Functionality has been available since 4.0, but was made available through this interface in 4.5.0.
+   *
+   * @param config the configuration for the produced {@link CursorStreamProvider} instances
+   * @return a new {@link CursorStreamProviderFactory}
+   * @since 4.5.0
+   */
+  default CursorStreamProviderFactory getFileStoreCursorStreamProviderFactory(FileStoreCursorStreamConfig config) {
+    throw new UnsupportedOperationException("Only supported in EE edition");
+  }
 }

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.client.adapter.SdkExtensionsClientAdapter;
-import org.mule.sdk.api.client.ExtensionsClient;
 
 /**
  * {@link ArgumentResolver} which resolves to a {@link ExtensionsClient} by delegating into a
@@ -16,18 +16,16 @@ import org.mule.sdk.api.client.ExtensionsClient;
  *
  * @since 4.5.0
  */
-public class SdkExtensionsClientArgumentResolver implements ArgumentResolver<ExtensionsClient> {
+public class SdkExtensionsClientArgumentResolver implements ArgumentResolver<org.mule.sdk.api.client.ExtensionsClient> {
 
-  private final ExtensionsClientArgumentResolver extensionsClientArgumentResolver;
+  private final ExtensionsClientArgumentResolver delegate;
 
-  public SdkExtensionsClientArgumentResolver(ExtensionsClientArgumentResolver extensionsClientArgumentResolver) {
-    this.extensionsClientArgumentResolver = extensionsClientArgumentResolver;
+  public SdkExtensionsClientArgumentResolver(ExtensionsClient extensionsClient) {
+    delegate = new ExtensionsClientArgumentResolver(extensionsClient);
   }
 
   @Override
-  public ExtensionsClient resolve(ExecutionContext executionContext) {
-    org.mule.runtime.extension.api.client.ExtensionsClient extensionsClient =
-        extensionsClientArgumentResolver.resolve(executionContext);
-    return extensionsClient == null ? null : new SdkExtensionsClientAdapter(extensionsClient);
+  public org.mule.sdk.api.client.ExtensionsClient resolve(ExecutionContext executionContext) {
+    return new SdkExtensionsClientAdapter(delegate.resolve(executionContext));
   }
 }

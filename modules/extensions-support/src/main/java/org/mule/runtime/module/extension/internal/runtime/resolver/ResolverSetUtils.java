@@ -11,10 +11,10 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 
@@ -33,7 +33,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -269,13 +268,15 @@ public class ResolverSetUtils {
     if (valueResolver.isDynamic()) {
       return valueResolver;
     }
-    CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
-    try (
-        ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, muleContext.getExpressionManager()).build()) {
-      Object staticProduct = valueResolver.resolve(ctx);
-      muleContext.getInjector().inject(staticProduct);
-      return staticProduct;
-    }
+
+    return withNullEvent(event -> {
+      try (
+          ValueResolvingContext ctx = ValueResolvingContext.builder(event, muleContext.getExpressionManager()).build()) {
+        Object staticProduct = valueResolver.resolve(ctx);
+        muleContext.getInjector().inject(staticProduct);
+        return staticProduct;
+      }
+    });
   }
 
   private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,

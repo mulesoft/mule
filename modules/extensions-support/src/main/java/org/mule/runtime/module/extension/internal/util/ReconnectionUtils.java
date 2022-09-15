@@ -9,21 +9,38 @@ package org.mule.runtime.module.extension.internal.util;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFilteredParameters;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Utilities for handling reconnection on operations that use a connection.
@@ -98,5 +115,57 @@ public class ReconnectionUtils {
       return tx != null && tx.hasResource(new ExtensionTransactionKey(configurationInstance));
     }
     return false;
+  }
+
+  /**
+   * Creates an {@link InterceptorChain} that enables reconnection for connected components
+   *
+   * @param extensionModel     the {@link ExtensionModel}
+   * @param componentModel     the {@link ComponentModel}
+   * @param connectionSupplier the connection supplier
+   * @param reflectionCache    a {@link ReflectionCache}
+   * @return a new {@link InterceptorChain}
+   * @since 4.5.0
+   */
+  public static InterceptorChain createReconnectionInterceptorsChain(ExtensionModel extensionModel,
+                                                                     ComponentModel componentModel,
+                                                                     ExtensionConnectionSupplier connectionSupplier,
+                                                                     ReflectionCache reflectionCache) {
+    InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
+
+    if (componentModel instanceof ConnectableComponentModel) {
+      if (((ConnectableComponentModel) componentModel).requiresConnection()) {
+        addConnectionInterceptors(chainBuilder, extensionModel, componentModel, connectionSupplier, reflectionCache);
+      }
+    }
+
+    return chainBuilder.build();
+  }
+
+  private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,
+                                                ExtensionModel extensionModel,
+                                                ComponentModel componentModel,
+                                                ExtensionConnectionSupplier connectionSupplier,
+                                                ReflectionCache reflectionCache) {
+    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier));
+    addCursorResetInterceptor(chainBuilder, extensionModel, componentModel, reflectionCache);
+  }
+
+  private static void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder,
+                                                ExtensionModel extensionModel,
+                                                ComponentModel componentModel,
+                                                ReflectionCache reflectionCache) {
+    Map<ParameterGroupModel, Set<ParameterModel>> streamParameters =
+        getFilteredParameters(componentModel, getStreamParameterFilter(extensionModel));
+    if (!streamParameters.isEmpty()) {
+      chainBuilder.addInterceptor(new CursorResetInterceptor(streamParameters, reflectionCache));
+    }
+  }
+
+  private static Predicate<ParameterModel> getStreamParameterFilter(ExtensionModel extensionModel) {
+    ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    return p -> getType(p.getType(), extensionClassLoader)
+        .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
+        .isPresent();
   }
 }

@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -22,8 +23,8 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature("EXTENSIONS_CLIENT")
-public abstract class AbstractExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
+@Feature(EXTENSIONS_CLIENT)
+public class ExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static String MESSAGE_TO_ECHO = "Echo this message!";
   private static String ANOTHER_MESSAGE_TO_ECHO = "Echo this another message!";

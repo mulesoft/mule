@@ -55,7 +55,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
-                                        DefaultExecutionMediator.ResultTransformer resultTransformer,
+                                        ResultTransformer resultTransformer,
                                         long outerFluxTerminationTimeout) {
     super(extensionModel, operationModel, configurationProviderResolver, target, targetValue, errorMappings, resolverSet,
           cursorProviderFactory, retryPolicyTemplate, nestedChain,

@@ -16,7 +16,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -48,16 +47,12 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory.extractExecutorInitialisationParams;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
-
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -67,7 +62,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -76,11 +70,8 @@ import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -116,25 +107,16 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.OperationExecutionParams;
-import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
-import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.adapter.SdkOperationTransactionalActionUtils;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.ComponentRetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryPolicyTemplateResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RouteBuilderValueResolver;
@@ -145,27 +127,18 @@ import org.mule.runtime.module.extension.internal.runtime.result.ReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.TargetReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDelegate;
-import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -174,7 +147,6 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.togglz.core.user.FeatureUser;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -844,133 +816,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
-    Map<String, Object> params = new HashMap<>();
+    Map<String, Object> params = extractExecutorInitialisationParams(
+                                                                     extensionModel,
+                                                                     componentModel,
+                                                                     resolverSet.getResolvers(),
+                                                                     this,
+                                                                     getStaticConfiguration(),
+                                                                     extensionManager,
+                                                                     expressionManager,
+                                                                     reflectionCache);
 
-    LazyValue<ValueResolvingContext> resolvingContext =
-        new LazyValue<>(() -> {
-          CoreEvent initialiserEvent = null;
-          try {
-            initialiserEvent = getNullEvent();
-            return ValueResolvingContext.builder(initialiserEvent, expressionManager)
-                .withConfig(getStaticConfiguration())
-                .build();
-          } finally {
-            if (initialiserEvent != null) {
-              ((BaseEventContext) initialiserEvent.getContext()).success();
-            }
-          }
-        });
-
-    LazyValue<Boolean> dynamicConfig = new LazyValue<>(
-                                                       () -> extensionManager
-                                                           .getConfigurationProvider(extensionModel, componentModel,
-                                                                                     resolvingContext.get().getEvent())
-                                                           .map(ConfigurationProvider::isDynamic)
-                                                           .orElse(false));
-
-    try {
-      for (ParameterGroupModel group : componentModel.getParameterGroupModels()) {
-        if (group.getName().equals(DEFAULT_GROUP_NAME)) {
-          for (ParameterModel p : group.getParameterModels()) {
-            if (!p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent()) {
-              continue;
-            }
-
-            ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
-            if (resolver != null) {
-              params.put(getMemberName(p), resolveComponentExecutorParam(resolvingContext, dynamicConfig, p, resolver));
-            }
-          }
-        } else {
-          ParameterGroupDescriptor groupDescriptor = group.getModelProperty(ParameterGroupModelProperty.class)
-              .map(g -> g.getDescriptor())
-              .orElse(null);
-
-          if (groupDescriptor == null) {
-            continue;
-          }
-
-          List<ParameterModel> fieldParameters = getGroupsOfFieldParameters(group);
-
-          if (fieldParameters.isEmpty()) {
-            continue;
-          }
-
-          ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
-
-          try {
-            params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }
-      }
-
-      return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
-    } finally {
-      resolvingContext.ifComputed(ValueResolvingContext::close);
-    }
-  }
-
-  private Object resolveComponentExecutorParam(LazyValue<ValueResolvingContext> resolvingContext,
-                                               LazyValue<Boolean> dynamicConfig,
-                                               ParameterModel p,
-                                               ValueResolver<?> resolver)
-      throws InitialisationException {
-    Object resolvedValue;
-    try {
-      if (resolver instanceof ConfigOverrideValueResolverWrapper) {
-        resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) resolver).resolveWithoutConfig(resolvingContext.get());
-        if (resolvedValue == null) {
-          if (dynamicConfig.get()) {
-            final ComponentLocation location = getLocation();
-            String message = format(
-                                    "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
-                                        + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
-                                        + "or don't set the parameter.",
-                                    location != null ? location.getComponentIdentifier().getIdentifier().toString() : toString(),
-                                    toString(),
-                                    p.getName());
-            throw new InitialisationException(createStaticMessage(message), this);
-          } else {
-            resolvedValue = resolver.resolve(resolvingContext.get());
-          }
-        }
-      } else {
-        resolvedValue = resolveValue(resolver, resolvingContext.get());
-      }
-
-      return resolvedValue;
-    } catch (InitialisationException e) {
-      throw e;
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  private ObjectBuilder createFieldParameterGroupBuilder(ParameterGroupDescriptor groupDescriptor,
-                                                         List<ParameterModel> fieldParameters) {
-    DefaultObjectBuilder groupBuilder =
-        new DefaultObjectBuilder(groupDescriptor.getType().getDeclaringClass().get(), reflectionCache);
-
-    fieldParameters.forEach(p -> {
-      ValueResolver resolver = resolverSet.getResolvers().get(p.getName());
-      if (resolver != null) {
-        Optional<Field> memberField = getMemberField(p);
-        if (memberField.isPresent()) {
-          groupBuilder.addPropertyResolver(getMemberField(p).get(), resolver);
-        } else {
-          groupBuilder.addPropertyResolver(p.getName(), resolver);
-        }
-      }
-    });
-    return groupBuilder;
-  }
-
-  private List<ParameterModel> getGroupsOfFieldParameters(ParameterGroupModel group) {
-    return group.getParameterModels().stream()
-        .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
-        .collect(toList());
+    return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
   }
 
   protected ReturnDelegate createReturnDelegate() {
@@ -986,14 +842,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ReturnDelegate getTargetReturnDelegate() {
     if (isSanitizedPayload(sanitize(targetValue))) {
-      return new PayloadTargetReturnDelegate(target, componentModel, cursorProviderFactory, muleContext);
+      return new PayloadTargetReturnDelegate(target, componentModel, muleContext);
     }
-    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext,
-                                    streamingManager);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, muleContext, streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
-    return new ValueReturnDelegate(componentModel, cursorProviderFactory, muleContext);
+    return new ValueReturnDelegate(componentModel, muleContext);
   }
 
   protected boolean isTargetPresent() {
@@ -1143,44 +998,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
                                         componentModel,
-                                        createInterceptorChain(),
+                                        createReconnectionInterceptorsChain(extensionModel, componentModel,
+                                                                            extensionConnectionSupplier, reflectionCache),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
                                         featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
-  }
-
-  protected InterceptorChain createInterceptorChain() {
-    InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
-
-    if (componentModel instanceof ConnectableComponentModel) {
-      if (((ConnectableComponentModel) componentModel).requiresConnection()) {
-        addConnectionInterceptors(chainBuilder);
-      }
-    }
-
-    return chainBuilder.build();
-  }
-
-  private void addConnectionInterceptors(InterceptorChain.Builder chainBuilder) {
-    chainBuilder.addInterceptor(new ConnectionInterceptor(extensionConnectionSupplier));
-
-    addCursorResetInterceptor(chainBuilder);
-  }
-
-  private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
-    Map<ParameterGroupModel, Set<ParameterModel>> streamParameters =
-        IntrospectionUtils.getFilteredParameters(componentModel, getStreamParameterFilter());
-    if (!streamParameters.isEmpty()) {
-      chainBuilder.addInterceptor(new CursorResetInterceptor(streamParameters, reflectionCache));
-    }
-  }
-
-  private Predicate<ParameterModel> getStreamParameterFilter() {
-    return p -> getType(p.getType(), getClassLoader(extensionModel))
-        .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
-        .isPresent();
   }
 
   /**

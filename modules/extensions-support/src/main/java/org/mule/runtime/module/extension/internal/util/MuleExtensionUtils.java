@@ -102,12 +102,15 @@ import org.mule.runtime.module.extension.internal.loader.java.property.SdkSource
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
@@ -697,6 +700,22 @@ public class MuleExtensionUtils {
         }
       }
     }
+  }
+
+  /**
+   * Returns a {@link ResultTransformer} if the given {@code operationModel} supports auto paging.
+   *
+   * @param operationModel              the {@link OperationModel}
+   * @param extensionConnectionSupplier the connection supplier
+   * @param supportsOAuth               whether the given operation supports OAuth authentication
+   * @return an {@link Optional} {@link ResultTransformer}
+   * @since 4.5.0
+   */
+  public static Optional<ResultTransformer> getPagingResultTransformer(OperationModel operationModel,
+                                                                       ExtensionConnectionSupplier extensionConnectionSupplier,
+                                                                       boolean supportsOAuth) {
+    return operationModel.getModelProperty(PagedOperationModelProperty.class)
+        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth));
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
