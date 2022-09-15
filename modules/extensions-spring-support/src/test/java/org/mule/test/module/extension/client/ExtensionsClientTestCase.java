@@ -291,7 +291,8 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes an operation that fails using the client and checks the threw exception")
   public void executeFailureNonBlockingOperation() throws Throwable {
-    exception.expect(ConnectionException.class);
+    exception.expect(MuleException.class);
+    exception.expectCause(instanceOf(ConnectionException.class));
     exception.expectMessage("You are not allowed to speak with gus.");
     OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
     doExecute(HEISENBERG_EXT_NAME, "callGusFringNonBlocking", params);
