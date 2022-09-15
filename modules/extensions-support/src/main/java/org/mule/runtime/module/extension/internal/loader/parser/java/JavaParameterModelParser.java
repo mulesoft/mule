@@ -14,6 +14,12 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
+import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
@@ -21,20 +27,15 @@ import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabular
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SCALAR_SECRET;
 import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECRET;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getParameterTermsFromAnnotations;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getParameterType;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -51,6 +52,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
@@ -80,10 +82,15 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exclusive
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkParameterPlacementUtils;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -329,6 +336,21 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(parameter);
+  }
+
+  @Override
+  public Optional<InputResolverModelParser> getInputResolverModelParser() {
+    return JavaInputResolverModelParserUtils.getResolverParser(parameter);
+  }
+
+  @Override
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser operationModelParser) {
+    return parseKeyIdResolverModelParser(operationModelParser, parameter, null, null);
+  }
+
+  @Override
+  public Optional<Pair<Integer, Boolean>> getMetadataKeyPart() {
+    return JavaMetadataKeyIdModelParserUtils.getMetadataKeyPart(parameter);
   }
 
   private void collectAdditionalModelProperties() {

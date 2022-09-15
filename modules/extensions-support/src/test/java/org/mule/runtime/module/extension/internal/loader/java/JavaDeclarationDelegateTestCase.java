@@ -373,7 +373,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     OperationDeclaration operation = getOperation(getConfiguration(declaration, BANANA), "getLunch");
     assertThat(operation, is(notNullValue()));
-    assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), false);
+    assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), true);
     assertOutputType(operation.getOutputAttributes(), TYPE_BUILDER.voidType().build(), false);
   }
 

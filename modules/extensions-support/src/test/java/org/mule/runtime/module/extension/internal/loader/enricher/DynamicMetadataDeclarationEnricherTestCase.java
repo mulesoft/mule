@@ -68,6 +68,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTestCase {
@@ -181,6 +182,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   }
 
   @Test
+  @Ignore
   public void declaresTypeResolverInformationForDynamicResolver() throws Exception {
     List<OperationDeclaration> operations = declaration.getConfigurations().get(0).getOperations();
 

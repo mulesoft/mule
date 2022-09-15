@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.hasKeyId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
@@ -120,7 +121,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
           .ifPresent(prop -> {
             final Type sourceType = prop.getType();
-            MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, sourceType, declaration);
+            MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, sourceType);
             enrichResolversInformation(declaration, metadataScope);
             enrichSuccesSourceCallbackMetadata(declaration);
             enrichErrorSourceCallbackMetadata(declaration);
@@ -150,8 +151,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
             if (operation.isAnnotatedWith(Query.class)) {
               enrichWithDsql(declaration, operation);
             } else {
-              MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, operation, declaration);
-              enrichResolversInformation(declaration, metadataScope);
+              MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, operation);
+              // enrichResolversInformation(declaration, metadataScope);
             }
           });
     }
@@ -285,6 +286,16 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         @Override
         public AttributesTypeResolver getAttributesResolver() {
           return nullMetadataResolver;
+        }
+
+        @Override
+        public MetadataType getKeyResolverMetadataType() {
+          return null;
+        }
+
+        @Override
+        public String getKeyResolverParameterName() {
+          return null;
         }
       };
       addQueryModelProperties(declaration, query);

@@ -11,15 +11,12 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaInputR
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.hasMetadataScopeAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.hasOutputResolverAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseJavaAttributesResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseJavaOutputResolverModelParser;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
@@ -30,11 +27,12 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaAttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaKeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +49,7 @@ import java.util.function.Supplier;
 public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
 
   private JavaKeyIdResolverModelParser javaKeyIdResolverModelParser =
-      new JavaKeyIdResolverModelParser(null, null, org.mule.sdk.api.metadata.NullMetadataResolver.class);
+      new JavaKeyIdResolverModelParser(null, null, null, org.mule.sdk.api.metadata.NullMetadataResolver.class);
 
   private JavaOutputResolverModelParser javaOutputResolverModelParser =
       new JavaOutputResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class);
@@ -59,37 +57,29 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
   private JavaAttributesResolverModelParser javaAttributesResolverModelParser =
       new JavaAttributesResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class);
 
-  private List<JavaInputResolverModelParser> javaInputResolverModelParsers = emptyList();
+  private List<InputResolverModelParser> javaInputResolverModelParsers = emptyList();
 
-  public DefaultMetadataScopeAdapter(Type extensionElement, MethodElement operation, OperationDeclaration declaration) {
-    javaInputResolverModelParsers = parseInputResolversModelParser(declaration);
+  public DefaultMetadataScopeAdapter(Type extensionElement, MethodElement operation) {
+    javaInputResolverModelParsers = parseInputResolversModelParser(operation);
 
     if (hasOutputResolverAnnotation(operation) || !javaInputResolverModelParsers.isEmpty()) {
-      if (!hasCustomStaticType(declaration.getOutput())) {
-        javaOutputResolverModelParser = parseOutputResolverModelParser(operation);
-      }
-      if (!hasCustomStaticType(declaration.getOutputAttributes())) {
-        javaAttributesResolverModelParser = parseAttributesResolverModelParser(operation);
-      }
-
-      Supplier<String> categoryName = () -> getCategoryName(javaOutputResolverModelParser,
-                                                            javaAttributesResolverModelParser, javaInputResolverModelParsers);
-
-      javaKeyIdResolverModelParser = parseKeyIdResolverModelParser(categoryName, operation);
+      javaOutputResolverModelParser = parseJavaOutputResolverModelParser(operation);
+      javaAttributesResolverModelParser = JavaOutputResolverModelParserUtils.parseJavaAttributesResolverModelParser(operation);
+      javaKeyIdResolverModelParser = parseKeyIdResolverModelParser(this::getCategoryName, operation);
     } else {
-      initializeFromClass(extensionElement, operation.getEnclosingType(), declaration);
+      initializeFromClass(extensionElement, operation.getEnclosingType());
     }
   }
 
-  public DefaultMetadataScopeAdapter(Type extensionElement, Type source, SourceDeclaration sourceDeclaration) {
-    initializeFromClass(extensionElement, source, sourceDeclaration);
+  public DefaultMetadataScopeAdapter(Type extensionElement, Type source) {
+    initializeFromClass(extensionElement, source);
   }
 
   public DefaultMetadataScopeAdapter(SourceCallbackDeclaration sourceCallbackDeclaration) {
     javaInputResolverModelParsers = parseInputResolversModelParser(sourceCallbackDeclaration);
   }
 
-  private void initializeFromClass(Type extensionType, Type annotatedType, WithOutputDeclaration declaration) {
+  private void initializeFromClass(Type extensionType, Type annotatedType) {
     // TODO MULE-10891: Add support for Source Callback parameters
     Optional<Class<?>> extensionClass = extensionType.getDeclaringClass();
     Optional<Class<?>> componentClass = annotatedType.getDeclaringClass();
@@ -98,21 +88,18 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
       boolean hasMetadataScopeAnnotation = hasMetadataScopeAnnotation(componentClass.get()) ||
           hasMetadataScopeAnnotation(extensionClass.get());
 
-      if (hasMetadataScopeAnnotation && !hasCustomStaticType(declaration.getOutput())) {
+      if (hasMetadataScopeAnnotation) {
         this.javaKeyIdResolverModelParser =
             parseKeyIdResolverModelParser(extensionType, annotatedType);
         this.javaOutputResolverModelParser =
-            parseOutputResolverModelParser(extensionType, annotatedType);
+            JavaOutputResolverModelParserUtils.parseJavaOutputResolverModelParser(extensionType, annotatedType);
         this.javaAttributesResolverModelParser =
-            parseAttributesResolverModelParser(extensionType, annotatedType);
+            parseJavaAttributesResolverModelParser(extensionType, annotatedType);
       }
     }
   }
 
-  private String getCategoryName(JavaOutputResolverModelParser javaOutputResolverModelParser,
-                                 JavaAttributesResolverModelParser javaAttributesResolverModelParser,
-                                 List<JavaInputResolverModelParser> javaInputResolverModelParsers) {
-
+  private String getCategoryName() {
     NamedTypeResolver namedTypeResolver = javaOutputResolverModelParser.getOutputResolver();
     if (javaOutputResolverModelParser.hasOutputResolver()) {
       return namedTypeResolver.getCategoryName();
@@ -123,7 +110,7 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
       return namedTypeAttributesResolver.getCategoryName();
     }
 
-    for (JavaInputResolverModelParser inputResolverModelParser : javaInputResolverModelParsers) {
+    for (InputResolverModelParser inputResolverModelParser : javaInputResolverModelParsers) {
       InputTypeResolver<?> inputTypeResolver = inputResolverModelParser.getInputResolver();
       if (!(inputTypeResolver instanceof NullMetadataResolver)) {
         return inputTypeResolver.getCategoryName();
@@ -132,10 +119,6 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
 
     throw new IllegalModelDefinitionException("Unable to create Keys Resolver. A Keys Resolver is being defined " +
         "without defining an Output Resolver, Input Resolver nor Attributes Resolver");
-  }
-
-  private boolean hasCustomStaticType(TypedDeclaration declaration) {
-    return declaration.getType().getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent();
   }
 
   @Override
@@ -189,5 +172,15 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
   @Override
   public AttributesTypeResolver getAttributesResolver() {
     return javaAttributesResolverModelParser.getAttributesResolver();
+  }
+
+  @Override
+  public MetadataType getKeyResolverMetadataType() {
+    return javaKeyIdResolverModelParser.getMetadataType();
+  }
+
+  @Override
+  public String getKeyResolverParameterName() {
+    return javaKeyIdResolverModelParser.getParameterName();
   }
 }

@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 
@@ -131,5 +132,20 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return decoratee.getSinceMuleVersionModelProperty();
+  }
+
+  @Override
+  public Optional<InputResolverModelParser> getInputResolverModelParser() {
+    return decoratee.getInputResolverModelParser();
+  }
+
+  @Override
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser parser) {
+    return decoratee.getKeyIdResolverModelParser(parser);
+  }
+
+  @Override
+  public Optional<Pair<Integer, Boolean>> getMetadataKeyPart() {
+    return decoratee.getMetadataKeyPart();
   }
 }

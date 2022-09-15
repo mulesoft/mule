@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -36,4 +37,18 @@ public interface KeyIdResolverModelParser {
    */
   TypeKeysResolver getKeyResolver();
 
+  /**
+   * @return the class of the resolver
+   */
+  Class<?> keyIdResolverDeclarationClass();
+
+  /**
+   * @return an instance the {@link MetadataType}
+   */
+  MetadataType getMetadataType();
+
+  /**
+   * @return the parameter name of the key resolver
+   */
+  String getParameterName();
 }
