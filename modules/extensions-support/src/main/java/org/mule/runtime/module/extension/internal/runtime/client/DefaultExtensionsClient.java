@@ -190,7 +190,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                              OperationParameters parameters) {
 
     final ExtensionModel extensionModel = findExtension(extensionName);
-    findOperation(extensionModel, operationName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     return executeAsync(
