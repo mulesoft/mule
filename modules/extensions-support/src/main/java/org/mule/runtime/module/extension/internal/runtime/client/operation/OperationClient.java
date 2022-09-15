@@ -97,19 +97,19 @@ public class OperationClient implements Lifecycle {
                                      MuleContext muleContext) {
 
     return new OperationClient(
-        createExecutionMediator(
-            key,
-            extensionConnectionSupplier,
-            errorTypeRepository,
-            reflectionCache,
-            muleContext),
-        ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
-            muleContext),
-        new ValueReturnDelegate(key.getOperationModel(), muleContext),
-        streamingManager,
-        expressionManager,
-        reflectionCache,
-        muleContext);
+                               createExecutionMediator(
+                                                       key,
+                                                       extensionConnectionSupplier,
+                                                       errorTypeRepository,
+                                                       reflectionCache,
+                                                       muleContext),
+                               ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
+                                                              muleContext),
+                               new ValueReturnDelegate(key.getOperationModel(), muleContext),
+                               streamingManager,
+                               expressionManager,
+                               reflectionCache,
+                               muleContext);
   }
 
   private OperationClient(ExecutionMediator<OperationModel> mediator,
@@ -144,24 +144,24 @@ public class OperationClient implements Lifecycle {
     CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
 
     ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
-        key.getExtensionModel(),
-        configurationInstance,
-        resolvedParams,
-        operationModel,
-        contextEvent,
-        cursorProviderFactory,
-        streamingManager,
-        NULL_COMPONENT,
-        parameterizer.getRetryPolicyTemplate(),
-        IMMEDIATE_SCHEDULER,
-        empty(),
-        muleContext);
+                                                                                    key.getExtensionModel(),
+                                                                                    configurationInstance,
+                                                                                    resolvedParams,
+                                                                                    operationModel,
+                                                                                    contextEvent,
+                                                                                    cursorProviderFactory,
+                                                                                    streamingManager,
+                                                                                    NULL_COMPONENT,
+                                                                                    parameterizer.getRetryPolicyTemplate(),
+                                                                                    IMMEDIATE_SCHEDULER,
+                                                                                    empty(),
+                                                                                    muleContext);
 
     return doExecute(context, shouldCompleteEvent);
   }
 
-  private  <T, A> CompletableFuture<Result<T, A>> doExecute(ExecutionContextAdapter<OperationModel> ctx,
-                                                        boolean shouldCompleteEvent) {
+  private <T, A> CompletableFuture<Result<T, A>> doExecute(ExecutionContextAdapter<OperationModel> ctx,
+                                                           boolean shouldCompleteEvent) {
 
     CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
     ExecutorCallback callback = new ExecutorCallback() {
@@ -207,12 +207,12 @@ public class OperationClient implements Lifecycle {
 
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-          paramsBuilder.build(),
-          muleContext,
-          true,
-          reflectionCache,
-          expressionManager,
-          "");
+                                                                            paramsBuilder.build(),
+                                                                            muleContext,
+                                                                            true,
+                                                                            reflectionCache,
+                                                                            expressionManager,
+                                                                            "");
 
       ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
       configurationInstance.ifPresent(ctxBuilder::withConfig);
@@ -255,12 +255,12 @@ public class OperationClient implements Lifecycle {
     if (shouldCompleteEvent) {
       if (value instanceof CursorIteratorProvider) {
         return new EventCompletingValue<>(new EventCompletingCursorIteratorProviderDecorator((CursorIteratorProvider) value,
-            ctx.getEvent()),
-            false);
+                                                                                             ctx.getEvent()),
+                                          false);
       } else if (value instanceof CursorStreamProvider) {
         return new EventCompletingValue<>(new EventCompletingCursorStreamProviderDecorator((CursorStreamProvider) value,
-            ctx.getEvent()),
-            false);
+                                                                                           ctx.getEvent()),
+                                          false);
       }
     }
 
@@ -297,28 +297,28 @@ public class OperationClient implements Lifecycle {
   }
 
   private static ExecutionMediator<OperationModel> createExecutionMediator(
-      OperationKey key,
-      ExtensionConnectionSupplier extensionConnectionSupplier,
-      ErrorTypeRepository errorTypeRepository,
-      ReflectionCache reflectionCache,
-      MuleContext muleContext) {
+                                                                           OperationKey key,
+                                                                           ExtensionConnectionSupplier extensionConnectionSupplier,
+                                                                           ErrorTypeRepository errorTypeRepository,
+                                                                           ReflectionCache reflectionCache,
+                                                                           MuleContext muleContext) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
-        extensionModel,
-        operationModel,
-        createReconnectionInterceptorsChain(extensionModel,
-            operationModel,
-            extensionConnectionSupplier,
-            reflectionCache),
-        errorTypeRepository,
-        muleContext.getExecutionClassLoader(),
-        getPagingResultTransformer(operationModel,
-            extensionConnectionSupplier,
-            supportsOAuth(extensionModel))
-            .orElse(null),
-        NULL_PROFILING_DATA_PRODUCER);
+                                                                                extensionModel,
+                                                                                operationModel,
+                                                                                createReconnectionInterceptorsChain(extensionModel,
+                                                                                                                    operationModel,
+                                                                                                                    extensionConnectionSupplier,
+                                                                                                                    reflectionCache),
+                                                                                errorTypeRepository,
+                                                                                muleContext.getExecutionClassLoader(),
+                                                                                getPagingResultTransformer(operationModel,
+                                                                                                           extensionConnectionSupplier,
+                                                                                                           supportsOAuth(extensionModel))
+                                                                                                               .orElse(null),
+                                                                                NULL_PROFILING_DATA_PRODUCER);
 
     try {
       initialiseIfNeeded(mediator, true, muleContext);
@@ -379,8 +379,7 @@ public class OperationClient implements Lifecycle {
   private static class NullProfilingDataProducer
       implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {
 
-    private NullProfilingDataProducer() {
-    }
+    private NullProfilingDataProducer() {}
 
     @Override
     public void triggerProfilingEvent(ComponentThreadingProfilingEventContext profilerEventContext) {

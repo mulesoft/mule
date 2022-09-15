@@ -121,11 +121,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                              String operationName,
                              DefaultOperationParameterizer parameterizer) {
     return new OperationKey(extensionName,
-        parameterizer.getConfigRef(),
-        operationName,
-        this::findExtension,
-        this::findOperationModel,
-        extensionManager);
+                            parameterizer.getConfigRef(),
+                            operationName,
+                            this::findExtension,
+                            this::findOperationModel,
+                            extensionManager);
   }
 
   private LoadingCache<OperationKey, OperationClient> createClientCache() {
@@ -141,14 +141,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private OperationClient createOperationClient(OperationKey key) {
     OperationClient client = from(
-        key,
-        extensionManager,
-        expressionManager,
-        extensionConnectionSupplier,
-        errorTypeRepository,
-        streamingManager,
-        reflectionCache,
-        muleContext);
+                                  key,
+                                  extensionManager,
+                                  expressionManager,
+                                  extensionConnectionSupplier,
+                                  errorTypeRepository,
+                                  streamingManager,
+                                  reflectionCache,
+                                  muleContext);
 
     try {
       initialiseIfNeeded(client);
@@ -171,8 +171,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   }
 
   private OperationModel findOperationModel(ExtensionModel extensionModel, String operationName) {
-    return findOperation(extensionModel, operationName).orElseThrow(() ->
-        new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName))));
+    return findOperation(extensionModel, operationName)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName))));
   }
 
   private ExtensionModel findExtension(String extensionName) {
@@ -194,14 +194,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     return executeAsync(
-        extensionName,
-        operationName,
-        parameterizer -> {
-          setContextEvent(parameterizer, parameters);
-          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-          resolveLegacyParameters(parameterizer, parameters);
-          configureLegacyRepeatableStreaming(parameterizer, operationModel);
-        });
+                        extensionName,
+                        operationName,
+                        parameterizer -> {
+                          setContextEvent(parameterizer, parameters);
+                          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+                          resolveLegacyParameters(parameterizer, parameters);
+                          configureLegacyRepeatableStreaming(parameterizer, operationModel);
+                        });
   }
 
   protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {

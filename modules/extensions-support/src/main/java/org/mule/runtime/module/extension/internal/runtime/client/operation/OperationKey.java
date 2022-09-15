@@ -77,13 +77,14 @@ public class OperationKey {
             .map(configurationProvider -> {
               if (configurationProvider.getExtensionModel() != extensionModel) {
                 throw new IllegalArgumentException(format("A config of the '%s' extension was expected but one from '%s' was parameterized instead",
-                    extensionModel.getName(), configurationProvider.getExtensionModel().getName()));
+                                                          extensionModel.getName(),
+                                                          configurationProvider.getExtensionModel().getName()));
               }
               return configurationProvider;
             })
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No configuration [" + configName + "] found"))));
       } else {
-        configurationProvider = extensionManager.getConfigurationProvider(extensionModel, operationModel,contextEvent);
+        configurationProvider = extensionManager.getConfigurationProvider(extensionModel, operationModel, contextEvent);
       }
     }
 
