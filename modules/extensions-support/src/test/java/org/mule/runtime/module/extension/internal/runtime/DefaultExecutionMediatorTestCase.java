@@ -235,7 +235,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             null,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
@@ -338,7 +338,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             null,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -354,7 +354,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             null,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -374,7 +374,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -396,7 +396,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -417,7 +417,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -436,7 +436,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
 
     execute();
   }
@@ -459,7 +459,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -481,7 +481,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -502,7 +502,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -520,7 +520,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                               muleContext.getErrorTypeRepository(),
                                               muleContext.getExecutionClassLoader(),
                                               failingTransformer,
-                                              threadReleaseDataProducer);
+                                              threadReleaseDataProducer, true);
     execute();
     verify(executorCallback, times(1)).error(moduleException);
   }
@@ -542,7 +542,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             mockErrorModel(),
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
 
     try {
       execute();

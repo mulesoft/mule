@@ -90,10 +90,11 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ClassLoader executionClassLoader,
                                   ResultTransformer resultTransformer,
-                                  ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer) {
+                                  ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer,
+                                  boolean suppressErrors) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
-    this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
 
