@@ -19,6 +19,7 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -260,7 +261,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   @Override
   public void dispose() {
-    // Nothing to do here as this is just wrapper for another classLoader
+    LifecycleUtils.trackDisposedObject(this);
   }
 
   @Override

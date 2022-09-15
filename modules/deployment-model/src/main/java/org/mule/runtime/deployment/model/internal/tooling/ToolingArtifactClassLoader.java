@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -127,6 +128,7 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
    */
   @Override
   public void dispose() {
+    LifecycleUtils.trackDisposedObject(this);
     regionClassLoader.dispose();
   }
 }

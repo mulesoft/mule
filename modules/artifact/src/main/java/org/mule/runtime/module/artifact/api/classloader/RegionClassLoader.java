@@ -22,6 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
@@ -426,6 +427,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public void dispose() {
+    LifecycleUtils.trackDisposedObject(this);
     registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(this::disposeClassLoader);
     registeredClassLoaders.clear();
     descriptorMapping.forEach((descriptor, classloader) -> {

@@ -238,7 +238,7 @@ public class LifecycleUtils {
    */
   public static void disposeIfNeeded(Object object, Logger logger) {
     object = unwrap(object);
-    tracker.markThatShouldBeCollected(object);
+    trackDisposedObject(object);
     if (object instanceof Disposable) {
       try {
         ((Disposable) object).dispose();
@@ -250,6 +250,10 @@ public class LifecycleUtils {
         }
       }
     }
+  }
+
+  public static void trackDisposedObject(Object object) {
+    tracker.markThatShouldBeCollected(object);
   }
 
   /**

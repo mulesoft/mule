@@ -6,6 +6,7 @@
  */
 package org.mule.test.runner.classloader;
 
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
@@ -52,7 +53,9 @@ class DelegatingArtifactClassLoader extends ClassLoader implements ArtifactClass
   }
 
   @Override
-  public void dispose() {}
+  public void dispose() {
+    LifecycleUtils.trackDisposedObject(this);
+  }
 
   @Override
   public URL findLocalResource(String resourceName) {

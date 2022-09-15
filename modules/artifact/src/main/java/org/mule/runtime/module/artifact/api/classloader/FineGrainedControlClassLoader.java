@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
@@ -190,6 +191,8 @@ public class FineGrainedControlClassLoader extends URLClassLoader
    */
   @Override
   public void dispose() {
+    LifecycleUtils.trackDisposedObject(this);
+
     try {
       // Java 7 added support for closing a URLClassLoader, it will close any resources opened by this classloader
       close();

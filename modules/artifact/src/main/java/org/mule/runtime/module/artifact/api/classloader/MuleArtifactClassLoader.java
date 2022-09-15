@@ -23,6 +23,7 @@ import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
 import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -299,6 +300,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public void dispose() {
+    LifecycleUtils.trackDisposedObject(this);
+
     descriptorMapping.forEach((descriptor, classloader) -> {
       try {
         classloader.close();
