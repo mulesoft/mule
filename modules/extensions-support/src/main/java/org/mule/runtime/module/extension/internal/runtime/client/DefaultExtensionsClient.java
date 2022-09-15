@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,13 +16,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -35,25 +30,17 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.DefaultOperationParameterizer;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.EventedOperationsParameterDecorator;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient;
@@ -61,13 +48,11 @@ import org.mule.runtime.module.extension.internal.runtime.client.operation.Opera
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -128,79 +113,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     parameters.accept(parameterizer);
 
     OperationKey key = toKey(extensionName, operationName, parameterizer);
-    boolean shouldCompleteEvent = false;
-    CoreEvent contextEvent = parameterizer.getContextEvent().orElse(null);
-    if (contextEvent == null) {
-      contextEvent = getNullEvent(muleContext);
-      shouldCompleteEvent = true;
-    }
 
-    OperationModel operationModel = key.getOperationModel();
-    Optional<ConfigurationInstance> configurationInstance =
-        getConfigurationInstance(key.getConfigurationProvider(), contextEvent);
-
-    final Map<String, Object> resolvedParams =
-        resolveOperationParameters(operationModel, configurationInstance, parameterizer, contextEvent);
-    CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
-
-    ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
-                                                                                    key.getExtensionModel(),
-                                                                                    configurationInstance,
-                                                                                    resolvedParams,
-                                                                                    operationModel,
-                                                                                    contextEvent,
-                                                                                    cursorProviderFactory,
-                                                                                    streamingManager,
-                                                                                    NULL_COMPONENT,
-                                                                                    parameterizer.getRetryPolicyTemplate(),
-                                                                                    IMMEDIATE_SCHEDULER,
-                                                                                    empty(),
-                                                                                    muleContext);
-
-    return clientCache.get(key).execute(context, shouldCompleteEvent);
-  }
-
-  private Map<String, Object> resolveOperationParameters(OperationModel operationModel,
-                                                         Optional<ConfigurationInstance> configurationInstance,
-                                                         DefaultOperationParameterizer parameterizer,
-                                                         CoreEvent event) {
-    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
-    parameterizer.setValuesOn(paramsBuilder);
-
-    try {
-      ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-                                                                            paramsBuilder.build(),
-                                                                            muleContext,
-                                                                            true,
-                                                                            reflectionCache,
-                                                                            expressionManager,
-                                                                            "");
-
-      ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
-      configurationInstance.ifPresent(ctxBuilder::withConfig);
-
-      try (ValueResolvingContext ctx = ctxBuilder.build()) {
-        return resolverSet.resolve(ctx).asMap();
-      }
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
-    }
-  }
-
-  private Optional<ConfigurationInstance> getConfigurationInstance(Optional<ConfigurationProvider> configurationProvider,
-                                                                   CoreEvent contextEvent) {
-    return configurationProvider.map(config -> config.get(contextEvent));
+    return clientCache.get(key).execute(key, parameterizer);
   }
 
   private OperationKey toKey(String extensionName,
                              String operationName,
                              DefaultOperationParameterizer parameterizer) {
-
-    final ExtensionModel extensionModel = findExtension(extensionName);
-    final Optional<ConfigurationProvider> configurationProvider = findConfiguration(extensionModel, parameterizer);
-    final OperationModel operationModel = findOperationModel(extensionModel, configurationProvider, operationName);
-
-    return new OperationKey(extensionModel, configurationProvider, operationModel);
+    return new OperationKey(extensionName,
+        parameterizer.getConfigRef(),
+        operationName,
+        this::findExtension,
+        this::findOperationModel,
+        extensionManager);
   }
 
   private LoadingCache<OperationKey, OperationClient> createClientCache() {
@@ -216,13 +141,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private OperationClient createOperationClient(OperationKey key) {
     OperationClient client = from(
-                                  key,
-                                  extensionManager,
-                                  expressionManager,
-                                  extensionConnectionSupplier,
-                                  errorTypeRepository,
-                                  reflectionCache,
-                                  muleContext);
+        key,
+        extensionManager,
+        expressionManager,
+        extensionConnectionSupplier,
+        errorTypeRepository,
+        streamingManager,
+        reflectionCache,
+        muleContext);
 
     try {
       initialiseIfNeeded(client);
@@ -244,60 +170,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private Optional<ConfigurationProvider> findConfiguration(ExtensionModel extensionModel,
-                                                            DefaultOperationParameterizer parameterizer) {
-    final String configRef = parameterizer.getConfigRef();
-    if (configRef != null) {
-      return of(extensionManager.getConfigurationProvider(configRef)
-          .map(configurationProvider -> {
-            if (configurationProvider.getExtensionModel() != extensionModel) {
-              throw new IllegalArgumentException();
-            }
-            return configurationProvider;
-          })
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No configuration [" + configRef + "] found"))));
-    }
-
-    return empty();
-  }
-
-  private OperationModel findOperationModel(ExtensionModel extensionModel,
-                                            Optional<ConfigurationProvider> configurationProvider,
-                                            String operationName) {
-    Optional<OperationModel> operation = extensionModel.getOperationModel(operationName);
-    if (operation.isPresent()) {
-      return operation.get();
-    }
-
-    if (configurationProvider.isPresent()) {
-      ConfigurationModel configurationModel = configurationProvider.get().getConfigurationModel();
-      return configurationModel.getOperationModel(operationName).orElseThrow(
-                                                                             () -> noSuchOperationException(operationName));
-    } else {
-      throw new IllegalArgumentException("Operation '" + operationName + "' not found at the extension level");
-    }
-  }
-
-  private MuleRuntimeException noSuchOperationException(String operationName) {
-    throw new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName)));
-  }
-
   private OperationModel findOperationModel(ExtensionModel extensionModel, String operationName) {
-    for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels()) {
-      Optional<OperationModel> operation = configurationModel.getOperationModel(operationName);
-      if (operation.isPresent()) {
-        return operation.get();
-      }
-    }
-
-    return extensionModel.getOperationModel(operationName).orElseThrow(() -> noSuchOperationException(operationName));
+    return findOperation(extensionModel, operationName).orElseThrow(() ->
+        new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName))));
   }
 
   private ExtensionModel findExtension(String extensionName) {
     return extensionManager.getExtension(extensionName)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No Extension [" + extensionName + "] Found")));
   }
-
 
   /**
    * {@inheritDoc}
@@ -309,17 +190,18 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                              OperationParameters parameters) {
 
     final ExtensionModel extensionModel = findExtension(extensionName);
+    findOperation(extensionModel, operationName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
     return executeAsync(
-                        extensionName,
-                        operationName,
-                        parameterizer -> {
-                          setContextEvent(parameterizer, parameters);
-                          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                          resolveLegacyParameters(parameterizer, parameters);
-                          configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                        });
+        extensionName,
+        operationName,
+        parameterizer -> {
+          setContextEvent(parameterizer, parameters);
+          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+          resolveLegacyParameters(parameterizer, parameters);
+          configureLegacyRepeatableStreaming(parameterizer, operationModel);
+        });
   }
 
   protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
