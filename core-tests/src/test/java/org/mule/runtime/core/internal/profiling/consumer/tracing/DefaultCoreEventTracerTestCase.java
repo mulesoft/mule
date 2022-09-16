@@ -116,7 +116,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   public static final String SPAN_ID_SPAN_VALUE = "spanIdSpan";
 
   @Test
-  public void testStartComponentExecution() {
+  public void testStartComponentExecutionWithNameBasedOnTheComponentIdentifier() {
     ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
     InternalSpan span = doTestStartComponentExecution(new SpanCustomizationInfo() {
 
@@ -135,7 +135,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testStartComponentExecution2() {
+  public void testStartNonExportableSpan() {
     ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
     InternalSpan span = doTestStartComponentExecution(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo(),
                                                       componentIdentifier);
@@ -521,15 +521,18 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
           return null;
         }
 
-        @Override public void addCurrentSpanAttributes(Map<String, String> attributes) {
+        @Override
+        public void addCurrentSpanAttributes(Map<String, String> attributes) {
           // Nothing to do.
         }
 
-        @Override public void addCurrentSpanAttribute(String key, String value) {
+        @Override
+        public void addCurrentSpanAttribute(String key, String value) {
           // Nothing to do.
         }
 
-        @Override public void setCurrentName(String name) {
+        @Override
+        public void setCurrentName(String name) {
           // Nothing to do.
         }
       };
