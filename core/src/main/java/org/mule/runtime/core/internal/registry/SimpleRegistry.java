@@ -16,6 +16,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
@@ -76,11 +78,15 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   private final RegistryMap registryMap = new RegistryMap(logger);
 
   public SimpleRegistry(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
+    this(muleContext, lifecycleInterceptor, muleContext != null ? of(createFeatureFlaggingService(muleContext)) : empty());
+  }
+
+  public SimpleRegistry(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor,
+                        Optional<FeatureFlaggingService> featureFlaggingService) {
     super(REGISTRY_ID, muleContext, lifecycleInterceptor);
-    if (getMuleContext() != null) {
-      FeatureFlaggingService featureFlaggingService = createFeatureFlaggingService(getMuleContext());
-      disableApplyObjectProcessor = featureFlaggingService.isEnabled(DISABLE_APPLY_OBJECT_PROCESSOR);
-      putDefaultEntriesIntoRegistry(featureFlaggingService);
+    if (featureFlaggingService.isPresent()) {
+      disableApplyObjectProcessor = featureFlaggingService.get().isEnabled(DISABLE_APPLY_OBJECT_PROCESSOR);
+      putDefaultEntriesIntoRegistry(featureFlaggingService.get());
     } else {
       disableApplyObjectProcessor = true;
       putDefaultEntriesIntoRegistry(null);
@@ -104,21 +110,21 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
     registryMap.putAll(defaultEntries);
   }
 
-  private FeatureFlaggingService createFeatureFlaggingService(MuleContext muleContext) {
+  private static FeatureFlaggingService createFeatureFlaggingService(MuleContext muleContext) {
     // Initial feature flagging service setup
     FeatureFlaggingRegistry ffRegistry = getInstance();
     return new FeatureFlaggingServiceBuilder()
         .withContext(muleContext)
         .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null),
-                                        resolveArtifactName()))
+                                        resolveArtifactName(muleContext)))
         .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();
   }
 
-  private String resolveArtifactName() {
-    if (getMuleContext().getConfiguration() != null) {
-      return getMuleContext().getConfiguration().getId();
+  private static String resolveArtifactName(MuleContext muleContext) {
+    if (muleContext.getConfiguration() != null) {
+      return muleContext.getConfiguration().getId();
     } else {
       return "";
     }

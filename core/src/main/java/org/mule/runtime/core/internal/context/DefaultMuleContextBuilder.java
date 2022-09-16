@@ -89,9 +89,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
-    muleContext.setRegistry(registry);
-    muleContext.setInjector(registry);
+    configureRegistry(muleContext);
 
     muleContext.setExceptionListener(createExceptionListener(muleContext));
     muleContext.setExecutionClassLoader(getExecutionClassLoader());
@@ -106,6 +104,12 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     }
 
     return muleContext;
+  }
+
+  protected void configureRegistry(DefaultMuleContext muleContext) {
+    final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
+    muleContext.setRegistry(registry);
+    muleContext.setInjector(registry);
   }
 
   private Properties getDeploymentProperties() {
