@@ -6,19 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy.processor;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
@@ -29,7 +16,23 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -52,6 +55,7 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -72,6 +76,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import org.mockito.ArgumentMatcher;
 
 @RunWith(Parameterized.class)
@@ -223,7 +228,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     public TestPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
                         ErrorHandler errorHandler) {
       super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED,
-            DEFAULT_MAX_CONCURRENCY, createFlowStatistics(name, muleContext), new ComponentInitialStateManager() {
+            DEFAULT_MAX_CONCURRENCY,
+            new DefaultFlowsSummaryStatistics(true), createFlowStatistics(name, muleContext.getStatistics()),
+            new ComponentInitialStateManager() {
 
               @Override
               public boolean mustStartMessageSource(Component component) {
@@ -254,9 +261,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   private class PipelineMessageNotificiationArgumentMatcher implements ArgumentMatcher<Notification> {
 
-    private int expectedAction;
-    private boolean exceptionExpected;
-    private CoreEvent event;
+    private final int expectedAction;
+    private final boolean exceptionExpected;
+    private final CoreEvent event;
 
     public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, CoreEvent event) {
       this.expectedAction = expectedAction;
