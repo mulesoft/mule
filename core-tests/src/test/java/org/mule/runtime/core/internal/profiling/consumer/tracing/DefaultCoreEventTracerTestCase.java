@@ -135,7 +135,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testStartNonExportableSpan() {
+  public void testStartComponentExecutionForANonExportableSpan() {
     ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
     InternalSpan span = doTestStartComponentExecution(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo(),
                                                       componentIdentifier);
