@@ -79,7 +79,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
                                                     List<ComponentAst> hierarchy) {
       Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
       operationModel.ifPresent(model -> model.getErrorModels().stream().map(MuleSdkErrorModelParser::new)
-          .forEach(errorModelParser -> addIfNotSuppressed(errorModelParser, models, hierarchy)));
+          .forEach(errorModelParser -> addParserAndMarkIfSuppressed(errorModelParser, models, hierarchy)));
     }
 
     private void handleRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels, List<ComponentAst> hierarchy) {
@@ -94,19 +94,20 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       }
 
       // TODO: Use the extension parser's namespace.
-      addIfNotSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels, hierarchy);
+      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels, hierarchy);
     }
 
     private static boolean isRaiseError(ComponentAst operationAst) {
       return operationAst.getIdentifier().equals(RAISE_ERROR_IDENTIFIER);
     }
 
-    private void addIfNotSuppressed(ErrorModelParser errorModelParser, List<ErrorModelParser> models,
-                                    List<ComponentAst> hierarchy) {
+    private void addParserAndMarkIfSuppressed(MuleSdkErrorModelParser errorModelParser, List<ErrorModelParser> models,
+                                              List<ComponentAst> hierarchy) {
       List<ErrorModelParserMatcher> suppressedErrors = getSuppressedErrors(hierarchy);
-      if (!isErrorSuppressed(errorModelParser, suppressedErrors)) {
-        models.add(errorModelParser);
+      if (isErrorSuppressed(errorModelParser, suppressedErrors)) {
+        errorModelParser.setSuppressed();
       }
+      models.add(errorModelParser);
     }
 
     /**

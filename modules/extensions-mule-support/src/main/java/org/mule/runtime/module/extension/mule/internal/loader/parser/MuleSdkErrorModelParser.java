@@ -20,6 +20,8 @@ import java.util.Optional;
  */
 public class MuleSdkErrorModelParser extends BaseErrorModelParser {
 
+  private boolean suppressed;
+
   /**
    * Create a new instance since an {@link ErrorModel}.
    *
@@ -40,6 +42,15 @@ public class MuleSdkErrorModelParser extends BaseErrorModelParser {
   public MuleSdkErrorModelParser(String namespace, String type, ErrorModelParser parent) {
     super(namespace, type);
     setParent(parent);
+  }
+
+  public void setSuppressed() {
+    this.suppressed = true;
+  }
+
+  @Override
+  public boolean isSuppressed() {
+    return suppressed;
   }
 
   @Override
