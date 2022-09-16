@@ -8,11 +8,12 @@ package org.mule.runtime.core.internal.util.rx;
 
 import static java.util.Collections.emptyList;
 
-import reactor.util.context.Context;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Function;
+
+import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Utils class to allow transactional behavior in reactor.
@@ -27,7 +28,7 @@ public final class ReactorTransactionUtils {
 
   public static final String TX_SCOPES_KEY = "mule.tx.activeTransactionsInReactorChain";
 
-  public static boolean isTxActiveByContext(Context ctx) {
+  public static boolean isTxActiveByContext(ContextView ctx) {
     return ctx != null && ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> !txScopes.isEmpty()).orElse(false);
   }
 

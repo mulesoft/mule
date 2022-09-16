@@ -18,8 +18,8 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -105,12 +105,11 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPub) {
-        return subscriberContext()
-            .flatMapMany(ctx -> from(eventPub)
-                .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                    ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
-                    : policyEventMapper.onOperationPolicyNext(event))
-                .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
+        return deferContextual(ctx -> from(eventPub)
+            .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
+                : policyEventMapper.onOperationPolicyNext(event))
+            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
     }), policyNextErrorHandler());
     initialiseIfNeeded(nextDispatchAsChain, muleContext);

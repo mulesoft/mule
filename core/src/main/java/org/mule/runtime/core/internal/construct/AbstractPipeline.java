@@ -322,12 +322,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   /**
-   * If an <b>Error Strategy</b> is being propagated in the subscription {@link reactor.util.context.Context}, clear it.
+   * If an <b>Error Strategy</b> is being propagated in the subscription {@link reactor.util.context.ContextView}, clear it.
    *
    * @return the transformed flux that clears the context if necessary
    */
   private Function<Flux<CoreEvent>, Publisher<CoreEvent>> clearSubscribersErrorStrategy() {
-    return pub -> pub.subscriberContext(context -> {
+    return pub -> pub.contextWrite(context -> {
       Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
       if (onErrorStrategy.isPresent()
           && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
