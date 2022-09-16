@@ -64,13 +64,14 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
   private final Tracer tracer;
   private final Context remoteContext;
-  private final io.opentelemetry.api.trace.Span openTelemetrySpan;
+  private io.opentelemetry.api.trace.Span openTelemetrySpan;
+  private final InternalSpan internalSpan;
 
   public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
                                    InternalSpan internalSpan) {
     this.tracer = tracer;
     remoteContext = resolveRemoteContext(eventContext);
-    openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan);
+    this.internalSpan = internalSpan;
   }
 
   @Override
@@ -78,12 +79,27 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     if (internalSpan.hasErrors()) {
       recordSpanExceptions(internalSpan);
     }
-    openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
+    getOpenTelemetrySpan().end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
   @Override
   public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
     return internalSpanExporterVisitor.accept(this);
+  }
+
+  @Override
+  public void addCurrentSpanAttributes(Map<String, String> attributes) {
+
+  }
+
+  @Override
+  public void addCurrentSpanAttribute(String key, String value) {
+
+  }
+
+  @Override
+  public void setCurrentName(String name) {
+
   }
 
   private void recordSpanExceptions(InternalSpan internalSpan) {
@@ -97,7 +113,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
                                                EXCEPTION_STACK_TRACE_KEY,
                                                InternalSpanError.getInternalSpanError(spanError).getErrorStacktrace().toString(),
                                                EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
-    openTelemetrySpan.addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
+    getOpenTelemetrySpan().addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
   }
 
   private Context resolveParentOpenTelemetrySpan(InternalSpan internalSpan) {
@@ -158,6 +174,9 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   }
 
   public io.opentelemetry.api.trace.Span getOpenTelemetrySpan() {
+    if (openTelemetrySpan == null) {
+      openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan);
+    }
     return openTelemetrySpan;
   }
 

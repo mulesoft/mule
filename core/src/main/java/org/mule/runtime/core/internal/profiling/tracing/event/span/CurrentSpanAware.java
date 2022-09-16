@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,4 +32,10 @@ public interface CurrentSpanAware {
    * @return the owned {@link InternalSpan}
    */
   Optional<InternalSpan> getCurrentSpan();
+
+  void addCurrentSpanAttributes(Map<String, String> attributes);
+
+  void setCurrentSpanName(String name);
+
+  void addCurrentSpanAttribute(String key, String value);
 }

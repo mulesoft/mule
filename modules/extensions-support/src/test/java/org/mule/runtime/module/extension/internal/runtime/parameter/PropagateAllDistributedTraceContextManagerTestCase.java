@@ -16,6 +16,9 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.execution.ExecutionContext;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
 import java.util.Map;
@@ -45,7 +48,9 @@ public class PropagateAllDistributedTraceContextManagerTestCase {
         .thenReturn(of(TRACE_FIELD_1, TRACE_FIELD_VALUE_1, TRACE_FIELD_2, TRACE_FIELD_VALUE_2));
     when(distributedTraceContext.baggageItemsAsMap())
         .thenReturn(of(TRACE_FIELD_3, TRACE_FIELD_VALUE_3, TRACE_FIELD_4, TRACE_FIELD_VALUE_4));
-    PropagateAllDistributedTraceContextManager manager = new PropagateAllDistributedTraceContextManager(distributedTraceContext);
+    CoreEventTracer coreEventTracer = mock(CoreEventTracer.class);
+    CoreEvent coreEvent = mock(CoreEvent.class);
+    PropagateAllDistributedTraceContextManager manager = new PropagateAllDistributedTraceContextManager(coreEventTracer, coreEvent);
 
     Map<String, String> remoteContextMap = manager.getRemoteTraceContextMap();
 

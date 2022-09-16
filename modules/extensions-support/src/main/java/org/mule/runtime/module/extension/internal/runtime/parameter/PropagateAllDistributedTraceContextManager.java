@@ -7,8 +7,12 @@
 
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveDistributedTraceContext;
+
 import static java.util.Collections.unmodifiableMap;
 
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
@@ -23,9 +27,13 @@ import java.util.Map;
 public class PropagateAllDistributedTraceContextManager implements DistributedTraceContextManager {
 
   private Map<String, String> contextMap;
+  private CoreEventTracer coreEventTracer;
+  private CoreEvent coreEvent;
 
-  public PropagateAllDistributedTraceContextManager(DistributedTraceContext distributedTraceContext) {
-    resolveContextMap(distributedTraceContext);
+  public PropagateAllDistributedTraceContextManager(CoreEventTracer coreEventTracer, CoreEvent coreEvent) {
+    this.coreEvent = coreEvent;
+    this.coreEventTracer = coreEventTracer;
+    resolveContextMap(resolveDistributedTraceContext(coreEvent, coreEventTracer));
   }
 
   private void resolveContextMap(DistributedTraceContext distributedTraceContext) {
@@ -42,5 +50,17 @@ public class PropagateAllDistributedTraceContextManager implements DistributedTr
   @Override
   public Map<String, String> getRemoteTraceContextMap() {
     return contextMap;
+  }
+
+  @Override public void setCurrentSpanName(String name) {
+    coreEventTracer.setCurrentSpanName(coreEvent, name);
+  }
+
+  @Override public void addCurrentSpanAttribute(String key, String value) {
+    coreEventTracer.addCurrentSpanAttribute(coreEvent, key, value);
+  }
+
+  @Override public void addCurrentSpanAttributes(Map<String, String> attributes) {
+    coreEventTracer.addCurrentSpanAttributes(coreEvent, attributes);
   }
 }

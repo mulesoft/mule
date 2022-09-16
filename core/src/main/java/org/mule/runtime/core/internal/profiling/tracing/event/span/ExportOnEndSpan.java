@@ -129,6 +129,24 @@ public class ExportOnEndSpan implements InternalSpan {
     return childSpanCustomizationInfo;
   }
 
+  @Override
+  public void addCurrentSpanAttributes(Map<String, String> attributes) {
+    runtimeInternalSpan.addCurrentSpanAttributes(attributes);
+    spanExporter.addCurrentSpanAttributes(attributes);
+  }
+
+  @Override
+  public void addCurrentSpanAttribute(String key, String value) {
+    runtimeInternalSpan.addCurrentSpanAttribute(key, value);
+    spanExporter.addCurrentSpanAttribute(key, value);
+  }
+
+  @Override
+  public void setCurrentSpanName(String name) {
+    runtimeInternalSpan.setCurrentSpanName(name);
+    spanExporter.setCurrentName(name);
+  }
+
   /**
    * Adds attribute to the exporter.
    */

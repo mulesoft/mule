@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.profiling.tracing.export;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 
+import java.util.Map;
+
 /**
  * An exporter for {@link InternalSpanExporter}
  *
@@ -29,4 +31,10 @@ public interface InternalSpanExporter {
    * @return the result of visit
    */
   <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor);
+
+  void addCurrentSpanAttributes(Map<String, String> attributes);
+
+  void addCurrentSpanAttribute(String key, String value);
+
+  void setCurrentName(String name);
 }

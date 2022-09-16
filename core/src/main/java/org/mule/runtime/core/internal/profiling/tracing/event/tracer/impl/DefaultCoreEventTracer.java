@@ -136,14 +136,10 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   @Override
   public void injectDistributedTraceContext(EventContext eventContext,
                                             DistributedTraceContextGetter distributedTraceContextGetter) {
-    if (eventContext instanceof DistributedTraceContextAware) {
-      ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
-                                                                               EventDistributedTraceContext.builder()
-                                                                                   .withGetter(distributedTraceContextGetter)
-                                                                                   .withPropagateTracingExceptions(
-                                                                                                                   propagateTracingExceptions)
-                                                                                   .build());
-    }
+    safeExecute(() -> doInjectDistributedTraceContext(eventContext, distributedTraceContextGetter),
+                "Error on injecting distributed trace context",
+                propagateTracingExceptions,
+                customLogger);
   }
 
   @Override
@@ -152,6 +148,34 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                              emptyMap(),
                                              "Error on getting distributed trace context", propagateTracingExceptions,
                                              customLogger);
+  }
+
+  @Override
+  public void setCurrentSpanName(CoreEvent coreEvent, String name) {
+    safeExecute(() -> doSetCurrentSpanName(coreEvent, name), "Error on setting the current span name", propagateTracingExceptions,
+                customLogger);
+  }
+
+  @Override
+  public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
+    EventContext eventContext = coreEvent.getContext();
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext)
+          .getDistributedTraceContext()
+          .addCurrentSpanAttribute(key, value);
+    }
+  }
+
+  @Override
+  public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+    EventContext eventContext = coreEvent.getContext();
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext)
+          .getDistributedTraceContext()
+          .addCurrentSpanAttributes(attributes);
+    }
   }
 
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan,
@@ -166,6 +190,17 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
 
     return currentSpan;
+  }
+
+
+  private void doSetCurrentSpanName(CoreEvent coreEvent, String name) {
+    EventContext eventContext = coreEvent.getContext();
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext)
+          .getDistributedTraceContext()
+          .setCurrentSpanName(name);
+    }
   }
 
   private Map<String, String> doGetDistributedTraceContextMap(CoreEvent coreEvent) {
@@ -192,6 +227,18 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       return contextMap;
     } else {
       return emptyMap();
+    }
+  }
+
+  private void doInjectDistributedTraceContext(EventContext eventContext,
+                                               DistributedTraceContextGetter distributedTraceContextGetter) {
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
+                                                                               EventDistributedTraceContext.builder()
+                                                                                   .withGetter(distributedTraceContextGetter)
+                                                                                   .withPropagateTracingExceptions(
+                                                                                                                   propagateTracingExceptions)
+                                                                                   .build());
     }
   }
 

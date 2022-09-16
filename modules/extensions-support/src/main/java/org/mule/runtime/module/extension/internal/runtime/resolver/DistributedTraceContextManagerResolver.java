@@ -29,7 +29,6 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
 
   @Override
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
-    return new PropagateAllDistributedTraceContextManager(resolveDistributedTraceContext(((ExecutionContextAdapter<?>) executionContext)
-        .getEvent(), coreEventTracer));
+    return new PropagateAllDistributedTraceContextManager(coreEventTracer, ((ExecutionContextAdapter<?>) executionContext).getEvent());
   }
 }

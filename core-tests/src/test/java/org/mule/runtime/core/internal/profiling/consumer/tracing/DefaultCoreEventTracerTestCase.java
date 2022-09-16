@@ -520,6 +520,18 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
         public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
           return null;
         }
+
+        @Override public void addCurrentSpanAttributes(Map<String, String> attributes) {
+          // Nothing to do.
+        }
+
+        @Override public void addCurrentSpanAttribute(String key, String value) {
+          // Nothing to do.
+        }
+
+        @Override public void setCurrentName(String name) {
+          // Nothing to do.
+        }
       };
     }
   }
