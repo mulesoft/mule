@@ -130,13 +130,12 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerTransformerRegistry(muleContext);
     registerExpressionManager(muleContext, registry);
     registerConnectionManager(muleContext);
+    registerNotificationHandlingObjects(muleContext);
     registerConnectivityTester(muleContext);
     registerInterceptionApiObjects(muleContext);
 
     registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
-    // registerObject(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, new MuleMessageProcessingManager(), muleContext);
     registerObject(OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService(), muleContext);
-    // registerObject(OBJECT_PROCESSING_TIME_WATCHER, new DefaultProcessingTimeWatcher(), muleContext);
     registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, new JavaObjectSerializer(), muleContext);
 
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
@@ -152,11 +151,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
     // TODO W-11742823 review this
     registerObject(METADATA_SERVICE_KEY, new MuleMetadataService(), muleContext);
-    // registerObject(VALUE_PROVIDER_SERVICE_KEY, new MuleValueProviderService(), muleContext);
-    registerObject(OBJECT_NOTIFICATION_DISPATCHER, new DefaultNotificationDispatcher(), muleContext);
-    registerObject(NotificationListenerRegistry.REGISTRY_KEY, new DefaultNotificationListenerRegistry(), muleContext);
-    // registerObject(EventContextService.REGISTRY_KEY, new DefaultEventContextService(), muleContext);
-    // registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, new TransactionFactoryLocator(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
@@ -184,6 +178,11 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void registerConnectionManager(MuleContext muleContext) throws RegistrationException {
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
+  }
+
+  protected void registerNotificationHandlingObjects(MuleContext muleContext) throws RegistrationException {
+    registerObject(OBJECT_NOTIFICATION_DISPATCHER, new DefaultNotificationDispatcher(), muleContext);
+    registerObject(NotificationListenerRegistry.REGISTRY_KEY, new DefaultNotificationListenerRegistry(), muleContext);
   }
 
   protected void registerExpressionManager(MuleContext muleContext, MuleRegistry registry) throws MuleException {
