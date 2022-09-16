@@ -138,21 +138,6 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
     return ofNullable(currentSpan);
   }
 
-  @Override
-  public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    this.currentSpan.addCurrentSpanAttributes(attributes);
-  }
-
-  @Override
-  public void setCurrentSpanName(String name) {
-    this.currentSpan.setCurrentSpanName(name);
-  }
-
-  @Override
-  public void addCurrentSpanAttribute(String key, String value) {
-    this.currentSpan.addCurrentSpanAttribute(key, value);
-  }
-
   /**
    * Builder for {@link EventDistributedTraceContext}
    *

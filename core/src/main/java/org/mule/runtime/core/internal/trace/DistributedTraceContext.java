@@ -115,21 +115,6 @@ public interface DistributedTraceContext extends CurrentSpanAware {
       public Optional<InternalSpan> getCurrentSpan() {
         return empty();
       }
-
-      @Override
-      public void addCurrentSpanAttributes(Map<String, String> attributes) {
-        // Nothing to do.
-      }
-
-      @Override
-      public void setCurrentSpanName(String name) {
-        // Nothing to do.
-      }
-
-      @Override
-      public void addCurrentSpanAttribute(String key, String value) {
-        // Nothing to do.
-      }
     };
   }
 }

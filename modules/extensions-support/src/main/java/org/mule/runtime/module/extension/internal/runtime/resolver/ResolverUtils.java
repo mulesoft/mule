@@ -234,7 +234,7 @@ public class ResolverUtils {
 
   public static DistributedTraceContextManager resolveDistributedTraceContextManager(CoreEvent coreEvent,
                                                                                      CoreEventTracer coreEventTracer) {
-    return new PropagateAllDistributedTraceContextManager(coreEventTracer, coreEvent);
+    return new PropagateAllDistributedTraceContextManager(resolveDistributedTraceContext(coreEvent, coreEventTracer));
   }
 
   public static DistributedTraceContext resolveDistributedTraceContext(CoreEvent event, CoreEventTracer coreEventTracer) {
@@ -285,18 +285,6 @@ public class ResolverUtils {
       @Override
       public Optional<InternalSpan> getCurrentSpan() {
         return empty();
-      }
-
-      @Override public void addCurrentSpanAttributes(Map<String, String> attributes) {
-        // Nothing to do.
-      }
-
-      @Override public void setCurrentSpanName(String name) {
-        // Nothing to do.
-      }
-
-      @Override public void addCurrentSpanAttribute(String key, String value) {
-        // Nothing to do.
       }
     };
   }

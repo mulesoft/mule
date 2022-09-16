@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class ExecutionSpan implements InternalSpan {
 
-  private String name;
+  private final String name;
   private final SpanIdentifier identifier;
   private final InternalSpan parent;
   private final Long startTime;
@@ -89,21 +89,6 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public <T> T visit(InternalSpanVisitor<T> visitor) {
     return visitor.accept(this);
-  }
-
-  @Override
-  public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    this.attributes.putAll(attributes);
-  }
-
-  @Override
-  public void addCurrentSpanAttribute(String key, String value) {
-    this.attributes.put(key, value);
-  }
-
-  @Override
-  public void setCurrentSpanName(String name) {
-    this.name = name;
   }
 
   @Override

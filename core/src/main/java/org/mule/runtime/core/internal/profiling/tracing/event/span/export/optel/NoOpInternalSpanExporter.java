@@ -11,8 +11,6 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 
-import java.util.Map;
-
 /**
  * An {@link InternalSpanExporter} that does not perform any action.
  *
@@ -38,20 +36,5 @@ public class NoOpInternalSpanExporter implements InternalSpanExporter {
   @Override
   public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
     return internalSpanExporterVisitor.accept(this);
-  }
-
-  @Override
-  public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    // Nothing to do.
-  }
-
-  @Override
-  public void addCurrentSpanAttribute(String key, String value) {
-    // Nothing to do.
-  }
-
-  @Override
-  public void setCurrentName(String name) {
-    // Nothing to do.
   }
 }

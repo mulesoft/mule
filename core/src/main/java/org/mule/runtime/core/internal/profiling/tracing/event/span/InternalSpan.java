@@ -97,12 +97,6 @@ public interface InternalSpan extends Span {
     return getDefaultChildSpanInfo();
   }
 
-  void addCurrentSpanAttributes(Map<String, String> attributes);
-
-  void addCurrentSpanAttribute(String key, String value);
-
-  void setCurrentSpanName(String name);
-
   /**
    * A wrapper as InternalSpan for other type of {@link Span}
    */
@@ -157,21 +151,6 @@ public interface InternalSpan extends Span {
     @Override
     public <T> T visit(InternalSpanVisitor<T> visitor) {
       return visitor.accept(this);
-    }
-
-    @Override
-    public void addCurrentSpanAttributes(Map<String, String> attributes) {
-
-    }
-
-    @Override
-    public void addCurrentSpanAttribute(String key, String value) {
-
-    }
-
-    @Override
-    public void setCurrentSpanName(String name) {
-
     }
   }
 }
