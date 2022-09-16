@@ -94,7 +94,8 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       }
 
       // TODO: Use the extension parser's namespace.
-      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels, hierarchy);
+      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels,
+                                   hierarchy);
     }
 
     private static boolean isRaiseError(ComponentAst operationAst) {

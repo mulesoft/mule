@@ -17,8 +17,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -110,7 +112,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       });
 
       loader.registerOutputTypes(operation.getDeclaration());
-      declareErrorModels(operation, parser);
+      declareErrorModels(operation, parser, extensionDeclarer);
       getStereotypeModelLoaderDelegate().addStereotypes(
                                                         parser,
                                                         operation,
@@ -123,10 +125,14 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     }
   }
 
-  private void declareErrorModels(OperationDeclarer operation, OperationModelParser parser) {
+  private void declareErrorModels(OperationDeclarer operation, OperationModelParser parser, ExtensionDeclarer extension) {
     final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
-    parser.getErrorModelParsers().stream()
-        .map(errorsModelFactory::getErrorModel)
-        .forEach(operation::withErrorModel);
+    for (ErrorModelParser errorModelParser : parser.getErrorModelParsers()) {
+      ErrorModel errorModel = errorsModelFactory.getErrorModel(errorModelParser);
+      if (!errorModelParser.isSuppressed()) {
+        operation.withErrorModel(errorModel);
+      }
+      extension.withErrorModel(errorModel);
+    }
   }
 }
