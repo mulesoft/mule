@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+
+import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.CONNECTIVITY;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
-import static reactor.core.Exceptions.unwrap;
 
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
@@ -44,20 +43,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
-
-import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
-import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
-import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
-import static org.mule.test.heisenberg.extension.HeisenbergErrors.CONNECTIVITY;
-import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -72,14 +59,10 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -91,12 +74,18 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+
+import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
+
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -108,6 +97,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -244,7 +235,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             null,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
@@ -347,7 +338,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             null,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -363,7 +354,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             null,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -383,7 +374,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -403,7 +394,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -422,7 +413,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
 
     execute();
   }
@@ -444,7 +435,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
     execute();
   }
 
@@ -462,7 +453,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                               muleContext.getErrorTypeRepository(),
                                               muleContext.getExecutionClassLoader(),
                                               failingTransformer,
-                                              threadReleaseDataProducer);
+                                              threadReleaseDataProducer, true);
     execute();
     verify(executorCallback, times(1)).error(moduleException);
   }
@@ -483,7 +474,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             mockErrorModel(),
                                             muleContext.getExecutionClassLoader(),
                                             failingTransformer,
-                                            threadReleaseDataProducer);
+                                            threadReleaseDataProducer, true);
 
     try {
       execute();

@@ -39,13 +39,15 @@ public class ModuleExceptionHandler {
 
   private final Set<ErrorModel> allowedErrorTypes;
   private final String extensionNamespace;
+  private final boolean suppressErrors;
 
   private final LoadingCache<ErrorTypeDefinition, Function<Throwable, ErrorType>> errorTypeCache;
 
   public ModuleExceptionHandler(ComponentModel componentModel, ExtensionModel extensionModel,
-                                ErrorTypeRepository typeRepository) {
+                                ErrorTypeRepository typeRepository, boolean suppressErrors) {
     allowedErrorTypes = componentModel.getErrorModels();
     extensionNamespace = getExtensionsNamespace(extensionModel);
+    this.suppressErrors = suppressErrors;
 
     errorTypeCache = newBuilder().build(errorDefinition -> {
       final Optional<ErrorType> errorTypeLookedUp = typeRepository.lookupErrorType(builder()
@@ -119,10 +121,25 @@ public class ModuleExceptionHandler {
     // we use it as it already contains additional information
     if (throwable.getClass().equals(ModuleException.class)) {
       return throwable.getCause() != null && (throwable.getCause().getMessage() != null || throwable.getMessage() == null)
-          ? suppressIfPresent(throwable.getCause(), MessagingException.class)
+          ? suppressMessagingException(throwable.getCause())
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()), throwable.getCause());
     } else {
+      return suppressMessagingException(throwable);
+    }
+  }
+
+  /**
+   * Suppresses MessagingExceptions if the {@link MuleRuntimeFeature#SUPPRESS_ERRORS} feature is enabled.
+   *
+   * @param throwable Throwable where the suppression will be done.
+   * @return Throwable with the result of the suppression.
+   * @see SuppressedMuleException
+   */
+  private Throwable suppressMessagingException(Throwable throwable) {
+    if (suppressErrors) {
       return suppressIfPresent(throwable, MessagingException.class);
+    } else {
+      return throwable;
     }
   }
 }

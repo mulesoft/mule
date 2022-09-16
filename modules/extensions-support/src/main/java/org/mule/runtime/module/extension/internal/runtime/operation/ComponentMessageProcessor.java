@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -63,6 +64,8 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -234,6 +237,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private ProfilingService profilingService;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -1125,7 +1131,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
-                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE));
+                                        profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
+                                        featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
   }
 
   protected InterceptorChain createInterceptorChain() {

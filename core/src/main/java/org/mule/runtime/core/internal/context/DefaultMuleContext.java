@@ -19,6 +19,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -319,6 +320,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableByteBuddyObjectCreation();
       configurePrintDetailedCompositeExceptionLog();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
+      configureSuppressErrors();
     }
   }
 
@@ -1366,6 +1368,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
                                                 minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#SUPPRESS_ERRORS} feature flag.
+   *
+   * @since 4.5.0, 4.4.0-202210, 4.3.0-202210
+   */
+  private static void configureSuppressErrors() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(SUPPRESS_ERRORS,
+                                                featureContext -> true);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
