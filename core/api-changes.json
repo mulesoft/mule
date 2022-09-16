@@ -3,6 +3,23 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getFlowSummaryStatistics()",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "getFlowSummaryStatistics",
+          "elementKind": "method",
+          "justification": "W-11493854: Feature needed for monitirng currently productive mules"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "FlowsSummaryStatistics",
+          "elementKind": "interface",
+          "justification": "W-11493854: Feature needed for monitirng currently productive mules"
+        },
+        {
           "code": "java.method.defaultMethodAddedToInterface",
           "new": "method java.util.Map<org.mule.runtime.api.component.Component, java.util.function.Consumer<java.lang.Exception>> org.mule.runtime.core.api.exception.FlowExceptionHandler::getRouters()",
           "package": "org.mule.runtime.core.api.exception",
