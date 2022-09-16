@@ -10,6 +10,7 @@ import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_C
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED;
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STARTED;
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;

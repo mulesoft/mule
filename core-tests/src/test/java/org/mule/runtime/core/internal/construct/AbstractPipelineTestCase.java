@@ -6,10 +6,18 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
-import org.junit.After;
-import org.junit.Test;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,21 +28,18 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
+import org.junit.After;
+import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class AbstractPipelineTestCase extends AbstractMuleContextTestCase {
@@ -44,10 +49,11 @@ public class AbstractPipelineTestCase extends AbstractMuleContextTestCase {
     public TestPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                         Optional<FlowExceptionHandler> exceptionListener,
                         Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                        Integer maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                        Integer maxConcurrency,
+                        DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                         ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
-            flowConstructStatistics, componentInitialStateManager);
+            flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
     }
 
     @Override
@@ -62,20 +68,22 @@ public class AbstractPipelineTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
 
-    MessageSource mockMessageSource = mock(MessageSource.class);
-    FlowConstructStatistics mockFlowConstructStatistics = mock(FlowConstructStatistics.class);
-    ComponentInitialStateManager mockComponentInitialStateManager = mock(ComponentInitialStateManager.class);
+    MessageSource messageSource = mock(MessageSource.class);
+    DefaultFlowsSummaryStatistics flowSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
+    FlowConstructStatistics flowConstructStatistics = mock(FlowConstructStatistics.class);
+    ComponentInitialStateManager componentInitialStateManager = mock(ComponentInitialStateManager.class);
     abstractPipeline = new TestPipeline(
                                         "TestPipeline",
                                         muleContext,
-                                        mockMessageSource,
+                                        messageSource,
                                         emptyList(),
                                         empty(),
                                         empty(),
                                         "test initial state",
                                         1,
-                                        mockFlowConstructStatistics,
-                                        mockComponentInitialStateManager);
+                                        flowSummaryStatistics,
+                                        flowConstructStatistics,
+                                        componentInitialStateManager);
     abstractPipeline.initialise();
   }
 
