@@ -102,7 +102,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-memory-management</artifactId>
+            <artifactId>mule-module-memory-management-core</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

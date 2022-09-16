@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.internal.memory.bytebuffer.HeapByteBufferProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -63,9 +64,12 @@ public class ArtifactMemoryManagementTestCase extends AbstractMuleTestCase {
     MemoryManagementService anotherArtifactMemoryManagementService =
         new ArtifactMemoryManagementService(containerMemoryManagementService);
 
-    when(containerMemoryManagementService.getByteBufferProvider(any(), any())).thenReturn(new HeapByteBufferProvider(
-                                                                                                                     BYTE_BUFFER_NAME,
-                                                                                                                     mock(ProfilingService.class)));
+    ProfilingService mockedProfilingService = mock(ProfilingService.class);
+    when(mockedProfilingService.getProfilingDataProducer(any(), any())).thenReturn(mock(ProfilingDataProducer.class));
+    HeapByteBufferProvider byteBufferProvider = new HeapByteBufferProvider(
+                                                                           BYTE_BUFFER_NAME,
+                                                                           mockedProfilingService);
+    when(containerMemoryManagementService.getByteBufferProvider(any(), any())).thenReturn(byteBufferProvider);
 
     artifactMemoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, HEAP);
     anotherArtifactMemoryManagementService.getByteBufferProvider(ANOTHER_BYTE_BUFFER, HEAP);

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.test.allure.AllureConstants.MemoryManagement.MEMORY_MANAGEMENT;
 import static org.mule.test.allure.AllureConstants.MemoryManagement.MemoryManagementServiceStory.BYTE_BUFFER_PROVIDER;
 
@@ -16,8 +19,14 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoRule;
 
 import java.nio.ByteBuffer;
 
@@ -33,9 +42,20 @@ public class WeavePoolBasedByteBufferProviderTestCase extends AbstractMuleTestCa
   private static final int TEST_NUMBER_OF_POOLS = 3;
   public static final String TEST_WEAVE_BUFFER_PROVIDER = "test-heap-buffer-provider";
 
-  private final WeavePoolBasedByteBufferProvider weavePoolBasedByteBufferProvider =
-      new WeavePoolBasedByteBufferProvider(TEST_WEAVE_BUFFER_PROVIDER, TEST_MAX_BUFFER_SIZE,
-                                           TEST_NUMBER_OF_POOLS, mock(ProfilingService.class));
+  @Rule
+  public MockitoRule rule = rule();
+
+  @Mock
+  ProfilingService profilingService;
+
+  private WeavePoolBasedByteBufferProvider weavePoolBasedByteBufferProvider;
+
+  @Before
+  public void setUp() {
+    when(profilingService.getProfilingDataProducer(any(), any())).thenReturn(mock(ProfilingDataProducer.class));
+    this.weavePoolBasedByteBufferProvider = new WeavePoolBasedByteBufferProvider(TEST_WEAVE_BUFFER_PROVIDER, TEST_MAX_BUFFER_SIZE,
+                                                                                 TEST_NUMBER_OF_POOLS, profilingService);
+  }
 
   @Test
   public void testInitialStatus() {

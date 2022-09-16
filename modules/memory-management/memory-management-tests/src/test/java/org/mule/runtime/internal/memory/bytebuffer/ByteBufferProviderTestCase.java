@@ -16,9 +16,12 @@ import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -59,16 +62,18 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
 
   @Parameterized.Parameters(name = "Testing Byte Buffer provider: {0}, {1}")
   public static List<Object[]> parameters() {
+    ProfilingService profilingService = mock(ProfilingService.class);
+    when(profilingService.getProfilingDataProducer(any(), any())).thenReturn(mock(ProfilingDataProducer.class));
     return asList(new Object[][] {
-        {new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER, mock(ProfilingService.class)),
+        {new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER, profilingService),
             new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE,
                                        TEST_GROWTH_FACTOR,
-                                       TEST_NUMBER_OF_POOLS, mock(ProfilingService.class)),
+                                       TEST_NUMBER_OF_POOLS, profilingService),
             false},
-        {new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER, mock(ProfilingService.class)),
+        {new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER, profilingService),
             new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE,
                                          TEST_GROWTH_FACTOR,
-                                         TEST_NUMBER_OF_POOLS, mock(ProfilingService.class)),
+                                         TEST_NUMBER_OF_POOLS, profilingService),
             true}
     });
   }
