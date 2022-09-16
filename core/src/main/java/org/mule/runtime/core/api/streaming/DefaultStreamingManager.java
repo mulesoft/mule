@@ -218,6 +218,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     } else if (provider instanceof CursorStreamProviderFactory) {
       cursorStreamProviderFactory = (CursorStreamProviderFactory) provider;
       cursorIteratorProviderFactory = forObjects().getDefaultCursorProviderFactory();
+    } else if (provider instanceof NullCursorProviderFactory) {
+      cursorStreamProviderFactory = forBytes().getNullCursorProviderFactory();
+      cursorIteratorProviderFactory = forObjects().getNullCursorProviderFactory();
     } else {
       throw new IllegalArgumentException("The given cursor provider factory must be either a CursorStreamProviderFactory or a CursorIteratorProviderFactory");
     }
