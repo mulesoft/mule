@@ -17,6 +17,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -42,6 +44,9 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
+        AllStatistics statistics = muleContext.getStatistics();
+        boolean enabled = statistics.isEnabled();
+        when(statistics.getFlowSummaryStatistics()).thenReturn(new DefaultFlowsSummaryStatistics(enabled));
         when(muleContext.getConfiguration()).thenReturn(configuration);
         createFlow();
     }

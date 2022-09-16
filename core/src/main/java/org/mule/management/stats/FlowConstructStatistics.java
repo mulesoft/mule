@@ -9,6 +9,8 @@ package org.mule.management.stats;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics
@@ -26,6 +28,9 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     private long averageQueueSize = 0;
     private long totalQueuedEvent = 0;
 
+    private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
+    private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
+    private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
 
     public FlowConstructStatistics(String flowConstructType, String name, ProcessingStrategy processingStrategy)
     {
@@ -60,6 +65,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     /**
      * Are statistics logged
      */
+    @Override
     public boolean isEnabled()
     {
         return enabled;
@@ -68,22 +74,32 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     public void incExecutionError()
     {
         executionError.addAndGet(1);
+        for (DefaultResetOnQueryCounter executionErrorsCounter : executionErrorsCounters)
+        {
+            executionErrorsCounter.increment();
+        }
     }
 
     public void incFatalError()
     {
         fatalError.addAndGet(1);
+        for (DefaultResetOnQueryCounter fatalErrorsCounter : fatalErrorsCounters)
+        {
+            fatalErrorsCounter.increment();
+        }
     }
 
     /**
      * Enable statistics logs (this is a dynamic parameter)
      */
+    @Override
     public synchronized void setEnabled(boolean b)
     {
         super.setEnabled(b);
         flowStatistics.setEnabled(enabled);
     }
 
+    @Override
     public synchronized void clear()
     {
         super.clear();
@@ -146,6 +162,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
         return threadPoolSize;
     }
 
+    @Override
     public synchronized void incQueuedEvent()
     {
         queuedEvent++;
@@ -157,6 +174,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
         averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
     }
 
+    @Override
     public synchronized void decQueuedEvent()
     {
         queuedEvent--;
@@ -166,5 +184,68 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     {
         return averageQueueSize;
     }
+
+    /**
+     * Provides a counter for {@link #getExecutionErrors() execution errors} that is not affected by calls to {@link #clear()} or
+     * {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
+     * <p>
+     * Counter initial value is set to the value of {@link #getExecutionErrors()} when this method is called.
+     * <p>
+     * If this is called concurrently with {@link #incExecutionError()}, there is chance of a race condition occurring where an
+     * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
+     * 
+     * @return a counter for {@link #getExecutionErrors()}.
+     * 
+     * @since 4.5
+     */
+    public ResetOnQueryCounter getExecutionErrorsCounter()
+    {
+        DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+        executionErrorsCounters.add(counter);
+        counter.add(getExecutionErrors());
+        return counter;
+    }
+
+    /**
+     * Provides a counter for {@link #getFatalErrors() fatal errors} that is not affected by calls to {@link #clear()} or
+     * {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
+     * <p>
+     * Counter initial value is set to the value of {@link #getFatalErrors()} when this method is called.
+     * <p>
+     * If this is called concurrently with {@link #incFatalError()}, there is chance of a race condition occurring where an event
+     * may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
+     * 
+     * @return a counter for {@link #getFatalErrors()}.
+     * 
+     * @since 4.5
+     */
+    public ResetOnQueryCounter getFatalErrorsCounter()
+    {
+        DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+        fatalErrorsCounters.add(counter);
+        counter.add(getFatalErrors());
+        return counter;
+    }
+
+    /**
+     * Provides a counter for {@link #getConnectionErrors() connection errors} that is not affected by calls to {@link #clear()}
+     * or {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
+     * <p>
+     * Counter initial value is set to the value of {@link #getConnectionErrors()} when this method is called.
+     * <p>
+     * If this is called concurrently with {@link #incConnectionErrors()}, there is chance of a race condition occurring where an
+     * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
+     * 
+     * @return a counter for {@link #getConnectionErrors()}.
+     * 
+     * @since 4.5
+     */
+     public ResetOnQueryCounter getConnectionErrorsCounter()
+     {
+         DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+         connectionErrorsCounters.add(counter);
+         counter.add(getConnectionErrors());
+         return counter;
+     }
 
 }
