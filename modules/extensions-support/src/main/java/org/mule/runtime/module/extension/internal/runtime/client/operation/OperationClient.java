@@ -318,7 +318,8 @@ public class OperationClient implements Lifecycle {
                                                                                                            extensionConnectionSupplier,
                                                                                                            supportsOAuth(extensionModel))
                                                                                                                .orElse(null),
-                                                                                NULL_PROFILING_DATA_PRODUCER);
+                                                                                NULL_PROFILING_DATA_PRODUCER,
+                                                                                false);
 
     try {
       initialiseIfNeeded(mediator, true, muleContext);
