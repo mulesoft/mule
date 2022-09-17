@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -17,6 +18,7 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SUBFLOW_ELEMENT_IDENTIFIER;
@@ -218,8 +220,7 @@ public class MacroExpansionModuleModel {
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
-    if (existOperationThatUsesImplicitConfiguration()
-        && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()) {
+    if (shouldAddImplicitConfiguration()) {
       ComponentModel configModel = new ComponentModel.Builder()
           .setIdentifier(ComponentIdentifier.builder()
               .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
@@ -261,6 +262,12 @@ public class MacroExpansionModuleModel {
                 });
           });
     });
+  }
+
+  private boolean shouldAddImplicitConfiguration() {
+    return existOperationThatUsesImplicitConfiguration() &&
+        extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent() &&
+        getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "true") != null;
   }
 
   private boolean existOperationThatUsesImplicitConfiguration() {
