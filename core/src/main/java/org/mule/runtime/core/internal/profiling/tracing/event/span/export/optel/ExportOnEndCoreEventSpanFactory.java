@@ -10,8 +10,6 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentSpan;
 
-import static java.lang.System.currentTimeMillis;
-
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -66,7 +64,8 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                           eventContext,
                                                           internalSpanExportManager,
                                                           spanCustomizationInfo.getChildSpanCustomizationInfo(),
-                                                          muleConfiguration);
+                                                          muleConfiguration,
+                                                          spanCustomizationInfo.isExportable(coreEvent));
 
 
     Map<String, String> attributes =

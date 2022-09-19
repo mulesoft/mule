@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.export;
 
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter;
+
 /**
  * A visitor for {@link InternalSpanExporter}.
  *
@@ -16,8 +18,13 @@ public interface InternalSpanExporterVisitor<T> {
 
   /**
    * @param opentelemetrySpanExporter the {@link OpenTelemetrySpanExporter} to accept
-   * @return the result of visiting the instnce.
+   * @return the result of visiting the instance.
    */
   T accept(OpenTelemetrySpanExporter opentelemetrySpanExporter);
 
+  /**
+   * @param openTelemetrySpanExporter the {@link NoOpInternalSpanExporter} to accept
+   * @return the result of visiting the instance.
+   */
+  T accept(NoOpInternalSpanExporter openTelemetrySpanExporter);
 }

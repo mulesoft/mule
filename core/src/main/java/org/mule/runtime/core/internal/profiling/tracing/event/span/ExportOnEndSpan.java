@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter.getNoExportInternalSpanExporter;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
@@ -14,6 +16,7 @@ import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpanExporter;
@@ -37,10 +40,22 @@ public class ExportOnEndSpan implements InternalSpan {
   public ExportOnEndSpan(InternalSpan runtimeInternalSpan, EventContext eventContext,
                          InternalSpanExportManager<EventContext> internalSpanExportManager,
                          ChildSpanCustomizationInfo childSpanCustomizationInfo,
-                         MuleConfiguration muleConfiguration) {
+                         MuleConfiguration muleConfiguration,
+                         boolean exportable) {
     this.runtimeInternalSpan = runtimeInternalSpan;
-    this.spanExporter = internalSpanExportManager.getInternalSpanExporter(eventContext, muleConfiguration, this);
+    this.spanExporter = getExporter(eventContext, internalSpanExportManager, muleConfiguration, exportable);
     this.childSpanCustomizationInfo = childSpanCustomizationInfo;
+  }
+
+  private InternalSpanExporter getExporter(EventContext eventContext,
+                                           InternalSpanExportManager<EventContext> internalSpanExportManager,
+                                           MuleConfiguration muleConfiguration,
+                                           boolean exportable) {
+    if (exportable) {
+      return internalSpanExportManager.getInternalSpanExporter(eventContext, muleConfiguration, this);
+    } else {
+      return getNoExportInternalSpanExporter();
+    }
   }
 
   @Override
@@ -128,9 +143,14 @@ public class ExportOnEndSpan implements InternalSpan {
     }
 
     @Override
-    public InternalSpanExporter accept(OpenTelemetrySpanExporter opentelemetrySpanExporter) {
-      opentelemetrySpanExporter.getOpenTelemetrySpan().setAttribute(key, value);
-      return opentelemetrySpanExporter;
+    public InternalSpanExporter accept(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
+      openTelemetrySpanExporter.getOpenTelemetrySpan().setAttribute(key, value);
+      return openTelemetrySpanExporter;
+    }
+
+    @Override
+    public InternalSpanExporter accept(NoOpInternalSpanExporter openTelemetrySpanExporter) {
+      return openTelemetrySpanExporter;
     }
   }
 }

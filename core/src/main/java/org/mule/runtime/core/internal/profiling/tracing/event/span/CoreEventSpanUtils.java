@@ -7,21 +7,15 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenetelemetryCoreEventInternalSpanExporterFactory.getOpenetelemetryCoreEventInternalSpanExporterFactory;
-
 import static java.util.Optional.empty;
 
-import io.opentelemetry.sdk.trace.export.SpanExporter;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpentelemetrySpanExporterManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetrySpanExporterManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 
 import java.util.Optional;
 
@@ -92,7 +86,7 @@ public class CoreEventSpanUtils {
    * @return the default {@link InternalSpanExportManager}.
    */
   public static InternalSpanExportManager<EventContext> getDefaultSpanExporterManager() {
-    return new OpentelemetrySpanExporterManager();
+    return new OpenTelemetrySpanExporterManager();
   }
 
 }

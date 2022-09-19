@@ -53,15 +53,15 @@ public class OpentelemetrySpanExporterTestCase {
     SpanDuration spanDuration = mock(SpanDuration.class);
 
     when(internalMuleSpan.getDuration()).thenReturn(spanDuration);
-    OpenTelemetrySpanExporter opentelemetrySpanExporter = new OpenTelemetrySpanExporter(
+    OpenTelemetrySpanExporter openTelemetrySpanExporter = new OpenTelemetrySpanExporter(
                                                                                         getOpenTelemetryTracer(new TestSpanConfiguration(),
                                                                                                                TEST_SERVICE_NAME),
                                                                                         (EventContext) eventContext,
                                                                                         internalMuleSpan);
-    assertThat(opentelemetrySpanExporter.getOpenTelemetrySpan().getSpanContext().getTraceId(), equalTo(PARENT_TRACE_ID));
-    assertThat(((ReadableSpan) opentelemetrySpanExporter.getOpenTelemetrySpan()).getParentSpanContext().getTraceId(), equalTo(
+    assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan().getSpanContext().getTraceId(), equalTo(PARENT_TRACE_ID));
+    assertThat(((ReadableSpan) openTelemetrySpanExporter.getOpenTelemetrySpan()).getParentSpanContext().getTraceId(), equalTo(
                                                                                                                               PARENT_TRACE_ID));
-    assertThat(((ReadableSpan) opentelemetrySpanExporter.getOpenTelemetrySpan()).getParentSpanContext().getSpanId(), equalTo(
+    assertThat(((ReadableSpan) openTelemetrySpanExporter.getOpenTelemetrySpan()).getParentSpanContext().getSpanId(), equalTo(
                                                                                                                              PARENT_SPAN_ID));
   }
 
