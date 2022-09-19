@@ -61,7 +61,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.Scope;
-import org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
@@ -145,10 +144,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
-    if (delegateBuilder instanceof AbstractMessageProcessorChainBuilder) {
-      ((AbstractMessageProcessorChainBuilder) delegateBuilder)
-          .setSpanCustomizationInfo(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
-    }
+    delegateBuilder.setSpanCustomizationInfo(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());
