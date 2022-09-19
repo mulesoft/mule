@@ -143,14 +143,14 @@ public class ExportOnEndSpan implements InternalSpan {
     }
 
     @Override
-    public InternalSpanExporter accept(OpenTelemetrySpanExporter opentelemetrySpanExporter) {
-      opentelemetrySpanExporter.getOpenTelemetrySpan().setAttribute(key, value);
-      return opentelemetrySpanExporter;
+    public InternalSpanExporter accept(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
+      openTelemetrySpanExporter.getOpenTelemetrySpan().setAttribute(key, value);
+      return openTelemetrySpanExporter;
     }
 
     @Override
-    public InternalSpanExporter accept(NoOpInternalSpanExporter opentelemetrySpanExporter) {
-      return opentelemetrySpanExporter;
+    public InternalSpanExporter accept(NoOpInternalSpanExporter openTelemetrySpanExporter) {
+      return openTelemetrySpanExporter;
     }
   }
 }

@@ -21,15 +21,15 @@ import java.util.concurrent.TimeUnit;
  * @since 4.5.0
  */
 @SuppressWarnings("NullableProblems")
-public class NoExportableOpentelemetrySpan implements Span {
+public class NoExportableOpenTelemetrySpan implements Span {
 
-  private static final Span INSTANCE = new NoExportableOpentelemetrySpan();
+  private static final Span INSTANCE = new NoExportableOpenTelemetrySpan();
 
   public static Span getNoExportableOpentelemetrySpan() {
     return INSTANCE;
   }
 
-  private NoExportableOpentelemetrySpan() {}
+  private NoExportableOpenTelemetrySpan() {}
 
   @Override
   public <T> Span setAttribute(AttributeKey<T> attributeKey, T t) {

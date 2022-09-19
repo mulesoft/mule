@@ -18,13 +18,13 @@ public interface InternalSpanExporterVisitor<T> {
 
   /**
    * @param opentelemetrySpanExporter the {@link OpenTelemetrySpanExporter} to accept
-   * @return the result of visiting the instnce.
+   * @return the result of visiting the instance.
    */
   T accept(OpenTelemetrySpanExporter opentelemetrySpanExporter);
 
   /**
-   * @param opentelemetrySpanExporter the {@link NoOpInternalSpanExporter} to accept
-   * @return the result of visiting the instnce.
+   * @param openTelemetrySpanExporter the {@link NoOpInternalSpanExporter} to accept
+   * @return the result of visiting the instance.
    */
-  T accept(NoOpInternalSpanExporter opentelemetrySpanExporter);
+  T accept(NoOpInternalSpanExporter openTelemetrySpanExporter);
 }

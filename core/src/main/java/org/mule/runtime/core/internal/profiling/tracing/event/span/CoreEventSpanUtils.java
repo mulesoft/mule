@@ -14,7 +14,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpentelemetrySpanExporterManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetrySpanExporterManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
 import java.util.Optional;
@@ -86,7 +86,7 @@ public class CoreEventSpanUtils {
    * @return the default {@link InternalSpanExportManager}.
    */
   public static InternalSpanExportManager<EventContext> getDefaultSpanExporterManager() {
-    return new OpentelemetrySpanExporterManager();
+    return new OpenTelemetrySpanExporterManager();
   }
 
 }

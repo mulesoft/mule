@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpentelemetryCoreEventInternalSpanExporterFactory.getOpentelemetryCoreEventInternalSpanExporterFactory;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryCoreEventInternalSpanExporterFactory.getOpenTelemetryCoreEventInternalSpanExporterFactory;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -17,14 +17,14 @@ import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExpor
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 /**
- * A {@link InternalSpanExportManager} that exports the span as opentelemetry.
+ * A {@link InternalSpanExportManager} that exports the span as open telemetry.
  *
  * @since 4.5.0
  */
-public class OpentelemetrySpanExporterManager implements InternalSpanExportManager<EventContext> {
+public class OpenTelemetrySpanExporterManager implements InternalSpanExportManager<EventContext> {
 
-  private static final OpentelemetryCoreEventInternalSpanExporterFactory SPAN_EXPORTER_FACTORY =
-      getOpentelemetryCoreEventInternalSpanExporterFactory();
+  private static final OpenTelemetryCoreEventInternalSpanExporterFactory SPAN_EXPORTER_FACTORY =
+      getOpenTelemetryCoreEventInternalSpanExporterFactory();
 
   @Override
   public ExportedSpanCapturer getExportedSpanCapturer() {

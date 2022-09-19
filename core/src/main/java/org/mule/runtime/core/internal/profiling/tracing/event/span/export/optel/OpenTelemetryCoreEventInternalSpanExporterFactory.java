@@ -25,17 +25,17 @@ import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
  *
  * @since 4.5.0
  */
-public class OpentelemetryCoreEventInternalSpanExporterFactory {
+public class OpenTelemetryCoreEventInternalSpanExporterFactory {
 
   private static final SpanExporterConfiguration CONFIGURATION = new SystemPropertiesSpanExporterConfiguration();
 
-  private static OpentelemetryCoreEventInternalSpanExporterFactory instance;
+  private static OpenTelemetryCoreEventInternalSpanExporterFactory instance;
 
-  private OpentelemetryCoreEventInternalSpanExporterFactory() {}
+  private OpenTelemetryCoreEventInternalSpanExporterFactory() {}
 
-  public static OpentelemetryCoreEventInternalSpanExporterFactory getOpentelemetryCoreEventInternalSpanExporterFactory() {
+  public static OpenTelemetryCoreEventInternalSpanExporterFactory getOpenTelemetryCoreEventInternalSpanExporterFactory() {
     if (instance == null) {
-      instance = new OpentelemetryCoreEventInternalSpanExporterFactory();
+      instance = new OpenTelemetryCoreEventInternalSpanExporterFactory();
     }
 
     return instance;

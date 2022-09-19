@@ -61,7 +61,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
   public static final String THREAD_END_ID_KEY = THREAD_END_ID;
 
   @Test
-  public void testOpentelemetryTracedSpanFactory() {
+  public void testOpenTelemetryTracedSpanFactory() {
     CoreEvent coreEvent = mock(CoreEvent.class);
     EventContext coreEventContext = mock(EventContext.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);

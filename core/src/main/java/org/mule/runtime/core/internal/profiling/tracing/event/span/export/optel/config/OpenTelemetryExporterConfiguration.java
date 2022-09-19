@@ -12,7 +12,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel
  *
  * @since 4.5.0
  */
-public interface OpentelemetryExporterConfiguration {
+public interface OpenTelemetryExporterConfiguration {
 
   /**
    * @return the export endpoint.
@@ -20,7 +20,7 @@ public interface OpentelemetryExporterConfiguration {
   String getEndpoint();
 
   /**
-   * @return if opentelemetry export is enabled
+   * @return if open telemetry export is enabled
    */
   boolean isEnabled();
 }

@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling.tracing.export;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getPropagator;
-import static org.mule.runtime.core.internal.profiling.tracing.export.NoExportableOpentelemetrySpan.getNoExportableOpentelemetrySpan;
+import static org.mule.runtime.core.internal.profiling.tracing.export.NoExportableOpenTelemetrySpan.getNoExportableOpentelemetrySpan;
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -212,7 +212,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       }
 
       @Override
-      public Span accept(NoOpInternalSpanExporter noExportInternalSpanExporter) {
+      public Span accept(NoOpInternalSpanExporter openTelemetrySpanExporter) {
         return getNoExportableOpentelemetrySpan();
       }
 
