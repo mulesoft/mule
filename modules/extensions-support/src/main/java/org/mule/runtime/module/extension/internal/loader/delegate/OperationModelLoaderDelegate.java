@@ -129,9 +129,15 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
     for (ErrorModelParser errorModelParser : parser.getErrorModelParsers()) {
       ErrorModel errorModel = errorsModelFactory.getErrorModel(errorModelParser);
+
+      // Only the non-suppressed errors must appear in the operation model
       if (!errorModelParser.isSuppressed()) {
         operation.withErrorModel(errorModel);
       }
+
+      // All the errors from all the operations will be declared in the extension, even if they are suppressed. The
+      // ErrorTypeRepository is populated with the errors declared in the ExtensionModel, then without changing the API,
+      // there is no way to avoid declaring them there.
       extension.withErrorModel(errorModel);
     }
   }
