@@ -13,16 +13,16 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
 /**
- * Batch Chain Customization info. Includes batch-step-record, batch-aggregator and batch-on-complete spans.
+ * Includes location into span customization info.
  *
  * @since 4.5.0
  */
-public class BatchChainCustomizationInfo extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
+public class LocationSpanCustomizationInfo extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
 
   private final String name;
   private ComponentLocation location;
 
-  public BatchChainCustomizationInfo(String name, ComponentLocation location) {
+  public LocationSpanCustomizationInfo(String name, ComponentLocation location) {
     this.name = name;
     this.location = location;
   }

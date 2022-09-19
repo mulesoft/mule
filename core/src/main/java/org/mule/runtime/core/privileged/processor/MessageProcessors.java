@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
-import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
@@ -47,7 +46,6 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.BatchChainCustomizationInfo;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
@@ -57,7 +55,6 @@ import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.ArrayDeque;
@@ -105,31 +102,11 @@ public class MessageProcessors {
   }
 
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
-                                               String name) {
+                                               SpanCustomizationInfo spanCustomizationInfo) {
     if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
-      return buildNewChainWithListOfProcessors(processingStrategy, processors, new SpanCustomizationInfo() {
-
-        @Override
-        public String getName(CoreEvent coreEvent) {
-          return name;
-        }
-
-        @Override
-        public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
-          return getDefaultChildSpanInfo();
-        }
-      });
-    }
-  }
-
-  public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
-                                               String name, ComponentLocation location) {
-    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
-      return (MessageProcessorChain) processors.get(0);
-    } else {
-      return buildNewChainWithListOfProcessors(processingStrategy, processors, new BatchChainCustomizationInfo(name, location));
+      return buildNewChainWithListOfProcessors(processingStrategy, processors, spanCustomizationInfo);
     }
   }
 
