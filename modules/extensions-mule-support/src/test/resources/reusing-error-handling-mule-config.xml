@@ -47,7 +47,7 @@
 
   <operation:def name="handleError">
     <operation:parameters>
-      <operation:parameter name="error" type="object" />
+      <operation:parameter name="error" type="error" />
     </operation:parameters>
     <operation:output>
       <operation:payload-type type="void"/>
