@@ -115,22 +115,21 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
   @Override
   public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
-    recordErrorAtCurrentSpan(coreEvent, () -> coreEvent.getError()
+    safeExecute(() -> recordErrorAtCurrentSpan(coreEvent, () -> coreEvent.getError()
         .orElseThrow(() -> new IllegalArgumentException(String.format("Provided coreEvent [%s] does not declare an error.",
                                                                       coreEvent))),
-                             isErrorEscapingCurrentSpan);
+                                               isErrorEscapingCurrentSpan),
+                "Error recording a span error at current span", propagateTracingExceptions, customLogger);
   }
 
   private void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> spanError, boolean isErrorEscapingCurrentSpan) {
-    safeExecute(() -> {
-      EventContext eventContext = coreEvent.getContext();
-      if (eventContext instanceof DistributedTraceContextAware) {
-        ((DistributedTraceContextAware) eventContext)
-            .getDistributedTraceContext()
-            .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
-                                                           isErrorEscapingCurrentSpan));
-      }
-    }, "Error recording a span error at current span", propagateTracingExceptions, customLogger);
+    EventContext eventContext = coreEvent.getContext();
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext)
+          .getDistributedTraceContext()
+          .recordErrorAtCurrentSpan(new DefaultSpanError(spanError.get(), coreEvent.getFlowCallStack(),
+                                                         isErrorEscapingCurrentSpan));
+    }
   }
 
   @Override

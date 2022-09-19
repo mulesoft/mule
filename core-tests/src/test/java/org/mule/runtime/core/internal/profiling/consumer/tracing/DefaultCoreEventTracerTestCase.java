@@ -476,6 +476,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
         getTestCoreEventTracer(logger, enablePropagateTracingErrors);
     CoreEvent coreEvent = mock(CoreEvent.class);
     when(coreEvent.getContext()).thenThrow(new TracingErrorPropagationException());
+    when(coreEvent.getError()).thenThrow(new TracingErrorPropagationException())
     consumerToExecute.accept(coreEventTracer, coreEvent);
 
     if (!enablePropagateTracingErrors) {
