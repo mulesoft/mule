@@ -38,4 +38,11 @@ public interface ErrorModelParser {
    * @return the error's parent definition
    */
   Optional<ErrorModelParser> getParent();
+
+  /**
+   * @return {@code true} if the parsed error should be suppressed from the operation model.
+   */
+  default boolean isSuppressed() {
+    return false;
+  }
 }

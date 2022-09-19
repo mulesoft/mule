@@ -120,4 +120,18 @@
             </try>
         </operation:body>
     </operation:def>
+
+    <operation:def name="operationRaisingUniqueErrorAndCatchingIt" >
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <try>
+                <operation:raise-error type="UNIQUE" />
+                <error-handler>
+                    <on-error-continue type="THIS:UNIQUE" />
+                </error-handler>
+            </try>
+        </operation:body>
+    </operation:def>
 </mule>
