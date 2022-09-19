@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-global-element-default-params-with-no-use"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-global-element-default-params-with-no-use"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-global-element-default-params http://www.mulesoft.org/schema/mule/module-global-element-default-params/current/mule-module-global-element-default-params.xsd">
+
+    <property name="moduleproperty" type="string" defaultValue="aniceproperty"/>
+
+    <operation name="set-xml-property">
+        <body>
+            <mule:set-payload value="#[vars.moduleproperty]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>
