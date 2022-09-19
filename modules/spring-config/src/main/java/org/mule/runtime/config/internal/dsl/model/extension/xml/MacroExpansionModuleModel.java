@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyMap;
@@ -104,6 +105,12 @@ public class MacroExpansionModuleModel {
    * <operation/>'s <body/> accordingly.
    */
   private static final String DEFAULT_CONFIG_GLOBAL_ELEMENT_SUFFIX = "%s-default-config-global-element-suffix";
+
+  /**
+   * If true avoid the creation of an implicit configuration
+   */
+  private final boolean disable_xml_sdk_implicit_configuration_creation =
+      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false"));
 
   private final ApplicationModel applicationModel;
   private final ExtensionModel extensionModel;
@@ -267,7 +274,7 @@ public class MacroExpansionModuleModel {
   private boolean shouldAddImplicitConfiguration() {
     return existOperationThatUsesImplicitConfiguration() &&
         extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent() &&
-        getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "true") != null;
+        !disable_xml_sdk_implicit_configuration_creation;
   }
 
   private boolean existOperationThatUsesImplicitConfiguration() {
