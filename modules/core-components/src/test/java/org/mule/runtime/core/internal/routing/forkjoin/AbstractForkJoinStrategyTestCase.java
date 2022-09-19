@@ -83,7 +83,6 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import reactor.core.Disposable;
 
 @Feature(FORK_JOIN_STRATEGIES)
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {

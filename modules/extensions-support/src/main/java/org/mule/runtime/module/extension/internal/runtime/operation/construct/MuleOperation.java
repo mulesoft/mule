@@ -25,15 +25,12 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
 
 /**
  * Default {@link Operation} implementation
