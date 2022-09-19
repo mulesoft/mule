@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.extension.internal.ast;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -20,6 +22,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
@@ -117,6 +120,12 @@ public class MacroExpansionModuleModel {
    */
   private static final String DEFAULT_CONFIG_GLOBAL_ELEMENT_SUFFIX = "%s-default-config-global-element-suffix";
 
+  /**
+   * If true avoid the creation of an implicit configuration
+   */
+  private final boolean disable_xml_sdk_implicit_configuration_creation =
+      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false"));
+
   private final ArtifactAst applicationModel;
   private final ExtensionModel extensionModel;
 
@@ -146,7 +155,7 @@ public class MacroExpansionModuleModel {
   private ArtifactAst expand(List<ComponentAst> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
     final ArtifactAst expandedArtifactAst;
 
-    if (existOperationThatUsesImplicitConfiguration() && hasXmlSdkPropertiesWithDefaultValues()) {
+    if (shouldAddImplicitConfiguration()) {
       expandedArtifactAst = copyRecursively(applicationModel, identity(),
                                             () -> singletonList(new XmlSdkImplicitConfig(extensionModel)), comp -> false);
     } else {
@@ -175,6 +184,11 @@ public class MacroExpansionModuleModel {
                                .map(Collections::singletonList)
                                .orElse(emptyList()),
                            comp -> false);
+  }
+
+  private boolean shouldAddImplicitConfiguration() {
+    return existOperationThatUsesImplicitConfiguration() && hasXmlSdkPropertiesWithDefaultValues() &&
+        !disable_xml_sdk_implicit_configuration_creation;
   }
 
   private boolean existOperationThatUsesImplicitConfiguration() {
@@ -429,8 +443,9 @@ public class MacroExpansionModuleModel {
 
     final Optional<String> configRef =
         !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-            ? of(format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName()))
-            : configRefName;
+            && shouldAddImplicitConfiguration()
+                ? of(format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName()))
+                : configRefName;
 
     Map<String, String> propertiesMap = extractProperties(expandedArtifactAst, configRef);
     Map<String, String> parametersMap = operationRefModel.getParameters().stream()
