@@ -58,6 +58,9 @@
             <try transactionalAction="INDIFFERENT">
                 <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -70,6 +73,9 @@
             <try transactionalAction="INDIFFERENT">
                 <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -82,6 +88,9 @@
             <try transactionalAction="BEGIN_OR_JOIN">
                 <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -94,6 +103,9 @@
             <try transactionalAction="BEGIN_OR_JOIN">
                 <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -106,6 +118,9 @@
             <try transactionalAction="ALWAYS_BEGIN">
                 <tx:verify-transaction-begun transactionalAction="ALWAYS_JOIN"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -118,6 +133,9 @@
             <try transactionalAction="ALWAYS_BEGIN">
                 <tx:verify-transaction-begun transactionalAction="NOT_SUPPORTED"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -130,6 +148,9 @@
             <try transactionalAction="ALWAYS_BEGIN">
                 <tx:verify-transaction-begun transactionalAction="ALWAYS_JOIN"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
             <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
         </operation:body>
@@ -143,6 +164,9 @@
             <try transactionalAction="ALWAYS_BEGIN">
                 <tx:verify-transaction-begun transactionalAction="ALWAYS_JOIN"/>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
             <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
         </operation:body>
@@ -194,6 +218,9 @@
                     <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
                 </async>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -208,6 +235,9 @@
                     <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
                 </async>
                 <set-payload value="hello world!"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -223,6 +253,9 @@
                 </async>
                 <set-payload value="hello world!"/>
                 <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -238,6 +271,9 @@
                 </async>
                 <set-payload value="hello world!"/>
                 <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -253,6 +289,9 @@
                 </async>
                 <set-payload value="hello world!"/>
                 <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
         </operation:body>
     </operation:def>
@@ -301,6 +340,9 @@
         <operation:body>
             <try transactionalAction="ALWAYS_BEGIN">
                 <this:with-tx-action-joining/>
+                <error-handler>
+                    <on-error-propagate />
+                </error-handler>
             </try>
             <set-payload value="hello worlddd!"/>
         </operation:body>
@@ -318,5 +360,4 @@
                     value="#['$(params.transactionalAction)']"/>
         </operation:body>
     </operation:def>
-
 </mule>
