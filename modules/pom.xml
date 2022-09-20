@@ -41,7 +41,7 @@
         <module>service</module>
         <module>troubleshooting</module>
         <module>feature-management</module>
-        <module>memory-management</module>
+        <module>memory-management-parent</module>
 
         <!-- depends on spring-config so it has to go after it -->
         <module>extensions-spring-support</module>
