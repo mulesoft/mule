@@ -17,7 +17,7 @@
     </properties>
 
     <modules>
-        <module>memory-management-core</module>
+        <module>memory-management</module>
         <module>memory-management-tests</module>
     </modules>
 
