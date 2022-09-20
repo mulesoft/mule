@@ -147,10 +147,23 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
                                                                                    plugin)))),
                                                                                    plugin -> plugin.getAdditionalDependencies()
                                                                                        .stream()
-                                                                                       .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
-                                                                                           .apply(artifact))
+                                                                                       .map(artifact -> createAdditionalPluginDependencyFromPackagerDependency(artifact,
+                                                                                                                                                               packagerClassLoaderModel))
                                                                                        .collect(toList()))))
         .orElse(emptyMap());
+  }
+
+  private BundleDependency createAdditionalPluginDependencyFromPackagerDependency(Artifact additionalPluginArtifact,
+                                                                                  AppClassLoaderModel packagerClassLoaderModel) {
+    BundleDependency additionalPluginDependency =
+        createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
+            .apply(additionalPluginArtifact);
+
+    if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
+      additionalPluginDependency = discoverPackagesAndResources(additionalPluginDependency);
+    }
+
+    return additionalPluginDependency;
   }
 
   private List<BundleDependency> getDependencies(AppClassLoaderModel packagerClassLoaderModel) {
@@ -205,16 +218,18 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
     return emptyList();
   }
 
-  private List<BundleDependency> discoverPackagesAndResources(List<BundleDependency> dependencies) {
+  private BundleDependency discoverPackagesAndResources(BundleDependency dependency) {
     JarExplorer jarExplorer = new FileJarExplorer();
 
-    return dependencies.stream().map(dependency -> {
-      if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null))) {
-        return discoverPluginPackagesAndResources(dependency, jarExplorer);
-      }
+    if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null))) {
+      return discoverPluginPackagesAndResources(dependency, jarExplorer);
+    }
 
-      return addLocalPackagesAndResourcesToDependency(dependency, jarExplorer);
-    }).collect(toList());
+    return addLocalPackagesAndResourcesToDependency(dependency, jarExplorer);
+  }
+
+  private List<BundleDependency> discoverPackagesAndResources(List<BundleDependency> dependencies) {
+    return dependencies.stream().map(this::discoverPackagesAndResources).collect(toList());
   }
 
   private BundleDependency discoverPluginPackagesAndResources(BundleDependency dependency, JarExplorer jarExplorer) {
