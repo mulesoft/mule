@@ -38,6 +38,14 @@ import java.util.Arrays;
 public class MuleSdkExtensionExtensionModelDeclarer {
 
   public static final String EXTENSION_CONSTRUCT_NAME = "extension";
+  public static final String NAME_PARAMETER_NAME = "name";
+  public static final String CATEGORY_PARAMETER_NAME = "category";
+  public static final String VENDOR_PARAMETER_NAME = "vendor";
+  public static final String REQUIRED_ENTITLEMENT_PARAMETER_NAME = "requiredEntitlement";
+  public static final String REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME = "requiresEnterpriseLicense";
+  public static final String ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME = "allowsEvaluationLicense";
+  public static final String NAMESPACE_PARAMETER_NAME = "namespace";
+  public static final String PREFIX_PARAMETER_NAME = "prefix";
 
   public ExtensionDeclarer declareExtensionModel() {
     final BaseTypeBuilder typeBuilder = create(JAVA);
@@ -68,49 +76,49 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .allowingTopLevelDefinition();
 
     final ParameterGroupDeclarer<?> params = extensionConstruct.onDefaultParameterGroup();
-    params.withRequiredParameter("name")
+    params.withRequiredParameter(NAME_PARAMETER_NAME)
         .describedAs("Name of the extension that identifies it.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .asComponentId();
 
     String[] validCategories = Arrays.stream(Category.values()).map(Enum::name).toArray(String[]::new);
-    params.withOptionalParameter("category")
+    params.withOptionalParameter(CATEGORY_PARAMETER_NAME)
         .describedAs("Category of the extension.")
         .ofType(typeBuilder.stringType().enumOf(validCategories).build())
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(COMMUNITY.name());
 
-    params.withOptionalParameter("vendor")
+    params.withOptionalParameter(VENDOR_PARAMETER_NAME)
         .describedAs("Vendor of the extension.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(MULESOFT);
 
-    params.withOptionalParameter("requiredEntitlement")
+    params.withOptionalParameter(REQUIRED_ENTITLEMENT_PARAMETER_NAME)
         .describedAs("The required entitlement in the customer extension license.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter("requiresEnterpriseLicense")
+    params.withOptionalParameter(REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME)
         .describedAs("If the extension requires an enterprise license to run.")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter("allowsEvaluationLicense")
+    params.withOptionalParameter(ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME)
         .describedAs("If the extension can be run with an evaluation license.")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter("namespace")
+    params.withOptionalParameter(NAMESPACE_PARAMETER_NAME)
         .describedAs("Expected namespace of the extension to look for when generating the schemas. If left empty it will " +
             "default to http://www.mulesoft.org/schema/mule/[prefix], where [prefix] is the attribute prefix attribute value.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter("prefix")
+    params.withOptionalParameter(PREFIX_PARAMETER_NAME)
         .describedAs("Expected prefix of the extension to look for when generating the schemas. If left empty it will create a " +
             "default one based on the extension's name, removing the words \"extension\", \"module\" or \"connector\" at " +
             "the end if they are present and hyphenizing the resulting name.")

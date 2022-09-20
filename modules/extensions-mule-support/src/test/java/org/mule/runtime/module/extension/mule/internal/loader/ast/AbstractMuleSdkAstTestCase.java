@@ -26,11 +26,11 @@ import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,13 +45,13 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   private final Map<String, String> properties = new HashMap<>();
 
-  private static List<ExtensionModel> runtimeExtensionModels;
+  protected static Set<ExtensionModel> runtimeExtensionModels;
 
   protected abstract String getConfigFile();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    runtimeExtensionModels = new ArrayList<>();
+    runtimeExtensionModels = new HashSet<>();
     Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
         .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader());
     for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
