@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
 /**
  * A Builder for a {@link ByteBufferProvider<ByteBuffer>}
  *
- * @since 4.5.0x
+ * @since 4.5.0
  */
 public final class ByteBufferProviderBuilder {
 
