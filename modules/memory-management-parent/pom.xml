@@ -9,7 +9,7 @@
     </parent>
     <artifactId>mule-module-memory-management-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Mule Modules</name>
+    <name>Mule Memory Management Service Modules</name>
     <description>Modules related to the memory management service</description>
 
     <properties>
