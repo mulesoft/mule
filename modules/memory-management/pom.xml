@@ -7,7 +7,7 @@
         <artifactId>mule</artifactId>
         <version>4.5.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-memory-management</artifactId>
+    <artifactId>mule-module-memory-management-parent</artifactId>
     <packaging>pom</packaging>
     <name>Mule Modules</name>
     <description>Modules related to the memory management service</description>
