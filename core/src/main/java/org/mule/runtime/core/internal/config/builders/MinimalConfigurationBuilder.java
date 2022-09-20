@@ -147,7 +147,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     tryRegisterMvel(muleContext);
 
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
-    registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
+    registerStreamingManager(muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
     // TODO W-11742823 review this
     registerObject(METADATA_SERVICE_KEY, new MuleMetadataService(), muleContext);
@@ -166,6 +166,10 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       }
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
+  }
+
+  protected void registerStreamingManager(MuleContext muleContext) throws RegistrationException {
+    registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
   }
 
   protected void registerInterceptionApiObjects(MuleContext muleContext) throws RegistrationException {
