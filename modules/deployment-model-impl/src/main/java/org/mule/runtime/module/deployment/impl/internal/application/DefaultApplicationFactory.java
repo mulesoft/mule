@@ -67,8 +67,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
-
 /**
  * Creates default mule applications
  */

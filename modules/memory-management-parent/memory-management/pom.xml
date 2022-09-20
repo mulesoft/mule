@@ -16,7 +16,7 @@
     <description>This module performs memory management for the runtime</description>
 
     <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
