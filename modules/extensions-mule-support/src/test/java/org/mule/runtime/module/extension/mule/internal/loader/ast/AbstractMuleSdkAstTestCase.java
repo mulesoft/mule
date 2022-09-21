@@ -6,13 +6,20 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.ast;
 
+import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 
 import static java.lang.Thread.currentThread;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
@@ -79,11 +86,20 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
   }
 
   protected ArtifactAst getArtifactAst() {
-    return parser.parse(classLoader.getResource(getConfigFile()));
+    return getArtifactAst(getConfigFile());
   }
 
   protected ArtifactAst getArtifactAst(String configFile) {
-    return parser.parse(classLoader.getResource(configFile));
+    ArtifactAst artifactAst = parser.parse(classLoader.getResource(configFile));
+    assertThat(validatorBuilder().build().validate(artifactAst).getItems(), is(empty()));
+    return artifactAst;
+  }
+
+  protected ValidationResult parseAstExpectingValidationErrors(String configFile) {
+    ArtifactAst artifactAst = parser.parse(classLoader.getResource(configFile));
+    ValidationResult validationResult = validatorBuilder().build().validate(artifactAst);
+    assertThat(validationResult.getItems(), is(not(empty())));
+    return validationResult;
   }
 
   protected ComponentAst getTopLevelComponent(ArtifactAst ast, String componentName) {

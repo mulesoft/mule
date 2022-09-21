@@ -37,6 +37,8 @@ import java.util.Arrays;
  */
 public class MuleSdkExtensionExtensionModelDeclarer {
 
+  public static final String EXTENSION_CONSTRUCT_NAME = "extension";
+
   public ExtensionDeclarer declareExtensionModel() {
     final BaseTypeBuilder typeBuilder = create(JAVA);
 
@@ -61,7 +63,7 @@ public class MuleSdkExtensionExtensionModelDeclarer {
   }
 
   private void declareExtensionConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct("extension")
+    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct(EXTENSION_CONSTRUCT_NAME)
         .describedAs("Root element of an extension that contains configurations, connections, operations, sources and functions as children.")
         .allowingTopLevelDefinition();
 
