@@ -39,6 +39,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
+import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifactExtensionModel;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 
@@ -297,22 +298,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .build()
         .validate(appModel);
 
-    final Collection<ValidationResultItem> items = validation.getItems();
-
-    items.stream()
-        .filter(v -> v.getValidation().getLevel().equals(WARN))
-        .forEach(v -> LOGGER.warn(componentsLocation(v)));
-
-    final List<ValidationResultItem> errors = items.stream()
-        .filter(v -> v.getValidation().getLevel().equals(ERROR))
-        .collect(toList());
-
-    if (!errors.isEmpty()) {
-      throw new ConfigurationException(createStaticMessage(validation.getItems()
-          .stream()
-          .map(this::componentsLocation)
-          .collect(joining(lineSeparator()))));
-    }
+    handleValidationResult(validation);
   }
 
   // TODO W-10855416: remove this and only validate it with the region classloader
@@ -326,13 +312,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private ClassLoader getRegionClassLoader() {
     return muleContext.getExecutionClassLoader().getParent();
-  }
-
-  private String componentsLocation(ValidationResultItem v) {
-    return v.getComponents().stream()
-        .map(component -> component.getMetadata().getFileName().orElse("unknown") + ":"
-            + component.getMetadata().getStartLine().orElse(-1))
-        .collect(joining("; ", "[", "]")) + ": " + v.getMessage();
   }
 
   protected void registerApplicationExtensionModel() {

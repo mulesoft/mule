@@ -6,32 +6,29 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
+import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
+import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifact;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.EXTENSION_CONSTRUCT_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE;
-import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE_URI;
 
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkApplicationExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -47,18 +44,7 @@ import java.util.stream.Stream;
 public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExtensionModelParserFactory
     implements ExtensionModelParserFactory {
 
-  private static final ComponentIdentifier EXTENSION_ROOT_IDENTIFIER = ComponentIdentifier.builder()
-      .namespace(MULE_EXTENSION_DSL_NAMESPACE)
-      .namespaceUri(MULE_EXTENSION_DSL_NAMESPACE_URI)
-      .name(EXTENSION_CONSTRUCT_NAME)
-      .build();
-
   private ArtifactAst cachedArtifactAst;
-
-  private static boolean containsExtension(ArtifactAst artifactAst) {
-    List<ComponentAst> topLevelComponents = artifactAst.topLevelComponents();
-    return topLevelComponents.size() == 1 && topLevelComponents.get(0).getIdentifier().equals(EXTENSION_ROOT_IDENTIFIER);
-  }
 
   /**
    * @param context The loading context.
@@ -72,7 +58,7 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
     // ...or an already parsed AST that has an extension definition.
     return context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME)
-        .map(MuleSdkExtensionExtensionModelParserFactory::containsExtension)
+        .map(ast -> ast.getArtifactType().equals(MULE_EXTENSION))
         .orElse(true);
   }
 
@@ -96,6 +82,7 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   private AstXmlParser createAstParser(Set<ExtensionModel> dependencies, boolean disableValidations) {
     Builder astBuilder = builder()
+        .withArtifactType(MULE_EXTENSION)
         .withExtensionModels(dependencies);
 
     if (disableValidations) {
@@ -105,36 +92,30 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     return astBuilder.build();
   }
 
-  private ArtifactAst parseAst(ExtensionLoadingContext context) {
+  private ArtifactAst parseAst(ExtensionLoadingContext context) throws ConfigurationException {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
     String[] resources = {getMandatoryParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
     ArtifactAst artifactAst = parseArtifact(resources,
-                                            MuleSdkExtensionExtensionModelParserFactory::containsExtension,
                                             this::createAstParser,
                                             dependencies,
-                                            APPLICATION,
                                             false,
                                             context.getExtensionClassLoader(),
                                             "this", // should be irrelevant as long as it doesn't collide
                                             context.getParameter(VERSION_PROPERTY_NAME));
 
-    // TODO: check if we can achieve this using AST validators
-    validateContainsExtension(artifactAst);
+    // Applies the AST validators and throws if there was any error
+    handleValidationResult(validatorBuilder().build().validate(artifactAst));
 
     return artifactAst;
   }
 
-  private void validateContainsExtension(ArtifactAst artifactAst) {
-    List<ComponentAst> topLevelComponents = artifactAst.topLevelComponents();
-    if (topLevelComponents.size() != 1) {
-      throw new MuleRuntimeException(createStaticMessage("Expected only one top level component"));
-    }
-
-    ComponentAst rootComponent = topLevelComponents.get(0);
-    if (!rootComponent.getIdentifier().equals(EXTENSION_ROOT_IDENTIFIER)) {
-      throw new MuleRuntimeException(createStaticMessage("Expected a single top level component matching identifier [%s], but got: [%s]",
-                                                         EXTENSION_ROOT_IDENTIFIER, rootComponent.getIdentifier()));
+  private ArtifactAst parseAstChecked(ExtensionLoadingContext context) {
+    // ExtensionModelParserFactory can't throw checked exceptions, hence the wrapping
+    try {
+      return parseAst(context);
+    } catch (ConfigurationException e) {
+      throw new MuleRuntimeException(e);
     }
   }
 
@@ -142,7 +123,7 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     if (cachedArtifactAst == null) {
       // The AST may be given already parsed. If not, we need to parse it from the resource file.
       cachedArtifactAst =
-          context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAst(context));
+          context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAstChecked(context));
     }
 
     return cachedArtifactAst;

@@ -8,7 +8,9 @@ package org.mule.runtime.module.artifact.activation.api.ast;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
@@ -16,29 +18,33 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.EnumSet.of;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
+import org.mule.runtime.ast.api.validation.ArtifactAstValidator;
+import org.mule.runtime.ast.api.validation.ValidationResult;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 
@@ -77,10 +83,8 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext)
       throws ConfigurationException {
     return parseArtifact(configResources,
-                         ArtifactAstUtils::containsReusableAssets,
                          parserSupplier,
                          extensions,
-                         artifactType,
                          disableValidations,
                          muleContext.getExecutionClassLoader().getParent(),
                          muleContext.getConfiguration().getId(),
@@ -94,31 +98,28 @@ public final class ArtifactAstUtils {
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code artifactId}.
    *
-   * @param configResources            the paths to the artifact's config files
-   * @param hasReusableAssetsPredicate a predicate to test if the artifact contains reusable assets.
-   * @param parserSupplier             the supplier used to obtain the ast parser. It might be invoked several times during the
-   *                                   parsing
-   * @param extensions                 the initial set of extensions the artifact depends on.
-   * @param artifactType               the artifact type
-   * @param disableValidations         whether to disable DSL validation
-   * @param artifactClassLoader        the artifact's classloader
-   * @param artifactId                 the artifact's ID.
-   * @param artifactVersion            the artifact's version.
+   * @param configResources     the paths to the artifact's config files
+   * @param parserSupplier      the supplier used to obtain the ast parser. It might be invoked several times during the parsing
+   * @param extensions          the initial set of extensions the artifact depends on.
+   * @param disableValidations  whether to disable DSL validation
+   * @param artifactClassLoader the artifact's classloader
+   * @param artifactId          the artifact's ID.
+   * @param artifactVersion     the artifact's version.
    * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
    */
   public static ArtifactAst parseArtifact(String[] configResources,
-                                          Predicate<ArtifactAst> hasReusableAssetsPredicate,
                                           AstXmlParserSupplier parserSupplier,
                                           Set<ExtensionModel> extensions,
-                                          ArtifactType artifactType,
                                           boolean disableValidations,
                                           ClassLoader artifactClassLoader,
                                           String artifactId,
-                                          Optional<String> artifactVersion) {
+                                          Optional<String> artifactVersion)
+      throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
-    if (artifactType.equals(APPLICATION) && hasReusableAssetsPredicate.test(partialAst)) {
+    if (definesOwnExtensionModel(partialAst)) {
       ExtensionModel artifactExtensionModel =
           parseArtifactExtensionModel(partialAst, artifactClassLoader, artifactId, artifactVersion, extensions).orElse(null);
       if (artifactExtensionModel != null) {
@@ -145,7 +146,7 @@ public final class ArtifactAstUtils {
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
                                                                      ClassLoader artifactClassLoader,
                                                                      MuleContext muleContext) {
-    if (!containsReusableAssets(ast)) {
+    if (!definesOwnExtensionModel(ast)) {
       return empty();
     }
 
@@ -192,20 +193,60 @@ public final class ArtifactAstUtils {
     }
   }
 
-  private static ArtifactAst doParseArtifactIntoAst(String[] configResources,
-                                                    AstXmlParserSupplier parserSupplier,
-                                                    Set<ExtensionModel> extensions,
-                                                    boolean disableValidations) {
-    try {
-      return parserSupplier.getParser(extensions, disableValidations).parse(loadConfigResources(configResources));
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
+  /**
+   * Handles a {@link ValidationResult} uniformly. Warnings are logged, errors raise exceptions.
+   *
+   * @param validationResult The {@link ValidationResult} obtained using an {@link ArtifactAstValidator}.
+   * @throws ConfigurationException If there was any result item with {@link ERROR} level.
+   */
+  public static void handleValidationResult(ValidationResult validationResult)
+      throws ConfigurationException {
+    final Collection<ValidationResultItem> items = validationResult.getItems();
+
+    // Logs warnings if any.
+    items.stream()
+        .filter(v -> v.getValidation().getLevel().equals(WARN))
+        .forEach(v -> LOGGER.warn(validationResultItemToString(v)));
+
+    // If there are any errors, throws.
+    final boolean hasErrors = items.stream().anyMatch(v -> v.getValidation().getLevel().equals(ERROR));
+    if (hasErrors) {
+      throw new ConfigurationException(createStaticMessage(validationResult.getItems()
+          .stream()
+          .map(ArtifactAstUtils::validationResultItemToString)
+          .collect(joining(lineSeparator()))));
     }
   }
 
-  private static boolean containsReusableAssets(ArtifactAst artifactAst) {
-    return artifactAst.topLevelComponentsStream()
-        .anyMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()));
+  private static String validationResultItemToString(ValidationResultItem v) {
+    return v.getComponents().stream()
+        .map(component -> component.getMetadata().getFileName().orElse("unknown") + ":"
+            + component.getMetadata().getStartLine().orElse(-1))
+        .collect(joining("; ", "[", "]")) + ": " + v.getMessage();
+  }
+
+  private static ArtifactAst doParseArtifactIntoAst(String[] configResources,
+                                                    AstXmlParserSupplier parserSupplier,
+                                                    Set<ExtensionModel> extensions,
+                                                    boolean disableValidations)
+      throws ConfigurationException {
+    return parserSupplier.getParser(extensions, disableValidations).parse(loadConfigResources(configResources));
+  }
+
+  private static boolean definesOwnExtensionModel(ArtifactAst artifactAst) {
+    ArtifactType artifactType = artifactAst.getArtifactType();
+    switch (artifactType) {
+      case APPLICATION:
+        return artifactAst.topLevelComponentsStream()
+            .anyMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()));
+      case MULE_EXTENSION:
+        // TODO: try to unify this one with the case above by changing the Mule Extensions DSL
+        return artifactAst.topLevelComponents().size() == 1 &&
+            artifactAst.topLevelComponents().get(0).directChildrenStream()
+                .anyMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()));
+      default:
+        return false;
+    }
   }
 
   private static ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
