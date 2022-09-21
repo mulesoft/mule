@@ -57,7 +57,8 @@ public class ExtensionStructureValidations implements ArtifactValidation {
   private Optional<ValidationResultItem> validateContainsExtension(ArtifactAst artifactAst) {
     List<ComponentAst> topLevelComponents = artifactAst.topLevelComponents();
     if (topLevelComponents.size() != 1) {
-      return of(create(emptyList(), this, "Expected exactly one top level component"));
+      return of(create(emptyList(), this,
+                       format("Expected a single top level component matching identifier [%s]", EXTENSION_ROOT_IDENTIFIER)));
     }
 
     ComponentAst rootComponent = topLevelComponents.get(0);
