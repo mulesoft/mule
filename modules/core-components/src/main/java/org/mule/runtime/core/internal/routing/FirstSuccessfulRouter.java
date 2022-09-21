@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
@@ -38,7 +39,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
-import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Router with {@link FirstSuccessful} routing logic.
@@ -61,7 +62,7 @@ class FirstSuccessfulRouter {
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
   private final EventInternalContextResolver<Stack<CoreEvent>> nextExecutionContextResolver =
       new EventInternalContextResolver<>(FIRST_SUCCESSFUL_START_EVENT, Stack::new);
-  private final AtomicReference<Context> downstreamContextReference = new AtomicReference<>(empty());
+  private final AtomicReference<ContextView> downstreamCtxReference = new AtomicReference<>(empty());
 
   // When using a first successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
@@ -103,7 +104,7 @@ class FirstSuccessfulRouter {
       // Upstream chains subscription delayed until downstream sink is recorded. This handles the transaction-enabled case, in
       // which the subscribing thread is the one that runs the whole chain. Check UntilSuccessfulRouter for more implementation
       // details.
-      subscribeUpstreamChains(downstreamContextReference.get());
+      subscribeUpstreamChains(downstreamCtxReference.get());
 
     })
         .doOnNext(event -> inflightEvents.decrementAndGet())
@@ -141,15 +142,19 @@ class FirstSuccessfulRouter {
    */
   Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
-        .compose(downstreamPublisher -> subscriberContext().flatMapMany(downstreamContext -> downstreamPublisher
-            .doOnSubscribe(s -> downstreamContextReference.set(downstreamContext))));
+        .transformDeferredContextual((downstreamPublisher, downstreamContext) -> downstreamPublisher
+            .doOnSubscribe(s ->
+            // When a transaction is active, the processing strategy executes the whole reactor chain in the same thread that
+            // performs the subscription itself. Because of this, the subscription has to be deferred until the
+            // downstreamPublisher FluxCreate#subscribe method registers the new sink in the recorder.
+            downstreamCtxReference.set(downstreamContext)));
   }
 
-  private void subscribeUpstreamChains(Context downstreamContext) {
+  private void subscribeUpstreamChains(ContextView downstreamContext) {
     for (Flux<CoreEvent> innerFlux : innerFluxes) {
-      innerFlux.subscriberContext(downstreamContext).subscribe();
+      innerFlux.contextWrite(downstreamContext).subscribe();
     }
-    upstreamFlux.subscriberContext(downstreamContext).subscribe();
+    upstreamFlux.contextWrite(downstreamContext).subscribe();
   }
 
 

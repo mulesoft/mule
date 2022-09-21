@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.extension.internal.processor;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
@@ -34,6 +27,15 @@ import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_OPERATION_CONFIG_REF;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -214,7 +216,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
       } else if (parameterModel.getDefaultValue() != null
           && (PRIMARY_CONTENT.equals(parameterModel.getRole())
               || CONTENT.equals(parameterModel.getRole()))) {
-        result.put(parameterName, new Pair<>((String) parameterModel.getDefaultValue(), parameterModel.getType()));
+        result.put(parameterName, new Pair<>(parameterModel.getDefaultValue(), parameterModel.getType()));
       }
     }
     return result;
@@ -242,19 +244,20 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         .map(this::createEventWithParameters)
         // 2. Restore the error handler, overriding the last one set by the inner chain. This one being set again is the one that
         // must be used for handling any errors in the mapper above.
-        .subscriberContext(ctx -> ctx.getOrEmpty(localStrategyCtxKey)
+        .contextWrite(ctx -> ctx.getOrEmpty(localStrategyCtxKey)
             .map(localErrorStr -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, localErrorStr))
             .orElse(ctx))
-        .compose(eventPub -> applyWithChildContext(eventPub,
-                                                   p -> from(p)
-                                                       .doOnNext(this::pushFlowStackEntry)
-                                                       .compose(nestedChain)
-                                                       .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-                                                           .pop()),
-                                                   ofNullable(getLocation()),
-                                                   errorHandler()))
+        .transformDeferred(eventPub -> applyWithChildContext(eventPub,
+                                                             p -> from(p)
+                                                                 .doOnNext(this::pushFlowStackEntry)
+                                                                 .transformDeferred(nestedChain)
+                                                                 .doOnNext(event -> ((DefaultFlowCallStack) event
+                                                                     .getFlowCallStack())
+                                                                         .pop()),
+                                                             ofNullable(getLocation()),
+                                                             errorHandler()))
         // 1. Store the current error handler into the subscription context, so it can be retrieved later
-        .subscriberContext(ctx -> ctx.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY)
+        .contextWrite(ctx -> ctx.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY)
             .map(onNextErrorStr -> ctx.put(localStrategyCtxKey, onNextErrorStr))
             .orElse(ctx))
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));

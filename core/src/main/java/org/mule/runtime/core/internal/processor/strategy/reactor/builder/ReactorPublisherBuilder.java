@@ -12,9 +12,9 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
@@ -121,7 +122,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> subscriberContext(Function<Context, Context> function) {
-      mono = mono.subscriberContext(function);
+      mono = mono.contextWrite(function);
       return this;
     }
 
@@ -185,7 +186,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> subscriberContext(Function<Context, Context> function) {
-      flux = flux.subscriberContext(function);
+      flux = flux.contextWrite(function);
       return this;
     }
 

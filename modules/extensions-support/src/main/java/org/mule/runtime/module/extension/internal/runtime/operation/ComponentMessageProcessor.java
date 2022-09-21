@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.Runtime.getRuntime;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -53,9 +47,16 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -148,7 +149,7 @@ import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.togglz.core.user.FeatureUser;
 import reactor.core.publisher.Flux;
-import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * A {@link Processor} capable of executing extension components.
@@ -279,25 +280,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final boolean mayCompleteInDifferentThread = mayCompleteInDifferentThread();
     final ComponentLocation location = getLocation();
 
-    return subscriberContext()
-        .flatMapMany(ctx -> {
-          Flux<CoreEvent> transformed =
-              createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
-                  .doOnNext(result -> {
-                    removeSdkInternalContextFromResult(location, result);
-                  })
-                  .map(propagateErrorResponseMapper());
+    return deferContextual(ctx -> {
+      Flux<CoreEvent> transformed =
+          createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
+              .doOnNext(result -> removeSdkInternalContextFromResult(location, result))
+              .map(propagateErrorResponseMapper());
 
-          if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
-            return transformed
-                .doAfterTerminate(this::outerPublisherTerminated)
-                .doOnSubscribe(s -> outerPublisherSubscribedTo());
-          } else {
-            // Certain features (ext client, batch, flow runner, interception-api) use Mono, so we don't want to dispose the inner
-            // stuff after the first event comes through
-            return transformed;
-          }
-        });
+      if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
+        return transformed
+            .doAfterTerminate(this::outerPublisherTerminated)
+            .doOnSubscribe(s -> outerPublisherSubscribedTo());
+      } else {
+        // Certain features (ext client, batch, flow runner, interception-api) use Mono, so we don't want to dispose the inner
+        // stuff after the first event comes through
+        return transformed;
+      }
+    });
   }
 
   private void removeSdkInternalContextFromResult(final ComponentLocation location, Either<Throwable, CoreEvent> result) {
@@ -315,7 +313,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
                                                              final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
                                                              final boolean mayCompleteInDifferentThread,
-                                                             Context ctx) {
+                                                             ContextView ctx) {
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
@@ -406,7 +404,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private void onEvent(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
+  private void onEvent(CoreEvent event, ExecutorCallback executorCallback, ContextView ctx) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
@@ -439,7 +437,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
+  private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, ContextView ctx) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
@@ -619,17 +617,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-          return subscriberContext()
-              .flatMapMany(ctx -> {
-                final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
+          return deferContextual(ctx -> {
+            final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
 
-                return from(propagateCompletion(from(publisher), emitter.flux(),
-                                                pub -> from(pub)
-                                                    .doOnNext(innerEventDispatcher(emitter))
-                                                    .map(e -> Either.empty()),
-                                                () -> emitter.complete(), e -> emitter.error(e)))
-                                                    .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
-              });
+            return from(propagateCompletion(from(publisher), emitter.flux(),
+                                            pub -> from(pub)
+                                                .doOnNext(innerEventDispatcher(emitter))
+                                                .map(e -> Either.empty()),
+                                            () -> emitter.complete(), e -> emitter.error(e)))
+                                                .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
+          });
         }
 
         private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
@@ -696,7 +693,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
+  private CoreEvent addContextToEvent(CoreEvent event, ContextView ctx) throws MuleException {
     SdkInternalContext sdkInternalContext = from(event);
     if (sdkInternalContext == null) {
       sdkInternalContext = new SdkInternalContext();
@@ -741,7 +738,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void setOperationExecutionParams(ComponentLocation location, CoreEvent event,
                                            Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                           CoreEvent operationEvent, ExecutorCallback callback, Context ctx) {
+                                           CoreEvent operationEvent, ExecutorCallback callback, ContextView ctx) {
 
     SdkInternalContext sdkInternalContext = SdkInternalContext.from(event);
 

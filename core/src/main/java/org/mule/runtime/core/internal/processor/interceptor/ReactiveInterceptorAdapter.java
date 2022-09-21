@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.String.valueOf;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -18,11 +14,17 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
+
+import static java.lang.String.valueOf;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toMap;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -104,38 +106,37 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
                    componentLocation.getLocation());
 
-      return publisher -> subscriberContext()
-          .flatMapMany(ctx -> from(publisher)
-              .flatMap(event -> just(event)
-                  .cast(InternalEvent.class)
-                  .map(doBefore(interceptor, (Component) component, dslParameters))
-                  .cast(CoreEvent.class)
-                  .transform(next)
-                  .onErrorMap(MessagingException.class,
-                              error -> {
-                                InternalEvent resolvedEvent = doAfter(interceptor, (Component) component,
-                                                                      of(error.getCause()))
-                                                                          .apply((InternalEvent) error.getEvent());
-                                Component failingComponent = error.getFailingComponent() != null
-                                    ? error.getFailingComponent()
-                                    : (Component) component;
+      return publisher -> deferContextual(ctx -> from(publisher)
+          .flatMap(event -> just(event)
+              .cast(InternalEvent.class)
+              .map(doBefore(interceptor, (Component) component, dslParameters))
+              .cast(CoreEvent.class)
+              .transform(next)
+              .onErrorMap(MessagingException.class,
+                          error -> {
+                            InternalEvent resolvedEvent = doAfter(interceptor, (Component) component,
+                                                                  of(error.getCause()))
+                                                                      .apply((InternalEvent) error.getEvent());
+                            Component failingComponent = error.getFailingComponent() != null
+                                ? error.getFailingComponent()
+                                : (Component) component;
 
-                                if (interceptor.isErrorMappingRequired(componentLocation)) {
-                                  return resolveMessagingException(resolvedEvent,
-                                                                   error.getCause(),
-                                                                   failingComponent,
-                                                                   of(error));
-                                } else {
-                                  return createMessagingException(resolvedEvent,
-                                                                  error.getCause(),
-                                                                  failingComponent,
-                                                                  of(error));
-                                }
-                              })
-                  .cast(InternalEvent.class)
-                  .map(doAfter(interceptor, (Component) component, empty()))
-                  .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
-                  .onErrorStop()));
+                            if (interceptor.isErrorMappingRequired(componentLocation)) {
+                              return resolveMessagingException(resolvedEvent,
+                                                               error.getCause(),
+                                                               failingComponent,
+                                                               of(error));
+                            } else {
+                              return createMessagingException(resolvedEvent,
+                                                              error.getCause(),
+                                                              failingComponent,
+                                                              of(error));
+                            }
+                          })
+              .cast(InternalEvent.class)
+              .map(doAfter(interceptor, (Component) component, empty()))
+              .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
+              .onErrorStop()));
     } else {
       return next;
     }

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
+
+import static java.lang.Thread.currentThread;
 
 import java.util.function.Supplier;
 
@@ -17,7 +18,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 
 import reactor.core.publisher.FluxSink;
-import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Provides a unique {@link FluxSink} for each Thread in transactional context. In case of non-transactional context, it delegates
@@ -47,7 +48,7 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
   }
 
   @Override
-  public FluxSink<T> get(Context ctx) {
+  public FluxSink<T> get(ContextView ctx) {
     // In case of tx we need to ensure that in use of the delegate supplier there are no 2 threads trying to use the
     // same sink. This could cause a race condition in which the second thread simply queues the event in the busy sink.
     // So, this thread will not unbind the tx (causing an error next time it tries to bind one), and the first one will

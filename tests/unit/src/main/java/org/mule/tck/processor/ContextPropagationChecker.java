@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -42,9 +42,8 @@ public class ContextPropagationChecker implements Processor {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return subscriberContext()
-        .flatMapMany(ctx -> from(publisher)
-            .doOnNext(e -> assertThat(ctx.getOrEmpty(CTX_PROPAGATED_KEY).orElse(false), is(true))));
+    return deferContextual(ctx -> from(publisher)
+        .doOnNext(e -> assertThat(ctx.getOrEmpty(CTX_PROPAGATED_KEY).orElse(false), is(true))));
   }
 
   public Function<Context, Context> contextPropagationFlag() {

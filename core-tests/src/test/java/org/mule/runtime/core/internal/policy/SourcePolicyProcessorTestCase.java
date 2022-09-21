@@ -6,18 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -27,9 +15,23 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.SOURCE_POLICY_PART_IDENTIFIER;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -47,10 +49,11 @@ import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.OptionalInt;
 
+import org.reactivestreams.Publisher;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -70,8 +73,8 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     mockFlowReturningEvent(modifiedMessageEvent);
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(false);
-    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     just(initialEvent).transform(policyProcessor).block();

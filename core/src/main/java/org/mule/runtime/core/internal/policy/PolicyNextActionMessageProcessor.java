@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -15,9 +13,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -78,8 +80,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   private MessageProcessorChain nextDispatchAsChain;
 
-  private Map<ComponentLocation, Boolean> locationsCache = new SmallMap<>();
-  private Map<Pair<ComponentLocation, String>, Boolean> subFlowLocationsCache = new SmallMap<>();
+  private final Map<ComponentLocation, Boolean> locationsCache = new SmallMap<>();
+  private final Map<Pair<ComponentLocation, String>, Boolean> subFlowLocationsCache = new SmallMap<>();
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -103,12 +105,11 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPub) {
-        return subscriberContext()
-            .flatMapMany(ctx -> from(eventPub)
-                .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                    ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
-                    : policyEventMapper.onOperationPolicyNext(event))
-                .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
+        return deferContextual(ctx -> from(eventPub)
+            .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
+                : policyEventMapper.onOperationPolicyNext(event))
+            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
     }), policyNextErrorHandler());
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
@@ -172,7 +173,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
         })
-        .compose(nextDispatchAsChain)
+        .transformDeferred(nextDispatchAsChain)
         .doOnNext(coreEvent -> {
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
           pushAfterNextFlowStackElement().accept(coreEvent);

@@ -7,14 +7,15 @@
 
 package org.mule.runtime.core.internal.routing.forkjoin;
 
-import static java.time.Duration.ofMillis;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+
+import static java.lang.Long.MAX_VALUE;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.defer;
@@ -43,6 +44,7 @@ import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -88,13 +90,21 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
                                                  long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType,
                                                  boolean isDetailedLogEnabled) {
+    Duration timeoutDuration;
+    if (timeout == Long.MAX_VALUE) {
+      timeoutDuration = Duration.ofNanos(MAX_VALUE);
+    } else {
+      timeoutDuration = Duration.ofMillis(timeout);
+    }
+
     reactor.core.scheduler.Scheduler reactorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
     return (original, routingPairs) -> {
       final AtomicInteger count = new AtomicInteger();
       final CoreEvent.Builder resultBuilder = builder(original);
       return from(routingPairs)
           .map(addSequence(count))
-          .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reactorTimeoutScheduler,
+          .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeoutDuration,
+                                              reactorTimeoutScheduler,
                                               timeoutErrorType),
                              maxConcurrency)
           .reduce(new Pair<List<Pair<CoreEvent, EventProcessingException>>, Boolean>(new ArrayList<>(), false),
@@ -154,7 +164,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   private Function<RoutingPair, Publisher<Pair<CoreEvent, EventProcessingException>>> processRoutePair(ProcessingStrategy processingStrategy,
                                                                                                        int maxConcurrency,
                                                                                                        boolean delayErrors,
-                                                                                                       long timeout,
+                                                                                                       Duration timeout,
                                                                                                        reactor.core.scheduler.Scheduler timeoutScheduler,
                                                                                                        ErrorType timeoutErrorType) {
 
@@ -164,7 +174,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       return from(processWithChildContextDontComplete(pair.getEvent(),
                                                       applyProcessingStrategy(processingStrategy, route, maxConcurrency),
                                                       empty()))
-                                                          .timeout(ofMillis(timeout),
+                                                          .timeout(timeout,
                                                                    onTimeout(processingStrategy, delayErrors, timeoutErrorType,
                                                                              pair),
                                                                    timeoutScheduler)

@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
-import static reactor.core.publisher.Mono.subscriberContext;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static reactor.core.publisher.Flux.deferContextual;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -46,8 +49,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-
-import reactor.core.publisher.Flux;
 
 @Feature(ROUTERS)
 @Stories({@Story(ASYNC), @Story(BACKPRESSURE)})
@@ -117,12 +118,11 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
   public void streamPerEventSinkMonoFlagged() throws MuleException {
     AtomicBoolean withinProcessToApply = new AtomicBoolean();
 
-    final StreamPerEventSink streamPerEventSink = new StreamPerEventSink(pub -> subscriberContext()
-        .flatMapMany(ctx -> Flux.from(pub)
-            .map(p -> {
-              withinProcessToApply.set(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false));
-              return p;
-            })),
+    final StreamPerEventSink streamPerEventSink = new StreamPerEventSink(pub -> deferContextual(ctx -> from(pub)
+        .map(p -> {
+          withinProcessToApply.set(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false));
+          return p;
+        })),
                                                                          event -> {
                                                                          });
 

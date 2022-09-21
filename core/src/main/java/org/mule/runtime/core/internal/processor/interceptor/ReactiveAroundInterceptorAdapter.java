@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromFuture;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -35,7 +35,7 @@ import java.util.concurrent.CompletionException;
 
 import org.slf4j.Logger;
 
-import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s
@@ -66,11 +66,10 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     if (interceptor.implementsAround()) {
       LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
 
-      return publisher -> subscriberContext()
-          .flatMapMany(ctx -> from(publisher)
-              .cast(InternalEvent.class)
-              .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next, ctx))
-                  .onErrorMap(CompletionException.class, CompletionException::getCause)));
+      return publisher -> deferContextual(ctx -> from(publisher)
+          .cast(InternalEvent.class)
+          .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next, ctx))
+              .onErrorMap(CompletionException.class, CompletionException::getCause)));
     } else {
       return next;
     }
@@ -78,7 +77,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
 
   private CompletableFuture<InternalEvent> doAround(InternalEvent event, ComponentInterceptorAdapter interceptor,
                                                     ReactiveProcessor component, Map<String, String> dslParameters,
-                                                    ReactiveProcessor next, Context ctx) {
+                                                    ReactiveProcessor next, ContextView ctx) {
     final InternalEvent eventWithResolvedParams = addResolvedParameters(event, (Component) component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);

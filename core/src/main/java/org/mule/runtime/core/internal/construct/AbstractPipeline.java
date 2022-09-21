@@ -39,7 +39,6 @@ import static java.util.stream.Collectors.toMap;
 
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -319,16 +318,16 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
         .transform(routeThroughProcessingStrategyTransformer())
-        .compose(clearSubscribersErrorStrategy());
+        .transformDeferred(clearSubscribersErrorStrategy());
   }
 
   /**
-   * If an <b>Error Strategy</b> is being propagated in the subscription {@link reactor.util.context.Context}, clear it.
+   * If an <b>Error Strategy</b> is being propagated in the subscription {@link reactor.util.context.ContextView}, clear it.
    *
    * @return the transformed flux that clears the context if necessary
    */
   private Function<Flux<CoreEvent>, Publisher<CoreEvent>> clearSubscribersErrorStrategy() {
-    return pub -> pub.subscriberContext(context -> {
+    return pub -> pub.contextWrite(context -> {
       Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
       if (onErrorStrategy.isPresent()
           && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
@@ -341,7 +340,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
-    return eventPublisher -> from(eventPublisher).compose(pipelineUpstream -> subscriberContext().flatMapMany(reactorContext -> {
+    return eventPublisher -> from(eventPublisher).transformDeferredContextual((pipelineUpstream, reactorContext) -> {
       if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
         return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
@@ -357,7 +356,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                             muleContext.getConfiguration().getShutdownTimeout(),
                                                             completionCallbackScheduler, getDslSource())));
       }
-    }));
+    });
   }
 
   private Flux<Either<Throwable, CoreEvent>> splicePipeline(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,

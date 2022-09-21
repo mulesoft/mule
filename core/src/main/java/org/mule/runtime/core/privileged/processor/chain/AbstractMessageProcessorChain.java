@@ -42,8 +42,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -76,13 +76,12 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
@@ -90,6 +89,7 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,6 +109,7 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
+
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -215,72 +216,71 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-      return subscriberContext()
-          .flatMapMany(ctx -> {
-            // Take into account events that might still be in an error handler to keep the flux from completing until those are
-            // finished.
-            final AtomicInteger inflightEvents = new AtomicInteger();
+      return deferContextual(ctx -> {
+        // Take into account events that might still be in an error handler to keep the flux from completing until those are
+        // finished.
+        final AtomicInteger inflightEvents = new AtomicInteger();
 
-            final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
-                .router(pub -> from(pub).subscriberContext(ctx),
-                        handled -> {
-                          // End current (MessageProcessor chain) Span.
-                          if (chainSpanCreated) {
-                            // We end the current span verifying that this the (MessageProcessor Chain) span.
-                            muleEventTracer
-                                .endCurrentSpan(handled,
-                                                new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(handled)));
-                          }
-                          errorSwitchSinkSinkRef.next(right(handled));
-                        },
-                        rethrown -> {
-                          // Record the error and end current (MessageProcessor chain) Span.
-                          CoreEvent coreEvent = ((MessagingException) rethrown).getEvent();
-                          if (chainSpanCreated) {
-                            muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) rethrown).getEvent(), true);
-                            // We end the current span verifying that this the (MessageProcessor Chain) span.
-                            muleEventTracer
-                                .endCurrentSpan(coreEvent,
-                                                new SpanNameTracingCondition(chainSpanCustomizationInfo
-                                                    .getName(coreEvent)));
-                          }
-                          errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
-                        }));
+        final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
+            .router(pub -> from(pub).contextWrite(ctx),
+                    handled -> {
+                      // End current (MessageProcessor chain) Span.
+                      if (chainSpanCreated) {
+                        // We end the current span verifying that this the (MessageProcessor Chain) span.
+                        muleEventTracer
+                            .endCurrentSpan(handled,
+                                            new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(handled)));
+                      }
+                      errorSwitchSinkSinkRef.next(right(handled));
+                    },
+                    rethrown -> {
+                      // Record the error and end current (MessageProcessor chain) Span.
+                      CoreEvent coreEvent = ((MessagingException) rethrown).getEvent();
+                      if (chainSpanCreated) {
+                        muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) rethrown).getEvent(), true);
+                        // We end the current span verifying that this the (MessageProcessor Chain) span.
+                        muleEventTracer
+                            .endCurrentSpan(coreEvent,
+                                            new SpanNameTracingCondition(chainSpanCustomizationInfo
+                                                .getName(coreEvent)));
+                      }
+                      errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
+                    }));
 
-            final Flux<CoreEvent> upstream =
-                from(doApply(publisher, interceptors, (context, throwable) -> {
-                  inflightEvents.incrementAndGet();
-                  if (chainSpanCreated) {
-                    // Record the error and end current (Processor) Span.
-                    muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(), true);
-                    // We verify that there is processor span to end.
-                    muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent(),
-                                                   getNotNullSpanTracingCondition());
-                  }
-                  routeError(errorRouter, throwable);
-                }));
+        final Flux<CoreEvent> upstream =
+            from(doApply(publisher, interceptors, (context, throwable) -> {
+              inflightEvents.incrementAndGet();
+              if (chainSpanCreated) {
+                // Record the error and end current (Processor) Span.
+                muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(), true);
+                // We verify that there is processor span to end.
+                muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent(),
+                                               getNotNullSpanTracingCondition());
+              }
+              routeError(errorRouter, throwable);
+            }));
 
-            return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
-                                            pub -> from(pub)
-                                                .map(event -> {
-                                                  final Either<MessagingException, CoreEvent> result =
-                                                      right(MessagingException.class, event);
-                                                  errorSwitchSinkSinkRef.next(result);
-                                                  return result;
-                                                }),
-                                            inflightEvents,
-                                            () -> {
-                                              errorSwitchSinkSinkRef.complete();
-                                              disposeIfNeeded(errorRouter, LOGGER);
-                                              clearRouterInGlobalErrorHandler(messagingExceptionHandler);
-                                            },
-                                            t -> {
-                                              errorSwitchSinkSinkRef.error(t);
-                                              disposeIfNeeded(errorRouter, LOGGER);
-                                              clearRouterInGlobalErrorHandler(messagingExceptionHandler);
-                                            }))
-                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
-          });
+        return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
+                                        pub -> from(pub)
+                                            .map(event -> {
+                                              final Either<MessagingException, CoreEvent> result =
+                                                  right(MessagingException.class, event);
+                                              errorSwitchSinkSinkRef.next(result);
+                                              return result;
+                                            }),
+                                        inflightEvents,
+                                        () -> {
+                                          errorSwitchSinkSinkRef.complete();
+                                          disposeIfNeeded(errorRouter, LOGGER);
+                                          clearRouterInGlobalErrorHandler(messagingExceptionHandler);
+                                        },
+                                        t -> {
+                                          errorSwitchSinkSinkRef.error(t);
+                                          disposeIfNeeded(errorRouter, LOGGER);
+                                          clearRouterInGlobalErrorHandler(messagingExceptionHandler);
+                                        }))
+                                            .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
+      });
 
     } else {
       return doApply(publisher, interceptors, (context, throwable) -> {
