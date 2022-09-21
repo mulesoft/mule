@@ -11,6 +11,8 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.rules.ExpectedException.none;
+
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory.CONFIGURATION_PROPERTIES;
@@ -60,7 +62,7 @@ import com.google.common.collect.ImmutableSet;
 public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Rule
-  public ExpectedException exception = ExpectedException.none();
+  public ExpectedException exception = none();
 
   @Before
   public void setUp() {

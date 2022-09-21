@@ -137,7 +137,7 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
           .ifPresent(ns -> problemsReporter.addError(new Problem(operationModel,
                                                                  format(WRONG_VALUE_FORMAT_MESSAGE, workingIdentifier.toString(),
                                                                         attributeToValidate, CORE_ERROR_NS, moduleErrorNs,
-                                                                        namespace, operationModel.getName()))));
+                                                                        ns, operationModel.getName()))));
     }
   }
 }
