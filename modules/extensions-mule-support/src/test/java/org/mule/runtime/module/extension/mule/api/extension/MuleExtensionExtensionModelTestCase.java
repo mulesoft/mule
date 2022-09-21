@@ -10,11 +10,15 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
 
+import static java.util.stream.Collectors.toList;
+
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,9 +30,13 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.validation.ValidationResult;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -122,6 +130,21 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
     expected.expect(MuleRuntimeException.class);
     expected.expectMessage(containsString("Attribute 'name' must appear on element 'extension'"));
     getArtifactAst("extensions/extension-without-name.xml");
+  }
+
+  @Test
+  public void notAnExtensionFailsWhenValidating() {
+    ValidationResult validationResult = parseAstExpectingValidationErrors("app-as-mule-extension.xml");
+    List<String> validationMessages = validationResult.getItems().stream()
+        .map(ValidationResultItem::getMessage)
+        .collect(toList());
+    assertThat(validationMessages,
+               hasItems("Expected a single top level component matching identifier [extension:extension], but got: [flow]"));
+  }
+
+  @Override
+  protected void customizeAstParserBuilder(Builder astParserBuilder) {
+    astParserBuilder.withArtifactType(MULE_EXTENSION);
   }
 
   private ComponentAst getRootComponent(ArtifactAst ast) {
