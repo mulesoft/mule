@@ -60,7 +60,7 @@ public class ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace extends 
     List<ErrorMapping> errorMappings = (List<ErrorMapping>) mappingsParameter.getValue().getRight();
     for (ErrorMapping errorMapping : errorMappings) {
       final String errorTypeString = errorMapping.getTarget();
-      final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
+      final ComponentIdentifier errorTypeId = parseErrorType(errorTypeString);
 
       String namespace = errorTypeId.getNamespace();
       if (alreadyUsedErrorNamespaces.contains(namespace) && !isAllowedBorrowedNamespace(namespace)) {

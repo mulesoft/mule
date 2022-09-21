@@ -60,7 +60,7 @@ public class RaiseErrorReferenceDoNotUseExtensionNamespaces extends AbstractErro
     final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
     final String errorTypeString = errorTypeParam.getResolvedRawValue();
     final Set<String> alreadyUsedErrorNamespaces = getAlreadyUsedErrorNamespaces(artifact);
-    final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
+    final ComponentIdentifier errorTypeId = parseErrorType(errorTypeString);
 
     String namespace = errorTypeId.getNamespace();
     if (alreadyUsedErrorNamespaces.contains(namespace) && !isAllowedBorrowedNamespace(namespace)) {

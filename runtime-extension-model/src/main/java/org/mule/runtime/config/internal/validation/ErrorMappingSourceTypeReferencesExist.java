@@ -60,7 +60,7 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     for (ErrorMapping errorMapping : getErrorMappings(component)) {
-      final ComponentIdentifier errorTypeId = parserErrorType(errorMapping.getSource());
+      final ComponentIdentifier errorTypeId = parseErrorType(errorMapping.getSource());
 
       final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);
       if (!errorType.isPresent()) {

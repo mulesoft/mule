@@ -71,7 +71,7 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
         .map(d -> d.getXmlDslModel().getPrefix().toUpperCase())
         .collect(toSet());
 
-    final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
+    final ComponentIdentifier errorTypeId = parseErrorType(errorTypeString);
 
     if (errorNamespaces.contains(errorTypeId.getNamespace())) {
       return validateErrorTypeId(component, errorTypeParam, artifact, this, errorTypeString, errorTypeId);
