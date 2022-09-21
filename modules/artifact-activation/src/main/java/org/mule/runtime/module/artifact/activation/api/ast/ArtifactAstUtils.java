@@ -86,7 +86,7 @@ public final class ArtifactAstUtils {
                          artifactType,
                          disableValidations,
                          muleContext.getExecutionClassLoader().getParent(),
-                         muleContext.getId(),
+                         muleContext.getConfiguration().getId(),
                          muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion),
                          expressionLanguageMetadataService);
   }
@@ -108,6 +108,7 @@ public final class ArtifactAstUtils {
    * @param artifactClassLoader        the artifact's classloader
    * @param artifactId                 the artifact's ID.
    * @param artifactVersion            the artifact's version.
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    */
   public static ArtifactAst parseArtifact(String[] configResources,
@@ -159,7 +160,7 @@ public final class ArtifactAstUtils {
 
     return parseArtifactExtensionModel(ast,
                                        artifactClassLoader,
-                                       muleContext.getId(),
+                                       muleContext.getConfiguration().getId(),
                                        muleContext.getConfiguration().getArtifactCoordinates()
                                            .map(ArtifactCoordinates::getVersion),
                                        muleContext.getExtensionManager().getExtensions(),
@@ -175,6 +176,7 @@ public final class ArtifactAstUtils {
    * @param artifactId          the artifact's ID.
    * @param artifactVersion     the artifact's version.
    * @param dependencies        the dependencies in context.
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an optional {@link ExtensionModel}
    */
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
