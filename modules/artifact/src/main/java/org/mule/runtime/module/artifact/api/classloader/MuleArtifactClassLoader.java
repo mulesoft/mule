@@ -18,10 +18,9 @@ import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
-import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
+import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -55,7 +54,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
 
-  private static final String DB_RESOURCE_RELEASER_CLASS_LOCATION =
+  private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/JdbcResourceReleaser.class";
 
   static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
@@ -100,14 +99,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final String artifactId;
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
-  private String dbResourceReleaserClassLocation = DB_RESOURCE_RELEASER_CLASS_LOCATION;
+  private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
   private volatile boolean shouldReleaseIbmMQResources = false;
   private volatile boolean shouldReleaseActiveMQReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
   private final ResourceReleaser scalaClassValueReleaserInstance;
-  private final ResourceReleaser mvelClassLoaderReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
@@ -130,7 +128,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     this.artifactDescriptor = artifactDescriptor;
     this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
     this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
-    this.mvelClassLoaderReleaserInstance = new MvelClassLoaderReleaser(this);
   }
 
   @Override
@@ -337,7 +334,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private void clearReferences() {
     classLoaderReferenceReleaser.release();
     scalaClassValueReleaserInstance.release();
-    mvelClassLoaderReleaserInstance.release();
   }
 
   void reportPossibleLeak(Exception e, String artifactId) {
@@ -376,13 +372,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    */
   protected ResourceReleaser createResourceReleaserInstance() {
     if (jdbcResourceReleaserInstance == null) {
-      jdbcResourceReleaserInstance = createInstance(dbResourceReleaserClassLocation);
+      jdbcResourceReleaserInstance = createInstance(resourceReleaserClassLocation);
     }
     return jdbcResourceReleaserInstance;
   }
 
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
-    this.dbResourceReleaserClassLocation = resourceReleaserClassLocation;
+    this.resourceReleaserClassLocation = resourceReleaserClassLocation;
   }
 
   private Class createClass(String classLocation) {
