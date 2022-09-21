@@ -6,23 +6,31 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_ELEMENT;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_ELEMENT;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.XmlSdkImplicitConfig.IMPLICIT_CONFIG_NAME_SUFFIX;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -34,6 +42,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
@@ -111,6 +121,12 @@ public class MacroExpansionModuleModel {
    */
   private static final String DEFAULT_CONFIG_GLOBAL_ELEMENT_SUFFIX = "%s-default-config-global-element-suffix";
 
+  /**
+   * If true avoid the creation of an implicit configuration
+   */
+  private final boolean disable_xml_sdk_implicit_configuration_creation =
+      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false"));
+
   private final ArtifactAst applicationModel;
   private final ExtensionModel extensionModel;
 
@@ -138,12 +154,22 @@ public class MacroExpansionModuleModel {
   }
 
   private ArtifactAst expand(List<ComponentAst> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
-    return copyRecursively(applicationModel, comp -> {
+    final ArtifactAst expandedArtifactAst;
+
+    if (shouldAddImplicitConfiguration()) {
+      expandedArtifactAst = copyRecursively(applicationModel, identity(),
+                                            () -> singletonList(new XmlSdkImplicitConfig(extensionModel)), comp -> false);
+    } else {
+      expandedArtifactAst = applicationModel;
+    }
+
+    return copyRecursively(expandedArtifactAst, comp -> {
 
       if (comp.getIdentifier().getNamespace().equals(extensionModel.getXmlDslModel().getPrefix())) {
         if (comp.getModel(OperationModel.class).isPresent()) {
           return comp.getModel(OperationModel.class)
-              .map(operationModel -> expandOperation(comp, operationModel, moduleGlobalElementsNames, empty()))
+              .map(operationModel -> expandOperation(expandedArtifactAst, comp, operationModel, moduleGlobalElementsNames,
+                                                     empty()))
               .orElse(comp);
         } else if (comp.getModel(ConfigurationModel.class).isPresent()) {
           return comp.getModel(ConfigurationModel.class)
@@ -159,6 +185,48 @@ public class MacroExpansionModuleModel {
                                .map(Collections::singletonList)
                                .orElse(emptyList()),
                            comp -> false);
+  }
+
+  private boolean shouldAddImplicitConfiguration() {
+    return existOperationThatUsesImplicitConfiguration() && hasXmlSdkPropertiesWithDefaultValues() &&
+        !disable_xml_sdk_implicit_configuration_creation;
+  }
+
+  private boolean existOperationThatUsesImplicitConfiguration() {
+    return applicationModel.topLevelComponentsStream()
+        .filter(componentAst -> componentAst.getIdentifier().getName().equals(FLOW_ELEMENT)
+            || componentAst.getIdentifier().getName().equals(SUBFLOW_ELEMENT))
+        .flatMap(ComponentAst::directChildrenStream)
+        .anyMatch(this::existOperationThatUsesImplicitConfiguration);
+  }
+
+  private boolean existOperationThatUsesImplicitConfiguration(ComponentAst componentAst) {
+    if (componentAst.getIdentifier().getNamespace().equals(extensionModel.getXmlDslModel().getPrefix()) &&
+        componentAst.getModel(OperationModel.class).isPresent() &&
+        !componentAst.getParameters().contains(MODULE_OPERATION_CONFIG_REF)) {
+      return true;
+    }
+
+    for (ComponentAst childComponentAst : componentAst.directChildren()) {
+      if (existOperationThatUsesImplicitConfiguration(childComponentAst)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean hasXmlSdkPropertiesWithDefaultValues() {
+    return extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
+        .map(ParameterizedModel::getParameterGroupModels)
+        .orElse(emptyList())
+        .stream()
+        .filter(parameterGroupModel -> parameterGroupModel.getName().equals(DEFAULT_GROUP_NAME))
+        .findFirst()
+        .map(ParameterGroupModel::getParameterModels)
+        .orElse(emptyList())
+        .stream()
+        .noneMatch(parameterModel -> parameterModel.isRequired() && !parameterModel.getName().equals("name"));
   }
 
   private Optional<String> defaultGlobalElementName() {
@@ -363,7 +431,7 @@ public class MacroExpansionModuleModel {
    *                                  app.
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
-  private ComponentAst expandOperation(ComponentAst operationRefModel,
+  private ComponentAst expandOperation(ArtifactAst expandedArtifactAst, ComponentAst operationRefModel,
                                        OperationModel operationModel, Set<String> moduleGlobalElementsNames,
                                        Optional<String> configRefParentTnsName) {
     final OperationComponentModelModelProperty operationComponentModelModelProperty =
@@ -374,7 +442,13 @@ public class MacroExpansionModuleModel {
         ? configRefParentTnsName
         : getConfigRefName(operationRefModel);
 
-    Map<String, String> propertiesMap = extractProperties(configRefName);
+    final Optional<String> configRef =
+        !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
+            && shouldAddImplicitConfiguration()
+                ? of(format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName()))
+                : configRefName;
+
+    Map<String, String> propertiesMap = extractProperties(expandedArtifactAst, configRef);
     Map<String, String> parametersMap = operationRefModel.getParameters().stream()
         .filter(paramAst -> paramAst.getResolvedRawValue() != null)
         .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getResolvedRawValue()));
@@ -384,15 +458,16 @@ public class MacroExpansionModuleModel {
     List<ComponentAst> processorChainChildren = operationModuleComponentModel.directChildrenStream()
         .map(bodyProcessor -> copyComponentTreeRecursively(bodyProcessor,
                                                            operationChildModel -> lookForTNSOperation(operationChildModel)
-                                                               .map(tnsOperation -> expandOperation(operationChildModel,
+                                                               .map(tnsOperation -> expandOperation(expandedArtifactAst,
+                                                                                                    operationChildModel,
                                                                                                     tnsOperation,
                                                                                                     moduleGlobalElementsNames,
-                                                                                                    configRefName))
+                                                                                                    configRef))
                                                                .orElseGet(() -> new MacroExpandedComponentAst(operationChildModel,
                                                                                                               operationChildModel
                                                                                                                   .getLocation(),
                                                                                                               moduleGlobalElementsNames,
-                                                                                                              configRefName
+                                                                                                              configRef
                                                                                                                   .orElse(""),
                                                                                                               literalParameters,
                                                                                                               operationChildModel
@@ -466,13 +541,13 @@ public class MacroExpansionModuleModel {
    * @param configRefName current <operation/> to macro expand, from which the config-ref attribute's value will be extracted.
    * @return a map with the name and values of the <module/>'s properties.
    */
-  private Map<String, String> extractProperties(Optional<String> configRefName) {
+  private Map<String, String> extractProperties(ArtifactAst expandedArtifactAst, Optional<String> configRefName) {
     Map<String, String> valuesMap = new HashMap<>();
     configRefName
         .filter(configParameter -> defaultGlobalElementName()
             .map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter)).orElse(true))
         .ifPresent(configParameter -> {
-          ComponentAst configRefComponentModel = getComponentAst(applicationModel, configParameter);
+          ComponentAst configRefComponentModel = getComponentAst(expandedArtifactAst, configParameter);
           // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
           configRefComponentModel.getParameters().stream()
