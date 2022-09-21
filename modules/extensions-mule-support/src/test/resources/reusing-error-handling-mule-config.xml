@@ -15,7 +15,7 @@
 
   <operation:def name="operationOne">
     <operation:output>
-      <operation:payload-type type="void"/>
+      <operation:payload-type type="string"/>
     </operation:output>
     <operation:body>
       <try>
@@ -31,7 +31,7 @@
 
   <operation:def name="operationTwo">
     <operation:output>
-      <operation:payload-type type="void"/>
+      <operation:payload-type type="string"/>
     </operation:output>
     <operation:body>
       <try>
@@ -50,12 +50,12 @@
       <operation:parameter name="error" type="error" />
     </operation:parameters>
     <operation:output>
-      <operation:payload-type type="void"/>
+      <operation:payload-type type="string"/>
     </operation:output>
     <operation:body>
       <choice>
         <when expression="#[params.error causedBy 'HEISENBERG:HEALTH']" >
-          <logger level="ERROR" message="Caught error!" />
+          <set-payload value="Caught error!" />
         </when>
         <otherwise>
           <operation:raise-error type="UNKNOWN" />
