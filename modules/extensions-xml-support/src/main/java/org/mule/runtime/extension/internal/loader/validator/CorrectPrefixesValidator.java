@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.extension.internal.loader.validator;
 
-import static java.lang.String.format;
-import static java.util.Locale.ROOT;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.IdentifierParsingUtils.getNamespace;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
+
+import static java.lang.String.format;
+import static java.util.Locale.ROOT;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -21,7 +22,6 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.api.util.IdentifierParsingUtils;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.error.ErrorMapping;
@@ -30,7 +30,6 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 
-import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -53,7 +52,6 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
   public static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
 
-  private static final String SEPARATOR = ":";
   public static final String TYPE_RAISE_ERROR_ATTRIBUTE = "type";
   public static final String EMPTY_TYPE_FORMAT_MESSAGE =
       "When using a %s the '%s' must not be null nor empty, offending operation '%s'";
