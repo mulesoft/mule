@@ -29,4 +29,12 @@ public interface InternalSpanExporter {
    * @return the result of visit
    */
   <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor);
+
+  /**
+   * Indicates the level until which the span hierarchy will be exported. For example: if the level is 2, the grandchildren of
+   * this span will not be exported.
+   *
+   * @return the level until which the child span hierarchy will be exported.
+   */
+  int getExportUntilLevel();
 }

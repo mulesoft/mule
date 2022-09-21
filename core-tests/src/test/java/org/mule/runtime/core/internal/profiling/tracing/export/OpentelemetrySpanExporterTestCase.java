@@ -11,6 +11,8 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.export
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
+import static java.lang.Integer.MAX_VALUE;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -57,6 +59,9 @@ public class OpentelemetrySpanExporterTestCase {
                                                                                         getOpenTelemetryTracer(new TestSpanConfiguration(),
                                                                                                                TEST_SERVICE_NAME),
                                                                                         (EventContext) eventContext,
+                                                                                        true,
+                                                                                        MAX_VALUE,
+                                                                                        false,
                                                                                         internalMuleSpan);
     assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan().getSpanContext().getTraceId(), equalTo(PARENT_TRACE_ID));
     assertThat(((ReadableSpan) openTelemetrySpanExporter.getOpenTelemetrySpan()).getParentSpanContext().getTraceId(), equalTo(

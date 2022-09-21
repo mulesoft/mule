@@ -42,13 +42,21 @@ public class OpenTelemetryCoreEventInternalSpanExporterFactory {
   }
 
   /**
-   * @param eventContext an extra instance that may have extra information for creat
+   * @param eventContext                      an extra instance that may have extra information for creat
+   * @param internalSpan                      the {@link InternalSpan} that will eventually be exported
+   * @param exportUntilLevel                  the level until which the child span hierarchy will be exported.
+   * @param ignoreExportLevelLimitOfAncestors if it forces the export ignoring the previous limits set by parents.
    *
-   * @param internalSpan the {@link InternalSpan} that will eventually be exported
    * @return the result exporter.
    */
-  public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, InternalSpan internalSpan) {
+  public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, boolean exportable,
+                                   int exportUntilLevel,
+                                   boolean ignoreExportLevelLimitOfAncestors,
+                                   InternalSpan internalSpan) {
     return new OpenTelemetrySpanExporter(getOpenTelemetryTracer(CONFIGURATION, muleConfiguration.getId()), eventContext,
+                                         exportable,
+                                         exportUntilLevel,
+                                         ignoreExportLevelLimitOfAncestors,
                                          internalSpan);
   }
 

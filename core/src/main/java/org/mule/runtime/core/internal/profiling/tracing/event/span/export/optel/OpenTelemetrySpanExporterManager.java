@@ -33,7 +33,11 @@ public class OpenTelemetrySpanExporterManager implements InternalSpanExportManag
 
   @Override
   public InternalSpanExporter getInternalSpanExporter(EventContext context, MuleConfiguration muleConfiguration,
+                                                      boolean exportable,
+                                                      int exportUntilLevel,
+                                                      boolean ignoreExportLevelLimitOfAncestors,
                                                       InternalSpan internalSpan) {
-    return SPAN_EXPORTER_FACTORY.from(context, muleConfiguration, internalSpan);
+    return SPAN_EXPORTER_FACTORY.from(context, muleConfiguration, exportable, exportUntilLevel, ignoreExportLevelLimitOfAncestors,
+                                      internalSpan);
   }
 }

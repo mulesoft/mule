@@ -11,6 +11,7 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
@@ -39,6 +40,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.lang.ref.Reference;
@@ -59,6 +61,8 @@ import org.reactivestreams.Publisher;
  * @since 4.0
  */
 public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable, Disposable {
+
+  public static final String EXECUTE_NEXT = "execute-next";
 
   static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
   static final String SUBFLOW_POLICY_PART_IDENTIFIER = "sub-flow";
@@ -111,7 +115,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 : policyEventMapper.onOperationPolicyNext(event))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
-    }), policyNextErrorHandler());
+    }), policyNextErrorHandler(), getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
   }
 

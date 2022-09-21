@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event;
 
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.EXECUTE_NEXT;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 
 import org.mule.runtime.api.component.Component;
@@ -30,5 +31,14 @@ public class NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo
   @Override
   public String getName(CoreEvent coreEvent) {
     return getSpanName(component.getIdentifier());
+  }
+
+  @Override
+  public boolean ignoreExportLevelLimitOfAncestors() {
+    if (component.getIdentifier().getName().equals(EXECUTE_NEXT)) {
+      return true;
+    }
+
+    return super.ignoreExportLevelLimitOfAncestors();
   }
 }

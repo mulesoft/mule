@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo.ROUTE_TAG;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo.SPAN_NAME_SEPARATOR;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.EXECUTE_NEXT;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -23,10 +26,14 @@ import java.util.Optional;
 public class NamedSpanBasedOnParentSpanChildSpanCustomizationInfo
     extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
 
+  public static final String EXECUTE_NEXT_ROUTE_TAG = EXECUTE_NEXT + SPAN_NAME_SEPARATOR + ROUTE_TAG;
+
   @Override
   public String getName(CoreEvent coreEvent) {
     return getSpan(coreEvent)
-        .map(internalSpan -> internalSpan.getName() + internalSpan.getChildSpanInfo().getChildSpanSuggestedName()).orElse("");
+        .map(internalSpan -> getComponentNameWithoutNamespace(internalSpan)
+            + internalSpan.getChildSpanInfo().getChildSpanSuggestedName())
+        .orElse("");
   }
 
   @Override
@@ -41,5 +48,17 @@ public class NamedSpanBasedOnParentSpanChildSpanCustomizationInfo
   @Override
   public String getLocationAsString(CoreEvent coreEvent) {
     return getSpan(coreEvent).map(internalSpan -> internalSpan.getAttribute(LOCATION_KEY).orElse("")).orElse("");
+  }
+
+  @Override
+  public boolean isExportable(CoreEvent coreEvent) {
+    return getSpan(coreEvent)
+        .map(internalSpan -> !getComponentNameWithoutNamespace(internalSpan).equals(EXECUTE_NEXT_ROUTE_TAG)).orElse(true);
+  }
+
+  private String getComponentNameWithoutNamespace(InternalSpan internalSpan) {
+    String spanName = internalSpan.getName();
+    int sepPos = spanName.indexOf(SPAN_NAME_SEPARATOR) + 1;
+    return spanName.substring(sepPos);
   }
 }

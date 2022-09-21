@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
 import org.mule.runtime.api.component.Component;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
@@ -21,6 +20,8 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
     extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
 
   public static final String SPAN_NAME_SEPARATOR = ":";
+  public static final String ROUTE_TAG = "route";
+  public static final String ATTEMPT_TAG = "attempt";
 
   protected Component component;
 
@@ -48,9 +49,9 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
 
     public static ChildSpanCustomizationInfo getChildSpanCustomizationInfo(Component component) {
       if (component.getIdentifier().getName().equals(UNTIL_SUCCESSFUL)) {
-        return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + "attempt");
+        return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ATTEMPT_TAG);
       }
-      return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + "route");
+      return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ROUTE_TAG);
     }
   }
 }

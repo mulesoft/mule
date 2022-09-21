@@ -20,10 +20,15 @@ import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 public interface InternalSpanExportManager<T> extends SpanExportManager {
 
   /**
-   * @param context           the context
-   * @param muleConfiguration information about the artifact where the span is generated.
-   * @param internalSpan      the {@link InternalSpan} to export.
+   * @param context                           the context
+   * @param muleConfiguration                 information about the artifact where the span is generated.
+   * @param exportUntilLevel                  Indicates the level until which the span hierarchy will be exported.
+   * @param internalSpan                      the {@link InternalSpan} to export.
+   * @param ignoreExportLevelLimitOfAncestors ignoring if one of the ancestors has set the export until level.
    * @return an {@link InternalSpanExporter}.
    */
-  InternalSpanExporter getInternalSpanExporter(T context, MuleConfiguration muleConfiguration, InternalSpan internalSpan);
+  InternalSpanExporter getInternalSpanExporter(T context, MuleConfiguration muleConfiguration, boolean exportable,
+                                               int exportUntilLevel,
+                                               boolean ignoreExportLevelLimitOfAncestors,
+                                               InternalSpan internalSpan);
 }

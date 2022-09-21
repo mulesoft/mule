@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.privileged.profiling.tracing;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -58,6 +59,32 @@ public interface SpanCustomizationInfo {
    */
   default boolean isExportable(CoreEvent coreEvent) {
     return true;
+  }
+
+  /**
+   * Indicates the level until which the span hierarchy will be exported. For example: if the level is 2, the grandchildren of
+   * this span will not be exported.
+   *
+   * This can be overridden.
+   *
+   * @see #ignoreExportLevelLimitOfAncestors()
+   *
+   * @return the level until which the child span hierarchy will be exported.
+   */
+  default int exportUntilLevel() {
+    return MAX_VALUE;
+  }
+
+  /**
+   * Indicates that both this span and the hierarchy of children will be exported ignoring if one of the ancestors has set the
+   * export until a certain level.
+   *
+   * @see #exportUntilLevel()
+   *
+   * @return if it forces the export ignoring the previous limits set by parents.
+   */
+  default boolean ignoreExportLevelLimitOfAncestors() {
+    return false;
   }
 
 }
