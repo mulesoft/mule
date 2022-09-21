@@ -66,7 +66,7 @@ public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesVal
 
     for (ErrorMapping errorMapping : getErrorMappings(component)) {
       final String errorTypeString = errorMapping.getTarget();
-      final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
+      final ComponentIdentifier errorTypeId = parseErrorType(errorTypeString);
 
       if (errorNamespaces.contains(errorTypeId.getNamespace())) {
         return validateErrorTypeId(component, component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME), artifact,

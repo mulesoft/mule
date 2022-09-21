@@ -7,9 +7,11 @@
 package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
+import static java.util.Locale.ROOT;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.IdentifierParsingUtils.getNamespace;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
@@ -19,6 +21,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.util.IdentifierParsingUtils;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.error.ErrorMapping;
@@ -27,6 +30,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -129,20 +133,13 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
                                                                    attributeToValidate,
                                                                    operationModel.getName())));
     } else {
-      int separator = stringRepresentation.get().indexOf(SEPARATOR);
-      if (separator > 0) {
-        String namespace = stringRepresentation.get().substring(0, separator).toUpperCase();
-        if (!moduleNamespace.toUpperCase().equals(namespace)) {
-          problemsReporter.addError(new Problem(operationModel, format(
-                                                                       WRONG_VALUE_FORMAT_MESSAGE,
-                                                                       workingIdentifier.toString(),
-                                                                       attributeToValidate,
-                                                                       CORE_ERROR_NS,
-                                                                       moduleNamespace.toUpperCase(),
-                                                                       namespace,
-                                                                       operationModel.getName())));
-        }
-      }
+      Optional<String> namespace = getNamespace(stringRepresentation.get());
+      final String moduleErrorNs = moduleNamespace.toUpperCase(ROOT);
+      namespace.filter(ns -> !moduleErrorNs.equals(ns))
+          .ifPresent(ns -> problemsReporter.addError(new Problem(operationModel,
+                                                                 format(WRONG_VALUE_FORMAT_MESSAGE, workingIdentifier.toString(),
+                                                                        attributeToValidate, CORE_ERROR_NS, moduleErrorNs,
+                                                                        namespace, operationModel.getName()))));
     }
   }
 }

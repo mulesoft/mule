@@ -8,14 +8,13 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.IdentifierParsingUtils.getNamespace;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -34,8 +33,6 @@ import java.util.function.Predicate;
  * @since 4.5
  */
 public class OperationRaiseErrorDoesntSpecifyNamespace implements Validation {
-
-  private static final char NAMESPACE_IDENTIFIER_SEPARATOR = ':';
 
   private static final String OPERATION_PREFIX = "operation";
   private static final String RAISE_ERROR = "raise-error";
@@ -67,16 +64,9 @@ public class OperationRaiseErrorDoesntSpecifyNamespace implements Validation {
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
     final String errorTypeString = errorTypeParam.getResolvedRawValue();
-
-    int indexOfSeparator = errorTypeString.indexOf(NAMESPACE_IDENTIFIER_SEPARATOR);
-    if (indexOfSeparator != -1) {
-      String namespace = errorTypeString.substring(0, indexOfSeparator);
-      return of(create(component, errorTypeParam, this,
-                       format("Operation raise error component (%s) is not allowed to specify a namespace: '%s'",
-                              OPERATION_RAISE_ERROR_IDENTIFIER, namespace)));
-    }
-
-    return empty();
+    return getNamespace(errorTypeString).map(s -> create(component, errorTypeParam, this,
+                                                         format("Operation raise error component (%s) is not allowed to specify a namespace: '%s'",
+                                                                OPERATION_RAISE_ERROR_IDENTIFIER, s)));
   }
 
   private static ComponentParameterAst getErrorTypeParam(ComponentAst component) {

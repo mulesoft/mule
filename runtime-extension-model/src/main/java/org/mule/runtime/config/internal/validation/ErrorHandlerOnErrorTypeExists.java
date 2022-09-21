@@ -58,7 +58,7 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
   public Optional<ValidationResultItem> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
     final ComponentParameterAst errorTypeParam = onErrorModel.getParameter(DEFAULT_GROUP_NAME, "type");
     for (String type : errorTypeParam.getResolvedRawValue().split(",")) {
-      final ComponentIdentifier parsedErrorType = parserErrorType(type.trim());
+      final ComponentIdentifier parsedErrorType = parseErrorType(type.trim());
 
       if ("*".equals(parsedErrorType.getNamespace()) || "*".equals(parsedErrorType.getName())) {
         // skip validation for matchers with wildcards
