@@ -83,7 +83,7 @@ public final class ArtifactAstUtils {
                          artifactType,
                          disableValidations,
                          muleContext.getExecutionClassLoader().getParent(),
-                         muleContext.getId(),
+                         muleContext.getConfiguration().getId(),
                          muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion));
   }
 
@@ -151,7 +151,7 @@ public final class ArtifactAstUtils {
 
     return parseArtifactExtensionModel(ast,
                                        artifactClassLoader,
-                                       muleContext.getId(),
+                                       muleContext.getConfiguration().getId(),
                                        muleContext.getConfiguration().getArtifactCoordinates()
                                            .map(ArtifactCoordinates::getVersion),
                                        muleContext.getExtensionManager().getExtensions());
