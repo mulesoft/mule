@@ -7,9 +7,11 @@
 
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorFromFailingProcessor;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
@@ -29,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 
-import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Implementation of {@link InterceptionAction} that does the needed hooks with {@code Reactor} into the pipeline.
@@ -44,11 +46,11 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   private final ReactiveProcessor processor;
   private final ReactiveProcessor next;
-  private final Context ctx;
+  private final ContextView ctx;
   private final DefaultInterceptionEvent interceptionEvent;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    ReactiveProcessor next, Context ctx, ReactiveProcessor processor,
+                                    ReactiveProcessor next, ContextView ctx, ReactiveProcessor processor,
                                     ErrorTypeLocator errorTypeLocator) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
@@ -70,8 +72,8 @@ class ReactiveInterceptionAction implements InterceptionAction {
         .map(interceptionEvent::reset)
         .cast(InterceptionEvent.class)
         // This is needed for all cases because the invoked component may use fluxes
-        .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
-        .subscriberContext(ctx)
+        .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
+        .contextWrite(ctx)
         .toFuture();
   }
 

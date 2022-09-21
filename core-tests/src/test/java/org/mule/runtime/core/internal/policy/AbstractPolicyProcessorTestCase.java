@@ -6,20 +6,22 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import static java.util.UUID.randomUUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
@@ -40,10 +42,12 @@ import org.mule.tck.message.StringAttributes;
 import java.lang.ref.Reference;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
-import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
@@ -89,8 +93,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void messageModifiedByNextProcessorIsPropagated() {
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     mockFlowReturningEvent(modifiedMessageEvent);
-    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
@@ -101,8 +105,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   @Test
   public void messageModifiedBeforeNextProcessorIsPropagatedToIt() {
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(true);
-    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
             .map(e -> CoreEvent.builder(e).message(MESSAGE).build())
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
@@ -117,8 +121,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     DefaultMuleSession session = new DefaultMuleSession();
     CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     mockFlowReturningEvent(modifiedSessionEvent);
-    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
@@ -129,13 +133,11 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   @Test
   public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() {
     DefaultMuleSession session = new DefaultMuleSession();
-    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> {
-          return Mono.<CoreEvent>from(invocation.getArgument(0))
-              .map(e -> PrivilegedEvent.builder(e).session(session).build())
-              .transform((Function<? super Mono<PrivilegedEvent>, ? extends Publisher<Object>>) ((Reference) ctx
-                  .get(POLICY_NEXT_OPERATION)).get());
-        }));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+            .map(e -> PrivilegedEvent.builder(e).session(session).build())
+            .transform((Function<? super Mono<PrivilegedEvent>, ? extends Publisher<Object>>) ((Reference) ctx
+                .get(POLICY_NEXT_OPERATION)).get())));
 
     just(initialEvent).transform(policyProcessor).block();
 

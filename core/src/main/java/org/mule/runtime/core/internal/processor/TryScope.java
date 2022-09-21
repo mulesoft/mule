@@ -37,9 +37,9 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -70,7 +70,8 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.util.context.Context;
+
+import reactor.util.context.ContextView;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -114,8 +115,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig, errorAfterTimeout);
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
-    return subscriberContext()
-        .flatMapMany(ctx -> from(publisher)
+    return deferContextual(ctx -> from(publisher)
             .handle((event, sink) -> {
               final boolean txPrevoiuslyActive = isTransactionActive();
               Transaction previousTx = getCurrentTx();
@@ -164,16 +164,16 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
   }
 
-  private CoreEvent processBlocking(Context ctx, CoreEvent event) throws MuleException {
+  private CoreEvent processBlocking(ContextView ctx, CoreEvent event) throws MuleException {
     try {
       return just(event)
-          .subscriberContext(popTxFromSubscriberContext())
+          .contextWrite(popTxFromSubscriberContext())
           .transform(nestedChain)
           .onErrorStop()
           // This is needed for all cases because of the way that transactional try cache invokes its inner chain
-          .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true))
-          .subscriberContext(pushTxToSubscriberContext(getLocation().getLocation()))
-          .subscriberContext(ctx)
+          .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true))
+          .contextWrite(pushTxToSubscriberContext(getLocation().getLocation()))
+          .contextWrite(ctx)
           .block();
     } catch (Throwable e) {
       if (e.getCause() instanceof InterruptedException) {

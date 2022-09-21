@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.rx;
 
-import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_STACK_TRACES_ON_DROP;
+
+import static java.lang.Boolean.getBoolean;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.create;
 import static reactor.util.context.Context.empty;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -37,7 +40,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   public Flux<T> flux() {
     return create(this)
-        .subscriberContext(ctx -> empty());
+        .contextWrite(ctx -> empty());
   }
 
   @Override

@@ -116,7 +116,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> subscriberContext(Function<Context, Context> function) {
-      mono = mono.subscriberContext(function);
+      mono = mono.contextWrite(function);
       return this;
     }
 
@@ -174,7 +174,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
 
     @Override
     public ReactorPublisherBuilder<Flux<CoreEvent>> subscriberContext(Function<Context, Context> function) {
-      flux = flux.subscriberContext(function);
+      flux = flux.contextWrite(function);
       return this;
     }
 

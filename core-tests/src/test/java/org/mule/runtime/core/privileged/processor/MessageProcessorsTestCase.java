@@ -6,24 +6,6 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.EMPTY_LIST;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isA;
-import static org.junit.Assert.fail;
-import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
@@ -44,6 +26,26 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.isA;
+import static org.junit.Assert.fail;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -80,16 +82,19 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+
+import org.reactivestreams.Publisher;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
 
 import io.qameta.allure.Issue;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -384,34 +389,36 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   private void assertHandleErrorWithStack(List<FlowStackElement> parentStack, List<FlowStackElement> childStack)
       throws InitialisationException {
 
-    thrown.expectCause(isA(MessagingException.class));
-
     final DefaultFlowCallStack inputFlowCallStack = (DefaultFlowCallStack) input.getFlowCallStack();
     Reference<DefaultFlowCallStack> childFlowCallStack = new Reference<>();
 
     chain = createChain(error);
 
-    try {
-      parentStack.stream().forEachOrdered(inputFlowCallStack::push);
+    parentStack.stream().forEachOrdered(inputFlowCallStack::push);
 
-      ReactiveProcessor childWithStack = p -> from(p).flatMap(e -> {
-        DefaultFlowCallStack stack = (DefaultFlowCallStack) e.getFlowCallStack();
+    ReactiveProcessor childWithStack = p -> from(p).flatMap(e -> {
+      DefaultFlowCallStack stack = (DefaultFlowCallStack) e.getFlowCallStack();
 
-        childStack.stream().forEachOrdered(stack::push);
+      childStack.stream().forEachOrdered(stack::push);
 
-        childFlowCallStack.set(stack);
+      childFlowCallStack.set(stack);
 
-        return from(processWithChildContext(e, error, Optional.empty()));
-      });
+      return from(processWithChildContext(e, error, Optional.empty()));
+    });
 
-      from(applyWithChildContextDontPropagateErrors(
-                                                    applyWithChildContextDontPropagateErrors(just(input), childWithStack,
-                                                                                             Optional.empty()),
-                                                    chain, Optional.empty())).subscribe();
-    } finally {
-      assertThat(childFlowCallStack.get(), is(not(nullValue())));
-      assertThat(inputFlowCallStack.getElements(), is(childFlowCallStack.get().getElements()));
-    }
+    AtomicReference<Throwable> handledError = new AtomicReference<>();
+
+    from(applyWithChildContextDontPropagateErrors(
+                                                  applyWithChildContextDontPropagateErrors(just(input), childWithStack,
+                                                                                           Optional.empty()),
+                                                  chain, Optional.empty()))
+                                                      .subscribe(e -> {
+                                                      },
+                                                                 handledError::set);
+
+    assertThat(handledError.get(), isA(MessagingException.class));
+    assertThat(childFlowCallStack.get(), is(not(nullValue())));
+    assertThat(inputFlowCallStack.getElements(), is(childFlowCallStack.get().getElements()));
   }
 
   @Test

@@ -23,9 +23,9 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -108,8 +108,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
                    componentLocation.getLocation());
 
-      return publisher -> subscriberContext()
-          .flatMapMany(ctx -> from(publisher)
+      return publisher -> deferContextual(ctx -> from(publisher)
               .flatMap(event -> just(event)
                   .cast(InternalEvent.class)
                   .map(doBefore(interceptor, (Component) component, dslParameters))

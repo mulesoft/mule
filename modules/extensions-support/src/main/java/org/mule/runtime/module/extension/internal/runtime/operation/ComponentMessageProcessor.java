@@ -61,8 +61,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -177,7 +177,7 @@ import org.slf4j.Logger;
 import org.slf4j.MDC;
 
 import reactor.core.publisher.Flux;
-import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * A {@link Processor} capable of executing extension components.
@@ -310,8 +310,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final boolean mayCompleteInDifferentThread = mayCompleteInDifferentThread();
     final ComponentLocation location = getLocation();
 
-    return subscriberContext()
-        .flatMapMany(ctx -> {
+      return deferContextual(ctx -> {
           Flux<CoreEvent> transformed =
               createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
                   .doOnNext(result -> {
@@ -437,7 +436,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private void onEvent(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
+  private void onEvent(CoreEvent event, ExecutorCallback executorCallback, ContextView ctx) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
@@ -470,7 +469,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
+  private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, ContextView ctx) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
@@ -664,8 +663,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-          return subscriberContext()
-              .flatMapMany(ctx -> {
+            return deferContextual(ctx -> {
                 final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
 
                 return from(propagateCompletion(from(publisher), emitter.flux(),
@@ -741,7 +739,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
+  private CoreEvent addContextToEvent(CoreEvent event, ContextView ctx) throws MuleException {
     SdkInternalContext sdkInternalContext = from(event);
     if (sdkInternalContext == null) {
       sdkInternalContext = new SdkInternalContext();
@@ -786,7 +784,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void setOperationExecutionParams(ComponentLocation location, CoreEvent event,
                                            Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                           CoreEvent operationEvent, ExecutorCallback callback, Context ctx) {
+                                           CoreEvent operationEvent, ExecutorCallback callback, ContextView ctx) {
 
     SdkInternalContext sdkInternalContext = SdkInternalContext.from(event);
 

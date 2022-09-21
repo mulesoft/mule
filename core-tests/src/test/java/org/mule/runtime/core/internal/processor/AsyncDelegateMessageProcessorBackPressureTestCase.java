@@ -18,7 +18,8 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHI
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
-import static reactor.core.publisher.Mono.subscriberContext;
+import static reactor.core.publisher.Flux.deferContextual;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -112,12 +113,11 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
   public void streamPerEventSinkMonoFlagged() throws MuleException {
     AtomicBoolean withinProcessToApply = new AtomicBoolean();
 
-    final StreamPerEventSink streamPerEventSink = new StreamPerEventSink(pub -> subscriberContext()
-        .flatMapMany(ctx -> Flux.from(pub)
-            .map(p -> {
-              withinProcessToApply.set(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false));
-              return p;
-            })),
+    final StreamPerEventSink streamPerEventSink = new StreamPerEventSink(pub -> deferContextual(ctx -> from(pub)
+        .map(p -> {
+          withinProcessToApply.set(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false));
+          return p;
+        })),
                                                                          event -> {
                                                                          });
 

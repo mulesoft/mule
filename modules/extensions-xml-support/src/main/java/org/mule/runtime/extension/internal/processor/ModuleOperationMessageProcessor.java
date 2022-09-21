@@ -228,19 +228,20 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         .map(this::createEventWithParameters)
         // 2. Restore the error handler, overriding the last one set by the inner chain. This one being set again is the one that
         // must be used for handling any errors in the mapper above.
-        .subscriberContext(ctx -> ctx.getOrEmpty(localStrategyCtxKey)
+        .contextWrite(ctx -> ctx.getOrEmpty(localStrategyCtxKey)
             .map(localErrorStr -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, localErrorStr))
             .orElse(ctx))
-        .compose(eventPub -> applyWithChildContext(eventPub,
-                                                   p -> from(p)
-                                                       .doOnNext(this::pushFlowStackEntry)
-                                                       .compose(nestedChain)
-                                                       .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-                                                           .pop()),
-                                                   ofNullable(getLocation()),
-                                                   errorHandler()))
+        .transformDeferred(eventPub -> applyWithChildContext(eventPub,
+                                                             p -> from(p)
+                                                                 .doOnNext(this::pushFlowStackEntry)
+                                                                 .transformDeferred(nestedChain)
+                                                                 .doOnNext(event -> ((DefaultFlowCallStack) event
+                                                                     .getFlowCallStack())
+                                                                         .pop()),
+                                                             ofNullable(getLocation()),
+                                                             errorHandler()))
         // 1. Store the current error handler into the subscription context, so it can be retrieved later
-        .subscriberContext(ctx -> ctx.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY)
+        .contextWrite(ctx -> ctx.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY)
             .map(onNextErrorStr -> ctx.put(localStrategyCtxKey, onNextErrorStr))
             .orElse(ctx))
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));

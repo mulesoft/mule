@@ -42,8 +42,8 @@ import static java.util.stream.Collectors.toList;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -104,7 +104,6 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -197,9 +196,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-      return subscriberContext()
-          .flatMapMany(ctx -> {
-            // take into account events that might still be in an error handler to keep the flux from completing until those are
+        return deferContextual(ctx -> {
+            // Take into account events that might still be in an error handler to keep the flux from completing until those are
             // finished.
             final AtomicInteger inflightEvents = new AtomicInteger();
 

@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.retry.policies;
 
-import static java.lang.String.valueOf;
-import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.retry.policy.PolicyStatus.policyExhausted;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+
+import static java.lang.String.valueOf;
+import static java.time.Duration.ofMillis;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
@@ -19,6 +21,8 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
+import static reactor.util.retry.Retry.withThrowable;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
@@ -34,9 +38,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import net.jodah.failsafe.Failsafe;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import net.jodah.failsafe.Failsafe;
 import reactor.core.publisher.Mono;
 import reactor.retry.BackoffDelay;
 import reactor.retry.Retry;
@@ -125,8 +130,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
             fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransanctional.get()));
 
         Mono<T> retryMono = from(publisher)
-            .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler)
-                .doOnRetry(retryContext -> logRetrying(retryContext.iteration())))
+            .retryWhen(withThrowable(retry.withBackoffScheduler(reactorRetryScheduler)
+                .doOnRetry(retryContext -> logRetrying(retryContext.iteration()))))
             .doOnError(e2 -> {
               logRetriesExhausted();
               onExhausted.accept(unwrap(e2));
