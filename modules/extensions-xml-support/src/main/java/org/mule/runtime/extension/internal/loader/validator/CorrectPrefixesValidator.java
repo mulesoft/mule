@@ -13,7 +13,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
 import static java.lang.String.format;
-import static java.util.Locale.ROOT;
+import static java.util.Locale.getDefault;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -132,7 +132,7 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
                                                                    operationModel.getName())));
     } else {
       Optional<String> namespace = getNamespace(stringRepresentation.get());
-      final String moduleErrorNs = moduleNamespace.toUpperCase(ROOT);
+      final String moduleErrorNs = moduleNamespace.toUpperCase(getDefault());
       namespace.filter(ns -> !moduleErrorNs.equals(ns))
           .ifPresent(ns -> problemsReporter.addError(new Problem(operationModel,
                                                                  format(WRONG_VALUE_FORMAT_MESSAGE, workingIdentifier.toString(),

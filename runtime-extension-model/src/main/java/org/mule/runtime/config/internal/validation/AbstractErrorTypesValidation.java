@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
-import static org.mule.runtime.api.util.IdentifierParsingUtils.parseErrorType;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
@@ -17,7 +16,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_P
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.lang.String.format;
-import static java.util.Locale.ROOT;
+import static java.util.Locale.getDefault;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
@@ -34,10 +33,8 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.internal.dsl.DslConstants;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,7 +43,7 @@ import java.util.Set;
  */
 public abstract class AbstractErrorTypesValidation implements Validation {
 
-  private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(ROOT);
+  private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(getDefault());
   protected static final String RAISE_ERROR = "raise-error";
 
   protected static final String ON_ERROR = "on-error";
@@ -123,7 +120,7 @@ public abstract class AbstractErrorTypesValidation implements Validation {
 
   protected static Set<String> getAlreadyUsedErrorNamespaces(ArtifactAst artifact) {
     return artifact.dependencies().stream()
-        .map(dependency -> dependency.getXmlDslModel().getPrefix().toUpperCase(ROOT))
+        .map(dependency -> dependency.getXmlDslModel().getPrefix().toUpperCase(getDefault()))
         .collect(toSet());
   }
 }
