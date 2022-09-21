@@ -35,6 +35,7 @@ public class SpecialTypesTypeLoader implements TypeLoader {
   private static final Map<String, MetadataType> SPECIAL_TYPES =
       unmodifiableMap(SmallMap.of(
                                   VOID, create(JAVA).voidType().build(),
+                                  // TODO (W-11793405): Review this type
                                   ERROR, create(JAVA).objectType()
                                       .id(Error.class.getName())
                                       .with(new ClassInformationAnnotation(Error.class))
