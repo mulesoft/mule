@@ -162,7 +162,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.3.0-20220919</muleDslApiVersion>
-        <muleAstVersion>0.8.0-20220919</muleAstVersion>
+        <muleAstVersion>0.8.0-20220922</muleAstVersion>
         <muleExtensionsApiVersion>1.3.0-20220919</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.3.0-20220919</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.5.0-20220919</muleMavenClientApi>
