@@ -58,7 +58,6 @@ import io.qameta.allure.Story;
 public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(ArtifactAstInRegistryTestCase.class);
-  private static final String OPTIONAL_OBJECT_KEY = "optional";
 
   @Parameters(name = "addArtifactAstToRegistry: {0}; lazyInit: {1}")
   public static List<Boolean[]> params() {
@@ -94,7 +93,7 @@ public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
                                                                                                                        addArtifactAstToRegistry
                                                                                                                            .toString()),
                                                                                                           APP,
-                                                                                                          false);
+                                                                                                          lazyInit);
 
     muleContext = (MuleContextWithRegistry) new DefaultMuleContextFactory()
         .createMuleContext(testServicesConfigurationBuilder,
