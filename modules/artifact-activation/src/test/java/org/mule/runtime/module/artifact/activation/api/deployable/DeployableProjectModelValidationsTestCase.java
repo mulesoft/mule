@@ -81,7 +81,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
     expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Artifact 'org.mule.sample:test-dep-b' is declared as a sharedLibrary but is not a dependency of the project");
-    new DeployableProjectModel(emptyList(), emptyList(),
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
@@ -106,7 +106,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
     Set<BundleDescriptor> sharedLibraries = new HashSet<>();
     sharedLibraries.add(testDep);
 
-    new DeployableProjectModel(emptyList(), emptyList(),
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
@@ -144,7 +144,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
     expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is declared in additionalPluginDependencies but is not a dependency of the project");
-    new DeployableProjectModel(emptyList(), emptyList(),
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
@@ -176,7 +176,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
             .build())
         .build()));
 
-    new DeployableProjectModel(emptyList(), emptyList(),
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
@@ -210,7 +210,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
     expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
-    new DeployableProjectModel(emptyList(), emptyList(),
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
@@ -240,7 +240,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
             .build())
         .build());
 
-    new DeployableProjectModel(emptyList(), emptyList(),
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
