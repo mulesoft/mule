@@ -50,8 +50,8 @@ import java.util.stream.Stream;
  */
 public class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
-  // The namespace of the extension when it's defined within an application rather than in a separate artifact.
-  public static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
+  // The namespace of the extension when it's defined within the same artifact rather than in a separate artifact.
+  public static final String ARTIFACT_LOCAL_EXTENSION_NAMESPACE = "THIS";
 
   private final MuleSdkExtensionModelMetadataParser metadataParser;
   private final Supplier<Stream<ComponentAst>> topLevelComponentsSupplier;

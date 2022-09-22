@@ -20,7 +20,7 @@ import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNam
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.ARTIFACT_LOCAL_EXTENSION_NAMESPACE;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -159,7 +159,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       }
 
       // TODO: Use the extension parser's namespace.
-      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels,
+      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(ARTIFACT_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels,
                                    hierarchy);
     }
 

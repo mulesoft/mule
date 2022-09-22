@@ -14,7 +14,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkApplicationExtensionModelMetadataParser;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkArtifactLocalExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
 import java.util.function.Supplier;
@@ -39,7 +39,7 @@ public class MuleSdkApplicationExtensionModelParserFactory extends BaseMuleSdkEx
   @Override
   protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
     String extensionName = getMandatoryParameter(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME);
-    return new MuleSdkApplicationExtensionModelMetadataParser(extensionName);
+    return new MuleSdkArtifactLocalExtensionModelMetadataParser(extensionName);
   }
 
   @Override
