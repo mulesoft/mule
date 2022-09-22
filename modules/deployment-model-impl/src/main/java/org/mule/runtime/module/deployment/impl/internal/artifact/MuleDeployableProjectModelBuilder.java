@@ -16,6 +16,8 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
@@ -207,7 +209,7 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
   private List<BundleDependency> getTransitiveDependencies(BundleDependency bundleDependency) {
     if (bundleDependency.getDescriptor().isPlugin() && bundleDependency.getBundleUri() != null) {
       ClassLoaderModel packagerClassLoaderModel =
-          getPackagerClassLoaderModel(getClassLoaderModelDescriptor(new File(bundleDependency.getBundleUri())));
+          getPackagerClassLoaderModel(getPluginClassLoaderModelDescriptor(bundleDependency));
 
       return packagerClassLoaderModel.getDependencies().stream()
           .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
@@ -436,11 +438,20 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
         .build();
   }
 
-  private File getClassLoaderModelDescriptor(File artifactFile) {
-    if (artifactFile.isDirectory()) {
-      return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
+  private File getPluginClassLoaderModelDescriptor(BundleDependency bundleDependency) {
+    File artifactFile = new File(bundleDependency.getBundleUri());
+    if (isHeavyPackage(artifactFile)) {
+      return getClassLoaderModelDescriptor(artifactFile);
     } else {
-      return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+      char slashChar = '/';
+      String path = META_INF + slashChar +
+          MULE_ARTIFACT + slashChar +
+          bundleDependency.getDescriptor().getGroupId().replace('.', slashChar) + slashChar +
+          bundleDependency.getDescriptor().getArtifactId() + slashChar +
+          bundleDependency.getDescriptor().getBaseVersion() + slashChar +
+          CLASSLOADER_MODEL_JSON_DESCRIPTOR;
+
+      return new File(projectFolder.getAbsolutePath(), path);
     }
   }
 
@@ -452,6 +463,14 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
     return ClassLoaderModelJsonSerializer.deserialize(classLoaderModelDescriptor);
   }
 
+  private static File getClassLoaderModelDescriptor(File artifactFile) {
+    if (artifactFile.isDirectory()) {
+      return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
+    } else {
+      return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+    }
+  }
+
   /**
    * Determines if the given project corresponds to a heavyweight package or a lightweight one.
    *
@@ -459,7 +478,7 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
    * @return {@code true} if the given project corresponds to a heavyweight package, {@code false} otherwise.
    */
   public static boolean isHeavyPackage(File projectFolder) {
-    return (new File(projectFolder, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION)).exists();
+    return getClassLoaderModelDescriptor(projectFolder).exists();
   }
 
 }

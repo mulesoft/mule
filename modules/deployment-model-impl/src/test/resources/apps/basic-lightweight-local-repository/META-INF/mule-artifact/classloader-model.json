@@ -1,0 +1,49 @@
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "com.test",
+    "artifactId": "basic",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-http-connector",
+        "version": "1.1.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "file:/path-to-local-repository/org/mule/connectors/mule-http-connector/1.1.0/mule-http-connector-1.1.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-sockets-connector",
+        "version": "1.1.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "file:/path-to-local-repository/org/mule/connectors/mule-sockets-connector/1.1.0/mule-sockets-connector-1.1.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-db-connector",
+        "version": "1.13.1",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "file:/path-to-local-repository/org/mule/connectors/mule-db-connector/1.13.1/mule-db-connector-1.13.1-mule-plugin.jar"
+    }
+  ],
+  "packages": [
+    "org.test"
+  ],
+  "resources": [
+    "app.xml",
+    "test-script.dwl"
+  ]
+}
