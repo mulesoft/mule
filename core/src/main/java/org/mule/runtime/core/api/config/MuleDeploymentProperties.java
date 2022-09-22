@@ -12,17 +12,24 @@ package org.mule.runtime.core.api.config;
 public class MuleDeploymentProperties {
 
   public static final String DEPLOYMENT_PROPERTY_PREFIX = "mule.application.deployment";
-  public static final String MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".muteLog";
+
+  public static final String MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY =
+      DEPLOYMENT_PROPERTY_PREFIX + ".muteLog";
 
   // TODO MULE-19199 Review usages of this property
-  public static final String MULE_LAZY_INIT_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit";
+  public static final String MULE_LAZY_INIT_DEPLOYMENT_PROPERTY =
+      DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit";
   public static final String MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY =
       MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableXmlValidations";
   public static final String MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY =
       MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableDslDeclarationValidations";
-  public static final String MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyConnections";
+  public static final String MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY =
+      DEPLOYMENT_PROPERTY_PREFIX + ".lazyConnections";
+  public static final String MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY =
+      DEPLOYMENT_PROPERTY_PREFIX + ".addArtifactAstToRegistry";
 
-  public static final String MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit.forceLog";
+  public static final String MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY =
+      DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit.forceLog";
 
   private MuleDeploymentProperties() {}
 }

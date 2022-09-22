@@ -184,6 +184,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         getCoreFunctionsProvider(),
                                                         getConfigurationProperties(),
                                                         getArtifactType(),
+                                                        getApplicationModel(),
                                                         getOptionalObjectsController(),
                                                         beanFactory,
                                                         getServiceDiscoverer(),

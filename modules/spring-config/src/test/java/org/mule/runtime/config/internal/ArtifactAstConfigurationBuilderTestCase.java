@@ -15,13 +15,13 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Collections.emptyMap;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
-import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -48,13 +48,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
 import org.mockito.ArgumentCaptor;
+
+import io.qameta.allure.Issue;
 
 public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
@@ -93,7 +95,7 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
   private void doTestBaseRegistryExpressionLanguageAdapter(boolean lazyInit, Class expectedClass) throws IOException,
       ConfigurationException {
     final ArtifactAstConfigurationBuilder configurationBuilder =
-        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), lazyInit);
+        astConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), lazyInit);
     ArgumentCaptor<Registry> registryCaptor = ArgumentCaptor.forClass(Registry.class);
     configurationBuilder.configure(muleContext);
 
@@ -115,7 +117,7 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
   @Test
   public void memoryManagementCanBeInjectedInBean() throws MuleException, IOException {
     final ArtifactAstConfigurationBuilder configurationBuilder =
-        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), false);
+        astConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), false);
 
     configurationBuilder.configure(muleContext);
     final ArtifactContext artifactContext = configurationBuilder.createArtifactContext();
@@ -125,7 +127,7 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
     assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
   }
 
-  private ArtifactAstConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, ArtifactAst artifactAst,
+  private ArtifactAstConfigurationBuilder astConfigurationBuilderRelativeToPath(File basePath, ArtifactAst artifactAst,
                                                                                 boolean lazyInit)
       throws IOException {
     return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),

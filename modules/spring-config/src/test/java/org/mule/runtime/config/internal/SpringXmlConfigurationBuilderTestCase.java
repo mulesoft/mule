@@ -17,17 +17,17 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -57,13 +57,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
 import org.mockito.ArgumentCaptor;
+
+import io.qameta.allure.Issue;
 
 public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
