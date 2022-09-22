@@ -42,6 +42,7 @@ public abstract class BaseMuleSdkExtensionModelParserFactory implements Extensio
 
   protected abstract MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context);
 
+  // TODO W-11796932: We should be able to remove this one by redesigning the DSL
   protected abstract Supplier<Stream<ComponentAst>> createTopLevelComponentsSupplier(ExtensionLoadingContext context);
 
   /**
