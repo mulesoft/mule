@@ -42,7 +42,7 @@ public class MvelClassLoaderReleaser implements ResourceReleaser {
   protected void releaseFromASMAccessOptimizer() {
     ClassLoader mvelCl = ((ClassLoader) getMVELClassLoader());
 
-    if (mvelCl.getParent() == muleArtifactClassLoader) {
+    if (mvelCl != null && mvelCl.getParent() == muleArtifactClassLoader) {
       setMVELClassLoader(null);
     }
   }
@@ -55,7 +55,7 @@ public class MvelClassLoaderReleaser implements ResourceReleaser {
     try {
       mvelCl = (ClassLoader) clField.get(null);
 
-      if (mvelCl.getParent() == muleArtifactClassLoader) {
+      if (mvelCl != null && mvelCl.getParent() == muleArtifactClassLoader) {
         clField.set(null, null);
       }
     } finally {
