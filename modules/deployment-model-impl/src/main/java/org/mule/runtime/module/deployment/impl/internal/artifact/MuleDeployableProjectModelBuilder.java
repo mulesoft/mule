@@ -127,6 +127,7 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
 
     return new DeployableProjectModel(packages,
                                       resources,
+                                      emptyList(),
                                       buildBundleDescriptor(packagerClassLoaderModel.getArtifactCoordinates()),
                                       getModelResolver(packagerClassLoaderModel.getArtifactCoordinates()),
                                       projectFolder, dependencies, sharedLibraries,

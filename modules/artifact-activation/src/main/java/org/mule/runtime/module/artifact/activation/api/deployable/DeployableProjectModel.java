@@ -152,9 +152,10 @@ public final class DeployableProjectModel {
   }
 
   /**
-   * These are the resources in the modeled project.
+   * These are the resources in the modeled project. These resources are located in one of the folders of {@link resourcesPath}
    * <p>
    * This does not take into account the resources of this project's dependencies.
+   *
    *
    * @return the resources of the project.
    */
