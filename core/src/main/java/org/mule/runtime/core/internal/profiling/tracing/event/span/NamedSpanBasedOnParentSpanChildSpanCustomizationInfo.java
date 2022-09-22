@@ -31,9 +31,7 @@ public class NamedSpanBasedOnParentSpanChildSpanCustomizationInfo
   @Override
   public String getName(CoreEvent coreEvent) {
     return getSpan(coreEvent)
-        .map(internalSpan -> getComponentNameWithoutNamespace(internalSpan)
-            + internalSpan.getChildSpanInfo().getChildSpanSuggestedName())
-        .orElse("");
+        .map(internalSpan -> internalSpan.getName() + internalSpan.getChildSpanInfo().getChildSpanSuggestedName()).orElse("");
   }
 
   @Override
