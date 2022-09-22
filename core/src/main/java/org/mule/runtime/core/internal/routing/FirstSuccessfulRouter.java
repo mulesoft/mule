@@ -184,7 +184,6 @@ class FirstSuccessfulRouter {
             }
           }
           // Scope execution was successful
-          inflightEvents.decrementAndGet();
           Stack<CoreEvent> nextEventContainer = nextExecutionContextResolver.getCurrentContextFromEvent(successfulEvent);
           nextEventContainer.pop();
           downstreamRecorder
