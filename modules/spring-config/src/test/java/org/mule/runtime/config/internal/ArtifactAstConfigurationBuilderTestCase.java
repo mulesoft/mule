@@ -127,17 +127,6 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
     assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
   }
 
-  @Test
-  public void artifactAstInRegistryIfEnabled() {
-
-  }
-
-  @Test
-  public void artifactAstNotInRegistryIfNotEnabled() {
-
-  }
-
-
   private ArtifactAstConfigurationBuilder astConfigurationBuilderRelativeToPath(File basePath, ArtifactAst artifactAst,
                                                                                 boolean lazyInit)
       throws IOException {
