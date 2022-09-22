@@ -112,12 +112,6 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     assertThat(span.getDuration().getStart(), notNullValue());
   }
 
-  private void setSpanMock(InternalSpan spanMock) {
-    when(spanMock.getName()).thenReturn(MULE_DUMMY_COMPONENT_NAME);
-    ChildSpanCustomizationInfo childSpanInfo = mock(ChildSpanCustomizationInfo.class);
-    when(spanMock.getChildSpanInfo()).thenReturn(childSpanInfo);
-  }
-
   @Test
   public void whenNewExportLevelIsLessThanParentLevelReturnNewLevel() {
     doTestLevels(3, 1);
@@ -186,5 +180,11 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     } else {
       assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), not(instanceOf(NoExportableOpenTelemetrySpan.class)));
     }
+  }
+
+  private void setSpanMock(InternalSpan spanMock) {
+    when(spanMock.getName()).thenReturn(MULE_DUMMY_COMPONENT_NAME);
+    ChildSpanCustomizationInfo childSpanInfo = mock(ChildSpanCustomizationInfo.class);
+    when(spanMock.getChildSpanInfo()).thenReturn(childSpanInfo);
   }
 }
