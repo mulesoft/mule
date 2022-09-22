@@ -80,7 +80,8 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
         .thenReturn(applicationClassLoader2);
     when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(Supplier.class)))
         .thenReturn(applicationClassLoader3);
-    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(), any())).thenReturn(applicationClassLoader4);
+    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(), any(PluginClassLoaderResolver.class)))
+        .thenReturn(applicationClassLoader4);
     when(artifactClassLoaderResolver.createMulePluginClassLoader(any(), any(), any())).thenReturn(pluginClassLoader1);
     when(artifactClassLoaderResolver.createMulePluginClassLoader(any(), any(), any(), any())).thenReturn(pluginClassLoader2);
   }

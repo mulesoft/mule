@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
@@ -72,6 +73,10 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
                                                                   PRIVILEGED_EXPORTED_PACKAGES)),
                                        new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
                                                                   PRIVILEGED_ARTIFACTS_IDS)));
+    } else if (isMuleFramework()) {
+      classLoaderConfigurationBuilder
+          .exportingPackages(newHashSet(packagerClassLoaderModel.getPackages()))
+          .exportingResources(newHashSet(packagerClassLoaderModel.getResources()));
     }
 
     List<BundleDependency> bundleDependencies = getBundleDependencies();
