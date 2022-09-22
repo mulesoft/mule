@@ -164,7 +164,7 @@
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.4.0-20220919</muleDslApiVersion>
         <muleAstVersion>1.0.0-20220919</muleAstVersion>
-        <mulePropertiesApiVersion>1.0.0-20220919</mulePropertiesApiVersion>
+        <mulePropertiesApiVersion>1.0.0-20220922</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.4.0-20220919</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.0.0</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.4.0-20220919</muleHttpPolicyApiVersion>
