@@ -25,7 +25,7 @@ import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkApplicationExtensionModelMetadataParser;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkArtifactLocalExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
@@ -64,9 +64,13 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   @Override
   protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
+    // The existence of the name here means that the AST parser is trying to load the artifact-local ExtensionModel in order
+    // to complete the AST.
     Optional<String> extensionName = context.getParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME);
+
     if (extensionName.isPresent()) {
-      return new MuleSdkApplicationExtensionModelMetadataParser(extensionName.get());
+      // In this case, we need to treat is as artifact-local, even when the artifact is an extension.
+      return new MuleSdkArtifactLocalExtensionModelMetadataParser(extensionName.get());
     } else {
       return new MuleSdkExtensionExtensionModelMetadataParser(getArtifactAst(context));
     }

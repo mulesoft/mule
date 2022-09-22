@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser.metadata;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.ARTIFACT_LOCAL_EXTENSION_NAMESPACE;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
 import static java.util.Optional.empty;
@@ -17,21 +17,20 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
 import java.util.Optional;
 
 /**
- * {@link MuleSdkExtensionModelMetadataParser} implementation for Mule SDK extensions defined as part of an application.
+ * {@link MuleSdkExtensionModelMetadataParser} implementation for Mule SDK extensions defined as part of the same artifact.
  *
  * @since 4.5.0
  */
-public class MuleSdkApplicationExtensionModelMetadataParser implements MuleSdkExtensionModelMetadataParser {
+public class MuleSdkArtifactLocalExtensionModelMetadataParser implements MuleSdkExtensionModelMetadataParser {
 
   private final String extensionName;
 
-  public MuleSdkApplicationExtensionModelMetadataParser(String extensionName) {
+  public MuleSdkArtifactLocalExtensionModelMetadataParser(String extensionName) {
     this.extensionName = extensionName;
   }
 
@@ -57,7 +56,7 @@ public class MuleSdkApplicationExtensionModelMetadataParser implements MuleSdkEx
 
   @Override
   public String getNamespace() {
-    return APP_LOCAL_EXTENSION_NAMESPACE;
+    return ARTIFACT_LOCAL_EXTENSION_NAMESPACE;
   }
 
   @Override
