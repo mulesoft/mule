@@ -42,7 +42,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
-import org.mule.runtime.extension.internal.component.value.HasObjectType;
+import org.mule.runtime.extension.internal.component.value.EnrichedValue;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
@@ -198,8 +198,12 @@ public class ResolverSetUtils {
                                                          MuleContext muleContext, ValueResolverFactory valueResolverFactory,
                                                          boolean acceptsReferences)
       throws MuleException {
+    if (value instanceof EnrichedValue) {
+      value = ((EnrichedValue) value).getValue();
+      type = getTypeFromEnrichedValue((EnrichedValue) value, type);
+    }
+    Object finalValue = value;
     Reference<ValueResolver> resolverReference = new Reference<>();
-
     if (type.getMetadataFormat().equals(MetadataFormat.JAVA)) {
       type.accept(new MetadataTypeVisitor() {
 
@@ -208,18 +212,18 @@ public class ResolverSetUtils {
           boolean effectivelyAcceptReferences = acceptsReferences;
           ValueResolver resolver;
           try {
-            if (value instanceof Collection) {
+            if (finalValue instanceof Collection) {
 
-              resolver = getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
+              resolver = getParameterValueResolverForCollection(parameterName, arrayType, (Collection) finalValue,
                                                                 reflectionCache, muleContext,
                                                                 valueResolverFactory);
               effectivelyAcceptReferences = false;
             } else {
-              resolver = new StaticValueResolver(value);
+              resolver = new StaticValueResolver(finalValue);
             }
             resolverReference
                 .set(getValueResolverFor(parameterName, arrayType, resolveAndInjectIfStatic(resolver, muleContext),
-                                         getDefaultValue(type),
+                                         getDefaultValue(arrayType),
                                          getExpressionSupport(arrayType), false, modelProperties, effectivelyAcceptReferences,
                                          valueResolverFactory));
           } catch (MuleException e) {
@@ -233,27 +237,27 @@ public class ResolverSetUtils {
           ValueResolver resolver;
           try {
             if (isMap(objectType)) {
-              if (value instanceof Map) {
-                resolver = getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
+              if (finalValue instanceof Map) {
+                resolver = getParameterValueResolverForMap(parameterName, objectType, (Map) finalValue, reflectionCache,
                                                            muleContext, valueResolverFactory);
                 effectivelyAcceptReferences = false;
               } else {
-                resolver = new StaticValueResolver(value);
+                resolver = new StaticValueResolver(finalValue);
               }
             } else {
               Optional<ValueResolver> pojoResolver =
-                  getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
+                  getPojoParameterValueResolver(parameterName, objectType, finalValue, reflectionCache,
                                                 muleContext, valueResolverFactory);
               if (pojoResolver.isPresent()) {
                 resolver = pojoResolver.get();
                 effectivelyAcceptReferences = false;
               } else {
-                resolver = new StaticValueResolver(value);
+                resolver = new StaticValueResolver(finalValue);
               }
             }
             resolverReference
                 .set(getValueResolverFor(parameterName, objectType, resolveAndInjectIfStatic(resolver, muleContext),
-                                         getDefaultValue(type),
+                                         getDefaultValue(objectType),
                                          getExpressionSupport(objectType), false, modelProperties, effectivelyAcceptReferences,
                                          valueResolverFactory));
           } catch (MuleException e) {
@@ -263,7 +267,7 @@ public class ResolverSetUtils {
 
         @Override
         protected void defaultVisit(MetadataType metadataType) {
-          resolverReference.set(getValueResolverFor(parameterName, metadataType, value, getDefaultValue(type),
+          resolverReference.set(getValueResolverFor(parameterName, metadataType, finalValue, getDefaultValue(metadataType),
                                                     getExpressionSupport(metadataType), false, modelProperties,
                                                     acceptsReferences, valueResolverFactory));
         }
@@ -309,6 +313,12 @@ public class ResolverSetUtils {
                                    expressionSupport, required, modelProperties, acceptsReferences);
   }
 
+  private static MetadataType getTypeFromEnrichedValue(EnrichedValue value) {
+    // Call the runtime provided API (Provide two ways, give the actual type loader, or create it here.)
+    value.getTypeInformation();
+    return null;
+  }
+
   private static Object resolveAndInjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) throws MuleException {
     if (valueResolver.isDynamic()) {
       return valueResolver;
@@ -334,10 +344,6 @@ public class ResolverSetUtils {
     Optional<Class<Object>> pojoClass = getType(objectType);
 
     if (pojoClass.isPresent() && value instanceof Map) {
-      if (value instanceof HasObjectType) {
-        objectType = ((HasObjectType) value).getObjectType();
-        pojoClass = getType(objectType);
-      }
       DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(pojoClass.get(), reflectionCache);
       for (ObjectFieldType objectFieldType : objectType.getFields()) {
         Map valuesMap = (Map) value;

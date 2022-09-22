@@ -784,23 +784,54 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("Validates that ComponentParameterization API can describe a parameter whose type is defined with a SubtypeMapping.")
   public void subtypedParameter() throws Exception {
-//    Integer squareArea = 4;
-//    Integer squareSide = 2;
-//    Square subtypedParameterValue = new Square();
-//    subtypedParameterValue.setArea(squareArea);
-//    subtypedParameterValue.setSide(squareSide);
-//    ObjectType valueObjectType = testOAuthExtensionModel.getImportedTypes().stream()
-//        .filter(importedTypeModel -> importedTypeModel.getImportedType().getAnnotation(TypeIdAnnotation.class)
-//            .map(typeIdAnnotation -> typeIdAnnotation.getValue().contains("Square")).orElse(false))
-//        .findFirst().get().getImportedType();
-//    Consumer<ValueDeclarer> subtypedParameterValueDeclarer = valueDeclarer -> valueDeclarer
-//        .objectValue(objectValueDeclarer -> objectValueDeclarer.withField("area", squareArea.toString())
-//            .withField("side", squareSide.toString()), valueObjectType);
-//    ParentShape shapeParameter =
-//        (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
-//                                                                    SUBTYPED_PARAMETER_NAME,
-//                                                                    subtypedParameterValueDeclarer);
-//    assertThat(shapeParameter, is(subtypedParameterValue));
+    Integer squareArea = 4;
+    Integer squareSide = 2;
+    Square subtypedParameterValue = new Square();
+    subtypedParameterValue.setArea(squareArea);
+    subtypedParameterValue.setSide(squareSide);
+    ObjectType valueObjectType = testOAuthExtensionModel.getImportedTypes().stream()
+        .filter(importedTypeModel -> importedTypeModel.getImportedType().getAnnotation(TypeIdAnnotation.class)
+            .map(typeIdAnnotation -> typeIdAnnotation.getValue().contains("Square")).orElse(false))
+        .findFirst().get().getImportedType();
+    Consumer<ValueDeclarer> subtypedParameterValueDeclarer = valueDeclarer -> valueDeclarer
+        .objectValue(objectValueDeclarer -> objectValueDeclarer.withField("area", squareArea.toString())
+            // USE STATIC VARIABLES
+            .withField("side", squareSide.toString()), "SubtypesConnector", "Square");
+    ParentShape shapeParameter =
+        (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+                                                                    SUBTYPED_PARAMETER_NAME,
+                                                                    subtypedParameterValueDeclarer);
+    assertThat(shapeParameter, is(subtypedParameterValue));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a pojo parameter with a field whose type is defined with a SubtypeMapping.")
+  public void pojoWithSubtypedField() throws Exception {
+    // ADD TEST
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a pojo parameter with a field whose type is defined with a SubtypeMapping.")
+  public void arrayOfSubtypedItems() throws Exception {
+    // ADD TEST
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a pojo parameter whose type is defined with a SubtypeMapping on another extension.")
+  public void pojoWithSubtypedFieldThatIsDefinedOnADifferentExtension() throws Exception {
+    // ADD TEST , DEFINE SUBTYPEMAPPING ON ANOTHER EXTENSION
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API fails when an object type is described with an invalid extension name.")
+  public void pojoWithInvalidExtensionName() throws Exception {
+    // ADD TEST
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API fails when an object type is described with an invalid typeId or alias.")
+  public void pojoWithInvalidTypeIdOrAlias() throws Exception {
+    // ADD TEST
   }
 
   private void testComponentParameterization(String parameterGroupName, String parameterName,

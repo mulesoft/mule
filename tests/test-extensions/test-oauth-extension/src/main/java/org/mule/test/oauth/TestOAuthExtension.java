@@ -9,6 +9,7 @@ package org.mule.test.oauth;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.subtypes.extension.Square;
@@ -23,6 +24,7 @@ import org.mule.test.values.extension.MyPojo;
 @Import(type = ParentShape.class)
 @Import(type = Square.class)
 @Import(type = Triangle.class)
+@SubTypeMapping(baseType = ParentShape.class, subTypes = Rectangle.class)
 public class TestOAuthExtension {
 
   public static final String TEST_OAUTH_EXTENSION_NAME = "Test OAuth Extension";
