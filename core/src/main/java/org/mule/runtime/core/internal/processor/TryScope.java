@@ -190,6 +190,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation());
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
+    transactionConfig.setMuleContext(muleContext);
     super.initialise();
   }
 

@@ -578,6 +578,12 @@ public interface AllureConstants {
       String XA_TRANSACTION = "XA Transaction";
     }
 
+    interface TimeoutStory {
+
+      String TRANSACTION_TIMEOUT = "Transaction timeout";
+
+    }
+
   }
 
   interface MuleDsl {
