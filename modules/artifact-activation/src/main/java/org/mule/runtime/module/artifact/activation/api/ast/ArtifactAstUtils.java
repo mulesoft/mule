@@ -57,7 +57,8 @@ public final class ArtifactAstUtils {
 
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
-  private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(of(OPERATION_DEF));
+  // TODO W-11796759: This class shouldn't know which are the specific reusable components.
+  private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = unmodifiableSet(of(OPERATION_DEF));
 
   /**
    * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
@@ -175,7 +176,7 @@ public final class ArtifactAstUtils {
                                                                      Optional<String> artifactVersion,
                                                                      Set<ExtensionModel> dependencies) {
     if (!artifactVersion.isPresent()) {
-      logModelNotGenerated("No version specified", artifactId);
+      logModelNotGenerated("No version specified", artifactId, ast.getArtifactType());
       return empty();
     }
 
@@ -188,7 +189,7 @@ public final class ArtifactAstUtils {
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, artifactId)
               .build()));
     } else {
-      logModelNotGenerated("Mule ExtensionModelLoader not found", artifactId);
+      logModelNotGenerated("Mule ExtensionModelLoader not found", artifactId, ast.getArtifactType());
       return empty();
     }
   }
@@ -238,12 +239,12 @@ public final class ArtifactAstUtils {
     switch (artifactType) {
       case APPLICATION:
         return artifactAst.topLevelComponentsStream()
-            .anyMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()));
+            .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
       case MULE_EXTENSION:
         // TODO: try to unify this one with the case above by changing the Mule Extensions DSL
         return artifactAst.topLevelComponents().size() == 1 &&
             artifactAst.topLevelComponents().get(0).directChildrenStream()
-                .anyMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()));
+                .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
       default:
         return false;
     }
@@ -261,9 +262,9 @@ public final class ArtifactAstUtils {
     }
   }
 
-  private static void logModelNotGenerated(String reason, String artifactId) {
+  private static void logModelNotGenerated(String reason, String artifactId, ArtifactType artifactType) {
     if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn("ExtensionModel for {} not generated: {}", artifactId, reason);
+      LOGGER.warn("ExtensionModel for {} {} not generated: {}", artifactType, artifactId, reason);
     }
   }
 
