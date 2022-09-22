@@ -25,6 +25,14 @@ import java.util.function.Function;
  */
 public class NoOpMemoryProfilingService implements ProfilingService {
 
+  private static final NoOpMemoryProfilingService INSTANCE = new NoOpMemoryProfilingService();
+
+  public static ProfilingService getNoOpMemoryProfilingService() {
+    return INSTANCE;
+  }
+
+  private NoOpMemoryProfilingService() {}
+
   private final TracingService noOpTracingService = new TracingService() {
 
     @Override

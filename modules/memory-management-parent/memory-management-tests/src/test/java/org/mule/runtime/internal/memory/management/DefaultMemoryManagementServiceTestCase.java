@@ -57,7 +57,7 @@ public class DefaultMemoryManagementServiceTestCase extends AbstractMuleTestCase
 
   @Test
   @Description("When a byte buffer provider is requested with a HEAP type, no direct buffers are retrieved")
-  public void correctByteBufferProviderObtainedHeap() {
+  public void correctByteBufferProviderObtainedHeap() throws Exception {
     ByteBufferProvider<ByteBuffer> byteBufferProvider =
         memoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, HEAP);
     ByteBuffer byteBuffer = byteBufferProvider.allocate(100);
@@ -66,7 +66,7 @@ public class DefaultMemoryManagementServiceTestCase extends AbstractMuleTestCase
 
   @Test
   @Description("When a byte buffer provider is requested with a DIRECT type,  direct buffers are retrieved")
-  public void correctByteBufferProviderObtainedDirect() {
+  public void correctByteBufferProviderObtainedDirect() throws Exception {
     ByteBufferProvider<ByteBuffer> byteBufferProvider =
         memoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, DIRECT);
     ByteBuffer byteBuffer = byteBufferProvider.allocate(100);
@@ -75,11 +75,19 @@ public class DefaultMemoryManagementServiceTestCase extends AbstractMuleTestCase
 
   @Test
   @Description("When a bytebuffer provider with the same name is returned, an exception is raised.")
-  public void byteBufferProvidersWithTheSameName() {
+  public void byteBufferProvidersWithTheSameName() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, TEST_BYTE_BUFFER));
     memoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, HEAP);
     memoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, DIRECT);
+  }
+
+  @Test
+  @Description("When a bytebuffer provider with a null name is returned, an exception is raised.")
+  public void byteBufferProvidersWithNullName() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Byte buffer provider name cannot be null.");
+    memoryManagementService.getByteBufferProvider(null, HEAP);
   }
 
   @Test

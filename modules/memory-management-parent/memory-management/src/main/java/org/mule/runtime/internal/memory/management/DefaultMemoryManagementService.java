@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.internal.memory.management;
 
+import static org.mule.runtime.internal.memory.bytebuffer.ByteBufferProviderBuilder.BYTE_BUFFER_PROVIDER_NAME_CANNOT_BE_NULL_MESSAGE;
 import static org.mule.runtime.internal.memory.bytebuffer.ByteBufferProviderBuilder.buildByteBufferProviderFrom;
 
+import static org.mule.runtime.internal.memory.profiling.NoOpMemoryProfilingService.getNoOpMemoryProfilingService;
+
 import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -17,11 +21,10 @@ import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.internal.memory.profiling.NoOpMemoryProfilingService;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
@@ -35,8 +38,8 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
   private static final DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
   private static final Logger LOGGER = getLogger(DefaultMemoryManagementService.class);
 
-  private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new HashMap<>();
-  private ProfilingService profilingService = new NoOpMemoryProfilingService();
+  private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new ConcurrentHashMap<>();
+  private ProfilingService profilingService = getNoOpMemoryProfilingService();
 
   public static DefaultMemoryManagementService getInstance() {
     return INSTANCE;
@@ -51,7 +54,7 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
     return new DefaultMemoryManagementService();
   }
 
-  private DefaultMemoryManagementService() {};
+  private DefaultMemoryManagementService() {}
 
   @Override
   public void dispose() {
@@ -67,27 +70,38 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
   @Override
   public synchronized ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType,
                                                                            ByteBufferPoolConfiguration poolConfiguration) {
+    if (name == null) {
+      throw new IllegalArgumentException("Profiling service cannot be null.");
+    }
+
     if (byteBufferProviders.containsKey(name)) {
       throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
     }
 
-    return byteBufferProviders.computeIfAbsent(name, n -> buildByteBufferProviderFrom(byteBufferType)
+    byteBufferProviders.put(name, buildByteBufferProviderFrom(byteBufferType)
         .withPoolConfiguration(poolConfiguration)
         .withProfilingService(profilingService)
         .build());
 
+    return byteBufferProviders.get(name);
   }
 
   @Override
   public synchronized ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType) {
+    if (name == null) {
+      throw new IllegalArgumentException(BYTE_BUFFER_PROVIDER_NAME_CANNOT_BE_NULL_MESSAGE);
+    }
+
     if (byteBufferProviders.containsKey(name)) {
       throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
     }
 
-    return byteBufferProviders.computeIfAbsent(name, n -> buildByteBufferProviderFrom(byteBufferType)
+    byteBufferProviders.put(name, buildByteBufferProviderFrom(byteBufferType)
         .withName(name)
         .withProfilingService(profilingService)
         .build());
+
+    return byteBufferProviders.get(name);
   }
 
   @Override
