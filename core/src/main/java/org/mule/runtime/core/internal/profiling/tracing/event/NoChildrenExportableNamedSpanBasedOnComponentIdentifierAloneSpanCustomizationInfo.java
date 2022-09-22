@@ -11,18 +11,18 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 /**
- * A {@link NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo} that will not export
- * any spans from its children hierarchy unless it is overridden by a span's {@link SpanCustomizationInfo}.
+ * A {@link NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo} that will not export any spans from its children
+ * hierarchy unless it is overridden by a span's {@link SpanCustomizationInfo}.
  *
  * @see SpanCustomizationInfo#ignoreExportLevelLimitOfAncestors()
  *
  * @since 4.5.0
  */
-public class NoExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo extends
+public class NoChildrenExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo extends
     NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo {
 
-  public NoExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(
-                                                                                   Component component) {
+  public NoChildrenExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(
+                                                                                           Component component) {
     super(component);
   }
 

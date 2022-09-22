@@ -139,7 +139,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       if (parentSpan instanceof ExportOnEndSpan) {
         return ((ExportOnEndSpan) parentSpan).getSpanExporter().getExportUntilLevel();
       }
-      parentSpan = getAsInternalSpan(internalSpan.getParent());
+      parentSpan = getAsInternalSpan(parentSpan.getParent());
     }
 
     return MAX_VALUE;

@@ -35,7 +35,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 
-import org.mule.runtime.core.internal.profiling.tracing.event.NoExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.NoChildrenExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
 
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -85,7 +85,7 @@ public class PolicyChain extends AbstractComponent
     String policyName = getLocation().getLocation();
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
-                                          new NoExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(this));
+                                          new NoChildrenExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(this));
     initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
