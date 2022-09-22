@@ -42,10 +42,14 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
 
   private final boolean enabled;
 
+  private final AtomicInteger declaredPublicFlows = new AtomicInteger(0);
+  private final AtomicInteger activePublicFlows = new AtomicInteger(0);
   private final AtomicInteger declaredPrivateFlows = new AtomicInteger(0);
   private final AtomicInteger activePrivateFlows = new AtomicInteger(0);
   private final AtomicInteger declaredTriggerFlows = new AtomicInteger(0);
   private final AtomicInteger activeTriggerFlows = new AtomicInteger(0);
+  private final AtomicInteger declaredApikitFlows = new AtomicInteger(0);
+  private final AtomicInteger activeApikitFlows = new AtomicInteger(0);
 
   public DefaultFlowsSummaryStatistics(boolean isStatisticsEnabled) {
     this.enabled = isStatisticsEnabled;
@@ -60,6 +64,14 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   @Override
   public boolean isEnabled() {
     return enabled;
+  }
+
+  public int incrementDeclaredPublicFlow() {
+    return declaredPublicFlows.incrementAndGet();
+  }
+
+  public int incrementActivePublicFlow() {
+    return activePublicFlows.incrementAndGet();
   }
 
   public int incrementDeclaredPrivateFlow() {
@@ -78,12 +90,32 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
     return activeTriggerFlows.incrementAndGet();
   }
 
+  public int incrementDeclaredApikitFlow() {
+    return declaredApikitFlows.incrementAndGet();
+  }
+
+  public int incrementActiveApikitFlow() {
+    return activeApikitFlows.incrementAndGet();
+  }
+
+  public int decrementActivePublicFlow() {
+    return activePublicFlows.decrementAndGet();
+  }
+
   public int decrementActiveTriggerFlow() {
     return activeTriggerFlows.decrementAndGet();
   }
 
   public int decrementActivePrivateFlow() {
     return activePrivateFlows.decrementAndGet();
+  }
+
+  public int decrementActiveApikitFlow() {
+    return activeApikitFlows.decrementAndGet();
+  }
+
+  public int decrementDeclaredPublicFlow() {
+    return declaredPublicFlows.decrementAndGet();
   }
 
   public int decrementDeclaredPrivateFlow() {
@@ -94,6 +126,20 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
     return declaredTriggerFlows.decrementAndGet();
   }
 
+  public int decrementDeclaredApikitFlow() {
+    return declaredApikitFlows.decrementAndGet();
+  }
+
+  @Override
+  public int getDeclaredPublicFlows() {
+    return declaredPublicFlows.get();
+  }
+  
+  @Override
+  public int getActivePublicFlows() {
+    return activePublicFlows.get();
+  }
+  
   @Override
   public int getDeclaredPrivateFlows() {
     return declaredPrivateFlows.get();
@@ -112,6 +158,16 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   @Override
   public int getActiveTriggerFlows() {
     return activeTriggerFlows.get();
+  }
+
+  @Override
+  public int getDeclaredApikitFlows() {
+    return declaredApikitFlows.get();
+  }
+
+  @Override
+  public int getActiveApikitFlows() {
+    return activeApikitFlows.get();
   }
 
   /**
