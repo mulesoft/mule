@@ -31,7 +31,9 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
 
@@ -43,24 +45,7 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
   public void createBasicDeployableProjectModel() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic");
 
-    assertThat(deployableProjectModel.getPackages(), contains("org.test"));
-    assertThat(deployableProjectModel.getResources(),
-               containsInAnyOrder("test-script.dwl", "app.xml"));
-
-    assertThat(deployableProjectModel.getDependencies(), hasSize(3));
-
-    Map<String, Integer> transitiveDependenciesNum =
-        of("mule-http-connector", 13, "mule-sockets-connector", 7, "mule-db-connector", 10);
-
-    deployableProjectModel.getDependencies()
-        .forEach(dependency -> assertThat(dependency.getTransitiveDependenciesList(),
-                                          hasSize(transitiveDependenciesNum.get(dependency.getDescriptor().getArtifactId()))));
-
-    assertThat(deployableProjectModel.getSharedLibraries(), hasSize(0));
-    assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(0));
-
-    // checks the Mule deployable model can be correctly deserialized
-    deployableProjectModel.getDeployableModel().validateModel("basic");
+    testBasicDeployableProjectModel(deployableProjectModel);
   }
 
   @Test
@@ -156,6 +141,38 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")),
                         hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("spring-context"))))));
+  }
+
+  @Test
+  @Issue("W-11799074")
+  @Description("Tests that when a deployable is packaged using the lightweight option that generates the " +
+      "classloader-model.json for its dependencies, and thus the deployable is considered for deployment as a heavy " +
+      "package even though its dependencies aren't really packaged within it, the model is correctly built.")
+  public void createDeployableProjectModelFromLightweightLocalRepository() throws URISyntaxException {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic-lightweight-local-repository");
+
+    testBasicDeployableProjectModel(deployableProjectModel);
+  }
+
+  private void testBasicDeployableProjectModel(DeployableProjectModel deployableProjectModel) {
+    assertThat(deployableProjectModel.getPackages(), contains("org.test"));
+    assertThat(deployableProjectModel.getResources(),
+               containsInAnyOrder("test-script.dwl", "app.xml"));
+
+    assertThat(deployableProjectModel.getDependencies(), hasSize(3));
+
+    Map<String, Integer> transitiveDependenciesNum =
+        of("mule-http-connector", 13, "mule-sockets-connector", 7, "mule-db-connector", 10);
+
+    deployableProjectModel.getDependencies()
+        .forEach(dependency -> assertThat(dependency.getTransitiveDependenciesList(),
+                                          hasSize(transitiveDependenciesNum.get(dependency.getDescriptor().getArtifactId()))));
+
+    assertThat(deployableProjectModel.getSharedLibraries(), hasSize(0));
+    assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(0));
+
+    // checks the Mule deployable model can be correctly deserialized
+    deployableProjectModel.getDeployableModel().validateModel("basic");
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
