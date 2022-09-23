@@ -91,8 +91,8 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase {
     incrementCounter.accept(flow1Stats);
     ResetOnQueryCounter afterIncCounter = createCounter.apply(flow1Stats);
 
-    assertThat(beforeIncCounter.get(), is(1L));
-    assertThat(afterIncCounter.get(), is(0L));
+    assertThat(beforeIncCounter.getAndReset(), is(1L));
+    assertThat(afterIncCounter.getAndReset(), is(1L));
   }
 
   @Test
@@ -125,9 +125,9 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase {
     incrementCounter.accept(flow2Stats);
     ResetOnQueryCounter after2IncEventsReceivedCounter = createCounter.apply(allStatistics.getApplicationStatistics());
 
-    assertThat(beforeIncEventsReceivedCounter.get(), is(2L));
-    assertThat(after1IncEventsReceivedCounter.get(), is(1L));
-    assertThat(after2IncEventsReceivedCounter.get(), is(0L));
+    assertThat(beforeIncEventsReceivedCounter.getAndReset(), is(2L));
+    assertThat(after1IncEventsReceivedCounter.getAndReset(), is(2L));
+    assertThat(after2IncEventsReceivedCounter.getAndReset(), is(2L));
   }
 
   @Test

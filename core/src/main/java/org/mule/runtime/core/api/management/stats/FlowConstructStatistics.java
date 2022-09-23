@@ -104,6 +104,8 @@ public interface FlowConstructStatistics extends Statistics {
   /**
    * Provides a counter for {@link #getExecutionErrors() execution errors} that is not affected by calls to {@link #clear()} or
    * {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * <p>
+   * Counter initial value is set to the value of {@link #getExecutionErrors()} when this method is called.
    * 
    * @return a counter for {@link #getExecutionErrors()}.
    * 
@@ -114,6 +116,8 @@ public interface FlowConstructStatistics extends Statistics {
   /**
    * Provides a counter for {@link #getFatalErrors() fatal errors} that is not affected by calls to {@link #clear()} or
    * {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * <p>
+   * Counter initial value is set to the value of {@link #getFatalErrors()} when this method is called.
    * 
    * @return a counter for {@link #getFatalErrors()}.
    * 
@@ -124,6 +128,8 @@ public interface FlowConstructStatistics extends Statistics {
   /**
    * Provides a counter for {@link #getConnectionErrors() connection errors} that is not affected by calls to {@link #clear()} or
    * {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * <p>
+   * Counter initial value is set to the value of {@link #getConnectionErrors()} when this method is called.
    * 
    * @return a counter for {@link #getConnectionErrors()}.
    * 
@@ -134,6 +140,8 @@ public interface FlowConstructStatistics extends Statistics {
   /**
    * Provides a counter for {@link #getTotalEventsReceived() total events received} that is not affected by calls to
    * {@link #clear()} or {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * <p>
+   * Counter initial value is set to the value of {@link #getTotalEventsReceived()} when this method is called.
    * 
    * @return a counter for {@link #getTotalEventsReceived()}.
    * 

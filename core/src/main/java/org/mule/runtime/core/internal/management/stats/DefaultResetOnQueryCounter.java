@@ -13,7 +13,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultResetOnQueryCounter implements ResetOnQueryCounter {
 
-  private final AtomicLong counter = new AtomicLong();
+  private final AtomicLong counter;
+
+  public DefaultResetOnQueryCounter(long initialValue) {
+    counter = new AtomicLong(initialValue);
+  }
 
   @Override
   public long getAndReset() {
