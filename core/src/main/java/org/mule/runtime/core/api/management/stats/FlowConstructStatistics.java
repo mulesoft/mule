@@ -106,6 +106,9 @@ public interface FlowConstructStatistics extends Statistics {
    * {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
    * <p>
    * Counter initial value is set to the value of {@link #getExecutionErrors()} when this method is called.
+   * <p>
+   * If this is called concurrently with {@link #incExecutionError()}, there is chance of a race condition occurring where an
+   * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
    * 
    * @return a counter for {@link #getExecutionErrors()}.
    * 
@@ -118,6 +121,9 @@ public interface FlowConstructStatistics extends Statistics {
    * {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
    * <p>
    * Counter initial value is set to the value of {@link #getFatalErrors()} when this method is called.
+   * <p>
+   * If this is called concurrently with {@link #incFatalError()}, there is chance of a race condition occurring where an event
+   * may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
    * 
    * @return a counter for {@link #getFatalErrors()}.
    * 
@@ -130,6 +136,9 @@ public interface FlowConstructStatistics extends Statistics {
    * {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
    * <p>
    * Counter initial value is set to the value of {@link #getConnectionErrors()} when this method is called.
+   * <p>
+   * If this is called concurrently with {@link #incConnectionErrors()}, there is chance of a race condition occurring where an
+   * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
    * 
    * @return a counter for {@link #getConnectionErrors()}.
    * 
@@ -142,6 +151,9 @@ public interface FlowConstructStatistics extends Statistics {
    * {@link #clear()} or {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
    * <p>
    * Counter initial value is set to the value of {@link #getTotalEventsReceived()} when this method is called.
+   * <p>
+   * If this is called concurrently with {@link #incReceivedEvents()}, there is chance of a race condition occurring where an
+   * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
    * 
    * @return a counter for {@link #getTotalEventsReceived()}.
    * 
