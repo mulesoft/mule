@@ -100,4 +100,45 @@ public interface FlowConstructStatistics extends Statistics {
   default long getConnectionErrors() {
     return 0;
   }
+
+  /**
+   * Provides a counter for {@link #getExecutionErrors() execution errors} that is not affected by calls to {@link #clear()} or
+   * {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * 
+   * @return a counter for {@link #getExecutionErrors()}.
+   * 
+   * @since 4.5
+   */
+  ResetOnQueryCounter getExecutionErrorsCounter();
+
+  /**
+   * Provides a counter for {@link #getFatalErrors() fatal errors} that is not affected by calls to {@link #clear()} or
+   * {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * 
+   * @return a counter for {@link #getFatalErrors()}.
+   * 
+   * @since 4.5
+   */
+  ResetOnQueryCounter getFatalErrorsCounter();
+
+  /**
+   * Provides a counter for {@link #getConnectionErrors() connection errors} that is not affected by calls to {@link #clear()} or
+   * {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * 
+   * @return a counter for {@link #getConnectionErrors()}.
+   * 
+   * @since 4.5
+   */
+  ResetOnQueryCounter getConnectionErrorsCounter();
+
+  /**
+   * Provides a counter for {@link #getTotalEventsReceived() total events received} that is not affected by calls to
+   * {@link #clear()} or {@link ResetOnQueryCounter#getAndReset()} calls to other instances of {@link ResetOnQueryCounter}.
+   * 
+   * @return a counter for {@link #getTotalEventsReceived()}.
+   * 
+   * @since 4.5
+   */
+  ResetOnQueryCounter getEventsReceivedCounter();
+
 }
