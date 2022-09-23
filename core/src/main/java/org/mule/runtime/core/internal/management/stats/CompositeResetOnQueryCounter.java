@@ -12,6 +12,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Implementation of {@link ResetOnQueryCounter} that composes other counters.
+ * <p>
+ * Getting values will add up the values of all the held counters, and resetting this will reset the held counters as well.
+ * 
+ * @since 4.5
+ */
 public class CompositeResetOnQueryCounter implements ResetOnQueryCounter {
 
   private final Set<ResetOnQueryCounter> counters;
