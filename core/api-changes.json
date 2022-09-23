@@ -8,7 +8,7 @@
           "package": "org.mule.runtime.core.api.management.stats",
           "classSimpleName": "ResetOnQueryCounter",
           "elementKind": "interface",
-          "justification": "W-11798994: Feature needed for monitorng currently productive mules"
+          "justification": "W-11798994: Feature needed for monitoring currently productive mules"
         },
         {
           "code": "java.method.added",
@@ -17,7 +17,7 @@
           "classSimpleName": "AllStatistics",
           "methodName": "getFlowSummaryStatistics",
           "elementKind": "method",
-          "justification": "W-11493854: Feature needed for monitorng currently productive mules"
+          "justification": "W-11493854: Feature needed for monitoring currently productive mules"
         },
         {
           "code": "java.class.added",
@@ -25,7 +25,7 @@
           "package": "org.mule.runtime.core.api.management.stats",
           "classSimpleName": "FlowsSummaryStatistics",
           "elementKind": "interface",
-          "justification": "W-11493854: Feature needed for monitorng currently productive mules"
+          "justification": "W-11493854: Feature needed for monitoring currently productive mules"
         },
         {
           "code": "java.annotation.added",
