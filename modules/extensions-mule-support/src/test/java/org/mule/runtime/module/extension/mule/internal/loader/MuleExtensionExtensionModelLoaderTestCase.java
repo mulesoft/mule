@@ -85,6 +85,14 @@ public class MuleExtensionExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   @Test
+  public void whenResourceIsEmptyAppInsteadOfExtensionThenFails() {
+    expectedException.expect(MuleRuntimeException.class);
+    expectedException
+        .expectMessage("Expected a single top level component matching identifier [extension:extension]");
+    getExtensionModelFrom("mule-empty-app-config.xml");
+  }
+
+  @Test
   public void loadExtensionExtensionModel() throws Exception {
     ExtensionModel extensionModel = getExtensionModelFrom("extensions/extension-fully-parameterized.xml");
 
