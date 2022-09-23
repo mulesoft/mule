@@ -31,7 +31,7 @@ public final class DslUtils {
   /**
    * Checks whether a given {@link ComponentAst} corresponds to a try scope.
    *
-   *  @param componentAst the component AST.
+   * @param componentAst the component AST.
    * @return {@code true} if the given {@link ComponentAst} is a try scope, or {@code false} otherwise.
    */
   public static boolean isTryScope(ComponentAst componentAst) {
