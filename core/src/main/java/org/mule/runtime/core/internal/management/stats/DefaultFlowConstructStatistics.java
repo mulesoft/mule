@@ -170,29 +170,33 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   @Override
   public ResetOnQueryCounter getEventsReceivedCounter() {
-    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter(getTotalEventsReceived());
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     eventsReceivedCounters.add(counter);
+    counter.add(getTotalEventsReceived());
     return counter;
   }
 
   @Override
   public ResetOnQueryCounter getExecutionErrorsCounter() {
-    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter(getExecutionErrors());
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     executionErrorsCounters.add(counter);
+    counter.add(getExecutionErrors());
     return counter;
   }
 
   @Override
   public ResetOnQueryCounter getConnectionErrorsCounter() {
-    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter(getConnectionErrors());
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     connectionErrorsCounters.add(counter);
+    counter.add(getConnectionErrors());
     return counter;
   }
 
   @Override
   public ResetOnQueryCounter getFatalErrorsCounter() {
-    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter(getFatalErrors());
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     fatalErrorsCounters.add(counter);
+    counter.add(getFatalErrors());
     return counter;
   }
 }
