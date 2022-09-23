@@ -123,6 +123,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final int maxConcurrency;
   private final DefaultFlowsSummaryStatistics flowsSummaryStatistics;
   private final boolean triggerFlow;
+  private final boolean apikitFlow;
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
@@ -148,7 +149,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency != null ? maxConcurrency : DEFAULT_MAX_CONCURRENCY;
     this.flowsSummaryStatistics = flowsSummaryStatistics;
-    this.triggerFlow = source != null || isApiKitFlow(getName());
+    this.triggerFlow = source != null;
+    this.apikitFlow = isApiKitFlow(getName());
 
     this.processingStrategyFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
     if (this.processingStrategyFactory instanceof AsyncProcessingStrategyFactory) {
@@ -263,11 +265,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .withMaxConcurrentTasks(1)
         .withName(getName() + ".flux.completionCallback"));
 
-    if (triggerFlow) {
-      flowsSummaryStatistics.incrementDeclaredTriggerFlow();
-    } else {
-      flowsSummaryStatistics.incrementDeclaredPrivateFlow();
-    }
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementDeclaredTriggerFlow,
+                                 DefaultFlowsSummaryStatistics::incrementDeclaredApikitFlow,
+                                 DefaultFlowsSummaryStatistics::incrementDeclaredPrivateFlow);
   }
 
   /**
@@ -525,11 +525,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       }
     }
 
-    if (triggerFlow) {
-      flowsSummaryStatistics.incrementActiveTriggerFlow();
-    } else {
-      flowsSummaryStatistics.incrementActivePrivateFlow();
-    }
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementActiveTriggerFlow,
+                                 DefaultFlowsSummaryStatistics::incrementActiveApikitFlow,
+                                 DefaultFlowsSummaryStatistics::incrementActivePrivateFlow);
   }
 
   private void stopOnFailure(Exception e) throws MuleException {
@@ -572,11 +570,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    if (triggerFlow) {
-      flowsSummaryStatistics.decrementActiveTriggerFlow();
-    } else {
-      flowsSummaryStatistics.decrementActivePrivateFlow();
-    }
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementActiveTriggerFlow,
+                                 DefaultFlowsSummaryStatistics::decrementActiveApikitFlow,
+                                 DefaultFlowsSummaryStatistics::decrementActivePrivateFlow);
 
     if (source != null) {
       stopSafely(() -> {
@@ -607,11 +603,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doDispose() {
-    if (triggerFlow) {
-      flowsSummaryStatistics.decrementDeclaredTriggerFlow();
-    } else {
-      flowsSummaryStatistics.decrementDeclaredPrivateFlow();
-    }
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementDeclaredTriggerFlow,
+                                 DefaultFlowsSummaryStatistics::decrementDeclaredApikitFlow,
+                                 DefaultFlowsSummaryStatistics::decrementDeclaredPrivateFlow);
 
     if (errorRouterForSourceResponseError != null) {
       synchronized (this) {
@@ -629,6 +623,18 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     disposeIfDisposable(source);
     disposeIfDisposable(processingStrategy);
     super.doDispose();
+  }
+
+  private void updateFlowsSummaryStatistics(Consumer<DefaultFlowsSummaryStatistics> triggerFlowsUpdater,
+                                            Consumer<DefaultFlowsSummaryStatistics> apikitflowsUpdater,
+                                            Consumer<DefaultFlowsSummaryStatistics> privateFlowsUpdater) {
+    if (triggerFlow) {
+      triggerFlowsUpdater.accept(flowsSummaryStatistics);
+    } else if (apikitFlow) {
+      apikitflowsUpdater.accept(flowsSummaryStatistics);
+    } else {
+      privateFlowsUpdater.accept(flowsSummaryStatistics);
+    }
   }
 
   protected Sink getSink() {
