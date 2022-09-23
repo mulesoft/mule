@@ -6,12 +6,18 @@
  */
 package org.mule.runtime.module.extension.mule.internal.operation;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+import static org.mule.tck.junit4.matcher.EventMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
@@ -26,7 +32,8 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   protected String[] getConfigFiles() {
     return new String[] {
         "mule-error-handling-operations-config.xml",
-        "mule-error-handling-with-try-operations-config.xml"
+        "mule-error-handling-with-try-operations-config.xml",
+        "reusing-error-handling-mule-config.xml"
     };
   }
 
@@ -69,5 +76,11 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   public void callingOperationThatSilencesErrors() throws Exception {
     flowRunner("flowCallingOperationThatSilencesOneSpecificErrorAndRaisesAnother")
         .runExpectingException(errorType("THIS", "CUSTOM"));
+  }
+
+  @Test
+  public void reusableErrorHandlerAsAnOperation() throws Exception {
+    CoreEvent result = flowRunner("reusableErrorHandlerAsAnOperationFlow").run();
+    assertThat(result, hasMessage(hasPayload(is("Caught error!"))));
   }
 }

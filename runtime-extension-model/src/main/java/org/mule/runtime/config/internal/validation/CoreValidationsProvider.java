@@ -63,6 +63,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService),
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
+                                                          new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService),
                                                           new OperationParameterDefaultValueDoesntSupportExpressions(),
                                                           new NoExpressionsInNoExpressionsSupportedParams(),
