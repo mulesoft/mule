@@ -274,8 +274,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     doInitialiseProcessingStrategy();
 
-    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementDeclaredPublicFlow,
-                                 DefaultFlowsSummaryStatistics::incrementDeclaredTriggerFlow,
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementDeclaredTriggerFlow,
                                  DefaultFlowsSummaryStatistics::incrementDeclaredApikitFlow,
                                  DefaultFlowsSummaryStatistics::incrementDeclaredPrivateFlow);
   }
@@ -557,8 +556,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       }
     }
 
-    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementActivePublicFlow,
-                                 DefaultFlowsSummaryStatistics::incrementActiveTriggerFlow,
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementActiveTriggerFlow,
                                  DefaultFlowsSummaryStatistics::incrementActiveApikitFlow,
                                  DefaultFlowsSummaryStatistics::incrementActivePrivateFlow);
   }
@@ -603,8 +601,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementActivePublicFlow,
-                                 DefaultFlowsSummaryStatistics::decrementActiveTriggerFlow,
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementActiveTriggerFlow,
                                  DefaultFlowsSummaryStatistics::decrementActiveApikitFlow,
                                  DefaultFlowsSummaryStatistics::decrementActivePrivateFlow);
 
@@ -637,8 +634,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doDispose() {
-    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementDeclaredPublicFlow,
-                                 DefaultFlowsSummaryStatistics::decrementDeclaredTriggerFlow,
+    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementDeclaredTriggerFlow,
                                  DefaultFlowsSummaryStatistics::decrementDeclaredApikitFlow,
                                  DefaultFlowsSummaryStatistics::decrementDeclaredPrivateFlow);
 
@@ -660,20 +656,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doDispose();
   }
 
-  private void updateFlowsSummaryStatistics(Consumer<DefaultFlowsSummaryStatistics> publicFlowsUpdater,
-                                            Consumer<DefaultFlowsSummaryStatistics> triggerFlowsUpdater,
+  private void updateFlowsSummaryStatistics(Consumer<DefaultFlowsSummaryStatistics> triggerFlowsUpdater,
                                             Consumer<DefaultFlowsSummaryStatistics> apikitflowsUpdater,
                                             Consumer<DefaultFlowsSummaryStatistics> privateFlowsUpdater) {
-    // There is nothing forbidding an ApiKit flow to also have a source, so a flow may be both.
     if (triggerFlow) {
       triggerFlowsUpdater.accept(flowsSummaryStatistics);
-    }
-    if (apikitFlow) {
+    } else if (apikitFlow) {
       apikitflowsUpdater.accept(flowsSummaryStatistics);
-    }
-
-    if (triggerFlow || apikitFlow) {
-      publicFlowsUpdater.accept(flowsSummaryStatistics);
     } else {
       privateFlowsUpdater.accept(flowsSummaryStatistics);
     }

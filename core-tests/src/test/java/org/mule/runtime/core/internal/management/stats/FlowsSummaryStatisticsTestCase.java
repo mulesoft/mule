@@ -71,16 +71,16 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                                          null, null);
 
     flow.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 1, 1, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 1, 0, 0);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   @Test
@@ -95,16 +95,16 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                                          null, null);
 
     flow.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 1, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 1, 0, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 1, 0, 1, 0, 1, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 1, 0, 0, 1, 0);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 1, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 1, 0, 0, 0, 0);
 
     flow.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   @Test
@@ -119,16 +119,16 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                                          null, null);
 
     flow.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 1, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 1, 0, 1, 1, 1, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 1, 0, 0);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 1, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   @Test
@@ -143,16 +143,16 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                                          null, null);
 
     flow.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 1, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 1, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 1, 0, 0, 0, 1);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 1, 0, 0, 1);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 1, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 1, 0, 0, 0);
 
     flow.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   @Test
@@ -175,19 +175,19 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
 
     flow1.initialise();
     flow2.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 2, 2, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 2, 0, 0, 0, 0, 0);
 
     flow1.start();
     flow2.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 2, 2, 0, 0, 2, 2, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 2, 0, 0, 2, 0, 0);
 
     flow1.stop();
     flow2.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 2, 2, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 2, 0, 0, 0, 0, 0);
 
     flow1.dispose();
     flow2.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   @Test
@@ -202,22 +202,22 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                                          null, null);
 
     flow.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 1, 1, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 1, 0, 0);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 1, 1, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 1, 0, 0);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   @Test
@@ -234,41 +234,35 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
                                          null, null);
 
     flow.initialise();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     doReturn(false).when(muleContext).isStarting();
     flow.start();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 1, 1, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 1, 0, 0);
 
     flow.stop();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 1, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
 
     flow.dispose();
-    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0, 0, 0);
+    assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 0, 0, 0, 0);
   }
 
   private void assertFlowsSummaryStatistics(FlowsSummaryStatistics flowsSummaryStatistics,
-                                            int expectedDeclaredPublicFlows,
                                             int expectedDeclaredTriggerFlows,
                                             int expectedDeclaredApikitFlows,
                                             int expectedDeclaredPrivateFlows,
-                                            int expectedActivePublicFlows,
                                             int expectedActiveTriggerFlows,
                                             int expectedActiveApikitFlows,
                                             int expectedActivePrivateFlows) {
-    assertThat("declaredPublicFlows",
-               flowsSummaryStatistics.getDeclaredPublicFlows(), is(expectedDeclaredPublicFlows));
     assertThat("declaredTriggerFlows",
                flowsSummaryStatistics.getDeclaredTriggerFlows(), is(expectedDeclaredTriggerFlows));
     assertThat("declaredApikitFlows",
                flowsSummaryStatistics.getDeclaredApikitFlows(), is(expectedDeclaredApikitFlows));
     assertThat("declaredPrivateFlows",
                flowsSummaryStatistics.getDeclaredPrivateFlows(), is(expectedDeclaredPrivateFlows));
-    assertThat("activePublicFlows",
-               flowsSummaryStatistics.getActivePublicFlows(), is(expectedActivePublicFlows));
     assertThat("activeTriggerFlows",
                flowsSummaryStatistics.getActiveTriggerFlows(), is(expectedActiveTriggerFlows));
     assertThat("activeApikitFlows",

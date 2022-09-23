@@ -42,8 +42,6 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
 
   private final boolean enabled;
 
-  private final AtomicInteger declaredPublicFlows = new AtomicInteger(0);
-  private final AtomicInteger activePublicFlows = new AtomicInteger(0);
   private final AtomicInteger declaredPrivateFlows = new AtomicInteger(0);
   private final AtomicInteger activePrivateFlows = new AtomicInteger(0);
   private final AtomicInteger declaredTriggerFlows = new AtomicInteger(0);
@@ -64,14 +62,6 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   @Override
   public boolean isEnabled() {
     return enabled;
-  }
-
-  public int incrementDeclaredPublicFlow() {
-    return declaredPublicFlows.incrementAndGet();
-  }
-
-  public int incrementActivePublicFlow() {
-    return activePublicFlows.incrementAndGet();
   }
 
   public int incrementDeclaredPrivateFlow() {
@@ -98,10 +88,6 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
     return activeApikitFlows.incrementAndGet();
   }
 
-  public int decrementActivePublicFlow() {
-    return activePublicFlows.decrementAndGet();
-  }
-
   public int decrementActiveTriggerFlow() {
     return activeTriggerFlows.decrementAndGet();
   }
@@ -114,10 +100,6 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
     return activeApikitFlows.decrementAndGet();
   }
 
-  public int decrementDeclaredPublicFlow() {
-    return declaredPublicFlows.decrementAndGet();
-  }
-
   public int decrementDeclaredPrivateFlow() {
     return declaredPrivateFlows.decrementAndGet();
   }
@@ -128,16 +110,6 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
 
   public int decrementDeclaredApikitFlow() {
     return declaredApikitFlows.decrementAndGet();
-  }
-
-  @Override
-  public int getDeclaredPublicFlows() {
-    return declaredPublicFlows.get();
-  }
-
-  @Override
-  public int getActivePublicFlows() {
-    return activePublicFlows.get();
   }
 
   @Override
