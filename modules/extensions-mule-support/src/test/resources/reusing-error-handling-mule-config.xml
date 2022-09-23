@@ -10,32 +10,16 @@
           http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
   <flow name="reusableErrorHandlerAsAnOperationFlow">
-    <this:operation-one />
+    <this:operation-reusing-error-handling-logic />
   </flow>
 
-  <operation:def name="operationOne">
+  <operation:def name="operationReusingErrorHandlingLogic">
     <operation:output>
       <operation:payload-type type="string"/>
     </operation:output>
     <operation:body>
       <try>
         <heisenberg:cure-cancer />
-        <error-handler>
-          <on-error-continue>
-            <this:handle-error error="#[error]" />
-          </on-error-continue>
-        </error-handler>
-      </try>
-    </operation:body>
-  </operation:def>
-
-  <operation:def name="operationTwo">
-    <operation:output>
-      <operation:payload-type type="string"/>
-    </operation:output>
-    <operation:body>
-      <try>
-        <heisenberg:kill-with-ricins />
         <error-handler>
           <on-error-continue>
             <this:handle-error error="#[error]" />
