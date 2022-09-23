@@ -39,11 +39,9 @@ public class ExportOnEndSpan implements InternalSpan {
                          ChildSpanCustomizationInfo childSpanCustomizationInfo,
                          MuleConfiguration muleConfiguration,
                          boolean exportable,
-                         int exportUntilLevel,
-                         boolean ignoreExportLevelLimitOfAncestors) {
+                         Set<String> noExportUntil) {
     this.runtimeInternalSpan = runtimeInternalSpan;
-    this.spanExporter = getExporter(eventContext, internalSpanExportManager, muleConfiguration, exportable, exportUntilLevel,
-                                    ignoreExportLevelLimitOfAncestors);
+    this.spanExporter = getExporter(eventContext, internalSpanExportManager, muleConfiguration, exportable, noExportUntil);
     this.childSpanCustomizationInfo = childSpanCustomizationInfo;
   }
 
@@ -51,10 +49,8 @@ public class ExportOnEndSpan implements InternalSpan {
                                            InternalSpanExportManager<EventContext> internalSpanExportManager,
                                            MuleConfiguration muleConfiguration,
                                            boolean exportable,
-                                           int exportUntilLevel,
-                                           boolean ignoreExportLevelLimitOfAncestors) {
-    return internalSpanExportManager.getInternalSpanExporter(eventContext, muleConfiguration, exportable, exportUntilLevel,
-                                                             ignoreExportLevelLimitOfAncestors, this);
+                                           Set<String> noExportUntil) {
+    return internalSpanExportManager.getInternalSpanExporter(eventContext, muleConfiguration, exportable, noExportUntil, this);
   }
 
   @Override

@@ -7,8 +7,8 @@
 
 package org.mule.runtime.core.privileged.profiling.tracing;
 
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -17,6 +17,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Info for a customized creation of an {@link InternalSpan}.
@@ -62,29 +63,17 @@ public interface SpanCustomizationInfo {
   }
 
   /**
-   * Indicates the level until which the span hierarchy will be exported. For example: if the level is 2, the grandchildren of
-   * this span will not be exported.
+   * Indicates that no children will be exported till a span is found with the names returned.
    *
-   * This can be overridden.
+   * For example: in case noExportUntil returns "execute-next", no children will be exported till an execute-next span.
    *
-   * @see #ignoreExportLevelLimitOfAncestors()
+   * ------------- span (exported) --------------------------------------------------------- |___ logger (not exported) ____ |___
+   * scope (not exported) |___ execute-next (exported) |__ flow (exported)
    *
-   * @return the level until which the child span hierarchy will be exported.
+   * @return the name of the spans where the span hierarchy is exported again.
    */
-  default int exportUntilLevel() {
-    return MAX_VALUE;
-  }
-
-  /**
-   * Indicates that both this span and the hierarchy of children will be exported ignoring if one of the ancestors has set the
-   * export until a certain level.
-   *
-   * @see #exportUntilLevel()
-   *
-   * @return if it forces the export ignoring the previous limits set by parents.
-   */
-  default boolean ignoreExportLevelLimitOfAncestors() {
-    return false;
+  default Set<String> noExportUntil() {
+    return emptySet();
   }
 
 }

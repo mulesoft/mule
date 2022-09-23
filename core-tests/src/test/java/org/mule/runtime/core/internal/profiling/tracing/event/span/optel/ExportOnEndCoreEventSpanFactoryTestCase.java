@@ -7,6 +7,10 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
+import static java.util.Collections.singleton;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.EXECUTE_NEXT;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
@@ -14,7 +18,6 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExpo
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Optional.of;
 import static java.lang.Thread.currentThread;
 
@@ -28,6 +31,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
@@ -35,7 +39,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
-import org.mule.runtime.core.internal.profiling.tracing.event.NoChildrenExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.NoChildrenExportableUntilExecuteNextSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.NoExportableOpenTelemetrySpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpanExporter;
@@ -113,13 +117,55 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
   }
 
   @Test
-  public void whenNewExportLevelIsLessThanParentLevelReturnNewLevel() {
-    doTestLevels(3, 1);
+  public void exportSpanWhenUsingNoExportUntilSpanCustomizationInfo() {
+    Component component = mock(Component.class);
+    ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
+    when(componentIdentifier.getNamespace()).thenReturn(IDENTIFIER_NAMESPACE);
+    when(componentIdentifier.getName()).thenReturn(EXECUTE_NEXT);
+    when(component.getIdentifier()).thenReturn(componentIdentifier);
+    ExportOnEndSpan spanMock = mock(ExportOnEndSpan.class);
+    setSpanMock(spanMock);
+    when(spanMock.getParent()).thenReturn(null);
+    InternalSpanExporter internalSpanExporter = mock(InternalSpanExporter.class);
+    when(spanMock.getSpanExporter()).thenReturn(internalSpanExporter);
+    assertThat(spanMock.getSpanExporter().noExportUntil(), empty());
+    InternalSpan span = getSpan(new NoChildrenExportableUntilExecuteNextSpanCustomizationInfo(component),
+                                spanMock);
+
+    assertThat(span, instanceOf(ExportOnEndSpan.class));
+    InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
+    assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
+    OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
+    assertThat(openTelemetrySpanExporter.noExportUntil(), IsCollectionWithSize.hasSize(1));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), hasItem(EXECUTE_NEXT));
+    assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), not(instanceOf(NoExportableOpenTelemetrySpan.class)));
   }
 
   @Test
-  public void whenNewExportLevelIsMoreThanParentLevelParentLevelMinus1() {
-    doTestLevels(0, -1);
+  public void noExportSpanWhenUsingNoExportUntilSpanCustomizationInfo() {
+    Component component = mock(Component.class);
+    ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
+    when(componentIdentifier.getNamespace()).thenReturn(IDENTIFIER_NAMESPACE);
+    when(componentIdentifier.getName()).thenReturn(IDENTIFIER_NAME);
+    when(component.getIdentifier()).thenReturn(componentIdentifier);
+    ExportOnEndSpan spanMock = mock(ExportOnEndSpan.class);
+    setSpanMock(spanMock);
+    ExportOnEndSpan parentSpan = mock(ExportOnEndSpan.class);
+    InternalSpanExporter parentSpanExporter = mock(InternalSpanExporter.class);
+    when(parentSpanExporter.noExportUntil()).thenReturn(singleton("noExportable"));
+    when(spanMock.getSpanExporter()).thenReturn(parentSpanExporter);
+    when(spanMock.getParent()).thenReturn(parentSpan);
+
+    InternalSpan span = getSpan(new NoChildrenExportableUntilExecuteNextSpanCustomizationInfo(component),
+                                spanMock);
+
+    assertThat(span, instanceOf(ExportOnEndSpan.class));
+    InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
+    assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
+    OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
+    assertThat(openTelemetrySpanExporter.noExportUntil(), IsCollectionWithSize.hasSize(2));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), hasItem(EXECUTE_NEXT));
+    assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), instanceOf(NoExportableOpenTelemetrySpan.class));
   }
 
   @Test
@@ -138,7 +184,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
     assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
     OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
-    assertThat(openTelemetrySpanExporter.getExportUntilLevel(), equalTo(MAX_VALUE - 1));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), empty());
     assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), instanceOf(NoExportableOpenTelemetrySpan.class));
   }
 
@@ -152,34 +198,6 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     when(coreEvent.getContext()).thenReturn(coreEventContext);
 
     return coreEventSpanFactory.getSpan(coreEvent, muleConfiguration, APP, spanCustomizationInfo);
-  }
-
-
-  private void doTestLevels(int parentLevel, int expectedLevel) {
-    Component component = mock(Component.class);
-    ComponentIdentifier componentIdentifier = mock(ComponentIdentifier.class);
-    when(componentIdentifier.getNamespace()).thenReturn(IDENTIFIER_NAMESPACE);
-    when(componentIdentifier.getName()).thenReturn(IDENTIFIER_NAME);
-    when(component.getIdentifier()).thenReturn(componentIdentifier);
-    ExportOnEndSpan spanMock = mock(ExportOnEndSpan.class);
-    setSpanMock(spanMock);
-    when(spanMock.getParent()).thenReturn(null);
-    InternalSpanExporter internalSpanExporter = mock(InternalSpanExporter.class);
-    when(spanMock.getSpanExporter()).thenReturn(internalSpanExporter);
-    when(internalSpanExporter.getExportUntilLevel()).thenReturn(parentLevel);
-    InternalSpan span = getSpan(new NoChildrenExportableNamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(component),
-                                spanMock);
-
-    assertThat(span, instanceOf(ExportOnEndSpan.class));
-    InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
-    assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
-    OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
-    assertThat(openTelemetrySpanExporter.getExportUntilLevel(), equalTo(expectedLevel));
-    if (expectedLevel <= 0) {
-      assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), instanceOf(NoExportableOpenTelemetrySpan.class));
-    } else {
-      assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), not(instanceOf(NoExportableOpenTelemetrySpan.class)));
-    }
   }
 
   private void setSpanMock(InternalSpan spanMock) {

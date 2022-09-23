@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo.ROUTE_TAG;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo.SPAN_NAME_SEPARATOR;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.EXECUTE_NEXT;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getComponentNameWithoutNamespace;
 import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,11 +53,5 @@ public class NamedSpanBasedOnParentSpanChildSpanCustomizationInfo
   public boolean isExportable(CoreEvent coreEvent) {
     return getSpan(coreEvent)
         .map(internalSpan -> !getComponentNameWithoutNamespace(internalSpan).equals(EXECUTE_NEXT_ROUTE_TAG)).orElse(true);
-  }
-
-  private String getComponentNameWithoutNamespace(InternalSpan internalSpan) {
-    String spanName = internalSpan.getName();
-    int sepPos = spanName.indexOf(SPAN_NAME_SEPARATOR) + 1;
-    return spanName.substring(sepPos);
   }
 }

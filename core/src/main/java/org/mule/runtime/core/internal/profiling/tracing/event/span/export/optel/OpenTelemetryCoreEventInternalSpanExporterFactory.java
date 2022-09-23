@@ -20,6 +20,8 @@ import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpan
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
+import java.util.Set;
+
 /**
  * A factory for exporting spans associated to events.
  *
@@ -42,21 +44,20 @@ public class OpenTelemetryCoreEventInternalSpanExporterFactory {
   }
 
   /**
-   * @param eventContext                      an extra instance that may have extra information for creat
-   * @param internalSpan                      the {@link InternalSpan} that will eventually be exported
-   * @param exportUntilLevel                  the level until which the child span hierarchy will be exported.
-   * @param ignoreExportLevelLimitOfAncestors if it forces the export ignoring the previous limits set by parents.
+   * @param eventContext      the event context
+   * @param muleConfiguration the mule configuration
+   * @param exportable        indicates if this is exportable.
+   * @param noExportUntil     noExportUntil the spans named as indicated
+   * @param internalSpan      the {@link InternalSpan} that will eventually be exported
    *
    * @return the result exporter.
    */
   public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, boolean exportable,
-                                   int exportUntilLevel,
-                                   boolean ignoreExportLevelLimitOfAncestors,
+                                   Set<String> noExportUntil,
                                    InternalSpan internalSpan) {
     return new OpenTelemetrySpanExporter(getOpenTelemetryTracer(CONFIGURATION, muleConfiguration.getId()), eventContext,
                                          exportable,
-                                         exportUntilLevel,
-                                         ignoreExportLevelLimitOfAncestors,
+                                         noExportUntil,
                                          internalSpan);
   }
 

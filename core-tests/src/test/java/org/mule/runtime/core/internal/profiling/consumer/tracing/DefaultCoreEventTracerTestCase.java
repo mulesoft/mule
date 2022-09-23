@@ -23,8 +23,8 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -78,6 +78,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.ImmutableMap;
@@ -508,7 +509,7 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     @Override
     public InternalSpanExporter getInternalSpanExporter(EventContext context, MuleConfiguration muleConfiguration,
                                                         boolean exportable,
-                                                        int exportUntilLevel, boolean ignoreExportLevelLimitOfAncestors,
+                                                        Set<String> noExportUntil,
                                                         InternalSpan internalSpan) {
       return new InternalSpanExporter() {
 
@@ -523,8 +524,8 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
         }
 
         @Override
-        public int getExportUntilLevel() {
-          return MAX_VALUE;
+        public Set<String> noExportUntil() {
+          return emptySet();
         }
       };
     }

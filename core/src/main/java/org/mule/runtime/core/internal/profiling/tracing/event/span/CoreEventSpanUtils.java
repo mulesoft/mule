@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo.SPAN_NAME_SEPARATOR;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -72,6 +73,12 @@ public class CoreEventSpanUtils {
     }
 
     return componentIdentifier.getName();
+  }
+
+  public static String getComponentNameWithoutNamespace(InternalSpan internalSpan) {
+    String spanName = internalSpan.getName();
+    int sepPos = spanName.indexOf(SPAN_NAME_SEPARATOR) + 1;
+    return spanName.substring(sepPos);
   }
 
   private static String getUnknownIfEmptyNamespace(ComponentIdentifier componentIdentifier) {
