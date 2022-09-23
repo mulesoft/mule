@@ -15,8 +15,9 @@ import org.mule.runtime.core.api.source.MessageSource;
  * 
  * <strong>Private/Trigger flows</strong>
  * <ul>
- * <li>A flow is considered <b>trigger</b> when it contains a {@link MessageSource} or it is a flow used by an ApiKit router.</li>
- * <li>A flow that is not <b>trigger</b> is considered <b>private</b>.</li>
+ * <li>A flow is considered <b>trigger</b> when it contains a {@link MessageSource}.</li>
+ * <li>A flow is considered <b>ApiKit</b> when it is a flow used by an ApiKit router and is not a <b>trigger.</b></li>
+ * <li>A flow that is not <b>trigger</b> nor <b>ApiKit</b> is considered <b>private</b>.</li>
  * </ul>
  * <p>
  * <strong>Active/Declared flows</strong>
@@ -63,5 +64,19 @@ public interface FlowsSummaryStatistics extends Statistics {
    * @return The number of active trigger flows
    */
   int getActiveTriggerFlows();
+
+  /**
+   * Returns the counter of ApiKit flows declared in the application.
+   * 
+   * @return The number of declared ApiKit flows
+   */
+  int getDeclaredApikitFlows();
+
+  /**
+   * Returns the counter of ApiKit flows active in the application.
+   *
+   * @return The number of active ApiKit flows
+   */
+  int getActiveApikitFlows();
 
 }
