@@ -134,12 +134,12 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   public int getDeclaredPublicFlows() {
     return declaredPublicFlows.get();
   }
-  
+
   @Override
   public int getActivePublicFlows() {
     return activePublicFlows.get();
   }
-  
+
   @Override
   public int getDeclaredPrivateFlows() {
     return declaredPrivateFlows.get();
