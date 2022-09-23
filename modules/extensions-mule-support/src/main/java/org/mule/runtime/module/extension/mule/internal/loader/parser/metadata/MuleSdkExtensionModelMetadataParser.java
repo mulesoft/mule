@@ -25,17 +25,17 @@ import java.util.Optional;
 public interface MuleSdkExtensionModelMetadataParser {
 
   /**
-   * @return The Extension's Name
+   * @return the extension's name
    */
   String getName();
 
   /**
-   * @return The Extension's {@link Category}
+   * @return the extension's {@link Category}
    */
   Category getCategory();
 
   /**
-   * @return The Extension's Vendor
+   * @return the extension's vendor
    */
   String getVendor();
 
