@@ -82,6 +82,6 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void typeFromDependencyByFullName() {
-    assertThat(applicationTypeLoader.load(FULL_CLASS_NAME_FOR_MOCK_TYPE).isPresent(), is(true));
+    assertThat(applicationTypeLoader.load(MOCK_EXTENSION_PREFIX + ":" + FULL_CLASS_NAME_FOR_MOCK_TYPE).isPresent(), is(true));
   }
 }
