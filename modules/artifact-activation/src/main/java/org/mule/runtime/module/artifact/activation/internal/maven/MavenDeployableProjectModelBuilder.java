@@ -108,6 +108,8 @@ public class MavenDeployableProjectModelBuilder
   private final MavenConfiguration mavenConfiguration;
   private List<String> packages = emptyList();
   private List<String> resources = emptyList();
+
+  private final List<Path> resourcesPath = new ArrayList<>();
   private List<BundleDependency> deployableMavenBundleDependencies;
   private Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
@@ -175,7 +177,7 @@ public class MavenDeployableProjectModelBuilder
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
 
-    return new DeployableProjectModel(packages, resources,
+    return new DeployableProjectModel(packages, resources, resourcesPath,
                                       buildBundleDescriptor(deployableArtifactCoordinates),
                                       getModelResolver(deployableArtifactCoordinates),
                                       projectFolder, deployableBundleDependencies,
@@ -200,7 +202,7 @@ public class MavenDeployableProjectModelBuilder
 
   /**
    * Resolves the dependencies of the deployable in the various forms needed to obtain the {@link DeployableProjectModel}.
-   * 
+   *
    * @param aetherMavenClient the configured {@link AetherMavenClient}.
    * @param pom               POM file.
    * @param pomModel          parsed POM model.
@@ -352,6 +354,7 @@ public class MavenDeployableProjectModelBuilder
 
   private List<String> getResourcesInFolder(String resourcesDirectoryName) throws IOException {
     Path resourcesDirectory = get(projectFolder.getAbsolutePath(), resourcesDirectoryName);
+    resourcesPath.add(resourcesDirectory);
     // look for all the sources under the resources directory
     List<Path> allResourcesFiles = walk(resourcesDirectory)
         .filter(Files::isRegularFile)

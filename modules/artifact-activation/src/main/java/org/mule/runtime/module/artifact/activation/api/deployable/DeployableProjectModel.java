@@ -23,6 +23,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Represents the structure of a project, providing what is needed in order to create its {@link ArtifactDescriptor} with a
  * {@link DeployableArtifactDescriptorFactory}.
- * 
+ *
  * @since 4.5
  */
 public final class DeployableProjectModel {
@@ -52,11 +53,14 @@ public final class DeployableProjectModel {
   private final Set<BundleDescriptor> sharedLibraries;
   private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
 
+  private final List<Path> resourcesPath;
+
   /**
    * Creates a new instance with the provided parameters.
-   * 
+   *
    * @param packages                     See {@link #getPackages()}
    * @param resources                    See {@link #getResources()}
+   * @param resourcesPath                See {@link #getResourcesPath()}
    * @param descriptor                   See {@link #getDescriptor()}
    * @param deployableModelSupplier      See {@link #getDeployableModel()}
    * @param projectFolder                See {@link #getProjectFolder()}
@@ -67,6 +71,7 @@ public final class DeployableProjectModel {
 
   public DeployableProjectModel(List<String> packages,
                                 List<String> resources,
+                                List<Path> resourcesPath,
                                 BundleDescriptor descriptor,
                                 Supplier<MuleDeployableModel> deployableModelSupplier,
                                 File projectFolder,
@@ -76,6 +81,7 @@ public final class DeployableProjectModel {
 
     this.packages = ImmutableList.copyOf(packages);
     this.resources = ImmutableList.copyOf(resources);
+    this.resourcesPath = ImmutableList.copyOf(resourcesPath);
     this.descriptor = requireNonNull(descriptor);
     this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
     this.projectFolder = requireNonNull(projectFolder);
@@ -138,7 +144,7 @@ public final class DeployableProjectModel {
    * These are the packages containing java classes in the modeled project.
    * <p>
    * This does not take into account the java packages of this project's dependencies.
-   * 
+   *
    * @return the java packages of the project.
    */
   public List<String> getPackages() {
@@ -146,14 +152,24 @@ public final class DeployableProjectModel {
   }
 
   /**
-   * These are the resources in the modeled project.
+   * These are the resources in the modeled project. These resources are located in one of the folders of {@link resourcesPath}
    * <p>
    * This does not take into account the resources of this project's dependencies.
-   * 
+   *
+   *
    * @return the resources of the project.
    */
   public List<String> getResources() {
     return resources;
+  }
+
+  /**
+   * These are the paths to the resources folders in the modeled project.
+   *
+   * @return the resources of the project.
+   */
+  public List<Path> getResourcesPath() {
+    return resourcesPath;
   }
 
   /**
