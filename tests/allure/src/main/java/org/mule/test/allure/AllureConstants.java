@@ -922,6 +922,11 @@ public interface AllureConstants {
       String MONITOR_NET_BYTES_USED = "Monitor net bytes used";
     }
 
+    interface MessageMetricsStory {
+
+      String LAPSED_MESSAGE_METRICS = "Lapsed message metrics";
+    }
+
     interface FlowSummaryStory {
 
       String ACTIVE_FLOWS_SUMMARY = "Active flows summary";
