@@ -71,7 +71,7 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
   public synchronized ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType,
                                                                            ByteBufferPoolConfiguration poolConfiguration) {
     if (name == null) {
-      throw new IllegalArgumentException("Profiling service cannot be null.");
+      throw new IllegalArgumentException(BYTE_BUFFER_PROVIDER_NAME_CANNOT_BE_NULL_MESSAGE);
     }
 
     if (byteBufferProviders.containsKey(name)) {
@@ -81,6 +81,7 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
     byteBufferProviders.put(name, buildByteBufferProviderFrom(byteBufferType)
         .withPoolConfiguration(poolConfiguration)
         .withProfilingService(profilingService)
+        .withName(name)
         .build());
 
     return byteBufferProviders.get(name);

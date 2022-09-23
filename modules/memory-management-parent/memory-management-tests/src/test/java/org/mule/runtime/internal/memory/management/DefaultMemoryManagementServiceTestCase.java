@@ -20,7 +20,9 @@ import static java.lang.String.format;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.junit.MockitoJUnit.rule;
+import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -88,6 +90,14 @@ public class DefaultMemoryManagementServiceTestCase extends AbstractMuleTestCase
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Byte buffer provider name cannot be null.");
     memoryManagementService.getByteBufferProvider(null, HEAP);
+  }
+
+  @Test
+  @Description("When a bytebuffer provider with a null name is returned, an exception is raised.")
+  public void byteBufferProvidersWithNullNameAndPoolingConfiguration() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Byte buffer provider name cannot be null.");
+    memoryManagementService.getByteBufferProvider(null, HEAP, mock(ByteBufferPoolConfiguration.class));
   }
 
   @Test
