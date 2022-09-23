@@ -14,7 +14,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
@@ -29,7 +28,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -85,7 +83,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
   @Test
   public void appExtensionModelContainsRaisedErrors() {
     ExtensionModel extensionModel = getAppExtensionModel();
-    List<String> raisedErrors = getRaisedErrors(extensionModel);
+    Set<String> raisedErrors = getRaisedErrors(extensionModel);
     assertThat(raisedErrors,
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
                                   "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH",
@@ -101,14 +99,14 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     }
   }
 
-  private void assertRaisedErrors(String operationName, Collection<String> expectedListOfErrors) {
+  private void assertRaisedErrors(String operationName, Collection<String> expectedSetOfErrors) {
     OperationModel operationModel = getOperationModel(operationName);
-    List<String> actualRaisedErrors = getRaisedErrors(operationModel);
+    Set<String> actualRaisedErrors = getRaisedErrors(operationModel);
 
-    assertThat(format("Actual list for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors,
-               hasSize(expectedListOfErrors.size()));
-    for (String item : expectedListOfErrors) {
-      assertThat(format("Actual list for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors, hasItem(item));
+    assertThat(format("Actual set for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors,
+               hasSize(expectedSetOfErrors.size()));
+    for (String item : expectedSetOfErrors) {
+      assertThat(format("Actual set for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors, hasItem(item));
     }
   }
 
@@ -118,12 +116,12 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
                                                                operationName)));
   }
 
-  private static List<String> getRaisedErrors(ExtensionModel extensionModel) {
-    return extensionModel.getErrorModels().stream().map(ErrorModel::toString).collect(toList());
+  private static Set<String> getRaisedErrors(ExtensionModel extensionModel) {
+    return extensionModel.getErrorModels().stream().map(ErrorModel::toString).collect(toSet());
   }
 
-  private static List<String> getRaisedErrors(OperationModel operationModel) {
-    return operationModel.getErrorModels().stream().map(ErrorModel::toString).collect(toList());
+  private static Set<String> getRaisedErrors(OperationModel operationModel) {
+    return operationModel.getErrorModels().stream().map(ErrorModel::toString).collect(toSet());
   }
 
   private ExtensionModel getAppExtensionModel() {
