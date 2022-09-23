@@ -84,6 +84,9 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         {
             log.trace("Executing MVEL expression '" + expression + "' with context: \n" + context.toString());
         }
+        if (expression.contains("payload")) {
+            this.compiledExpressionsCache.invalidate(expression);
+        }
         return MVEL.executeExpression(getCompiledExpression(expression), context);
     }
 
