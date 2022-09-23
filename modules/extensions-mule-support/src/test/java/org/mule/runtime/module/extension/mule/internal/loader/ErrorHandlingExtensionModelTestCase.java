@@ -11,10 +11,11 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLI
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -44,29 +46,29 @@ import org.junit.Test;
 @Stories({@Story(APPLICATION_EXTENSION_MODEL), @Story(ERROR_HANDLING)})
 public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalTestCase {
 
-  private static final Map<String, List<String>> expectedErrors = new HashMap<>();
+  private static final Map<String, Set<String>> expectedErrors = new HashMap<>();
 
   @BeforeClass
   public static void setupExpectedErrors() {
-    expectedErrors.put("raiseThis", singletonList("THIS:CUSTOM"));
-    expectedErrors.put("raiseCustom", singletonList("THIS:CUSTOM"));
-    expectedErrors.put("heisenbergCureCancer", asList("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("raiseThis", singleton("THIS:CUSTOM"));
+    expectedErrors.put("raiseCustom", singleton("THIS:CUSTOM"));
+    expectedErrors.put("heisenbergCureCancer", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
 
     // Not applying the mappings in the extension model. Otherwise, this would declare "MY:MAPPED".
-    expectedErrors.put("withMappingInsideBody", asList("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("withMappingInsideBody", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
 
     // We can't guess what errors will set-payload raise (this operation will raise a "MULE:EXPRESSION" error).
-    expectedErrors.put("divisionByZero", emptyList());
+    expectedErrors.put("divisionByZero", emptySet());
 
-    expectedErrors.put("operationSilencingOneSpecificErrorAndRaisingAnother", asList("HEISENBERG:OAUTH2", "THIS:CUSTOM"));
-    expectedErrors.put("operationSilencingAllErrorsAndRaisingAnother", singletonList("THIS:CUSTOM"));
-    expectedErrors.put("operationSilencingAllHeisenbergErrorsAndRaisingAnother", singletonList("THIS:HEALTH"));
-    expectedErrors.put("operationSilencingAllHealthErrorsWithinACatchAll", singletonList("HEISENBERG:OAUTH2"));
+    expectedErrors.put("operationSilencingOneSpecificErrorAndRaisingAnother", asSet("HEISENBERG:OAUTH2", "THIS:CUSTOM"));
+    expectedErrors.put("operationSilencingAllErrorsAndRaisingAnother", singleton("THIS:CUSTOM"));
+    expectedErrors.put("operationSilencingAllHeisenbergErrorsAndRaisingAnother", singleton("THIS:HEALTH"));
+    expectedErrors.put("operationSilencingAllHealthErrorsWithinACatchAll", singleton("HEISENBERG:OAUTH2"));
 
-    expectedErrors.put("operationRaisingUniqueErrorAndCatchingIt", emptyList());
+    expectedErrors.put("operationRaisingUniqueErrorAndCatchingIt", emptySet());
 
-    expectedErrors.put("operationWithMultipleOnErrorContinues", emptyList());
-    expectedErrors.put("operationCatchingAllButWithWhen", asList("HEISENBERG:OAUTH2", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("operationWithMultipleOnErrorContinues", emptySet());
+    expectedErrors.put("operationCatchingAllButWithWhen", asSet("HEISENBERG:OAUTH2", "HEISENBERG:HEALTH"));
   }
 
   @Inject
@@ -92,9 +94,9 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
 
   @Test
   public void eachOperationDeclaresTheErrorsThatRaises() {
-    for (Entry<String, List<String>> expectedForOperation : expectedErrors.entrySet()) {
+    for (Entry<String, Set<String>> expectedForOperation : expectedErrors.entrySet()) {
       String operationName = expectedForOperation.getKey();
-      List<String> expected = expectedForOperation.getValue();
+      Set<String> expected = expectedForOperation.getValue();
       assertRaisedErrors(operationName, expected);
     }
   }
@@ -126,5 +128,9 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
 
   private ExtensionModel getAppExtensionModel() {
     return extensionManager.getExtension(muleContext.getConfiguration().getId()).get();
+  }
+
+  private static <T> Set<T> asSet(T... a) {
+    return stream(a).collect(toSet());
   }
 }
