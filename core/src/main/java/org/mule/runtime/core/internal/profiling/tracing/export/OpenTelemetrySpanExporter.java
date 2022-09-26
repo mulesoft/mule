@@ -72,7 +72,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   private final boolean exportable;
   private Set<String> noExportUntil;
   private final InternalSpan internalSpan;
-  private Map<String, String> attributes = new HashMap<>();
+  private final Map<String, String> attributes = new HashMap<>();
 
   public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
                                    boolean exportable,
@@ -80,6 +80,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
                                    InternalSpan internalSpan) {
     this.tracer = tracer;
     this.internalSpan = internalSpan;
+    this.noExportUntil = noExportUntil;
     remoteContext = resolveRemoteContext(eventContext);
     this.exportable = exportable;
   }
@@ -209,7 +210,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
     io.opentelemetry.api.trace.Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
-    attributes.forEach((key, value) -> span.setAttribute(key, value));
+    attributes.forEach(span::setAttribute);
 
     return span;
   }

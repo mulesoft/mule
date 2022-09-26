@@ -39,6 +39,7 @@ public class OpentelemetrySpanExporterTestCase {
   public static final String PARENT_TRACE_ID = "80e1afed08e019fc1110464cfa66635c";
   public static final String PARENT_SPAN_ID = "7a085853722dc6d2";
   public static final String TEST_SERVICE_NAME = "test-service";
+  public static final String TEST_SPAN_NAME = "testSpanName";
 
   @Test
   public void createOpentelemetrySpanExporterWithRemoteW3CContextParent() {
@@ -55,6 +56,7 @@ public class OpentelemetrySpanExporterTestCase {
     SpanDuration spanDuration = mock(SpanDuration.class);
 
     when(internalMuleSpan.getDuration()).thenReturn(spanDuration);
+    when(internalMuleSpan.getName()).thenReturn(TEST_SPAN_NAME);
     OpenTelemetrySpanExporter openTelemetrySpanExporter = new OpenTelemetrySpanExporter(
                                                                                         getOpenTelemetryTracer(new TestSpanConfiguration(),
                                                                                                                TEST_SERVICE_NAME),
