@@ -10,6 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.api.util.IdentifierParsingUtils.parseErrorType;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE;
@@ -22,6 +23,7 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.Mule
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Locale.getDefault;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -43,9 +45,9 @@ import java.util.function.BiFunction;
 /**
  * {@link Characteristic} that retrieves all the {@link ErrorModelParser} emitted by the inner components of this Model
  */
-// TODO: Contemplate the cases identified in W-11640594
 public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorModelParser>> {
 
+  private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(getDefault());
   private static final String ERROR_TYPE_PARAM = "type";
   private static final String WHEN_PARAM = "when";
 
@@ -105,17 +107,21 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     private MuleSdkErrorModelParser applyMappingIsSomeMatches(ErrorModel errorModel, List<ErrorMapping> errorMappings) {
       return errorMappings.stream()
               .filter(errorMapping -> doesMappingSourceMatch(errorMapping, errorModel))
-              .map(errorMapping -> applyMappingAndCreateParser(errorMapping, errorModel))
-              .findFirst().orElseGet(() -> new MuleSdkErrorModelParser(errorModel));
+              .map(Aggregator::buildParserFromTarget)
+              .findFirst()
+              .orElseGet(() -> new MuleSdkErrorModelParser(errorModel));
     }
 
-    private MuleSdkErrorModelParser applyMappingAndCreateParser(ErrorMapping errorMapping, ErrorModel errorModel) {
-      return null;
+    private static MuleSdkErrorModelParser buildParserFromTarget(ErrorMapping errorMapping) {
+      String mappingTargetAsString = errorMapping.getTarget();
+      ComponentIdentifier targetErrorId = parseErrorType(mappingTargetAsString, CORE_ERROR_NAMESPACE);
+      return new MuleSdkErrorModelParser(targetErrorId.getNamespace(), targetErrorId.getName(), null);
     }
 
     private boolean doesMappingSourceMatch(ErrorMapping errorMapping, ErrorModel errorModel) {
       String mappingSourceAsString = errorMapping.getSource();
-      return false;
+      ComponentIdentifier sourceErrorId = parseErrorType(mappingSourceAsString, CORE_ERROR_NAMESPACE);
+      return new SingleErrorModelParserMatcher(sourceErrorId).matches(new MuleSdkErrorModelParser(errorModel));
     }
 
     private void handleRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels, List<ComponentAst> hierarchy) {
