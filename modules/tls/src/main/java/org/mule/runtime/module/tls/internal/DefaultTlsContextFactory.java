@@ -276,7 +276,7 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
 
   @Override
   public boolean isTrustStoreConfigured() {
-    return tlsConfiguration.getTrustStore() != null;
+    return !trustStoreInsecure && tlsConfiguration.getTrustStore() != null;
   }
 
   @Override
