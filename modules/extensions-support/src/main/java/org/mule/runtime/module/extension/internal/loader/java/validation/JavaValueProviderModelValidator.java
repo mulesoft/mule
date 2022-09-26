@@ -38,9 +38,12 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ValueProv
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@link ExtensionModelValidator} for the correct usage of {@link ValueProviderModel} and
@@ -136,8 +139,14 @@ public final class JavaValueProviderModelValidator implements ExtensionModelVali
       valueProvidersIdValidator
           .addValueProviderInformation(new ValueProviderInformation(valueProviderModel.get(), model, valueProvider.getName()));
     }
+    List<ParameterModel> allParameterModels = model.getAllParameterModels();
+
+    if (validateComponentHasParametersWithRepeatedNames(allParameterModels, param, problemsReporter, model)) {
+      return;
+    }
+
     Map<String, MetadataType> allParameters =
-        model.getAllParameterModels().stream().collect(toMap(ParameterModel::getName, ParameterModel::getType));
+        allParameterModels.stream().collect(toMap(ParameterModel::getName, ParameterModel::getType));
     String modelName = NameUtils.getModelName(model);
     String modelTypeName = getComponentModelTypeName(model);
 
@@ -200,6 +209,30 @@ public final class JavaValueProviderModelValidator implements ExtensionModelVali
                                                      providerName, modelTypeName, modelName)));
       }
     }
+  }
+
+  private boolean validateComponentHasParametersWithRepeatedNames(List<ParameterModel> allParameterModels, ParameterModel param,
+                                                                  ProblemsReporter problemsReporter,
+                                                                  ParameterizedModel parameterizedModel) {
+    Set<String> repeatedParameterNames = new HashSet<>();
+    Set<String> parameterNames = new HashSet<>();
+    for (ParameterModel parameterModel : allParameterModels) {
+      if (parameterNames.contains(parameterModel.getName())) {
+        repeatedParameterNames.add(parameterModel.getName());
+      } else {
+        parameterNames.add(parameterModel.getName());
+      }
+    }
+    if (!repeatedParameterNames.isEmpty()) {
+      problemsReporter
+          .addError(new Problem(param,
+                                format("Parameter [%s] from %s with name %s has a Value Provider defined, but that %s has one or more parameters with repeated names [%s]. Components with parameters with non-unique names do not support Value Providers",
+                                       param.getName(), getComponentModelTypeName(parameterizedModel),
+                                       parameterizedModel.getName(), getComponentModelTypeName(parameterizedModel),
+                                       repeatedParameterNames.stream().collect(Collectors.joining(", ")))));
+      return true;
+    }
+    return false;
   }
 
   private static final class ValueProviderInformation {
