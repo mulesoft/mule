@@ -103,6 +103,22 @@
         </operation:body>
     </operation:def>
 
+    <flow name="transitiveMappingFlow">
+        <this:transitive-mapping />
+    </flow>
+
+    <operation:def name="transitiveMapping" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <heisenberg:cure-cancer>
+                <error-mapping sourceType="HEISENBERG:HEALTH" targetType="MY:MAPPED"/>
+                <error-mapping sourceType="MY:MAPPED" targetType="MY:TRANSITIVE"/>
+            </heisenberg:cure-cancer>
+        </operation:body>
+    </operation:def>
+
     <!-- Combination of 1.2 and 1.3 -->
     <flow name="errorMappingInsideBodyAndInInvocationFlow">
         <this:with-mapping-inside-body >

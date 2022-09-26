@@ -83,4 +83,9 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
     CoreEvent result = flowRunner("reusableErrorHandlerAsAnOperationFlow").run();
     assertThat(result, hasMessage(hasPayload(is("Caught error!"))));
   }
+
+  @Test
+  public void errorMappingIsNotTransitive() throws Exception {
+    flowRunner("transitiveMappingFlow").runExpectingException(errorType("MY", "MAPPED"));
+  }
 }

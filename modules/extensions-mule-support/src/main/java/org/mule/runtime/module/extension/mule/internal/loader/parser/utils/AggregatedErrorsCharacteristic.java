@@ -101,10 +101,10 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       }
 
       List<ErrorMapping> errorMappings = errorMappingsOpt.get();
-      return applyMappingIsSomeMatches(errorModel, errorMappings);
+      return applyMappingIfSomeMatches(errorModel, errorMappings);
     }
 
-    private MuleSdkErrorModelParser applyMappingIsSomeMatches(ErrorModel errorModel, List<ErrorMapping> errorMappings) {
+    private MuleSdkErrorModelParser applyMappingIfSomeMatches(ErrorModel errorModel, List<ErrorMapping> errorMappings) {
       return errorMappings.stream()
           .filter(errorMapping -> doesMappingSourceMatch(errorMapping, errorModel))
           .map(Aggregator::buildParserFromTarget)
