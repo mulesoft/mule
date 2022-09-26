@@ -55,6 +55,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     expectedErrors.put("withMappingInsideBody", asSet("MY:MAPPED", "HEISENBERG:OAUTH2"));
     expectedErrors.put("mappingAnyInsideBody", singleton("MY:MAPPED"));
     expectedErrors.put("transitiveMapping", asSet("MY:MAPPED", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("mappingChildAfterParent", singleton("MY:MAPPEDCONNECTIVITY"));
 
     // We can't guess what errors will set-payload raise (this operation will raise a "MULE:EXPRESSION" error).
     expectedErrors.put("divisionByZero", emptySet());
@@ -88,7 +89,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     assertThat(raisedErrors,
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
                                   "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH",
-                                  "THIS:UNIQUE", "MY:MAPPED"));
+                                  "THIS:UNIQUE", "MY:MAPPED", "MY:MAPPEDCONNECTIVITY"));
   }
 
   @Test

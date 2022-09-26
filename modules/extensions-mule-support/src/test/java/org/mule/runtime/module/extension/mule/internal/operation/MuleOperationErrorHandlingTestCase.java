@@ -88,4 +88,9 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   public void errorMappingIsNotTransitive() throws Exception {
     flowRunner("transitiveMappingFlow").runExpectingException(errorType("MY", "MAPPED"));
   }
+
+  @Test
+  public void mappingChildAfterParent() throws Exception {
+    flowRunner("mappingChildAfterParentFlow").runExpectingException(errorType("MY", "MAPPEDCONNECTIVITY"));
+  }
 }
