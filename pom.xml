@@ -519,7 +519,7 @@
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <workingDirectory>${project.build.directory}</workingDirectory>
-                        <argLine>${surefire.args}</argLine>
+                        <argLine>${surefire.args} -ea --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED</argLine>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
