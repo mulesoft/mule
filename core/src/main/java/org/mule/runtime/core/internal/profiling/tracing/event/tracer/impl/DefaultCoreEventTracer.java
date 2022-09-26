@@ -240,17 +240,18 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                                                           this::getInternalSpanOpenTelemetryExecutionSpanFunction)
           .orElse(null);
 
-      if (span == null) {
-        return emptyMap();
-      }
-
       Map<String, String> contextMap = new HashMap<>();
 
       // First the remote context
       contextMap.putAll(distributedTraceContext.tracingFieldsAsMap());
       contextMap.putAll(distributedTraceContext.baggageItemsAsMap());
-      // Then the current span. So that it will overwrite the common properties.
-      contextMap.putAll(OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span));
+
+      Map<String, String> currentSpanContextMap;
+
+      if (span != null) {
+        // Then the current span. So that it will overwrite the common properties.
+        contextMap.putAll(OpenTelemetryResourcesProvider.getDistributedTraceContextMap(span));
+      }
 
       return contextMap;
     } else {
