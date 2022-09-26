@@ -16,6 +16,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifact;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -105,13 +107,24 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                             dependencies,
                                             false,
                                             context.getExtensionClassLoader(),
-                                            "this", // should be irrelevant as long as it doesn't collide
+                                            getArtifactLocalExtensionName(resources[0]),
                                             context.getParameter(VERSION_PROPERTY_NAME));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst));
 
     return artifactAst;
+  }
+
+  /**
+   *
+   * @param resourcePath The path to the Mule SDK resource file.
+   * @return The name of the temporary Extension that is going to be generated under the namespace "this" in order to generate a
+   *         full AST. Will be useful only for troubleshooting if there is any AST parsing error. Doesn't mean anything outside
+   *         the scope of this parser factory.
+   */
+  private String getArtifactLocalExtensionName(String resourcePath) {
+    return format("this-%s", resourcePath);
   }
 
   private ArtifactAst parseAstChecked(ExtensionLoadingContext context) {
