@@ -54,7 +54,7 @@ public abstract class BaseMuleSdkExtensionModelParserFactory implements Extensio
    *
    * @return The parameter value.
    */
-  protected <T> T getMandatoryParameter(ExtensionLoadingContext context, String parameterName) {
+  protected <T> T getRequiredLoadingParameter(ExtensionLoadingContext context, String parameterName) {
     return context.<T>getParameter(parameterName)
         .orElseThrow(() -> new NoSuchElementException(format("Parameter '%s' not found in context", parameterName)));
   }

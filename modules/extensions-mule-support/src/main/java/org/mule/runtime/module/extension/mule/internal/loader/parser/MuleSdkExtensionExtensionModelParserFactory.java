@@ -99,7 +99,7 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
   private ArtifactAst parseAst(ExtensionLoadingContext context) throws ConfigurationException {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
-    String[] resources = {getMandatoryParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
+    String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
     ArtifactAst artifactAst = parseArtifact(resources,
                                             this::createAstParser,
                                             dependencies,
