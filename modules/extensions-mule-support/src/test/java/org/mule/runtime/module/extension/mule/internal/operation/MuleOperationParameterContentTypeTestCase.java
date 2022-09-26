@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.mule.internal.operation;
 
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
@@ -17,6 +18,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
@@ -30,6 +32,8 @@ import org.junit.Test;
 @Story(OPERATIONS)
 public class MuleOperationParameterContentTypeTestCase extends MuleArtifactFunctionalTestCase {
 
+  private final String TEST_PAYLOAD = "{\"hello!\": 5}";
+
   @Override
   protected String getConfigFile() {
     return "mule-schema-extracting-config.xml";
@@ -40,16 +44,29 @@ public class MuleOperationParameterContentTypeTestCase extends MuleArtifactFunct
   public void whenParameterMediaTypeIsSpecifiedThenItIsPreserved() throws Exception {
     CoreEvent resultEvent = flowRunner("showSchemaFlow")
         .withMediaType(APPLICATION_JSON.withCharset(UTF_8))
-        .withPayload("{\"hello!\": 5}")
+        .withPayload(TEST_PAYLOAD)
         .run();
 
     Map<String, Object> payload = (Map<String, Object>) resultEvent.getMessage().getPayload().getValue();
     assertThat(payload.get("encoding"), is("UTF-8"));
     assertThat(payload.get("mediaType"), is("application/json; charset=UTF-8"));
     assertThat(payload.get("mimeType"), is("application/json"));
-    assertThat(payload.get("raw"), is("{\"hello!\": 5}"));
+    assertThat(payload.get("raw"), is(TEST_PAYLOAD));
     assertThat(payload.get("contentLength"), is(13));
 
     assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+  }
+
+  @Test
+  public void whenParameterMediaTypeIsSpecifiedThenItIsPreservedThroughOutput() throws Exception {
+    CoreEvent resultEvent = flowRunner("identityFlow")
+        .withMediaType(APPLICATION_JSON.withCharset(UTF_8))
+        .withPayload(TEST_PAYLOAD)
+        .run();
+
+    TypedValue<String> payload = resultEvent.getMessage().getPayload();
+
+    assertThat(payload.getValue(), is(TEST_PAYLOAD));
+    assertThat(payload.getDataType(), is(like(String.class, APPLICATION_JSON, UTF_8)));
   }
 }

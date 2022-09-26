@@ -20,7 +20,23 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="identity">
+        <operation:parameters>
+            <operation:parameter name="content" type="binary"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="binary"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="#[params.content]"/>
+        </operation:body>
+    </operation:def>
+
     <flow name="showSchemaFlow">
         <this:show-schema content="#[payload]"/>
+    </flow>
+
+    <flow name="identityFlow">
+        <this:identity content="#[payload]"/>
     </flow>
 </mule>
