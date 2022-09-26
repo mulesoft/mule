@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.module.extension.internal.loader.parser.BaseErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
@@ -42,6 +45,16 @@ public class MuleSdkErrorModelParser extends BaseErrorModelParser {
   public MuleSdkErrorModelParser(String namespace, String type, ErrorModelParser parent) {
     super(namespace, type);
     setParent(parent);
+  }
+
+  /**
+   * Create a new instance since an {@link ErrorType}.
+   *
+   * @param errorType the {@link ErrorType} with the error data.
+   */
+  public MuleSdkErrorModelParser(ErrorType errorType) {
+    this(errorType.getNamespace(), errorType.getIdentifier(),
+         ofNullable(errorType.getParentErrorType()).map(MuleSdkErrorModelParser::new).orElse(null));
   }
 
   public void setSuppressed() {

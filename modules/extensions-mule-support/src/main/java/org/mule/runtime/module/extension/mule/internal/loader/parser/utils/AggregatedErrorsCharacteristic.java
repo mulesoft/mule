@@ -9,23 +9,34 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.api.util.IdentifierParsingUtils.parseErrorType;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
+import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Locale.getDefault;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkErrorModelParser;
 
@@ -39,9 +50,9 @@ import java.util.function.BiFunction;
 /**
  * {@link Characteristic} that retrieves all the {@link ErrorModelParser} emitted by the inner components of this Model
  */
-// TODO: Contemplate the cases identified in W-11640594
 public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorModelParser>> {
 
+  private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(getDefault());
   private static final String ERROR_TYPE_PARAM = "type";
   private static final String WHEN_PARAM = "when";
 
@@ -78,8 +89,62 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     private void handleOperationOtherThanRaiseError(ComponentAst operationAst, List<ErrorModelParser> models,
                                                     List<ComponentAst> hierarchy) {
       Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
-      operationModel.ifPresent(model -> model.getErrorModels().stream().map(MuleSdkErrorModelParser::new)
+      operationModel.ifPresent(model -> model.getErrorModels().stream()
+          .map(errorModel -> createErrorModelParser(errorModel, operationAst))
           .forEach(errorModelParser -> addParserAndMarkIfSuppressed(errorModelParser, models, hierarchy)));
+    }
+
+    private MuleSdkErrorModelParser createErrorModelParser(ErrorModel errorModel, ComponentAst operationAst) {
+      final ComponentParameterAst errorMappingsParam = operationAst.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME);
+      if (errorMappingsParam == null) {
+        return new MuleSdkErrorModelParser(errorModel);
+      }
+
+      Optional<List<ErrorMapping>> errorMappingsOpt = errorMappingsParam.<List<ErrorMapping>>getValue().getValue();
+      if (!errorMappingsOpt.isPresent()) {
+        return new MuleSdkErrorModelParser(errorModel);
+      }
+
+      List<ErrorMapping> errorMappings = errorMappingsOpt.get();
+      return applyMappingIfSomeMatches(errorModel, errorMappings);
+    }
+
+    private MuleSdkErrorModelParser applyMappingIfSomeMatches(ErrorModel errorModel, List<ErrorMapping> errorMappings) {
+      return errorMappings.stream()
+          .filter(errorMapping -> doesMappingSourceMatch(errorMapping, errorModel))
+          .map(Aggregator::buildParserFromTarget)
+          .findFirst()
+          .orElseGet(() -> new MuleSdkErrorModelParser(errorModel));
+    }
+
+    private static MuleSdkErrorModelParser buildParserFromTarget(ErrorMapping errorMapping) {
+      String mappingTargetAsString = errorMapping.getTarget();
+      ComponentIdentifier targetErrorId = parseErrorType(mappingTargetAsString, CORE_ERROR_NAMESPACE);
+
+      // The target namespace in error-mapping might be:
+      // 1. The namespace "THIS": It's forbidden by an AST validation that prevents it to use namespaces from some
+      // extension. If you want to raise an error from such namespace, you need to use the <operation:raise-error>
+      // component.
+      // 2. The namespace of some existing extension: It's not allowed by the same AST validation.
+      // 3. The core namespace ("MULE"): It is allowed.
+      // 4. Some original namespace (not present in any extension), as "INTERNAL": In this case, there isn't any syntax
+      // to make that error not-a-child of "MULE:ANY".
+      //
+      // Therefore, we have 2 cases here:
+      if (CORE_ERROR_NAMESPACE.equals(targetErrorId.getNamespace())) {
+        // It's a core error
+        return new MuleSdkErrorModelParser(MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(targetErrorId)
+            .orElseThrow(() -> new IllegalArgumentException(format("Error doesn't exist %s", targetErrorId))));
+      } else {
+        // It's from a namespace that doesn't belong to any extension (parent is MULE:ANY, we pass a null)
+        return new MuleSdkErrorModelParser(targetErrorId.getNamespace(), targetErrorId.getName(), null);
+      }
+    }
+
+    private boolean doesMappingSourceMatch(ErrorMapping errorMapping, ErrorModel errorModel) {
+      String mappingSourceAsString = errorMapping.getSource();
+      ComponentIdentifier sourceErrorId = parseErrorType(mappingSourceAsString, CORE_ERROR_NAMESPACE);
+      return new SingleErrorModelParserMatcher(sourceErrorId).matches(new MuleSdkErrorModelParser(errorModel));
     }
 
     private void handleRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels, List<ComponentAst> hierarchy) {

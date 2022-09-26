@@ -52,8 +52,10 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     expectedErrors.put("raiseCustom", singleton("THIS:CUSTOM"));
     expectedErrors.put("heisenbergCureCancer", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
 
-    // Not applying the mappings in the extension model. Otherwise, this would declare "MY:MAPPED".
-    expectedErrors.put("withMappingInsideBody", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("withMappingInsideBody", asSet("MY:MAPPED", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("mappingAnyInsideBody", singleton("MY:MAPPED"));
+    expectedErrors.put("transitiveMapping", asSet("MY:MAPPED", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("mappingChildAfterParent", singleton("MY:MAPPEDCONNECTIVITY"));
 
     // We can't guess what errors will set-payload raise (this operation will raise a "MULE:EXPRESSION" error).
     expectedErrors.put("divisionByZero", emptySet());
@@ -87,7 +89,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     assertThat(raisedErrors,
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
                                   "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH",
-                                  "THIS:UNIQUE"));
+                                  "THIS:UNIQUE", "MY:MAPPED", "MY:MAPPEDCONNECTIVITY"));
   }
 
   @Test
