@@ -9,12 +9,14 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
@@ -23,9 +25,11 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkErrorModelParser;
 
@@ -78,8 +82,40 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     private void handleOperationOtherThanRaiseError(ComponentAst operationAst, List<ErrorModelParser> models,
                                                     List<ComponentAst> hierarchy) {
       Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
-      operationModel.ifPresent(model -> model.getErrorModels().stream().map(MuleSdkErrorModelParser::new)
+      operationModel.ifPresent(model -> model.getErrorModels().stream()
+          .map(errorModel -> createErrorModelParser(errorModel, operationAst))
           .forEach(errorModelParser -> addParserAndMarkIfSuppressed(errorModelParser, models, hierarchy)));
+    }
+
+    private MuleSdkErrorModelParser createErrorModelParser(ErrorModel errorModel, ComponentAst operationAst) {
+      final ComponentParameterAst errorMappingsParam = operationAst.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME);
+      if (errorMappingsParam == null) {
+        return new MuleSdkErrorModelParser(errorModel);
+      }
+
+      Optional<List<ErrorMapping>> errorMappingsOpt = errorMappingsParam.<List<ErrorMapping>>getValue().getValue();
+      if (!errorMappingsOpt.isPresent()) {
+        return new MuleSdkErrorModelParser(errorModel);
+      }
+
+      List<ErrorMapping> errorMappings = errorMappingsOpt.get();
+      return applyMappingIsSomeMatches(errorModel, errorMappings);
+    }
+
+    private MuleSdkErrorModelParser applyMappingIsSomeMatches(ErrorModel errorModel, List<ErrorMapping> errorMappings) {
+      return errorMappings.stream()
+              .filter(errorMapping -> doesMappingSourceMatch(errorMapping, errorModel))
+              .map(errorMapping -> applyMappingAndCreateParser(errorMapping, errorModel))
+              .findFirst().orElseGet(() -> new MuleSdkErrorModelParser(errorModel));
+    }
+
+    private MuleSdkErrorModelParser applyMappingAndCreateParser(ErrorMapping errorMapping, ErrorModel errorModel) {
+      return null;
+    }
+
+    private boolean doesMappingSourceMatch(ErrorMapping errorMapping, ErrorModel errorModel) {
+      String mappingSourceAsString = errorMapping.getSource();
+      return false;
     }
 
     private void handleRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels, List<ComponentAst> hierarchy) {
