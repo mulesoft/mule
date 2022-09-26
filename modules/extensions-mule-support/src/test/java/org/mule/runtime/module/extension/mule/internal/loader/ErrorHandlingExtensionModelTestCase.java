@@ -51,7 +51,9 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     expectedErrors.put("raiseThis", singleton("THIS:CUSTOM"));
     expectedErrors.put("raiseCustom", singleton("THIS:CUSTOM"));
     expectedErrors.put("heisenbergCureCancer", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
+
     expectedErrors.put("withMappingInsideBody", asSet("MY:MAPPED", "HEISENBERG:OAUTH2"));
+    expectedErrors.put("mappingAnyInsideBody", singleton("MY:MAPPED"));
 
     // We can't guess what errors will set-payload raise (this operation will raise a "MULE:EXPRESSION" error).
     expectedErrors.put("divisionByZero", emptySet());

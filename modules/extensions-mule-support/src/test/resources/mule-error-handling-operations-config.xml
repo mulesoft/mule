@@ -92,6 +92,17 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="mappingAnyInsideBody" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <heisenberg:cure-cancer>
+                <error-mapping targetType="MY:MAPPED"/>
+            </heisenberg:cure-cancer>
+        </operation:body>
+    </operation:def>
+
     <!-- Combination of 1.2 and 1.3 -->
     <flow name="errorMappingInsideBodyAndInInvocationFlow">
         <this:with-mapping-inside-body >
