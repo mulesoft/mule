@@ -24,7 +24,6 @@ import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.BaseMuleSdkExtensionModelParser;
 
