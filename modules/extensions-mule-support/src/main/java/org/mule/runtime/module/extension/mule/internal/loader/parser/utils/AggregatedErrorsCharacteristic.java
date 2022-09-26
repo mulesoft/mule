@@ -126,8 +126,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       // extension. If you want to raise an error from such namespace, you need to use the <operation:raise-error>
       // component.
       // 2. The namespace of some existing extension: It's not allowed by the same AST validation.
-      // 3. The core namespace ("MULE"): It is allowed, but there aren't core errors that doesn't inherit from "MULE:ANY"
-      // directly.
+      // 3. The core namespace ("MULE"): It is allowed.
       // 4. Some original namespace (not present in any extension), as "INTERNAL": In this case, there isn't any syntax
       // to make that error not-a-child of "MULE:ANY".
       //
