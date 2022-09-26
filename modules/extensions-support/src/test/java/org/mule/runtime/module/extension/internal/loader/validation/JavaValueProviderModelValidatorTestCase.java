@@ -347,7 +347,6 @@ public class JavaValueProviderModelValidatorTestCase {
     ParameterModel clashingParameterMock = mock(ParameterModel.class);
 
     mockParameter(clashingParameterMock, operationParameterBuilder, "anotherValueProviderId", "anotherParameter", OBJECT_TYPE);
-    when(clashingParameterMock.getValueProviderModel()).thenReturn(empty());
     when(clashingParameterMock.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(empty());
     when(operationModel.getAllParameterModels())
         .thenReturn(asList(operationParameter, anotherOperationParameter, clashingParameterMock));
