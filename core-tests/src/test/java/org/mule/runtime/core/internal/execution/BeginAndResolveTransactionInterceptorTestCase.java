@@ -12,12 +12,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+
+import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -49,12 +53,15 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
   @Mock
   MessagingException messagingException;
 
+  @Mock
+  DefaultMuleException defaultMuleException;
+
   BeginAndResolveTransactionInterceptor beginAndResolveTransactionInterceptor;
 
   @Before
   public void before() {
     beginAndResolveTransactionInterceptor =
-        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, null, true, true);
+      new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, null, true, true);
   }
 
   @Test
@@ -71,6 +78,25 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
       TransactionCoordination.getInstance().bindTransaction(tx);
       beginAndResolveTransactionInterceptor.execute(executionCallback, executionContext);
     } catch (MessagingException messagingException1) {
+    }
+    verify(tx, times(1)).rollback();
+  }
+
+  @Test
+  @Issue("W-11085992")
+  @Description("Test for cases when a DefaultMuleException is thrown")
+  public void executeWithDefaultMuleException() throws Exception {
+    Transaction tx = spy(Transaction.class);
+
+    when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_BEGIN);
+    when(transactionConfig.getFactory()).thenReturn(transactionFactory);
+    when(transactionFactory.beginTransaction(any(), any(), any(), any())).thenReturn(tx);
+    when(executionInterceptor.execute(executionCallback, executionContext)).thenThrow(defaultMuleException);
+
+    try {
+      TransactionCoordination.getInstance().bindTransaction(tx);
+      beginAndResolveTransactionInterceptor.execute(executionCallback, executionContext);
+    } catch (DefaultMuleException defaultMuleException) {
     }
     verify(tx, times(1)).rollback();
   }

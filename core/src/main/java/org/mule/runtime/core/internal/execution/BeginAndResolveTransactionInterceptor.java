@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -77,6 +78,14 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
       resolveTransactionIfRequired(resolveStartedTransaction);
       return result;
     } catch (MessagingException e) {
+      logger.warn("There was an exception due to {}: Rolling back the transaction",
+                  e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage());
+      if (processOnException) {
+        rollbackTransactionIfRequired(resolveStartedTransaction || mustResolveAnyTransaction);
+      }
+      throw e;
+    } catch (DefaultMuleException e) {
+      logger.warn("There was an exception due to {} : Rolling back the transaction", e.getCause());
       if (processOnException) {
         rollbackTransactionIfRequired(resolveStartedTransaction || mustResolveAnyTransaction);
       }
