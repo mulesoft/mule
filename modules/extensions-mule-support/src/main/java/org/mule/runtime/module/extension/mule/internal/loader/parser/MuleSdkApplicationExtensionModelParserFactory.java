@@ -38,13 +38,13 @@ public class MuleSdkApplicationExtensionModelParserFactory extends BaseMuleSdkEx
 
   @Override
   protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
-    String extensionName = getMandatoryParameter(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME);
+    String extensionName = getRequiredLoadingParameter(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME);
     return new MuleSdkArtifactLocalExtensionModelMetadataParser(extensionName);
   }
 
   @Override
   protected Supplier<Stream<ComponentAst>> createTopLevelComponentsSupplier(ExtensionLoadingContext context) {
-    ArtifactAst artifactAst = getMandatoryParameter(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
+    ArtifactAst artifactAst = getRequiredLoadingParameter(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
     return artifactAst::topLevelComponentsStream;
   }
 }
