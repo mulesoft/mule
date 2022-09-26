@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveDistributedTraceContext;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -29,7 +28,7 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
 
   @Override
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
-    return new PropagateAllDistributedTraceContextManager(resolveDistributedTraceContext(((ExecutionContextAdapter<?>) executionContext)
-        .getEvent(), coreEventTracer));
+    return new PropagateAllDistributedTraceContextManager(((ExecutionContextAdapter<?>) executionContext)
+        .getEvent(), coreEventTracer);
   }
 }

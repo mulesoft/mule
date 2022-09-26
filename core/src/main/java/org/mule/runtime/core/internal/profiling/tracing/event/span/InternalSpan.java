@@ -98,6 +98,15 @@ public interface InternalSpan extends Span {
   }
 
   /**
+   * Updates the name for the current {@link InternalSpan}
+   *
+   * @param name the name to set to the current span.
+   */
+  default void updateName(String name) {
+    // By default this is not done.
+  }
+
+  /**
    * A wrapper as InternalSpan for other type of {@link Span}
    */
   class SpanInternalWrapper implements InternalSpan {

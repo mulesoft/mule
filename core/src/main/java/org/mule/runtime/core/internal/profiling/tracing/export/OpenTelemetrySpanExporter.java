@@ -19,6 +19,7 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.SpanError;
+import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -64,13 +66,15 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
   private final Tracer tracer;
   private final Context remoteContext;
-  private final io.opentelemetry.api.trace.Span openTelemetrySpan;
+  private io.opentelemetry.api.trace.Span openTelemetrySpan;
+  private final InternalSpan internalSpan;
+  private Map<String, String> attributes = new HashMap<>();
 
   public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
                                    InternalSpan internalSpan) {
     this.tracer = tracer;
+    this.internalSpan = internalSpan;
     remoteContext = resolveRemoteContext(eventContext);
-    openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan);
   }
 
   @Override
@@ -78,7 +82,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     if (internalSpan.hasErrors()) {
       recordSpanExceptions(internalSpan);
     }
-    openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
+    getOpenTelemetrySpan().end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
   @Override
@@ -97,7 +101,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
                                                EXCEPTION_STACK_TRACE_KEY,
                                                InternalSpanError.getInternalSpanError(spanError).getErrorStacktrace().toString(),
                                                EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
-    openTelemetrySpan.addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
+    getOpenTelemetrySpan().addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
   }
 
   private Context resolveParentOpenTelemetrySpan(InternalSpan internalSpan) {
@@ -153,12 +157,27 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
     }
 
-    return spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
+    io.opentelemetry.api.trace.Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
+    attributes.forEach((key, value) -> span.setAttribute(key, value));
+
+    return span;
   }
 
   public io.opentelemetry.api.trace.Span getOpenTelemetrySpan() {
+    if (openTelemetrySpan == null) {
+      openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan);
+    }
+
     return openTelemetrySpan;
+  }
+
+  public void setAttribute(String key, String value) {
+    if (openTelemetrySpan == null) {
+      this.attributes.put(key, value);
+    } else {
+      openTelemetrySpan.setAttribute(key, value);
+    }
   }
 
   /**

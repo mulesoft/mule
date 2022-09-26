@@ -15,7 +15,7 @@ import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.notification.legacy.LegacyNotificationActionDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.source.trace.DefaultDistributedSourceTraceContext;
+import org.mule.runtime.module.extension.internal.runtime.source.trace.SourceDistributedSourceTraceContext;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
@@ -32,7 +32,7 @@ import java.util.Optional;
 public class SdkSourceCallBackContextAdapter implements SourceCallbackContextAdapter {
 
   private final SourceCallbackContext delegate;
-  private DistributedTraceContextManager distributedSourceTraceContext = new DefaultDistributedSourceTraceContext();
+  private DistributedTraceContextManager distributedSourceTraceContext = new SourceDistributedSourceTraceContext();
 
   public SdkSourceCallBackContextAdapter(SourceCallbackContext delegate) {
     this.delegate = delegate;

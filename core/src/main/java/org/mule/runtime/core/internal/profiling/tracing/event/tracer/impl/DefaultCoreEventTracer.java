@@ -154,6 +154,69 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                              customLogger);
   }
 
+  @Override
+  public void setCurrentSpanName(CoreEvent coreEvent, String name) {
+    safeExecute(() -> doSetCurrentSpanName(coreEvent, name),
+                "Error on setting the current span name",
+                propagateTracingExceptions,
+                customLogger);
+  }
+
+  @Override
+  public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
+    safeExecute(() -> doAddCurrentSpanAttribute(coreEvent, key, value),
+                "Error on adding an attribute to a core event",
+                propagateTracingExceptions,
+                customLogger);
+  }
+
+  @Override
+  public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+    safeExecute(() -> doAddCurrentSpanAttributes(coreEvent, attributes),
+                "Error on adding attributes to a core event",
+                propagateTracingExceptions,
+                customLogger);
+  }
+
+  private void doAddCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+    EventContext eventContext = coreEvent.getContext();
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      DistributedTraceContext distributedTraceContext =
+          ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
+      InternalSpan span = distributedTraceContext.getCurrentSpan().orElse(null);
+      if (span != null) {
+        attributes.forEach((key, value) -> span.addAttribute(key, value));
+      }
+    }
+  }
+
+  private void doAddCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
+    EventContext eventContext = coreEvent.getContext();
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      DistributedTraceContext distributedTraceContext =
+          ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
+      InternalSpan span = distributedTraceContext.getCurrentSpan().orElse(null);
+      if (span != null) {
+        span.addAttribute(key, value);
+      }
+    }
+  }
+
+  private void doSetCurrentSpanName(CoreEvent coreEvent, String name) {
+    EventContext eventContext = coreEvent.getContext();
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      DistributedTraceContext distributedTraceContext =
+          ((DistributedTraceContextAware) eventContext).getDistributedTraceContext();
+      InternalSpan span = distributedTraceContext.getCurrentSpan().orElse(null);
+      if (span != null) {
+        span.updateName(name);
+      }
+    }
+  }
+
   private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan,
                                                   TracingCondition tracingCondition)
       throws TracingConditionNotMetException {

@@ -55,6 +55,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -256,17 +257,28 @@ public class PetStoreOperations {
 
   @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
   public DistributedTraceContextManager getPetTraceContextPropagator(DistributedTraceContextManager distributedTraceContextManager) {
+    distributedTraceContextManager.setCurrentSpanName("customSpanName");
+    distributedTraceContextManager.addCurrentSpanAttribute("attributeAddedByAddCurrentSpanAttribute", "ok");
+    distributedTraceContextManager.addCurrentSpanAttributes(Collections.singletonMap("attributeAddedByAddCurrentSpanAttributes","ok"));
     return distributedTraceContextManager;
   }
 
   @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
   public DistributedTraceContextManager getPetTraceContextPropagatorThroughForwardCompatibilityHelper(CorrelationInfo correlationInfo) {
-    return forwardCompatibilityHelper.map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo)).orElse(null);
+    DistributedTraceContextManager distributedTraceContextManager =  forwardCompatibilityHelper.map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo)).orElse(null);
+    distributedTraceContextManager.setCurrentSpanName("customSpanName");
+    distributedTraceContextManager.addCurrentSpanAttribute("attributeAddedByAddCurrentSpanAttribute", "ok");
+    distributedTraceContextManager.addCurrentSpanAttributes(Collections.singletonMap("attributeAddedByAddCurrentSpanAttributes","ok"));
+    return distributedTraceContextManager;
   }
 
   @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
   public DistributedTraceContextManager getPetTraceContextPropagatorThroughForwardCompatibilityHelperSdkApi(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
-    return forwardCompatibilityHelper.map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo)).orElse(null);
+    DistributedTraceContextManager distributedTraceContextManager = forwardCompatibilityHelper.map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo)).orElse(null);
+    distributedTraceContextManager.setCurrentSpanName("customSpanName");
+    distributedTraceContextManager.addCurrentSpanAttribute("attributeAddedByAddCurrentSpanAttribute", "ok");
+    distributedTraceContextManager.addCurrentSpanAttributes(Collections.singletonMap("attributeAddedByAddCurrentSpanAttributes","ok"));
+    return distributedTraceContextManager;
   }
 
   @OutputResolver(output = CorrelationInfoOutputResolver.class)
