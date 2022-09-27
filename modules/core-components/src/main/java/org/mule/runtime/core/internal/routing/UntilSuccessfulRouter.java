@@ -238,6 +238,7 @@ class UntilSuccessfulRouter {
   }
 
   private void subscribeUpstreamChains(ContextView downstreamContext) {
+    // this is needed because execution errors happen during subscription when wrapped within a Mono
     AtomicReference<Throwable> handledError = new AtomicReference<>();
 
     innerFlux.contextWrite(downstreamContext).subscribe(e -> {
