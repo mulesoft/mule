@@ -7,8 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
-import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.EXECUTE_NEXT;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExpo
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
+import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 import static java.lang.Thread.currentThread;
 
@@ -31,7 +32,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
@@ -136,7 +136,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
     assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
     OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
-    assertThat(openTelemetrySpanExporter.noExportUntil(), IsCollectionWithSize.hasSize(1));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), hasSize(1));
     assertThat(openTelemetrySpanExporter.noExportUntil(), hasItem(EXECUTE_NEXT));
     assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), not(instanceOf(NoExportableOpenTelemetrySpan.class)));
   }
@@ -163,7 +163,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
     assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
     OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
-    assertThat(openTelemetrySpanExporter.noExportUntil(), IsCollectionWithSize.hasSize(2));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), hasSize(1));
     assertThat(openTelemetrySpanExporter.noExportUntil(), hasItem(EXECUTE_NEXT));
     assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), instanceOf(NoExportableOpenTelemetrySpan.class));
   }
