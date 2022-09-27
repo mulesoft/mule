@@ -129,6 +129,11 @@ public class ExportOnEndSpan implements InternalSpan {
     return childSpanCustomizationInfo;
   }
 
+  @Override
+  public void updateName(String name) {
+    runtimeInternalSpan.updateName(name);
+  }
+
   /**
    * Adds attribute to the exporter.
    */
@@ -144,7 +149,7 @@ public class ExportOnEndSpan implements InternalSpan {
 
     @Override
     public InternalSpanExporter accept(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
-      openTelemetrySpanExporter.getOpenTelemetrySpan().setAttribute(key, value);
+      openTelemetrySpanExporter.setAttribute(key, value);
       return openTelemetrySpanExporter;
     }
 

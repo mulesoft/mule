@@ -25,6 +25,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -166,6 +167,21 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
     @Override
     public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void setCurrentSpanName(CoreEvent coreEvent, String name) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
       // Nothing to do.
     }
 

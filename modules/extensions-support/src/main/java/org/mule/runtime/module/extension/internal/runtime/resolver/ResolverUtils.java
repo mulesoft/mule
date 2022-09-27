@@ -234,7 +234,7 @@ public class ResolverUtils {
 
   public static DistributedTraceContextManager resolveDistributedTraceContextManager(CoreEvent coreEvent,
                                                                                      CoreEventTracer coreEventTracer) {
-    return new PropagateAllDistributedTraceContextManager(resolveDistributedTraceContext(coreEvent, coreEventTracer));
+    return new PropagateAllDistributedTraceContextManager(coreEvent, coreEventTracer);
   }
 
   public static DistributedTraceContext resolveDistributedTraceContext(CoreEvent event, CoreEventTracer coreEventTracer) {

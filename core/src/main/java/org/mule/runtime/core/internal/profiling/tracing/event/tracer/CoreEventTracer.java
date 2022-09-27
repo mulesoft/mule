@@ -102,4 +102,29 @@ public interface CoreEventTracer {
   default Map<String, String> getDistributedTraceContextMap(CoreEvent event) {
     return emptyMap();
   }
+
+  /**
+   * Sets the current span name. It attempts to rename it if possible.
+   *
+   * @param coreEvent the {@link CoreEvent} to set the name to.
+   * @param name      the name to set.
+   */
+  void setCurrentSpanName(CoreEvent coreEvent, String name);
+
+  /**
+   * Adds an attribute to the current span.
+   *
+   * @param coreEvent the coreEvent to add the attribute to.
+   * @param key       the key for the span attribute
+   * @param value     the value for the span attribute
+   */
+  void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value);
+
+  /**
+   * Adds the attribute to the current span.
+   *
+   * @param coreEvent  the coreEvent to add the attribute to.
+   * @param attributes a map with the attributes to add.
+   */
+  void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes);
 }

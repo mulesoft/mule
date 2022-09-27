@@ -14,11 +14,11 @@ import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import java.util.Map;
 
 /**
- * Default implementation for {@link DistributedTraceContextManager}.
+ * An implementation for {@link DistributedTraceContextManager} used internally for sources.
  *
  * @since 4.5.0
  */
-public class DefaultDistributedSourceTraceContext implements DistributedTraceContextManager {
+public class SourceDistributedSourceTraceContext implements DistributedTraceContextManager {
 
   private Map<String, String> remoteTraceContextMap = emptyMap();
 
@@ -30,5 +30,20 @@ public class DefaultDistributedSourceTraceContext implements DistributedTraceCon
   @Override
   public Map<String, String> getRemoteTraceContextMap() {
     return remoteTraceContextMap;
+  }
+
+  @Override
+  public void setCurrentSpanName(String name) {
+    // Nothing to do in sources.
+  }
+
+  @Override
+  public void addCurrentSpanAttribute(String key, String value) {
+    // Nothing to do in sources.
+  }
+
+  @Override
+  public void addCurrentSpanAttributes(Map<String, String> attributes) {
+    // Nothing to do in sources.
   }
 }

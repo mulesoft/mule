@@ -29,7 +29,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotification;
-import org.mule.runtime.module.extension.internal.runtime.source.trace.DefaultDistributedSourceTraceContext;
+import org.mule.runtime.module.extension.internal.runtime.source.trace.SourceDistributedSourceTraceContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
 import org.mule.sdk.api.connectivity.TransactionalConnection;
@@ -38,7 +38,6 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
-import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +62,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private final List<NotificationFunction> notificationFunctions = new LinkedList<>();
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
-  private DistributedTraceContextManager sourceDistributedTraceContext = new DefaultDistributedSourceTraceContext();
+  private DistributedTraceContextManager sourceDistributedTraceContext = new SourceDistributedSourceTraceContext();
   private final ProfilingService profilingService;
 
   /**

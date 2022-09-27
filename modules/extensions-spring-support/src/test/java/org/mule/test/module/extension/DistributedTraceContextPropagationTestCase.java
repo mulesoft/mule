@@ -122,7 +122,8 @@ public class DistributedTraceContextPropagationTestCase extends AbstractExtensio
           (DistributedTraceContextManager) event.getMessage().getPayload().getValue();
       assertThat(distributedTraceContextManager.getClass().getName(),
                  equalTo("org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager"));
-      assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), aMapWithSize(2));
+      // This will only resolve the correlation id, as the current span is closed after the flow is executed.
+      assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), aMapWithSize(1));
       assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), hasEntry("X-Correlation-ID", "0000-0000"));
     }
   }
