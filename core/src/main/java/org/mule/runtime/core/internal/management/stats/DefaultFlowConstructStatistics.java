@@ -8,10 +8,13 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static java.lang.System.currentTimeMillis;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
@@ -29,6 +32,11 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   // Transient to avoid de-serialization backward compatibility problems (MULE-19020)
   private transient final AtomicLong connectionErrors = new AtomicLong(0);
+
+  private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
     this.name = name;
@@ -50,11 +58,13 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void incExecutionError() {
     executionError.addAndGet(1);
+    executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
   public void incFatalError() {
     fatalError.addAndGet(1);
+    fatalErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   /**
@@ -140,11 +150,13 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void incReceivedEvents() {
     receivedEvents.addAndGet(1);
+    eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
   public void incConnectionErrors() {
     connectionErrors.addAndGet(1);
+    connectionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
@@ -156,4 +168,35 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
     return currentTimeMillis() - samplePeriod;
   }
 
+  @Override
+  public ResetOnQueryCounter getEventsReceivedCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    eventsReceivedCounters.add(counter);
+    counter.add(getTotalEventsReceived());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getExecutionErrorsCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    executionErrorsCounters.add(counter);
+    counter.add(getExecutionErrors());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getConnectionErrorsCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    connectionErrorsCounters.add(counter);
+    counter.add(getConnectionErrors());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getFatalErrorsCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    fatalErrorsCounters.add(counter);
+    counter.add(getFatalErrors());
+    return counter;
+  }
 }
