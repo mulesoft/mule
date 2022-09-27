@@ -234,7 +234,7 @@ public class MessageProcessors {
           .switchIfEmpty(from(alternate))
           .doOnSuccess(completeSuccessIfNeeded((event.getContext()), completeContext))
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
-          .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
+          .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
           .block();
     } catch (Throwable e) {
       if (e.getCause() instanceof InterruptedException) {
@@ -292,7 +292,7 @@ public class MessageProcessors {
         .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
         .doOnSuccess(completeSuccessIfNeeded((event.getContext()), true))
         .doOnError(completeErrorIfNeeded((event.getContext()), true))
-        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
+        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
   }
 
   /**
@@ -491,14 +491,14 @@ public class MessageProcessors {
 
       sink.success(eventChildCtx);
     })
-        .toProcessor()
+        .share()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
             .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
-            .toProcessor())
+            .share())
         .map(MessageProcessors::toParentContext)
-        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
+        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
             .put(WITHIN_PROCESS_TO_APPLY, true));
   }
 
