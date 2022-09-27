@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import static org.mule.runtime.api.memory.provider.type.ByteBufferPoolStrategy.FIXED_BUFFERS_POOL;
 import static org.mule.runtime.api.memory.provider.type.ByteBufferType.DIRECT;
+import static org.mule.runtime.internal.memory.profiling.NoOpMemoryProfilingService.getNoOpMemoryProfilingService;
 
 import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
-import org.mule.runtime.api.memory.provider.type.ByteBufferPoolStrategy;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.profiling.ProfilingService;
 
@@ -23,10 +24,12 @@ import java.nio.ByteBuffer;
  */
 public final class ByteBufferProviderBuilder {
 
+  public static final String BYTE_BUFFER_PROVIDER_NAME_CANNOT_BE_NULL_MESSAGE = "Byte buffer provider name cannot be null.";
+  public static final String PROFILING_SERVICE_CANNOT_BE_NULL_MESSAGE = "Profiling service cannot be null.";
   private final boolean isDirect;
 
   private ByteBufferPoolConfiguration poolConfiguration;
-  private ProfilingService profilingService;
+  private ProfilingService profilingService = getNoOpMemoryProfilingService();
   private String name;
 
   private ByteBufferProviderBuilder(boolean isDirect) {
@@ -38,9 +41,17 @@ public final class ByteBufferProviderBuilder {
   }
 
   public ByteBufferProvider<ByteBuffer> build() {
+    if (profilingService == null) {
+      throw new IllegalArgumentException(PROFILING_SERVICE_CANNOT_BE_NULL_MESSAGE);
+    }
+
+    if (name == null) {
+      throw new IllegalArgumentException(BYTE_BUFFER_PROVIDER_NAME_CANNOT_BE_NULL_MESSAGE);
+    }
+
     if (isDirect) {
       if (poolConfiguration != null) {
-        if (poolConfiguration.getByteBufferPoolStrategy() == ByteBufferPoolStrategy.FIXED_BUFFERS_POOL) {
+        if (poolConfiguration.getByteBufferPoolStrategy() == FIXED_BUFFERS_POOL) {
           return new WeavePoolBasedByteBufferProvider(name, poolConfiguration.getMaxBufferSize(),
                                                       poolConfiguration.getNumberOfPools(), profilingService);
         }
