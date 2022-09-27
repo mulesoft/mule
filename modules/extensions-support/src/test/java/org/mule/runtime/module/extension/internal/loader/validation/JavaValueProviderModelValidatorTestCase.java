@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 
@@ -339,6 +340,21 @@ public class JavaValueProviderModelValidatorTestCase {
         .thenReturn(Optional.of(operationParameterBuilder.build()));
     validate();
     assertNoErrors();
+  }
+
+  @Test
+  public void modelTypeContainsTwoParametersWithTheSameName() {
+    ParameterModel clashingParameterMock = mock(ParameterModel.class);
+
+    mockParameter(clashingParameterMock, operationParameterBuilder, "anotherValueProviderId", "anotherParameter", OBJECT_TYPE);
+    when(clashingParameterMock.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(empty());
+    when(operationModel.getAllParameterModels())
+        .thenReturn(asList(operationParameter, anotherOperationParameter, clashingParameterMock));
+    when(parameterGroupModel.getParameterModels())
+        .thenReturn(asList(operationParameter, anotherOperationParameter, clashingParameterMock));
+
+    validate();
+    assertProblems("Parameter [someName] from operation with name superOperation has a Value Provider defined, but that operation has one or more parameters with repeated names [anotherParameter]. Components with parameters with non-unique names do not support Value Providers");
   }
 
   private void assertProblems(String errorMessage) {
