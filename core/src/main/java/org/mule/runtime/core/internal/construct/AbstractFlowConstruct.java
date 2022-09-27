@@ -64,6 +64,8 @@ import java.util.Optional;
  */
 public abstract class AbstractFlowConstruct extends AbstractExecutableComponent implements FlowConstruct, Lifecycle {
 
+  public static final String FLOW_FLOW_CONSTRUCT_TYPE = "Flow";
+
   protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
   private final FlowConstructLifecycleManager lifecycleManager;
@@ -199,7 +201,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   }
 
   public static FlowConstructStatistics createFlowStatistics(String flowName, AllStatistics statistics) {
-    DefaultFlowConstructStatistics flowStatistics = new DefaultFlowConstructStatistics("Flow", flowName);
+    DefaultFlowConstructStatistics flowStatistics = new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, flowName);
     flowStatistics.setEnabled(statistics.isEnabled());
     statistics.add(flowStatistics);
     return flowStatistics;
