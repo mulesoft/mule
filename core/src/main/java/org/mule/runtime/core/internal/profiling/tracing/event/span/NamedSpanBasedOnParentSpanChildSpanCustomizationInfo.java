@@ -40,18 +40,12 @@ public class NamedSpanBasedOnParentSpanChildSpanCustomizationInfo
     return getDefaultChildSpanInfo();
   }
 
-  private Optional<InternalSpan> getSpan(CoreEvent coreEvent) {
+  protected Optional<InternalSpan> getSpan(CoreEvent coreEvent) {
     return ((DistributedTraceContextAware) coreEvent.getContext()).getDistributedTraceContext().getCurrentSpan();
   }
 
   @Override
   public String getLocationAsString(CoreEvent coreEvent) {
     return getSpan(coreEvent).map(internalSpan -> internalSpan.getAttribute(LOCATION_KEY).orElse("")).orElse("");
-  }
-
-  @Override
-  public boolean isExportable(CoreEvent coreEvent) {
-    return getSpan(coreEvent)
-        .map(internalSpan -> !getComponentNameWithoutNamespace(internalSpan).equals(EXECUTE_NEXT_ROUTE_TAG)).orElse(true);
   }
 }

@@ -79,6 +79,7 @@ import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportExecuteNextChildSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
@@ -183,6 +184,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private CoreEventTracer muleEventTracer;
   private static final SpanCustomizationInfo DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO =
       new NamedSpanBasedOnParentSpanChildSpanCustomizationInfo();
+  private static final SpanCustomizationInfo NO_COMPONENT_PROCESSOR_DEFAULT_CUSTOMIZATION_INFO =
+      new NoExportExecuteNextChildSpanCustomizationInfo();
 
   /**
    * The span customization info for the chain.
@@ -526,7 +529,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo((Component) processor);
     } else {
       // Other type of processors we define taking into account the parent.
-      spanCustomizationInfo = DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO;
+      spanCustomizationInfo = NO_COMPONENT_PROCESSOR_DEFAULT_CUSTOMIZATION_INFO;
     }
 
     // We start the component verifying that the current span is the span corresponding to
