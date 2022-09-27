@@ -10,6 +10,7 @@ import static java.util.Collections.emptySet;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -41,9 +42,14 @@ public interface ExtensionDiscoveryRequest {
   Collection<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
 
   /**
-   * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
+   * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions.
    */
   Set<ExtensionModel> getParentArtifactExtensions();
+
+  /**
+   * @return {@link ConfigurationProperties} to take into account when parsing extensions. Non-null.
+   */
+  ConfigurationProperties getConfigurationProperties();
 
   /**
    * Parallel discovery will try to parallelize only the discovery for extensions that do not depend on the DSL of other
@@ -69,6 +75,7 @@ public interface ExtensionDiscoveryRequest {
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
+    private ConfigurationProperties configurationProperties;
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -90,9 +97,14 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
+    public ExtensionDiscoveryRequestBuilder setConfigurationProperties(ConfigurationProperties configurationProperties) {
+      this.configurationProperties = configurationProperties;
+      return this;
+    }
+
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions);
+                                                  parallelDiscovery, enrichDescriptions, configurationProperties);
     }
   }
 }
