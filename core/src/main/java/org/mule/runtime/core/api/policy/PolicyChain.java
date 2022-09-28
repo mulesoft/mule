@@ -34,6 +34,9 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+
+import org.mule.runtime.core.internal.profiling.tracing.event.NoChildrenExportableUntilExecuteNextSpanCustomizationInfo;
+
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -79,7 +82,9 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public final void initialise() throws InitialisationException {
-    processorChain = buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler());
+    processorChain =
+        buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
+                                          new NoChildrenExportableUntilExecuteNextSpanCustomizationInfo(this));
     initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);

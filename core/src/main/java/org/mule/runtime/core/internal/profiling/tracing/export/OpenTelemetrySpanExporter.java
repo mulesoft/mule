@@ -7,11 +7,13 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.export;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getComponentNameWithoutNamespace;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getPropagator;
 import static org.mule.runtime.core.internal.profiling.tracing.export.NoExportableOpenTelemetrySpan.getNoExportableOpentelemetrySpan;
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 
+import static java.util.Collections.emptySet;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import static io.opentelemetry.api.common.AttributeKey.booleanKey;
@@ -19,18 +21,18 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.SpanError;
-import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanVisitor;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -67,14 +69,43 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   private final Tracer tracer;
   private final Context remoteContext;
   private io.opentelemetry.api.trace.Span openTelemetrySpan;
+  private final boolean exportable;
+  private Set<String> noExportUntil;
   private final InternalSpan internalSpan;
-  private Map<String, String> attributes = new HashMap<>();
+  private final Map<String, String> attributes = new HashMap<>();
 
   public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
+                                   boolean exportable,
+                                   Set<String> noExportUntil,
                                    InternalSpan internalSpan) {
     this.tracer = tracer;
     this.internalSpan = internalSpan;
+    this.noExportUntil = noExportUntil;
     remoteContext = resolveRemoteContext(eventContext);
+    this.exportable = exportable;
+  }
+
+  private Set<String> resolveNoExportUntil(Set<String> noExportUntil, Set<String> parentNoExportUntil) {
+    Set<String> finalNoExportUntil = new HashSet<>(noExportUntil);
+    finalNoExportUntil.addAll(parentNoExportUntil);
+    return finalNoExportUntil;
+  }
+
+  private Set<String> resolveParentNoExportUntil(InternalSpan internalSpan) {
+    InternalSpan parentSpan = getAsInternalSpan(internalSpan.getParent());
+
+    if (parentSpan == null) {
+      return emptySet();
+    }
+
+    while (parentSpan != null) {
+      if (parentSpan instanceof ExportOnEndSpan) {
+        return ((ExportOnEndSpan) parentSpan).getSpanExporter().noExportUntil();
+      }
+      parentSpan = getAsInternalSpan(parentSpan.getParent());
+    }
+
+    return emptySet();
   }
 
   @Override
@@ -88,6 +119,11 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   @Override
   public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
     return internalSpanExporterVisitor.accept(this);
+  }
+
+  @Override
+  public Set<String> noExportUntil() {
+    return noExportUntil;
   }
 
   private void recordSpanExceptions(InternalSpan internalSpan) {
@@ -113,7 +149,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
     io.opentelemetry.api.trace.Span parentOpenTelemetrySpan = null;
 
-    while (parentOpenTelemetrySpan == null) {
+    while (parentOpenTelemetrySpan == null && parentSpan != null) {
       parentOpenTelemetrySpan = parentSpan.visit(OPEN_TELEMETRY_PARENT_SPAN_VISITOR);
 
       if (parentOpenTelemetrySpan == null) {
@@ -148,7 +184,22 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     return emptyDistributedEventContext();
   }
 
-  private io.opentelemetry.api.trace.Span resolveOpenTelemetrySpan(InternalSpan internalSpan) {
+  private io.opentelemetry.api.trace.Span resolveOpenTelemetrySpan(InternalSpan internalSpan, Set<String> parentNoExportUntil,
+                                                                   Set<String> noExportUntil) {
+    boolean exportableAccordingToName = exportableAccordingToName(internalSpan, parentNoExportUntil);
+
+    // In case the hierarchy is exportable according to parent
+    if (exportableAccordingToName) {
+      this.noExportUntil = noExportUntil;
+    } else {
+      // Otherwise I have to merge when they begin to export.
+      this.noExportUntil = resolveNoExportUntil(noExportUntil, parentNoExportUntil);
+    }
+
+    if ((!parentNoExportUntil.isEmpty() && !exportableAccordingToName) || !exportable) {
+      return getNoExportableOpentelemetrySpan();
+    }
+
     SpanBuilder spanBuilder = tracer.spanBuilder(internalSpan.getName());
 
     Context parentSpanContext = resolveParentOpenTelemetrySpan(internalSpan);
@@ -159,14 +210,19 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
     io.opentelemetry.api.trace.Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
-    attributes.forEach((key, value) -> span.setAttribute(key, value));
+    attributes.forEach(span::setAttribute);
 
     return span;
   }
 
+  private boolean exportableAccordingToName(InternalSpan internalSpan, Set<String> parentNoExportUntil) {
+    return parentNoExportUntil.contains(getComponentNameWithoutNamespace(internalSpan));
+  }
+
   public io.opentelemetry.api.trace.Span getOpenTelemetrySpan() {
     if (openTelemetrySpan == null) {
-      openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan);
+      Set<String> parentNoExportUntil = resolveParentNoExportUntil(internalSpan);
+      openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan, parentNoExportUntil, noExportUntil);
     }
 
     return openTelemetrySpan;
@@ -229,12 +285,6 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       public Span accept(OpenTelemetrySpanExporter opentelemetrySpanExporter) {
         return opentelemetrySpanExporter.getOpenTelemetrySpan();
       }
-
-      @Override
-      public Span accept(NoOpInternalSpanExporter openTelemetrySpanExporter) {
-        return getNoExportableOpentelemetrySpan();
-      }
-
     }
   }
 }

@@ -8,6 +8,7 @@
 package org.mule.runtime.core.privileged.profiling.tracing;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Info for a customized creation of an {@link InternalSpan}.
@@ -58,6 +60,20 @@ public interface SpanCustomizationInfo {
    */
   default boolean isExportable(CoreEvent coreEvent) {
     return true;
+  }
+
+  /**
+   * Indicates that no children will be exported till a span is found with the names returned.
+   *
+   * For example: in case noExportUntil returns "execute-next", no children will be exported till an execute-next span.
+   *
+   * ------------- span (exported) --------------------------------------------------------- |___ logger (not exported) ____ |___
+   * scope (not exported) |___ execute-next (exported) |__ flow (exported)
+   *
+   * @return the name of the spans where the span hierarchy is exported again.
+   */
+  default Set<String> noExportUntil() {
+    return emptySet();
   }
 
 }

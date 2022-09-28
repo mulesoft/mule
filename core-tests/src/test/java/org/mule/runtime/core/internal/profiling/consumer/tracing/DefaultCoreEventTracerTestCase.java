@@ -24,6 +24,7 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -64,7 +65,6 @@ import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextA
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.NoOpInternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingConditionNotMetException;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
@@ -78,6 +78,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.ImmutableMap;
@@ -140,7 +141,6 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
     InternalSpan span = doTestStartComponentExecution(getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo(),
                                                       componentIdentifier);
     assertThat(span, instanceOf(ExportOnEndSpan.class));
-    assertThat(((ExportOnEndSpan) span).getSpanExporter(), instanceOf(NoOpInternalSpanExporter.class));
   }
 
 
@@ -508,6 +508,8 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
 
     @Override
     public InternalSpanExporter getInternalSpanExporter(EventContext context, MuleConfiguration muleConfiguration,
+                                                        boolean exportable,
+                                                        Set<String> noExportUntil,
                                                         InternalSpan internalSpan) {
       return new InternalSpanExporter() {
 
@@ -519,6 +521,11 @@ public class DefaultCoreEventTracerTestCase extends AbstractMuleTestCase {
         @Override
         public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
           return null;
+        }
+
+        @Override
+        public Set<String> noExportUntil() {
+          return emptySet();
         }
       };
     }

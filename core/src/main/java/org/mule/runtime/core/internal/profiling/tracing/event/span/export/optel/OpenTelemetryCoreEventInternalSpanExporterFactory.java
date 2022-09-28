@@ -20,6 +20,8 @@ import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpan
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
+import java.util.Set;
+
 /**
  * A factory for exporting spans associated to events.
  *
@@ -42,13 +44,20 @@ public class OpenTelemetryCoreEventInternalSpanExporterFactory {
   }
 
   /**
-   * @param eventContext an extra instance that may have extra information for creat
+   * @param eventContext      the event context
+   * @param muleConfiguration the mule configuration
+   * @param exportable        indicates if this is exportable.
+   * @param noExportUntil     noExportUntil the spans named as indicated
+   * @param internalSpan      the {@link InternalSpan} that will eventually be exported
    *
-   * @param internalSpan the {@link InternalSpan} that will eventually be exported
    * @return the result exporter.
    */
-  public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, InternalSpan internalSpan) {
+  public InternalSpanExporter from(EventContext eventContext, MuleConfiguration muleConfiguration, boolean exportable,
+                                   Set<String> noExportUntil,
+                                   InternalSpan internalSpan) {
     return new OpenTelemetrySpanExporter(getOpenTelemetryTracer(CONFIGURATION, muleConfiguration.getId()), eventContext,
+                                         exportable,
+                                         noExportUntil,
                                          internalSpan);
   }
 

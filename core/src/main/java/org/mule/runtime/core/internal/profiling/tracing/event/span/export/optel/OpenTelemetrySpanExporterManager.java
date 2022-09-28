@@ -16,6 +16,8 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.export.Intern
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
+import java.util.Set;
+
 /**
  * A {@link InternalSpanExportManager} that exports the span as open telemetry.
  *
@@ -33,7 +35,10 @@ public class OpenTelemetrySpanExporterManager implements InternalSpanExportManag
 
   @Override
   public InternalSpanExporter getInternalSpanExporter(EventContext context, MuleConfiguration muleConfiguration,
+                                                      boolean exportable,
+                                                      Set<String> noExportUntil,
                                                       InternalSpan internalSpan) {
-    return SPAN_EXPORTER_FACTORY.from(context, muleConfiguration, internalSpan);
+    return SPAN_EXPORTER_FACTORY.from(context, muleConfiguration, exportable, noExportUntil,
+                                      internalSpan);
   }
 }
