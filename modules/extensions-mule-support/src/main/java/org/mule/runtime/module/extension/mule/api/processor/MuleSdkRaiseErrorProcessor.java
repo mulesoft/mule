@@ -8,10 +8,12 @@ package org.mule.runtime.module.extension.mule.api.processor;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.module.extension.mule.internal.error.ThrowableError.wrap;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -30,7 +32,7 @@ public final class MuleSdkRaiseErrorProcessor extends AbstractRaiseErrorProcesso
 
   private static final DataType ERROR_DATA_TYPE = fromType(Error.class);
 
-  private AttributeEvaluator cause = new AttributeEvaluator("#[error]", ERROR_DATA_TYPE);
+  private AttributeEvaluator causeEvaluator = new AttributeEvaluator("#[error]", ERROR_DATA_TYPE);
 
   @Override
   protected ComponentIdentifier calculateErrorIdentifier(String typeId) {
@@ -40,24 +42,24 @@ public final class MuleSdkRaiseErrorProcessor extends AbstractRaiseErrorProcesso
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    cause.initialize(expressionManager);
+    causeEvaluator.initialize(expressionManager);
   }
 
   @Override
-  protected TypedException getException(ErrorType type, String message, CoreEvent event) {
-    Error calculatedCause = calculateCause(event);
-    if (calculatedCause == null) {
-      return new TypedException(new DefaultMuleException(message), type);
+  protected MuleException getException(ErrorType type, String message, CoreEvent event) {
+    throw new TypedException(calculateCause(event, message), type);
+  }
+
+  private Throwable calculateCause(CoreEvent event, String message) {
+    Error causeError = causeEvaluator.<Error>resolveTypedValue(event).getValue();
+    if (causeError == null) {
+      return new DefaultMuleException(message);
     } else {
-      return new TypedException(new DefaultMuleException(message), type, message);
+      return wrap(causeError);
     }
   }
 
-  private Error calculateCause(CoreEvent event) {
-    return cause.<Error>resolveTypedValue(event).getValue();
-  }
-
   public void setCause(String cause) {
-    this.cause = new AttributeEvaluator(cause, ERROR_DATA_TYPE);
+    this.causeEvaluator = new AttributeEvaluator(cause, ERROR_DATA_TYPE);
   }
 }

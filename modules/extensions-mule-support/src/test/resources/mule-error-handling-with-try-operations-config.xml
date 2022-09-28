@@ -134,4 +134,38 @@
             </try>
         </operation:body>
     </operation:def>
+
+    <flow name="nestedErrorsFlow">
+        <this:nested-raise-errors/>
+    </flow>
+    
+    <operation:def name="nestedRaiseErrors">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <try>
+                <try>
+                    <try>
+                        <operation:raise-error type="FIRST" description="First error" />
+                        <error-handler>
+                            <on-error-continue>
+                                <operation:raise-error type="SECOND" description="Second error" />
+                            </on-error-continue>
+                        </error-handler>
+                    </try>
+                    <error-handler>
+                        <on-error-continue>
+                            <operation:raise-error type="THIRD" description="Third error" />
+                        </on-error-continue>
+                    </error-handler>
+                </try>
+                <error-handler>
+                    <on-error-continue>
+                        <operation:raise-error type="FOURTH" description="Fourth error" />
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </operation:body>
+    </operation:def>
 </mule>

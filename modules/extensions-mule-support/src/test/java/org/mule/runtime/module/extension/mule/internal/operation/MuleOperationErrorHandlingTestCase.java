@@ -13,11 +13,19 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.component.execution.ComponentExecutionException;
+import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
+
+import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
@@ -79,6 +87,29 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   }
 
   @Test
+  public void executionExceptionHasTheCaughtErrorAsCause() throws Exception {
+    try {
+      flowRunner("flowCallingOperationThatSilencesOneSpecificErrorAndRaisesAnother").run();
+      fail("Calling the flow should have failed");
+    } catch (EventProcessingException exception) {
+      Optional<Error> optionalError = exception.getEvent().getError();
+      assertThat(optionalError.isPresent(), is(true));
+
+      Error error = optionalError.get();
+      assertThat(error.getErrorType(), errorType("THIS", "CUSTOM"));
+
+      Throwable executionException = error.getCause();
+      assertThat(executionException, instanceOf(ComponentExecutionException.class));
+
+      Throwable causeAsException = executionException.getCause();
+      assertThat(causeAsException, instanceOf(Error.class));
+
+      Error causeAsError = (Error) causeAsException;
+      assertThat(causeAsError.getErrorType(), errorType("HEISENBERG", "HEALTH"));
+    }
+  }
+
+  @Test
   public void reusableErrorHandlerAsAnOperation() throws Exception {
     CoreEvent result = flowRunner("reusableErrorHandlerAsAnOperationFlow").run();
     assertThat(result, hasMessage(hasPayload(is("Caught error!"))));
@@ -92,5 +123,38 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   @Test
   public void mappingChildAfterParent() throws Exception {
     flowRunner("mappingChildAfterParentFlow").runExpectingException(errorType("MY", "MAPPEDCONNECTIVITY"));
+  }
+
+  @Test
+  public void nestedErrors() throws Exception {
+    try {
+      flowRunner("nestedErrorsFlow").run();
+      fail("Calling the flow should have failed");
+    } catch (EventProcessingException exception) {
+      Optional<Error> optionalError = exception.getEvent().getError();
+      assertThat(optionalError.isPresent(), is(true));
+      Error error = optionalError.get();
+      assertThat(error.getErrorType(), errorType("THIS", "FOURTH"));
+      Throwable executionException = error.getCause();
+      assertThat(executionException, instanceOf(ComponentExecutionException.class));
+
+      Throwable causeOfFourth = executionException.getCause();
+      assertThat(causeOfFourth, instanceOf(Error.class));
+      Error causeOfFourthAsError = (Error) causeOfFourth;
+      assertThat(causeOfFourthAsError.getErrorType(), errorType("THIS", "THIRD"));
+
+      Throwable causeOfThird = causeOfFourthAsError.getCause();
+      assertThat(causeOfThird, instanceOf(Error.class));
+      Error causeOfThirdAsError = (Error) causeOfThird;
+      assertThat(causeOfThirdAsError.getErrorType(), errorType("THIS", "SECOND"));
+
+      Throwable causeOfSecond = causeOfThirdAsError.getCause();
+      assertThat(causeOfSecond, instanceOf(Error.class));
+      Error causeOfSecondAsError = (Error) causeOfSecond;
+      assertThat(causeOfSecondAsError.getErrorType(), errorType("THIS", "FIRST"));
+
+      Throwable causeOfFirst = causeOfSecondAsError.getCause();
+      assertThat(causeOfFirst, instanceOf(DefaultMuleException.class));
+    }
   }
 }
