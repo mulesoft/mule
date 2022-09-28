@@ -11,21 +11,26 @@ import static org.mule.runtime.api.meta.type.TypeCatalog.getDefault;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toSet;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader;
+import org.mule.metadata.message.api.el.ModuleDefinition;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * a {@link TypeLoader} for obtaining types available in the context of the current application. It accepts primitive type names
@@ -40,6 +45,7 @@ public class ApplicationTypeLoader implements TypeLoader {
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
   private final Map<String, String> extensionModelNamesByPrefix;
   private final TypeCatalog dependenciesTypeCatalog;
+  private final Set<ModuleDefinition> moduleDefinitions;
 
   public ApplicationTypeLoader(Set<ExtensionModel> extensionModels) {
     this.dependenciesTypeCatalog = getDefault(extensionModels);
@@ -48,6 +54,13 @@ public class ApplicationTypeLoader implements TypeLoader {
     for (ExtensionModel extensionModel : extensionModels) {
       extensionModelNamesByPrefix.put(extensionModel.getXmlDslModel().getPrefix(), extensionModel.getName());
     }
+
+    Function<ExtensionModel, ModuleDefinition> toModule = new ExtensionModelToModuleDefinitionTransformer();
+    moduleDefinitions = extensionModels.stream().map(toModule).collect(toSet());
+  }
+
+  public ApplicationTypeLoader(Set<ExtensionModel> extensionModels, ExpressionLanguageMetadataService elms) {
+    this(extensionModels);
   }
 
   @Override

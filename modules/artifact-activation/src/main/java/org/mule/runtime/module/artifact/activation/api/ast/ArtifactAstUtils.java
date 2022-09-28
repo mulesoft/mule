@@ -28,6 +28,7 @@ import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -53,6 +55,8 @@ public final class ArtifactAstUtils {
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
   private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(of(OPERATION_DEF));
+
+  public static final ExpressionLanguageMetadataService EXPRESSION_LANGUAGE_SERVICE = new WeaveExpressionLanguageMetadataServiceImpl();
 
   /**
    * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
@@ -119,7 +123,6 @@ public final class ArtifactAstUtils {
       logModelNotGenerated("No version specified on muleContext", muleContext);
       return empty();
     }
-
     Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
     if (loader.isPresent()) {
       Set<ExtensionModel> dependenciesExtensionModels = muleContext.getExtensionManager().getExtensions();
@@ -128,7 +131,7 @@ public final class ArtifactAstUtils {
               .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels))
+              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels, EXPRESSION_LANGUAGE_SERVICE))
               .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);
