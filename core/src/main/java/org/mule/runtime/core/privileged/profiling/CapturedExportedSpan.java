@@ -26,7 +26,7 @@ public interface CapturedExportedSpan {
   String getName();
 
   /**
-   * @return the paranet span id.
+   * @return the parent span id.
    */
   String getParentSpanId();
 
