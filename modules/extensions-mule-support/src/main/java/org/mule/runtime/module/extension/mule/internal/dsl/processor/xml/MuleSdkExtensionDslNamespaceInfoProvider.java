@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.dsl.processor.xml;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 
 import org.mule.runtime.ast.internal.xml.StaticXmlNamespaceInfo;

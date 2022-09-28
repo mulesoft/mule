@@ -129,7 +129,7 @@ public class MuleExtensionExtensionModelLoaderTestCase extends AbstractMuleSdkAs
         .addParameter(VERSION_PROPERTY_NAME, "1.2.3")
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
         .build();
-    return new MuleSdkExtensionModelLoader().loadExtensionModel(loadingRequest);
+    return new MuleSdkExtensionExtensionModelLoader().loadExtensionModel(loadingRequest);
   }
 
   @Override
