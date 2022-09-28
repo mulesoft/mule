@@ -6,18 +6,24 @@
  */
 package org.mule.runtime.core.privileged.processor.chain;
 
-import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+
+import static java.util.function.Function.identity;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
+
+import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
@@ -92,6 +98,23 @@ public final class ChainErrorHandlingUtils {
     } else {
       return identity();
     }
+  }
+
+  /**
+   * Finds or Creates an {@link Error} based on a provided {@link EventProcessingException}.
+   * 
+   * @param exception Provided {@link EventProcessingException}.
+   * @return {@link Error} found at the provided exception's {@link CoreEvent} or created based on the exception data.
+   * @see EventProcessingException#getEvent()
+   */
+  static Error resolveError(EventProcessingException exception) {
+    return exception.getEvent().getError().orElseGet(() -> ErrorBuilder.builder()
+        .exception(exception)
+        .description(exception.getMessage())
+        .detailedDescription(exception.getDetailedMessage())
+        .errorType(exception.getExceptionInfo().getErrorType())
+        .failingComponent(exception.getFailingComponent())
+        .build());
   }
 
 
