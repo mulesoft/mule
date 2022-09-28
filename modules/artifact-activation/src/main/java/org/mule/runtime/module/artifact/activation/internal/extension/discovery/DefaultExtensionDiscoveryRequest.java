@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
@@ -27,25 +26,23 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   private final Set<ExtensionModel> parentArtifactExtensions;
   private final boolean parallelDiscovery;
   private final boolean enrichDescriptions;
-  private final ConfigurationProperties configurationProperties;
+  private final boolean ocsEnabled;
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
-    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions,
-         ConfigurationProperties.nullConfigurationProperties());
+    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false);
   }
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions, boolean parallelDiscovery,
-                                          boolean enrichDescriptions, ConfigurationProperties configurationProperties) {
+                                          boolean enrichDescriptions, boolean ocsEnabled) {
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
     this.parallelDiscovery = parallelDiscovery;
     this.enrichDescriptions = enrichDescriptions;
-    this.configurationProperties =
-        configurationProperties != null ? configurationProperties : ConfigurationProperties.nullConfigurationProperties();
+    this.ocsEnabled = ocsEnabled;
   }
 
   @Override
@@ -69,8 +66,8 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   }
 
   @Override
-  public ConfigurationProperties getConfigurationProperties() {
-    return configurationProperties;
+  public boolean isOCSEnabled() {
+    return ocsEnabled;
   }
 
 }

@@ -10,7 +10,6 @@ import static java.util.Collections.emptySet;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -47,9 +46,9 @@ public interface ExtensionDiscoveryRequest {
   Set<ExtensionModel> getParentArtifactExtensions();
 
   /**
-   * @return {@link ConfigurationProperties} to take into account when parsing extensions. Non-null.
+   * @return Whether OCS is enabled.
    */
-  ConfigurationProperties getConfigurationProperties();
+  boolean isOCSEnabled();
 
   /**
    * Parallel discovery will try to parallelize only the discovery for extensions that do not depend on the DSL of other
@@ -75,7 +74,7 @@ public interface ExtensionDiscoveryRequest {
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
-    private ConfigurationProperties configurationProperties;
+    private boolean ocsEnabled;
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -97,14 +96,14 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
-    public ExtensionDiscoveryRequestBuilder setConfigurationProperties(ConfigurationProperties configurationProperties) {
-      this.configurationProperties = configurationProperties;
+    public ExtensionDiscoveryRequestBuilder setOCSEnabled(boolean ocsEnabled) {
+      this.ocsEnabled = ocsEnabled;
       return this;
     }
 
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, configurationProperties);
+                                                  parallelDiscovery, enrichDescriptions, ocsEnabled);
     }
   }
 }
