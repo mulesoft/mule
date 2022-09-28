@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.mule.api.loader;
 
-import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkThisExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -23,6 +25,9 @@ public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoader
 
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {
-    return singleton(new MuleSdkExtensionModelLoader());
+    Set<ExtensionModelLoader> loaders = new HashSet<>();
+    loaders.add(new MuleSdkExtensionExtensionModelLoader());
+    loaders.add(new MuleSdkThisExtensionModelLoader());
+    return unmodifiableSet(loaders);
   }
 }

@@ -6,33 +6,28 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_THIS_LOADER_ID;
 
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkApplicationExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionExtensionModelParserFactory;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkThisExtensionModelParserFactory;
 
 /**
- * {@link ExtensionModelLoader} implementation for the Mule SDK
+ * {@link ExtensionModelLoader} implementation for Mule SDK Extensions defined as part of the same artifact.
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionModelLoader extends AbstractExtensionModelLoader {
+public class MuleSdkThisExtensionModelLoader extends AbstractExtensionModelLoader {
 
   @Override
   public String getId() {
-    return MULE_SDK_LOADER_ID;
+    return MULE_SDK_THIS_LOADER_ID;
   }
 
   @Override
   protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
-    if (MuleSdkExtensionExtensionModelParserFactory.handles(context)) {
-      return new MuleSdkExtensionExtensionModelParserFactory();
-    } else {
-      return new MuleSdkApplicationExtensionModelParserFactory();
-    }
+    return new MuleSdkThisExtensionModelParserFactory();
   }
 }

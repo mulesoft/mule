@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.handleValidationResult;
@@ -27,11 +25,9 @@ import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkArtifactLocalExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -48,34 +44,9 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   private ArtifactAst cachedArtifactAst;
 
-  /**
-   * @param context The loading context.
-   * @return whether this factory is capable of creating a parser for the given {@link ExtensionLoadingContext}.
-   */
-  public static boolean handles(ExtensionLoadingContext context) {
-    // It needs a context containing a resource file.
-    if (context.getParameter(MULE_SDK_RESOURCE_PROPERTY_NAME).isPresent()) {
-      return true;
-    }
-
-    // ...or an already parsed AST that has an extension definition.
-    return context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME)
-        .map(ast -> ast.getArtifactType().equals(MULE_EXTENSION))
-        .orElse(true);
-  }
-
   @Override
   protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
-    // The existence of the name here means that the AST parser is trying to load the artifact-local ExtensionModel in order
-    // to complete the AST.
-    Optional<String> extensionName = context.getParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME);
-
-    if (extensionName.isPresent()) {
-      // In this case, we need to treat is as artifact-local, even when the artifact is an extension.
-      return new MuleSdkArtifactLocalExtensionModelMetadataParser(extensionName.get());
-    } else {
-      return new MuleSdkExtensionExtensionModelMetadataParser(getArtifactAst(context));
-    }
+    return new MuleSdkExtensionExtensionModelMetadataParser(getArtifactAst(context));
   }
 
   @Override
@@ -138,9 +109,7 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   private ArtifactAst getArtifactAst(ExtensionLoadingContext context) {
     if (cachedArtifactAst == null) {
-      // The AST may be given already parsed. If not, we need to parse it from the resource file.
-      cachedArtifactAst =
-          context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAstChecked(context));
+      cachedArtifactAst = parseAstChecked(context);
     }
 
     return cachedArtifactAst;

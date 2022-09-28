@@ -26,11 +26,11 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class MuleSdkArtifactLocalExtensionModelMetadataParser implements MuleSdkExtensionModelMetadataParser {
+public class MuleSdkThisExtensionModelMetadataParser implements MuleSdkExtensionModelMetadataParser {
 
   private final String extensionName;
 
-  public MuleSdkArtifactLocalExtensionModelMetadataParser(String extensionName) {
+  public MuleSdkThisExtensionModelMetadataParser(String extensionName) {
     this.extensionName = extensionName;
   }
 

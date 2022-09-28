@@ -14,7 +14,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_THIS_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
@@ -192,7 +192,9 @@ public final class ArtifactAstUtils {
       logModelNotGenerated("No version specified", artifactId, ast.getArtifactType());
       return empty();
     }
-    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
+
+    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(),
+                                                                  MULE_SDK_THIS_LOADER_ID);
     if (loader.isPresent()) {
       return of(loader.get()
           .loadExtensionModel(builder(artifactClassLoader, getDefault(dependencies))
