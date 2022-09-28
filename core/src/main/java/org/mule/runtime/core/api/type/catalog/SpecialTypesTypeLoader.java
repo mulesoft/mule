@@ -8,15 +8,13 @@ package org.mule.runtime.core.api.type.catalog;
 
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.util.collection.SmallMap;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,13 +31,8 @@ public class SpecialTypesTypeLoader implements TypeLoader {
   public static final String ERROR = "error";
 
   private static final Map<String, MetadataType> SPECIAL_TYPES =
-      unmodifiableMap(SmallMap.of(
-                                  VOID, create(JAVA).voidType().build(),
-                                  // TODO (W-11793405): Review this type
-                                  ERROR, create(JAVA).objectType()
-                                      .id(Error.class.getName())
-                                      .with(new ClassInformationAnnotation(Error.class))
-                                      .build()));
+      unmodifiableMap(of(VOID, create(JAVA).voidType().build(), ERROR,
+                         org.mule.runtime.extension.api.error.ErrorConstants.ERROR));
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {

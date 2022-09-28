@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.extension;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE_URI;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_SCHEMA_LOCATION;
@@ -19,8 +20,8 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
-import static org.mule.sdk.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.DEPRECATED_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
@@ -229,16 +230,22 @@ public class MuleOperationExtensionModelDeclarer {
     raiseError.withOutput().ofType(VOID_TYPE);
     raiseError.withOutputAttributes().ofType(VOID_TYPE);
 
-    raiseError.onDefaultParameterGroup()
-        .withRequiredParameter("type")
+    ParameterGroupDeclarer parameters = raiseError.onDefaultParameterGroup();
+
+    parameters.withRequiredParameter("type")
         .ofType(ERROR_TYPE_DEFINITION)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The error type to raise.");
 
-    raiseError.onDefaultParameterGroup()
-        .withOptionalParameter("description")
+    parameters.withOptionalParameter("description")
         .ofType(STRING_TYPE)
         .describedAs("The description of this error.");
+
+    parameters.withOptionalParameter("cause")
+        .ofType(ERROR)
+        .withExpressionSupport(SUPPORTED)
+        .defaultingTo("#[error]")
+        .describedAs("The cause of the error.");
   }
 
   private void declareOutputTypeParameters(NestedComponentDeclarer component, String outputRole) {
