@@ -253,7 +253,6 @@ public final class ArtifactAstUtils {
         return artifactAst.topLevelComponentsStream()
             .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
       case MULE_EXTENSION:
-        // TODO W-11796932: Try to unify this one with the case above by changing the Mule Extensions DSL
         return artifactAst.topLevelComponents().size() == 1 &&
             artifactAst.topLevelComponents().get(0).directChildrenStream()
                 .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
