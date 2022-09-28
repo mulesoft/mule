@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.mule.internal.dsl.processor.xml;
 
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
+
 import static java.util.Collections.singletonList;
 
 import org.mule.runtime.ast.internal.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-import org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants;
 
 import java.util.Collection;
 
@@ -23,8 +25,8 @@ import java.util.Collection;
 public class MuleSdkExtensionDslNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
   private static final Collection<XmlNamespaceInfo> XML_NAMESPACE_INFO =
-      singletonList(new StaticXmlNamespaceInfo(MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI,
-                                               MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE));
+      singletonList(new StaticXmlNamespaceInfo(MULE_SDK_EXTENSION_DSL_NAMESPACE_URI,
+                                               MULE_SDK_EXTENSION_DSL_NAMESPACE));
 
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
