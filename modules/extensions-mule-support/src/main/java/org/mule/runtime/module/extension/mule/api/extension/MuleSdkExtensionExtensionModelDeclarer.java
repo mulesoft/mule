@@ -15,10 +15,19 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
-import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE;
-import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE_URI;
-import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_XSD_FILE_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CONSTRUCT_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.meta.Category;
@@ -37,16 +46,6 @@ import java.util.Arrays;
  */
 public class MuleSdkExtensionExtensionModelDeclarer {
 
-  public static final String EXTENSION_CONSTRUCT_NAME = "extension";
-  public static final String NAME_PARAMETER_NAME = "name";
-  public static final String CATEGORY_PARAMETER_NAME = "category";
-  public static final String VENDOR_PARAMETER_NAME = "vendor";
-  public static final String REQUIRED_ENTITLEMENT_PARAMETER_NAME = "requiredEntitlement";
-  public static final String REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME = "requiresEnterpriseLicense";
-  public static final String ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME = "allowsEvaluationLicense";
-  public static final String NAMESPACE_PARAMETER_NAME = "namespace";
-  public static final String PREFIX_PARAMETER_NAME = "prefix";
-
   public ExtensionDeclarer declareExtensionModel() {
     final BaseTypeBuilder typeBuilder = create(JAVA);
 
@@ -58,11 +57,11 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
-            .setPrefix(MULE_EXTENSION_DSL_NAMESPACE)
-            .setNamespace(MULE_EXTENSION_DSL_NAMESPACE_URI)
+            .setPrefix(MULE_SDK_EXTENSION_DSL_NAMESPACE)
+            .setNamespace(MULE_SDK_EXTENSION_DSL_NAMESPACE_URI)
             .setSchemaVersion(MULE_VERSION)
-            .setXsdFileName(MULE_EXTENSION_DSL_XSD_FILE_NAME)
-            .setSchemaLocation(MULE_EXTENSION_DSL_SCHEMA_LOCATION)
+            .setXsdFileName(MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME)
+            .setSchemaLocation(MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION)
             .build());
 
     declareExtensionConstruct(extensionDeclarer, typeBuilder);
@@ -71,54 +70,54 @@ public class MuleSdkExtensionExtensionModelDeclarer {
   }
 
   private void declareExtensionConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct(EXTENSION_CONSTRUCT_NAME)
+    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct(MULE_SDK_EXTENSION_CONSTRUCT_NAME)
         .describedAs("Root element of an extension that contains configurations, connections, operations, sources and functions as children.")
         .allowingTopLevelDefinition();
 
     final ParameterGroupDeclarer<?> params = extensionConstruct.onDefaultParameterGroup();
-    params.withRequiredParameter(NAME_PARAMETER_NAME)
+    params.withRequiredParameter(MULE_SDK_EXTENSION_NAME_PARAMETER_NAME)
         .describedAs("Name of the extension that identifies it.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .asComponentId();
 
     String[] validCategories = Arrays.stream(Category.values()).map(Enum::name).toArray(String[]::new);
-    params.withOptionalParameter(CATEGORY_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME)
         .describedAs("Category of the extension.")
         .ofType(typeBuilder.stringType().enumOf(validCategories).build())
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(COMMUNITY.name());
 
-    params.withOptionalParameter(VENDOR_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME)
         .describedAs("Vendor of the extension.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(MULESOFT);
 
-    params.withOptionalParameter(REQUIRED_ENTITLEMENT_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME)
         .describedAs("The required entitlement in the customer extension license.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME)
         .describedAs("If the extension requires an enterprise license to run.")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME)
         .describedAs("If the extension can be run with an evaluation license.")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(NAMESPACE_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME)
         .describedAs("Expected namespace of the extension to look for when generating the schemas. If left empty it will " +
             "default to http://www.mulesoft.org/schema/mule/[prefix], where [prefix] is the attribute prefix attribute value.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(PREFIX_PARAMETER_NAME)
+    params.withOptionalParameter(MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME)
         .describedAs("Expected prefix of the extension to look for when generating the schemas. If left empty it will create a " +
             "default one based on the extension's name, removing the words \"extension\", \"module\" or \"connector\" at " +
             "the end if they are present and hyphenizing the resulting name.")

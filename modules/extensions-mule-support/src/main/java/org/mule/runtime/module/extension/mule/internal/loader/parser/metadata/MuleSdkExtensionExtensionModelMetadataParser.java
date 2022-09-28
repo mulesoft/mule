@@ -8,14 +8,14 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser.metadata;
 
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.CATEGORY_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.NAMESPACE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.NAME_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.PREFIX_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.REQUIRED_ENTITLEMENT_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer.VENDOR_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -85,9 +85,10 @@ public class MuleSdkExtensionExtensionModelMetadataParser extends BaseMuleSdkExt
   }
 
   private void parseMetadata(ComponentAst extensionComponentAst) {
-    name = getParameter(extensionComponentAst, NAME_PARAMETER_NAME);
-    category = Category.valueOf(this.<String>getParameter(extensionComponentAst, CATEGORY_PARAMETER_NAME).toUpperCase());
-    vendor = getParameter(extensionComponentAst, VENDOR_PARAMETER_NAME);
+    name = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);
+    category = Category
+        .valueOf(this.<String>getParameter(extensionComponentAst, MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME).toUpperCase());
+    vendor = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME);
 
     parseXmlDslConfiguration(extensionComponentAst);
     parseLicenseModelProperty(extensionComponentAst);
@@ -97,8 +98,8 @@ public class MuleSdkExtensionExtensionModelMetadataParser extends BaseMuleSdkExt
   }
 
   private void parseXmlDslConfiguration(ComponentAst extensionComponentAst) {
-    Optional<String> prefix = getOptionalParameter(extensionComponentAst, PREFIX_PARAMETER_NAME);
-    Optional<String> namespace = getOptionalParameter(extensionComponentAst, NAMESPACE_PARAMETER_NAME);
+    Optional<String> prefix = getOptionalParameter(extensionComponentAst, MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME);
+    Optional<String> namespace = getOptionalParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME);
     if (prefix.isPresent() || namespace.isPresent()) {
       xmlDslConfiguration = of(new XmlDslConfiguration(prefix.orElse(""), namespace.orElse("")));
     } else {
@@ -107,9 +108,12 @@ public class MuleSdkExtensionExtensionModelMetadataParser extends BaseMuleSdkExt
   }
 
   private void parseLicenseModelProperty(ComponentAst extensionComponentAst) {
-    boolean requiresEeLicense = getParameter(extensionComponentAst, REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME);
-    boolean allowsEvaluationLicense = getParameter(extensionComponentAst, ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME);
-    Optional<String> requiredEntitlement = getOptionalParameter(extensionComponentAst, REQUIRED_ENTITLEMENT_PARAMETER_NAME);
+    boolean requiresEeLicense =
+        getParameter(extensionComponentAst, MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME);
+    boolean allowsEvaluationLicense = getParameter(extensionComponentAst,
+                                                   MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME);
+    Optional<String> requiredEntitlement = getOptionalParameter(extensionComponentAst,
+                                                                MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME);
     licenseModelProperty = new LicenseModelProperty(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
   }
 }

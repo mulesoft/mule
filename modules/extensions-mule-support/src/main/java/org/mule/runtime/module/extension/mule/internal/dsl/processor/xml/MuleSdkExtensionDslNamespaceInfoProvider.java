@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.module.extension.mule.internal.dsl.processor.xml;
 
-import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
-
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 
 import org.mule.runtime.ast.internal.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
+import org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants;
 
 import java.util.Collection;
 
@@ -25,14 +23,9 @@ import java.util.Collection;
  */
 public class MuleSdkExtensionDslNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-  public static final String MULE_EXTENSION_DSL_NAMESPACE = "extension";
-  public static final String MULE_EXTENSION_DSL_NAMESPACE_URI = format(DEFAULT_NAMESPACE_URI_MASK, "mule-extension");
-  public static final String MULE_EXTENSION_DSL_XSD_FILE_NAME = "mule-extension.xsd";
-  public static final String MULE_EXTENSION_DSL_SCHEMA_LOCATION =
-      buildSchemaLocation(MULE_EXTENSION_DSL_NAMESPACE, MULE_EXTENSION_DSL_XSD_FILE_NAME);
-
   private static final Collection<XmlNamespaceInfo> XML_NAMESPACE_INFO =
-      singletonList(new StaticXmlNamespaceInfo(MULE_EXTENSION_DSL_NAMESPACE_URI, MULE_EXTENSION_DSL_NAMESPACE));
+      singletonList(new StaticXmlNamespaceInfo(MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI,
+                                               MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE));
 
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
