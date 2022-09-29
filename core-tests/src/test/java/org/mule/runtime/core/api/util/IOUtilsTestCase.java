@@ -75,7 +75,7 @@ import sun.misc.Unsafe;
 @SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(IOUtils.class)
-@PowerMockIgnore({"javax.management.*", "javax.xml.*", "javax.crypto.*", "org.xml.*", "org.w3c.*"})
+@PowerMockIgnore("javax.management.*")
 public class IOUtilsTestCase extends AbstractMuleTestCase {
 
   private static final List<String> POWER_MOCK_PLUGINS = asList("mock-maker-inline", InlineByteBuddyMockMaker.class.getName());
