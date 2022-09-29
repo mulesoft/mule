@@ -36,20 +36,23 @@ public class InsecureTLSValidationTestCase extends AbstractCoreValidationTestCas
   @Test
   public void TLSInsecureValidation() {
     final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                                               "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-                                                               "      xmlns:tls=\"http://www.mulesoft.org/schema/mule/tls\"\n" +
-                                                               "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                                                               "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n" +
-                                                               "                           http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd\">\n"
-                                                               +
-                                                               "\n" +
-                                                               "    <tls:context name=\"TLS_Context\">\n" +
-                                                               "        <tls:trust-store path=\"${truststore.path}\" password=\"${truststore.password}\" type=\"${truststore.type}\" insecure=\"true\"/>\n" +
-                                                               "        <tls:key-store type=\"${keystore.type}\" path=\"${keystore.path}\" alias=\"${keystore.alias}\" keyPassword=\"${keystore.keyPassword}\" password=\"${keystore.password}\" />\n" +
-                                                               "     </tls:context>\n" +
-                                                               "    \n" +
-                                                               "</mule>")
-      .stream().findFirst();
+        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+        "      xmlns:tls=\"http://www.mulesoft.org/schema/mule/tls\"\n" +
+        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n"
+        +
+        "                           http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd\">\n"
+        +
+        "\n" +
+        "    <tls:context name=\"TLS_Context\">\n" +
+        "        <tls:trust-store path=\"${truststore.path}\" password=\"${truststore.password}\" type=\"${truststore.type}\" insecure=\"true\"/>\n"
+        +
+        "        <tls:key-store type=\"${keystore.type}\" path=\"${keystore.path}\" alias=\"${keystore.alias}\" keyPassword=\"${keystore.keyPassword}\" password=\"${keystore.password}\" />\n"
+        +
+        "     </tls:context>\n" +
+        "    \n" +
+        "</mule>")
+            .stream().findFirst();
 
     assertThat(msg.get().getValidation().getLevel(), is(WARN));
     assertThat(msg.get().getMessage(),

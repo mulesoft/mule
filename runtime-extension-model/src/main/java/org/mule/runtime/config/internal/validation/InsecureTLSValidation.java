@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 public class InsecureTLSValidation implements Validation {
 
   private static final ComponentIdentifier TLS_IDENTIFIER =
-    builder().namespace(TLS_PREFIX).name(TLS_TRUST_STORE_ELEMENT_IDENTIFIER).build();
+      builder().namespace(TLS_PREFIX).name(TLS_TRUST_STORE_ELEMENT_IDENTIFIER).build();
 
   @Override
   public String getName() {
@@ -57,7 +57,8 @@ public class InsecureTLSValidation implements Validation {
     final ComponentParameterAst param = component.getParameter("TrustStore", "insecure");
     Object insecure = param.getValue().getRight();
     if (insecure instanceof Boolean && (Boolean) insecure) {
-      return of(create(component, param, this, "Setting insecure to true renders connections vulnerable to attack. Use it only for prototyping or testing. Never use it in production environments."));
+      return of(create(component, param, this,
+                       "Setting insecure to true renders connections vulnerable to attack. Use it only for prototyping or testing. Never use it in production environments."));
     } else {
       return empty();
     }
