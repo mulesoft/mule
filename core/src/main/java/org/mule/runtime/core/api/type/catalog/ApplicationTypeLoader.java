@@ -90,7 +90,8 @@ public class ApplicationTypeLoader implements TypeLoader {
     }
 
     @Override
-    public void getInputType(String expression, MetadataType output, MuleEventMetadataTypeBuilder builder, MessageCallback callback) {
+    public void getInputType(String expression, MetadataType output, MuleEventMetadataTypeBuilder builder,
+                             MessageCallback callback) {
 
     }
 
@@ -100,7 +101,8 @@ public class ApplicationTypeLoader implements TypeLoader {
     }
 
     @Override
-    public MetadataType getOutputType(TypeBindings typeBindings, String expression, String outputMimeType, MessageCallback callback) {
+    public MetadataType getOutputType(TypeBindings typeBindings, String expression, String outputMimeType,
+                                      MessageCallback callback) {
       return null;
     }
 
@@ -145,7 +147,8 @@ public class ApplicationTypeLoader implements TypeLoader {
     }
 
     @Override
-    public ModuleDefinition moduleDefinition(String nameIdentifier, Collection<ModuleDefinition> modules) throws ExpressionCompilationException {
+    public ModuleDefinition moduleDefinition(String nameIdentifier, Collection<ModuleDefinition> modules)
+        throws ExpressionCompilationException {
       return null;
     }
 
@@ -188,7 +191,7 @@ public class ApplicationTypeLoader implements TypeLoader {
 
     private static boolean matchesAlias(String expectedAlias, MetadataType metadataType) {
       return metadataType.getAnnotation(TypeAliasAnnotation.class)
-              .map(typeAliasAnnotation -> typeAliasAnnotation.getValue().equals(expectedAlias)).orElse(false);
+          .map(typeAliasAnnotation -> typeAliasAnnotation.getValue().equals(expectedAlias)).orElse(false);
     }
   }
 }
