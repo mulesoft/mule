@@ -10,8 +10,8 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
@@ -50,21 +50,8 @@ abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupMo
   }
 
   @Override
-  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser operationModelParser,
-                                                                        String categoryName) {
-
-    Optional<KeyIdResolverModelParser> keyIdResolverModelParser = doGetParameters()
-        .map(parameter -> parseKeyIdResolverModelParser(operationModelParser, parameter, categoryName, null))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
-
-    if (keyIdResolverModelParser.isPresent()) {
-      return keyIdResolverModelParser;
-    }
-
-    return getGroupParameter()
-        .flatMap(groupParameter -> parseKeyIdResolverModelParser(operationModelParser, groupParameter, categoryName, getName()));
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
+    return getGroupParameter().flatMap(groupParameter -> parseKeyIdResolverModelParser(groupParameter, categoryName, getName()));
   }
 
   protected abstract Optional<ExtensionParameter> getGroupParameter();

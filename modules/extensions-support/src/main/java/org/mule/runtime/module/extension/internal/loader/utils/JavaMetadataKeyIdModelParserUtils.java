@@ -69,6 +69,21 @@ public class JavaMetadataKeyIdModelParserUtils {
     return keyIdResolverModelParser;
   }
 
+  public static Optional<KeyIdResolverModelParser> parseKeyIdResolverModelParser(ExtensionParameter extensionParameter,
+                                                                                 String categoryName,
+                                                                                 String groupName) {
+    String parameterName = !isBlank(groupName) ? groupName : extensionParameter.getName();
+    MetadataType metadataType = extensionParameter.getType().asMetadataType();
+    return mapReduceSingleAnnotation(extensionParameter, "parameter", extensionParameter.getName(),
+                                     org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId.class,
+                                     MetadataKeyId.class,
+                                     value -> keyIdResolverFromType(parameterName, categoryName, metadataType,
+                                                                    value
+                                                                        .getClassValue(org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId::value)),
+                                     value -> keyIdResolverFromType(parameterName, categoryName, metadataType,
+                                                                    value.getClassValue(MetadataKeyId::value)));
+  }
+
   public static JavaKeyIdResolverModelParser parseKeyIdResolverModelParser(Supplier<String> categoryName,
                                                                            MethodElement<?> methodElement) {
     Optional<JavaKeyIdResolverModelParser> javaKeyIdResolverModelParser = empty();
@@ -114,7 +129,9 @@ public class JavaMetadataKeyIdModelParserUtils {
         .orElseGet(() -> new JavaKeyIdResolverModelParser(null, null, null, NullMetadataResolver.class));
   }
 
-  public static JavaKeyIdResolverModelParser parseKeyIdResolverModelParser(Type extensionType, WithAnnotations annotatedType) {
+  // TODO: delete
+  public static JavaKeyIdResolverModelParser parseJavaKeyIdResolverModelParser(Type extensionType,
+                                                                               WithAnnotations annotatedType) {
     Optional<JavaKeyIdResolverModelParser> javaKeyIdResolverModelParser = mapReduceSingleAnnotation(annotatedType, "source", "",
                                                                                                     org.mule.runtime.extension.api.annotation.metadata.MetadataScope.class,
                                                                                                     MetadataScope.class,
@@ -139,6 +156,66 @@ public class JavaMetadataKeyIdModelParserUtils {
 
     return javaKeyIdResolverModelParser
         .orElse(new JavaKeyIdResolverModelParser(null, null, null, NullMetadataResolver.class));
+  }
+
+  public static Optional<KeyIdResolverModelParser> parseKeyIdResolverModelParser(Type extensionType,
+                                                                                 WithAnnotations annotatedType) {
+    Optional<KeyIdResolverModelParser> keyIdResolverModelParser = mapReduceSingleAnnotation(annotatedType, "source", "",
+                                                                                            org.mule.runtime.extension.api.annotation.metadata.MetadataScope.class,
+                                                                                            MetadataScope.class,
+                                                                                            valueFetcher -> {
+                                                                                              Type type = valueFetcher
+                                                                                                  .getClassValue(org.mule.runtime.extension.api.annotation.metadata.MetadataScope::keysResolver);
+                                                                                              Class<?> declaringClass =
+                                                                                                  type.getDeclaringClass()
+                                                                                                      .orElse(null);
+                                                                                              if (declaringClass != null
+                                                                                                  && !isStaticResolver(declaringClass)) {
+                                                                                                return keyIdResolverFromTypeOnSources(declaringClass);
+                                                                                              } else {
+                                                                                                return null;
+                                                                                              }
+                                                                                            },
+                                                                                            valueFetcher -> {
+                                                                                              Type type = valueFetcher
+                                                                                                  .getClassValue(MetadataScope::keysResolver);
+                                                                                              Class<?> declaringClass =
+                                                                                                  type.getDeclaringClass()
+                                                                                                      .orElse(null);
+                                                                                              if (declaringClass != null
+                                                                                                  && !isStaticResolver(declaringClass)) {
+                                                                                                return keyIdResolverFromTypeOnSources(declaringClass);
+                                                                                              } else {
+                                                                                                return null;
+                                                                                              }
+                                                                                            });
+
+    if (!keyIdResolverModelParser.isPresent()) {
+      keyIdResolverModelParser = mapReduceSingleAnnotation(extensionType, "source", "",
+                                                           org.mule.runtime.extension.api.annotation.metadata.MetadataScope.class,
+                                                           MetadataScope.class,
+                                                           valueFetcher -> {
+                                                             Type type = valueFetcher
+                                                                 .getClassValue(org.mule.runtime.extension.api.annotation.metadata.MetadataScope::keysResolver);
+                                                             Class<?> declaringClass = type.getDeclaringClass().orElse(null);
+                                                             if (declaringClass != null && !isStaticResolver(declaringClass)) {
+                                                               return keyIdResolverFromTypeOnSources(declaringClass);
+                                                             } else {
+                                                               return null;
+                                                             }
+                                                           },
+                                                           valueFetcher -> {
+                                                             Type type = valueFetcher.getClassValue(MetadataScope::keysResolver);
+                                                             Class<?> declaringClass = type.getDeclaringClass().orElse(null);
+                                                             if (declaringClass != null && !isStaticResolver(declaringClass)) {
+                                                               return keyIdResolverFromTypeOnSources(declaringClass);
+                                                             } else {
+                                                               return null;
+                                                             }
+                                                           });
+    }
+
+    return keyIdResolverModelParser;
   }
 
   public static Optional<KeyIdResolverModelParser> parseKeyIdResolverModelParser(WithAnnotations annotatedType) {
@@ -192,6 +269,10 @@ public class JavaMetadataKeyIdModelParserUtils {
     }
 
     return new JavaKeyIdResolverModelParser(null, categoryName, metadataType, type.getDeclaringClass().get());
+  }
+
+  private static JavaKeyIdResolverModelParser keyIdResolverFromTypeOnSources(Class<?> clazz) {
+    return new JavaKeyIdResolverModelParser(null, null, null, clazz);
   }
 
 }

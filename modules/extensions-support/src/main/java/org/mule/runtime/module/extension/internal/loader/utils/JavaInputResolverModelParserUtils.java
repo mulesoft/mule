@@ -44,23 +44,6 @@ public class JavaInputResolverModelParserUtils {
     return concat(parameterInputResolvers.stream(), parameterGroupInputResolvers.stream()).collect(toList());
   }
 
-  public static List<InputResolverModelParser> parseInputResolversModelParserPingo(MethodElement<?> methodElement) {
-
-    List<InputResolverModelParser> parameterInputResolvers = methodElement.getParameters().stream()
-        .map(JavaInputResolverModelParserUtils::getResolverParser)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
-
-    List<InputResolverModelParser> parameterGroupInputResolvers = methodElement.getParameterGroups().stream()
-        .map(JavaInputResolverModelParserUtils::getResolverParser)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
-
-    return concat(parameterInputResolvers.stream(), parameterGroupInputResolvers.stream()).collect(toList());
-  }
-
   public static List<InputResolverModelParser> parseInputResolversModelParser(SourceCallbackDeclaration sourceCallbackDeclaration) {
     return sourceCallbackDeclaration.getAllParameters().stream()
         .map(param -> param.getModelProperty(ExtensionParameterDescriptorModelProperty.class))

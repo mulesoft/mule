@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
@@ -20,8 +21,8 @@ import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaMode
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaKeyIdResolverModelParser;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +45,7 @@ public final class ParameterModelsLoaderDelegate {
     return declare(component, null, groupParsers);
   }
 
-  public List<ParameterDeclarer> declare(HasParametersDeclarer component, OperationModelParser operationModelParser,
+  public List<ParameterDeclarer> declare(HasParametersDeclarer component, KeyIdResolverModelParser parentKeyIdResolverModelParser,
                                          List<ParameterGroupModelParser> groupParsers) {
     final List<ParameterDeclarer> declarerList = new LinkedList<>();
 
@@ -75,13 +76,23 @@ public final class ParameterModelsLoaderDelegate {
               .defaultingTo(parameterParser.getDefaultValue());
         }
 
-        if (operationModelParser != null) {
-          Optional<KeyIdResolverModelParser> keyIdResolverModelParser =
-              parameterParser.getKeyIdResolverModelParser(operationModelParser);
-          Optional<Pair<Integer, Boolean>> metadataKeyPart = parameterParser.getMetadataKeyPart();
+        Optional<KeyIdResolverModelParser> parameterKeyIdResolverModelParser = parameterParser.getKeyIdResolverModelParser(null);
+        Optional<Pair<Integer, Boolean>> metadataKeyPart = parameterParser.getMetadataKeyPart();
 
-          declareMetadataKeyPartModelProperty(parameter, keyIdResolverModelParser.orElse(null), metadataKeyPart.orElse(null));
+        if (parameterKeyIdResolverModelParser.isPresent() && !parameterKeyIdResolverModelParser.get().hasKeyIdResolver()
+            && parentKeyIdResolverModelParser != null) {
+          parameterKeyIdResolverModelParser = of(new JavaKeyIdResolverModelParser(
+                                                                                  parameterKeyIdResolverModelParser.get()
+                                                                                      .getParameterName(),
+                                                                                  null,
+                                                                                  parameterKeyIdResolverModelParser.get()
+                                                                                      .getMetadataType(),
+                                                                                  parentKeyIdResolverModelParser
+                                                                                      .keyIdResolverDeclarationClass()));
         }
+
+        declareMetadataKeyPartModelProperty(parameter, parameterKeyIdResolverModelParser.orElse(null),
+                                            metadataKeyPart.orElse(null));
 
         Optional<InputResolverModelParser> inputResolverModelParser = parameterParser.getInputResolverModelParser();
         final MetadataType metadataType = parameterParser.getType();

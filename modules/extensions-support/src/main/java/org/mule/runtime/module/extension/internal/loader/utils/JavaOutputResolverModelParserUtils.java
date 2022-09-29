@@ -224,6 +224,63 @@ public class JavaOutputResolverModelParserUtils {
     return javaAttributesResolverModelParser.orElse(new JavaAttributesResolverModelParser(NullMetadataResolver.class));
   }
 
+  public static Optional<AttributesResolverModelParser> parseAttributesResolverModelParser(Type extensionType,
+                                                                                           WithAnnotations annotatedType) {
+    Optional<AttributesResolverModelParser> attributesResolverModelParser =
+        mapReduceSingleAnnotation(annotatedType, "source", "",
+                                  org.mule.runtime.extension.api.annotation.metadata.MetadataScope.class,
+                                  MetadataScope.class,
+                                  valueFetcher -> {
+                                    Type type = valueFetcher
+                                        .getClassValue(org.mule.runtime.extension.api.annotation.metadata.MetadataScope::attributesResolver);
+                                    Class<?> declaringClass = type.getDeclaringClass().orElse(null);
+                                    if (declaringClass != null && !isStaticResolver(declaringClass)) {
+                                      return attributesResolverFromType(declaringClass);
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  valueFetcher -> {
+                                    Type type = valueFetcher.getClassValue(MetadataScope::attributesResolver);
+                                    Class<?> declaringClass = type.getDeclaringClass().orElse(null);
+                                    if (declaringClass != null && !isStaticResolver(declaringClass)) {
+                                      return attributesResolverFromType(declaringClass);
+                                    } else {
+                                      return null;
+                                    }
+                                  });
+
+    if (!attributesResolverModelParser.isPresent()) {
+      attributesResolverModelParser = mapReduceSingleAnnotation(extensionType, "source", "",
+                                                                org.mule.runtime.extension.api.annotation.metadata.MetadataScope.class,
+                                                                MetadataScope.class,
+                                                                valueFetcher -> {
+                                                                  Type type = valueFetcher
+                                                                      .getClassValue(org.mule.runtime.extension.api.annotation.metadata.MetadataScope::outputResolver);
+                                                                  Class<?> declaringClass = type.getDeclaringClass().orElse(null);
+                                                                  if (declaringClass != null
+                                                                      && !isStaticResolver(declaringClass)) {
+                                                                    return attributesResolverFromType(declaringClass);
+                                                                  } else {
+                                                                    return null;
+                                                                  }
+                                                                },
+                                                                valueFetcher -> {
+                                                                  Type type =
+                                                                      valueFetcher.getClassValue(MetadataScope::outputResolver);
+                                                                  Class<?> declaringClass = type.getDeclaringClass().orElse(null);
+                                                                  if (declaringClass != null
+                                                                      && !isStaticResolver(declaringClass)) {
+                                                                    return attributesResolverFromType(declaringClass);
+                                                                  } else {
+                                                                    return null;
+                                                                  }
+                                                                });
+    }
+
+    return attributesResolverModelParser;
+  }
+
   // TODO: delete
   private static JavaOutputResolverModelParser outputResolverFromType(Type type) {
     if (isStaticResolver(type.getDeclaringClass().get())) {

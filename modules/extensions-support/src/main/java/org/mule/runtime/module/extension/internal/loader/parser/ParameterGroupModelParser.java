@@ -72,7 +72,7 @@ public interface ParameterGroupModelParser {
    */
   List<ModelProperty> getAdditionalModelProperties();
 
-  Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser operationModelParser, String categoryName);
+  Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName);
 
   /**
    * Describes the group's exclusive optional parameters

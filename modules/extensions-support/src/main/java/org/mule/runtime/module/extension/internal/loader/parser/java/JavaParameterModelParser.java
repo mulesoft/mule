@@ -84,7 +84,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeM
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
@@ -344,8 +343,8 @@ public class JavaParameterModelParser implements ParameterModelParser {
   }
 
   @Override
-  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser operationModelParser) {
-    return parseKeyIdResolverModelParser(operationModelParser, parameter, null, null);
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
+    return parseKeyIdResolverModelParser(parameter, categoryName, null);
   }
 
   @Override

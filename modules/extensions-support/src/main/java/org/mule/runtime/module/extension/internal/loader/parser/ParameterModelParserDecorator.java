@@ -140,8 +140,8 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   }
 
   @Override
-  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser parser) {
-    return decoratee.getKeyIdResolverModelParser(parser);
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
+    return decoratee.getKeyIdResolverModelParser(categoryName);
   }
 
   @Override

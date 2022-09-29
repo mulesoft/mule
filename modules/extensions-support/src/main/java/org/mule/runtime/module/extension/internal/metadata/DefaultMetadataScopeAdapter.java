@@ -29,9 +29,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaAttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaKeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils;
 
 import java.util.HashMap;
@@ -90,7 +90,7 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
 
       if (hasMetadataScopeAnnotation) {
         this.javaKeyIdResolverModelParser =
-            parseKeyIdResolverModelParser(extensionType, annotatedType);
+            JavaMetadataKeyIdModelParserUtils.parseJavaKeyIdResolverModelParser(extensionType, annotatedType);
         this.javaOutputResolverModelParser =
             JavaOutputResolverModelParserUtils.parseJavaOutputResolverModelParser(extensionType, annotatedType);
         this.javaAttributesResolverModelParser =

@@ -122,7 +122,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
           .ifPresent(prop -> {
             final Type sourceType = prop.getType();
             MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, sourceType);
-            enrichResolversInformation(declaration, metadataScope);
+            // enrichResolversInformation(declaration, metadataScope);
             enrichSuccesSourceCallbackMetadata(declaration);
             enrichErrorSourceCallbackMetadata(declaration);
           });
@@ -161,8 +161,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                             SourceCallbackDeclaration sourceCallbackDeclaration,
                                             MetadataScopeAdapter metadataScope) {
       final String categoryName = getCategoryName(metadataScope);
-      declareResolversInformation(sourceCallbackDeclaration, metadataScope, categoryName,
-                                  sourceDeclaration.isRequiresConnection());
+      // declareResolversInformation(sourceCallbackDeclaration, metadataScope, categoryName,
+      // sourceDeclaration.isRequiresConnection());
       declareMetadataResolverFactory(sourceCallbackDeclaration, metadataScope);
     }
 
@@ -227,8 +227,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     private void declareMetadataResolverFactory(SourceCallbackDeclaration sourceCallbackDeclaration,
                                                 MetadataScopeAdapter metadataScope) {
       MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-      sourceCallbackDeclaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
-      declareInputResolvers(sourceCallbackDeclaration, metadataScope);
+      // sourceCallbackDeclaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
+      // declareInputResolvers(sourceCallbackDeclaration, metadataScope);
     }
 
     private void enrichWithDsql(OperationDeclaration declaration,

@@ -114,8 +114,7 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
   }
 
   @Override
-  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser operationModelParser,
-                                                                        String categoryName) {
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
     return empty();
   }
 }

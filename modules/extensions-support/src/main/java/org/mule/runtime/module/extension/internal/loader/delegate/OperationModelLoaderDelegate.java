@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
@@ -42,6 +43,8 @@ import org.mule.runtime.module.extension.internal.loader.parser.InputResolverMod
 import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaKeyIdResolverModelParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -140,7 +143,8 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
       parser.getSinceMuleVersionModelProperty().ifPresent(operation::withModelProperty);
 
-      loader.getParameterModelsLoaderDelegate().declare(operation, parser, parser.getParameterGroupModelParsers());
+      loader.getParameterModelsLoaderDelegate().declare(operation, keyIdResolverModelParser.orElse(null),
+                                                        parser.getParameterGroupModelParsers());
       addSemanticTerms(operation.getDeclaration(), parser);
       parser.getExecutionType().ifPresent(operation::withExecutionType);
       parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
@@ -287,23 +291,45 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     }
   }
 
-  private Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser parser,
+  private Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(OperationModelParser operationModelParser,
                                                                          OutputResolverModelParser outputResolverModelParser,
                                                                          AttributesResolverModelParser attributesResolverModelParser,
                                                                          List<InputResolverModelParser> inputResolverModelParsers) {
 
     Optional<KeyIdResolverModelParser> keyIdResolverModelParser = empty();
     if (outputResolverModelParser != null || !inputResolverModelParsers.isEmpty()) {
-      String categoryName =
-          getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers);
+      String categoryName = getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers);
 
-      keyIdResolverModelParser = parser.getParameterGroupModelParsers().stream()
-          .map(parameterGroupParser -> parameterGroupParser.getKeyIdResolverModelParser(parser, categoryName))
+      keyIdResolverModelParser = operationModelParser.getParameterGroupModelParsers().stream()
+          .map(parameterGroupModelParser -> parameterGroupModelParser.getKeyIdResolverModelParser(categoryName))
           .filter(Optional::isPresent)
           .map(Optional::get)
           .findFirst();
-    }
 
+      if (!keyIdResolverModelParser.isPresent()) {
+        keyIdResolverModelParser = operationModelParser.getParameterGroupModelParsers().stream()
+            .map(ParameterGroupModelParser::getParameterParsers)
+            .flatMap(List::stream)
+            .collect(toList())
+            .stream()
+            .map(parameterModelParser -> parameterModelParser.getKeyIdResolverModelParser(categoryName))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+      }
+
+      if (keyIdResolverModelParser.isPresent() && !keyIdResolverModelParser.get().hasKeyIdResolver()) {
+        Optional<KeyIdResolverModelParser> enclosingKeyIdResolverModelParser = operationModelParser.getKeyIdResolverModelParser();
+        if (enclosingKeyIdResolverModelParser.isPresent()) {
+          keyIdResolverModelParser = of(new JavaKeyIdResolverModelParser(
+                                                                         keyIdResolverModelParser.get().getParameterName(),
+                                                                         categoryName,
+                                                                         keyIdResolverModelParser.get().getMetadataType(),
+                                                                         enclosingKeyIdResolverModelParser.get()
+                                                                             .keyIdResolverDeclarationClass()));
+        }
+      }
+    }
     return keyIdResolverModelParser;
   }
 
