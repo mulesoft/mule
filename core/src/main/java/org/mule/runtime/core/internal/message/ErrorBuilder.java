@@ -255,10 +255,10 @@ public final class ErrorBuilder {
    * @return the error instance
    */
   public Error build() {
-    checkState(exception != null, "error exception cannot be null");
-    checkState(description != null, "description exception cannot be null");
-    checkState(detailedDescription != null, "detailed description exception cannot be null");
-    checkState(errorType != null, "errorType exception cannot be null");
+    checkState(exception != null, "exception cannot be null");
+    checkState(description != null, "description cannot be null");
+    checkState(detailedDescription != null, "detailedDescription cannot be null");
+    checkState(errorType != null, "errorType cannot be null");
     return new DeserializableErrorImplementation(exception, description, detailedDescription, failingComponent, errorType,
                                                  errorMessage, errors, suppressedErrors);
   }

@@ -245,7 +245,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                       if (chainSpanCreated) {
                         // Record the error at the current (MessageProcessorChain) Span.
                         muleEventTracer.recordErrorAtCurrentSpan(coreEvent,
-                                                                 () -> resolveError(((EventProcessingException) rethrown)), true);
+                                                                 () -> resolveError(((EventProcessingException) rethrown),
+                                                                                    errorTypeLocator),
+                                                                 true);
                         // We end the current Span verifying that it's a MessageProcessorChain span.
                         muleEventTracer
                             .endCurrentSpan(coreEvent,
@@ -261,7 +263,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
               if (chainSpanCreated) {
                 // Record the error at the current (MessageProcessor) Span.
                 muleEventTracer.recordErrorAtCurrentSpan(((MessagingException) throwable).getEvent(),
-                                                         () -> resolveError(((MessagingException) throwable)), true);
+                                                         () -> resolveError(((MessagingException) throwable), errorTypeLocator),
+                                                         true);
                 // We end the current Span verifying that it's not null.
                 muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent(),
                                                getNotNullSpanTracingCondition());
