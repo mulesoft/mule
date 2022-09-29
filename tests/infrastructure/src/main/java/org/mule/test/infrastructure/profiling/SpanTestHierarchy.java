@@ -27,24 +27,11 @@ public class SpanTestHierarchy {
   private final String NO_PARENT_SPAN = "0000000000000000";
   private HashSet<String> visitedSpans = new HashSet();
   private HashMap<String, CapturedExportedSpan> spanHashMap = new HashMap<>();
+  private Collection<CapturedExportedSpan> actualExportedSpans;
 
-  public class SpanNode {
-
-    private String spanName;
-    private SpanNode parent;
-    private List<SpanNode> children = new ArrayList<>();
-
-    public SpanNode(String spanName) {
-      this.spanName = spanName;
-    }
-
-    public void addChild(SpanNode child) {
-      children.add(child);
-    }
-
-    public List<SpanNode> getChildren() {
-      return children;
-    }
+  public SpanTestHierarchy(Collection<CapturedExportedSpan> actualExportedSpans) {
+    this.actualExportedSpans = actualExportedSpans;
+    actualExportedSpans.forEach(span -> spanHashMap.put(span.getSpanId(), span));
   }
 
   public SpanTestHierarchy withRoot(String rootName) {
@@ -79,32 +66,16 @@ public class SpanTestHierarchy {
     return root;
   }
 
-  public void assertRoot(SpanNode node, CapturedExportedSpan span) {
-    assertThat(span, notNullValue());
-    assertThat(span.getName(), equalTo(node.spanName));
-    assertThat(span.getParentSpanId(), equalTo(NO_PARENT_SPAN));
-  } //TODO:Check redundancy
-
-  public void assertPreOrder(SpanNode node, CapturedExportedSpan parent, Collection<CapturedExportedSpan> exportedSpans) {
-    if (spanHashMap.isEmpty()) {
-      exportedSpans.forEach(span -> spanHashMap.put(span.getSpanId(), span));
+  public void assertSpanTree(SpanNode node, CapturedExportedSpan parent) {
+    CapturedExportedSpan capturedExportedSpan;
+    capturedExportedSpan = findExpectedSpan(node, parent);
+    for (SpanNode child : node.children) {
+      assertSpanTree(child, capturedExportedSpan);
     }
-    if (node != null) {
-      CapturedExportedSpan capturedExportedSpan;
-      if (node.spanName.equals("mule:flow")) {
-        capturedExportedSpan = findExpectedSpan(node, null, exportedSpans);
-      } else {
-        capturedExportedSpan = findExpectedSpan(node, parent, exportedSpans);
-      }
-      for (SpanNode child : node.children) {
-        assertPreOrder(child, capturedExportedSpan, exportedSpans);
-      }
-    }
-  } 
+  }
 
-  private CapturedExportedSpan findExpectedSpan(SpanNode spanNode, CapturedExportedSpan parent,
-                                                Collection<CapturedExportedSpan> exportedSpans) {
-    CapturedExportedSpan expectedSpan = exportedSpans.stream()
+  private CapturedExportedSpan findExpectedSpan(SpanNode spanNode, CapturedExportedSpan parent) {
+    CapturedExportedSpan expectedSpan = actualExportedSpans.stream()
         .filter(exportedSpan -> !visitedSpans.contains(exportedSpan.getSpanId())
             && exportedSpan.getName().equals(spanNode.spanName)
             && findCorrectParentInMap(exportedSpan, parent != null ? parent.getName() : null))
@@ -114,26 +85,28 @@ public class SpanTestHierarchy {
     return expectedSpan;
   }
 
-  private boolean findCorrectParent(Collection<CapturedExportedSpan> exportedSpans, CapturedExportedSpan expectedSpan,
-                                    String expectedParentName) {
-    CapturedExportedSpan parentSpan = exportedSpans.stream()
-        .filter(exportedSpan -> exportedSpan.getSpanId().equals(expectedSpan.getParentSpanId()))
-        .findFirst().orElse(null);
-    if (expectedParentName != null && parentSpan == null) {
-      return false;
-    } else if (expectedParentName == null && parentSpan == null) {
-      return true;
-    }
-    return parentSpan.getName().equals(expectedParentName);
-  }
-
   private boolean findCorrectParentInMap(CapturedExportedSpan expectedSpan, String expectedParentName) {
     CapturedExportedSpan parentSpan = spanHashMap.get(expectedSpan.getParentSpanId());
     if (expectedParentName != null && parentSpan == null) {
       return false;
     } else if (expectedParentName == null && parentSpan == null) {
-      return true;
+      return expectedSpan.getParentSpanId().equals(NO_PARENT_SPAN);
     }
     return parentSpan.getName().equals(expectedParentName);
+  }
+
+  public class SpanNode {
+
+    private String spanName;
+    private SpanNode parent;
+    private List<SpanNode> children = new ArrayList<>();
+
+    public SpanNode(String spanName) {
+      this.spanName = spanName;
+    }
+
+    public void addChild(SpanNode child) {
+      children.add(child);
+    }
   }
 }
