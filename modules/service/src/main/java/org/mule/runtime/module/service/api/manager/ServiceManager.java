@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.service.api.manager;
 
 import org.mule.api.annotation.NoImplement;
@@ -14,7 +13,7 @@ import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.internal.manager.MuleServiceManager;
 
 /**
- * Manages the lifecycle of the services avaialbe in the {@link ServiceRepository}
+ * Manages the lifecycle of the services available in the {@link ServiceRepository}
  */
 @NoImplement
 public interface ServiceManager extends Startable, Stoppable, ServiceRepository {

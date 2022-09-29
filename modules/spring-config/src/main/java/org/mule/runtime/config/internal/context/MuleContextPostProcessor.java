@@ -18,10 +18,14 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * 
  * @see MuleContextAware
  * @see org.mule.runtime.core.api.MuleContext
+ *
+ * @deprecated this interface is deprecated since {@link MuleContext} is deprecated. See {@link MuleContext} deprecation
+ *             documentation for a replacement.
  */
+@Deprecated
 public class MuleContextPostProcessor implements BeanPostProcessor {
 
-  private MuleContext muleContext;
+  private final MuleContext muleContext;
 
   public MuleContextPostProcessor(MuleContext muleContext) {
     this.muleContext = muleContext;
