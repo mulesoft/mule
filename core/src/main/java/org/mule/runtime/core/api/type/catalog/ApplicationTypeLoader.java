@@ -46,6 +46,9 @@ import java.util.function.Function;
  */
 public class ApplicationTypeLoader implements TypeLoader {
 
+  private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
+  private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
+
   private final Set<ModuleDefinition> moduleDefinitions;
   private final MockExpressionLanguageServiceImpl elms;
 
@@ -64,14 +67,22 @@ public class ApplicationTypeLoader implements TypeLoader {
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {
+    Optional<MetadataType> primitive = primitivesTypeLoader.load(typeIdentifier);
+    if (primitive.isPresent()) {
+      return primitive;
+    }
+
+    Optional<MetadataType> special = specialTypesLoader.load(typeIdentifier);
+    if (special.isPresent()) {
+      return special;
+    }
+
     return elms.resolveType(typeIdentifier, moduleDefinitions);
   }
 
   // TODO: Remove this class
   private static class MockExpressionLanguageServiceImpl implements ExpressionLanguageMetadataService {
 
-    private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
-    private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
     private final Map<String, String> extensionModelNamesByPrefix;
     private final TypeCatalog dependenciesTypeCatalog;
 
@@ -152,25 +163,11 @@ public class ApplicationTypeLoader implements TypeLoader {
       return null;
     }
 
-    public Optional<MetadataType> resolveType(String typeIdentifier, Collection<ModuleDefinition> moduleDefinitions) {
-      Optional<MetadataType> primitive = primitivesTypeLoader.load(typeIdentifier);
-      if (primitive.isPresent()) {
-        return primitive;
-      }
-
-      Optional<MetadataType> special = specialTypesLoader.load(typeIdentifier);
-      if (special.isPresent()) {
-        return special;
-      }
-
-      return getFromDependency(typeIdentifier);
-    }
-
     // The string format can be the full name of the type, or a string with syntax <extension-prefix>:<type-alias> if
     // the type has an alias. This format is temporal in order to use the types from the test operations, but may change
     // when the type catalog using dataweave is fully implemented.
     // TODO (W-11706194 and W-11706243): Adapt the syntax when the type resolution is delegated to DW.
-    private Optional<MetadataType> getFromDependency(String typeIdentifier) {
+    public Optional<MetadataType> resolveType(String typeIdentifier, Collection<ModuleDefinition> moduleDefinitions) {
       ComponentIdentifier componentIdentifier = buildFromStringRepresentation(typeIdentifier);
       String extensionName = extensionModelNamesByPrefix.get(componentIdentifier.getNamespace());
       String typeAlias = componentIdentifier.getName();
