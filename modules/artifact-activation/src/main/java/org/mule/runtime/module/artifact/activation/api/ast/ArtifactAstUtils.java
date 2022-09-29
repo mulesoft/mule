@@ -21,7 +21,6 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.EnumSet.of;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
@@ -36,7 +35,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -56,7 +54,13 @@ public final class ArtifactAstUtils {
 
   private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(of(OPERATION_DEF));
 
-  public static final ExpressionLanguageMetadataService EXPRESSION_LANGUAGE_SERVICE = new WeaveExpressionLanguageMetadataServiceImpl();
+  private static final ExpressionLanguageMetadataService EXPRESSION_LANGUAGE_SERVICE = createExpressionLanguageMetadataService();
+
+  private static ExpressionLanguageMetadataService createExpressionLanguageMetadataService() {
+    // Should this class be obtained from each artifactClassLoader?
+    // return new WeaveExpressionLanguageMetadataServiceImpl();
+    return null;
+  }
 
   /**
    * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
@@ -131,7 +135,7 @@ public final class ArtifactAstUtils {
               .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels, EXPRESSION_LANGUAGE_SERVICE))
+              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels))
               .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);
