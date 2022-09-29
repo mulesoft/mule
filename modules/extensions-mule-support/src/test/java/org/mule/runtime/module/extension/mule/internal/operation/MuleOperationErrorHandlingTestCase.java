@@ -15,6 +15,7 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERA
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -25,7 +26,9 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
@@ -126,7 +129,7 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   }
 
   @Test
-  public void nestedErrors() throws Exception {
+  public void nestedTriesWithDefaultCauses() throws Exception {
     try {
       flowRunner("nestedErrorsFlow").run();
       fail("Calling the flow should have failed");
@@ -135,26 +138,59 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
       assertThat(optionalError.isPresent(), is(true));
       Error error = optionalError.get();
       assertThat(error.getErrorType(), errorType("THIS", "FOURTH"));
-      Throwable executionException = error.getCause();
-      assertThat(executionException, instanceOf(ComponentExecutionException.class));
 
-      Throwable causeOfFourth = executionException.getCause();
-      assertThat(causeOfFourth, instanceOf(Error.class));
-      Error causeOfFourthAsError = (Error) causeOfFourth;
-      assertThat(causeOfFourthAsError.getErrorType(), errorType("THIS", "THIRD"));
+      Error causeOfFourth = getErrorCause(error);
+      assertThat(causeOfFourth, is(notNullValue()));
+      assertThat(causeOfFourth.getErrorType(), errorType("THIS", "THIRD"));
 
-      Throwable causeOfThird = causeOfFourthAsError.getCause();
-      assertThat(causeOfThird, instanceOf(Error.class));
-      Error causeOfThirdAsError = (Error) causeOfThird;
-      assertThat(causeOfThirdAsError.getErrorType(), errorType("THIS", "SECOND"));
+      Error causeOfThird = getErrorCause(causeOfFourth);
+      assertThat(causeOfThird, is(notNullValue()));
+      assertThat(causeOfThird.getErrorType(), errorType("THIS", "SECOND"));
 
-      Throwable causeOfSecond = causeOfThirdAsError.getCause();
-      assertThat(causeOfSecond, instanceOf(Error.class));
-      Error causeOfSecondAsError = (Error) causeOfSecond;
-      assertThat(causeOfSecondAsError.getErrorType(), errorType("THIS", "FIRST"));
+      Error causeOfSecond = getErrorCause(causeOfThird);
+      assertThat(causeOfSecond, is(notNullValue()));
+      assertThat(causeOfSecond.getErrorType(), errorType("THIS", "FIRST"));
 
-      Throwable causeOfFirst = causeOfSecondAsError.getCause();
+      Throwable causeOfFirst = causeOfSecond.getCause();
       assertThat(causeOfFirst, instanceOf(DefaultMuleException.class));
     }
+  }
+
+  @Test
+  public void operationReusingErrorHandlingLogic() throws Exception {
+    // This just doesn't throw any error
+    flowRunner("reusableErrorHandlerAsAnOperationFlow").run();
+  }
+
+    @Test
+  public void tryHandlingUnknownError() throws Exception {
+    try {
+      flowRunner("tryHandlingUnknownErrorFlow").run();
+      fail("Calling the flow should have failed");
+    } catch (EventProcessingException exception) {
+      Optional<Error> optionalError = exception.getEvent().getError();
+      assertThat(optionalError.isPresent(), is(true));
+      Error error = optionalError.get();
+      assertThat(error.getErrorType(), errorType("THIS", "UNKNOWN"));
+
+      Error cause = getErrorCause(error);
+      assertThat(cause, is(notNullValue()));
+      assertThat(cause.getErrorType(), errorType("THIS", "CUSTOM"));
+    }
+  }
+
+  private static Error getErrorCause(Error error) {
+    Set<Throwable> seen = new HashSet<>();
+    Throwable currentCause = error.getCause();
+    while (!seen.contains(currentCause)) {
+      seen.add(currentCause);
+      if (currentCause instanceof Error) {
+        return (Error) currentCause;
+      }
+      // The exceptions we skip are all ComponentExecutionException's
+      assertThat(currentCause, instanceOf(ComponentExecutionException.class));
+      currentCause = currentCause.getCause();
+    }
+    return null;
   }
 }
