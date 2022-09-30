@@ -150,19 +150,6 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
   }
 
   @Override
-  public ResetOnQueryCounter getConnectionErrorsCounter() {
-    Set<ResetOnQueryCounter> counters = new HashSet<>();
-
-    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
-      if (!(stats instanceof ApplicationStatistics)) {
-        counters.add(stats.getConnectionErrorsCounter());
-      }
-    }
-
-    return new CompositeResetOnQueryCounter(counters);
-  }
-
-  @Override
   public ResetOnQueryCounter getFatalErrorsCounter() {
     Set<ResetOnQueryCounter> counters = new HashSet<>();
 

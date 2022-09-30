@@ -22,7 +22,6 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
 
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
-  private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
@@ -137,14 +136,6 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
     DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     executionErrorsCounters.add(counter);
     counter.add(getExecutionErrors());
-    return counter;
-  }
-
-  @Override
-  public ResetOnQueryCounter getConnectionErrorsCounter() {
-    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
-    connectionErrorsCounters.add(counter);
-    counter.add(getConnectionErrors());
     return counter;
   }
 
