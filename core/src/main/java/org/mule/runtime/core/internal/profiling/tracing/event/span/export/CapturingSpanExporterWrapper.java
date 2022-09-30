@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.SERVICE_NAME_KEY;
 import static java.lang.String.valueOf;
 
-import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.privileged.profiling.CapturedEventData;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
@@ -24,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
