@@ -24,10 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.inject.Inject;
+
 public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, MuleContextAware {
 
-  private final ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
-  private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<ProcessingTimeReference, Object>();
+  private final ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<>();
+  private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<>();
   private MuleContext muleContext;
   private Scheduler scheduler;
   private Future<?> checkerTask;
@@ -54,6 +56,7 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
@@ -86,8 +89,8 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
    */
   static class ProcessingTimeReference extends WeakReference<ProcessingTime> {
 
-    private FlowConstructStatistics statistics;
-    private AtomicLong accumulator;
+    private final FlowConstructStatistics statistics;
+    private final AtomicLong accumulator;
 
     ProcessingTimeReference(ProcessingTime time, ReferenceQueue<ProcessingTime> queue) {
       super(time, queue);
