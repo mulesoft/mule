@@ -121,13 +121,13 @@ public class MavenDeployableProjectModelBuilder
   private Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   private File deployableArtifactRepositoryFolder;
-  private boolean exportResourcesAndPackagedIfEmptyLoaderDescriptor = false;
+  private boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = false;
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration,
-                                            boolean exportResourcesAndPackagedIfEmptyLoaderDescriptor) {
+                                            boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
     this.projectFolder = projectFolder;
     this.mavenConfiguration = mavenConfiguration;
-    this.exportResourcesAndPackagedIfEmptyLoaderDescriptor = exportResourcesAndPackagedIfEmptyLoaderDescriptor;
+    this.exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = exportAllResourcesAndPackagesIfEmptyLoaderDescriptor;
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration) {
@@ -135,8 +135,8 @@ public class MavenDeployableProjectModelBuilder
     this.mavenConfiguration = mavenConfiguration;
   }
 
-  public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportResourcesAndPackagedIfEmptyLoaderDescriptor) {
-    this(projectFolder, getDefaultMavenConfiguration(), exportResourcesAndPackagedIfEmptyLoaderDescriptor);
+  public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
+    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor);
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder) {
@@ -206,7 +206,8 @@ public class MavenDeployableProjectModelBuilder
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
-        if (exportResourcesAndPackagedIfEmptyLoaderDescriptor && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
+        if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
+            && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
           applicationModel = buildModelWithResourcesAndClasses(applicationModel);
         }
         return applicationModel;
