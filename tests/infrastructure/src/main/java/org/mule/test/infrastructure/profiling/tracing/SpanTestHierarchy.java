@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.infrastructure.profiling;
+package org.mule.test.infrastructure.profiling.tracing;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -18,15 +18,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * A tree-based hierarchy to model the span hierarchy that must be expected on tests.
+ *
+ * @since 4.5.0
+ */
 public class SpanTestHierarchy {
 
   private SpanNode root;
   private SpanNode currentNode;
   private SpanNode lastChild;
-  private final String NO_PARENT_SPAN = "0000000000000000";
-  private HashSet<String> visitedSpans = new HashSet();
-  private HashMap<String, CapturedExportedSpan> spanHashMap = new HashMap<>();
-  private Collection<CapturedExportedSpan> actualExportedSpans;
+  private static final String NO_PARENT_SPAN = "0000000000000000";
+  private final HashSet<String> visitedSpans = new HashSet();
+  private final HashMap<String, CapturedExportedSpan> spanHashMap = new HashMap<>();
+  private final Collection<CapturedExportedSpan> actualExportedSpans;
 
   public SpanTestHierarchy(Collection<CapturedExportedSpan> actualExportedSpans) {
     this.actualExportedSpans = actualExportedSpans;
@@ -65,40 +70,49 @@ public class SpanTestHierarchy {
     return root;
   }
 
-  public void assertSpanTree(SpanNode node, CapturedExportedSpan parent) {
-    CapturedExportedSpan capturedExportedSpan;
-    capturedExportedSpan = findExpectedSpan(node, parent);
-    for (SpanNode child : node.children) {
-      assertSpanTree(child, capturedExportedSpan);
+  /**
+   * Traverses the expected span hierarchy tree asserting that each node exists in the actual captured spans and that it has the
+   * correct parent node
+   * 
+   * @param rootNode the root node from where to start the assertion
+   */
+  public void assertSpanTree(SpanNode rootNode) {
+    assertSpanTree(rootNode, null);
+  }
+
+  private void assertSpanTree(SpanNode expectedNode, CapturedExportedSpan actualParent) {
+    CapturedExportedSpan actualSpan = findActualSpan(expectedNode, actualParent);
+    for (SpanNode expectedChild : expectedNode.children) {
+      assertSpanTree(expectedChild, actualSpan);
     }
   }
 
-  private CapturedExportedSpan findExpectedSpan(SpanNode spanNode, CapturedExportedSpan parent) {
-    CapturedExportedSpan expectedSpan = actualExportedSpans.stream()
+  private CapturedExportedSpan findActualSpan(SpanNode expectedNode, CapturedExportedSpan actualParent) {
+    CapturedExportedSpan actualSpan = actualExportedSpans.stream()
         .filter(exportedSpan -> !visitedSpans.contains(exportedSpan.getSpanId())
-            && exportedSpan.getName().equals(spanNode.spanName)
-            && findCorrectParentInMap(exportedSpan, parent != null ? parent.getName() : null))
+            && exportedSpan.getName().equals(expectedNode.spanName)
+            && hasCorrectParent(exportedSpan, actualParent != null ? actualParent.getName() : null))
         .findFirst().orElse(null);
-    assertThat("Expected span: " + spanNode.spanName + " was not found", expectedSpan, notNullValue());
-    visitedSpans.add(expectedSpan.getSpanId());
-    return expectedSpan;
+    assertThat("Expected span: " + expectedNode.spanName + " was not found", actualSpan, notNullValue());
+    visitedSpans.add(actualSpan.getSpanId());
+    return actualSpan;
   }
 
-  private boolean findCorrectParentInMap(CapturedExportedSpan expectedSpan, String expectedParentName) {
-    CapturedExportedSpan parentSpan = spanHashMap.get(expectedSpan.getParentSpanId());
+  private boolean hasCorrectParent(CapturedExportedSpan span, String expectedParentName) {
+    CapturedExportedSpan parentSpan = spanHashMap.get(span.getParentSpanId());
     if (expectedParentName != null && parentSpan == null) {
       return false;
     } else if (expectedParentName == null && parentSpan == null) {
-      return expectedSpan.getParentSpanId().equals(NO_PARENT_SPAN);
+      return span.getParentSpanId().equals(NO_PARENT_SPAN);
     }
     return parentSpan.getName().equals(expectedParentName);
   }
 
-  public class SpanNode {
+  private static class SpanNode {
 
-    private String spanName;
+    private final String spanName;
     private SpanNode parent;
-    private List<SpanNode> children = new ArrayList<>();
+    private final List<SpanNode> children = new ArrayList<>();
 
     public SpanNode(String spanName) {
       this.spanName = spanName;
