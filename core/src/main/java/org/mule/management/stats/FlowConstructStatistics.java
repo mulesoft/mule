@@ -227,25 +227,4 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
         return counter;
     }
 
-    /**
-     * Provides a counter for {@link #getConnectionErrors() connection errors} that is not affected by calls to {@link #clear()}
-     * or {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
-     * <p>
-     * Counter initial value is set to the value of {@link #getConnectionErrors()} when this method is called.
-     * <p>
-     * If this is called concurrently with {@link #incConnectionErrors()}, there is chance of a race condition occurring where an
-     * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
-     * 
-     * @return a counter for {@link #getConnectionErrors()}.
-     * 
-     * @since 4.5
-     */
-     public ResetOnQueryCounter getConnectionErrorsCounter()
-     {
-         DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
-         connectionErrorsCounters.add(counter);
-         counter.add(getConnectionErrors());
-         return counter;
-     }
-
 }

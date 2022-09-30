@@ -97,26 +97,6 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase
                       },
                       new Object[]
                       {
-                          "connectionErrors",
-                          new Transformer()
-                          {
-                              @Override
-                              public Object transform(Object statistics)
-                              {
-                                  return ((FlowConstructStatistics)statistics).getConnectionErrorsCounter();
-                              }
-                          },
-                          new Closure()
-                          {
-                              @Override
-                              public void execute(Object statistics)
-                              {
-                                  ((FlowConstructStatistics) statistics).incConnectionErrors();
-                              }
-                          }
-                      },
-                      new Object[]
-                      {
                           "fatalErrors",
                           new Transformer()
                           {
