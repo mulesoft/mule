@@ -42,9 +42,30 @@
           <set-payload value="Caught error!" />
         </when>
         <otherwise>
-          <operation:raise-error type="UNKNOWN" />
+          <operation:raise-error type="UNKNOWN" cause="#[params.error]" />
         </otherwise>
       </choice>
+    </operation:body>
+  </operation:def>
+
+  <flow name="tryHandlingUnknownErrorFlow">
+    <this:try-handling-unknown-error />
+  </flow>
+
+  <operation:def name="tryHandlingUnknownError">
+    <operation:output>
+      <operation:payload-type type="string"/>
+    </operation:output>
+    <operation:body>
+      <try>
+        <operation:raise-error type="CUSTOM" />
+        <error-handler>
+          <on-error-continue>
+            <!-- this operation doesn't know how to handle a "THIS:CUSTOM" -->
+            <this:handle-error error="#[error]" />
+          </on-error-continue>
+        </error-handler>
+      </try>
     </operation:body>
   </operation:def>
 </mule>

@@ -14,7 +14,6 @@ import static java.lang.String.format;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -39,7 +38,7 @@ public abstract class AbstractRaiseErrorProcessor extends AbstractComponent impl
   private ErrorTypeRepository errorTypeRepository;
 
   @Inject
-  private ExtendedExpressionManager expressionManager;
+  protected ExtendedExpressionManager expressionManager;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -61,10 +60,12 @@ public abstract class AbstractRaiseErrorProcessor extends AbstractComponent impl
 
   protected abstract ComponentIdentifier calculateErrorIdentifier(String typeId);
 
+  protected abstract TypedException getException(ErrorType type, String message, CoreEvent event);
+
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
     String message = descriptionEvaluator.resolveValue(event);
-    throw new TypedException(new DefaultMuleException(message), errorType);
+    throw getException(errorType, message, event);
   }
 
   public void setType(String type) {

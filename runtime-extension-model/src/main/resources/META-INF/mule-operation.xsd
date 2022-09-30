@@ -304,6 +304,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="cause" type="mule:nonBlankString" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The cause of the error.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
