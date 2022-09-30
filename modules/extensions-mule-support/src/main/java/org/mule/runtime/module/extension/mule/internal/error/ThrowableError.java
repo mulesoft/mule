@@ -12,9 +12,14 @@ import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
+/**
+ * Implementation of {@link Throwable} which also implements {@link Error}. It's used to set an {link Error} as the cause of
+ * another. We need an adapter for this because the {@link Error#getCause()} method returns a {@link Throwable}.
+ */
 public class ThrowableError extends Throwable implements Error {
 
   private static final long serialVersionUID = 7595432995248792091L;
+
   private final Error error;
 
   public static ThrowableError wrap(Error error) {
