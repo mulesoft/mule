@@ -157,7 +157,7 @@ public interface ArtifactClassLoaderResolver {
    * @param descriptor                the descriptor of the application to generate a class loader for.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
    *                                  created.
-   * @param urls                      a list of {@link URL} pointing to external resources
+   * @param urls                      a list of {@link URL} pointing to external resources and classes
    * @return a class loader for an application.
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
@@ -175,7 +175,7 @@ public interface ArtifactClassLoaderResolver {
    * @param domainClassLoader         the class loader of the domain the application belongs to.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
    *                                  created.
-   * @param urls                      a list of {@link URL} pointing to external resources
+   * @param urls                      a list of {@link URL} pointing to external resources and classes
    * @return a class loader for an application.
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,

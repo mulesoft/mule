@@ -121,13 +121,13 @@ public class MavenDeployableProjectModelBuilder
   private Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   private File deployableArtifactRepositoryFolder;
-  private boolean importResourcesIfEmptyLoaderDescriptor = false;
+  private boolean exportResourcesAndPackagedIfEmptyLoaderDescriptor = false;
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration,
-                                            boolean importResourcesIfEmptyLoaderDescriptor) {
+                                            boolean exportResourcesAndPackagedIfEmptyLoaderDescriptor) {
     this.projectFolder = projectFolder;
     this.mavenConfiguration = mavenConfiguration;
-    this.importResourcesIfEmptyLoaderDescriptor = importResourcesIfEmptyLoaderDescriptor;
+    this.exportResourcesAndPackagedIfEmptyLoaderDescriptor = exportResourcesAndPackagedIfEmptyLoaderDescriptor;
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration) {
@@ -135,8 +135,8 @@ public class MavenDeployableProjectModelBuilder
     this.mavenConfiguration = mavenConfiguration;
   }
 
-  public MavenDeployableProjectModelBuilder(File projectFolder, boolean importResourcesIfEmptyLoaderDescriptor) {
-    this(projectFolder, getDefaultMavenConfiguration(), importResourcesIfEmptyLoaderDescriptor);
+  public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportResourcesAndPackagedIfEmptyLoaderDescriptor) {
+    this(projectFolder, getDefaultMavenConfiguration(), exportResourcesAndPackagedIfEmptyLoaderDescriptor);
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder) {
@@ -206,8 +206,8 @@ public class MavenDeployableProjectModelBuilder
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
-        if (importResourcesIfEmptyLoaderDescriptor && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
-          applicationModel = buildModelWithResources(applicationModel);
+        if (exportResourcesAndPackagedIfEmptyLoaderDescriptor && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
+          applicationModel = buildModelWithResourcesAndClasses(applicationModel);
         }
         return applicationModel;
       };
@@ -218,12 +218,12 @@ public class MavenDeployableProjectModelBuilder
     }
   }
 
-  private MuleApplicationModel buildModelWithResources(MuleApplicationModel applicationModel) {
+  private MuleApplicationModel buildModelWithResourcesAndClasses(MuleApplicationModel applicationModel) {
     MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder()
         .setName(applicationModel.getName() != null ? applicationModel.getName() : "mule")
         .setMinMuleVersion(applicationModel.getMinMuleVersion())
         .setRequiredProduct(applicationModel.getRequiredProduct())
-        .withClassLoaderModelDescriptorLoader(createDescriptorWithResources())
+        .withClassLoaderModelDescriptorLoader(createDescriptorWithResourcesAndClasses())
         .withBundleDescriptorLoader(applicationModel.getBundleDescriptorLoader() != null
             ? applicationModel.getBundleDescriptorLoader()
             : new MuleArtifactLoaderDescriptor("mule", emptyMap()))
@@ -235,7 +235,7 @@ public class MavenDeployableProjectModelBuilder
     return builder.build();
   }
 
-  private MuleArtifactLoaderDescriptor createDescriptorWithResources() {
+  private MuleArtifactLoaderDescriptor createDescriptorWithResourcesAndClasses() {
     Map<String, Object> attributes = of("exportedResources", resources, "exportedPackages", packages);
     return new MuleArtifactLoaderDescriptor("mule", attributes);
   }
