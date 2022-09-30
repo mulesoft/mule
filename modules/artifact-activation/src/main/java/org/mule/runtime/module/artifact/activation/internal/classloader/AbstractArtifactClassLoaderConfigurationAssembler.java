@@ -73,10 +73,6 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
                                                                   PRIVILEGED_EXPORTED_PACKAGES)),
                                        new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
                                                                   PRIVILEGED_ARTIFACTS_IDS)));
-    } else if (isMuleFramework()) {
-      classLoaderConfigurationBuilder
-          .exportingPackages(newHashSet(packagerClassLoaderModel.getPackages()))
-          .exportingResources(newHashSet(packagerClassLoaderModel.getResources()));
     }
 
     List<BundleDependency> bundleDependencies = getBundleDependencies();
