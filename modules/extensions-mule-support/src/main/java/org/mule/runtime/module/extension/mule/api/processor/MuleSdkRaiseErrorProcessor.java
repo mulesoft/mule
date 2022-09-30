@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.Mule
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -46,8 +46,8 @@ public final class MuleSdkRaiseErrorProcessor extends AbstractRaiseErrorProcesso
   }
 
   @Override
-  protected MuleException getException(ErrorType type, String message, CoreEvent event) {
-    throw new TypedException(calculateCause(event, message), type);
+  protected MuleRuntimeException getException(ErrorType type, String message, CoreEvent event) {
+    return new TypedException(calculateCause(event, message), type);
   }
 
   private Throwable calculateCause(CoreEvent event, String message) {
