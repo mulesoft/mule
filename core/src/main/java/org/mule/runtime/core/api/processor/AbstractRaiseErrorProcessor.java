@@ -16,7 +16,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
@@ -60,7 +60,7 @@ public abstract class AbstractRaiseErrorProcessor extends AbstractComponent impl
 
   protected abstract ComponentIdentifier calculateErrorIdentifier(String typeId);
 
-  protected abstract MuleRuntimeException getException(ErrorType type, String message, CoreEvent event);
+  protected abstract TypedException getException(ErrorType type, String message, CoreEvent event);
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {

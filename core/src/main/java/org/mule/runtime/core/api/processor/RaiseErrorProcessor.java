@@ -10,7 +10,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -28,7 +27,7 @@ public final class RaiseErrorProcessor extends AbstractRaiseErrorProcessor {
   }
 
   @Override
-  protected MuleRuntimeException getException(ErrorType type, String message, CoreEvent event) {
+  protected TypedException getException(ErrorType type, String message, CoreEvent event) {
     return new TypedException(new DefaultMuleException(message), type);
   }
 }
