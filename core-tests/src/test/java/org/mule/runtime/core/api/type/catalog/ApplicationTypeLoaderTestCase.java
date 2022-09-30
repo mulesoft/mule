@@ -23,6 +23,7 @@ import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Feature;
@@ -56,7 +57,8 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
         .build();
     when(mockExtensionModel.getTypes()).thenReturn(singleton(mockType));
 
-    applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel));
+    ExpressionLanguageMetadataService mockMetadataService = mock(ExpressionLanguageMetadataService.class);
+    applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel), mockMetadataService);
   }
 
   @Test

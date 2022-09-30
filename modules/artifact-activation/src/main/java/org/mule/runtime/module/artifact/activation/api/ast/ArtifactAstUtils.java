@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -58,8 +59,7 @@ public final class ArtifactAstUtils {
 
   private static ExpressionLanguageMetadataService createExpressionLanguageMetadataService() {
     // Should this class be obtained from each artifactClassLoader?
-    // return new WeaveExpressionLanguageMetadataServiceImpl();
-    return null;
+    return new WeaveExpressionLanguageMetadataServiceImpl();
   }
 
   /**
@@ -135,7 +135,8 @@ public final class ArtifactAstUtils {
               .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels))
+              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME,
+                            new ApplicationTypeLoader(dependenciesExtensionModels, EXPRESSION_LANGUAGE_SERVICE))
               .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);

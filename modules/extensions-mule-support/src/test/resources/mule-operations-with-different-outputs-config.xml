@@ -77,7 +77,7 @@
 
     <operation:def name="returningDoor">
         <operation:output>
-            <operation:payload-type type="subtypes:Door"/>
+            <operation:payload-type type="mule!subtypes::Door"/>
         </operation:output>
         <operation:body>
             <subtypes:door-retriever door="global-car-door" />

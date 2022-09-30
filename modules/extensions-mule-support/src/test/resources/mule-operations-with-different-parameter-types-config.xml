@@ -17,7 +17,7 @@
 
     <operation:def name="getDoorColor">
         <operation:parameters>
-            <operation:parameter name="door" type="subtypes:Door" />
+            <operation:parameter name="door" type="mule!subtypes::Door" />
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string" />
