@@ -119,7 +119,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver,
-                                                                        List<URL> urls) {
+                                                                        List<URL> additionalClassloaderUrls) {
     return createApplicationClassLoader(descriptor, pluginClassLoaderResolver);
   }
 
@@ -127,7 +127,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver,
-                                                                        List<URL> urls) {
+                                                                        List<URL> additionalClassloaderUrls) {
     return createApplicationClassLoader(descriptor, domainClassLoader, pluginClassLoaderResolver);
   }
 
