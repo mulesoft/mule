@@ -162,7 +162,7 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
     flowRunner("reusableErrorHandlerAsAnOperationFlow").run();
   }
 
-    @Test
+  @Test
   public void tryHandlingUnknownError() throws Exception {
     try {
       flowRunner("tryHandlingUnknownErrorFlow").run();
