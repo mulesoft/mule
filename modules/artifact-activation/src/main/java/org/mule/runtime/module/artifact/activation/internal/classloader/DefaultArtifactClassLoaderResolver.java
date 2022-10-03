@@ -223,7 +223,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getArtifactClassLoaderLookupPolicy(parentClassLoader, descriptor);
 
     List<URL> resourcesPath =
-        stream(descriptor.getClassLoaderModel().getUrls()).collect(toCollection(() -> additionalClassloaderUrls));
+        additionalClassloaderUrls.stream().collect(toCollection(() -> asList(descriptor.getClassLoaderModel().getUrls())));
 
     MuleDeployableArtifactClassLoader appClassLoader =
         new MuleApplicationClassLoader(artifactId, descriptor, regionClassLoader,
