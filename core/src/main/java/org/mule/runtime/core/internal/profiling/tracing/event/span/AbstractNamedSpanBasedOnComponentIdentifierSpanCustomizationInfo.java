@@ -22,6 +22,7 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
   public static final String SPAN_NAME_SEPARATOR = ":";
   public static final String ROUTE_TAG = "route";
   public static final String ATTEMPT_TAG = "attempt";
+  public static final String ITERATION_TAG = "iteration";
 
   protected Component component;
 
@@ -36,7 +37,7 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
 
   @Override
   public String getLocationAsString(CoreEvent coreEvent) {
-    // The location is based only n the component.
+    // The location is based only on the component.
     return CoreEventSpanUtils.getLocationAsString(component.getLocation());
   }
 
@@ -46,10 +47,14 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
   static class ChildSpanCustomizationInfoResolver {
 
     public static final String UNTIL_SUCCESSFUL = "until-successful";
+    public static final String PARALLEL_FOR_EACH = "parallel-foreach";
+    public static final String FOR_EACH = "foreach";
 
     public static ChildSpanCustomizationInfo getChildSpanCustomizationInfo(Component component) {
       if (component.getIdentifier().getName().equals(UNTIL_SUCCESSFUL)) {
         return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ATTEMPT_TAG);
+      } else if (component.getIdentifier().getName().equals(FOR_EACH)) {
+        return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ITERATION_TAG);
       }
       return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ROUTE_TAG);
     }
