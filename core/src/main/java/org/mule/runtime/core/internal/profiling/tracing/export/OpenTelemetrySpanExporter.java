@@ -184,8 +184,14 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     return emptyDistributedEventContext();
   }
 
-  private io.opentelemetry.api.trace.Span resolveOpenTelemetrySpan(InternalSpan internalSpan, Set<String> parentNoExportUntil,
-                                                                   Set<String> noExportUntil) {
+  private synchronized io.opentelemetry.api.trace.Span resolveOpenTelemetrySpan(InternalSpan internalSpan,
+                                                                                Set<String> parentNoExportUntil,
+                                                                                Set<String> noExportUntil) {
+    // In case it was already resolved, return the same.
+    if (openTelemetrySpan != null) {
+      return openTelemetrySpan;
+    }
+
     boolean exportableAccordingToName = exportableAccordingToName(internalSpan, parentNoExportUntil);
 
     // In case the hierarchy is exportable according to parent

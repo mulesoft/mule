@@ -40,6 +40,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -49,6 +51,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 @PrepareForTest(MuleAstUtils.class)
 @Issue("W-10808757")
 @Story(APP_DEPLOYMENT)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*", "org.w3c.*",
+    "jdk.internal.misc.*", "java.lang.*"})
 public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
 
   @Rule

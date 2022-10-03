@@ -59,6 +59,8 @@ import org.springframework.beans.factory.support.ManagedMap;
 class ComponentConfigurationBuilder<T> {
 
   private static final Logger LOGGER = getLogger(ComponentConfigurationBuilder.class);
+  private static final String GLOBAL_FUNCTIONS_START_TAG = "<global-functions><![CDATA[";
+  private static final String GLOBAL_FUNCTIONS_END_TAG = "]]></global-functions>";
 
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
@@ -467,8 +469,15 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
-          .ifPresent(v -> this.value = v);
+      Optional<String> value = createBeanDefinitionRequest.getComponent().getMetadata().getSourceCode();
+      if (value.isPresent() && value.get().startsWith(GLOBAL_FUNCTIONS_START_TAG)) {
+        Optional<String> data =
+            value.map(val -> val.substring(GLOBAL_FUNCTIONS_START_TAG.length(), val.indexOf(GLOBAL_FUNCTIONS_END_TAG)));
+        this.value = data.orElse("");
+      } else {
+        getParameterValue(((CreateParamBeanDefinitionRequest) createBeanDefinitionRequest).getParam().getModel().getName(), null)
+            .ifPresent(v -> this.value = v);
+      }
     }
 
     @Override

@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -24,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -92,6 +96,7 @@ public abstract class AbstractQueueManager
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }

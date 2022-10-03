@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 public class PartitionedPersistentObjectStore<T extends Serializable> extends AbstractPartitionableObjectStore<T>
@@ -202,6 +204,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     muleContext = context;
   }

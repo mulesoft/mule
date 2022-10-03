@@ -61,6 +61,7 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
                   baseDefinition.withIdentifier("raise-error")
                       .withTypeDefinition(fromType(MuleSdkRaiseErrorProcessor.class))
                       .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
+                      .withSetterParameterDefinition("cause", fromSimpleParameter("cause").build())
                       .withSetterParameterDefinition("description", fromSimpleParameter("description").build())
                       .build());
   }

@@ -7,13 +7,14 @@
 package org.mule.runtime.core.internal.security;
 
 import static java.util.Optional.ofNullable;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
@@ -26,18 +27,21 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private SecurityProvider provider;
