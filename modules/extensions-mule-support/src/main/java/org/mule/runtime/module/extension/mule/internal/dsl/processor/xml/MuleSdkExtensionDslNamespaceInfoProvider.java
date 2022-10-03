@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.mule.internal.dsl.processor.xml;
 
-import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
-import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
 
 import static java.util.Collections.singletonList;
 

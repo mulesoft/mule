@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.validation;
 import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.module.extension.mule.api.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ROOT_IDENTIFIER;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ROOT_IDENTIFIER;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
