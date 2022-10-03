@@ -73,11 +73,10 @@ public class SpanTestHierarchy {
   /**
    * Traverses the expected span hierarchy tree asserting that each node exists in the actual captured spans and that it has the
    * correct parent node
-   * 
-   * @param rootNode the root node from where to start the assertion
+   *
    */
-  public void assertSpanTree(SpanNode rootNode) {
-    assertSpanTree(rootNode, null);
+  public void assertSpanTree() {
+    assertSpanTree(root, null);
   }
 
   private void assertSpanTree(SpanNode expectedNode, CapturedExportedSpan actualParent) {
