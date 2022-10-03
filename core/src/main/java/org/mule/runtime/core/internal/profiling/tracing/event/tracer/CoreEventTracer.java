@@ -10,15 +10,19 @@ import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.core.api.event.CoreEvent;
+
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
+
 import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * A tracer for {@link CoreEvent}'s.
@@ -88,11 +92,27 @@ public interface CoreEventTracer {
   /**
    * Records a {@link SpanError} as part of the current {@link Span}.
    *
-   * @param coreEvent                  The event to retrieve the distributed trace context from.
+   * @param coreEvent                  The event to retrieve the distributed trace context from. Must contain the
+   *                                   {@link org.mule.runtime.api.message.Error} to be recorded.
    * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
    *                                   {@link Span} containing the error represents.
    */
-  void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan);
+  default void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
+    recordErrorAtCurrentSpan(coreEvent, () -> coreEvent.getError()
+        .orElseThrow(() -> new IllegalArgumentException(String.format("Provided coreEvent [%s] does not declare an error.",
+                                                                      coreEvent))),
+                             isErrorEscapingCurrentSpan);
+  }
+
+  /**
+   * Records a {@link SpanError} as part of the current {@link Span}.
+   *
+   * @param coreEvent                  The event to retrieve the distributed trace context from.
+   * @param errorSupplier              Supplier of the {@link org.mule.runtime.api.message.Error} that occurred.
+   * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
+   *                                   {@link Span} containing the error represents.
+   */
+  void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan);
 
 
   /**

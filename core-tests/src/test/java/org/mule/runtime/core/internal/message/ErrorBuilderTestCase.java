@@ -74,9 +74,9 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   public ExpectedException expectedException = none();
 
   @Test
-  public void errorCanNotBeNull() {
+  public void exceptionCannotBeNull() {
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage("error exception cannot be null");
+    expectedException.expectMessage("exception cannot be null");
     builder().build();
   }
 
@@ -84,7 +84,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   public void errorTypeCanNotBeNull() {
     RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage("errorType exception cannot be null");
+    expectedException.expectMessage("errorType cannot be null");
     builder(exception).build();
   }
 
