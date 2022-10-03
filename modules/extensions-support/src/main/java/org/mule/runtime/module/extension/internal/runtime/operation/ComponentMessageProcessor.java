@@ -47,6 +47,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
+import static org.mule.runtime.oauth.internal.util.ClassLoaderUtils.setContextClassLoader;
+
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -200,6 +202,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
+  protected ClassLoader classLoader;
   private Optional<TransactionConfig> transactionConfig;
 
   @Inject
@@ -249,6 +252,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    MessageProcessorChain nestedChain,
+                                   ClassLoader classLoader,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
@@ -262,6 +266,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.nestedChain = nestedChain;
+    this.classLoader = classLoader;
     this.reflectionCache = reflectionCache;
     this.resultTransformer = resultTransformer;
     this.hasNestedChain = hasNestedChain(componentModel);
@@ -898,14 +903,25 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return retryPolicyResolver.apply(staticConfig).isEnabled();
   }
 
+  protected void startIfNeededNestedChain() throws MuleException {
+    if (nestedChain != null) {
+      final Thread currentThread = Thread.currentThread();
+      final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+      setContextClassLoader(currentThread, currentClassLoader, this.classLoader);
+      try {
+        LOGGER.debug("Starting nested chain ({}) of component '{}'...", nestedChain, processorPath);
+        startIfNeeded(nestedChain);
+      } finally {
+        setContextClassLoader(currentThread, this.classLoader, currentClassLoader);
+      }
+    }
+  }
+
   @Override
   public void doStart() throws MuleException {
     startIfNeeded(componentExecutor);
 
-    if (nestedChain != null) {
-      LOGGER.debug("Starting nested chain ({}) of component '{}'...", nestedChain, processorPath);
-      startIfNeeded(nestedChain);
-    }
+    startIfNeededNestedChain();
 
     startIfNeeded(getRoutes());
 

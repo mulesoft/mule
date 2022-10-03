@@ -52,13 +52,14 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         CursorProviderFactory cursorProviderFactory,
                                         RetryPolicyTemplate retryPolicyTemplate,
                                         MessageProcessorChain nestedChain,
+                                        ClassLoader classLoader,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
                                         ResultTransformer resultTransformer,
                                         long outerFluxTerminationTimeout) {
     super(extensionModel, operationModel, configurationProviderResolver, target, targetValue, errorMappings, resolverSet,
-          cursorProviderFactory, retryPolicyTemplate, nestedChain,
+          cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
           extensionManager, policyManager, reflectionCache, resultTransformer, outerFluxTerminationTimeout);
   }
 
