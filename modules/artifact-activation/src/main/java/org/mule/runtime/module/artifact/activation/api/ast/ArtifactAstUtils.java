@@ -58,7 +58,7 @@ public final class ArtifactAstUtils {
   private static final ExpressionLanguageMetadataService EXPRESSION_LANGUAGE_SERVICE = createExpressionLanguageMetadataService();
 
   private static ExpressionLanguageMetadataService createExpressionLanguageMetadataService() {
-    // Should this class be obtained from each artifactClassLoader?
+    // TODO: Should this class be obtained from each artifactClassLoader? From the container one? Review.
     return new WeaveExpressionLanguageMetadataServiceImpl();
   }
 
