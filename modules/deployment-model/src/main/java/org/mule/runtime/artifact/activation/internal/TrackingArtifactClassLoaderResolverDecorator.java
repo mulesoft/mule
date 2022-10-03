@@ -120,7 +120,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver,
                                                                         List<URL> additionalClassloaderUrls) {
-    return createApplicationClassLoader(descriptor, pluginClassLoaderResolver);
+    throw new UnsupportedOperationException("Mule Server does not support loading additional classpath entries.");
   }
 
   @Override
@@ -128,7 +128,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
                                                                         Supplier<ArtifactClassLoader> domainClassLoader,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver,
                                                                         List<URL> additionalClassloaderUrls) {
-    return createApplicationClassLoader(descriptor, domainClassLoader, pluginClassLoaderResolver);
+    throw new UnsupportedOperationException("Mule Server does not support loading additional classpath entries.");
   }
 
   private void trackDeployableArtifactClassLoader(MuleDeployableArtifactClassLoader artifactClassLoader) {
