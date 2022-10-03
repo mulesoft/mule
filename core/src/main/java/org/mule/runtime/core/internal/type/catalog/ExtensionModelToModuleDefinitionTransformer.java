@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.type.catalog;
+package org.mule.runtime.core.internal.type.catalog;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.message.api.el.ModuleDefinition.builder;
@@ -19,6 +19,12 @@ import org.mule.runtime.api.meta.model.function.FunctionModel;
 
 import java.util.function.Function;
 
+/**
+ * Utility object to create a {@link ModuleDefinition} starting from a {@link ExtensionModel}. The resulting
+ * {@link ModuleDefinition} object will have the functions and types from the original {@link ExtensionModel}.
+ *
+ * @since 4.5.0
+ */
 public class ExtensionModelToModuleDefinitionTransformer implements Function<ExtensionModel, ModuleDefinition> {
 
   @Override

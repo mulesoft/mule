@@ -14,10 +14,10 @@ import org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader;
 import org.mule.metadata.message.api.el.ModuleDefinition;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.core.internal.type.catalog.ExtensionModelToModuleDefinitionTransformer;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -35,7 +35,7 @@ public class ApplicationTypeLoader implements TypeLoader {
   private final Collection<ModuleDefinition> moduleDefinitions;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  public ApplicationTypeLoader(Set<ExtensionModel> extensionModels,
+  public ApplicationTypeLoader(Collection<ExtensionModel> extensionModels,
                                ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.moduleDefinitions = extensionModelsToModuleDefinitions(extensionModels);
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
