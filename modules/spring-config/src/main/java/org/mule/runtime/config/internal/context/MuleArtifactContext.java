@@ -11,13 +11,10 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_C
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.NOTIFICATIONS_IDENTIFIER;
 import static org.mule.runtime.config.internal.context.AbstractSpringMuleContextServiceConfigurator.getBeanDefinitionBuilder;
@@ -39,16 +36,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.handleValidationResult;
+import static org.mule.runtime.module.artifact.activation.internal.ast.validation.ValidationUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifactExtensionModel;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 
 import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -90,7 +85,6 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResult;
-import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
@@ -130,7 +124,6 @@ import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExten
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -302,7 +295,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .build()
         .validate(appModel);
 
-    handleValidationResult(validation);
+    handleValidationResult(validation, LOGGER);
   }
 
   // TODO W-10855416: remove this and only validate it with the region classloader
