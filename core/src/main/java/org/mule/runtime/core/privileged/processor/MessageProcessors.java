@@ -491,12 +491,12 @@ public class MessageProcessors {
 
       sink.success(eventChildCtx);
     })
-        .share()
+        .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
             .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
-            .share())
+            .toProcessor())
         .map(MessageProcessors::toParentContext)
         .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
             .put(WITHIN_PROCESS_TO_APPLY, true));
