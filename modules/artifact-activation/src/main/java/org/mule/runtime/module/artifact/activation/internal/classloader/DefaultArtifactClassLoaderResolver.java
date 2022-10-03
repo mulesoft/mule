@@ -21,8 +21,9 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -223,7 +224,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getArtifactClassLoaderLookupPolicy(parentClassLoader, descriptor);
 
     List<URL> resourcesPath =
-        additionalClassloaderUrls.stream().collect(toCollection(() -> asList(descriptor.getClassLoaderModel().getUrls())));
+        concat(additionalClassloaderUrls.stream(), stream(descriptor.getClassLoaderModel().getUrls())).collect(toList());
 
     MuleDeployableArtifactClassLoader appClassLoader =
         new MuleApplicationClassLoader(artifactId, descriptor, regionClassLoader,
