@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
@@ -66,7 +68,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
     final MessageProcessorChain nestedChain;
 
     if (nestedProcessors != null) {
-      nestedChain = newChain(empty(), nestedProcessors);
+      nestedChain = newChain(empty(), nestedProcessors, getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
