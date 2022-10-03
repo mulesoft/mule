@@ -53,7 +53,8 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
     public static ChildSpanCustomizationInfo getChildSpanCustomizationInfo(Component component) {
       if (component.getIdentifier().getName().equals(UNTIL_SUCCESSFUL)) {
         return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ATTEMPT_TAG);
-      } else if (component.getIdentifier().getName().equals(FOR_EACH)) {
+      } else if (component.getIdentifier().getName().equals(FOR_EACH)
+          || component.getIdentifier().getName().equals(PARALLEL_FOR_EACH)) {
         return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ITERATION_TAG);
       }
       return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ROUTE_TAG);
