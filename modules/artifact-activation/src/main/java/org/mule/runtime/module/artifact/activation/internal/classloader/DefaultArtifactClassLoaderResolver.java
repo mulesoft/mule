@@ -17,10 +17,13 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.D
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -51,6 +54,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -180,6 +184,14 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
+                                                                        PluginClassLoaderResolver pluginClassLoaderResolver,
+                                                                        List<URL> additionalClassloaderUrls) {
+    return createApplicationClassLoader(descriptor, () -> defaultDomainClassloader, pluginClassLoaderResolver,
+                                        additionalClassloaderUrls);
+  }
+
+  @Override
+  public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader) {
     return createApplicationClassLoader(descriptor, domainClassLoader,
                                         (ownerClassLoader, artifactPluginDescriptor) -> empty());
@@ -189,6 +201,14 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver) {
+    return createApplicationClassLoader(descriptor, domainClassLoader, pluginClassLoaderResolver, emptyList());
+  }
+
+  @Override
+  public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
+                                                                        Supplier<ArtifactClassLoader> domainClassLoader,
+                                                                        PluginClassLoaderResolver pluginClassLoaderResolver,
+                                                                        List<URL> additionalClassloaderUrls) {
     ArtifactClassLoader parentClassLoader = domainClassLoader.get();
     String artifactId = getApplicationId(parentClassLoader.getArtifactId(), descriptor.getName());
 
@@ -203,11 +223,14 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getArtifactClassLoaderLookupPolicy(parentClassLoader, descriptor);
 
+    List<URL> resourcesPath =
+        concat(additionalClassloaderUrls.stream(), stream(descriptor.getClassLoaderModel().getUrls())).collect(toList());
+
     MuleDeployableArtifactClassLoader appClassLoader =
         new MuleApplicationClassLoader(artifactId, descriptor, regionClassLoader,
                                        nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
                                                                          descriptor.getClassLoaderModel().getUrls()),
-                                       asList(descriptor.getClassLoaderModel().getUrls()),
+                                       resourcesPath,
                                        classLoaderLookupPolicy);
 
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);

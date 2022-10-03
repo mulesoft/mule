@@ -33,6 +33,7 @@ import static java.lang.String.format;
 import static java.nio.file.Files.walk;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
@@ -40,6 +41,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
@@ -49,6 +51,8 @@ import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -117,15 +121,29 @@ public class MavenDeployableProjectModelBuilder
   private Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   private File deployableArtifactRepositoryFolder;
+  private boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = false;
+
+  public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration,
+                                            boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
+    this.projectFolder = projectFolder;
+    this.mavenConfiguration = mavenConfiguration;
+    this.exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = exportAllResourcesAndPackagesIfEmptyLoaderDescriptor;
+  }
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration) {
     this.projectFolder = projectFolder;
     this.mavenConfiguration = mavenConfiguration;
   }
 
+  public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
+    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor);
+  }
+
   public MavenDeployableProjectModelBuilder(File projectFolder) {
     this(projectFolder, getDefaultMavenConfiguration());
   }
+
+
 
   private static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
@@ -186,12 +204,41 @@ public class MavenDeployableProjectModelBuilder
 
   private Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
-      return () -> applicationModelResolver().resolve(projectFolder);
+      return () -> {
+        MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
+        if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
+            && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
+          applicationModel = buildModelWithResourcesAndClasses(applicationModel);
+        }
+        return applicationModel;
+      };
     } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
       return () -> domainModelResolver().resolve(projectFolder);
     } else {
       throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
     }
+  }
+
+  private MuleApplicationModel buildModelWithResourcesAndClasses(MuleApplicationModel applicationModel) {
+    MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder()
+        .setName(applicationModel.getName() != null ? applicationModel.getName() : "mule")
+        .setMinMuleVersion(applicationModel.getMinMuleVersion())
+        .setRequiredProduct(applicationModel.getRequiredProduct())
+        .withClassLoaderModelDescriptorLoader(createDescriptorWithResourcesAndClasses())
+        .withBundleDescriptorLoader(applicationModel.getBundleDescriptorLoader() != null
+            ? applicationModel.getBundleDescriptorLoader()
+            : new MuleArtifactLoaderDescriptor("mule", emptyMap()))
+        .setDomain(applicationModel.getDomain().orElse(null));
+    builder.setConfigs(applicationModel.getConfigs());
+    builder.setRedeploymentEnabled(applicationModel.isRedeploymentEnabled());
+    builder.setSecureProperties(applicationModel.getSecureProperties());
+    builder.setLogConfigFile(applicationModel.getLogConfigFile());
+    return builder.build();
+  }
+
+  private MuleArtifactLoaderDescriptor createDescriptorWithResourcesAndClasses() {
+    Map<String, Object> attributes = of("exportedResources", resources, "exportedPackages", packages);
+    return new MuleArtifactLoaderDescriptor("mule", attributes);
   }
 
   private ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
