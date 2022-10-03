@@ -8,9 +8,6 @@ package org.mule.runtime.module.artifact.activation.api.ast;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
@@ -18,12 +15,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_THIS_LO
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
-import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.EnumSet.of;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -32,16 +27,12 @@ import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
-import org.mule.runtime.ast.api.validation.ArtifactAstValidator;
-import org.mule.runtime.ast.api.validation.ValidationResult;
-import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -193,38 +184,6 @@ public final class ArtifactAstUtils {
       logModelNotGenerated("Mule ExtensionModelLoader not found", artifactId, ast.getArtifactType());
       return empty();
     }
-  }
-
-  /**
-   * Handles a {@link ValidationResult} uniformly. Warnings are logged, errors raise exceptions.
-   *
-   * @param validationResult The {@link ValidationResult} obtained using an {@link ArtifactAstValidator}.
-   * @throws ConfigurationException If there was any result item with {@link ERROR} level.
-   */
-  public static void handleValidationResult(ValidationResult validationResult)
-      throws ConfigurationException {
-    final Collection<ValidationResultItem> items = validationResult.getItems();
-
-    // Logs warnings if any.
-    items.stream()
-        .filter(v -> v.getValidation().getLevel().equals(WARN))
-        .forEach(v -> LOGGER.warn(validationResultItemToString(v)));
-
-    // If there are any errors, throws.
-    final boolean hasErrors = items.stream().anyMatch(v -> v.getValidation().getLevel().equals(ERROR));
-    if (hasErrors) {
-      throw new ConfigurationException(createStaticMessage(validationResult.getItems()
-          .stream()
-          .map(ArtifactAstUtils::validationResultItemToString)
-          .collect(joining(lineSeparator()))));
-    }
-  }
-
-  private static String validationResultItemToString(ValidationResultItem v) {
-    return v.getComponents().stream()
-        .map(component -> component.getMetadata().getFileName().orElse("unknown") + ":"
-            + component.getMetadata().getStartLine().orElse(-1))
-        .collect(joining("; ", "[", "]")) + ": " + v.getMessage();
   }
 
   private static ArtifactAst doParseArtifactIntoAst(String[] configResources,

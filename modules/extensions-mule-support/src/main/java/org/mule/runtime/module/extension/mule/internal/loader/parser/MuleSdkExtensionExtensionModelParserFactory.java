@@ -11,10 +11,12 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
-import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.handleValidationResult;
+import static org.mule.runtime.module.artifact.activation.internal.ast.validation.ValidationUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifact;
 
 import static java.lang.String.format;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -32,6 +34,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+
 /**
  * {@link ExtensionModelParserFactory} implementation for Mule SDK in the context of extensions.
  *
@@ -41,6 +45,8 @@ import java.util.stream.Stream;
  */
 public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExtensionModelParserFactory
     implements ExtensionModelParserFactory {
+
+  private static final Logger LOGGER = getLogger(MuleSdkExtensionExtensionModelParserFactory.class);
 
   private ArtifactAst cachedArtifactAst;
 
@@ -82,7 +88,7 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                             context.getParameter(VERSION_PROPERTY_NAME));
 
     // Applies the AST validators and throws if there was any error
-    handleValidationResult(validatorBuilder().build().validate(artifactAst));
+    handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
 
     return artifactAst;
   }
