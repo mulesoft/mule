@@ -296,7 +296,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
-    expected.expect(ExpressionRuntimeException.class);
+    expected.expectCause(instanceOf(ExpressionRuntimeException.class));
     expected.expectMessage(containsString("You called the function '+' with these arguments"));
     untilSuccessful.process(testEvent);
   }

@@ -203,7 +203,7 @@ public class MessageProcessors {
           .switchIfEmpty(from(alternate))
           .doOnSuccess(completeSuccessIfNeeded((event.getContext()), completeContext))
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
-          .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
+          .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
           .block();
     } catch (Throwable e) {
       if (e.getCause() instanceof InterruptedException) {
@@ -261,7 +261,7 @@ public class MessageProcessors {
         .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
         .doOnSuccess(completeSuccessIfNeeded((event.getContext()), true))
         .doOnError(completeErrorIfNeeded((event.getContext()), true))
-        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
+        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
   }
 
   /**
@@ -467,8 +467,8 @@ public class MessageProcessors {
             .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
-        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
-            .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
+        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
+                .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,

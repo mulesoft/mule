@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
@@ -53,6 +54,7 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.ContextView;
 
@@ -252,8 +254,20 @@ class UntilSuccessfulRouter {
   }
 
   private void subscribeUpstreamChains(ContextView downstreamContext) {
-    innerFlux.contextWrite(downstreamContext).subscribe();
-    upstreamFlux.contextWrite(downstreamContext).subscribe();
+    // this is needed because execution errors happen during subscription when wrapped within a Mono
+    AtomicReference<Throwable> handledError = new AtomicReference<>();
+
+    innerFlux.contextWrite(downstreamContext).subscribe(e -> {
+    }, handledError::set);
+    if (handledError.get() != null) {
+      throw propagateWrappingFatal(handledError.get());
+    }
+
+    upstreamFlux.contextWrite(downstreamContext).subscribe(e -> {
+    }, handledError::set);
+    if (handledError.get() != null) {
+      throw propagateWrappingFatal(handledError.get());
+    }
   }
 
   private RetryContext getRetryContextForEvent(CoreEvent event) {
