@@ -93,8 +93,9 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
     Map<String, Object> attributes = new HashMap<>(loaderDescriber.getAttributes());
     attributes.putAll(additionalAttributes);
 
-    return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies), ocsEnabled)
+    return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies))
         .addParameters(attributes)
+        .setOCSEnabled(ocsEnabled)
         .setArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }
