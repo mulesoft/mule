@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
@@ -21,7 +22,6 @@ import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -44,7 +44,7 @@ public class ApplicationExtensionModelsEnricher implements ArtifactExtensionMode
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
   // TODO W-11796759: This class shouldn't know which are the specific reusable components.
-  private static final Set<TypedComponentIdentifier.ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
+  private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
   private final String artifactId;
   private final Optional<String> artifactVersion;
