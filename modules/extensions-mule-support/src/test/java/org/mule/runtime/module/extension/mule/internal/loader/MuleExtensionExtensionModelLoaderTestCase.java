@@ -119,8 +119,8 @@ public class MuleExtensionExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   @Test
-  public void whenExtensionHasSelfReferencesUsingThisThenTheExtensionModelIsCorrect() {
-    ExtensionModel extensionModel = getExtensionModelFrom("extensions/extension-using-this.xml");
+  public void whenExtensionHasSelfReferencesThenTheExtensionModelIsCorrect() {
+    ExtensionModel extensionModel = getExtensionModelFrom("extensions/extension-self-referencing.xml");
     assertThat(extensionModel.getOperationModels(), hasSize(2));
   }
 

@@ -20,7 +20,7 @@ import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNam
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.ARTIFACT_LOCAL_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -29,13 +29,10 @@ import static java.util.Locale.getDefault;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkErrorModelParser;
@@ -159,7 +156,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
       }
 
       // TODO: Use the extension parser's namespace.
-      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(ARTIFACT_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null),
+      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null),
                                    errorModels,
                                    hierarchy);
     }

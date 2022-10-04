@@ -3,11 +3,11 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
            xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
-           xmlns:this="http://www.mulesoft.org/schema/mule/this"
+           xmlns:self-referencing="http://www.mulesoft.org/schema/mule/self-referencing"
            xmlns="http://www.mulesoft.org/schema/mule/mule-extension"
            xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
-        http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd
+        http://www.mulesoft.org/schema/mule/self-referencing http://www.mulesoft.org/schema/mule/self-referencing/current/mule-self-referencing.xsd
         http://www.mulesoft.org/schema/mule/mule-extension http://www.mulesoft.org/schema/mule/mule-extension/current/mule-extension.xsd">
     <operation:def name="identityBetweenBraces">
         <operation:parameters>
@@ -17,7 +17,7 @@
             <operation:payload-type type="any"/>
         </operation:output>
         <operation:body>
-            <this:identity input="#[params.input]"/>
+            <self-referencing:identity input="#[params.input]"/>
             <mule:set-payload value="#['(' ++ payload ++ ')']"/>
         </operation:body>
     </operation:def>
