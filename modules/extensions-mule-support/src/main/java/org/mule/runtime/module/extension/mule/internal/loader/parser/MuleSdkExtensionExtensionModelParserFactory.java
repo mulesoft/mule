@@ -15,6 +15,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.ValidationUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionsEnricher;
 
+import static java.util.Collections.singletonMap;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,10 +27,13 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionExtensionModelMetadataParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -46,19 +51,46 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     implements ExtensionModelParserFactory {
 
   private static final Logger LOGGER = getLogger(MuleSdkExtensionExtensionModelParserFactory.class);
+  private static final String MULE_SDK_EXTENSION_MODEL_PARSER_FACTORY_PROPERTY_NAME = "muleParserFactory";
 
+  /**
+   * @param context the loading context
+   * @return a {@link ExtensionModelParserFactory} instance (which may be cached in the {@code context}).
+   */
+  public static ExtensionModelParserFactory create(ExtensionLoadingContext context) {
+    // The parser factory could be shared by multiple loading requests that are part of the same context.
+    Optional<ExtensionModelParserFactory> parserFactory =
+        context.getParameter(MULE_SDK_EXTENSION_MODEL_PARSER_FACTORY_PROPERTY_NAME);
+    return parserFactory.orElseGet(MuleSdkExtensionExtensionModelParserFactory::new);
+  }
+
+  // For performance reasons we will be sharing the parser factory instance for the two-step model loading.
+  // We use these fields to cache the artifact's AST and the resulting parser, so we don't create them more than once.
   private ArtifactAst cachedArtifactAst;
+  private ExtensionModelParser cachedExtensionModelParser;
+
+  @Override
+  public ExtensionModelParser createParser(ExtensionLoadingContext context) {
+    this.cachedArtifactAst = getArtifactAst(context);
+
+    // As part of getting the artifact's AST, it is possible that we have already created the parser. We don't want to do it
+    // again.
+    if (cachedExtensionModelParser == null) {
+      cachedExtensionModelParser = super.createParser(context);
+    }
+    return cachedExtensionModelParser;
+  }
 
   @Override
   protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
-    return new MuleSdkExtensionExtensionModelMetadataParser(getArtifactAst(context));
+    return new MuleSdkExtensionExtensionModelMetadataParser(cachedArtifactAst);
   }
 
   @Override
   protected Supplier<Stream<ComponentAst>> createTopLevelComponentsSupplier(ExtensionLoadingContext context) {
     // At this point we can assume there is only one top level component which is the extension:extension component
     // We don't need to check for this because it should be guaranteed by previous validations
-    ComponentAst rootComponent = getArtifactAst(context).topLevelComponents().get(0);
+    ComponentAst rootComponent = cachedArtifactAst.topLevelComponents().get(0);
     return rootComponent::directChildrenStream;
   }
 
@@ -84,7 +116,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                                                   dependencies,
                                                                   false,
                                                                   context.getExtensionClassLoader(),
-                                                                  new MuleSdkLocalExtensionModelsEnricher(version));
+                                                                  new MuleSdkLocalExtensionModelsEnricher(version,
+                                                                                                          getLoadingRequestExtraParameters()));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
@@ -102,12 +135,11 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
   }
 
   private ArtifactAst getArtifactAst(ExtensionLoadingContext context) {
-    if (cachedArtifactAst == null) {
-      // The AST may be given already parsed. If not, we need to parse it from the resource file.
-      cachedArtifactAst =
-          context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAstChecked(context));
-    }
+    // The AST may be given already parsed. If not, we need to parse it from the resource file.
+    return context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAstChecked(context));
+  }
 
-    return cachedArtifactAst;
+  private Map<String, Object> getLoadingRequestExtraParameters() {
+    return singletonMap(MULE_SDK_EXTENSION_MODEL_PARSER_FACTORY_PROPERTY_NAME, this);
   }
 }

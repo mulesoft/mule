@@ -22,6 +22,7 @@ import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactExtensio
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,9 +33,18 @@ import java.util.Set;
 public class MuleSdkLocalExtensionModelsEnricher implements ArtifactExtensionModelsEnricher {
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
+
+  private final Map<String, Object> extraParameters;
   private final String version;
 
-  public MuleSdkLocalExtensionModelsEnricher(String version) {
+  /**
+   * Creates a new enricher with the given parameters.
+   *
+   * @param version         the artifact's version.
+   * @param extraParameters allows for adding extra parameters to the loading request for the new model.
+   */
+  public MuleSdkLocalExtensionModelsEnricher(String version, Map<String, Object> extraParameters) {
+    this.extraParameters = extraParameters;
     this.version = version;
   }
 
@@ -53,6 +63,7 @@ public class MuleSdkLocalExtensionModelsEnricher implements ArtifactExtensionMod
     ExtensionModel extensionModel = loader.loadExtensionModel(builder(classLoader, getDefault(extensions))
         .addParameter(VERSION_PROPERTY_NAME, version)
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+        .addParameters(extraParameters)
         .build());
 
     // Enriches the ExtensionModels by adding the new one.
