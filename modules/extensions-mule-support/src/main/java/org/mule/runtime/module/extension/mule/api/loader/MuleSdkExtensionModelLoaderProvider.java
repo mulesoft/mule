@@ -10,7 +10,7 @@ import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkThisExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkApplicationExtensionModelLoader;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
 
 import java.util.HashSet;
@@ -27,7 +27,7 @@ public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoader
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {
     Set<ExtensionModelLoader> loaders = new HashSet<>();
     loaders.add(new MuleSdkExtensionExtensionModelLoader());
-    loaders.add(new MuleSdkThisExtensionModelLoader());
+    loaders.add(new MuleSdkApplicationExtensionModelLoader());
     return unmodifiableSet(loaders);
   }
 }
