@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
@@ -18,7 +19,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 
-import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -38,7 +38,7 @@ import java.util.Set;
  */
 public class MuleSdkLocalExtensionModelsEnricher implements ArtifactExtensionModelsEnricher {
 
-  private static final Set<TypedComponentIdentifier.ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
+  private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
   private final String version;
 
   public MuleSdkLocalExtensionModelsEnricher(String version) {
