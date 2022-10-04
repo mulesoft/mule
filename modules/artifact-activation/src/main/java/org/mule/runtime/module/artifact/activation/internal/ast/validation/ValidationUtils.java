@@ -22,6 +22,11 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 
+/**
+ * Utilities for handling {@link ValidationResult}s in a uniform way.
+ *
+ * @since 4.5.0
+ */
 public class ValidationUtils {
 
   private ValidationUtils() {
