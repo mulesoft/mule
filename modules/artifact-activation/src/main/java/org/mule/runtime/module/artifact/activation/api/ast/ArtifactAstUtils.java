@@ -42,7 +42,7 @@ public final class ArtifactAstUtils {
    * @param disableValidations whether to disable DSL validation
    * @param muleContext        the app's {@link MuleContext}
    * @return an {@link ArtifactAst}
-   * @throws ConfigurationException it the artifact couldn't be parsed
+   * @throws ConfigurationException it the app couldn't be parsed
    */
   public static ArtifactAst parseAndBuildAppExtensionModel(String[] configResources,
                                                            AstXmlParserSupplier parserSupplier,
@@ -61,8 +61,8 @@ public final class ArtifactAstUtils {
   }
 
   /**
-   * Parses {@code configResources} for a Mule artifact and returns an {@link ArtifactAst} enriched with an additional
-   * {@link ExtensionModel} which models the artifact itself, with all its defined operations, sources, functions, etc.
+   * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
    * <p>
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code artifactId}.
@@ -71,11 +71,11 @@ public final class ArtifactAstUtils {
    * @param parserSupplier      the supplier used to obtain the ast parser. It might be invoked several times during the parsing
    * @param extensions          the initial set of extensions the artifact depends on.
    * @param disableValidations  whether to disable DSL validation
-   * @param artifactClassLoader the artifact's classloader
-   * @param artifactId          the artifact's ID.
-   * @param artifactVersion     the artifact's version.
+   * @param artifactClassLoader the application's classloader
+   * @param artifactId          the application's ID.
+   * @param artifactVersion     the application's version.
    * @return an {@link ArtifactAst}
-   * @throws ConfigurationException it the artifact couldn't be parsed
+   * @throws ConfigurationException it the app couldn't be parsed
    */
   public static ArtifactAst parseArtifact(String[] configResources,
                                           AstXmlParserSupplier parserSupplier,
@@ -98,9 +98,9 @@ public final class ArtifactAstUtils {
    * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
    * {@link ExtensionModel} which represents it.
    *
-   * @param ast                 the artifact's AST
-   * @param artifactClassLoader the artifact's classloader
-   * @param muleContext         the artifact's context
+   * @param ast                 the application's AST
+   * @param artifactClassLoader the application's classloader
+   * @param muleContext         the application's context
    * @return an optional {@link ExtensionModel}
    */
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
@@ -115,13 +115,13 @@ public final class ArtifactAstUtils {
   }
 
   /**
-   * If the {@code ast} represents an artifact which defines reusable components (operations, sources, etc), it returns an
+   * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
    * {@link ExtensionModel} which represents it.
    *
-   * @param ast                 the artifact's AST
-   * @param artifactClassLoader the artifact's classloader
-   * @param artifactId          the artifact's ID.
-   * @param artifactVersion     the artifact's version.
+   * @param ast                 the application's AST
+   * @param artifactClassLoader the application's classloader
+   * @param artifactId          the application's ID.
+   * @param artifactVersion     the application's version.
    * @param dependencies        the dependencies in context.
    * @return an optional {@link ExtensionModel}
    */

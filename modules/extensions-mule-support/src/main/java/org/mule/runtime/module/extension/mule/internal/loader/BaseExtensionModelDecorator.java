@@ -31,10 +31,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * This class provides a skeletal implementation of the {@link ExtensionModel} interface, to minimize the effort required to
+ * implement this interface when decorating instances of {@link ExtensionModel}.
+ *
+ * @since 1.0
+ */
 public class BaseExtensionModelDecorator implements ExtensionModel {
 
   private final ExtensionModel decorated;
 
+  /**
+   * Creates a new decorator for the provided instance.
+   *
+   * @param decorated the {@link ExtensionModel} instance to decorate.
+   */
   public BaseExtensionModelDecorator(ExtensionModel decorated) {
     this.decorated = decorated;
   }
