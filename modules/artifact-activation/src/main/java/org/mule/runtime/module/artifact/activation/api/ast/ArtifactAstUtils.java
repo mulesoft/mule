@@ -51,47 +51,14 @@ public final class ArtifactAstUtils {
                                                            boolean disableValidations,
                                                            MuleContext muleContext)
       throws ConfigurationException {
-    return parseArtifact(configResources,
-                         parserSupplier,
-                         extensions,
-                         disableValidations,
-                         muleContext.getExecutionClassLoader().getParent(),
-                         muleContext.getConfiguration().getId(),
-                         muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion));
-  }
-
-  /**
-   * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
-   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
-   * <p>
-   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
-   * {@code artifactId}.
-   *
-   * @param configResources     the paths to the artifact's config files
-   * @param parserSupplier      the supplier used to obtain the ast parser. It might be invoked several times during the parsing
-   * @param extensions          the initial set of extensions the artifact depends on.
-   * @param disableValidations  whether to disable DSL validation
-   * @param artifactClassLoader the application's classloader
-   * @param artifactId          the application's ID.
-   * @param artifactVersion     the application's version.
-   * @return an {@link ArtifactAst}
-   * @throws ConfigurationException it the app couldn't be parsed
-   */
-  public static ArtifactAst parseArtifact(String[] configResources,
-                                          AstXmlParserSupplier parserSupplier,
-                                          Set<ExtensionModel> extensions,
-                                          boolean disableValidations,
-                                          ClassLoader artifactClassLoader,
-                                          String artifactId,
-                                          Optional<String> artifactVersion)
-      throws ConfigurationException {
-
+    String artifactId = muleContext.getConfiguration().getId();
+    Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
     return parseArtifactWithExtensionsEnricher(configResources,
                                                parserSupplier,
                                                extensions,
                                                disableValidations,
-                                               artifactClassLoader,
-                                               new ApplicationExtensionModelsEnricher(artifactId, artifactVersion));
+                                               muleContext.getExecutionClassLoader().getParent(),
+                                               new ApplicationExtensionModelsEnricher(artifactId, version));
   }
 
   /**
@@ -106,36 +73,14 @@ public final class ArtifactAstUtils {
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
                                                                      ClassLoader artifactClassLoader,
                                                                      MuleContext muleContext) {
-    return parseArtifactExtensionModel(ast,
-                                       artifactClassLoader,
-                                       muleContext.getConfiguration().getId(),
-                                       muleContext.getConfiguration().getArtifactCoordinates()
-                                           .map(ArtifactCoordinates::getVersion),
-                                       muleContext.getExtensionManager().getExtensions());
-  }
-
-  /**
-   * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
-   * {@link ExtensionModel} which represents it.
-   *
-   * @param ast                 the application's AST
-   * @param artifactClassLoader the application's classloader
-   * @param artifactId          the application's ID.
-   * @param artifactVersion     the application's version.
-   * @param dependencies        the dependencies in context.
-   * @return an optional {@link ExtensionModel}
-   */
-  public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
-                                                                     ClassLoader artifactClassLoader,
-                                                                     String artifactId,
-                                                                     Optional<String> artifactVersion,
-                                                                     Set<ExtensionModel> dependencies) {
-    ApplicationExtensionModelsEnricher enricher = new ApplicationExtensionModelsEnricher(artifactId, artifactVersion);
+    String artifactId = muleContext.getConfiguration().getId();
+    Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
+    ApplicationExtensionModelsEnricher enricher = new ApplicationExtensionModelsEnricher(artifactId, version);
     if (!enricher.applicable(ast)) {
       return empty();
     }
 
-    return enricher.parseApplicationExtensionModel(ast, artifactClassLoader, dependencies);
+    return enricher.parseApplicationExtensionModel(ast, artifactClassLoader, muleContext.getExtensionManager().getExtensions());
   }
 
   private ArtifactAstUtils() {}
