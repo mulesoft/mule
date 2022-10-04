@@ -9,12 +9,11 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.ValidationUtils.handleValidationResult;
-import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifact;
-
-import static java.lang.String.format;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionsEnricher;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -78,30 +77,19 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
   private ArtifactAst parseAst(ExtensionLoadingContext context) throws ConfigurationException {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
+    String version = getRequiredLoadingParameter(context, VERSION_PROPERTY_NAME);
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
-    ArtifactAst artifactAst = parseArtifact(resources,
-                                            this::createAstParser,
-                                            dependencies,
-                                            false,
-                                            context.getExtensionClassLoader(),
-                                            getArtifactLocalExtensionName(resources[0]),
-                                            context.getParameter(VERSION_PROPERTY_NAME));
+    ArtifactAst artifactAst = parseArtifactWithExtensionsEnricher(resources,
+                                                                  this::createAstParser,
+                                                                  dependencies,
+                                                                  false,
+                                                                  context.getExtensionClassLoader(),
+                                                                  new MuleSdkLocalExtensionModelsEnricher(version));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
 
     return artifactAst;
-  }
-
-  /**
-   *
-   * @param resourcePath The path to the Mule SDK resource file.
-   * @return The name of the temporary Extension that is going to be generated under the namespace "this" in order to generate a
-   *         full AST. Will be useful only for troubleshooting if there is any AST parsing error. Doesn't mean anything outside
-   *         the scope of this parser factory.
-   */
-  private String getArtifactLocalExtensionName(String resourcePath) {
-    return format("this-%s", resourcePath);
   }
 
   private ArtifactAst parseAstChecked(ExtensionLoadingContext context) {
@@ -115,7 +103,9 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   private ArtifactAst getArtifactAst(ExtensionLoadingContext context) {
     if (cachedArtifactAst == null) {
-      cachedArtifactAst = parseAstChecked(context);
+      // The AST may be given already parsed. If not, we need to parse it from the resource file.
+      cachedArtifactAst =
+          context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAstChecked(context));
     }
 
     return cachedArtifactAst;

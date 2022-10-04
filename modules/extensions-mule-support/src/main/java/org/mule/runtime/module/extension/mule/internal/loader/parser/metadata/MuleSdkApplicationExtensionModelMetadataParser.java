@@ -22,15 +22,15 @@ import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfigurat
 import java.util.Optional;
 
 /**
- * {@link MuleSdkExtensionModelMetadataParser} implementation for Mule SDK extensions defined as part of the same artifact.
+ * {@link MuleSdkExtensionModelMetadataParser} implementation for Mule SDK extensions defined by applications.
  *
  * @since 4.5.0
  */
-public class MuleSdkThisExtensionModelMetadataParser implements MuleSdkExtensionModelMetadataParser {
+public class MuleSdkApplicationExtensionModelMetadataParser implements MuleSdkExtensionModelMetadataParser {
 
   private final String extensionName;
 
-  public MuleSdkThisExtensionModelMetadataParser(String extensionName) {
+  public MuleSdkApplicationExtensionModelMetadataParser(String extensionName) {
     this.extensionName = extensionName;
   }
 
