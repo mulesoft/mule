@@ -38,7 +38,7 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class ApplicationExtensionModelEnricher implements ArtifactExtensionModelsEnricher {
+public class ApplicationExtensionModelsEnricher implements ArtifactExtensionModelsEnricher {
 
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
@@ -48,7 +48,7 @@ public class ApplicationExtensionModelEnricher implements ArtifactExtensionModel
   private final String artifactId;
   private final Optional<String> artifactVersion;
 
-  public ApplicationExtensionModelEnricher(String artifactId, Optional<String> artifactVersion) {
+  public ApplicationExtensionModelsEnricher(String artifactId, Optional<String> artifactVersion) {
     this.artifactId = artifactId;
     this.artifactVersion = artifactVersion;
   }
