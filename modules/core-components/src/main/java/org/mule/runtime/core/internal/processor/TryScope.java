@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEG
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
@@ -225,7 +226,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       }
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
-                                                         messagingExceptionHandler, getLocation().getLocation());
+                                                         messagingExceptionHandler, getLocation().getLocation(),
+                                                         getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
