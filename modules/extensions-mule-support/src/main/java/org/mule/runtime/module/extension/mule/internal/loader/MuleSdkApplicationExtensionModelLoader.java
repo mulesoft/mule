@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_THIS_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_APPLICATION_LOADER_ID;
 
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -23,7 +23,7 @@ public class MuleSdkApplicationExtensionModelLoader extends AbstractExtensionMod
 
   @Override
   public String getId() {
-    return MULE_SDK_THIS_LOADER_ID;
+    return MULE_SDK_APPLICATION_LOADER_ID;
   }
 
   @Override

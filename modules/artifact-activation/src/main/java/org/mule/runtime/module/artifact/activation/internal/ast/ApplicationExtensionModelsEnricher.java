@@ -12,7 +12,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_THIS_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_APPLICATION_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
@@ -90,7 +90,8 @@ public class ApplicationExtensionModelsEnricher implements ArtifactExtensionMode
       return empty();
     }
 
-    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(this.getClass().getClassLoader(), MULE_SDK_THIS_LOADER_ID);
+    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(this.getClass().getClassLoader(),
+                                                                  MULE_SDK_APPLICATION_LOADER_ID);
     if (loader.isPresent()) {
       return of(loader.get()
           .loadExtensionModel(builder(artifactClassLoader, getDefault(dependencies))
