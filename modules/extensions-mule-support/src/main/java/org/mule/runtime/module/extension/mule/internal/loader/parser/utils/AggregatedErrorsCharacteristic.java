@@ -20,7 +20,6 @@ import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNam
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -56,12 +55,18 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
   private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
       builder().namespace(OPERATION_DSL_NAMESPACE).name(RAISE_ERROR).build();
 
-  public AggregatedErrorsCharacteristic() {
-    super(new Aggregator(), emptyList(), null);
+  public AggregatedErrorsCharacteristic(String namespace) {
+    super(new Aggregator(namespace), emptyList(), null);
   }
 
   private static class Aggregator
       implements BiFunction<ComponentAstWithHierarchy, List<ErrorModelParser>, List<ErrorModelParser>> {
+
+    private final String namespace;
+
+    private Aggregator(String namespace) {
+      this.namespace = namespace;
+    }
 
     @Override
     public List<ErrorModelParser> apply(ComponentAstWithHierarchy componentAstWithHierarchy, List<ErrorModelParser> errorModels) {
@@ -155,9 +160,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
         return;
       }
 
-      // TODO: Use the extension parser's namespace.
-      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null), errorModels,
-                                   hierarchy);
+      addParserAndMarkIfSuppressed(new MuleSdkErrorModelParser(namespace, errorId.get(), null), errorModels, hierarchy);
     }
 
     private static boolean isRaiseError(ComponentAst operationAst) {

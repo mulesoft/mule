@@ -194,7 +194,7 @@ public class MuleSdkExtensionModelParser implements ExtensionModelParser {
     final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
         topLevelComponentsSupplier.get()
             .filter(c -> c.getComponentType() == OPERATION_DEF)
-            .map(c -> new MuleSdkOperationModelParserSdk(c, typeLoader, extensionModelHelper))
+            .map(c -> new MuleSdkOperationModelParserSdk(c, metadataParser.getNamespace(), typeLoader, extensionModelHelper))
             .collect(toMap(c -> getSanitizedElementName(c::getName), identity()));
 
     // Some characteristics of the operation model parsers require knowledge about the other operation model parsers

@@ -96,7 +96,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final Characteristic<Boolean> isBlocking = new IsBlockingCharacteristic();
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
   private final FilteringCharacteristic<Boolean> isTransactional = new IsTransactionalCharacteristic();
-  private final Characteristic<List<ErrorModelParser>> errorModels = new AggregatedErrorsCharacteristic();
+  private final Characteristic<List<ErrorModelParser>> errorModels;
 
   private final List<ModelProperty> additionalModelProperties =
       asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty(),
@@ -104,11 +104,12 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private String name;
 
-  public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader,
+  public MuleSdkOperationModelParserSdk(ComponentAst operation, String namespace, TypeLoader typeLoader,
                                         ExtensionModelHelper extensionModelHelper) {
     this.operation = operation;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
+    this.errorModels = new AggregatedErrorsCharacteristic(namespace);
 
     parseStructure();
   }
