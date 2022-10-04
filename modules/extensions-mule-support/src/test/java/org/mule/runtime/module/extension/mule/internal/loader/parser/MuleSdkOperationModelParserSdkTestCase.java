@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.setMockAstChild;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockOutputAst;
@@ -64,7 +65,7 @@ public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase
     someMetadataType = mock(MetadataType.class);
     when(typeLoader.load("some")).thenReturn(Optional.of(someMetadataType));
 
-    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, typeLoader, new ExtensionModelHelper(emptySet()));
+    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, APP_LOCAL_EXTENSION_NAMESPACE, typeLoader, new ExtensionModelHelper(emptySet()));
   }
 
   // ------------------------------- //
