@@ -17,7 +17,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.module.artifact.activation.internal.ast.ApplicationExtensionModelEnricher;
+import org.mule.runtime.module.artifact.activation.internal.ast.ApplicationExtensionModelsEnricher;
 
 import java.util.Optional;
 import java.util.Set;
@@ -98,8 +98,8 @@ public final class ArtifactAstUtils {
                                                extensions,
                                                disableValidations,
                                                artifactClassLoader,
-                                               new ApplicationExtensionModelEnricher(artifactId, artifactVersion,
-                                                                                     expressionLanguageMetadataService));
+                                               new ApplicationExtensionModelsEnricher(artifactId, artifactVersion,
+                                                                                      expressionLanguageMetadataService));
   }
 
   /**
@@ -143,8 +143,8 @@ public final class ArtifactAstUtils {
                                                                      Optional<String> artifactVersion,
                                                                      Set<ExtensionModel> dependencies,
                                                                      ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    ApplicationExtensionModelEnricher enricher =
-        new ApplicationExtensionModelEnricher(artifactId, artifactVersion, expressionLanguageMetadataService);
+    ApplicationExtensionModelsEnricher enricher =
+        new ApplicationExtensionModelsEnricher(artifactId, artifactVersion, expressionLanguageMetadataService);
     if (!enricher.applicable(ast)) {
       return empty();
     }

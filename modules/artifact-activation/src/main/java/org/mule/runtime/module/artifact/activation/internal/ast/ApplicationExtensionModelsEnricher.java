@@ -39,7 +39,7 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class ApplicationExtensionModelEnricher implements ArtifactExtensionModelsEnricher {
+public class ApplicationExtensionModelsEnricher implements ArtifactExtensionModelsEnricher {
 
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
@@ -50,8 +50,8 @@ public class ApplicationExtensionModelEnricher implements ArtifactExtensionModel
   private final Optional<String> artifactVersion;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  public ApplicationExtensionModelEnricher(String artifactId, Optional<String> artifactVersion,
-                                           ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+  public ApplicationExtensionModelsEnricher(String artifactId, Optional<String> artifactVersion,
+                                            ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactId = artifactId;
     this.artifactVersion = artifactVersion;
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
