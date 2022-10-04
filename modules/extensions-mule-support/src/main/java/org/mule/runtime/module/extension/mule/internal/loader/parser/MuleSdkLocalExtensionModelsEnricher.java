@@ -12,27 +12,20 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
-import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 
 import static java.util.Collections.singleton;
-import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactExtensionModelsEnricher;
-import org.mule.runtime.module.extension.mule.internal.loader.BaseExtensionModelDecorator;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link ArtifactExtensionModelsEnricher} that loads an {@link ExtensionModel} from an extension's {@link ArtifactAst} and
- * decorates it so that the prefix and namespace correspond to {@link THIS_PREFIX} and {@link THIS_NAMESPACE} respectively.
+ * {@link ArtifactExtensionModelsEnricher} that loads an {@link ExtensionModel} from an extension's {@link ArtifactAst}.
  *
  * @since 4.5.0
  */
@@ -62,24 +55,9 @@ public class MuleSdkLocalExtensionModelsEnricher implements ArtifactExtensionMod
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
         .build());
 
-    // Decorates the model so that the prefix and namespaces are changed to the artifact-local ones.
-    ExtensionModel decoratedExtensionModel = new MuleSdkLocalExtensionModelDecorator(extensionModel);
-
     // Enriches the ExtensionModels by adding the new one.
     Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
-    enrichedExtensionModels.add(decoratedExtensionModel);
+    enrichedExtensionModels.add(extensionModel);
     return enrichedExtensionModels;
-  }
-
-  private static class MuleSdkLocalExtensionModelDecorator extends BaseExtensionModelDecorator {
-
-    public MuleSdkLocalExtensionModelDecorator(ExtensionModel extensionModel) {
-      super(extensionModel);
-    }
-
-    @Override
-    public XmlDslModel getXmlDslModel() {
-      return createXmlLanguageModel(of(THIS_PREFIX), of(THIS_NAMESPACE), getName(), getVersion());
-    }
   }
 }

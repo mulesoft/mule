@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser.metadata;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.ARTIFACT_LOCAL_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
 import static java.util.Optional.empty;
@@ -56,7 +56,7 @@ public class MuleSdkApplicationExtensionModelMetadataParser implements MuleSdkEx
 
   @Override
   public String getNamespace() {
-    return ARTIFACT_LOCAL_EXTENSION_NAMESPACE;
+    return APP_LOCAL_EXTENSION_NAMESPACE;
   }
 
   @Override
