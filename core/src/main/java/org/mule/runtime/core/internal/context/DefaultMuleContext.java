@@ -1327,7 +1327,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_INSECURE_TLS_CONFIGURATION,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                  .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
 
 }
