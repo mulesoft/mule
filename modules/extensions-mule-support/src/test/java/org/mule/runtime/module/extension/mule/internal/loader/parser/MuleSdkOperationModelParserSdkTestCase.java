@@ -65,7 +65,8 @@ public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase
     someMetadataType = mock(MetadataType.class);
     when(typeLoader.load("some")).thenReturn(Optional.of(someMetadataType));
 
-    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, APP_LOCAL_EXTENSION_NAMESPACE, typeLoader, new ExtensionModelHelper(emptySet()));
+    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, APP_LOCAL_EXTENSION_NAMESPACE, typeLoader,
+                                                              new ExtensionModelHelper(emptySet()));
   }
 
   // ------------------------------- //
