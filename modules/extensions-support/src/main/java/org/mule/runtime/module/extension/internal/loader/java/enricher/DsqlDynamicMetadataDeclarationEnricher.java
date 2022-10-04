@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.java.enricher;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.getMetadataKeyPart;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.hasKeyId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -37,6 +36,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -57,7 +57,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
+public class DsqlDynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -197,7 +197,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                String categoryName) {
       return component.getParameterGroups().stream()
           .flatMap(g -> g.getParameters().stream())
-          .filter(p -> getExtensionParameter(p).map(JavaMetadataKeyIdModelParserUtils::hasKeyId).orElse(false))
+          .filter(p -> getExtensionParameter(p).map(this::hasKeyId).orElse(false))
           .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName(), categoryName))
           .findFirst();
     }
@@ -222,6 +222,10 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
       getMetadataKeyPart(element).ifPresent(metadataKeyPart -> baseDeclaration
           .addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.getFirst(), metadataKeyPart.getSecond())));
+    }
+
+    private boolean hasKeyId(WithAnnotations withAnnotations) {
+      return withAnnotations.isAnnotatedWith(MetadataKeyId.class);
     }
 
   }

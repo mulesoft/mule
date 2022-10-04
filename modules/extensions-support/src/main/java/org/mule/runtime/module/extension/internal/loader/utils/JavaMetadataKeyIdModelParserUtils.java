@@ -33,11 +33,6 @@ import java.util.Optional;
  */
 public class JavaMetadataKeyIdModelParserUtils {
 
-  public static boolean hasKeyId(WithAnnotations withAnnotations) {
-    return withAnnotations.isAnnotatedWith(MetadataKeyId.class) ||
-        withAnnotations.isAnnotatedWith(org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId.class);
-  }
-
   public static Optional<KeyIdResolverModelParser> parseKeyIdResolverModelParser(OperationModelParser operationModelParser,
                                                                                  ExtensionParameter extensionParameter,
                                                                                  String categoryName,

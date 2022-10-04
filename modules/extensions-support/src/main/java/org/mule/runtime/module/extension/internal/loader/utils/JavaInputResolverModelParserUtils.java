@@ -25,6 +25,11 @@ import org.mule.sdk.api.annotation.metadata.TypeResolver;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Helper class for introspecting input metadata.
+ *
+ * @since 4.5
+ */
 public class JavaInputResolverModelParserUtils {
 
   public static List<InputResolverModelParser> parseInputResolversModelParser(MethodElement<?> methodElement) {
