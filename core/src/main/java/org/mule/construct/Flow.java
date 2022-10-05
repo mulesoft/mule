@@ -255,6 +255,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         }
         statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);
+        
+        configureSummaryStatistics();
     }
 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException

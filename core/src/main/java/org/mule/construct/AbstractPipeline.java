@@ -6,7 +6,9 @@
  */
 package org.mule.construct;
 
+import static org.mule.management.stats.DefaultFlowsSummaryStatistics.isApiKitFlow;
 import static org.mule.util.NotificationUtils.buildPathResolver;
+
 import org.mule.api.GlobalNameableObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -37,6 +39,7 @@ import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
+import org.mule.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
@@ -52,6 +55,8 @@ import org.mule.util.NotificationUtils.PathResolver;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.collections.Closure;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
@@ -71,9 +76,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected ProcessingStrategy processingStrategy;
     private boolean canProcessMessage = false;
 
+    private DefaultFlowsSummaryStatistics flowsSummaryStatistics;
+    private boolean triggerFlow;
+    private final boolean apikitFlow;
+
     public AbstractPipeline(String name, MuleContext muleContext)
     {
         super(name, muleContext);
+        this.apikitFlow = isApiKitFlow(name);
     }
 
     /**
@@ -192,6 +202,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         {
             this.messageSource = messageSource;
         }
+        
+        this.triggerFlow = messageSource != null;
     }
 
     @Override
@@ -242,6 +254,31 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         initialiseIfInitialisable(pipeline);
 
         createFlowMap();
+
+        updateFlowsSummaryStatistics(new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).incrementDeclaredTriggerFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).incrementDeclaredApikitFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).incrementDeclaredPrivateFlow();
+                                         }
+                                     });
     }
 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
@@ -347,6 +384,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
     }
 
+    protected void configureSummaryStatistics()
+    {
+        flowsSummaryStatistics = (DefaultFlowsSummaryStatistics) muleContext.getStatistics().getFlowSummaryStatistics();
+    }
+    
     @Override
     protected void doStart() throws MuleException
     {
@@ -372,6 +414,31 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 throw e;
             }
         }
+
+        updateFlowsSummaryStatistics(new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).incrementActiveTriggerFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).incrementActiveApikitFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).incrementActivePrivateFlow();
+                                         }
+                                     });
     }
 
     private void createFlowMap()
@@ -391,7 +458,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         //Only MP till first InterceptingMessageProcessor should be used to generate the Path,
         // since the next ones will be generated by the InterceptingMessageProcessor because they are added as an inned chain
-        List<MessageProcessor> filteredMessageProcessorList = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> filteredMessageProcessorList = new ArrayList<>();
         for (MessageProcessor messageProcessor : getMessageProcessors())
         {
             if(messageProcessor instanceof InterceptingMessageProcessor){
@@ -457,6 +524,31 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     protected void doStop() throws MuleException
     {
+        updateFlowsSummaryStatistics(new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).decrementActiveTriggerFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).decrementActiveApikitFlow();
+                                         }
+                                     },
+                                     new Closure() 
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics)input).decrementActivePrivateFlow();
+                                         }
+                                     });
+
         try
         {
             stopIfStoppable(messageSource);
@@ -473,9 +565,59 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     protected void doDispose()
     {
+        updateFlowsSummaryStatistics(new Closure()
+                                     {
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics) input).decrementDeclaredTriggerFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                               
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics) input).decrementDeclaredApikitFlow();
+                                         }
+                                     },
+                                     new Closure()
+                                     {
+                               
+                                         @Override
+                                         public void execute(Object input)
+                                         {
+                                             ((DefaultFlowsSummaryStatistics) input).decrementDeclaredPrivateFlow();
+                                         }
+                                     });
+
         disposeIfDisposable(pipeline);
         disposeIfDisposable(messageSource);
         super.doDispose();
+    }
+
+    private void updateFlowsSummaryStatistics(Closure triggerFlowsUpdater,
+                                              Closure apikitflowsUpdater,
+                                              Closure privateFlowsUpdater)
+    {
+        if(flowsSummaryStatistics == null)
+        {
+            return;
+        }
+      
+        if (triggerFlow)
+        {
+            triggerFlowsUpdater.execute(flowsSummaryStatistics);
+        }
+        else if (apikitFlow)
+        {
+            apikitflowsUpdater.execute(flowsSummaryStatistics);
+        }
+        else
+        {
+            privateFlowsUpdater.execute(flowsSummaryStatistics);
+        }
     }
 
 }
