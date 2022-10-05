@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,6 +35,7 @@ import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -44,6 +48,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,8 +57,8 @@ import org.junit.Test;
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
-  private List<Object> startStopOrder = new ArrayList<>();
-  private RecordingTQM rtqm = new RecordingTQM();
+  private final List<Object> startStopOrder = new ArrayList<>();
+  private final RecordingTQM rtqm = new RecordingTQM();
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
@@ -132,7 +137,8 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   private class RecordingFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public RecordingFlow(String name, MuleContext muleContext) {
-      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null,
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY,
+            new DefaultFlowsSummaryStatistics(true), null,
             new ComponentInitialStateManager() {
 
               @Override
