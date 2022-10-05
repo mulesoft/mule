@@ -116,8 +116,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                                                   dependencies,
                                                                   false,
                                                                   context.getExtensionClassLoader(),
-                                                                  new MuleSdkExtensionExtensionModelsEnricher(version,
-                                                                                                              getLoadingRequestExtraParameters()));
+                                                                  new MuleSdkExtensionExtensionModelParser(version,
+                                                                                                           getLoadingRequestExtraParameters()));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
