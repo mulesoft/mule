@@ -9,9 +9,19 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
+/**
+ * A {@link SpanCustomizationInfo} that sets the span name based on the {@link org.mule.runtime.api.component.ComponentIdentifier}
+ * of the {@link Component} that belongs to the current span and adds a suffix which indicates it represents an iteration
+ *
+ * @since 4.5.0
+ */
 public class NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInfo
     extends NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo {
+
+  public static final String ITERATION_TAG = "iteration";
 
   public NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInfo(Component component) {
     super(component);
@@ -19,6 +29,6 @@ public class NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInf
 
   @Override
   public String getName(CoreEvent coreEvent) {
-    return super.getName(coreEvent) + ":iteration";
+    return super.getName(coreEvent) + SPAN_NAME_SEPARATOR + ITERATION_TAG;
   }
 }
