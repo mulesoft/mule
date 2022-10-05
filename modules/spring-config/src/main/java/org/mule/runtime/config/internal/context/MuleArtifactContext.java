@@ -67,6 +67,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.notification.ConnectionNotification;
 import org.mule.runtime.api.notification.ConnectionNotificationListener;
 import org.mule.runtime.api.notification.CustomNotification;
@@ -166,6 +167,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final DefaultResourceLocator resourceLocator;
   private final PropertiesResolverConfigurationProperties configurationProperties;
   protected final MemoryManagementService memoryManagementService;
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
   private final FeatureFlaggingService featureFlaggingService;
@@ -211,10 +213,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                              MemoryManagementService memoryManagementService,
-                             FeatureFlaggingService featureFlaggingService) {
+                             FeatureFlaggingService featureFlaggingService,
+                             ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.featureFlaggingService = featureFlaggingService;
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
     this.coreFunctionsProvider = this.muleContext.getRegistry().get(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY);
     this.optionalObjectsController = optionalObjectsController;
     this.artifactType = artifactType;
@@ -365,7 +369,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return appExtensionModel;
     }
 
-    return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext, null);
+    return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext, expressionLanguageMetadataService);
   }
 
   private void logModelNotGenerated(String reason) {

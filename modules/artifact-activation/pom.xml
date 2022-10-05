@@ -18,7 +18,6 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <muleMavenClientApi>1.4.3</muleMavenClientApi>
         <muleMavenClientImpl>1.4.3</muleMavenClientImpl>
-        <dataWeaveVersion>2.5.0-SNAPSHOT</dataWeaveVersion>
     </properties>
 
     <dependencies>
@@ -64,12 +63,6 @@
             <artifactId>aether-util</artifactId>
             <!-- provided by mule-maven-client-impl -->
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.mulesoft.services</groupId>
-            <artifactId>mule-service-weave-ee</artifactId>
-            <version>${dataWeaveVersion}</version>
-            <classifier>mule-service</classifier>
         </dependency>
 
         <dependency>

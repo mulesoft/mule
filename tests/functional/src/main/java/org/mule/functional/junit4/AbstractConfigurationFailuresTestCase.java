@@ -21,10 +21,12 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -81,7 +83,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
                                                                                              enableLazyInit(),
                                                                                              false,
                                                                                              new String[] {configuration},
-                                                                                             null);
+                                                                                             mock(ExpressionLanguageMetadataService.class));
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);

@@ -6,7 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -15,11 +14,13 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.crea
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
+import static org.mockito.Mockito.mock;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -102,7 +103,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           enableLazyInit(),
                                                           artifactDeclaration,
-                                                          null);
+                                                          mock(ExpressionLanguageMetadataService.class));
     }
 
     String configResources = getConfigResources();
@@ -111,7 +112,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
                                                           disableXmlValidations(), enableLazyInit(),
                                                           mustRegenerateExtensionModels(),
                                                           new String[] {configResources},
-                                                          null);
+                                                          mock(ExpressionLanguageMetadataService.class));
     }
     configResources = getConfigFile();
     if (configResources != null) {
@@ -122,13 +123,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
                                                           disableXmlValidations(), enableLazyInit(),
                                                           mustRegenerateExtensionModels(),
                                                           new String[] {configResources},
-                                                          null);
+                                                          mock(ExpressionLanguageMetadataService.class));
     }
     return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                         disableXmlValidations(), enableLazyInit(),
                                                         mustRegenerateExtensionModels(),
                                                         getConfigFiles(),
-                                                        null);
+                                                        mock(ExpressionLanguageMetadataService.class));
   }
 
   public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {

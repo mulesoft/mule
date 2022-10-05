@@ -66,7 +66,8 @@ public class ApplicationTypeLoader implements TypeLoader {
 
   private Optional<MetadataType> evaluateTypeExpression(String typeExpression) {
     try {
-      return ofNullable(expressionLanguageMetadataService.evaluateTypeExpression(typeExpression, moduleDefinitions));
+      // return ofNullable(expressionLanguageMetadataService.evaluateTypeExpression(typeExpression, moduleDefinitions));
+      return expressionLanguageMetadataService.evaluateTypeExpression(typeExpression, moduleDefinitions);
     } catch (ExpressionCompilationException exception) {
       LOGGER.error("Failed to evaluate type expression '{}'", typeExpression, exception);
       return empty();
