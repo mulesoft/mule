@@ -30,7 +30,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
+public class DefaultTlsContextFactoryTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -111,8 +111,9 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void insecureTrustStoreShouldNotBeConfigured() throws IOException {
+  public void insecureTrustStoreShouldNotBeConfigured() throws IOException, InitialisationException {
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
+    initialiseIfNeeded(tlsContextFactory, muleContext);
     tlsContextFactory.setTrustStorePath("trustStore");
     tlsContextFactory.setTrustStoreInsecure(true);
     assertFalse(tlsContextFactory.isTrustStoreConfigured());
