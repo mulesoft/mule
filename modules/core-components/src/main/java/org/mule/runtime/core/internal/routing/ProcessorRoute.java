@@ -23,10 +23,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.SpanCustomizationInfoAware;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

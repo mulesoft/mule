@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -303,11 +304,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   public interface MessagingExceptionHandlerAware {
 
     void setMessagingExceptionHandler(FlowExceptionHandler messagingExceptionHandler);
-  }
-
-  public interface SpanCustomizationInfoAware {
-
-    void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo);
   }
 
   private static final class LazyProcessorChainBuilder extends AbstractMessageProcessorChain
