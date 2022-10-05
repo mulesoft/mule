@@ -67,6 +67,8 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   public static final AttributeKey<String> EXCEPTION_STACK_TRACE_KEY = stringKey("exception.stacktrace");
   public static final AttributeKey<Boolean> EXCEPTION_ESCAPED_KEY = booleanKey("exception.escaped");
 
+  public static final String EXCEPTIONS_HAS_BEEN_RECORDED = "Exceptions has been recorded.";
+
   private final Tracer tracer;
   private final Context remoteContext;
   private Span openTelemetrySpan;
@@ -112,7 +114,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   @Override
   public void export(InternalSpan internalSpan) {
     if (internalSpan.hasErrors()) {
-      getOpenTelemetrySpan().setStatus(ERROR);
+      getOpenTelemetrySpan().setStatus(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
       recordSpanExceptions(internalSpan);
     }
     getOpenTelemetrySpan().end(internalSpan.getDuration().getEnd(), NANOSECONDS);
