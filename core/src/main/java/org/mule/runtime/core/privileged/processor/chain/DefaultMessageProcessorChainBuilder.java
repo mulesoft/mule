@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -304,14 +305,19 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     void setMessagingExceptionHandler(FlowExceptionHandler messagingExceptionHandler);
   }
 
+  public interface SpanCustomizationInfoAware {
+
+    void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo);
+  }
 
   private static final class LazyProcessorChainBuilder extends AbstractMessageProcessorChain
-      implements MessagingExceptionHandlerAware {
+      implements MessagingExceptionHandlerAware, SpanCustomizationInfoAware {
 
     private final AbstractMessageProcessorChainBuilder chainBuilder;
     private final Supplier<ProcessingStrategy> processingStrategySupplier;
     private FlowExceptionHandler messagingExceptionHandler;
     private MessageProcessorChain delegate;
+    private SpanCustomizationInfo spanCustomizationInfo;
 
     private LazyProcessorChainBuilder(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                       List<Processor> processors,
@@ -326,6 +332,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     public void initialise() throws InitialisationException {
       chainBuilder.setProcessingStrategy(processingStrategySupplier.get());
       chainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
+      chainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
       delegate = chainBuilder.build();
       delegate.setAnnotations(getAnnotations());
       initialiseIfNeeded(delegate, muleContext);
@@ -359,6 +366,12 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     @Override
     public void setMessagingExceptionHandler(FlowExceptionHandler messagingExceptionHandler) {
       this.messagingExceptionHandler = messagingExceptionHandler;
+
+    }
+
+    @Override
+    public void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo) {
+      this.spanCustomizationInfo = spanCustomizationInfo;
 
     }
   }

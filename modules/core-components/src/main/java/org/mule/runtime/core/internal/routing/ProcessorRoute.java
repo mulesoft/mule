@@ -23,7 +23,10 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.SpanCustomizationInfoAware;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +41,7 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
   private final Processor processor;
+  private SpanCustomizationInfo spanCustomizationInfo;
 
   // just let the error be propagated to the outer chain...
   private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
@@ -69,10 +73,17 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
 
+  public void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo) {
+    this.spanCustomizationInfo = spanCustomizationInfo;
+  }
+
   @Override
   public void initialise() throws InitialisationException {
     if (processor instanceof MessagingExceptionHandlerAware) {
       ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
+    }
+    if (processor instanceof SpanCustomizationInfoAware) {
+      ((SpanCustomizationInfoAware) processor).setSpanCustomizationInfo(spanCustomizationInfo);
     }
     initialiseIfNeeded(processor, muleContext);
   }
