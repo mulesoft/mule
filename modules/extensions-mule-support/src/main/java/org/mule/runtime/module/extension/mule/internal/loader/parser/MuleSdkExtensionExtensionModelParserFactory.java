@@ -28,7 +28,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkExtensionArtifactExtensionModelParser;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
@@ -44,7 +46,21 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   private static final Logger LOGGER = getLogger(MuleSdkExtensionExtensionModelParserFactory.class);
 
-  private ArtifactAst cachedArtifactAst;
+  /**
+   * Configures the context by adding some parameters that are computed from the other ones.
+   * <p>
+   * In this particular case, it takes care of parsing and adding the artifact's AST if it is not already in the context.
+   * 
+   * @param context             the context that will be used for the declaration.
+   * @param onNewExtensionModel a consumer to call if the artifact's {@link ExtensionModel} is created as part of the parsing
+   *                            process.
+   */
+  public void configureContextBeforeParsing(ExtensionLoadingContext context, Consumer<ExtensionModel> onNewExtensionModel) {
+    Optional<ArtifactAst> ast = context.getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
+    if (!ast.isPresent()) {
+      context.addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, parseAstChecked(context, onNewExtensionModel));
+    }
+  }
 
   @Override
   public ExtensionModelParser createParser(ExtensionLoadingContext context) {
@@ -64,7 +80,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     return astBuilder.build();
   }
 
-  private ArtifactAst parseAst(ExtensionLoadingContext context) throws ConfigurationException {
+  private ArtifactAst parseAst(ExtensionLoadingContext context, Consumer<ExtensionModel> onNewExtensionModel)
+      throws ConfigurationException {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
     String version = getRequiredLoadingParameter(context, VERSION_PROPERTY_NAME);
@@ -74,7 +91,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                                                dependencies,
                                                                false,
                                                                context.getExtensionClassLoader(),
-                                                               new MuleSdkExtensionArtifactExtensionModelParser(version));
+                                                               new MuleSdkExtensionArtifactExtensionModelParser(version,
+                                                                                                                onNewExtensionModel));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
@@ -82,22 +100,16 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     return artifactAst;
   }
 
-  private ArtifactAst parseAstChecked(ExtensionLoadingContext context) {
+  private ArtifactAst parseAstChecked(ExtensionLoadingContext context, Consumer<ExtensionModel> onNewExtensionModel) {
     // ExtensionModelParserFactory can't throw checked exceptions, hence the wrapping
     try {
-      return parseAst(context);
+      return parseAst(context, onNewExtensionModel);
     } catch (ConfigurationException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
   private ArtifactAst getArtifactAst(ExtensionLoadingContext context) {
-    if (cachedArtifactAst == null) {
-      // The AST may be given already parsed. If not, we need to parse it from the resource file.
-      cachedArtifactAst =
-          context.<ArtifactAst>getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME).orElseGet(() -> parseAstChecked(context));
-    }
-
-    return cachedArtifactAst;
+    return getRequiredLoadingParameter(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
   }
 }

@@ -25,6 +25,7 @@ import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionEx
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * {@link ArtifactExtensionModelParser} that loads an {@link ExtensionModel} from an extension's {@link ArtifactAst}.
@@ -35,9 +36,17 @@ public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExt
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
+  private final Consumer<ExtensionModel> onNewExtensionModel;
   private final String version;
 
-  public MuleSdkExtensionArtifactExtensionModelParser(String version) {
+  /**
+   * Creates a new parser with the given parameters.
+   *
+   * @param version             the artifact's version.
+   * @param onNewExtensionModel a consumer to call when the parser creates the artifact's {@link ExtensionModel}.
+   */
+  public MuleSdkExtensionArtifactExtensionModelParser(String version, Consumer<ExtensionModel> onNewExtensionModel) {
+    this.onNewExtensionModel = onNewExtensionModel;
     this.version = version;
   }
 
@@ -54,6 +63,9 @@ public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExt
         .addParameter(VERSION_PROPERTY_NAME, version)
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
         .build());
+
+    // Calls the registered consumer with the new ExtensionModel.
+    onNewExtensionModel.accept(extensionModel);
 
     return of(extensionModel);
   }
