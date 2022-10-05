@@ -110,7 +110,8 @@ public class ApplicationContextBuilder {
 
   protected ConfigurationBuilder getAppBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources, mock(ExpressionLanguageMetadataService.class));
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
+                                                     mock(ExpressionLanguageMetadataService.class));
     appBuilder.setParentArtifactContext(domainArtifactContext);
     return appBuilder;
   }
