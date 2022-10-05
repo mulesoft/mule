@@ -341,7 +341,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return appExtensionModel;
     }
 
-    return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext, expressionLanguageMetadataService);
+    try {
+      return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext, expressionLanguageMetadataService);
+    } catch (ConfigurationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private void logModelNotGenerated(String reason) {

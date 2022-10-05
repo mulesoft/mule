@@ -14,6 +14,8 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -30,13 +32,12 @@ public class ArtifactAstUtils {
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code artifactId}.
    *
-   * @param configResources         the paths to the artifact's config files
-   * @param parserSupplier          the supplier used to obtain the ast parser. It might be invoked several times during the
-   *                                parsing
-   * @param extensions              the initial set of extensions the artifact depends on.
-   * @param disableValidations      whether to disable DSL validation
-   * @param artifactClassLoader     the artifact's classloader
-   * @param extensionModelsEnricher an enricher capable of providing additional {@link ExtensionModel}s for the artifact.
+   * @param configResources      the paths to the artifact's config files
+   * @param parserSupplier       the supplier used to obtain the ast parser. It might be invoked several times during the parsing
+   * @param extensions           the initial set of extensions the artifact depends on.
+   * @param disableValidations   whether to disable DSL validation
+   * @param artifactClassLoader  the artifact's classloader
+   * @param extensionModelParser a parser capable of providing the {@link ExtensionModel} which models the artifact itself.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the artifact couldn't be parsed
    */
@@ -45,17 +46,17 @@ public class ArtifactAstUtils {
                                                                 Set<ExtensionModel> extensions,
                                                                 boolean disableValidations,
                                                                 ClassLoader artifactClassLoader,
-                                                                ArtifactExtensionModelsEnricher extensionModelsEnricher)
+                                                                ArtifactExtensionModelParser extensionModelParser)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
-    if (extensionModelsEnricher.isApplicable(partialAst)) {
-      Set<ExtensionModel> enrichedExtensionModels =
-          extensionModelsEnricher.getEnrichedExtensionModels(partialAst, artifactClassLoader, extensions);
-      if (!enrichedExtensionModels.equals(extensions)) {
-        return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations);
-      }
+    Optional<ExtensionModel> extensionModel =
+        extensionModelParser.parseArtifactExtensionModel(partialAst, artifactClassLoader, extensions);
+    if (extensionModel.isPresent()) {
+      Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
+      enrichedExtensionModels.add(extensionModel.get());
+      return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations);
     }
 
     return disableValidations

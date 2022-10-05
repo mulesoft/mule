@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.artifact.activation.internal.ast;
+
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_APPLICATION_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+
+import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * An {@link ArtifactExtensionModelParser} suitable for the context of applications.
+ *
+ * @since 4.5.0
+ */
+public class ApplicationExtensionModelParser implements ArtifactExtensionModelParser {
+
+  // TODO W-11796759: This class shouldn't know which are the specific reusable components.
+  private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
+
+  private final String artifactId;
+  private final Optional<String> artifactVersion;
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
+
+  public ApplicationExtensionModelParser(String artifactId, Optional<String> artifactVersion,
+                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    this.artifactId = artifactId;
+    this.artifactVersion = artifactVersion;
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
+  }
+
+  @Override
+  public Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast, ClassLoader classLoader,
+                                                              Set<ExtensionModel> extensions)
+      throws ConfigurationException {
+    if (!containsReusableComponents(ast)) {
+      return empty();
+    }
+
+    if (!artifactVersion.isPresent()) {
+      throw new ConfigurationException(buildErrorMessage("No version specified", artifactId));
+    }
+
+    Optional<ExtensionModelLoader> loader =
+        getOptionalLoaderById(this.getClass().getClassLoader(), MULE_SDK_APPLICATION_LOADER_ID);
+    if (loader.isPresent()) {
+      return of(loader.get()
+          .loadExtensionModel(builder(classLoader, getDefault(extensions))
+              .addParameter(VERSION_PROPERTY_NAME, artifactVersion.get())
+              .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, artifactId)
+              .build()));
+    } else {
+      throw new ConfigurationException(buildErrorMessage("Mule ExtensionModelLoader not found", artifactId));
+    }
+  }
+
+  private boolean containsReusableComponents(ArtifactAst ast) {
+    return ast.topLevelComponentsStream()
+        .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
+  }
+
+  private I18nMessage buildErrorMessage(String reason, String artifactId) {
+    return createStaticMessage("ExtensionModel for application %s not generated: %s", artifactId, reason);
+  }
+}
