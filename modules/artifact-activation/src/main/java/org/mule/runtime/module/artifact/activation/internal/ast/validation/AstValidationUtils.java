@@ -27,9 +27,9 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class ValidationUtils {
+public class AstValidationUtils {
 
-  private ValidationUtils() {
+  private AstValidationUtils() {
     // Empty private constructor to avoid instantiation.
   }
 
@@ -54,7 +54,7 @@ public class ValidationUtils {
     if (hasErrors) {
       throw new ConfigurationException(createStaticMessage(validationResult.getItems()
           .stream()
-          .map(ValidationUtils::validationResultItemToString)
+          .map(AstValidationUtils::validationResultItemToString)
           .collect(joining(lineSeparator()))));
     }
   }

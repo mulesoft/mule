@@ -30,7 +30,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class MuleSdkLocalExtensionModelsEnricher implements ArtifactExtensionModelsEnricher {
+public class MuleSdkExtensionExtensionModelsEnricher implements ArtifactExtensionModelsEnricher {
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
@@ -43,13 +43,13 @@ public class MuleSdkLocalExtensionModelsEnricher implements ArtifactExtensionMod
    * @param version         the artifact's version.
    * @param extraParameters allows for adding extra parameters to the loading request for the new model.
    */
-  public MuleSdkLocalExtensionModelsEnricher(String version, Map<String, Object> extraParameters) {
+  public MuleSdkExtensionExtensionModelsEnricher(String version, Map<String, Object> extraParameters) {
     this.extraParameters = extraParameters;
     this.version = version;
   }
 
   @Override
-  public boolean applicable(ArtifactAst ast) {
+  public boolean isApplicable(ArtifactAst ast) {
     return ast.topLevelComponents().size() == 1 &&
         ast.topLevelComponents().get(0).directChildrenStream()
             .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));

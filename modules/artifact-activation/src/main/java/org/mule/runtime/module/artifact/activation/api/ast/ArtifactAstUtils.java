@@ -84,7 +84,7 @@ public final class ArtifactAstUtils {
     Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
     ApplicationExtensionModelsEnricher enricher =
         new ApplicationExtensionModelsEnricher(artifactId, version, expressionLanguageMetadataService);
-    if (!enricher.applicable(ast)) {
+    if (!enricher.isApplicable(ast)) {
       return empty();
     }
 

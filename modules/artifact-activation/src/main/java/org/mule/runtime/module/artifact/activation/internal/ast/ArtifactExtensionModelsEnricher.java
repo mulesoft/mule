@@ -22,7 +22,7 @@ public interface ArtifactExtensionModelsEnricher {
    * @param ast the artifact's AST
    * @return whether the enricher should be applied to the given {@link ArtifactAst}.
    */
-  boolean applicable(ArtifactAst ast);
+  boolean isApplicable(ArtifactAst ast);
 
   /**
    * @param ast         the artifact's AST
