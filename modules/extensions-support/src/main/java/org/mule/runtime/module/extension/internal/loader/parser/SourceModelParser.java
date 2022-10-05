@@ -150,10 +150,22 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
 
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 
+  /**
+   * @return an {@link Optional} {@link OutputResolverModelParser} that encapsulates the source's output resolver if dynamic
+   *         metadata were defined
+   */
   Optional<OutputResolverModelParser> getOutputResolverModelParser();
 
+  /**
+   * @return an {@link Optional} {@link AttributesResolverModelParser} that encapsulates the source's attribute resolver if
+   *         dynamic metadata were defined
+   */
   Optional<AttributesResolverModelParser> getAttributesResolverModelParser();
 
+  /**
+   * @return an {@link Optional} {@link KeyIdResolverModelParser} that encapsulates the source's key id resolver if dynamic
+   *         metadata were defined
+   */
   Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser();
 
   /**

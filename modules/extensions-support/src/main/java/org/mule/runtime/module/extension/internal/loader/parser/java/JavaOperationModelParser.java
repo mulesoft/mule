@@ -259,7 +259,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void parseBlockingOperation() {
-    // TODO: Should be possible to parse dynamic types right here
     Optional<OutputResolverModelParser> outputResolverModelParser = getOutputResolverModelParser();
     boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();
     outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), isDynamicResolver);

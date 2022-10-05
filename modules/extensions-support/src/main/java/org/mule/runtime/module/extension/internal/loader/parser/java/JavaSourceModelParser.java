@@ -236,8 +236,6 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   private void resolveOutputTypes() {
-
-    // TODO: Should be possible to parse dynamic types right here
     Optional<OutputResolverModelParser> outputResolverModelParser =
         parseOutputResolverModelParser(extensionElement, sourceElement);
     boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();

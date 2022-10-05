@@ -72,6 +72,11 @@ public interface ParameterGroupModelParser {
    */
   List<ModelProperty> getAdditionalModelProperties();
 
+  /**
+   * @param categoryName the category name that the resolver should be part of
+   * @return an {@link Optional} {@link KeyIdResolverModelParser} that encapsulates the operation's key id resolver if dynamic
+   *         metadata were defined
+   */
   Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName);
 
   /**

@@ -171,11 +171,27 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
 
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 
+  /**
+   * @return an {@link Optional} {@link OutputResolverModelParser} that encapsulates the operation's output resolver if dynamic
+   *         metadata were defined
+   */
   Optional<OutputResolverModelParser> getOutputResolverModelParser();
 
+  /**
+   * @return an {@link Optional} {@link AttributesResolverModelParser} that encapsulates the operation's attribute resolver if
+   *         dynamic metadata were defined
+   */
   Optional<AttributesResolverModelParser> getAttributesResolverModelParser();
 
+  /**
+   * @return a {@link List} of {@link InputResolverModelParser} that encapsulates the operation's input resolvers if dynamic
+   *         metadata were defined
+   */
   List<InputResolverModelParser> getInputResolverModelParsers();
 
+  /**
+   * @return an {@link Optional} {@link KeyIdResolverModelParser} that encapsulates the operation's key id resolver if dynamic
+   *         metadata were defined
+   */
   Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser();
 }

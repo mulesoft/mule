@@ -87,6 +87,7 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
     return parameters.stream();
   }
 
+  @Override
   public Optional<ExtensionParameter> getGroupParameter() {
     return of(groupParameter);
   }
