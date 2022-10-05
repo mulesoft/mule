@@ -76,7 +76,7 @@ public final class ArtifactAstUtils {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
     ApplicationExtensionModelsEnricher enricher = new ApplicationExtensionModelsEnricher(artifactId, version);
-    if (!enricher.applicable(ast)) {
+    if (!enricher.isApplicable(ast)) {
       return empty();
     }
 

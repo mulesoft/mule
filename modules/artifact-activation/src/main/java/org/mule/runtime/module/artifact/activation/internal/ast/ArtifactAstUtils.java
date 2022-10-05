@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
-import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -21,7 +20,6 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-@NoInstantiate
 public class ArtifactAstUtils {
 
   /**
@@ -51,7 +49,7 @@ public class ArtifactAstUtils {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
-    if (extensionModelsEnricher.applicable(partialAst)) {
+    if (extensionModelsEnricher.isApplicable(partialAst)) {
       Set<ExtensionModel> enrichedExtensionModels =
           extensionModelsEnricher.getEnrichedExtensionModels(partialAst, artifactClassLoader, extensions);
       if (!enrichedExtensionModels.equals(extensions)) {

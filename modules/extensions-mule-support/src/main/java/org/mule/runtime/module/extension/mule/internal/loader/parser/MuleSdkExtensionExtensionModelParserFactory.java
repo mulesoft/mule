@@ -12,7 +12,7 @@ import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
-import static org.mule.runtime.module.artifact.activation.internal.ast.validation.ValidationUtils.handleValidationResult;
+import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.handleValidationResult;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionsEnricher;
 
 import static java.util.Collections.singletonMap;
@@ -116,8 +116,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                                                   dependencies,
                                                                   false,
                                                                   context.getExtensionClassLoader(),
-                                                                  new MuleSdkLocalExtensionModelsEnricher(version,
-                                                                                                          getLoadingRequestExtraParameters()));
+                                                                  new MuleSdkExtensionExtensionModelsEnricher(version,
+                                                                                                              getLoadingRequestExtraParameters()));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);

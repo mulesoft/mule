@@ -54,7 +54,7 @@ public class ApplicationExtensionModelsEnricher implements ArtifactExtensionMode
   }
 
   @Override
-  public boolean applicable(ArtifactAst ast) {
+  public boolean isApplicable(ArtifactAst ast) {
     return ast.topLevelComponentsStream()
         .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
   }
