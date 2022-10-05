@@ -4,6 +4,31 @@
       "ignore": [
         {
           "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getFlowSummaryStatistics()",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "getFlowSummaryStatistics",
+          "elementKind": "method",
+          "justification": "W-11798994: Feature needed for monitoring currently productive mules"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "FlowsSummaryStatistics",
+          "elementKind": "interface",
+          "justification": "W-11798994: Feature needed for monitoring currently productive mules"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.api.management.stats.ResetOnQueryCounter",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "ResetOnQueryCounter",
+          "elementKind": "interface",
+          "justification": "W-11798994: Feature needed for monitoring currently productive mules"
+        },
+        {
+          "code": "java.method.added",
           "new": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.api.transformer.AbstractMessageTransformer::createTransformationEvent(org.mule.runtime.api.message.Message, org.mule.runtime.api.event.EventContext)",
           "package": "org.mule.runtime.core.api.transformer",
           "classSimpleName": "AbstractMessageTransformer",
