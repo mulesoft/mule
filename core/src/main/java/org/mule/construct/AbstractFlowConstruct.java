@@ -29,12 +29,14 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
+import org.mule.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 
+import org.apache.commons.collections.Closure;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -249,8 +251,12 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         statistics = new FlowConstructStatistics(getConstructType(), name);
         statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);
+
+        configureSummaryStatistics();
     }
 
+    protected abstract void configureSummaryStatistics();
+    
     protected void doStart() throws MuleException
     {
         // Empty template method
@@ -261,8 +267,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         // Empty template method
     }
 
-    protected void doDispose()
-    {
+    protected void doDispose() {
         muleContext.getStatistics().remove(statistics);
     }
 

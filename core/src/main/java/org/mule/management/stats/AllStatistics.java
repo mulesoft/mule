@@ -21,8 +21,9 @@ public class AllStatistics
 {
     private boolean isStatisticsEnabled;
     private long startTime;
-    private ApplicationStatistics appStats;
-    private Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<String, FlowConstructStatistics>();
+    private final ApplicationStatistics appStats;
+    private final FlowsSummaryStatistics flowSummaryStatistics;
+    private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
 
     /**
      * 
@@ -31,6 +32,7 @@ public class AllStatistics
     {
         clear();
         appStats = new ApplicationStatistics(this);
+        flowSummaryStatistics = new DefaultFlowsSummaryStatistics(isStatisticsEnabled);
         appStats.setEnabled(isStatisticsEnabled);
         add(appStats);
     }
@@ -132,5 +134,10 @@ public class AllStatistics
     public FlowConstructStatistics getApplicationStatistics()
     {
         return appStats;
+    }
+
+    public FlowsSummaryStatistics getFlowSummaryStatistics()
+    {
+        return flowSummaryStatistics;
     }
 }
