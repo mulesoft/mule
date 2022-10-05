@@ -36,6 +36,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
@@ -97,6 +98,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
   private final MemoryManagementService memoryManagementService;
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private ApplicationStatus status;
 
@@ -129,11 +131,19 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.policyManager = applicationPolicyProvider;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
+    this.expressionLanguageMetadataService = getExpressionLanguageMetadataService(serviceRepository);
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
     }
+  }
+
+  private ExpressionLanguageMetadataService getExpressionLanguageMetadataService(ServiceRepository serviceRepository) {
+    return (ExpressionLanguageMetadataService) serviceRepository.getServices().stream()
+        .filter(service -> ExpressionLanguageMetadataService.class.isAssignableFrom(service.getClass()))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -245,6 +255,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setPolicyProvider(policyManager)
               .setRuntimeLockFactory(runtimeLockFactory)
               .setMemoryManagementService(memoryManagementService)
+              .setExpressionLanguageMetadataService(expressionLanguageMetadataService)
               .setArtifactCoordinates(descriptor.getBundleDescriptor());
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);

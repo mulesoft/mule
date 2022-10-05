@@ -20,6 +20,7 @@ import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUti
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
@@ -35,6 +36,7 @@ import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistr
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,28 +83,34 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
   private ArtifactAstConfigurationBuilder artifactAstConfigurationBuilder;
 
+  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
+
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean enableLazyInit,
-                                                  ArtifactDeclaration artifactDeclaration) {
+                                                  ArtifactDeclaration artifactDeclaration,
+                                                  ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = false;
     this.enableLazyInit = enableLazyInit;
     this.ignoreCaches = false;
 
     this.artifactDeclaration = requireNonNull(artifactDeclaration);
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean disableXmlValidations,
                                                   boolean enableLazyInit,
                                                   boolean ignoreCaches,
-                                                  String[] configResources) {
+                                                  String[] configResources,
+                                                  ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = disableXmlValidations;
     this.enableLazyInit = enableLazyInit;
     this.ignoreCaches = ignoreCaches;
 
     this.configResources = requireNonNull(configResources);
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   public void setArtifactType(ArtifactType artifactType) {
@@ -123,9 +131,10 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     } else if (configResources.length == 0) {
       artifactAst = emptyArtifact();
     } else if (ignoreCaches) {
-      artifactAst = parseArtifactIntoAst(extensions, muleContext);
+      artifactAst = parseArtifactIntoAst(extensions, muleContext, expressionLanguageMetadataService);
     } else {
-      artifactAst = configAstsCache.get(asList(configResources), key -> parseArtifactIntoAst(extensions, muleContext));
+      artifactAst = configAstsCache.get(asList(configResources),
+                                        key -> parseArtifactIntoAst(extensions, muleContext, expressionLanguageMetadataService));
     }
 
     artifactAstConfigurationBuilder =
@@ -151,14 +160,16 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
         : parsersCache.get(xmlParserFactory);
   }
 
-  protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
+  protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext,
+                                             ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     try {
       ArtifactAst ast = parseAndBuildAppExtensionModel(configResources,
                                                        this::getParser,
                                                        extensions,
                                                        artifactType,
                                                        disableXmlValidations,
-                                                       muleContext);
+                                                       muleContext,
+                                                       expressionLanguageMetadataService);
 
       if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
         return serializeAndDeserialize(ast);

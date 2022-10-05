@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -54,13 +53,6 @@ public final class ArtifactAstUtils {
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
   private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(of(OPERATION_DEF));
-
-  private static final ExpressionLanguageMetadataService EXPRESSION_LANGUAGE_SERVICE = createExpressionLanguageMetadataService();
-
-  private static ExpressionLanguageMetadataService createExpressionLanguageMetadataService() {
-    // TODO: Should this class be obtained from each artifactClassLoader? From the container one? Review.
-    return new WeaveExpressionLanguageMetadataServiceImpl();
-  }
 
   /**
    * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
@@ -83,14 +75,16 @@ public final class ArtifactAstUtils {
                                                            Set<ExtensionModel> extensions,
                                                            ArtifactType artifactType,
                                                            boolean disableValidations,
-                                                           MuleContext muleContext)
+                                                           MuleContext muleContext,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
     if (artifactType.equals(APPLICATION)) {
       ExtensionModel artifactExtensionModel =
-          parseArtifactExtensionModel(partialAst, muleContext.getExecutionClassLoader().getParent(), muleContext).orElse(null);
+          parseArtifactExtensionModel(partialAst, muleContext.getExecutionClassLoader().getParent(), muleContext,
+                                      expressionLanguageMetadataService).orElse(null);
       if (artifactExtensionModel != null) {
         Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
         enrichedExtensionModels.add(artifactExtensionModel);
@@ -107,14 +101,16 @@ public final class ArtifactAstUtils {
    * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
    * {@link ExtensionModel} which represents it.
    *
-   * @param ast                 the application's AST
-   * @param artifactClassLoader the application's classloader
-   * @param muleContext         the application's context
+   * @param ast                               the application's AST
+   * @param artifactClassLoader               the application's classloader
+   * @param muleContext                       the application's context
+   * @param expressionLanguageMetadataService
    * @return an optional {@link ExtensionModel}
    */
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
                                                                      ClassLoader artifactClassLoader,
-                                                                     MuleContext muleContext) {
+                                                                     MuleContext muleContext,
+                                                                     ExpressionLanguageMetadataService expressionLanguageMetadataService) {
 
     if (ast.topLevelComponentsStream()
         .noneMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()))) {
@@ -136,7 +132,7 @@ public final class ArtifactAstUtils {
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
               .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME,
-                            new ApplicationTypeLoader(dependenciesExtensionModels, EXPRESSION_LANGUAGE_SERVICE))
+                            new ApplicationTypeLoader(dependenciesExtensionModels, expressionLanguageMetadataService))
               .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);

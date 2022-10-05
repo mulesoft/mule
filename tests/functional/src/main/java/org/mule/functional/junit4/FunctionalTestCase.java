@@ -101,7 +101,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     if (artifactDeclaration != null) {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           enableLazyInit(),
-                                                          artifactDeclaration);
+                                                          artifactDeclaration,
+                                                          null);
     }
 
     String configResources = getConfigResources();
@@ -109,7 +110,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           disableXmlValidations(), enableLazyInit(),
                                                           mustRegenerateExtensionModels(),
-                                                          new String[] {configResources});
+                                                          new String[] {configResources},
+                                                          null);
     }
     configResources = getConfigFile();
     if (configResources != null) {
@@ -119,12 +121,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           disableXmlValidations(), enableLazyInit(),
                                                           mustRegenerateExtensionModels(),
-                                                          new String[] {configResources});
+                                                          new String[] {configResources},
+                                                          null);
     }
     return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                         disableXmlValidations(), enableLazyInit(),
                                                         mustRegenerateExtensionModels(),
-                                                        getConfigFiles());
+                                                        getConfigFiles(),
+                                                        null);
   }
 
   public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {

@@ -32,6 +32,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
@@ -121,6 +122,7 @@ public class ArtifactContextBuilder {
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
   private MemoryManagementService memoryManagementService;
+  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactCoordinates artifactCoordinates;
 
   private ArtifactContextBuilder() {}
@@ -467,7 +469,8 @@ public class ArtifactContextBuilder {
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators)
                     .setRuntimeLockFactory(runtimeLockFactory)
-                    .setMemoryManagementService(memoryManagementService);
+                    .setMemoryManagementService(memoryManagementService)
+                    .setExpressionLanguageMetadataService(expressionLanguageMetadataService);
 
             if (parentArtifact != null && parentArtifact.getArtifactContext() != null) {
               artifactContextConfigurationBuilder.setParentArtifactContext(parentArtifact.getArtifactContext());
@@ -550,6 +553,11 @@ public class ArtifactContextBuilder {
 
   public ArtifactContextBuilder setMemoryManagementService(MemoryManagementService memoryManagementService) {
     this.memoryManagementService = memoryManagementService;
+    return this;
+  }
+
+  public ArtifactContextBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
     return this;
   }
 }

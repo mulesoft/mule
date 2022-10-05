@@ -80,7 +80,8 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
                                                                                              disableXmlValidations(),
                                                                                              enableLazyInit(),
                                                                                              false,
-                                                                                             new String[] {configuration});
+                                                                                             new String[] {configuration},
+                                                                                             null);
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);

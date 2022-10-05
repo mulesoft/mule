@@ -365,12 +365,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return appExtensionModel;
     }
 
-    return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext);
+    return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext, null);
   }
 
   private void logModelNotGenerated(String reason) {
     if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn(reason + ". ExtensionModel for app {} not generated", muleContext.getConfiguration().getId());
+      LOGGER.warn("{}. ExtensionModel for app {} not generated", reason, muleContext.getConfiguration().getId());
     }
   }
 
