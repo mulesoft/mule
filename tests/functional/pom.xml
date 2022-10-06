@@ -12,6 +12,8 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+
+        <dataweaveVersion>2.5.0-SNAPSHOT</dataweaveVersion>
     </properties>
 
     <dependencies>
@@ -108,6 +110,11 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <version>${dataweaveVersion}</version>
         </dependency>
 
         <!-- Unit tests -->

@@ -6,10 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
@@ -17,6 +13,11 @@ import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerF
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
+
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -36,7 +37,7 @@ import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistr
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.module.service.api.manager.ServiceManager;
+import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +48,6 @@ import java.util.Set;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.mockito.Mockito;
 
 /**
  * {@link AbstractConfigurationBuilder} implementation that delegates to {@link ArtifactAstConfigurationBuilder} using cached
@@ -119,7 +119,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    ExpressionLanguageMetadataService expressionLanguageMetadataService = Mockito.mock(ExpressionLanguageMetadataService.class);
+    ExpressionLanguageMetadataService expressionLanguageMetadataService = new WeaveExpressionLanguageMetadataServiceImpl();
 
     final ArtifactAst artifactAst;
     if (artifactDeclaration != null) {
