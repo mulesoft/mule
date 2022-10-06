@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
@@ -207,6 +208,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   public static final Logger logger = getLogger(AbstractDeploymentTestCase.class);
 
   private static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
+  private static final String EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME = "expressionLanguageMetadataService";
   private static final String SCHEDULER_SERVICE_NAME = "schedulerService";
   protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 2000;
   protected static final String FLOW_PROPERTY_NAME = "flowName";
@@ -599,6 +601,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                   new File(services, SCHEDULER_SERVICE_NAME));
     copyDirectory(getExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME)),
                   new File(services, EXPRESSION_LANGUAGE_SERVICE_NAME));
+    copyDirectory(buildExpressionLanguageMetadataServiceFile(compilerWorkFolder
+        .newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME)),
+                  new File(services, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     testDeploymentListener = new TestDeploymentListener();

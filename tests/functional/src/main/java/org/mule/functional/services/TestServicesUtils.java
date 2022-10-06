@@ -9,6 +9,7 @@ package org.mule.functional.services;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -72,6 +73,28 @@ public class TestServicesUtils {
         .withServiceProviderClass("org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
         .forContract("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath())
+        .unpack(true)
+        .getArtifactFile();
+  }
+
+
+  /**
+   * Provides a packaged mock {@link ExpressionLanguageMetadataService} implementation.
+   *
+   * @param tempFolder where to generate temporary files needed for compilation of the service classes.
+   * @return the zip service file
+   */
+  public static File buildExpressionLanguageMetadataServiceFile(File tempFolder) {
+    final File defaultServiceJarFile = new CompilerUtils.JarCompiler()
+        .compiling(getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataService.java", tempFolder),
+                   getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataServiceProvider.java",
+                                   tempFolder))
+        .compile("mule-module-service-mock-expression-language-metadata-1.0-SNAPSHOT.jar");
+
+    return new ServiceFileBuilder("expressionLanguageMetadataService")
+        .withServiceProviderClass("org.mule.service.el.metadata.MockExpressionLanguageMetadataServiceProvider")
+        .forContract("org.mule.runtime.api.metadata.ExpressionLanguageMetadataService")
+        .usingLibrary(defaultServiceJarFile.getAbsolutePath())
         .unpack(true)
         .getArtifactFile();
   }
