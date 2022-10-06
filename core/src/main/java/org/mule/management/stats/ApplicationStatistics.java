@@ -6,13 +6,16 @@
  */
 package org.mule.management.stats;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Aggregate statistics for all services and flows in an application.   Do this by looping through all of the
  * applications' FlowConstructStatistics that aren;t themselves aggregators.
  */
 public class ApplicationStatistics extends FlowConstructStatistics
 {
-    private AllStatistics parent;
+    private final AllStatistics parent;
 
     public ApplicationStatistics(AllStatistics parent)
     {
@@ -170,5 +173,52 @@ public class ApplicationStatistics extends FlowConstructStatistics
             }
         }
         return total;
+    }
+
+
+    @Override
+    public ResetOnQueryCounter getEventsReceivedCounter()
+    {
+      Set<ResetOnQueryCounter> counters = new HashSet<>();
+
+      for (FlowConstructStatistics stats : parent.getServiceStatistics())
+      {
+          if (!(stats instanceof ApplicationStatistics))
+          {
+              counters.add(stats.getEventsReceivedCounter());
+          }
+      }
+
+      return new CompositeResetOnQueryCounter(counters);
+    }
+
+    @Override
+    public ResetOnQueryCounter getExecutionErrorsCounter() {
+        Set<ResetOnQueryCounter> counters = new HashSet<>();
+  
+        for (FlowConstructStatistics stats : parent.getServiceStatistics())
+        {
+            if (!(stats instanceof ApplicationStatistics))
+            {
+                counters.add(stats.getExecutionErrorsCounter());
+            }
+        }
+  
+        return new CompositeResetOnQueryCounter(counters);
+    }
+
+    @Override
+    public ResetOnQueryCounter getFatalErrorsCounter()
+    {
+        Set<ResetOnQueryCounter> counters = new HashSet<>();
+  
+        for (FlowConstructStatistics stats : parent.getServiceStatistics())
+        {
+            if (!(stats instanceof ApplicationStatistics)) {
+                counters.add(stats.getFatalErrorsCounter());
+            }
+        }
+  
+        return new CompositeResetOnQueryCounter(counters);
     }
 }
