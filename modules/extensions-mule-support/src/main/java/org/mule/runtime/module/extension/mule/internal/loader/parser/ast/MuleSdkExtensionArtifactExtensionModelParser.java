@@ -23,7 +23,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactExtensionModelParser;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,17 +35,9 @@ public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExt
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
-  private final Map<String, Object> extraParameters;
   private final String version;
 
-  /**
-   * Creates a new parser with the given parameters.
-   *
-   * @param version         the artifact's version.
-   * @param extraParameters allows for adding extra parameters to the loading request for the new model.
-   */
-  public MuleSdkExtensionArtifactExtensionModelParser(String version, Map<String, Object> extraParameters) {
-    this.extraParameters = extraParameters;
+  public MuleSdkExtensionArtifactExtensionModelParser(String version) {
     this.version = version;
   }
 
@@ -62,7 +53,6 @@ public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExt
     ExtensionModel extensionModel = loader.loadExtensionModel(builder(classLoader, getDefault(extensions))
         .addParameter(VERSION_PROPERTY_NAME, version)
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-        .addParameters(extraParameters)
         .build());
 
     return of(extensionModel);
