@@ -103,7 +103,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   @Override
   public void initialise() throws InitialisationException {
     Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
-    nestedChain = buildNewChainWithListOfProcessors(processingStrategy, messageProcessors, new NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInfo(this));
+    nestedChain =
+        buildNewChainWithListOfProcessors(processingStrategy, messageProcessors,
+                                          new NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInfo(this));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
   }

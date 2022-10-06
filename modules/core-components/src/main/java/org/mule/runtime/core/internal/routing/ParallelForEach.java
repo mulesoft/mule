@@ -72,7 +72,9 @@ public class ParallelForEach extends AbstractForkJoinRouter {
 
   @Override
   public void initialise() throws InitialisationException {
-    nestedChain = buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors, new NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInfo(this));
+    nestedChain =
+        buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors,
+                                          new NamedSpanBasedOnComponentIdentifierAndIterationSpanCustomizationInfo(this));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, collectionExpression);
     super.initialise();
   }
