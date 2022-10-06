@@ -13,7 +13,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFAC
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.handleValidationResult;
-import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionsEnricher;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionParser;
 
 import static java.util.Collections.singletonMap;
 
@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkExtensionArtifactExtensionModelParser;
 
 import java.util.Map;
 import java.util.Optional;
@@ -72,7 +73,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     // again.
     if (cachedExtensionModelParser == null) {
       cachedExtensionModelParser =
-          new MuleSdkExtensionModelParser(this.cachedArtifactAst, createTypeLoader(context), createExtensionModelHelper(context));
+          new MuleSdkExtensionExtensionModelParser(this.cachedArtifactAst, createTypeLoader(context),
+                                                   createExtensionModelHelper(context));
     }
     return cachedExtensionModelParser;
   }
@@ -94,13 +96,13 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
     String version = getRequiredLoadingParameter(context, VERSION_PROPERTY_NAME);
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
-    ArtifactAst artifactAst = parseArtifactWithExtensionsEnricher(resources,
-                                                                  this::createAstParser,
-                                                                  dependencies,
-                                                                  false,
-                                                                  context.getExtensionClassLoader(),
-                                                                  new MuleSdkExtensionExtensionModelParser(version,
-                                                                                                           getLoadingRequestExtraParameters()));
+    ArtifactAst artifactAst = parseArtifactWithExtensionParser(resources,
+                                                               this::createAstParser,
+                                                               dependencies,
+                                                               false,
+                                                               context.getExtensionClassLoader(),
+                                                               new MuleSdkExtensionArtifactExtensionModelParser(version,
+                                                                                                                getLoadingRequestExtraParameters()));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);

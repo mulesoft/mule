@@ -28,8 +28,7 @@ public class ArtifactAstUtils {
    * Parses {@code configResources} for a Mule artifact and returns an {@link ArtifactAst} enriched with an additional
    * {@link ExtensionModel} which models the artifact itself, with all its defined operations, sources, functions, etc.
    * <p>
-   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
-   * {@code artifactId}.
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()}.
    *
    * @param configResources      the paths to the artifact's config files
    * @param parserSupplier       the supplier used to obtain the ast parser. It might be invoked several times during the parsing
@@ -40,12 +39,12 @@ public class ArtifactAstUtils {
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the artifact couldn't be parsed
    */
-  public static ArtifactAst parseArtifactWithExtensionsEnricher(String[] configResources,
-                                                                AstXmlParserSupplier parserSupplier,
-                                                                Set<ExtensionModel> extensions,
-                                                                boolean disableValidations,
-                                                                ClassLoader artifactClassLoader,
-                                                                ArtifactExtensionModelParser extensionModelParser)
+  public static ArtifactAst parseArtifactWithExtensionParser(String[] configResources,
+                                                             AstXmlParserSupplier parserSupplier,
+                                                             Set<ExtensionModel> extensions,
+                                                             boolean disableValidations,
+                                                             ClassLoader artifactClassLoader,
+                                                             ArtifactExtensionModelParser extensionModelParser)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);

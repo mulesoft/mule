@@ -6,71 +6,121 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-
-import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
 
-import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactExtensionModelParser;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Stream;
 
 /**
- * {@link ArtifactExtensionModelParser} that loads an {@link ExtensionModel} from an extension's {@link ArtifactAst}.
+ * {@link ExtensionModelParser} implementation for Mule SDK extensions
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionExtensionModelParser implements ArtifactExtensionModelParser {
+public class MuleSdkExtensionExtensionModelParser extends AbstractMuleSdkExtensionModelParser {
 
-  private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
+  private String name;
+  private Category category;
+  private String vendor;
+  private String namespace;
+  private Optional<XmlDslConfiguration> xmlDslConfiguration;
+  private LicenseModelProperty licenseModelProperty;
 
-  private final Map<String, Object> extraParameters;
-  private final String version;
-
-  /**
-   * Creates a new parser with the given parameters.
-   *
-   * @param version         the artifact's version.
-   * @param extraParameters allows for adding extra parameters to the loading request for the new model.
-   */
-  public MuleSdkExtensionExtensionModelParser(String version, Map<String, Object> extraParameters) {
-    this.extraParameters = extraParameters;
-    this.version = version;
+  public MuleSdkExtensionExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
+    super(ast, typeLoader, extensionModelHelper);
+    parseMetadata(getExtensionComponentAst(ast));
   }
 
   @Override
-  public Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast, ClassLoader classLoader,
-                                                              Set<ExtensionModel> extensions) {
-    if (!containsReusableComponents(ast)) {
-      return empty();
-    }
-
-    // Loads the model using the Mule SDK Extensions loader.
-    ExtensionModelLoader loader = new MuleSdkExtensionExtensionModelLoader();
-    ExtensionModel extensionModel = loader.loadExtensionModel(builder(classLoader, getDefault(extensions))
-        .addParameter(VERSION_PROPERTY_NAME, version)
-        .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-        .addParameters(extraParameters)
-        .build());
-
-    return of(extensionModel);
+  public String getName() {
+    return name;
   }
 
-  private boolean containsReusableComponents(ArtifactAst ast) {
-    return ast.topLevelComponents().size() == 1 &&
-        ast.topLevelComponents().get(0).directChildrenStream()
-            .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
+  @Override
+  public Category getCategory() {
+    return category;
+  }
+
+  @Override
+  public String getVendor() {
+    return vendor;
+  }
+
+  @Override
+  public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
+    return xmlDslConfiguration;
+  }
+
+  @Override
+  public String getNamespace() {
+    return namespace;
+  }
+
+  @Override
+  public LicenseModelProperty getLicenseModelProperty() {
+    return licenseModelProperty;
+  }
+
+  @Override
+  protected Stream<ComponentAst> getTopLevelElements(ArtifactAst ast) {
+    return getExtensionComponentAst(ast).directChildrenStream();
+  }
+
+  private ComponentAst getExtensionComponentAst(ArtifactAst ast) {
+    // At this point we can assume there is only one top level component which is the extension:extension component
+    // We don't need to check for this because it should be guaranteed by previous validations
+    return ast.topLevelComponents().get(0);
+  }
+
+  private void parseMetadata(ComponentAst extensionComponentAst) {
+    name = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);
+    category = Category
+        .valueOf(this.<String>getParameter(extensionComponentAst, MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME).toUpperCase());
+    vendor = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME);
+
+    parseXmlDslConfiguration(extensionComponentAst);
+    parseLicenseModelProperty(extensionComponentAst);
+
+    // use dummy version since this is just for obtaining the namespace
+    this.namespace = getExtensionsNamespace(getXmlDslModel(name, "1.0.0", xmlDslConfiguration));
+  }
+
+  private void parseXmlDslConfiguration(ComponentAst extensionComponentAst) {
+    Optional<String> prefix = getOptionalParameter(extensionComponentAst, MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME);
+    Optional<String> namespace = getOptionalParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME);
+    if (prefix.isPresent() || namespace.isPresent()) {
+      xmlDslConfiguration = of(new XmlDslConfiguration(prefix.orElse(""), namespace.orElse("")));
+    } else {
+      xmlDslConfiguration = empty();
+    }
+  }
+
+  private void parseLicenseModelProperty(ComponentAst extensionComponentAst) {
+    boolean requiresEeLicense =
+        getParameter(extensionComponentAst, MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME);
+    boolean allowsEvaluationLicense = getParameter(extensionComponentAst,
+                                                   MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME);
+    Optional<String> requiredEntitlement = getOptionalParameter(extensionComponentAst,
+                                                                MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME);
+    licenseModelProperty = new LicenseModelProperty(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
   }
 }
