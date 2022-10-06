@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class ApplicationExtensionModelParser implements ArtifactExtensionModelParser {
+public class ApplicationArtifactExtensionModelParser implements ArtifactExtensionModelParser {
 
   // TODO W-11796759: This class shouldn't know which are the specific reusable components.
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
@@ -45,8 +45,8 @@ public class ApplicationExtensionModelParser implements ArtifactExtensionModelPa
   private final Optional<String> artifactVersion;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  public ApplicationExtensionModelParser(String artifactId, Optional<String> artifactVersion,
-                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+  public ApplicationArtifactExtensionModelParser(String artifactId, Optional<String> artifactVersion,
+                                                 ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactId = artifactId;
     this.artifactVersion = artifactVersion;
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;

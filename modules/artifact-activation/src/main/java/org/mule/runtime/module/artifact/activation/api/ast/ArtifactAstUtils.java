@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.ast;
 
-import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionsEnricher;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionParser;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -15,7 +15,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.module.artifact.activation.internal.ast.ApplicationExtensionModelParser;
+import org.mule.runtime.module.artifact.activation.internal.ast.ApplicationArtifactExtensionModelParser;
 
 import java.util.Optional;
 import java.util.Set;
@@ -55,13 +55,13 @@ public final class ArtifactAstUtils {
       throws ConfigurationException {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
-    return parseArtifactWithExtensionsEnricher(configResources,
-                                               parserSupplier,
-                                               extensions,
-                                               disableValidations,
-                                               muleContext.getExecutionClassLoader().getParent(),
-                                               new ApplicationExtensionModelParser(artifactId, version,
-                                                                                   expressionLanguageMetadataService));
+    return parseArtifactWithExtensionParser(configResources,
+                                            parserSupplier,
+                                            extensions,
+                                            disableValidations,
+                                            muleContext.getExecutionClassLoader().getParent(),
+                                            new ApplicationArtifactExtensionModelParser(artifactId, version,
+                                                                                        expressionLanguageMetadataService));
   }
 
   /**
@@ -82,7 +82,8 @@ public final class ArtifactAstUtils {
 
     String artifactId = muleContext.getConfiguration().getId();
     Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
-    ApplicationExtensionModelParser parser = new ApplicationExtensionModelParser(artifactId, version, expressionLanguageMetadataService);
+    ApplicationArtifactExtensionModelParser parser =
+        new ApplicationArtifactExtensionModelParser(artifactId, version, expressionLanguageMetadataService);
     return parser.parseArtifactExtensionModel(ast, artifactClassLoader, muleContext.getExtensionManager().getExtensions());
   }
 
