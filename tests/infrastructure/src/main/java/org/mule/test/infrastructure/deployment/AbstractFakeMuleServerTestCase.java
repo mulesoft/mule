@@ -46,7 +46,13 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     muleServer.addZippedService(getSchedulerService());
     muleServer.addZippedService(getHttpService());
     muleServer.addZippedService(getExpressionLanguageService());
-    muleServer.addZippedService(getExpressionLanguageMetadataService());
+    if (addExpressionLanguageMetadataService()) {
+      muleServer.addZippedService(getExpressionLanguageMetadataService());
+    }
+  }
+
+  protected boolean addExpressionLanguageMetadataService() {
+    return true;
   }
 
   @After
