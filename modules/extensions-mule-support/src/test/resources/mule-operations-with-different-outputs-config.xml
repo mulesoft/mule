@@ -33,6 +33,7 @@
             <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
+            <logger message="#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]"/>
             <set-payload value="Expected output" />
         </operation:body>
     </operation:def>

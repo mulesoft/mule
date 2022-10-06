@@ -90,6 +90,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                                  () -> getExpressionSyntacticValidationErrorLevel(featureFlaggingService),
                                                                  Severity.ERROR));
       validations.add(new ExpressionParametersSyntacticallyValid(expressionLanguage, () -> WARN, WARNING));
+      validations.add(new OperationDoesNotHaveInsecureExpression(expressionLanguage));
     }
 
     return validations;
