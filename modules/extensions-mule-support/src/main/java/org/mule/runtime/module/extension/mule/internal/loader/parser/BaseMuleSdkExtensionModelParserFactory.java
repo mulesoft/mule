@@ -9,18 +9,13 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.lang.String.format;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
 import java.util.NoSuchElementException;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Base {@link ExtensionModelParserFactory} implementation for Mule SDK.
@@ -30,19 +25,6 @@ import java.util.stream.Stream;
  * @since 4.5.0
  */
 public abstract class BaseMuleSdkExtensionModelParserFactory implements ExtensionModelParserFactory {
-
-  @Override
-  public ExtensionModelParser createParser(ExtensionLoadingContext context) {
-    return new MuleSdkExtensionModelParser(createMetadataParser(context),
-                                           createTopLevelComponentsSupplier(context),
-                                           createTypeLoader(context),
-                                           new ExtensionModelHelper(context.getDslResolvingContext().getExtensions(),
-                                                                    context.getDslResolvingContext()));
-  }
-
-  protected abstract MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context);
-
-  protected abstract Supplier<Stream<ComponentAst>> createTopLevelComponentsSupplier(ExtensionLoadingContext context);
 
   /**
    * Gets a parameter from the given {@link ExtensionLoadingContext} assuming it needs to be present.
@@ -64,5 +46,16 @@ public abstract class BaseMuleSdkExtensionModelParserFactory implements Extensio
    */
   protected TypeLoader createTypeLoader(ExtensionLoadingContext context) {
     return new ApplicationTypeLoader(context.getDslResolvingContext().getExtensions());
+  }
+
+  /**
+   *
+   * @param context The {@link ExtensionLoadingContext}.
+   * @return An {@link ExtensionModelHelper} to aid with the lookup of component models by identifier among the extensions in the
+   *         context.
+   */
+  protected ExtensionModelHelper createExtensionModelHelper(ExtensionLoadingContext context) {
+    return new ExtensionModelHelper(context.getDslResolvingContext().getExtensions(),
+                                    context.getDslResolvingContext());
   }
 }

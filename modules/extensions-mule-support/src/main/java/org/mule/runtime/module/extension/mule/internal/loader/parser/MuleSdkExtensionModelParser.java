@@ -6,41 +6,29 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
-import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
+import static java.util.Optional.of;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.model.ExternalLibraryModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
-import org.mule.runtime.api.meta.model.notification.NotificationModel;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -48,159 +36,91 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionModelParser implements ExtensionModelParser {
+public class MuleSdkExtensionModelParser extends AbstractMuleSdkExtensionModelParser {
 
-  // The namespace of the extension when it's defined within an application rather than in a separate artifact.
-  public static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
+  private String name;
+  private Category category;
+  private String vendor;
+  private String namespace;
+  private Optional<XmlDslConfiguration> xmlDslConfiguration;
+  private LicenseModelProperty licenseModelProperty;
 
-  private final MuleSdkExtensionModelMetadataParser metadataParser;
-  private final Supplier<Stream<ComponentAst>> topLevelComponentsSupplier;
-  private final TypeLoader typeLoader;
-  private final List<OperationModelParser> operationModelParsers;
-  private final ExtensionModelHelper extensionModelHelper;
-
-  public MuleSdkExtensionModelParser(MuleSdkExtensionModelMetadataParser metadataParser,
-                                     Supplier<Stream<ComponentAst>> topLevelComponentsSupplier,
-                                     TypeLoader typeLoader,
-                                     ExtensionModelHelper extensionModelHelper) {
-    this.metadataParser = metadataParser;
-    this.topLevelComponentsSupplier = topLevelComponentsSupplier;
-    this.typeLoader = typeLoader;
-    this.extensionModelHelper = extensionModelHelper;
-    operationModelParsers = computeOperationModelParsers();
-  }
-
-  @Override
-  public List<ModelProperty> getAdditionalModelProperties() {
-    return emptyList();
+  public MuleSdkExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
+    super(ast, typeLoader, extensionModelHelper);
+    parseMetadata(getExtensionComponentAst(ast));
   }
 
   @Override
   public String getName() {
-    return metadataParser.getName();
+    return name;
   }
 
   @Override
   public Category getCategory() {
-    return metadataParser.getCategory();
+    return category;
   }
 
   @Override
   public String getVendor() {
-    return metadataParser.getVendor();
-  }
-
-  @Override
-  public List<ConfigurationModelParser> getConfigurationParsers() {
-    return emptyList();
-  }
-
-  @Override
-  public List<OperationModelParser> getOperationModelParsers() {
-    return operationModelParsers;
-  }
-
-  @Override
-  public List<SourceModelParser> getSourceModelParsers() {
-    return emptyList();
-  }
-
-  @Override
-  public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return emptyList();
-  }
-
-  @Override
-  public List<FunctionModelParser> getFunctionModelParsers() {
-    return emptyList();
-  }
-
-  @Override
-  public List<ErrorModelParser> getErrorModelParsers() {
-    return emptyList();
-  }
-
-  @Override
-  public LicenseModelProperty getLicenseModelProperty() {
-    return metadataParser.getLicenseModelProperty();
-  }
-
-  @Override
-  public List<ExternalLibraryModel> getExternalLibraryModels() {
-    return emptyList();
-  }
-
-  @Override
-  public Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty() {
-    return empty();
-  }
-
-  @Override
-  public Optional<DeprecationModel> getDeprecationModel() {
-    return empty();
+    return vendor;
   }
 
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
-    return metadataParser.getXmlDslConfiguration();
-  }
-
-  @Override
-  public List<MetadataType> getExportedTypes() {
-    return emptyList();
-  }
-
-  @Override
-  public List<String> getExportedResources() {
-    return emptyList();
-  }
-
-  @Override
-  public List<MetadataType> getImportedTypes() {
-    return emptyList();
-  }
-
-  @Override
-  public List<String> getPrivilegedExportedArtifacts() {
-    return emptyList();
-  }
-
-  @Override
-  public List<String> getPrivilegedExportedPackages() {
-    return emptyList();
-  }
-
-  @Override
-  public Map<MetadataType, List<MetadataType>> getSubTypes() {
-    return emptyMap();
-  }
-
-  @Override
-  public List<NotificationModel> getNotificationModels() {
-    return emptyList();
+    return xmlDslConfiguration;
   }
 
   @Override
   public String getNamespace() {
-    return metadataParser.getNamespace();
+    return namespace;
   }
 
   @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return empty();
+  public LicenseModelProperty getLicenseModelProperty() {
+    return licenseModelProperty;
   }
 
-  private List<OperationModelParser> computeOperationModelParsers() {
-    final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
-        topLevelComponentsSupplier.get()
-            .filter(c -> c.getComponentType() == OPERATION_DEF)
-            .map(c -> new MuleSdkOperationModelParserSdk(c, metadataParser.getNamespace(), typeLoader, extensionModelHelper))
-            .collect(toMap(c -> getSanitizedElementName(c::getName), identity()));
+  @Override
+  protected Stream<ComponentAst> getTopLevelElements(ArtifactAst ast) {
+    return getExtensionComponentAst(ast).directChildrenStream();
+  }
 
-    // Some characteristics of the operation model parsers require knowledge about the other operation model parsers
-    operationParsersByName.values()
-        .forEach(operationModelParser -> operationModelParser.computeCharacteristics(operationParsersByName));
+  private ComponentAst getExtensionComponentAst(ArtifactAst ast) {
+    // At this point we can assume there is only one top level component which is the extension:extension component
+    // We don't need to check for this because it should be guaranteed by previous validations
+    return ast.topLevelComponents().get(0);
+  }
 
-    return new ArrayList<>(operationParsersByName.values());
+  private void parseMetadata(ComponentAst extensionComponentAst) {
+    name = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);
+    category = Category
+        .valueOf(this.<String>getParameter(extensionComponentAst, MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME).toUpperCase());
+    vendor = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME);
+
+    parseXmlDslConfiguration(extensionComponentAst);
+    parseLicenseModelProperty(extensionComponentAst);
+
+    // use dummy version since this is just for obtaining the namespace
+    this.namespace = getExtensionsNamespace(getXmlDslModel(name, "1.0.0", xmlDslConfiguration));
+  }
+
+  private void parseXmlDslConfiguration(ComponentAst extensionComponentAst) {
+    Optional<String> prefix = getOptionalParameter(extensionComponentAst, MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME);
+    Optional<String> namespace = getOptionalParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME);
+    if (prefix.isPresent() || namespace.isPresent()) {
+      xmlDslConfiguration = of(new XmlDslConfiguration(prefix.orElse(""), namespace.orElse("")));
+    } else {
+      xmlDslConfiguration = empty();
+    }
+  }
+
+  private void parseLicenseModelProperty(ComponentAst extensionComponentAst) {
+    boolean requiresEeLicense =
+        getParameter(extensionComponentAst, MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME);
+    boolean allowsEvaluationLicense = getParameter(extensionComponentAst,
+                                                   MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME);
+    Optional<String> requiredEntitlement = getOptionalParameter(extensionComponentAst,
+                                                                MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME);
+    licenseModelProperty = new LicenseModelProperty(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
   }
 }

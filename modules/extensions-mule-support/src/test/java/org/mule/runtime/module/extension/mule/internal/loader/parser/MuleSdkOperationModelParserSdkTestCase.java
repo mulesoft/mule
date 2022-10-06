@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkApplicationExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.setMockAstChild;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockOutputAst;

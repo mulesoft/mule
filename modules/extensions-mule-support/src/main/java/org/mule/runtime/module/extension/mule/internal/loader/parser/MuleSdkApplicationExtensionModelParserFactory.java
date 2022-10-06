@@ -11,14 +11,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSI
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkApplicationExtensionModelMetadataParser;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
-
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * {@link ExtensionModelParserFactory} implementation for Mule SDK in the context of applications.
@@ -36,14 +31,10 @@ public class MuleSdkApplicationExtensionModelParserFactory extends BaseMuleSdkEx
     implements ExtensionModelParserFactory {
 
   @Override
-  protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
+  public ExtensionModelParser createParser(ExtensionLoadingContext context) {
     String extensionName = getRequiredLoadingParameter(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME);
-    return new MuleSdkApplicationExtensionModelMetadataParser(extensionName);
-  }
-
-  @Override
-  protected Supplier<Stream<ComponentAst>> createTopLevelComponentsSupplier(ExtensionLoadingContext context) {
     ArtifactAst artifactAst = getRequiredLoadingParameter(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
-    return artifactAst::topLevelComponentsStream;
+    return new MuleSdkApplicationExtensionModelParser(extensionName, artifactAst, createTypeLoader(context),
+                                                      createExtensionModelHelper(context));
   }
 }

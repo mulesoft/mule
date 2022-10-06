@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public abstract class BaseMuleSdkExtensionModelParser {
+abstract class BaseMuleSdkExtensionModelParser {
 
   protected static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
   private static final String MESSAGE_PARAMETER = "message";
