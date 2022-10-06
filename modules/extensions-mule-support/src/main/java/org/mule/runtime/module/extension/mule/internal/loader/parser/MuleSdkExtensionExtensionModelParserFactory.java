@@ -127,10 +127,4 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
   private Map<String, Object> getLoadingRequestExtraParameters() {
     return singletonMap(MULE_SDK_EXTENSION_MODEL_PARSER_FACTORY_PROPERTY_NAME, this);
   }
-
-  /**
-   * Private constructor to avoid direct instantiation. Use
-   * {@link MuleSdkExtensionExtensionModelParserFactory#create(ExtensionLoadingContext)}.
-   */
-  private MuleSdkExtensionExtensionModelParserFactory() {}
 }
