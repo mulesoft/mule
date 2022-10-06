@@ -140,9 +140,13 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   private static ExpressionLanguageMetadataService getExpressionLanguageMetadataService(ServiceRepository serviceRepository) {
-    return (ExpressionLanguageMetadataService) serviceRepository.getServices().stream()
+    if (serviceRepository == null) {
+      return null;
+    }
+    return serviceRepository.getServices().stream()
         .filter(service -> ExpressionLanguageMetadataService.class.isAssignableFrom(service.getClass()))
         .findFirst()
+        .map(ExpressionLanguageMetadataService.class::cast)
         .orElse(null);
   }
 
