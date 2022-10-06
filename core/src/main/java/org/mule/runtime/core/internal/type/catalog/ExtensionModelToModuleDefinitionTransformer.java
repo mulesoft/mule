@@ -25,7 +25,6 @@ import java.util.function.Function;
  *
  * @since 4.5.0
  */
-// TODO: Unit tests
 public class ExtensionModelToModuleDefinitionTransformer implements Function<ExtensionModel, ModuleDefinition> {
 
   @Override

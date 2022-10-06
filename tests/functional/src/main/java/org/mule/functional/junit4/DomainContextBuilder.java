@@ -104,8 +104,7 @@ public class DomainContextBuilder {
 
   private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
-                                                     mock(ExpressionLanguageMetadataService.class));
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
     appBuilder.setArtifactType(ArtifactType.DOMAIN);
     return appBuilder;
   }

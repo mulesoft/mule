@@ -47,6 +47,7 @@ import java.util.Set;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.mockito.Mockito;
 
 /**
  * {@link AbstractConfigurationBuilder} implementation that delegates to {@link ArtifactAstConfigurationBuilder} using cached
@@ -83,34 +84,28 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
   private ArtifactAstConfigurationBuilder artifactAstConfigurationBuilder;
 
-  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
-
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean enableLazyInit,
-                                                  ArtifactDeclaration artifactDeclaration,
-                                                  ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+                                                  ArtifactDeclaration artifactDeclaration) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = false;
     this.enableLazyInit = enableLazyInit;
     this.ignoreCaches = false;
 
     this.artifactDeclaration = requireNonNull(artifactDeclaration);
-    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean disableXmlValidations,
                                                   boolean enableLazyInit,
                                                   boolean ignoreCaches,
-                                                  String[] configResources,
-                                                  ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+                                                  String[] configResources) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = disableXmlValidations;
     this.enableLazyInit = enableLazyInit;
     this.ignoreCaches = ignoreCaches;
 
     this.configResources = requireNonNull(configResources);
-    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   public void setArtifactType(ArtifactType artifactType) {
@@ -124,6 +119,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
+    ExpressionLanguageMetadataService expressionLanguageMetadataService = Mockito.mock(ExpressionLanguageMetadataService.class);
 
     final ArtifactAst artifactAst;
     if (artifactDeclaration != null) {

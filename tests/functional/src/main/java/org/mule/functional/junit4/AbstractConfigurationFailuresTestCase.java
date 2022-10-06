@@ -21,12 +21,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -62,7 +60,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder =
-      new TestServicesConfigurationBuilder(true, mockExpressionExecutor());
+      new TestServicesConfigurationBuilder(true, mockExpressionExecutor(), true);
 
   protected void loadConfiguration(String configuration) throws MuleException, InterruptedException {
 
@@ -82,8 +80,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
                                                                                              disableXmlValidations(),
                                                                                              enableLazyInit(),
                                                                                              false,
-                                                                                             new String[] {configuration},
-                                                                                             mock(ExpressionLanguageMetadataService.class));
+                                                                                             new String[] {configuration});
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);
