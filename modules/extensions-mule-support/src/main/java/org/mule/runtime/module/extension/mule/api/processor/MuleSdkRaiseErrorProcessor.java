@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.api.processor;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.module.extension.mule.internal.error.ThrowableError.wrap;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkApplicationExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.DefaultMuleException;

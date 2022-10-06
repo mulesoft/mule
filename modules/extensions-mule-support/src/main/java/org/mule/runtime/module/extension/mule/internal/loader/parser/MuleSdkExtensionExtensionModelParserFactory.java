@@ -22,21 +22,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionExtensionModelMetadataParser;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.metadata.MuleSdkExtensionModelMetadataParser;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -76,22 +71,10 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
     // As part of getting the artifact's AST, it is possible that we have already created the parser. We don't want to do it
     // again.
     if (cachedExtensionModelParser == null) {
-      cachedExtensionModelParser = super.createParser(context);
+      cachedExtensionModelParser =
+          new MuleSdkExtensionModelParser(this.cachedArtifactAst, createTypeLoader(context), createExtensionModelHelper(context));
     }
     return cachedExtensionModelParser;
-  }
-
-  @Override
-  protected MuleSdkExtensionModelMetadataParser createMetadataParser(ExtensionLoadingContext context) {
-    return new MuleSdkExtensionExtensionModelMetadataParser(cachedArtifactAst);
-  }
-
-  @Override
-  protected Supplier<Stream<ComponentAst>> createTopLevelComponentsSupplier(ExtensionLoadingContext context) {
-    // At this point we can assume there is only one top level component which is the extension:extension component
-    // We don't need to check for this because it should be guaranteed by previous validations
-    ComponentAst rootComponent = cachedArtifactAst.topLevelComponents().get(0);
-    return rootComponent::directChildrenStream;
   }
 
   private AstXmlParser createAstParser(Set<ExtensionModel> dependencies, boolean disableValidations) {
