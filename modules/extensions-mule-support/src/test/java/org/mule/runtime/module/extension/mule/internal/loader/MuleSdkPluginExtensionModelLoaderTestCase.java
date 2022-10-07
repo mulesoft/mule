@@ -49,9 +49,9 @@ import org.slf4j.Logger;
 
 @Feature(REUSE)
 @Story(EXTENSION_EXTENSION_MODEL)
-public class MuleExtensionExtensionModelLoaderTestCase extends AbstractMuleSdkAstTestCase {
+public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAstTestCase {
 
-  private static final Logger LOGGER = getLogger(MuleExtensionExtensionModelLoaderTestCase.class);
+  private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelLoaderTestCase.class);
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
@@ -129,7 +129,7 @@ public class MuleExtensionExtensionModelLoaderTestCase extends AbstractMuleSdkAs
         .addParameter(VERSION_PROPERTY_NAME, "1.2.3")
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
         .build();
-    return new MuleSdkExtensionExtensionModelLoader().loadExtensionModel(loadingRequest);
+    return new MuleSdkPluginExtensionModelLoader().loadExtensionModel(loadingRequest);
   }
 
   @Override

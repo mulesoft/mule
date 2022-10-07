@@ -14,23 +14,23 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionExtensionModelParserFactory;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkPluginExtensionModelParserFactory;
 
 import java.util.Optional;
 
 /**
- * {@link ExtensionModelLoader} implementation for Mule SDK Extensions.
+ * {@link ExtensionModelLoader} implementation for Mule SDK Plugins.
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionExtensionModelLoader extends AbstractExtensionModelLoader {
+public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoader {
 
   private static final String MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME = "_muleSdkArtifactExtensionModel";
 
-  private final MuleSdkExtensionExtensionModelParserFactory parserFactory;
+  private final MuleSdkPluginExtensionModelParserFactory parserFactory;
 
-  public MuleSdkExtensionExtensionModelLoader() {
-    parserFactory = new MuleSdkExtensionExtensionModelParserFactory();
+  public MuleSdkPluginExtensionModelLoader() {
+    parserFactory = new MuleSdkPluginExtensionModelParserFactory();
   }
 
   @Override

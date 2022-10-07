@@ -32,11 +32,11 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * {@link ExtensionModelParser} implementation for Mule SDK extensions
+ * {@link ExtensionModelParser} implementation for Mule SDK plugins
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionExtensionModelParser extends AbstractMuleSdkExtensionModelParser {
+public class MuleSdkPluginExtensionModelParser extends AbstractMuleSdkExtensionModelParser {
 
   private String name;
   private Category category;
@@ -45,7 +45,7 @@ public class MuleSdkExtensionExtensionModelParser extends AbstractMuleSdkExtensi
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private LicenseModelProperty licenseModelProperty;
 
-  public MuleSdkExtensionExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     super(ast, typeLoader, extensionModelHelper);
     parseMetadata(getExtensionComponentAst(ast));
   }

@@ -11,7 +11,7 @@ import static java.util.Collections.unmodifiableSet;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkApplicationExtensionModelLoader;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +26,7 @@ public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoader
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {
     Set<ExtensionModelLoader> loaders = new HashSet<>();
-    loaders.add(new MuleSdkExtensionExtensionModelLoader());
+    loaders.add(new MuleSdkPluginExtensionModelLoader());
     loaders.add(new MuleSdkApplicationExtensionModelLoader());
     return unmodifiableSet(loaders);
   }

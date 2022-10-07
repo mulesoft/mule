@@ -21,18 +21,18 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactExtensionModelParser;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * {@link ArtifactExtensionModelParser} that loads an {@link ExtensionModel} from an extension's {@link ArtifactAst}.
+ * {@link ArtifactExtensionModelParser} that loads an {@link ExtensionModel} from a plugin's {@link ArtifactAst}.
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExtensionModelParser {
+public class MuleSdkPluginArtifactExtensionModelParser implements ArtifactExtensionModelParser {
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
@@ -45,7 +45,7 @@ public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExt
    * @param version             the artifact's version.
    * @param onNewExtensionModel a consumer to call when the parser creates the artifact's {@link ExtensionModel}.
    */
-  public MuleSdkExtensionArtifactExtensionModelParser(String version, Consumer<ExtensionModel> onNewExtensionModel) {
+  public MuleSdkPluginArtifactExtensionModelParser(String version, Consumer<ExtensionModel> onNewExtensionModel) {
     this.onNewExtensionModel = onNewExtensionModel;
     this.version = version;
   }
@@ -58,7 +58,7 @@ public class MuleSdkExtensionArtifactExtensionModelParser implements ArtifactExt
     }
 
     // Loads the model using the Mule SDK Extensions loader.
-    ExtensionModelLoader loader = new MuleSdkExtensionExtensionModelLoader();
+    ExtensionModelLoader loader = new MuleSdkPluginExtensionModelLoader();
     ExtensionModel extensionModel = loader.loadExtensionModel(builder(classLoader, getDefault(extensions))
         .addParameter(VERSION_PROPERTY_NAME, version)
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)

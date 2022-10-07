@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkExtensionArtifactExtensionModelParser;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginArtifactExtensionModelParser;
 
 import java.util.Optional;
 import java.util.Set;
@@ -35,16 +35,16 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 
 /**
- * {@link ExtensionModelParserFactory} implementation for Mule SDK in the context of extensions.
+ * {@link ExtensionModelParserFactory} implementation for Mule SDK in the context of plugins.
  *
  * Takes a resource file as parameter of the {@link ExtensionLoadingContext} using {@link MULE_SDK_RESOURCE_PROPERTY_NAME}.
  *
  * @since 4.5.0
  */
-public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExtensionModelParserFactory
+public class MuleSdkPluginExtensionModelParserFactory extends BaseMuleSdkExtensionModelParserFactory
     implements ExtensionModelParserFactory {
 
-  private static final Logger LOGGER = getLogger(MuleSdkExtensionExtensionModelParserFactory.class);
+  private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelParserFactory.class);
 
   /**
    * Configures the context by adding some parameters that are computed from the other ones.
@@ -64,8 +64,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
 
   @Override
   public ExtensionModelParser createParser(ExtensionLoadingContext context) {
-    return new MuleSdkExtensionExtensionModelParser(getArtifactAst(context), createTypeLoader(context),
-                                                    createExtensionModelHelper(context));
+    return new MuleSdkPluginExtensionModelParser(getArtifactAst(context), createTypeLoader(context),
+                                                 createExtensionModelHelper(context));
   }
 
   private AstXmlParser createAstParser(Set<ExtensionModel> dependencies, boolean disableValidations) {
@@ -91,8 +91,8 @@ public class MuleSdkExtensionExtensionModelParserFactory extends BaseMuleSdkExte
                                                                dependencies,
                                                                false,
                                                                context.getExtensionClassLoader(),
-                                                               new MuleSdkExtensionArtifactExtensionModelParser(version,
-                                                                                                                onNewExtensionModel));
+                                                               new MuleSdkPluginArtifactExtensionModelParser(version,
+                                                                                                             onNewExtensionModel));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
