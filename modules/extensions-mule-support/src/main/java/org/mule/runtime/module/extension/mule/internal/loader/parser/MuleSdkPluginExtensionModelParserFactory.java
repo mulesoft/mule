@@ -13,7 +13,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFAC
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.handleValidationResult;
-import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionParser;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -86,13 +86,13 @@ public class MuleSdkPluginExtensionModelParserFactory extends BaseMuleSdkExtensi
 
     String version = getRequiredLoadingParameter(context, VERSION_PROPERTY_NAME);
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
-    ArtifactAst artifactAst = parseArtifactWithExtensionParser(resources,
-                                                               this::createAstParser,
-                                                               dependencies,
-                                                               false,
-                                                               context.getExtensionClassLoader(),
-                                                               new MuleSdkPluginArtifactExtensionModelParser(version,
-                                                                                                             onNewExtensionModel));
+    ArtifactAst artifactAst = parseArtifact(resources,
+                                            this::createAstParser,
+                                            dependencies,
+                                            false,
+                                            context.getExtensionClassLoader(),
+                                            new MuleSdkPluginArtifactExtensionModelParser(version,
+                                                                                          onNewExtensionModel));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);

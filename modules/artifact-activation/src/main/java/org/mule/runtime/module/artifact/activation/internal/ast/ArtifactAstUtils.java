@@ -40,12 +40,12 @@ public class ArtifactAstUtils {
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the artifact couldn't be parsed
    */
-  public static ArtifactAst parseArtifactWithExtensionParser(String[] configResources,
-                                                             AstXmlParserSupplier parserSupplier,
-                                                             Set<ExtensionModel> extensions,
-                                                             boolean disableValidations,
-                                                             ClassLoader artifactClassLoader,
-                                                             ArtifactExtensionModelParser extensionModelParser)
+  public static ArtifactAst parseArtifact(String[] configResources,
+                                          AstXmlParserSupplier parserSupplier,
+                                          Set<ExtensionModel> extensions,
+                                          boolean disableValidations,
+                                          ClassLoader artifactClassLoader,
+                                          ArtifactExtensionModelParser extensionModelParser)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.ast;
 
-import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifactWithExtensionParser;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -55,13 +55,12 @@ public final class ArtifactAstUtils {
       throws ConfigurationException {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
-    return parseArtifactWithExtensionParser(configResources,
-                                            parserSupplier,
-                                            extensions,
-                                            disableValidations,
-                                            muleContext.getExecutionClassLoader().getParent(),
-                                            new ApplicationArtifactExtensionModelParser(artifactId, version,
-                                                                                        expressionLanguageMetadataService));
+    return parseArtifact(configResources,
+                         parserSupplier,
+                         extensions,
+                         disableValidations,
+                         muleContext.getExecutionClassLoader().getParent(),
+                         new ApplicationArtifactExtensionModelParser(artifactId, version, expressionLanguageMetadataService));
   }
 
   /**
