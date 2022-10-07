@@ -7,12 +7,16 @@
 package org.mule.runtime.module.extension.mule.internal.loader;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_LOADER_ID;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionExtensionModelParserFactory.create;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionExtensionModelParserFactory;
+
+import java.util.Optional;
 
 /**
  * {@link ExtensionModelLoader} implementation for Mule SDK Extensions.
@@ -21,13 +25,37 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
  */
 public class MuleSdkExtensionExtensionModelLoader extends AbstractExtensionModelLoader {
 
+  private static final String MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME = "_muleSdkArtifactExtensionModel";
+
+  private final MuleSdkExtensionExtensionModelParserFactory parserFactory;
+
+  public MuleSdkExtensionExtensionModelLoader() {
+    parserFactory = new MuleSdkExtensionExtensionModelParserFactory();
+  }
+
   @Override
   public String getId() {
     return MULE_SDK_EXTENSION_LOADER_ID;
   }
 
   @Override
+  protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
+    super.configureContextBeforeDeclaration(context);
+    // Takes care of doing preparations of the context which are necessary by the parser.
+    // Registers a callback in case the parser discovers the ExtensionModel as part of the process.
+    parserFactory.configureContextBeforeParsing(context, extensionModel -> context
+        .addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, extensionModel));
+  }
+
+  @Override
   protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
-    return create(context);
+    return parserFactory;
+  }
+
+  @Override
+  public ExtensionModel loadExtensionModel(ExtensionLoadingContext context, ArtifactCoordinates artifactCoordinates) {
+    // The extension model may have been already created and placed in the context as a parameter.
+    Optional<ExtensionModel> extensionModel = context.getParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME);
+    return extensionModel.orElseGet(() -> super.loadExtensionModel(context, artifactCoordinates));
   }
 }
