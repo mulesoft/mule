@@ -48,7 +48,6 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
@@ -95,12 +94,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import java.util.function.Supplier;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -210,15 +210,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
     Runnable onSuccess;
     Consumer<Throwable> onFailure;
-    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = this::onReconnectionSuccessful;
-      onFailure = (t) -> {
-        RetryPolicyExhaustedException exception = t instanceof RetryPolicyExhaustedException ? (RetryPolicyExhaustedException) t
-            : new RetryPolicyExhaustedException(t, ExtensionMessageSource.this);
-        systemExceptionHandler.handleException(exception);
-        onReconnectionFailed(exception);
-      };
+      onFailure = this::onReconnectionFailed;
     } else {
       onSuccess = () -> {
       };
@@ -245,17 +239,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         this.onReconnectionSuccessful();
       }
     } catch (ExecutionException exception) {
-      RetryPolicyExhaustedException retryPolicyExhaustedException =
-          new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
-      systemExceptionHandler.handleException(retryPolicyExhaustedException);
-      throw retryPolicyExhaustedException;
+      throw new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
     } catch (InterruptedException e) {
-      MuleRuntimeException muleRuntimeException =
-          new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
-                                                              sourceModel.getName(), getLocation().getRootContainerName())),
-                                   e);
-      systemExceptionHandler.handleException(muleRuntimeException);
-      throw muleRuntimeException;
+      throw new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
+                                                                sourceModel.getName(), getLocation().getRootContainerName())),
+                                     e);
     }
   }
 
