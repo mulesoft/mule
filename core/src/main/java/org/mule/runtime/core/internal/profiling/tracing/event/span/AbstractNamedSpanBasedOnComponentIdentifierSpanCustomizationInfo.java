@@ -35,7 +35,7 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
 
   @Override
   public String getLocationAsString(CoreEvent coreEvent) {
-    // The location is based only n the component.
+    // The location is based only on the component.
     return CoreEventSpanUtils.getLocationAsString(component.getLocation());
   }
 
