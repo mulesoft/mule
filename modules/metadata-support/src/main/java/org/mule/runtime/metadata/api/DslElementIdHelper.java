@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata;
+package org.mule.runtime.metadata.api;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -24,7 +24,6 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
@@ -33,6 +32,7 @@ import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

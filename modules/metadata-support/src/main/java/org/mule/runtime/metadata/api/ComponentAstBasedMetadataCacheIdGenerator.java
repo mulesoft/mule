@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata;
+package org.mule.runtime.metadata.api;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -13,10 +13,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getModelNameAst;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.getModelNameAst;
+import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -34,11 +34,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.config.api.dsl.model.metadata.types.AttributesMetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.InputMetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.KeysMetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.MetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.OutputMetadataResolutionTypeInformation;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
@@ -48,6 +43,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
+import org.mule.runtime.metadata.api.types.*;
 
 import java.util.ArrayList;
 import java.util.List;

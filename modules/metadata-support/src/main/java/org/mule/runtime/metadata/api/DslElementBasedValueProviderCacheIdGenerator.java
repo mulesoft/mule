@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata;
+package org.mule.runtime.metadata.api;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveSimpleValue;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.getSourceElementName;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveSimpleValue;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 
@@ -27,11 +27,11 @@ import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.HashMap;
@@ -183,7 +183,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
   }
 
 
-  Optional<ValueProviderCacheId> resolveIdForInjectedElement(DslElementModel<?> injectedElement) {
+  public Optional<ValueProviderCacheId> resolveIdForInjectedElement(DslElementModel<?> injectedElement) {
     if (!(injectedElement.getModel() instanceof EnrichableModel)) {
       return empty();
     }

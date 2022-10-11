@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata;
+package org.mule.runtime.metadata.api;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -12,12 +12,12 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getGlobalElement;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getModelName;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveSimpleValue;
-import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.getGlobalElement;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.getModelName;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.getSourceElementName;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveSimpleValue;
+import static org.mule.runtime.metadata.api.DslElementIdHelper.sourceElementNameFromSimpleValue;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -25,12 +25,6 @@ import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
-import org.mule.runtime.config.api.dsl.model.metadata.types.AttributesMetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.InputMetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.KeysMetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.MetadataResolutionTypeInformation;
-import org.mule.runtime.config.api.dsl.model.metadata.types.OutputMetadataResolutionTypeInformation;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
@@ -38,12 +32,14 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.mule.runtime.metadata.api.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

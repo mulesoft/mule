@@ -40,7 +40,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -50,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

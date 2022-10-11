@@ -19,11 +19,10 @@ import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.ComponentAstBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.DslElementBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
@@ -38,6 +37,7 @@ import java.util.Set;
 import org.junit.Before;
 
 import com.google.common.collect.ImmutableSet;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractDslModelTestCase {
 

@@ -111,6 +111,11 @@
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-metadata-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Unit tests -->
         <dependency>

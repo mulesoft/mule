@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata.types;
+package org.mule.runtime.metadata.api.types;
 
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.Optional;
 import java.util.function.Function;
