@@ -12,12 +12,12 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.getGlobalElement;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.getModelName;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.getSourceElementName;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveSimpleValue;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.getGlobalElement;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.getModelName;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.getSourceElementName;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.resolveSimpleValue;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.sourceElementNameFromSimpleValue;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;

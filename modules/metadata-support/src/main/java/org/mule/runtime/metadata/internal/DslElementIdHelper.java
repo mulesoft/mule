@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.api;
+package org.mule.runtime.metadata.internal;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -40,7 +40,7 @@ public class DslElementIdHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DslElementIdHelper.class);
 
-  static String getSourceElementName(DslElementModel<?> elementModel) {
+  public static String getSourceElementName(DslElementModel<?> elementModel) {
     return elementModel.getDsl().getPrefix() + ":" +
         getModelName(elementModel.getModel()).orElse(elementModel.getDsl().getElementName()) +
         elementModel.getConfiguration()
@@ -48,7 +48,7 @@ public class DslElementIdHelper {
             .map(n -> "[" + n + "]").orElse("");
   }
 
-  static Optional<String> getModelName(Object model) {
+  public static Optional<String> getModelName(Object model) {
     if (model instanceof NamedObject) {
       return of(((NamedObject) model).getName());
     }
@@ -60,7 +60,7 @@ public class DslElementIdHelper {
     return empty();
   }
 
-  static String sourceElementNameFromSimpleValue(DslElementModel<?> element) {
+  public static String sourceElementNameFromSimpleValue(DslElementModel<?> element) {
     return getModelName(element.getModel())
         .map(modelName -> isBlank(element.getDsl().getPrefix()) ? modelName : element.getDsl().getPrefix() + ":" + modelName)
         .orElseGet(() -> element.getIdentifier().map(Object::toString).orElse(isBlank(element.getDsl().getElementName())
@@ -68,7 +68,7 @@ public class DslElementIdHelper {
             : element.getDsl().getElementName()));
   }
 
-  static Optional<String> resolveConfigName(DslElementModel<?> elementModel) {
+  public static Optional<String> resolveConfigName(DslElementModel<?> elementModel) {
     // TODO Migrate to Stereotypes when config-ref is part of model
     Optional<ComponentConfiguration> configuration = elementModel.getConfiguration();
     if (configuration.isPresent()) {
@@ -80,8 +80,8 @@ public class DslElementIdHelper {
     return empty();
   }
 
-  static Optional<Either<DslElementModel<?>, String>> resolveSimpleValue(DslElementModel<?> element,
-                                                                         ComponentLocator<DslElementModel<?>> locator) {
+  public static Optional<Either<DslElementModel<?>, String>> resolveSimpleValue(DslElementModel<?> element,
+                                                                                ComponentLocator<DslElementModel<?>> locator) {
     if (element == null || !element.getValue().isPresent()) {
       return empty();
     }
@@ -149,7 +149,7 @@ public class DslElementIdHelper {
     return of(reference.get() == null ? right(value) : left(reference.get()));
   }
 
-  static Optional<DslElementModel<?>> getGlobalElement(String name, ComponentLocator<DslElementModel<?>> locator) {
+  public static Optional<DslElementModel<?>> getGlobalElement(String name, ComponentLocator<DslElementModel<?>> locator) {
     if (!isBlank(name)) {
       return locator.get(Location.builder().globalName(name).build());
     }

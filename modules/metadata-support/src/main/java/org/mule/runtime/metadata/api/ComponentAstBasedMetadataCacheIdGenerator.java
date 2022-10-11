@@ -13,10 +13,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.getModelNameAst;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.getModelNameAst;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ArrayType;

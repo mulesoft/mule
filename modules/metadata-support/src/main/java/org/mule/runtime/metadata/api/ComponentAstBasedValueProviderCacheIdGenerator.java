@@ -12,10 +12,10 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
-import static org.mule.runtime.metadata.api.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 

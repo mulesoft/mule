@@ -11,10 +11,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.getSourceElementName;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.resolveSimpleValue;
-import static org.mule.runtime.metadata.api.DslElementIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.getSourceElementName;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.resolveSimpleValue;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 
