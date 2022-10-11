@@ -50,7 +50,6 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
@@ -89,6 +88,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
@@ -684,7 +684,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  @Issue("MULE-19890")
   public void redeploysDomainZipRefreshesAppsAndStartsThemAndNoStatusPersistenceWasSaved() throws Exception {
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
     File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
@@ -697,37 +696,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
-    reset(domainDeploymentListener);
-    reset(applicationDeploymentListener);
-
-    addPackedDomainFromBuilder(dummyDomainFileBuilder);
-    alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
-
-    assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
-    assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
-    // no deberia ser dummyDomainFileBuilder?
-    Properties artifactStatusDeploymentProperties =
-        resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
-    assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
-  }
-
-  @Test
-  @Issue("W-10984029")
-  public void redeploysDomainZipRefreshesAppsAndStartsThemAndDeploymentPropertiesAreNotErased() throws Exception {
-    addPackedDomainFromBuilder(dummyDomainFileBuilder);
-    File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
-    long firstFileTimestamp = dummyDomainFile.lastModified();
-
-    startDeployment();
-
-    Properties initialDeploymentProperties = new Properties();
-    initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
-    deploymentService.deploy(dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(), initialDeploymentProperties);
-
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+    final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
 
     reset(domainDeploymentListener);
     reset(applicationDeploymentListener);
@@ -739,9 +708,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
-    Properties finalDeploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), empty());
-    assertThat(finalDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
-    assertThat(finalDeploymentProperties.get(COMPONENT_NAME), is(COMPONENT_CLASS));
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test

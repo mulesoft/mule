@@ -11,12 +11,9 @@ import static java.util.Optional.of;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-
-import static java.util.Optional.empty;
-
-import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.Artifact;
 
@@ -72,9 +69,8 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
         applicationDeployer.preTrackArtifact(domainApplication);
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
           try {
-            applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), empty(),
-                                                       getArtifactStatusProperties(appStatusPreRedeployment
-                                                           .get(domainApplication)));
+            applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(),
+                                                       getProperties(appStatusPreRedeployment.get(domainApplication)));
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {
             applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);
@@ -91,7 +87,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
     domainApplications = Collections.emptyList();
   }
 
-  private Optional<Properties> getArtifactStatusProperties(ApplicationStatus applicationStatus) {
+  private Optional<Properties> getProperties(ApplicationStatus applicationStatus) {
     Properties properties = new Properties();
     boolean startArtifact = applicationStatus.equals(STARTED) || applicationStatus.equals(DEPLOYMENT_FAILED);
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(startArtifact));
