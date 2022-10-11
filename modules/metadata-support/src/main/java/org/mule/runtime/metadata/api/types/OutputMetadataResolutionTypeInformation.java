@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
@@ -35,6 +36,13 @@ public class OutputMetadataResolutionTypeInformation extends AbstractMetadataRes
   }
 
   public OutputMetadataResolutionTypeInformation(DslElementModel<?> component) {
+    super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
+    checkArgument(component.getModel() != null, "Cannot generate an Output Cache Key for a 'null' component");
+    checkArgument(component.getModel() instanceof HasOutputModel,
+                  "Cannot generate an Output Cache Key for a component with no output");
+  }
+
+  public OutputMetadataResolutionTypeInformation(ComponentParameterization<?> component) {
     super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
     checkArgument(component.getModel() != null, "Cannot generate an Output Cache Key for a 'null' component");
     checkArgument(component.getModel() instanceof HasOutputModel,

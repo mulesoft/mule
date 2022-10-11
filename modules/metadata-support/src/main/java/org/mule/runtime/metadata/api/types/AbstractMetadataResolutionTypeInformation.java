@@ -9,7 +9,9 @@ package org.mule.runtime.metadata.api.types;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
@@ -48,6 +50,14 @@ public abstract class AbstractMetadataResolutionTypeInformation implements Metad
                                                    Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
     if (component.getModel() instanceof EnrichableModel) {
       this.setPrivateFields((EnrichableModel) component.getModel(), getResolverInformationFromModelProperty);
+    }
+  }
+
+  public AbstractMetadataResolutionTypeInformation(ComponentParameterization parameterization,
+                                                   Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
+    ParameterizedModel model = parameterization.getModel();
+    if (model instanceof EnrichableModel) {
+      setPrivateFields(((EnrichableModel) model), getResolverInformationFromModelProperty);
     }
   }
 
