@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginArtifactExtensionModelParser;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginExtensionModelLoadingHelper;
 
 import java.util.Optional;
 import java.util.Set;
@@ -91,8 +91,8 @@ public class MuleSdkPluginExtensionModelParserFactory extends BaseMuleSdkExtensi
                                             dependencies,
                                             false,
                                             context.getExtensionClassLoader(),
-                                            new MuleSdkPluginArtifactExtensionModelParser(version,
-                                                                                          onNewExtensionModel));
+                                            new MuleSdkPluginExtensionModelLoadingHelper(version,
+                                                                                         onNewExtensionModel));
 
     // Applies the AST validators and throws if there was any error
     handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);

@@ -45,13 +45,13 @@ public class ArtifactAstUtils {
                                           Set<ExtensionModel> extensions,
                                           boolean disableValidations,
                                           ClassLoader artifactClassLoader,
-                                          ArtifactExtensionModelParser extensionModelParser)
+                                          MuleSdkExtensionModelLoadingHelper extensionModelParser)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
     Optional<ExtensionModel> extensionModel =
-        extensionModelParser.parseArtifactExtensionModel(partialAst, artifactClassLoader, extensions);
+        extensionModelParser.loadExtensionModel(partialAst, artifactClassLoader, extensions);
     if (extensionModel.isPresent()) {
       Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
       enrichedExtensionModels.add(extensionModel.get());

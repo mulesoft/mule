@@ -15,7 +15,8 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.module.artifact.activation.internal.ast.ApplicationArtifactExtensionModelParser;
+import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkApplicationExtensionModelLoadingHelper;
+import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingHelper;
 
 import java.util.Optional;
 import java.util.Set;
@@ -53,14 +54,12 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    String artifactId = muleContext.getConfiguration().getId();
-    Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
     return parseArtifact(configResources,
                          parserSupplier,
                          extensions,
                          disableValidations,
                          muleContext.getExecutionClassLoader().getParent(),
-                         new ApplicationArtifactExtensionModelParser(artifactId, version, expressionLanguageMetadataService));
+                         getExtensionModelLoadingHelper(muleContext, expressionLanguageMetadataService));
   }
 
   /**
@@ -78,12 +77,14 @@ public final class ArtifactAstUtils {
                                                                      MuleContext muleContext,
                                                                      ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
+    return getExtensionModelLoadingHelper(muleContext, expressionLanguageMetadataService)
+        .loadExtensionModel(ast, artifactClassLoader, muleContext.getExtensionManager().getExtensions());
+  }
 
+  private static MuleSdkExtensionModelLoadingHelper getExtensionModelLoadingHelper(MuleContext muleContext, ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
-    ApplicationArtifactExtensionModelParser parser =
-        new ApplicationArtifactExtensionModelParser(artifactId, version, expressionLanguageMetadataService);
-    return parser.parseArtifactExtensionModel(ast, artifactClassLoader, muleContext.getExtensionManager().getExtensions());
+    return new MuleSdkApplicationExtensionModelLoadingHelper(artifactId, version, expressionLanguageMetadataService);
   }
 
   private ArtifactAstUtils() {}

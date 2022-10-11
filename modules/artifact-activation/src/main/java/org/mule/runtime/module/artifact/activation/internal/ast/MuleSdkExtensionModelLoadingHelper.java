@@ -14,19 +14,19 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Allows extracting an {@link ExtensionModel} represented by the {@link ArtifactAst} being parsed.
+ * Allows for extracting an {@link ExtensionModel} which represents the {@link ArtifactAst} being parsed.
  *
  * @since 4.5.0
  */
-public interface ArtifactExtensionModelParser {
+public interface MuleSdkExtensionModelLoadingHelper {
 
   /**
    * @param ast         the artifact's AST
    * @param classLoader the artifact's classloader
    * @param extensions  the initial set of extensions the artifact depends on.
-   * @return a potentially enriched {@link Set} of {@link ExtensionModel}s.
-   * @throws ConfigurationException it the artifact couldn't be parsed.
+   * @return an {@link ExtensionModel} that represents the {@code ast}.
+   * @throws ConfigurationException if the artifact couldn't be parsed.
    */
-  Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast, ClassLoader classLoader, Set<ExtensionModel> extensions)
+  Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader, Set<ExtensionModel> extensions)
       throws ConfigurationException;
 }
