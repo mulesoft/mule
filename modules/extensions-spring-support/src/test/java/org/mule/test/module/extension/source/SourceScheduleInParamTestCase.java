@@ -10,7 +10,6 @@ import static java.lang.Thread.sleep;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
@@ -36,9 +35,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.AfterClass;
+
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 @Feature(SOURCES)
@@ -49,21 +47,15 @@ public class SourceScheduleInParamTestCase extends AbstractExtensionFunctionalTe
   private static final int TIMEOUT = 5000;
   private static final int DELAY = 100;
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
-  private static final Long CUSTOMIZED_DEFAULT_SCHEDULER_FIXED_FREQUENCY = 10000L;
-  private static String previousDefaultSchedulerFixedFrequencyPropertyValue = null;
 
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    previousDefaultSchedulerFixedFrequencyPropertyValue =
-        System.setProperty(DEFAULT_SCHEDULER_FIXED_FREQUENCY, CUSTOMIZED_DEFAULT_SCHEDULER_FIXED_FREQUENCY.toString());
-  }
+  public static class AdoptionProcessor implements Processor {
 
-  @AfterClass
-  public static void afterClass() throws Exception {
-    if (previousDefaultSchedulerFixedFrequencyPropertyValue == null) {
-      System.clearProperty(DEFAULT_SCHEDULER_FIXED_FREQUENCY);
-    } else {
-      System.setProperty(DEFAULT_SCHEDULER_FIXED_FREQUENCY, previousDefaultSchedulerFixedFrequencyPropertyValue);
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      synchronized (ADOPTION_EVENTS) {
+        ADOPTION_EVENTS.add(event);
+      }
+      return event;
     }
   }
 
@@ -89,6 +81,7 @@ public class SourceScheduleInParamTestCase extends AbstractExtensionFunctionalTe
   public void vanillaPoll() throws Exception {
     startFlow("vanilla");
     assertAllPetsAdopted();
+
     check(TIMEOUT, DELAY * 2, () -> {
       synchronized (ADOPTION_EVENTS) {
         return PetAdoptionSchedulerInParamSource.COMPLETED_POLLS > 1 &&
@@ -112,38 +105,6 @@ public class SourceScheduleInParamTestCase extends AbstractExtensionFunctionalTe
     sleep(1000);
     startFlow("longFrequencyPoll");
     assertStartedPolls(1);
-  }
-
-  @Test
-  public void pollWithExplicitFixedFrequency() throws Exception {
-    startFlow("pollWithExplicitFixedFrequency");
-    checkPollFrequency(60001L);
-    assertStartedPolls(1);
-    stopFlow("pollWithExplicitFixedFrequency");
-  }
-
-  @Test
-  public void pollWithExplicitDefaultFixedFrequency() throws Exception {
-    startFlow("pollWithExplicitDefaultFixedFrequency");
-    checkPollFrequency(60000L);
-    assertStartedPolls(1);
-    stopFlow("pollWithExplicitDefaultFixedFrequency");
-  }
-
-  @Test
-  public void pollWithExplicitPreviousDefaultFixedFrequency() throws Exception {
-    startFlow("pollWithExplicitPreviousDefaultFixedFrequency");
-    checkPollFrequency(1000L);
-    assertStartedPolls(1);
-    stopFlow("pollWithExplicitPreviousDefaultFixedFrequency");
-  }
-
-  @Test
-  public void pollWithImplicitFixedFrequencyAndCustomizedDefaultFixedFrequency() throws Exception {
-    startFlow("pollWithImplicitFixedFrequency");
-    checkPollFrequency(CUSTOMIZED_DEFAULT_SCHEDULER_FIXED_FREQUENCY);
-    assertStartedPolls(1);
-    stopFlow("pollWithImplicitFixedFrequency");
   }
 
   private void assertStartedPolls(int polls) {
@@ -170,21 +131,4 @@ public class SourceScheduleInParamTestCase extends AbstractExtensionFunctionalTe
   private void stopFlow(String flowName) throws Exception {
     ((Stoppable) getFlowConstruct(flowName)).stop();
   }
-
-  private void checkPollFrequency(Long frequency) {
-    assertThat(PetAdoptionSchedulerInParamSource.frequency, is(frequency));
-  }
-
-
-  public static class AdoptionProcessor implements Processor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      synchronized (ADOPTION_EVENTS) {
-        ADOPTION_EVENTS.add(event);
-      }
-      return event;
-    }
-  }
-
 }
