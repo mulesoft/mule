@@ -17,24 +17,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -43,14 +27,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -58,14 +34,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -98,16 +66,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {
@@ -166,24 +126,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -192,14 +136,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -207,14 +143,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -247,16 +175,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {
@@ -315,24 +235,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -341,14 +245,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -356,14 +252,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -396,16 +284,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {
@@ -464,24 +344,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -490,14 +354,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -505,14 +361,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -545,16 +393,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {
@@ -613,24 +453,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -639,14 +463,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -654,14 +470,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -694,16 +502,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {
@@ -762,31 +562,15 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
             },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
+            "display": {
+              "range": "string",
+              "mandatory": true
             },
             "listenerConfig": {
               "range": "string",
@@ -795,10 +579,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -810,6 +590,10 @@
               "range": "number",
               "mandatory": false
             },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -819,50 +603,21 @@
               "range": "string",
               "mandatory": false
             },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "withAlias": {
+              "range": "string",
+              "mandatory": true
+            },
+            "defaultPlacement": {
               "range": "string",
               "mandatory": true
             },
             "accessTokenUrl": {
               "range": "string",
               "mandatory": false
-            },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
-            },
-            "display": {
-              "range": "string",
-              "mandatory": true
-            },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
-              "mandatory": false
-            },
-            "defaultPlacement": {
-              "range": "string",
-              "mandatory": true
             },
             "header": {
               "range": "string",
@@ -876,13 +631,18 @@
               "range": "string",
               "mandatory": true
             },
-            "profileLevel": {
-              "range": "number",
-              "mandatory": false
-            },
             "scopes": {
               "range": "string",
               "mandatory": false
+            },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -927,22 +687,10 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
+            "apiVersion": {
+              "range": "number",
               "mandatory": false
             },
             "clientId": {
@@ -954,30 +702,6 @@
               "range": "string",
               "mandatory": false
             },
-            "display": {
-              "range": "string",
-              "mandatory": true
-            },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
-              "mandatory": false
-            },
-            "apiVersion": {
-              "range": "number",
-              "mandatory": false
-            },
             "objectStore": {
               "range": "string",
               "mandatory": false
@@ -986,18 +710,14 @@
               "range": "boolean",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
+            "display": {
+              "range": "string",
+              "mandatory": true
             },
             "clientSecret": {
               "propertyTerm": "connectivity.clientSecret",
               "range": "string",
               "mandatory": true
-            },
-            "profileLevel": {
-              "range": "number",
-              "mandatory": false
             },
             "scopes": {
               "range": "string",
@@ -1046,24 +766,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -1072,14 +776,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -1087,14 +783,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -1127,16 +815,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {
@@ -1195,24 +875,8 @@
         }
       },
       "nodeMappings": {
-        "ConnectionProperties": {
-          "mapping": {
-            "connectionDescription": {
-              "range": "string",
-              "mandatory": false
-            },
-            "connectionType": {
-              "range": "string",
-              "mandatory": false
-            }
-          }
-        },
         "Connection": {
           "mapping": {
-            "connectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "before": {
               "range": "string",
               "mandatory": false
@@ -1221,14 +885,6 @@
               "range": "string",
               "mandatory": true
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
-            "detailsPriority": {
-              "range": "number",
-              "mandatory": false
-            },
             "listenerConfig": {
               "range": "string",
               "mandatory": true
@@ -1236,14 +892,6 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
-              "mandatory": false
-            },
-            "oauthConnectionType": {
-              "range": "string",
-              "mandatory": false
-            },
-            "securityLevel": {
-              "range": "number",
               "mandatory": false
             },
             "consumerSecret": {
@@ -1276,16 +924,8 @@
               "range": "string",
               "mandatory": false
             },
-            "profileConnectionProperties": {
-              "range": "ConnectionProperties",
-              "mandatory": false
-            },
             "resourceOwnerId": {
               "range": "string",
-              "mandatory": false
-            },
-            "profileLevel": {
-              "range": "number",
               "mandatory": false
             },
             "scopes": {

@@ -27,72 +27,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -189,32 +123,8 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.oauth.ConnectionProperties">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="optional" name="connectionDescription"></xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="connectionType"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" type="test-oauth:org.mule.test.oauth.ConnectionProperties" abstract="true" name="abstract-connection-properties"></xs:element>
-  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" substitutionGroup="test-oauth:abstract-connection-properties" name="connection-properties">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
@@ -224,72 +134,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -386,15 +230,7 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -405,72 +241,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -567,15 +337,7 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -586,72 +348,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -748,15 +444,7 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -767,72 +455,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -929,15 +551,7 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -948,72 +562,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -1110,19 +658,11 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="withAlias"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="defaultPlacement"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="queryParam"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="header"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -1484,46 +1024,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="random-headers">
               <xs:complexType>
                 <xs:sequence>
@@ -1534,32 +1034,6 @@
                     </xs:complexType>
                   </xs:element>
                 </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-client-credentials">
@@ -1609,17 +1083,9 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="knownCustomHeader"></xs:attribute>
           <xs:attribute type="mule:substitutableName" use="optional" name="randomHeaders"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -1665,72 +1131,6 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -1827,15 +1227,7 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -1863,72 +1255,6 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
-                    <xs:complexType>
-                      <xs:sequence maxOccurs="1">
-                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
-                      </xs:sequence>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
-                        <xs:complexType>
-                          <xs:complexContent>
-                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
-                          </xs:complexContent>
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
             <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
               <xs:complexType>
                 <xs:complexContent>
@@ -2025,15 +1351,7 @@
           <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
-          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -2059,18 +1377,4 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:simpleType name="org.mule.test.oauth.ConnectionTypeEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="DEFAULT"></xs:enumeration>
-          <xs:enumeration value="DUO"></xs:enumeration>
-          <xs:enumeration value="HYPER"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
 </xs:schema>
