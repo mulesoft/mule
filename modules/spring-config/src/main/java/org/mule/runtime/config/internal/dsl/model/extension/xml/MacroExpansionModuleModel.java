@@ -472,7 +472,16 @@ public class MacroExpansionModuleModel {
         .filter(configParameter -> defaultGlobalElementName()
             .map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter)).orElse(true))
         .ifPresent(configParameter -> {
-          ComponentAst configRefComponentModel = getComponentAst(applicationModel, configParameter);
+          // look for the global element which "name" attribute maps to "configParameter" value
+          // or a nested element to a config that was added by the macroexpansion of another module before
+          ComponentAst configRefComponentModel = applicationModel
+              .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
+              .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
+                  && configParameter.equals(componentModel.getComponentId().orElse(null)))
+              .findFirst()
+              .orElseThrow(() -> new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app",
+                                                                     extensionModel.getXmlDslModel().getPrefix(),
+                                                                     configParameter)));
           // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
           configRefComponentModel.getParameters().stream()
@@ -481,25 +490,6 @@ public class MacroExpansionModuleModel {
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
-  }
-
-  private ComponentAst getComponentAst(ArtifactAst applicationModel, String configParameter) {
-    // look for the global element which "name" attribute maps to "configParameter" value
-    // or a nested element to a config that was added by the macroexpansion of another module before
-    return applicationModel
-        .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
-        .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
-            && configParameter.equals(componentModel.getComponentId().orElse(null)))
-        .findFirst()
-        .orElseGet(() -> { // Else look for the element in the parent ast (e.g. the domain of the app)
-          Optional<ArtifactAst> parent = applicationModel.getParent();
-          if (parent.isPresent()) {
-            return getComponentAst(parent.get(), configParameter);
-          } else {
-            throw new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app nor in its domain",
-                                                      extensionModel.getXmlDslModel().getPrefix(), configParameter));
-          }
-        });
   }
 
   /**
