@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -104,18 +103,12 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Initializing LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
-
     if (!initialized) {
       initialized = true;
       try {
         initStats();
         doInitialise();
       } catch (Exception e) {
-        LOGGER.error(format("Error initializing LifecycleAwareConfigurationInstance '%s'", getName()), e);
-
         if (e instanceof InitialisationException) {
           throw (InitialisationException) e;
         } else {
@@ -127,10 +120,6 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void start() throws MuleException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Starting LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
-
     if (!started) {
       started = true;
       if (connectionProvider.isPresent()) {
@@ -154,10 +143,6 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void stop() throws MuleException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Stopping LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
-
     if (started) {
       started = false;
       try {
@@ -186,10 +171,6 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void dispose() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Disposing LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
-
     if (initialized) {
       initialized = false;
       disposeIfNeeded(value, LOGGER);

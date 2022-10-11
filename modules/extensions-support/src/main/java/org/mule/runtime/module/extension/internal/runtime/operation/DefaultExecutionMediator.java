@@ -123,8 +123,15 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   public void execute(CompletableComponentExecutor<M> executor,
                       ExecutionContextAdapter<M> context,
                       ExecutorCallback callback) {
+
+    final MutableConfigurationStats stats = getMutableConfigurationStats(context);
+    if (stats != null) {
+      stats.addActiveComponent();
+      stats.addInflightOperation();
+    }
+
     try (DeferredExecutorCallback deferredCallback =
-        new DeferredExecutorCallback(getDelegateExecutorCallback(getStats(context), callback, context))) {
+        new DeferredExecutorCallback(getDelegateExecutorCallback(stats, callback, context))) {
       withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
         executeWithInterceptors(executor, context, deferredCallback);
         return null;
@@ -134,16 +141,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     } catch (Throwable t) {
       callback.error(wrapFatal(t));
     }
-  }
-
-  private MutableConfigurationStats getStats(ExecutionContextAdapter<M> context) {
-    final MutableConfigurationStats stats = getMutableConfigurationStats(context);
-    if (stats != null) {
-      stats.addActiveComponent();
-      stats.addInflightOperation();
-    }
-
-    return stats;
   }
 
   private ExecutorCallback getDelegateExecutorCallback(final MutableConfigurationStats stats,
