@@ -12,7 +12,7 @@ import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
-import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.handleValidationResult;
+import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -95,7 +95,7 @@ public class MuleSdkPluginExtensionModelParserFactory extends BaseMuleSdkExtensi
                                                                                          onNewExtensionModel));
 
     // Applies the AST validators and throws if there was any error
-    handleValidationResult(validatorBuilder().build().validate(artifactAst), LOGGER);
+    logWarningsAndThrowIfContainsErrors(validatorBuilder().build().validate(artifactAst), LOGGER);
 
     return artifactAst;
   }

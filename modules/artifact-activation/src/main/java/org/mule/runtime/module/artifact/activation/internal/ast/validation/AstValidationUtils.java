@@ -34,13 +34,13 @@ public class AstValidationUtils {
   }
 
   /**
-   * Handles a {@link ValidationResult} uniformly. Warnings are logged, errors raise exceptions.
+   * Scans the {@link ValidationResult} logging warning messages. Throws a {@link ConfigurationException} if there is any error.
    *
    * @param validationResult The {@link ValidationResult} obtained using an {@link ArtifactAstValidator}.
    * @param logger           The {@link Logger} to use for logging.
    * @throws ConfigurationException If there was any result item with {@link ERROR} level.
    */
-  public static void handleValidationResult(ValidationResult validationResult, Logger logger)
+  public static void logWarningsAndThrowIfContainsErrors(ValidationResult validationResult, Logger logger)
       throws ConfigurationException {
     final Collection<ValidationResultItem> items = validationResult.getItems();
 
