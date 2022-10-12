@@ -1114,6 +1114,7 @@
                             </dependency>
                         </dependencies>
                         <configuration>
+                        	<skip>true</skip>
                             <oldVersion>${oldMuleArtifactVersion}</oldVersion>
                             <failOnUnresolvedArtifacts>true</failOnUnresolvedArtifacts>
                             <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
