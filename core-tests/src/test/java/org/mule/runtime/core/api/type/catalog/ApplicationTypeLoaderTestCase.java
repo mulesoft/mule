@@ -28,7 +28,9 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +82,8 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-11706194")
+  @Description("The type expressions are resolved by the ExpressionLanguageMetadataService")
   public void typeResolvedByExpressionLanguageMetadataService() {
     assertThat(applicationTypeLoader.load(MOCK_TYPE_ID).isPresent(), is(true));
   }

@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.type.catalog;
 
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES_CATALOG;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
@@ -25,9 +27,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Set;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
+@Feature(REUSE)
+@Story(TYPES_CATALOG)
+@Issue("W-11706194")
 public class ExtensionModelToModuleDefinitionTransformerTestCase extends AbstractMuleTestCase {
 
   private static final String MOCK_EXTENSION_PREFIX = "mock";
