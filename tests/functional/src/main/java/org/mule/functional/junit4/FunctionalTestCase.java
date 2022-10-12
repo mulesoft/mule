@@ -72,6 +72,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   private volatile boolean tearingDown = false;
   private final Set<FlowRunner> runners = new HashSet<>();
+  private final ExpressionLanguageMetadataService mockExpressionLanguageMetadataService =
+      mock(ExpressionLanguageMetadataService.class);
 
   public FunctionalTestCase() {
     super();
@@ -299,6 +301,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
-    return mock(ExpressionLanguageMetadataService.class);
+    return mockExpressionLanguageMetadataService;
   }
 }

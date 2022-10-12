@@ -64,6 +64,9 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   private static final String MOCK_EXPR_EXECUTOR = "mockExpressionExecutor";
   private static final String MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE = "mockExpressionLanguageMetadataService";
 
+  private static final ExpressionLanguageMetadataService expressionLanguageMetadataService =
+      mock(ExpressionLanguageMetadataService.class);
+
   private static DefaultExpressionLanguageFactoryService cachedExprLanguageFactory;
   private static int cachedExprLanguageFactoryCounter = 0;
 
@@ -120,7 +123,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
     if (mockExpressionLanguageMetadataService) {
       customizationService.registerCustomServiceImpl(MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE,
-                                                     mock(ExpressionLanguageMetadataService.class));
+                                                     expressionLanguageMetadataService);
     }
   }
 
