@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_APPLICA
 
 import static java.util.Collections.singleton;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -36,22 +37,22 @@ public class MuleSdkApplicationExtensionModelLoadingHelper extends AbstractMuleS
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
   private final String artifactId;
-  private final Optional<String> artifactVersion;
+  private final Optional<ArtifactCoordinates> artifactCoordinates;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  public MuleSdkApplicationExtensionModelLoadingHelper(String artifactId, Optional<String> artifactVersion,
+  public MuleSdkApplicationExtensionModelLoadingHelper(String artifactId, Optional<ArtifactCoordinates> artifactCoordinates,
                                                        ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactId = artifactId;
-    this.artifactVersion = artifactVersion;
+    this.artifactCoordinates = artifactCoordinates;
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   @Override
-  protected String getVersion() throws ConfigurationException {
-    if (!artifactVersion.isPresent()) {
-      throw new ConfigurationException(buildErrorMessage("No version specified", artifactId));
+  protected ArtifactCoordinates getArtifactCoordinates() throws ConfigurationException {
+    if (!artifactCoordinates.isPresent()) {
+      throw new ConfigurationException(buildErrorMessage("No artifact coordinates specified", artifactId));
     }
-    return artifactVersion.get();
+    return artifactCoordinates.get();
   }
 
   @Override

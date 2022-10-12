@@ -83,8 +83,8 @@ public final class ArtifactAstUtils {
 
   private static MuleSdkExtensionModelLoadingHelper getExtensionModelLoadingHelper(MuleContext muleContext, ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     String artifactId = muleContext.getConfiguration().getId();
-    Optional<String> version = muleContext.getConfiguration().getArtifactCoordinates().map(ArtifactCoordinates::getVersion);
-    return new MuleSdkApplicationExtensionModelLoadingHelper(artifactId, version, expressionLanguageMetadataService);
+    Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
+    return new MuleSdkApplicationExtensionModelLoadingHelper(artifactId, artifactCoordinates, expressionLanguageMetadataService);
   }
 
   private ArtifactAstUtils() {}

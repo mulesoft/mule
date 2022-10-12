@@ -29,11 +29,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
 import org.mule.tck.classlaoder.TestClassLoader;
@@ -57,6 +59,11 @@ import org.slf4j.Logger;
 public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAstTestCase {
 
   private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelLoaderTestCase.class);
+  private static final ArtifactCoordinates TEST_ARTIFACT_COORDINATES = new BundleDescriptor.Builder()
+      .setArtifactId("TestExtension")
+      .setGroupId("TestGroup")
+      .setVersion("1.2.3")
+      .build();
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
@@ -148,14 +155,21 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
     assertThat(extensionModel.getOperationModels(), hasSize(2));
   }
 
+  @Test
+  public void whenExtensionModelIsLoadedThenArtifactCoordinatesAreCorrect() throws Exception {
+    ExtensionModel extensionModel = getExtensionModelFrom("extensions/extension-fully-parameterized.xml");
+    assertThat(extensionModel.getArtifactCoordinates().get(), is(TEST_ARTIFACT_COORDINATES));
+  }
+
   private ExtensionModel getExtensionModelFrom(String extensionFile) {
     return getExtensionModelFrom(extensionFile, this.getClass().getClassLoader());
   }
 
   private ExtensionModel getExtensionModelFrom(String extensionFile, ClassLoader classLoader) {
     ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(runtimeExtensionModels))
-        .addParameter(VERSION_PROPERTY_NAME, "1.2.3")
+        .addParameter(VERSION_PROPERTY_NAME, TEST_ARTIFACT_COORDINATES.getVersion())
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
+        .setArtifactCoordinates(TEST_ARTIFACT_COORDINATES)
         .build();
     return new MuleSdkPluginExtensionModelLoader().loadExtensionModel(loadingRequest);
   }

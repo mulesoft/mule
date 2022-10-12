@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -14,6 +15,7 @@ import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -30,6 +32,8 @@ import java.util.Set;
  */
 public abstract class AbstractMuleSdkExtensionModelLoadingHelper implements MuleSdkExtensionModelLoadingHelper {
 
+  private Optional<ExtensionModel> extensionModel;
+
   @Override
   public Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader,
                                                      Set<ExtensionModel> extensions)
@@ -38,23 +42,33 @@ public abstract class AbstractMuleSdkExtensionModelLoadingHelper implements Mule
       return empty();
     }
 
-    String version = getVersion();
+    ArtifactCoordinates artifactCoordinates = getArtifactCoordinates();
     ExtensionModelLoader loader = getLoader();
 
     ExtensionModelLoadingRequest.Builder loadingRequestBuilder = builder(classLoader, getDefault(extensions))
-        .addParameter(VERSION_PROPERTY_NAME, version)
+        .setArtifactCoordinates(artifactCoordinates)
+        .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.getVersion())
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast);
 
     addCustomLoadingRequestParameters(loadingRequestBuilder);
 
-    return of(loader.loadExtensionModel(loadingRequestBuilder.build()));
+    extensionModel = of(loader.loadExtensionModel(loadingRequestBuilder.build()));
+    return extensionModel;
+  }
+
+  @Override
+  public Optional<ExtensionModel> getExtensionModel() {
+    // Intentionally checking for null on the optional reference to see if the loadExtensionModel method has been called.
+    // This is semantically different from the ExtensionModel being not present.
+    checkState(extensionModel != null, "ExtensionModel hasn't been loaded yet");
+    return extensionModel;
   }
 
   /**
-   * @return A {@link String} representing the artifact's version.
-   * @throws ConfigurationException if the version cannot be identified.
+   * @return The {@link ArtifactCoordinates} representing the artifact.
+   * @throws ConfigurationException if the {@link ArtifactCoordinates} cannot be identified.
    */
-  protected abstract String getVersion() throws ConfigurationException;
+  protected abstract ArtifactCoordinates getArtifactCoordinates() throws ConfigurationException;
 
   /**
    *

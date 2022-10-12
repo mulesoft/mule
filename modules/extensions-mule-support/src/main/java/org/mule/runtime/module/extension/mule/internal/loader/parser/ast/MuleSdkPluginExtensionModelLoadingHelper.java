@@ -11,6 +11,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 
 import static java.util.Collections.singleton;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -19,9 +20,7 @@ import org.mule.runtime.module.artifact.activation.internal.ast.AbstractMuleSdkE
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingHelper;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * {@link MuleSdkExtensionModelLoadingHelper} that loads an {@link ExtensionModel} from a plugin's {@link ArtifactAst}.
@@ -32,33 +31,20 @@ public class MuleSdkPluginExtensionModelLoadingHelper extends AbstractMuleSdkExt
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
-  private final Consumer<ExtensionModel> onNewExtensionModel;
-  private final String version;
+  private final ArtifactCoordinates artifactCoordinates;
 
   /**
    * Creates a new helper with the given parameters.
    *
-   * @param version             the artifact's version.
-   * @param onNewExtensionModel a consumer to call when the helper creates the artifact's {@link ExtensionModel}.
+   * @param artifactCoordinates the artifact's coordinates.
    */
-  public MuleSdkPluginExtensionModelLoadingHelper(String version, Consumer<ExtensionModel> onNewExtensionModel) {
-    this.onNewExtensionModel = onNewExtensionModel;
-    this.version = version;
+  public MuleSdkPluginExtensionModelLoadingHelper(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
   }
 
   @Override
-  public Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader,
-                                                     Set<ExtensionModel> extensions)
-      throws ConfigurationException {
-    Optional<ExtensionModel> newExtensionModel = super.loadExtensionModel(ast, classLoader, extensions);
-    // Calls the registered consumer with the new ExtensionModel (if any).
-    newExtensionModel.ifPresent(onNewExtensionModel);
-    return newExtensionModel;
-  }
-
-  @Override
-  protected String getVersion() throws ConfigurationException {
-    return version;
+  protected ArtifactCoordinates getArtifactCoordinates() throws ConfigurationException {
+    return artifactCoordinates;
   }
 
   @Override
