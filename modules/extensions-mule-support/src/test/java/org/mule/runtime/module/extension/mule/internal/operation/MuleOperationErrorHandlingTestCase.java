@@ -193,4 +193,10 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
     }
     return null;
   }
+
+  @Test
+  public void whenAnOperationRaisesAnErrorThePayloadIsNotChanged() throws Exception {
+    CoreEvent result = flowRunner("operationSettingPayloadAndRaisingErrorFlow").run();
+    assertThat(result, hasMessage(hasPayload(is("Payload before calling the operation"))));
+  }
 }

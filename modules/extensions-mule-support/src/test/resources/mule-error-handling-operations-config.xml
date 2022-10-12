@@ -141,4 +141,24 @@
             <error-mapping sourceType="MY:MAPPED" targetType="MY:MAPPED_TWICE"/>
         </this:with-mapping-inside-body>
     </flow>
+
+    <flow name="operationSettingPayloadAndRaisingErrorFlow">
+        <try>
+            <set-payload value="Payload before calling the operation" />
+            <this:set-payload-and-raise-error />
+            <error-handler>
+                <on-error-continue />
+            </error-handler>
+        </try>
+    </flow>
+
+    <operation:def name="setPayloadAndRaiseError" >
+        <operation:output>
+            <operation:payload-type type="string" />
+        </operation:output>
+        <operation:body>
+            <set-payload value="Payload set within the operation" />
+            <operation:raise-error type="CUSTOM" />
+        </operation:body>
+    </operation:def>
 </mule>
