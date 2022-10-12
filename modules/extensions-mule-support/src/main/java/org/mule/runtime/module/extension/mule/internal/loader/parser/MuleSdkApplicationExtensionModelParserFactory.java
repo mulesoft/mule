@@ -8,6 +8,9 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.createExtensionModelHelper;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.createTypeLoader;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.getRequiredLoadingParameter;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -27,8 +30,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
  *
  * @since 4.5.0
  */
-public class MuleSdkApplicationExtensionModelParserFactory extends BaseMuleSdkExtensionModelParserFactory
-    implements ExtensionModelParserFactory {
+public class MuleSdkApplicationExtensionModelParserFactory implements ExtensionModelParserFactory {
 
   @Override
   public ExtensionModelParser createParser(ExtensionLoadingContext context) {
