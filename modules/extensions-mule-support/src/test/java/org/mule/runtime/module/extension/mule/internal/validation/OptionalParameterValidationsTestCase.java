@@ -24,7 +24,7 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Stories({@Story(OPERATIONS), @Story(PARAMETERS)})
-public class OptionalParameterWithExpressionDefaultTestCase extends AbstractConfigFileValidationTestCase {
+public class OptionalParameterValidationsTestCase extends AbstractConfigFileValidationTestCase {
 
   @Rule
   public ExpectedException expected = none();
@@ -35,5 +35,11 @@ public class OptionalParameterWithExpressionDefaultTestCase extends AbstractConf
     expected.expect(ConfigurationException.class);
     expected.expectMessage("An expression was given for 'defaultValue' of the optional parameter 'someparam'");
     parseConfig("validation/optional-parameter-with-expression-default.xml");
+  }
+
+  @Test
+  @Description("An operation with only optional parameters is legal")
+  public void operationWithOnlyOptionalParametersIsLegal() throws Exception {
+    parseConfig("validation/operation-with-only-optional-parameter.xml");
   }
 }

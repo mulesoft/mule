@@ -196,7 +196,7 @@
                         </xsd:annotation>
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="parameter" type="parameterType" maxOccurs="unbounded"/>
+                                <xsd:element name="parameter" type="parameterType" minOccurs="0" maxOccurs="unbounded"/>
                                 <xsd:element name="optional-parameter" type="optionalParameterType" minOccurs="0" maxOccurs="unbounded"/>
                                 <xsd:element name="exclusive-optionals" type="exclusiveOptionalsType" minOccurs="0" maxOccurs="1"/>
                             </xsd:sequence>
