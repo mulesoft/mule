@@ -55,7 +55,7 @@ public class ArtifactAstUtils {
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true, artifactClassLoader);
 
     Optional<ExtensionModel> extensionModel =
-        extensionModelParser.loadExtensionModel(partialAst, artifactClassLoader, extensions);
+        extensionModelParser.loadExtensionModel(partialAst, artifactClassLoader.getParent(), extensions);
     if (extensionModel.isPresent()) {
       Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
       enrichedExtensionModels.add(extensionModel.get());

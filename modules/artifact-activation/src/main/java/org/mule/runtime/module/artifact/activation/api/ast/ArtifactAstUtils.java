@@ -58,7 +58,7 @@ public final class ArtifactAstUtils {
                          parserSupplier,
                          extensions,
                          disableValidations,
-                         muleContext.getExecutionClassLoader().getParent(),
+                         muleContext.getExecutionClassLoader(),
                          getExtensionModelLoadingHelper(muleContext, expressionLanguageMetadataService));
   }
 
@@ -81,7 +81,8 @@ public final class ArtifactAstUtils {
         .loadExtensionModel(ast, artifactClassLoader, muleContext.getExtensionManager().getExtensions());
   }
 
-  private static MuleSdkExtensionModelLoadingHelper getExtensionModelLoadingHelper(MuleContext muleContext, ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+  private static MuleSdkExtensionModelLoadingHelper getExtensionModelLoadingHelper(MuleContext muleContext,
+                                                                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
     return new MuleSdkApplicationExtensionModelLoadingHelper(artifactId, artifactCoordinates, expressionLanguageMetadataService);
