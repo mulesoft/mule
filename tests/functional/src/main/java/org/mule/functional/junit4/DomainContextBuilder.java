@@ -104,9 +104,14 @@ public class DomainContextBuilder {
 
   private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
+                                                     getExpressionLanguageMetadataService());
     appBuilder.setArtifactType(ArtifactType.DOMAIN);
     return appBuilder;
+  }
+
+  protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
+    return mock(ExpressionLanguageMetadataService.class);
   }
 
   protected Set<ExtensionModel> getExtensionModels() {

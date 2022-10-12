@@ -41,6 +41,7 @@ public class ApplicationContextBuilder {
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
   private final MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
+  private ExpressionLanguageMetadataService expressionLanguageMetadataService = mock(ExpressionLanguageMetadataService.class);
 
   public ApplicationContextBuilder setContextId(String contextId) {
     this.contextId = contextId;
@@ -66,6 +67,11 @@ public class ApplicationContextBuilder {
    */
   public ApplicationContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
     this.artifactCoordinates = artifactCoordinates;
+    return this;
+  }
+
+  public ApplicationContextBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
     return this;
   }
 
@@ -110,7 +116,8 @@ public class ApplicationContextBuilder {
 
   protected ConfigurationBuilder getAppBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
+                                                     expressionLanguageMetadataService);
     appBuilder.setParentArtifactContext(domainArtifactContext);
     return appBuilder;
   }

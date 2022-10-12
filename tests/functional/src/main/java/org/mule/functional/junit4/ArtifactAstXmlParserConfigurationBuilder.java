@@ -37,7 +37,6 @@ import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistr
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +74,8 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private final boolean enableLazyInit;
   private final boolean ignoreCaches;
 
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
+
   private ArtifactDeclaration artifactDeclaration;
   private String[] configResources;
 
@@ -86,11 +87,14 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean enableLazyInit,
-                                                  ArtifactDeclaration artifactDeclaration) {
+                                                  ArtifactDeclaration artifactDeclaration,
+                                                  ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = false;
     this.enableLazyInit = enableLazyInit;
     this.ignoreCaches = false;
+
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
 
     this.artifactDeclaration = requireNonNull(artifactDeclaration);
   }
@@ -99,11 +103,14 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
                                                   boolean disableXmlValidations,
                                                   boolean enableLazyInit,
                                                   boolean ignoreCaches,
-                                                  String[] configResources) {
+                                                  String[] configResources,
+                                                  ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = disableXmlValidations;
     this.enableLazyInit = enableLazyInit;
     this.ignoreCaches = ignoreCaches;
+
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
 
     this.configResources = requireNonNull(configResources);
   }
@@ -119,7 +126,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    ExpressionLanguageMetadataService expressionLanguageMetadataService = new WeaveExpressionLanguageMetadataServiceImpl();
 
     final ArtifactAst artifactAst;
     if (artifactDeclaration != null) {
