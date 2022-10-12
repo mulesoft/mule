@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Mock implementation which only implements a rudimentary {@link #evaluateTypeExpression(String, Collection)}.
+ * Fake implementation which only implements a rudimentary {@link #evaluateTypeExpression(String, Collection)}.
  */
-public class MockExpressionLanguageMetadataService implements ExpressionLanguageMetadataService {
+public class FakeExpressionLanguageMetadataService implements ExpressionLanguageMetadataService {
 
   @Override
   public String getName() {

@@ -102,6 +102,6 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
 
   @Override
   protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
-    return new MockExpressionLanguageMetadataService();
+    return new FakeExpressionLanguageMetadataService();
   }
 }

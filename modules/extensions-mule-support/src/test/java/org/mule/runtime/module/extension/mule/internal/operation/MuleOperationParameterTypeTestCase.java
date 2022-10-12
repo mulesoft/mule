@@ -37,6 +37,6 @@ public class MuleOperationParameterTypeTestCase extends MuleArtifactFunctionalTe
 
   @Override
   protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
-    return new MockExpressionLanguageMetadataService();
+    return new FakeExpressionLanguageMetadataService();
   }
 }

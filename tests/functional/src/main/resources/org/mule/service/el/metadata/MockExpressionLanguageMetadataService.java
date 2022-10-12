@@ -30,70 +30,71 @@ public class MockExpressionLanguageMetadataService implements ExpressionLanguage
 
   @Override
   public void getInputType(String expression, MetadataType output, MuleEventMetadataTypeBuilder builder, MessageCallback callback) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType getOutputType(TypeBindings typeBindings, String expression, MessageCallback callback) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType getOutputType(TypeBindings typeBindings, String expression, String outputMimeType, MessageCallback callback) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType getMetadataFromSample(InputStream sample, Map<String, Object> readerProperties, String mimeType) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean isAssignable(MetadataType assignment, MetadataType expected, MessageCallback callback) {
-    return false;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Map<String, MetadataType> resolveAssignment(MetadataType assignment, MetadataType expected, MessageCallback callback) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType substitute(MetadataType assignment, Map<String, MetadataType> substitution) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType unify(List<MetadataType> metadataTypes) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType intersect(List<MetadataType> metadataTypes) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataTypeSerializer getTypeSerializer() {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public TypeLoader createTypeLoader(String content, MetadataFormat metadataFormat) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public TypeLoader createTypeLoader(String content, MetadataFormat metadataFormat, Collection<ModuleDefinition> modules) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public ModuleDefinition moduleDefinition(String nameIdentifier, Collection<ModuleDefinition> modules) throws ExpressionCompilationException {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MetadataType evaluateTypeExpression(String typeExpression, Collection<ModuleDefinition> modules) throws ExpressionCompilationException {
-    return null;
+    throw new UnsupportedOperationException();
   }
 }
