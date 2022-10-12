@@ -61,12 +61,14 @@ public final class ArtifactAstUtils {
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code muleContext.getConfiguration.getId()} return value
    *
-   * @param configResources    the paths to the application's config files
-   * @param parserSupplier     the supplier used to obtain the ast parser. It might be invoked several times during the parsing
-   * @param extensions         the initial set of extensions the app depends on.
-   * @param artifactType       the artifact type
-   * @param disableValidations whether to disable DSL validation
-   * @param muleContext        the app's {@link MuleContext}
+   * @param configResources                   the paths to the application's config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param muleContext                       the app's {@link MuleContext}
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
    */
@@ -104,7 +106,7 @@ public final class ArtifactAstUtils {
    * @param ast                               the application's AST
    * @param artifactClassLoader               the application's classloader
    * @param muleContext                       the application's context
-   * @param expressionLanguageMetadataService
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an optional {@link ExtensionModel}
    */
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,

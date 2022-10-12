@@ -27,7 +27,6 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -144,7 +143,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       return null;
     }
     return serviceRepository.getServices().stream()
-        .filter(service -> ExpressionLanguageMetadataService.class.isAssignableFrom(service.getClass()))
+        .filter(ExpressionLanguageMetadataService.class::isInstance)
         .findFirst()
         .map(ExpressionLanguageMetadataService.class::cast)
         .orElse(null);
