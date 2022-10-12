@@ -57,7 +57,7 @@ import java.util.function.Supplier;
 public class TypeResolutionMetadataCacheIdGenerator implements ComponentParameterizationMetadataCacheIdGenerator {
 
   @Override
-  public Optional<MetadataCacheId> getIdForComponentOutputMetadata(ComponentParameterization parameterization) {
+  public Optional<MetadataCacheId> getIdForComponentOutputMetadata(ComponentParameterization<?> parameterization) {
     if (parameterization.getModel() instanceof HasOutputModel) {
       return doResolveType(parameterization, new OutputMetadataResolutionTypeInformation(parameterization));
     } else {
@@ -66,7 +66,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
   }
 
   @Override
-  public Optional<MetadataCacheId> getIdForComponentAttributesMetadata(ComponentParameterization parameterization) {
+  public Optional<MetadataCacheId> getIdForComponentAttributesMetadata(ComponentParameterization<?> parameterization) {
     if (parameterization.getModel() instanceof HasOutputModel) {
       return doResolveType(parameterization, new AttributesMetadataResolutionTypeInformation(parameterization));
     } else {
@@ -75,7 +75,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
   }
 
   @Override
-  public Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentParameterization parameterization,
+  public Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentParameterization<?> parameterization,
                                                                   String parameterName) {
     checkArgument(parameterization.getModel().getAllParameterModels().stream()
         .anyMatch(parameterModel -> parameterModel.getName().equals(parameterName)),
@@ -88,7 +88,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
 
 
   @Override
-  public Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentParameterization parameterization,
+  public Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentParameterization<?> parameterization,
                                                                   String parameterGroupName, String parameterName) {
     checkArgument(parameterization.getParameter(parameterGroupName, parameterName) != null,
                   () -> "Cannot generate an Input Cache Key for component '" + parameterization.getModel().getName()
@@ -100,17 +100,17 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
   }
 
   @Override
-  public Optional<MetadataCacheId> getIdForComponentMetadata(ComponentParameterization parameterization) {
+  public Optional<MetadataCacheId> getIdForComponentMetadata(ComponentParameterization<?> parameterization) {
     return doResolve(parameterization);
   }
 
   @Override
-  public Optional<MetadataCacheId> getIdForMetadataKeys(ComponentParameterization parameterization) {
+  public Optional<MetadataCacheId> getIdForMetadataKeys(ComponentParameterization<?> parameterization) {
     return doResolveType(parameterization, new KeysMetadataResolutionTypeInformation(parameterization));
   }
 
   @Override
-  public Optional<MetadataCacheId> getIdForGlobalMetadata(ComponentParameterization parameterization) {
+  public Optional<MetadataCacheId> getIdForGlobalMetadata(ComponentParameterization<?> parameterization) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (parameterization.getModel() instanceof ConfigurationModel) {
@@ -135,7 +135,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
     }
   }
 
-  private Optional<MetadataCacheId> resolveCategoryId(ComponentParameterization parameterization) {
+  private Optional<MetadataCacheId> resolveCategoryId(ComponentParameterization<?> parameterization) {
     if (!(parameterization.getModel() instanceof ComponentModel)) {
       return empty();
     }
@@ -144,7 +144,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
         .map(this::createCategoryMetadataCacheId);
   }
 
-  private Optional<MetadataCacheId> doResolveType(ComponentParameterization parameterization,
+  private Optional<MetadataCacheId> doResolveType(ComponentParameterization<?> parameterization,
                                                   MetadataResolutionTypeInformation typeInformation) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
@@ -183,7 +183,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
                                       .orElse(format("(%s):(%s)", sourceElementName(parameterization), "Unknown Type"))));
   }
 
-  private Optional<MetadataCacheId> doResolve(ComponentParameterization parameterization) {
+  private Optional<MetadataCacheId> doResolve(ComponentParameterization<?> parameterization) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     resolveConfigId(parameterization).ifPresent(keyParts::add);
@@ -206,11 +206,11 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
     return new MetadataCacheId(stereotype.hashCode(), stereotype.toString());
   }
 
-  private Optional<MetadataCacheId> resolveConfigId(ComponentParameterization parameterization) {
+  private Optional<MetadataCacheId> resolveConfigId(ComponentParameterization<?> parameterization) {
     return resolveConfigName(parameterization).flatMap(this::getHashedGlobal);
   }
 
-  private Optional<MetadataCacheId> resolveGlobalElement(ComponentParameterization parameterization) {
+  private Optional<MetadataCacheId> resolveGlobalElement(ComponentParameterization<?> parameterization) {
     List<String> parameterNamesRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(parameterization);
 
     Map<Pair<ParameterGroupModel, ParameterModel>, Object> parameters = parameterization.getParameters();
@@ -228,7 +228,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
     return of(new MetadataCacheId(parts, parameterization.getModel().getName()));
   }
 
-  private List<String> parameterNamesRequiredForMetadataCacheId(ComponentParameterization parameterization) {
+  private List<String> parameterNamesRequiredForMetadataCacheId(ComponentParameterization<?> parameterization) {
     if (!(parameterization.getModel() instanceof EnrichableModel)) {
       return emptyList();
     }
@@ -236,7 +236,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
         .map(RequiredForMetadataModelProperty::getRequiredParameters).orElse(emptyList());
   }
 
-  private Optional<MetadataCacheId> resolveMetadataKeyParts(ComponentParameterization parameterization,
+  private Optional<MetadataCacheId> resolveMetadataKeyParts(ComponentParameterization<?> parameterization,
                                                             ComponentModel componentModel, boolean resolveAllKeys) {
     boolean isPartialFetching = componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
         .map(TypeResolversInformationModelProperty::isPartialTypeKeyResolver)
@@ -257,7 +257,7 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
     return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
   }
 
-  private MetadataCacheId resolveKeyFromSimpleValue(ComponentParameterization parameterization, ParameterGroupModel groupModel,
+  private MetadataCacheId resolveKeyFromSimpleValue(ComponentParameterization<?> parameterization, ParameterGroupModel groupModel,
                                                     ParameterModel param) {
     final MetadataCacheId notCheckingReferences =
         computeIdFor(parameterization, groupModel, param, MetadataCacheIdBuilderAdapter::new);
@@ -312,24 +312,23 @@ public class TypeResolutionMetadataCacheIdGenerator implements ComponentParamete
     return of(new MetadataCacheId(name.hashCode(), "global: " + name));
   }
 
-  public static String sourceElementName(ComponentParameterization parameterization) {
+  public static String sourceElementName(ComponentParameterization<?> parameterization) {
     Map<Pair<ParameterGroupModel, ParameterModel>, Object> parameters = parameterization.getParameters();
     return parameters.keySet().stream().filter(p -> p.getSecond().getName().equals("config"))
         .map(p -> parameterization.getParameter(p.getFirst(), p.getSecond()).toString()).findFirst().orElse(null);
   }
 
-  public static Optional<String> resolveConfigName(ComponentParameterization parameterization) {
+  public static Optional<String> resolveConfigName(ComponentParameterization<?> parameterization) {
     return ofNullable(parameterization.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME)).map(param -> (String) param);
   }
 
-  public static <K> K computeIdFor(ComponentParameterization parameterization,
+  public static <K> K computeIdFor(ComponentParameterization<?> parameterization,
                                    ParameterGroupModel groupModel,
                                    ParameterModel parameter,
                                    Supplier<CacheIdBuilderAdapter<K>> cacheIdBuilderSupplier) {
     String name = parameter.getName();
-    Supplier<CacheIdBuilderAdapter<K>> idBuilderSupplier = cacheIdBuilderSupplier;
     CacheIdBuilderAdapter<K> idBuilder =
-        idBuilderSupplier.get().withSourceElementName(name).withHashValue(Objects.hashCode(name));
+        cacheIdBuilderSupplier.get().withSourceElementName(name).withHashValue(Objects.hashCode(name));
     idBuilder.withHashValue(Objects.hashCode(parameterization.getParameter(groupModel, parameter)));
     return idBuilder.build();
   }

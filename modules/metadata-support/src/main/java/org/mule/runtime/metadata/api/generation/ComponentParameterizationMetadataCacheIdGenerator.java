@@ -12,7 +12,8 @@ import org.mule.runtime.extension.api.component.ComponentParameterization;
 
 import java.util.Optional;
 
-public interface ComponentParameterizationMetadataCacheIdGenerator extends MetadataCacheIdGenerator<ComponentParameterization> {
+public interface ComponentParameterizationMetadataCacheIdGenerator
+    extends MetadataCacheIdGenerator<ComponentParameterization<?>> {
 
   /**
    * Calculates the {@link MetadataCacheId} required to identify the MetadataType associated to the parameter named
@@ -26,7 +27,8 @@ public interface ComponentParameterizationMetadataCacheIdGenerator extends Metad
    * @return a {@link MetadataCacheId} that identifies the component's parameter type with all its current configuration or
    *         {@link Optional#empty} if no valid identifier can be created.
    */
-  Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentParameterization parameterization, String parameterGroupName,
+  Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentParameterization<?> parameterization,
+                                                           String parameterGroupName,
                                                            String parameterName);
 
 }
