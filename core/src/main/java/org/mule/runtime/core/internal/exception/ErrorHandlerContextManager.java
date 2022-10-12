@@ -109,10 +109,13 @@ public class ErrorHandlerContextManager {
       // If the error was "handled" by the On Error handler, then it must not be further propagated.
       errorHandlerContext.successCallback.accept(result);
     } else {
-      // If the error was "not handled" by the On Error handler, then it must be further propagated.
-      if (result.getError().isPresent()) {
-        exception.setProcessedEvent(result);
+      if (exception.getEvent() != result) {
+        // We need to resolve possible nesting when the result is coming from the execution of a different on error handler
+        // (meaning that the current error handler failed its execution).
+        exception.setProcessedEvent(CoreEvent.builder(result)
+            .error(result.getError().orElseGet(() -> exception.getEvent().getError().orElse(null))).build());
       }
+      // If the error was not "handled" by the On Error handler, then it must be further propagated.
       errorHandlerContext.errorCallback.accept(exception);
     }
   }
