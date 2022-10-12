@@ -20,7 +20,7 @@ import java.util.Optional;
 /**
  * Implementation of {@link MetadataResolutionTypeInformation} that describes Input Types from a {@link ComponentParameterization}
  *
- * @since 1.0
+ * @since 4.5
  */
 public class ComponentParameterizationInputMetadataResolutionTypeInformation extends AbstractMetadataResolutionTypeInformation {
 

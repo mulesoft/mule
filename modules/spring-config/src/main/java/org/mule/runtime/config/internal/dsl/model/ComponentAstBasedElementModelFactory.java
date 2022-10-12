@@ -41,13 +41,14 @@ import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
+import org.mule.runtime.metadata.api.dsl.DslElementModel.Builder;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.mule.runtime.metadata.api.dsl.DslElementModel;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -80,7 +81,7 @@ class ComponentAstBasedElementModelFactory {
 
           if (elementIdentifier.isPresent()
               && configuration.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
-            DslElementModel.Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
+            Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
                 .withModel(type)
                 .withDsl(typeDsl)
                 .withConfig(configuration);

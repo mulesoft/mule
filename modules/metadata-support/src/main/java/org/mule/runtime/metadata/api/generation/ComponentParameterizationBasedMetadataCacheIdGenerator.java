@@ -40,7 +40,11 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
-import org.mule.runtime.metadata.api.types.*;
+import org.mule.runtime.metadata.api.types.AttributesMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.ComponentParameterizationInputMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.KeysMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.MetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.OutputMetadataResolutionTypeInformation;
 
 import java.util.ArrayList;
 import java.util.List;

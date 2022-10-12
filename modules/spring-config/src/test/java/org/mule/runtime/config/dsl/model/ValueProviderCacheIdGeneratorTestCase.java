@@ -40,6 +40,7 @@ import org.mule.runtime.metadata.api.generation.DslElementBasedValueProviderCach
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -48,7 +49,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
 

@@ -8,7 +8,7 @@
           "package": "org.mule.runtime.config.api.dsl.model",
           "classSimpleName": "DslElementModel",
           "elementKind": "class",
-          "justification": "reasons"
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module\n"
         },
         {
           "code": "java.method.returnTypeTypeParametersChanged",
@@ -20,7 +20,7 @@
           "classSimpleName": "DslElementModelFactory",
           "methodName": "create",
           "elementKind": "method",
-          "justification": "reasons"
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module\n"
         },
         {
           "code": "java.method.returnTypeTypeParametersChanged",
@@ -32,7 +32,7 @@
           "classSimpleName": "DslElementModelFactory",
           "methodName": "create",
           "elementKind": "method",
-          "justification": "reasons"
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module\n"
         },
         {
           "code": "java.method.returnTypeTypeParametersChanged",
@@ -44,7 +44,7 @@
           "classSimpleName": "DslElementModelFactory",
           "methodName": "create",
           "elementKind": "method",
-          "justification": "reasons"
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module\n"
         },
         {
           "code": "java.method.parameterTypeChanged",
@@ -57,7 +57,7 @@
           "methodName": "asXml",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "reasons"
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module\n"
         }
       ]
     }

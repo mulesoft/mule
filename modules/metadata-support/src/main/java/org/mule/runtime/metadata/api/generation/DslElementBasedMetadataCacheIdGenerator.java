@@ -33,13 +33,17 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
+import org.mule.runtime.metadata.api.types.AttributesMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.InputMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.KeysMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.MetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.api.types.OutputMetadataResolutionTypeInformation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.mule.runtime.metadata.api.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

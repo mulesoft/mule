@@ -18,7 +18,6 @@ import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.Optional;
 
-
 /**
  * Implementation of {@link MetadataResolutionTypeInformation} that describes Attribute Types from a {@link ComponentAst}
  *

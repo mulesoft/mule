@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,6 @@ import java.util.Set;
 import org.junit.Before;
 
 import com.google.common.collect.ImmutableSet;
-import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractDslModelTestCase {
 
