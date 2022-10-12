@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
@@ -21,6 +22,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -34,10 +36,13 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
+import org.mule.tck.classlaoder.TestClassLoader;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -93,6 +98,25 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   @Test
+  public void loadingIsDoneWithTheSpecifiedClassLoader() {
+    URL existentResource = getResourceAsUrl("extensions/extension-fully-parameterized.xml", this.getClass(), true, true);
+    assertThat(existentResource, is(notNullValue()));
+
+    // Creates a TestClassloader which has non-existent resource name mapped to an existent valid resource.
+    final String nonexistentResourceName = "nonExistentResource";
+    TestClassLoader testClassLoader = new TestClassLoader(this.getClass().getClassLoader());
+    testClassLoader.addResource(nonexistentResourceName, existentResource);
+
+    // Trying to load the model from the resource by its non-existent name should only succeed if the right class loader is used.
+    getExtensionModelFrom(nonexistentResourceName, testClassLoader);
+
+    // Control test to verify that loading from the non-existent name will actually fail if using the wrong class loader.
+    expectedException.expect(MuleRuntimeException.class);
+    expectedException.expectCause(hasCause(instanceOf(FileNotFoundException.class)));
+    getExtensionModelFrom(nonexistentResourceName);
+  }
+
+  @Test
   public void loadExtensionExtensionModel() throws Exception {
     ExtensionModel extensionModel = getExtensionModelFrom("extensions/extension-fully-parameterized.xml");
 
@@ -125,7 +149,11 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   private ExtensionModel getExtensionModelFrom(String extensionFile) {
-    ExtensionModelLoadingRequest loadingRequest = builder(this.getClass().getClassLoader(), getDefault(runtimeExtensionModels))
+    return getExtensionModelFrom(extensionFile, this.getClass().getClassLoader());
+  }
+
+  private ExtensionModel getExtensionModelFrom(String extensionFile, ClassLoader classLoader) {
+    ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(runtimeExtensionModels))
         .addParameter(VERSION_PROPERTY_NAME, "1.2.3")
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
         .build();

@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -48,30 +52,36 @@ public class ArtifactAstUtils {
                                           MuleSdkExtensionModelLoadingHelper extensionModelParser)
       throws ConfigurationException {
 
-    final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
+    final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true, artifactClassLoader);
 
     Optional<ExtensionModel> extensionModel =
         extensionModelParser.loadExtensionModel(partialAst, artifactClassLoader, extensions);
     if (extensionModel.isPresent()) {
       Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
       enrichedExtensionModels.add(extensionModel.get());
-      return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations);
+      return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations,
+                                    artifactClassLoader);
     }
 
     return disableValidations
         ? partialAst
-        : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false);
+        : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false, artifactClassLoader);
   }
 
   private static ArtifactAst doParseArtifactIntoAst(String[] configResources,
                                                     AstXmlParserSupplier parserSupplier,
                                                     Set<ExtensionModel> extensions,
-                                                    boolean disableValidations)
+                                                    boolean disableValidations,
+                                                    ClassLoader artifactClassLoader)
       throws ConfigurationException {
-    return parserSupplier.getParser(extensions, disableValidations).parse(loadConfigResources(configResources));
+    return parserSupplier.getParser(extensions, disableValidations)
+        .parse(loadConfigResources(configResources, artifactClassLoader));
   }
 
-  private static ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
+  private static ConfigResource[] loadConfigResources(String[] configs, ClassLoader artifactClassLoader)
+      throws ConfigurationException {
+    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+    setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
     try {
       ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
       for (int i = 0; i < configs.length; i++) {
@@ -80,6 +90,8 @@ public class ArtifactAstUtils {
       return artifactConfigResources;
     } catch (IOException e) {
       throw new ConfigurationException(e);
+    } finally {
+      setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
     }
   }
 
