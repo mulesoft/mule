@@ -54,7 +54,7 @@ import java.util.function.Supplier;
  * This is based on {@link ComponentAstBasedMetadataCacheIdGenerator}, from Mule Spring Config, used in Mule Runtime Tooling
  * Client, to generate the keys from the ComponentAst.
  */
-public class TypeResolutionMetadataCacheIdGenerator implements ComponentParameterizationMetadataCacheIdGenerator {
+public class ComponentParameterizationBasedMetadataCacheIdGenerator implements ComponentParameterizationMetadataCacheIdGenerator {
 
   @Override
   public Optional<MetadataCacheId> getIdForComponentOutputMetadata(ComponentParameterization<?> parameterization) {
