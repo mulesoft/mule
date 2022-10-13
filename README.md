@@ -22,7 +22,7 @@ A flow, therefore, is the construct within which you link together several indiv
 Get Started
 ===========
 
-1. Download, then unzip Mule – either the Standalone version (Mule runtime engine) or Anypoint Studio (the runtime engine + the Eclipse-based graphical IDE) – from [mulesoft.com](https://www.mulesoft.com).
+1. Download, then unzip Mule – either the Standalone version (Mule runtime engine) or Anypoint Studio (the runtime engine + the Eclipse-based graphical IDE) – from [mulesoft.com](https://www.mulesoft.com). 
 
 1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 8 Update 152.
 
