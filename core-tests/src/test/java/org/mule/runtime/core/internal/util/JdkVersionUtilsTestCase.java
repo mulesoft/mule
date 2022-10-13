@@ -75,6 +75,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-19045")
   public void testUndefinedJdkPreferences() throws Exception {
     setJdkVersion("1.4.2");
 
@@ -108,6 +109,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-19045")
   public void testSupportedJdkVendor() {
     assertTrue(JdkVersionUtils.isSupportedJdkVendor());
   }
