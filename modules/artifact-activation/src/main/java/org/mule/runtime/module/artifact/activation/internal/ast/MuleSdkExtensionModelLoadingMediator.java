@@ -29,10 +29,4 @@ public interface MuleSdkExtensionModelLoadingMediator {
    */
   Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader, Set<ExtensionModel> extensions)
       throws ConfigurationException;
-
-  /**
-   * @return an {@link ExtensionModel} that represents the {@code ast}. Previously loaded using
-   *         {@link #loadExtensionModel(ArtifactAst, ClassLoader, Set)}.
-   */
-  Optional<ExtensionModel> getExtensionModel();
 }

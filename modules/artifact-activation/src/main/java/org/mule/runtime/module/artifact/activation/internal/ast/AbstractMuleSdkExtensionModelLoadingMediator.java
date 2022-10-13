@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -32,8 +31,6 @@ import java.util.Set;
  */
 public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements MuleSdkExtensionModelLoadingMediator {
 
-  private Optional<ExtensionModel> extensionModel;
-
   @Override
   public Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader,
                                                      Set<ExtensionModel> extensions)
@@ -52,16 +49,7 @@ public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements Mu
 
     addCustomLoadingRequestParameters(loadingRequestBuilder);
 
-    extensionModel = of(loader.loadExtensionModel(loadingRequestBuilder.build()));
-    return extensionModel;
-  }
-
-  @Override
-  public Optional<ExtensionModel> getExtensionModel() {
-    // Intentionally checking for null on the optional reference to see if the loadExtensionModel method has been called.
-    // This is semantically different from the ExtensionModel being not present.
-    checkState(extensionModel != null, "ExtensionModel hasn't been loaded yet");
-    return extensionModel;
+    return of(loader.loadExtensionModel(loadingRequestBuilder.build()));
   }
 
   /**

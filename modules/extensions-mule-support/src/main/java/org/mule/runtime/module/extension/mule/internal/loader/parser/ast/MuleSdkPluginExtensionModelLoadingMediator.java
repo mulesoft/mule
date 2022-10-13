@@ -20,7 +20,9 @@ import org.mule.runtime.module.artifact.activation.internal.ast.AbstractMuleSdkE
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * {@link MuleSdkExtensionModelLoadingMediator} that loads an {@link ExtensionModel} from a plugin's {@link ArtifactAst}.
@@ -32,14 +34,27 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
   private final ArtifactCoordinates artifactCoordinates;
+  private final Consumer<ExtensionModel> onNewExtensionModel;
 
   /**
    * Creates a new helper with the given parameters.
    *
    * @param artifactCoordinates the artifact's coordinates.
+   * @param onNewExtensionModel a consumer to call if the artifact's {@link ExtensionModel} is created as part of the parsing
+   *                            process.
    */
-  public MuleSdkPluginExtensionModelLoadingMediator(ArtifactCoordinates artifactCoordinates) {
+  public MuleSdkPluginExtensionModelLoadingMediator(ArtifactCoordinates artifactCoordinates,
+                                                    Consumer<ExtensionModel> onNewExtensionModel) {
     this.artifactCoordinates = artifactCoordinates;
+    this.onNewExtensionModel = onNewExtensionModel;
+  }
+
+  @Override
+  public Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader, Set<ExtensionModel> extensions)
+      throws ConfigurationException {
+    Optional<ExtensionModel> extensionModel = super.loadExtensionModel(ast, classLoader, extensions);
+    extensionModel.ifPresent(onNewExtensionModel);
+    return extensionModel;
   }
 
   @Override

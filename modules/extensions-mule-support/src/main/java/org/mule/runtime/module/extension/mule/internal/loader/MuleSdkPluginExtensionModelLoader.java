@@ -64,8 +64,7 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     Optional<ArtifactAst> ast = context.getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
     if (!ast.isPresent()) {
       // Note that during parsing of the AST, the ExtensionModel will need to be generated in order to perform validations.
-      parseAstAndBuildPluginExtensionModel(context)
-          .ifPresent(em -> context.addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, em));
+      context.addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, parseAstAndBuildPluginExtensionModel(context));
     }
   }
 
@@ -87,12 +86,15 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     return astBuilder.build();
   }
 
-  private Optional<ExtensionModel> parseAstAndBuildPluginExtensionModel(ExtensionLoadingContext context) {
+  private ArtifactAst parseAstAndBuildPluginExtensionModel(ExtensionLoadingContext context) {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
+
+    // Registers a callback in case the parser discovers the ExtensionModel as part of the process.
     MuleSdkExtensionModelLoadingMediator loadingHelper =
-        new MuleSdkPluginExtensionModelLoadingMediator(context.getArtifactCoordinates());
+        new MuleSdkPluginExtensionModelLoadingMediator(context.getArtifactCoordinates(),
+                                                       em -> context.addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, em));
 
     try {
       // Parses the full AST of the artifact by providing a helper for loading the ExtensionModel that represents the artifact
@@ -106,7 +108,7 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
 
       // Applies the AST validators and throws if there was any error
       logWarningsAndThrowIfContainsErrors(validatorBuilder().build().validate(artifactAst), LOGGER);
-      return loadingHelper.getExtensionModel();
+      return artifactAst;
     } catch (ConfigurationException e) {
       // ExtensionModelParserFactory can't throw checked exceptions, hence the wrapping
       throw new MuleRuntimeException(e);
