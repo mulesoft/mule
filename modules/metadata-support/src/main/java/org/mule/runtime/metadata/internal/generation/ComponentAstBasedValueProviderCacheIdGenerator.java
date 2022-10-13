@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal;
+package org.mule.runtime.metadata.internal.generation;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -12,10 +12,10 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
-import static org.mule.runtime.metadata.internal.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 
