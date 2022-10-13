@@ -288,7 +288,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       Exception exception = notification.getException();
 
       boolean result = true;
-      if (notification instanceof PipelineMessageNotification && exception instanceof MessagingException) {
+      if (notification instanceof PipelineMessageNotification && exception != null) {
         result = ((MessagingException) exception).getFailingComponent()
             .equals(((PipelineMessageNotification) notification).getFailingComponent().get());
       }
