@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
+
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.util.UUID.getUUID;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,6 +24,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Kiwi;
@@ -74,7 +78,8 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
   class LifecycleTrackerFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public LifecycleTrackerFlow(String name, MuleContext muleContext) {
-      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null,
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY,
+            new DefaultFlowsSummaryStatistics(true), null,
             new ComponentInitialStateManager() {
 
               @Override
