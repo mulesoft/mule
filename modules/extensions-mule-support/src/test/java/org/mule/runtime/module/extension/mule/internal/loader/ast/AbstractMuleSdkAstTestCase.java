@@ -28,7 +28,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,7 +51,7 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    runtimeExtensionModels = new HashSet<>();
+    runtimeExtensionModels = new LinkedHashSet<>();
     Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
         .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader());
     for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
