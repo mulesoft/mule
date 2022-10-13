@@ -7,7 +7,10 @@
 package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatistics {
@@ -16,6 +19,10 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
+
+  private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
     super(flowConstructType, name);
@@ -34,13 +41,21 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
   }
 
   @Override
+  public void incReceivedEvents() {
+    super.incReceivedEvents();
+    eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
+  }
+
+  @Override
   public void incExecutionError() {
     executionError.addAndGet(1);
+    executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
   public void incFatalError() {
     fatalError.addAndGet(1);
+    fatalErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   /**
@@ -108,4 +123,27 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
     return fatalError.get();
   }
 
+  @Override
+  public ResetOnQueryCounter getEventsReceivedCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    eventsReceivedCounters.add(counter);
+    counter.add(getTotalEventsReceived());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getExecutionErrorsCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    executionErrorsCounters.add(counter);
+    counter.add(getExecutionErrors());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getFatalErrorsCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    fatalErrorsCounters.add(counter);
+    counter.add(getFatalErrors());
+    return counter;
+  }
 }
