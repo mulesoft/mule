@@ -81,7 +81,7 @@ class ComponentAstBasedElementModelFactory {
 
           if (elementIdentifier.isPresent()
               && configuration.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
-            Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
+            DslElementModel.Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
                 .withModel(type)
                 .withDsl(typeDsl)
                 .withConfig(configuration);

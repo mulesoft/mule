@@ -8,11 +8,11 @@
     </parent>
     <artifactId>mule-module-metadata-support</artifactId>
     <packaging>jar</packaging>
-    <name>Metadata Support</name>
+    <name>Mule Metadata Support Module</name>
     <description>
         Runtime support for Metadata Caches
     </description>
-    
+
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>

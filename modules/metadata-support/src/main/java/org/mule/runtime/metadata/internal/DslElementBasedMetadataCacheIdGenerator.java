@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.api.generation;
+package org.mule.runtime.metadata.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -33,11 +33,11 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
-import org.mule.runtime.metadata.api.types.AttributesMetadataResolutionTypeInformation;
-import org.mule.runtime.metadata.api.types.InputMetadataResolutionTypeInformation;
-import org.mule.runtime.metadata.api.types.KeysMetadataResolutionTypeInformation;
-import org.mule.runtime.metadata.api.types.MetadataResolutionTypeInformation;
-import org.mule.runtime.metadata.api.types.OutputMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.internal.types.AttributesMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.internal.types.InputMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.internal.types.KeysMetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.internal.types.MetadataResolutionTypeInformation;
+import org.mule.runtime.metadata.internal.types.OutputMetadataResolutionTypeInformation;
 
 import java.util.ArrayList;
 import java.util.List;
