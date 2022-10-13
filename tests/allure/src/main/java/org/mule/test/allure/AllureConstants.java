@@ -6,6 +6,8 @@
  */
 package org.mule.test.allure;
 
+import org.mule.test.allure.AllureConstants.PricingMetricsFeature.NetworkUsageMonitoringStory;
+
 public interface AllureConstants {
 
   interface DbFeature {
@@ -577,4 +579,25 @@ public interface AllureConstants {
 
   }
 
+  interface PricingMetricsFeature {
+
+    String PRICING_METRICS = "Pricing Metrics";
+
+    interface NetworkUsageMonitoringStory {
+
+      String MONITOR_NET_BYTES_USED = "Monitor net bytes used";
+    }
+
+    interface MessageMetricsStory {
+
+      String LAPSED_MESSAGE_METRICS = "Lapsed message metrics";
+    }
+
+    interface FlowSummaryStory {
+
+      String ACTIVE_FLOWS_SUMMARY = "Active flows summary";
+      String DETECT_APIKIT_FLOWS_AS_TRIGGERS = "Detect APiKit flows as triggers";
+
+    }
+  }
 }

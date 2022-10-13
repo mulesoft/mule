@@ -8,14 +8,18 @@ package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Aggregate statistics for all services and flows in an application. Do this by looping through all of the applications'
- * FlowConstructStatistics that aren;t themselves aggregators.
+ * FlowConstructStatistics that aren't themselves aggregators.
  */
 public class ApplicationStatistics extends DefaultFlowConstructStatistics {
 
-  private AllStatistics parent;
+  private final AllStatistics parent;
 
   public ApplicationStatistics(AllStatistics parent) {
     super("Application", "application totals");
@@ -117,5 +121,44 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
       }
     }
     return total;
+  }
+
+  @Override
+  public ResetOnQueryCounter getEventsReceivedCounter() {
+    Set<ResetOnQueryCounter> counters = new HashSet<>();
+
+    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
+      if (!(stats instanceof ApplicationStatistics)) {
+        counters.add(stats.getEventsReceivedCounter());
+      }
+    }
+
+    return new CompositeResetOnQueryCounter(counters);
+  }
+
+  @Override
+  public ResetOnQueryCounter getExecutionErrorsCounter() {
+    Set<ResetOnQueryCounter> counters = new HashSet<>();
+
+    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
+      if (!(stats instanceof ApplicationStatistics)) {
+        counters.add(stats.getExecutionErrorsCounter());
+      }
+    }
+
+    return new CompositeResetOnQueryCounter(counters);
+  }
+
+  @Override
+  public ResetOnQueryCounter getFatalErrorsCounter() {
+    Set<ResetOnQueryCounter> counters = new HashSet<>();
+
+    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
+      if (!(stats instanceof ApplicationStatistics)) {
+        counters.add(stats.getFatalErrorsCounter());
+      }
+    }
+
+    return new CompositeResetOnQueryCounter(counters);
   }
 }
