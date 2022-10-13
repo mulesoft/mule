@@ -18,7 +18,6 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.util
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -26,11 +25,11 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingHelper;
+import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkPluginExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginExtensionModelLoadingHelper;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginExtensionModelLoadingMediator;
 
 import java.util.Optional;
 import java.util.Set;
@@ -92,8 +91,8 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
-    MuleSdkExtensionModelLoadingHelper loadingHelper =
-        new MuleSdkPluginExtensionModelLoadingHelper(context.getArtifactCoordinates());
+    MuleSdkExtensionModelLoadingMediator loadingHelper =
+        new MuleSdkPluginExtensionModelLoadingMediator(context.getArtifactCoordinates());
 
     try {
       // Parses the full AST of the artifact by providing a helper for loading the ExtensionModel that represents the artifact

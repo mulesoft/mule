@@ -27,11 +27,11 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * An {@link MuleSdkExtensionModelLoadingHelper} suitable for the context of applications.
+ * An {@link MuleSdkExtensionModelLoadingMediator} suitable for the context of applications.
  *
  * @since 4.5.0
  */
-public class MuleSdkApplicationExtensionModelLoadingHelper extends AbstractMuleSdkExtensionModelLoadingHelper {
+public class MuleSdkApplicationExtensionModelLoadingMediator extends AbstractMuleSdkExtensionModelLoadingMediator {
 
   // TODO W-11796759: This class shouldn't know which are the specific reusable components.
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
@@ -40,8 +40,8 @@ public class MuleSdkApplicationExtensionModelLoadingHelper extends AbstractMuleS
   private final Optional<ArtifactCoordinates> artifactCoordinates;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  public MuleSdkApplicationExtensionModelLoadingHelper(String artifactId, Optional<ArtifactCoordinates> artifactCoordinates,
-                                                       ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+  public MuleSdkApplicationExtensionModelLoadingMediator(String artifactId, Optional<ArtifactCoordinates> artifactCoordinates,
+                                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactId = artifactId;
     this.artifactCoordinates = artifactCoordinates;
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;

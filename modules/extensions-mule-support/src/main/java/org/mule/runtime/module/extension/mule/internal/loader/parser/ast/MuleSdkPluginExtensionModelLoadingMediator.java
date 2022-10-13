@@ -16,18 +16,18 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.artifact.activation.internal.ast.AbstractMuleSdkExtensionModelLoadingHelper;
-import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingHelper;
+import org.mule.runtime.module.artifact.activation.internal.ast.AbstractMuleSdkExtensionModelLoadingMediator;
+import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
 import java.util.Set;
 
 /**
- * {@link MuleSdkExtensionModelLoadingHelper} that loads an {@link ExtensionModel} from a plugin's {@link ArtifactAst}.
+ * {@link MuleSdkExtensionModelLoadingMediator} that loads an {@link ExtensionModel} from a plugin's {@link ArtifactAst}.
  *
  * @since 4.5.0
  */
-public class MuleSdkPluginExtensionModelLoadingHelper extends AbstractMuleSdkExtensionModelLoadingHelper {
+public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkExtensionModelLoadingMediator {
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
@@ -38,7 +38,7 @@ public class MuleSdkPluginExtensionModelLoadingHelper extends AbstractMuleSdkExt
    *
    * @param artifactCoordinates the artifact's coordinates.
    */
-  public MuleSdkPluginExtensionModelLoadingHelper(ArtifactCoordinates artifactCoordinates) {
+  public MuleSdkPluginExtensionModelLoadingMediator(ArtifactCoordinates artifactCoordinates) {
     this.artifactCoordinates = artifactCoordinates;
   }
 

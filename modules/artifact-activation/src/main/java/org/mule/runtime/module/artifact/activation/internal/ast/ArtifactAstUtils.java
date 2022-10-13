@@ -35,12 +35,13 @@ public class ArtifactAstUtils {
    * <p>
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()}.
    *
-   * @param configResources      the paths to the artifact's config files
-   * @param parserSupplier       the supplier used to obtain the ast parser. It might be invoked several times during the parsing
-   * @param extensions           the initial set of extensions the artifact depends on.
-   * @param disableValidations   whether to disable DSL validation
-   * @param artifactClassLoader  the artifact's classloader
-   * @param extensionModelParser a parser capable of providing the {@link ExtensionModel} which models the artifact itself.
+   * @param configResources        the paths to the artifact's config files
+   * @param parserSupplier         the supplier used to obtain the ast parser. It might be invoked several times during the
+   *                               parsing
+   * @param extensions             the initial set of extensions the artifact depends on.
+   * @param disableValidations     whether to disable DSL validation
+   * @param artifactClassLoader    the artifact's classloader
+   * @param extensionModelMediator a mediator capable of providing the {@link ExtensionModel} which models the artifact itself.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the artifact couldn't be parsed
    */
@@ -49,13 +50,13 @@ public class ArtifactAstUtils {
                                           Set<ExtensionModel> extensions,
                                           boolean disableValidations,
                                           ClassLoader artifactClassLoader,
-                                          MuleSdkExtensionModelLoadingHelper extensionModelParser)
+                                          MuleSdkExtensionModelLoadingMediator extensionModelMediator)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true, artifactClassLoader);
 
     Optional<ExtensionModel> extensionModel =
-        extensionModelParser.loadExtensionModel(partialAst, artifactClassLoader.getParent(), extensions);
+        extensionModelMediator.loadExtensionModel(partialAst, artifactClassLoader.getParent(), extensions);
     if (extensionModel.isPresent()) {
       Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
       enrichedExtensionModels.add(extensionModel.get());

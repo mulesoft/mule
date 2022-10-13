@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public interface MuleSdkExtensionModelLoadingHelper {
+public interface MuleSdkExtensionModelLoadingMediator {
 
   /**
    * @param ast         the artifact's AST

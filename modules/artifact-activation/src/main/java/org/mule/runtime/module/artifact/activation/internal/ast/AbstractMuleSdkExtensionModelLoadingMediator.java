@@ -26,11 +26,11 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Template implementation for {@link MuleSdkExtensionModelLoadingHelper}.
+ * Template implementation for {@link MuleSdkExtensionModelLoadingMediator}.
  *
  * @since 4.5.0
  */
-public abstract class AbstractMuleSdkExtensionModelLoadingHelper implements MuleSdkExtensionModelLoadingHelper {
+public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements MuleSdkExtensionModelLoadingMediator {
 
   private Optional<ExtensionModel> extensionModel;
 
