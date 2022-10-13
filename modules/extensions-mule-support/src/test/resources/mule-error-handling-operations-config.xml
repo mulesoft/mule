@@ -141,4 +141,44 @@
             <error-mapping sourceType="MY:MAPPED" targetType="MY:MAPPED_TWICE"/>
         </this:with-mapping-inside-body>
     </flow>
+
+    <!-- Use Case 1.4: Payload is not set when operation raises errors -->
+    <flow name="operationSettingPayloadAndRaisingErrorFlow">
+        <try>
+            <set-payload value="Payload before calling the operation" />
+            <this:set-payload-and-raise-error />
+            <error-handler>
+                <on-error-continue />
+            </error-handler>
+        </try>
+    </flow>
+
+    <operation:def name="setPayloadAndRaiseError" >
+        <operation:output>
+            <operation:payload-type type="string" />
+        </operation:output>
+        <operation:body>
+            <set-payload value="Payload set within the operation" />
+            <operation:raise-error type="CUSTOM" />
+        </operation:body>
+    </operation:def>
+
+    <!-- This test is intended to avoid a change breaking backwards for the old behavior of flows (opposite to the
+         use case 1.4) -->
+    <flow name="backwardsCompatibleAwfulBehaviorFlow">
+        <try>
+            <set-payload value="Payload before calling the referenced flow" />
+            <flow-ref name="setPayloadAndRaiseErrorFlow" />
+            <error-handler>
+                <on-error-continue />
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="setPayloadAndRaiseErrorFlow">
+        <try>
+            <set-payload value="Payload set within the referenced flow" />
+            <raise-error type="APP:CUSTOM" />
+        </try>
+    </flow>
 </mule>
