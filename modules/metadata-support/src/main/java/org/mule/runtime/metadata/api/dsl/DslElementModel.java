@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model;
+package org.mule.runtime.metadata.api.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.Optional.empty;

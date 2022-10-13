@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata;
+package org.mule.runtime.metadata.internal.generation;
 
 import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 
 public class ComponentBasedIdHelper {
 
-  static Optional<String> getModelNameAst(ComponentAst component) {
+  public static Optional<String> getModelNameAst(ComponentAst component) {
     final Optional<NamedObject> namedObjectModel = component.getModel(NamedObject.class);
     if (namedObjectModel.isPresent()) {
       try {
@@ -47,20 +47,20 @@ public class ComponentBasedIdHelper {
     return empty();
   }
 
-  static String sourceElementName(ComponentAst element) {
+  public static String sourceElementName(ComponentAst element) {
     return getModelNameAst(element)
         .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName
             + element.getComponentId().map(n -> "[" + n + "]").orElse(""))
         .orElseGet(() -> element.getIdentifier().toString());
   }
 
-  static String sourceElementNameFromSimpleValue(ComponentAst element) {
+  public static String sourceElementNameFromSimpleValue(ComponentAst element) {
     return getModelNameAst(element)
         .map(modelName -> element.getIdentifier().getNamespace() + ":" + modelName)
         .orElseGet(() -> element.getIdentifier().toString());
   }
 
-  static Optional<String> resolveConfigName(ComponentAst elementModel) {
+  public static Optional<String> resolveConfigName(ComponentAst elementModel) {
     // TODO MULE-18327 Migrate to Stereotypes when config-ref is part of model
     // There seems to be something missing in the mock model from the unit tests and this fails.
     // return MuleAstUtils.parameterOfType(elementModel, MuleStereotypes.CONFIG)
@@ -77,9 +77,9 @@ public class ComponentBasedIdHelper {
     return DeprecatedParameterVisitorFunctions.computeHashFor(componentParameterAst);
   }
 
-  static <K> K computeIdFor(ComponentAst containerComponent,
-                            ComponentParameterAst componentParameterAst,
-                            Supplier<CacheIdBuilderAdapter<K>> cacheIdBuilderSupplier) {
+  public static <K> K computeIdFor(ComponentAst containerComponent,
+                                   ComponentParameterAst componentParameterAst,
+                                   Supplier<CacheIdBuilderAdapter<K>> cacheIdBuilderSupplier) {
     return ParameterVisitorFunctions.computeIdFor(containerComponent, componentParameterAst, cacheIdBuilderSupplier);
   }
 

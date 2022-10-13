@@ -1,4 +1,67 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModel",
+          "elementKind": "class",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T extends java.lang.Object>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T extends java.lang.Object>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T extends java.lang.Object>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.w3c.dom.Element org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter::asXml(===org.mule.runtime.config.api.dsl.model.DslElementModel===)",
+          "new": "parameter org.w3c.dom.Element org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter::asXml(===org.mule.runtime.metadata.api.dsl.DslElementModel===)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.DslElementModel",
+          "newType": "org.mule.runtime.metadata.api.dsl.DslElementModel",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "XmlDslElementModelConverter",
+          "methodName": "asXml",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        }
+      ]
+    }
+  },
   "4.4.0": {
     "revapi": {
       "ignore": [

@@ -32,15 +32,15 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.internal.generation.ComponentAstBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.internal.generation.DslElementBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.HashMap;
 import java.util.LinkedList;
