@@ -33,13 +33,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="optional" minOccurs="0" type="optionalParameterType">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Indicates that the parameter is optional
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                     <xsd:element name="deprecated" type="deprecatedType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -196,7 +189,7 @@
                         </xsd:annotation>
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="parameter" type="parameterType" maxOccurs="unbounded"/>
+                                <xsd:element name="parameter" type="parameterType" minOccurs="0" maxOccurs="unbounded"/>
                                 <xsd:element name="optional-parameter" type="optionalParameterType" minOccurs="0" maxOccurs="unbounded"/>
                                 <xsd:element name="exclusive-optionals" type="exclusiveOptionalsType" minOccurs="0" maxOccurs="1"/>
                             </xsd:sequence>

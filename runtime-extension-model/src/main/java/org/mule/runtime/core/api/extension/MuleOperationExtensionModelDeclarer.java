@@ -283,7 +283,7 @@ public class MuleOperationExtensionModelDeclarer {
 
     final NestedComponentDeclarer parameterDef = parametersDef.withComponent(PARAMETER)
         .describedAs("Defines an operation parameter")
-        .withMinOccurs(1)
+        .withMinOccurs(0)
         .withMaxOccurs(null);
 
     declareDeprecationConstruct(parameterDef, "Defines a parameter's deprecation.");
