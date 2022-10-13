@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.management.stats;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,8 +22,9 @@ public class AllStatistics {
 
   private boolean isStatisticsEnabled;
   private long startTime;
-  private ApplicationStatistics appStats;
-  private Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<String, FlowConstructStatistics>();
+  private final ApplicationStatistics appStats;
+  private final FlowsSummaryStatistics flowSummaryStatistics;
+  private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
 
   /**
    * 
@@ -30,6 +32,7 @@ public class AllStatistics {
   public AllStatistics() {
     clear();
     appStats = new ApplicationStatistics(this);
+    flowSummaryStatistics = new DefaultFlowsSummaryStatistics(isStatisticsEnabled);
     appStats.setEnabled(isStatisticsEnabled);
     add(appStats);
   }
@@ -85,5 +88,9 @@ public class AllStatistics {
 
   public FlowConstructStatistics getApplicationStatistics() {
     return appStats;
+  }
+
+  public FlowsSummaryStatistics getFlowSummaryStatistics() {
+    return flowSummaryStatistics;
   }
 }
