@@ -6,15 +6,18 @@
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.MuleContext;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -38,6 +41,7 @@ public class ApplicationContextBuilder {
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
   private final MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
+  private ExpressionLanguageMetadataService expressionLanguageMetadataService = mock(ExpressionLanguageMetadataService.class);
 
   public ApplicationContextBuilder setContextId(String contextId) {
     this.contextId = contextId;
@@ -63,6 +67,11 @@ public class ApplicationContextBuilder {
    */
   public ApplicationContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
     this.artifactCoordinates = artifactCoordinates;
+    return this;
+  }
+
+  public ApplicationContextBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
     return this;
   }
 
@@ -107,7 +116,8 @@ public class ApplicationContextBuilder {
 
   protected ConfigurationBuilder getAppBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
+                                                     expressionLanguageMetadataService);
     appBuilder.setParentArtifactContext(domainArtifactContext);
     return appBuilder;
   }

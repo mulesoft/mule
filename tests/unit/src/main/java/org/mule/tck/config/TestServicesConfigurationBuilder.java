@@ -28,6 +28,7 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
@@ -61,6 +62,10 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   private static final DefaultValidationResult SUCCESS_VALIDATION_RESULT = new DefaultValidationResult(true, null);
   private static final String MOCK_HTTP_SERVICE = "mockHttpService";
   private static final String MOCK_EXPR_EXECUTOR = "mockExpressionExecutor";
+  private static final String MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE = "mockExpressionLanguageMetadataService";
+
+  private static final ExpressionLanguageMetadataService expressionLanguageMetadataService =
+      mock(ExpressionLanguageMetadataService.class);
 
   private static DefaultExpressionLanguageFactoryService cachedExprLanguageFactory;
   private static int cachedExprLanguageFactoryCounter = 0;
@@ -69,18 +74,21 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   private final boolean mockHttpService;
   private final boolean mockExpressionExecutor;
+  private final boolean mockExpressionLanguageMetadataService;
 
   private final Map<String, Object> additionalMockedServices = new HashMap<>();
 
   private final Map<String, Object> overriddenDefaultServices = new HashMap<>();
 
   public TestServicesConfigurationBuilder() {
-    this(true, true);
+    this(true, true, true);
   }
 
-  public TestServicesConfigurationBuilder(boolean mockHttpService, boolean mockExpressionExecutor) {
+  public TestServicesConfigurationBuilder(boolean mockHttpService, boolean mockExpressionExecutor,
+                                          boolean mockExpressionLanguageMetadataService) {
     this.mockHttpService = mockHttpService;
     this.mockExpressionExecutor = mockExpressionExecutor;
+    this.mockExpressionLanguageMetadataService = mockExpressionLanguageMetadataService;
   }
 
   @Override
@@ -112,6 +120,11 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     if (mockHttpService) {
       customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService());
     }
+
+    if (mockExpressionLanguageMetadataService) {
+      customizationService.registerCustomServiceImpl(MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE,
+                                                     expressionLanguageMetadataService);
+    }
   }
 
   protected void registerServices(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
@@ -127,6 +140,10 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
     if (mockHttpService) {
       registry.registerObject(MOCK_HTTP_SERVICE, mockHttpService());
+    }
+
+    if (mockExpressionLanguageMetadataService) {
+      registry.registerObject(MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE, mock(ExpressionLanguageMetadataService.class));
     }
 
     overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {

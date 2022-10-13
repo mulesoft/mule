@@ -21,13 +21,13 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.EnumSet.of;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
@@ -61,12 +61,14 @@ public final class ArtifactAstUtils {
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code muleContext.getConfiguration.getId()} return value
    *
-   * @param configResources    the paths to the application's config files
-   * @param parserSupplier     the supplier used to obtain the ast parser. It might be invoked several times during the parsing
-   * @param extensions         the initial set of extensions the app depends on.
-   * @param artifactType       the artifact type
-   * @param disableValidations whether to disable DSL validation
-   * @param muleContext        the app's {@link MuleContext}
+   * @param configResources                   the paths to the application's config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param muleContext                       the app's {@link MuleContext}
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
    */
@@ -75,14 +77,16 @@ public final class ArtifactAstUtils {
                                                            Set<ExtensionModel> extensions,
                                                            ArtifactType artifactType,
                                                            boolean disableValidations,
-                                                           MuleContext muleContext)
+                                                           MuleContext muleContext,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
     if (artifactType.equals(APPLICATION)) {
       ExtensionModel artifactExtensionModel =
-          parseArtifactExtensionModel(partialAst, muleContext.getExecutionClassLoader().getParent(), muleContext).orElse(null);
+          parseArtifactExtensionModel(partialAst, muleContext.getExecutionClassLoader().getParent(), muleContext,
+                                      expressionLanguageMetadataService).orElse(null);
       if (artifactExtensionModel != null) {
         Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
         enrichedExtensionModels.add(artifactExtensionModel);
@@ -99,14 +103,16 @@ public final class ArtifactAstUtils {
    * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
    * {@link ExtensionModel} which represents it.
    *
-   * @param ast                 the application's AST
-   * @param artifactClassLoader the application's classloader
-   * @param muleContext         the application's context
+   * @param ast                               the application's AST
+   * @param artifactClassLoader               the application's classloader
+   * @param muleContext                       the application's context
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an optional {@link ExtensionModel}
    */
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
                                                                      ClassLoader artifactClassLoader,
-                                                                     MuleContext muleContext) {
+                                                                     MuleContext muleContext,
+                                                                     ExpressionLanguageMetadataService expressionLanguageMetadataService) {
 
     if (ast.topLevelComponentsStream()
         .noneMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()))) {
@@ -119,7 +125,6 @@ public final class ArtifactAstUtils {
       logModelNotGenerated("No version specified on muleContext", muleContext);
       return empty();
     }
-
     Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
     if (loader.isPresent()) {
       Set<ExtensionModel> dependenciesExtensionModels = muleContext.getExtensionManager().getExtensions();
@@ -128,7 +133,8 @@ public final class ArtifactAstUtils {
               .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader(dependenciesExtensionModels))
+              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME,
+                            new ApplicationTypeLoader(dependenciesExtensionModels, expressionLanguageMetadataService))
               .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);

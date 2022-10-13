@@ -41,10 +41,10 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -115,7 +115,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder;
   public Supplier<TestServicesConfigurationBuilder> testServicesConfigurationBuilderSupplier =
-      () -> new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService());
+      () -> new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService(),
+                                                 mockExpressionLanguageMetadataService());
 
   public TemporaryFolder workingDirectory = new TemporaryFolder();
 
@@ -370,6 +371,16 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected boolean mockExprExecutorService() {
     return false;
+  }
+
+  /**
+   * Defines if a mock should be used for the {@link ExpressionLanguageMetadataService}. If {@code false} an implementation will
+   * need to be provided.
+   *
+   * @return whether the {@link ExpressionLanguageMetadataService} should be mocked or not.
+   */
+  protected boolean mockExpressionLanguageMetadataService() {
+    return true;
   }
 
   /**

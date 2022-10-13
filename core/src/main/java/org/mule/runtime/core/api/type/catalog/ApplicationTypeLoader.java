@@ -6,26 +6,25 @@
  */
 package org.mule.runtime.core.api.type.catalog;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.meta.type.TypeCatalog.getDefault;
-
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader;
-import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.metadata.message.api.el.ModuleDefinition;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.core.internal.type.catalog.ExtensionModelToModuleDefinitionTransformer;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * a {@link TypeLoader} for obtaining types available in the context of the current application. It accepts primitive type names
@@ -36,18 +35,18 @@ import java.util.Set;
  */
 public class ApplicationTypeLoader implements TypeLoader {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationTypeLoader.class);
+
   private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
-  private final Map<String, String> extensionModelNamesByPrefix;
-  private final TypeCatalog dependenciesTypeCatalog;
 
-  public ApplicationTypeLoader(Set<ExtensionModel> extensionModels) {
-    this.dependenciesTypeCatalog = getDefault(extensionModels);
+  private final Collection<ModuleDefinition> moduleDefinitions;
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-    extensionModelNamesByPrefix = new HashMap<>(extensionModels.size());
-    for (ExtensionModel extensionModel : extensionModels) {
-      extensionModelNamesByPrefix.put(extensionModel.getXmlDslModel().getPrefix(), extensionModel.getName());
-    }
+  public ApplicationTypeLoader(Collection<ExtensionModel> extensionModels,
+                               ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    this.moduleDefinitions = extensionModelsToModuleDefinitions(extensionModels);
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   @Override
@@ -62,34 +61,20 @@ public class ApplicationTypeLoader implements TypeLoader {
       return special;
     }
 
-    return getFromDependency(typeIdentifier);
+    return evaluateTypeExpression(typeIdentifier);
   }
 
-  // The string format can be the full name of the type, or a string with syntax <extension-prefix>:<type-alias> if
-  // the type has an alias. This format is temporal in order to use the types from the test operations, but may change
-  // when the type catalog using dataweave is fully implemented.
-  // TODO (W-11706194 and W-11706243): Adapt the syntax when the type resolution is delegated to DW.
-  private Optional<MetadataType> getFromDependency(String typeIdentifier) {
-    ComponentIdentifier componentIdentifier = buildFromStringRepresentation(typeIdentifier);
-    String extensionName = extensionModelNamesByPrefix.get(componentIdentifier.getNamespace());
-    String typeAlias = componentIdentifier.getName();
-    Collection<ObjectType> typesFromExtension = dependenciesTypeCatalog.getExtensionTypes(extensionName);
-    for (ObjectType objectType : typesFromExtension) {
-      if (matchesAlias(typeAlias, objectType)) {
-        return of(objectType);
-      }
+  private Optional<MetadataType> evaluateTypeExpression(String typeExpression) {
+    try {
+      return ofNullable(expressionLanguageMetadataService.evaluateTypeExpression(typeExpression, moduleDefinitions));
+    } catch (ExpressionCompilationException exception) {
+      LOGGER.error("Failed to evaluate type expression '{}'", typeExpression, exception);
+      return empty();
     }
-
-    Optional<ObjectType> typeByFullName = dependenciesTypeCatalog.getType(typeIdentifier);
-    if (typeByFullName.isPresent()) {
-      return of(typeByFullName.get());
-    }
-
-    return empty();
   }
 
-  private static boolean matchesAlias(String expectedAlias, MetadataType metadataType) {
-    return metadataType.getAnnotation(TypeAliasAnnotation.class)
-        .map(typeAliasAnnotation -> typeAliasAnnotation.getValue().equals(expectedAlias)).orElse(false);
+  private static Collection<ModuleDefinition> extensionModelsToModuleDefinitions(Collection<ExtensionModel> extensionModels) {
+    Function<ExtensionModel, ModuleDefinition> toModule = new ExtensionModelToModuleDefinitionTransformer();
+    return extensionModels.stream().map(toModule).collect(toSet());
   }
 }

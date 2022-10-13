@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.util.MuleAstUtils;
 import org.mule.runtime.ast.api.validation.ArtifactAstValidatorBuilder;
 import org.mule.runtime.ast.internal.validation.DefaultValidatorBuilder;
@@ -103,7 +104,7 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
                                 emptyMap(), APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
                                 mock(MemoryManagementService.class),
-                                featureFlaggingService) {
+                                featureFlaggingService, mock(ExpressionLanguageMetadataService.class)) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {

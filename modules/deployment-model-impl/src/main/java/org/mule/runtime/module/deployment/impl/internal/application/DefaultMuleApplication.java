@@ -27,7 +27,6 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -36,6 +35,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
@@ -97,6 +97,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
   private final MemoryManagementService memoryManagementService;
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private ApplicationStatus status;
 
@@ -129,11 +130,23 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.policyManager = applicationPolicyProvider;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
+    this.expressionLanguageMetadataService = getExpressionLanguageMetadataService(serviceRepository);
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
     }
+  }
+
+  private static ExpressionLanguageMetadataService getExpressionLanguageMetadataService(ServiceRepository serviceRepository) {
+    if (serviceRepository == null) {
+      return null;
+    }
+    return serviceRepository.getServices().stream()
+        .filter(ExpressionLanguageMetadataService.class::isInstance)
+        .findFirst()
+        .map(ExpressionLanguageMetadataService.class::cast)
+        .orElse(null);
   }
 
   @Override
@@ -245,6 +258,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setPolicyProvider(policyManager)
               .setRuntimeLockFactory(runtimeLockFactory)
               .setMemoryManagementService(memoryManagementService)
+              .setExpressionLanguageMetadataService(expressionLanguageMetadataService)
               .setArtifactCoordinates(descriptor.getBundleDescriptor());
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);

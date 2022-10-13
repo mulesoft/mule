@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
@@ -121,7 +122,8 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
-                                                   baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
+                                                   baseMuleArtifactContext.getBean(FeatureFlaggingService.class),
+                                                   baseMuleArtifactContext.getBean(ExpressionLanguageMetadataService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
     createSpringRegistry((DefaultMuleContext) muleContext, baseMuleArtifactContext, muleArtifactContext);
   }
@@ -158,12 +160,13 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                        BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                        ContributedErrorTypeRepository errorTypeRepository,
                                                        ContributedErrorTypeLocator errorTypeLocator,
-                                                       FeatureFlaggingService featureFlaggingService)
+                                                       FeatureFlaggingService featureFlaggingService,
+                                                       ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws Exception {
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
     return doCreateApplicationContext(muleContext, optionalObjectsController,
                                       baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-                                      featureFlaggingService);
+                                      featureFlaggingService, expressionLanguageMetadataService);
   }
 
   protected OptionalObjectsController createApplicationObjectController() {
@@ -189,7 +192,8 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                          ContributedErrorTypeRepository errorTypeRepository,
                                                          ContributedErrorTypeLocator errorTypeLocator,
-                                                         FeatureFlaggingService featureFlaggingService) {
+                                                         FeatureFlaggingService featureFlaggingService,
+                                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     ComponentBuildingDefinitionRegistryFactory resolvedComponentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
             .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
@@ -205,7 +209,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          runtimeLockFactory,
                                          resolvedComponentBuildingDefinitionRegistryFactory,
                                          new ArtifactMemoryManagementService(memoryManagementService),
-                                         featureFlaggingService);
+                                         featureFlaggingService, expressionLanguageMetadataService);
     } else {
       MuleArtifactContext context;
       context = new MuleArtifactContext(muleContext, artifactAst,
@@ -216,7 +220,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                         getArtifactProperties(), artifactType,
                                         resolvedComponentBuildingDefinitionRegistryFactory,
                                         new ArtifactMemoryManagementService(memoryManagementService),
-                                        featureFlaggingService);
+                                        featureFlaggingService, expressionLanguageMetadataService);
       context.initialize();
       return context;
     }

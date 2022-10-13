@@ -236,7 +236,7 @@ public class MuleContextUtils {
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
     CustomServiceRegistry customServices = new DefaultCustomizationService();
-    new TestServicesConfigurationBuilder(true, true).configure(customServices);
+    new TestServicesConfigurationBuilder().configure(customServices);
     when(muleContext.getCustomizationService()).thenReturn(customServices);
 
     SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());

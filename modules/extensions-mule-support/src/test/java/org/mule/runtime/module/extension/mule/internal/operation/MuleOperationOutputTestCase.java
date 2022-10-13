@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -97,5 +98,10 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
       assertThat("There are still open cursors", stats.getOpenCursorsCount(), is(0));
       return true;
     }));
+  }
+
+  @Override
+  protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
+    return new FakeExpressionLanguageMetadataService();
   }
 }

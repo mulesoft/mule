@@ -6,19 +6,22 @@
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+import static org.mockito.Mockito.mock;
+
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -101,9 +104,14 @@ public class DomainContextBuilder {
 
   private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
+                                                     getExpressionLanguageMetadataService());
     appBuilder.setArtifactType(ArtifactType.DOMAIN);
     return appBuilder;
+  }
+
+  protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
+    return mock(ExpressionLanguageMetadataService.class);
   }
 
   protected Set<ExtensionModel> getExtensionModels() {

@@ -123,9 +123,10 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
   }
 
   private Optional<Function<String, ValueResolver>> getCustomValueResolver(MetadataType metadataType) {
-    if (MediaType.class.equals(getType(metadataType))) {
+    Optional<Class<Object>> clazz = ExtensionMetadataTypeUtils.getType(metadataType);
+    if (clazz.map(MediaType.class::equals).orElse(false)) {
       return of(key -> new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType()));
-    } else if (ExtensionMetadataTypeUtils.getType(metadataType).map(Charset.class::equals).orElse(false)) {
+    } else if (clazz.map(Charset.class::equals).orElse(false)) {
       return of(key -> new StaticValueResolver<>(parseCharset(key)));
     }
     return empty();
