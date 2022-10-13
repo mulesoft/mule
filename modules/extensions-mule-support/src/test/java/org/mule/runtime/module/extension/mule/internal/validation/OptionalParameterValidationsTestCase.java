@@ -42,4 +42,10 @@ public class OptionalParameterValidationsTestCase extends AbstractConfigFileVali
   public void operationWithOnlyOptionalParametersIsLegal() throws Exception {
     parseConfig("validation/operation-with-only-optional-parameter.xml");
   }
+
+  @Test
+  @Description("An operation empty parameters tag is legal")
+  public void operationWithEmptyParametersTagIsLegal() throws Exception {
+    parseConfig("validation/operation-with-empty-parameters-tag.xml");
+  }
 }

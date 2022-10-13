@@ -7,15 +7,15 @@
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
-    <operation:def name="operationWithOnlyOptionalParameter" >
+    <operation:def name="operationWithEmptyParametersTag" >
         <operation:parameters>
-            <operation:optional-parameter name="someparam" type="string" defaultValue="Hi!" />
+            <!-- Nothing here... -->
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
-            <set-payload value="[params.someparam]" />
+            <set-payload value="Hi!" />
         </operation:body>
     </operation:def>
 </mule>
