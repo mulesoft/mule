@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
@@ -198,5 +199,12 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   public void whenAnOperationRaisesAnErrorThePayloadIsNotChanged() throws Exception {
     CoreEvent result = flowRunner("operationSettingPayloadAndRaisingErrorFlow").run();
     assertThat(result, hasMessage(hasPayload(is("Payload before calling the operation"))));
+  }
+
+  @Test
+  @Description("This test is intended to avoid a change breaking backwards for the old behavior of flows (opposite to the operation's behavior)")
+  public void whenAReferencedFlowChangesThePayloadAndRaisesAnErrorThePayloadIsChanged() throws Exception {
+    CoreEvent result = flowRunner("backwardsCompatibleAwfulBehaviorFlow").run();
+    assertThat(result, hasMessage(hasPayload(is("Payload set within the referenced flow"))));
   }
 }
