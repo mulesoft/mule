@@ -287,13 +287,19 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       EnrichedServerNotification notification = (EnrichedServerNotification) argument;
       Exception exception = notification.getException();
 
-      boolean result =
+      boolean result = true;
+      if (notification instanceof PipelineMessageNotification && exception instanceof MessagingException) {
+        result = ((MessagingException) exception).getFailingComponent()
+            .equals(((PipelineMessageNotification) notification).getFailingComponent().get());
+      }
+
+      result = result &&
           expectedAction == notification.getAction().getActionId()
-              && (notification.getEvent() == null) == (this.event == null)
-              && (this.event == null ||
-                  (this.event.getMessage().getPayload().equals(notification.getEvent().getMessage().getPayload()) &&
-                      this.event.getMessage().getAttributes().equals(notification.getEvent().getMessage().getAttributes())))
-              && exceptionExpected == (exception != null);
+          && (notification.getEvent() == null) == (this.event == null)
+          && (this.event == null ||
+              (this.event.getMessage().getPayload().equals(notification.getEvent().getMessage().getPayload()) &&
+                  this.event.getMessage().getAttributes().equals(notification.getEvent().getMessage().getAttributes())))
+          && exceptionExpected == (exception != null);
 
       return result;
     }
