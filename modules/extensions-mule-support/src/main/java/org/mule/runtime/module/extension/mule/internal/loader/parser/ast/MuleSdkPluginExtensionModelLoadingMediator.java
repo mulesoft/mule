@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.internal.ast.AbstractMuleSdkExtensionModelLoadingMediator;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
 import java.util.Optional;
 import java.util.Set;
@@ -34,18 +33,22 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
   private final ArtifactCoordinates artifactCoordinates;
+  private final ExtensionModelLoader extensionModelLoader;
   private final Consumer<ExtensionModel> onNewExtensionModel;
 
   /**
    * Creates a new helper with the given parameters.
    *
-   * @param artifactCoordinates the artifact's coordinates.
-   * @param onNewExtensionModel a consumer to call if the artifact's {@link ExtensionModel} is created as part of the parsing
-   *                            process.
+   * @param artifactCoordinates  the artifact's coordinates.
+   * @param extensionModelLoader the loader to use for loading the {@link ExtensionModel}.
+   * @param onNewExtensionModel  a consumer to call if the artifact's {@link ExtensionModel} is created as part of the parsing
+   *                             process.
    */
   public MuleSdkPluginExtensionModelLoadingMediator(ArtifactCoordinates artifactCoordinates,
+                                                    ExtensionModelLoader extensionModelLoader,
                                                     Consumer<ExtensionModel> onNewExtensionModel) {
     this.artifactCoordinates = artifactCoordinates;
+    this.extensionModelLoader = extensionModelLoader;
     this.onNewExtensionModel = onNewExtensionModel;
   }
 
@@ -64,7 +67,7 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
 
   @Override
   protected ExtensionModelLoader getLoader() throws ConfigurationException {
-    return new MuleSdkPluginExtensionModelLoader();
+    return extensionModelLoader;
   }
 
   @Override

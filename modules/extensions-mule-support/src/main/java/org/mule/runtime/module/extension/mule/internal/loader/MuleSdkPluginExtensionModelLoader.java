@@ -94,6 +94,7 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     // Registers a callback in case the parser discovers the ExtensionModel as part of the process.
     MuleSdkExtensionModelLoadingMediator loadingHelper =
         new MuleSdkPluginExtensionModelLoadingMediator(context.getArtifactCoordinates(),
+                                                       this,
                                                        em -> context.addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, em));
 
     try {
