@@ -142,6 +142,7 @@
         </this:with-mapping-inside-body>
     </flow>
 
+    <!-- Use Case 1.4: Payload is not set when operation raises errors -->
     <flow name="operationSettingPayloadAndRaisingErrorFlow">
         <try>
             <set-payload value="Payload before calling the operation" />
