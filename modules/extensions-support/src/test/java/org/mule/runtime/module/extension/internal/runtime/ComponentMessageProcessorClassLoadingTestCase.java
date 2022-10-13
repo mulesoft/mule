@@ -100,13 +100,13 @@ public class ComponentMessageProcessorClassLoadingTestCase extends AbstractMuleC
 
           assertThat(currentThread().getContextClassLoader(), is(sameInstance(contextClassLoader)));
 
-          setContextClassLoader(currentThread, currentClassLoader, this.classLoader);
+          setContextClassLoader(currentThread, currentClassLoader, this.nestedChainClassLoader);
           try {
             assertThat(currentThread().getContextClassLoader(), is(sameInstance(applicationClassLoader)));
 
             startIfNeeded(nestedChain);
           } finally {
-            setContextClassLoader(currentThread, this.classLoader, currentClassLoader);
+            setContextClassLoader(currentThread, this.nestedChainClassLoader, currentClassLoader);
 
             assertThat(currentClassLoader, is(sameInstance(contextClassLoader)));
           }

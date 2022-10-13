@@ -202,7 +202,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
-  protected ClassLoader classLoader;
+  protected ClassLoader nestedChainClassLoader;
   private Optional<TransactionConfig> transactionConfig;
 
   @Inject
@@ -266,7 +266,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.nestedChain = nestedChain;
-    this.classLoader = classLoader;
+    this.nestedChainClassLoader = classLoader;
     this.reflectionCache = reflectionCache;
     this.resultTransformer = resultTransformer;
     this.hasNestedChain = hasNestedChain(componentModel);
@@ -907,12 +907,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     if (nestedChain != null) {
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      setContextClassLoader(currentThread, currentClassLoader, this.classLoader);
+      setContextClassLoader(currentThread, currentClassLoader, this.nestedChainClassLoader);
       try {
         LOGGER.debug("Starting nested chain ({}) of component '{}'...", nestedChain, processorPath);
         startIfNeeded(nestedChain);
       } finally {
-        setContextClassLoader(currentThread, this.classLoader, currentClassLoader);
+        setContextClassLoader(currentThread, this.nestedChainClassLoader, currentClassLoader);
       }
     }
   }
