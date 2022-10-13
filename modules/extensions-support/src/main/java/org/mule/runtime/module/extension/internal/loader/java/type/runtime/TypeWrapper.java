@@ -76,7 +76,7 @@ public class TypeWrapper implements Type {
       resolvableTypeGenerics = resolvableType.getGenerics();
       for (ResolvableType type : resolvableTypeGenerics) {
         TypeWrapper concreteType;
-        if (type == resolvableType || type.isAssignableFrom(resolvableType)) {
+        if (type == resolvableType || (type.isAssignableFrom(resolvableType) && resolvableType.isAssignableFrom(type))) {
           concreteType = this;
         } else {
           concreteType = new TypeWrapper(type, typeLoader);
