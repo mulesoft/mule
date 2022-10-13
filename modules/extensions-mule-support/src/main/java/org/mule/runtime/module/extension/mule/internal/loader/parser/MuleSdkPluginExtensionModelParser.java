@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public class MuleSdkPluginExtensionModelParser extends AbstractMuleSdkExtensionModelParser {
+public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelParser {
 
   private String name;
   private Category category;
@@ -47,7 +47,7 @@ public class MuleSdkPluginExtensionModelParser extends AbstractMuleSdkExtensionM
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     super(ast, typeLoader, extensionModelHelper);
-    parseMetadata(getExtensionComponentAst(ast));
+    parseStructure(getExtensionComponentAst(ast));
   }
 
   @Override
@@ -91,7 +91,7 @@ public class MuleSdkPluginExtensionModelParser extends AbstractMuleSdkExtensionM
     return ast.topLevelComponents().get(0);
   }
 
-  private void parseMetadata(ComponentAst extensionComponentAst) {
+  private void parseStructure(ComponentAst extensionComponentAst) {
     name = getParameter(extensionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);
     category = Category
         .valueOf(this.<String>getParameter(extensionComponentAst, MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME).toUpperCase());

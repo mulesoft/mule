@@ -45,17 +45,16 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public abstract class AbstractMuleSdkExtensionModelParser extends BaseMuleSdkExtensionModelParser
-    implements ExtensionModelParser {
+public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionModelParser implements ExtensionModelParser {
 
   private final ArtifactAst ast;
   private final TypeLoader typeLoader;
   private final List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
 
-  public AbstractMuleSdkExtensionModelParser(ArtifactAst ast,
-                                             TypeLoader typeLoader,
-                                             ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkExtensionModelParser(ArtifactAst ast,
+                                     TypeLoader typeLoader,
+                                     ExtensionModelHelper extensionModelHelper) {
     this.ast = ast;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;

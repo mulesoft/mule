@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public class MuleSdkApplicationExtensionModelParser extends AbstractMuleSdkExtensionModelParser {
+public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionModelParser {
 
   // The namespace of the extension when it's defined within an application rather than in a separate artifact.
   public static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
