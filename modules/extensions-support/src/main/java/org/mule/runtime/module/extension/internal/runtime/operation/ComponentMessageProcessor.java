@@ -78,6 +78,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -903,8 +904,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return retryPolicyResolver.apply(staticConfig).isEnabled();
   }
 
+  /**
+   * If the {@link #nestedChain} is not null, it changes the current ClassLoader for the Application's ClassLoader
+   * {@link #nestedChainClassLoader} to start the processors, and then it goes back to the previous ClassLoader.
+   *
+   * @throws MuleException if the {@link LifecycleUtils#startIfNeeded} fails.
+   */
   protected void startIfNeededNestedChain() throws MuleException {
     if (nestedChain != null) {
+      // The Application's ClassLoader (nestedChainClassLoader) is needed to have the proper classpath
+      // when a processor needs to load an Application's resource.
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
       setContextClassLoader(currentThread, currentClassLoader, this.nestedChainClassLoader);
