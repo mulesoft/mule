@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.ast;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
@@ -16,6 +17,7 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -32,9 +34,12 @@ import java.util.Set;
 public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements MuleSdkExtensionModelLoadingMediator {
 
   protected final Optional<ArtifactCoordinates> artifactCoordinates;
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  protected AbstractMuleSdkExtensionModelLoadingMediator(Optional<ArtifactCoordinates> artifactCoordinates) {
+  protected AbstractMuleSdkExtensionModelLoadingMediator(Optional<ArtifactCoordinates> artifactCoordinates,
+                                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactCoordinates = artifactCoordinates;
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   @Override
@@ -49,7 +54,8 @@ public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements Mu
 
     ExtensionModelLoadingRequest.Builder loadingRequestBuilder = builder(classLoader, getDefault(extensions))
         .addParameter(VERSION_PROPERTY_NAME, getVersion())
-        .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast);
+        .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+        .addParameter(MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME, expressionLanguageMetadataService);
 
     artifactCoordinates.ifPresent(loadingRequestBuilder::setArtifactCoordinates);
 

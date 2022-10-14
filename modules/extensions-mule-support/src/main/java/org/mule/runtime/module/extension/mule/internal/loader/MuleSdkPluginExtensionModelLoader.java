@@ -10,6 +10,7 @@ import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
@@ -21,6 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -105,12 +107,15 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
   private ArtifactAst parseAstAndBuildPluginExtensionModel(ExtensionLoadingContext context) {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
+    ExpressionLanguageMetadataService expressionLanguageMetadataService =
+        getRequiredLoadingParameter(context, MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME);
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
     String version = getRequiredLoadingParameter(context, VERSION_PROPERTY_NAME);
 
     // Registers a callback in case the parser discovers the ExtensionModel as part of the process.
     MuleSdkExtensionModelLoadingMediator loadingHelper =
-        new MuleSdkPluginExtensionModelLoadingMediator(context.getArtifactCoordinates(),
+        new MuleSdkPluginExtensionModelLoadingMediator(expressionLanguageMetadataService,
+                                                       context.getArtifactCoordinates(),
                                                        version,
                                                        this,
                                                        em -> context.addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, em));

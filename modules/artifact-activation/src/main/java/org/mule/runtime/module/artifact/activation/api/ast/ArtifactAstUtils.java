@@ -85,8 +85,8 @@ public final class ArtifactAstUtils {
                                                                                        ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
-    return new MuleSdkApplicationExtensionModelLoadingMediator(artifactId, artifactCoordinates,
-                                                               expressionLanguageMetadataService);
+    return new MuleSdkApplicationExtensionModelLoadingMediator(expressionLanguageMetadataService, artifactId,
+                                                               artifactCoordinates);
   }
 
   private ArtifactAstUtils() {}

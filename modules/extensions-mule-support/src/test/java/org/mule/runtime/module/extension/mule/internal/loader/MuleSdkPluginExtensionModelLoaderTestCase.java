@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -32,12 +33,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
+import org.mule.runtime.module.extension.mule.internal.operation.FakeExpressionLanguageMetadataService;
 import org.mule.tck.classlaoder.TestClassLoader;
 
 import java.io.File;
@@ -59,6 +62,8 @@ import org.slf4j.Logger;
 public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAstTestCase {
 
   private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelLoaderTestCase.class);
+  private static final ExpressionLanguageMetadataService expressionLanguageMetadataService =
+      new FakeExpressionLanguageMetadataService();
   private static final ArtifactCoordinates TEST_ARTIFACT_COORDINATES = new BundleDescriptor.Builder()
       .setArtifactId("TestExtension")
       .setGroupId("TestGroup")
@@ -169,6 +174,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
     ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(runtimeExtensionModels))
         .addParameter(VERSION_PROPERTY_NAME, TEST_ARTIFACT_COORDINATES.getVersion())
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
+        .addParameter(MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME, expressionLanguageMetadataService)
         .setArtifactCoordinates(TEST_ARTIFACT_COORDINATES)
         .build();
     return new MuleSdkPluginExtensionModelLoader().loadExtensionModel(loadingRequest);

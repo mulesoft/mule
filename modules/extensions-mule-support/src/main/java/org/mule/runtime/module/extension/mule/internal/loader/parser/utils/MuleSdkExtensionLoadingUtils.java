@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
+
 import static java.lang.String.format;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.extension.api.ExtensionConstants;
@@ -41,7 +44,9 @@ public class MuleSdkExtensionLoadingUtils {
    * @return A {@link TypeLoader} suitable for loading types in the context of the extension being modeled in the current context.
    */
   public static TypeLoader createTypeLoader(ExtensionLoadingContext context) {
-    return new ApplicationTypeLoader(context.getDslResolvingContext().getExtensions());
+    ExpressionLanguageMetadataService expressionLanguageMetadataService =
+        getRequiredLoadingParameter(context, MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME);
+    return new ApplicationTypeLoader(context.getDslResolvingContext().getExtensions(), expressionLanguageMetadataService);
   }
 
   /**

@@ -37,13 +37,11 @@ public class MuleSdkApplicationExtensionModelLoadingMediator extends AbstractMul
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
   private final String artifactId;
-  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  public MuleSdkApplicationExtensionModelLoadingMediator(String artifactId, Optional<ArtifactCoordinates> artifactCoordinates,
-                                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    super(artifactCoordinates);
+  public MuleSdkApplicationExtensionModelLoadingMediator(ExpressionLanguageMetadataService expressionLanguageMetadataService,
+                                                         String artifactId, Optional<ArtifactCoordinates> artifactCoordinates) {
+    super(artifactCoordinates, expressionLanguageMetadataService);
     this.artifactId = artifactId;
-    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   @Override
