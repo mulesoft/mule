@@ -32,7 +32,7 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
 
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
-  private final ArtifactCoordinates artifactCoordinates;
+  private final String version;
   private final ExtensionModelLoader extensionModelLoader;
   private final Consumer<ExtensionModel> onNewExtensionModel;
 
@@ -40,14 +40,17 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
    * Creates a new mediator with the given parameters.
    *
    * @param artifactCoordinates  the artifact's coordinates.
+   * @param version              the artifact's version in case the full coordinates are not available.
    * @param extensionModelLoader the loader to use for loading the {@link ExtensionModel}.
    * @param onNewExtensionModel  a consumer to call if the artifact's {@link ExtensionModel} is created as part of the parsing
    *                             process.
    */
-  public MuleSdkPluginExtensionModelLoadingMediator(ArtifactCoordinates artifactCoordinates,
+  public MuleSdkPluginExtensionModelLoadingMediator(Optional<ArtifactCoordinates> artifactCoordinates,
+                                                    String version,
                                                     ExtensionModelLoader extensionModelLoader,
                                                     Consumer<ExtensionModel> onNewExtensionModel) {
-    this.artifactCoordinates = artifactCoordinates;
+    super(artifactCoordinates);
+    this.version = version;
     this.extensionModelLoader = extensionModelLoader;
     this.onNewExtensionModel = onNewExtensionModel;
   }
@@ -61,8 +64,8 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
   }
 
   @Override
-  protected ArtifactCoordinates getArtifactCoordinates() throws ConfigurationException {
-    return artifactCoordinates;
+  protected String getVersion() throws ConfigurationException {
+    return artifactCoordinates.map(ArtifactCoordinates::getVersion).orElse(version);
   }
 
   @Override

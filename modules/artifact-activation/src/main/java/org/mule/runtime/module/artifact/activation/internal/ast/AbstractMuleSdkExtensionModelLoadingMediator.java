@@ -31,6 +31,12 @@ import java.util.Set;
  */
 public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements MuleSdkExtensionModelLoadingMediator {
 
+  protected final Optional<ArtifactCoordinates> artifactCoordinates;
+
+  protected AbstractMuleSdkExtensionModelLoadingMediator(Optional<ArtifactCoordinates> artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
+  }
+
   @Override
   public Optional<ExtensionModel> loadExtensionModel(ArtifactAst ast, ClassLoader classLoader,
                                                      Set<ExtensionModel> extensions)
@@ -39,13 +45,13 @@ public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements Mu
       return empty();
     }
 
-    ArtifactCoordinates artifactCoordinates = getArtifactCoordinates();
     ExtensionModelLoader loader = getLoader();
 
     ExtensionModelLoadingRequest.Builder loadingRequestBuilder = builder(classLoader, getDefault(extensions))
-        .setArtifactCoordinates(artifactCoordinates)
-        .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.getVersion())
+        .addParameter(VERSION_PROPERTY_NAME, getVersion())
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast);
+
+    artifactCoordinates.ifPresent(loadingRequestBuilder::setArtifactCoordinates);
 
     addCustomLoadingRequestParameters(loadingRequestBuilder);
 
@@ -53,10 +59,10 @@ public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements Mu
   }
 
   /**
-   * @return The {@link ArtifactCoordinates} representing the artifact.
-   * @throws ConfigurationException if the {@link ArtifactCoordinates} cannot be identified.
+   * @return The version of the artifact.
+   * @throws ConfigurationException if the version cannot be identified.
    */
-  protected abstract ArtifactCoordinates getArtifactCoordinates() throws ConfigurationException;
+  protected abstract String getVersion() throws ConfigurationException;
 
   /**
    *

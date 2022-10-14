@@ -37,22 +37,19 @@ public class MuleSdkApplicationExtensionModelLoadingMediator extends AbstractMul
   private static final Set<ComponentType> REUSABLE_COMPONENT_TYPES = singleton(OPERATION_DEF);
 
   private final String artifactId;
-  private final Optional<ArtifactCoordinates> artifactCoordinates;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   public MuleSdkApplicationExtensionModelLoadingMediator(String artifactId, Optional<ArtifactCoordinates> artifactCoordinates,
                                                          ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    super(artifactCoordinates);
     this.artifactId = artifactId;
-    this.artifactCoordinates = artifactCoordinates;
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   @Override
-  protected ArtifactCoordinates getArtifactCoordinates() throws ConfigurationException {
-    if (!artifactCoordinates.isPresent()) {
-      throw new ConfigurationException(buildErrorMessage("No artifact coordinates specified", artifactId));
-    }
-    return artifactCoordinates.get();
+  protected String getVersion() throws ConfigurationException {
+    return artifactCoordinates.map(ArtifactCoordinates::getVersion)
+        .orElseThrow(() -> new ConfigurationException(buildErrorMessage("No version specified", artifactId)));
   }
 
   @Override

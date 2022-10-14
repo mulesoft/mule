@@ -12,6 +12,7 @@ import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.getRequiredLoadingParameter;
@@ -25,6 +26,8 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
+import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
@@ -86,14 +89,29 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     return astBuilder.build();
   }
 
+  /**
+   * Parses the plugin's AST from the resource file.
+   * <p>
+   * In order to perform AST validations the {@link ExtensionModel} needs to be loaded.
+   * <p>
+   * As an optimization, the loaded {@link ExtensionModel} will be stored in the context so that we can avoid loading it again
+   * later on.
+   *
+   * @param context the context that will be used for the declaration.
+   * @return the plugin's {@link ArtifactAst}.
+   * @see ArtifactAstUtils#parseArtifact(String[], AstXmlParserSupplier, Set, boolean, ClassLoader,
+   *      MuleSdkExtensionModelLoadingMediator)
+   */
   private ArtifactAst parseAstAndBuildPluginExtensionModel(ExtensionLoadingContext context) {
     Set<ExtensionModel> dependencies = context.getDslResolvingContext().getExtensions();
 
     String[] resources = {getRequiredLoadingParameter(context, MULE_SDK_RESOURCE_PROPERTY_NAME)};
+    String version = getRequiredLoadingParameter(context, VERSION_PROPERTY_NAME);
 
     // Registers a callback in case the parser discovers the ExtensionModel as part of the process.
     MuleSdkExtensionModelLoadingMediator loadingHelper =
         new MuleSdkPluginExtensionModelLoadingMediator(context.getArtifactCoordinates(),
+                                                       version,
                                                        this,
                                                        em -> context.addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, em));
 
