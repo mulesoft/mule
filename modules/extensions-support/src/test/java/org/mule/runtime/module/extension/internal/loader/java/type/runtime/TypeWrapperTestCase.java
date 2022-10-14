@@ -10,9 +10,7 @@ import org.junit.Test;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.parser.java.CustomStaticTypeUtilsTestCase;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -20,11 +18,14 @@ public class TypeWrapperTestCase {
 
   @Test
   public void enumParameterType() {
-    TypeWrapper type = new TypeWrapper(CustomStaticTypeUtilsTestCase.TestEnum.class, new DefaultExtensionsTypeLoaderFactory()
+    TypeWrapper type = new TypeWrapper(TestEnum.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    for (ExtensionParameter parameter : type.getMethod("compareTo", Enum.class).map(WithParameters::getParameters)
-        .orElse(emptyList())) {
+    for (ExtensionParameter parameter : type.getMethod("compareTo", Enum.class).map(WithParameters::getParameters).get()) {
       assertThat(parameter.getType().getTypeName(), is(("java.lang.Enum")));
     }
+  }
+
+  public enum TestEnum {
+    SOME_VALUE, ANOTHER_VALUE
   }
 }

@@ -476,8 +476,4 @@ public class CustomStaticTypeUtilsTestCase {
       return CUSTOM_STATIC_METADATATYPE;
     }
   }
-
-  public enum TestEnum {
-    SOME_VALUE, ANOTHER_VALUE
-  }
 }
