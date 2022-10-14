@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,7 +43,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
-import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterWrapper;
@@ -54,7 +52,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 import org.junit.Test;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 public class CustomStaticTypeUtilsTestCase {
 
@@ -210,16 +207,6 @@ public class CustomStaticTypeUtilsTestCase {
   @Test
   public void sdkCustomAttributesStaticTypeSource() {
     assertCustomType(getSourceAttributesType(getSourceElementWithClass(SdkCustomAttributesStaticTypeSource.class)));
-  }
-
-  @Test
-  public void enumParameterType() throws NoSuchMethodException {
-    TypeWrapper type = new TypeWrapper(TestEnum.class, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    for (ExtensionParameter parameter : type.getMethod("compareTo", Enum.class).map(WithParameters::getParameters)
-        .orElse(emptyList())) {
-      parameter.getType();
-    }
   }
 
   private SourceElement getSourceElementWithClass(Class<? extends Source> sourceClass) {
