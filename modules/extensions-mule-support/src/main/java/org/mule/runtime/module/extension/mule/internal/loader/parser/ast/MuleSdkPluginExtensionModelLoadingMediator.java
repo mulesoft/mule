@@ -37,7 +37,7 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
   private final Consumer<ExtensionModel> onNewExtensionModel;
 
   /**
-   * Creates a new helper with the given parameters.
+   * Creates a new mediator with the given parameters.
    *
    * @param artifactCoordinates  the artifact's coordinates.
    * @param extensionModelLoader the loader to use for loading the {@link ExtensionModel}.

@@ -13,7 +13,6 @@ import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 
 import java.util.NoSuchElementException;
 
@@ -35,23 +34,6 @@ public class MuleSdkExtensionLoadingUtils {
    */
   public static <T> T getRequiredLoadingParameter(ExtensionLoadingContext context, String parameterName) {
     return context.<T>getParameter(parameterName).orElseThrow(() -> createParameterNotFoundException(parameterName));
-  }
-
-  /**
-   * Gets a parameter from the given {@link ExtensionModelLoadingRequest} assuming it needs to be present.
-   *
-   * @param request       The {@link ExtensionModelLoadingRequest}.
-   * @param parameterName The parameter name, typically a constant from {@link ExtensionConstants}.
-   * @param <T>           The expected type of the parameter.
-   *
-   * @return The parameter value.
-   */
-  public static <T> T getRequiredLoadingParameter(ExtensionModelLoadingRequest request, String parameterName) {
-    T parameterValue = (T) request.getParameters().get(parameterName);
-    if (parameterValue == null) {
-      throw createParameterNotFoundException(parameterName);
-    }
-    return parameterValue;
   }
 
   /**
