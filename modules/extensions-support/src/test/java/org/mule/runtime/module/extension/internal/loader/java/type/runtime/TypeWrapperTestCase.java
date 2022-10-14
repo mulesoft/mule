@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TypeWrapperTestCase {
 
   @Test
-  public void enumParameterType() {
+  public void recursiveParameterType() {
     TypeWrapper type = new TypeWrapper(TestEnum.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     for (ExtensionParameter parameter : type.getMethod("compareTo", Enum.class).map(WithParameters::getParameters).get()) {
