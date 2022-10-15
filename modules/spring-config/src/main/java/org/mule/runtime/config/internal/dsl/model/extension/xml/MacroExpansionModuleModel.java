@@ -358,7 +358,10 @@ public class MacroExpansionModuleModel {
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder.setIdentifier(operationRefModel.getIdentifier());
 
-    Map<String, String> propertiesMap = extractProperties(configRefName);
+    final Optional<String> configRef =
+        !configRefName.isPresent() && shouldAddImplicitConfiguration() ? of(IMPLICIT_CONFIG_NAME) : configRefName;
+
+    Map<String, String> propertiesMap = extractProperties(configRef);
     Map<String, String> parametersMap = ((ComponentAst) operationRefModel).getParameters().stream()
         .filter(paramAst -> paramAst.getRawValue() != null)
         .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()));
@@ -372,10 +375,6 @@ public class MacroExpansionModuleModel {
     }
 
     operationRefModel.getMetadata().getSourceCode().ifPresent(processorChainBuilder::setSourceCode);
-
-    final Optional<String> configRef =
-        !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-            ? of(IMPLICIT_CONFIG_NAME) : configRefName;
 
     bodyProcessors.stream()
         .map(bodyProcessor -> lookForTNSOperation((ComponentAst) bodyProcessor)
@@ -518,9 +517,12 @@ public class MacroExpansionModuleModel {
                                                                      configParameter)));
           // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
-          configRefComponentModel.getParameters().stream()
-              .filter(paramAst -> paramAst.getRawValue() != null)
-              .forEach(paramAst -> valuesMap.put(paramAst.getModel().getName(), paramAst.getRawValue()));
+
+          Map<String, String> propertiesMap = configRefComponentModel.getParameters()
+              .stream()
+              .collect(toMap(paramAst -> paramAst.getModel().getName(),
+                             paramAst -> paramAst.getValue().reduce(v -> v, Object::toString)));
+          valuesMap.putAll(propertiesMap);
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
