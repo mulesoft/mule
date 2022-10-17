@@ -88,6 +88,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
         .setNestedChain(nestedChain)
+        .setClassLoader(Thread.currentThread().getContextClassLoader())
         .build();
   }
 

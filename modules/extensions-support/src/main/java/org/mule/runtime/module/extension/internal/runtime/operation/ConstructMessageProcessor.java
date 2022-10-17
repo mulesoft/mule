@@ -38,12 +38,13 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    MessageProcessorChain nestedChain,
+                                   ClassLoader classLoader,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
                                    long terminationTimeout) {
     super(extensionModel, constructModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, nestedChain,
+          retryPolicyTemplate, nestedChain, classLoader,
           extensionManager, policyManager, reflectionCache, null, terminationTimeout);
   }
 

@@ -56,6 +56,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected CursorProviderFactory cursorProviderFactory;
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected MessageProcessorChain nestedChain;
+  protected ClassLoader classLoader;
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
@@ -144,6 +145,11 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   public ComponentMessageProcessorBuilder<M, P> setNestedChain(MessageProcessorChain nestedChain) {
     this.nestedChain = nestedChain;
+    return this;
+  }
+
+  public ComponentMessageProcessorBuilder<M, P> setClassLoader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
     return this;
   }
 
