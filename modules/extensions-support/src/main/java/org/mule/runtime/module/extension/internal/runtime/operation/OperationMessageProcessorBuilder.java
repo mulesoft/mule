@@ -59,14 +59,14 @@ public final class OperationMessageProcessorBuilder
 
     if (supportsOAuth) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain,
+                                                arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
                                                 extensionManager,
                                                 policyManager, reflectionCache, resultTransformer, terminationTimeout);
     } else {
       return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                           arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain, extensionManager,
-                                           policyManager,
-                                           reflectionCache, resultTransformer, terminationTimeout);
+                                           arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
+                                           extensionManager,
+                                           policyManager, reflectionCache, resultTransformer, terminationTimeout);
     }
   }
 
