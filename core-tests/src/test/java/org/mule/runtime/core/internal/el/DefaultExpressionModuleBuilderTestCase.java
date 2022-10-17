@@ -12,10 +12,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JSON;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
@@ -66,8 +66,8 @@ public class DefaultExpressionModuleBuilderTestCase extends AbstractMuleTestCase
   @Test
   public void shouldBeAbleToAddDeclaredTypes() {
     ExpressionModule.Builder builder = ExpressionModule.builder(namespace);
-    NumberType numberType = create(MetadataFormat.JSON).numberType().build();
-    ObjectTypeBuilder objectTypeBuilder = create(MetadataFormat.JSON).objectType();
+    NumberType numberType = create(JSON).numberType().build();
+    ObjectTypeBuilder objectTypeBuilder = create(JSON).objectType();
     objectTypeBuilder.addField().key("age").value(numberType).build();
     ObjectType objectType = objectTypeBuilder.build();
     builder.addType(objectType);
