@@ -17,12 +17,28 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TypeWrapperTestCase {
 
   @Test
-  public void recursiveParameterType() {
+  public void enumParameterType() {
     TypeWrapper type = new TypeWrapper(TestEnum.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     for (ExtensionParameter parameter : type.getMethod("compareTo", Enum.class).map(WithParameters::getParameters).get()) {
       assertThat(parameter.getType().getTypeName(), is(("java.lang.Enum")));
     }
+  }
+
+  @Test
+  public void recursiveParameterType() {
+    TypeWrapper type = new TypeWrapper(SomeClass.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    for (ExtensionParameter parameter : type.getMethod("someMethod", SomeClass.class).map(WithParameters::getParameters).get()) {
+      assertThat(parameter.getType().getTypeName(),
+                 is(("org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapperTestCase$SomeClass")));
+    }
+  }
+
+  // Similar to java.util.stream.BaseStream
+  public class SomeClass<T extends SomeClass> {
+
+    public void someMethod(T someParameter) {}
   }
 
   public enum TestEnum {
