@@ -17,6 +17,7 @@ import java.util.Properties;
  * Creates an instance of a deployable artifact descriptor.
  *
  * @param <D> the concrete type of deployable artifact descriptor (application or domain) to resolve.
+ * @since 4.5
  */
 public interface DeployableArtifactDescriptorCreator<D extends DeployableArtifactDescriptor> {
 
