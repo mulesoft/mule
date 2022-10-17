@@ -21,7 +21,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,7 +67,7 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    return (DomainDescriptor) descriptorCreator.create(getArtifactLocation().getName(),
-                                                       getDeploymentProperties());
+    return descriptorCreator.create(getArtifactLocation().getName(),
+                                    getDeploymentProperties());
   }
 }
