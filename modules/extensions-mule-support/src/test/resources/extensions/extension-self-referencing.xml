@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension name="Self-Referencing Extension"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<extension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
            xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
            xmlns:self-referencing="http://www.mulesoft.org/schema/mule/self-referencing"
@@ -9,6 +8,8 @@
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
         http://www.mulesoft.org/schema/mule/self-referencing http://www.mulesoft.org/schema/mule/self-referencing/current/mule-self-referencing.xsd
         http://www.mulesoft.org/schema/mule/mule-extension http://www.mulesoft.org/schema/mule/mule-extension/current/mule-extension.xsd">
+    <description name="Self-Referencing Extension"/>
+
     <operation:def name="identityBetweenBraces">
         <operation:parameters>
             <operation:parameter name="input" type="any"/>

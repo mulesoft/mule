@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -109,5 +110,9 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   protected ComponentAst getChild(ComponentAst ast, String childName) {
     return ast.directChildrenStreamByIdentifier(null, childName).findFirst().get();
+  }
+
+  protected Optional<ComponentAst> getOptionalChild(ComponentAst ast, String childName) {
+    return ast.directChildrenStreamByIdentifier(null, childName).findFirst();
   }
 }

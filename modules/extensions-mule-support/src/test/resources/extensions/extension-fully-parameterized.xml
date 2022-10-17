@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension name="Fully Parameterized Extension"
-           category="PREMIUM"
-           vendor="Extension Producers Inc."
-           requiredEntitlement="Premium Extension"
-           requiresEnterpriseLicense="true"
-           allowsEvaluationLicense="false"
-           namespace="http://www.mulesoft.org/schema/a/different/path/mule/fully-parameterized"
-           prefix="fully-param"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<extension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
            xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
            xmlns="http://www.mulesoft.org/schema/mule/mule-extension"
            xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
         http://www.mulesoft.org/schema/mule/mule-extension http://www.mulesoft.org/schema/mule/mule-extension/current/mule-extension.xsd">
+
+    <description name="Fully Parameterized Extension"
+                 category="PREMIUM"
+                 vendor="Extension Producers Inc.">
+        <licensing requiresEnterpriseLicense="true"
+                   allowsEvaluationLicense="false"
+                   requiredEntitlement="Premium Extension"/>
+        <xml-dsl-attributes namespace="http://www.mulesoft.org/schema/a/different/path/mule/fully-parameterized"
+                            prefix="fully-param"/>
+    </description>
 
     <operation:def name="identity">
         <operation:parameters>

@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
@@ -64,12 +68,24 @@ abstract class BaseMuleSdkExtensionModelParser {
   }
 
   /**
-   * @param component
-   * @param childName
+   * @param component a {@link ComponentAst}
+   * @param childName the child element name
    * @return The first direct child (if any) with the given {@code childName}
    */
   protected Optional<ComponentAst> getSingleChild(ComponentAst component, String childName) {
     return getChildren(component, childName).findFirst();
+  }
+
+  /**
+   * @param component a {@link ComponentAst}
+   * @param childName the child element name
+   * @return The first direct child with the given {@code childName}
+   * @throws MuleRuntimeException if not found.
+   */
+  protected ComponentAst getRequiredSingleChild(ComponentAst component, String childName) {
+    return getSingleChild(component, childName)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("The content of element '%s' is not complete. '%s' is expected.",
+                                                                               component.getIdentifier(), childName))));
   }
 
   /**
