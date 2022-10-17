@@ -18,8 +18,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
-import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,13 +44,28 @@ public interface DeployableArtifactDescriptorFactory {
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
+   * @param descriptorCreator        creates the descriptor's instance that will be populated by the factory.
    * @return a descriptor for a domain.
    */
   DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                           Map<String, String> deploymentProperties,
                                           PluginPatchesResolver pluginPatchesResolver,
                                           PluginModelResolver pluginModelResolver,
-                                          PluginDescriptorResolver pluginDescriptorResolver);
+                                          PluginDescriptorResolver pluginDescriptorResolver,
+                                          DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator);
+
+  /**
+   * Creates a descriptor for a domain, including its plugin descriptors, using the default resolvers.
+   *
+   * @param model                model describing the structure of the domain with all the necessary information to build its
+   *                             descriptor.
+   * @param deploymentProperties properties that affect how the artifact is deployed.
+   * @param descriptorCreator    creates the descriptor's instance that will be populated by the factory.
+   * @return a descriptor for a domain.
+   */
+  DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
+                                          Map<String, String> deploymentProperties,
+                                          DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator);
 
   /**
    * Creates a descriptor for a domain, including its plugin descriptors, using the default resolvers.
@@ -76,7 +89,8 @@ public interface DeployableArtifactDescriptorFactory {
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
-   * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}, or null if .
+   * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}.
+   * @param descriptorCreator        creates the descriptor's instance that will be populated by the factory.
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
@@ -84,7 +98,8 @@ public interface DeployableArtifactDescriptorFactory {
                                                     PluginPatchesResolver pluginPatchesResolver,
                                                     PluginModelResolver pluginModelResolver,
                                                     PluginDescriptorResolver pluginDescriptorResolver,
-                                                    DomainDescriptorResolver domainDescriptorResolver);
+                                                    DomainDescriptorResolver domainDescriptorResolver,
+                                                    DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors.
@@ -115,6 +130,21 @@ public interface DeployableArtifactDescriptorFactory {
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
                                                     DomainDescriptorResolver domainDescriptorResolver);
+
+  /**
+   * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
+   *
+   * @param model                    model describing the structure of the application with all the necessary information to build
+   *                                 its descriptor.
+   * @param deploymentProperties     properties that affect how the artifact is deployed.
+   * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}.
+   * @param descriptorCreator        creates the descriptor's instance that will be populated by the factory.
+   * @return a descriptor for an application.
+   */
+  ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                    Map<String, String> deploymentProperties,
+                                                    DomainDescriptorResolver domainDescriptorResolver,
+                                                    DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.

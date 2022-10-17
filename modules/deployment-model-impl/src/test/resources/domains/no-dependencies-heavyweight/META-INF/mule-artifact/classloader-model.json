@@ -1,0 +1,11 @@
+{
+    "version": "1.2.0",
+    "artifactCoordinates": {
+        "groupId": "com.test",
+        "artifactId": "no-dependencies-heavyweight",
+        "version": "1.0.0-SNAPSHOT",
+        "type": "jar",
+        "classifier": "mule-domain"
+    },
+    "dependencies": []
+}

@@ -1108,4 +1108,11 @@ public interface AllureConstants {
       String ANYPOINT_MONITORING_SIDECAR = "Anypoint monitoring sidecar";
     }
   }
+
+  interface DeployableCreationFeature {
+
+    String APP_CREATION = "Application creation";
+    String DOMAIN_CREATION = "Domain creation";
+
+  }
 }
