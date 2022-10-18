@@ -57,6 +57,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected MessageProcessorChain nestedChain;
   protected boolean lazyModeEnabled;
+  protected ClassLoader classLoader;
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
@@ -150,6 +151,11 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   public ComponentMessageProcessorBuilder<M, P> setNestedChain(MessageProcessorChain nestedChain) {
     this.nestedChain = nestedChain;
+    return this;
+  }
+
+  public ComponentMessageProcessorBuilder<M, P> setClassLoader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
     return this;
   }
 
