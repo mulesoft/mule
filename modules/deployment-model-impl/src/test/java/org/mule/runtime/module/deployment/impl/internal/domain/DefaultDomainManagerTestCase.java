@@ -37,6 +37,7 @@ import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesR
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -120,7 +121,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   private Domain createDomain(String artifactId, String version, String artifactName) throws IOException {
     final DomainDescriptor descriptor = new DomainDescriptor(artifactName);
     descriptor.setBundleDescriptor(createBundleDescriptor(artifactId, version));
-    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any())).thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class)))
+        .thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     when(domainArtifactClassLoader.getArtifactId()).thenReturn(artifactId);

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
 
 import static java.util.Optional.empty;
 
@@ -35,6 +36,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
@@ -65,6 +67,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import io.qameta.allure.Feature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,6 +78,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+@Feature(APP_CREATION)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultApplicationFactory.class})
 @PowerMockIgnore({"javax.management.*", "javax.script.*"})
@@ -132,7 +136,8 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
     final File[] resourceFiles = new File[] {new File("mule-config.xml")};
-    when(deployableArtifactDescriptorFactory.createApplicationDescriptor(any(), any(), any())).thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory
+        .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class))).thenReturn(descriptor);
 
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = new ArtifactPluginDescriptor(FAKE_ARTIFACT_PLUGIN);
     coreArtifactPluginDescriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().build());
@@ -213,7 +218,8 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
     descriptor.setArtifactLocation(new File("some/location"));
-    when(deployableArtifactDescriptorFactory.createApplicationDescriptor(any(), any(), any())).thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory
+        .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class))).thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());
   }
