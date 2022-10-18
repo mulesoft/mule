@@ -475,7 +475,7 @@ class ComponentConfigurationBuilder<T> {
         value = componentAst.getMetadata().getSourceCode();
       }
 
-      if (value.isPresent() && value.get().startsWith(GLOBAL_FUNCTIONS_START_TAG)) {
+      if (value != null && value.isPresent() && value.get().startsWith(GLOBAL_FUNCTIONS_START_TAG)) {
         Optional<String> data =
             value.map(val -> val.substring(GLOBAL_FUNCTIONS_START_TAG.length(), val.indexOf(GLOBAL_FUNCTIONS_END_TAG)));
         this.value = data.orElse("");
