@@ -469,7 +469,12 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      Optional<String> value = createBeanDefinitionRequest.getComponent().getMetadata().getSourceCode();
+      ComponentAst componentAst = createBeanDefinitionRequest.getComponent();
+      Optional<String> value = Optional.empty();
+      if (componentAst != null && componentAst.getMetadata() != null) {
+        value = componentAst.getMetadata().getSourceCode();
+      }
+
       if (value.isPresent() && value.get().startsWith(GLOBAL_FUNCTIONS_START_TAG)) {
         Optional<String> data =
             value.map(val -> val.substring(GLOBAL_FUNCTIONS_START_TAG.length(), val.indexOf(GLOBAL_FUNCTIONS_END_TAG)));
