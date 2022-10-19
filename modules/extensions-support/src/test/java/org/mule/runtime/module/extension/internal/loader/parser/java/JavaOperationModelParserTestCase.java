@@ -15,6 +15,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
@@ -23,8 +24,11 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Param
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Test;
+import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.MinMuleVersion;
 
 public class JavaOperationModelParserTestCase {
 
@@ -33,16 +37,39 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void parseTransactionalOperation() throws NoSuchMethodException {
-    parseOperation(getMethod());
-
+    parseTransactionalOperation(getMethod());
   }
 
   @Test
   public void parseSdkTransactionalOperation() throws NoSuchMethodException {
-    parseOperation(getSdkMethod());
+    parseTransactionalOperation(getSdkMethod());
   }
 
-  public void parseOperation(Method method) {
+  @Test
+  public void calculateMinMuleVersionForOperation() throws NoSuchMethodException {
+    parseTransactionalOperation(getMethod());
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.1.0"));
+  }
+
+  @Test
+  public void calculateMinMuleVersionForSdkOperation() throws NoSuchMethodException {
+    parseTransactionalOperation(getSdkMethod());
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.5"));
+  }
+
+  @Test
+  public void operationMinMuleVersionAnnotationTakesPrecedence() throws NoSuchMethodException {
+    parseOperation(WithAnnotatedMethod.class.getMethod("annotatedMethod", String.class));
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.6.1"));
+  }
+
+  public void parseTransactionalOperation(Method method) {
     operationElement = new OperationWrapper(method, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     ExtensionElement extensionElement = mock(ExtensionElement.class);
@@ -52,6 +79,14 @@ public class JavaOperationModelParserTestCase {
                                           mock(OperationContainerElement.class), operationElement,
                                           mock(ExtensionLoadingContext.class));
     assertThat(parser.isTransactional(), is(true));
+  }
+
+  public void parseOperation(Method method) {
+    operationElement = new OperationWrapper(method, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    parser = new JavaOperationModelParser(mock(JavaExtensionModelParser.class), mock(ExtensionElement.class),
+                                          mock(OperationContainerElement.class), operationElement,
+                                          mock(ExtensionLoadingContext.class));
   }
 
   public Method getMethod() throws NoSuchMethodException {
@@ -72,5 +107,12 @@ public class JavaOperationModelParserTestCase {
   private class SdkTransactionalOperations {
 
     public void transactionalOperation(@Connection JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection connection) {}
+  }
+
+
+  private class WithAnnotatedMethod {
+
+    @MinMuleVersion("4.6.1")
+    public void annotatedMethod(@Alias("someAlias") String aliased) {}
   }
 }

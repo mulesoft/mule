@@ -26,6 +26,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateFromMethod;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
@@ -403,7 +404,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(operationElement);
+    return of(new SinceMuleVersionModelProperty(calculateFromMethod(operationElement)));
   }
 
   @Override

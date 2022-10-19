@@ -35,8 +35,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.lang.model.element.TypeElement;
 
@@ -111,6 +113,12 @@ public class TypeWrapper implements Type {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, aClass, typeLoader))
         : empty();
+  }
+
+  @Override
+  public List<Type> getAnnotations() {
+    return Arrays.stream(aClass.getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), typeLoader))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -304,5 +312,15 @@ public class TypeWrapper implements Type {
     } catch (NoSuchMethodException e) {
       return Optional.empty();
     }
+  }
+
+  @Override
+  public List<MethodElement> getEnclosingMethods() {
+    return Arrays.stream(aClass.getDeclaredMethods()).map(method -> new MethodWrapper(method, typeLoader)).collect(toList());
+  }
+
+  @Override
+  public List<Type> getImplementingInterfaces() {
+    return Arrays.stream(aClass.getInterfaces()).map(clazz -> new TypeWrapper(clazz, typeLoader)).collect(toList());
   }
 }

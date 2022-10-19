@@ -25,9 +25,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -141,6 +143,12 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method, typeLoader))
         : empty();
+  }
+
+  @Override
+  public List<Type> getAnnotations() {
+    return Arrays.stream(method.getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), typeLoader))
+        .collect(Collectors.toList());
   }
 
   @Override
