@@ -169,7 +169,10 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       return ((URLClassLoader) classLoader).getURLs();
     } else if (classLoader.getClass().getName().startsWith("jdk.internal.loader.ClassLoaders$")) {
       return getUrls(classLoader);
-    } else if (classLoader.getParent().getClass().getName().startsWith("sun.misc.Launcher$AppClassLoader")) {
+    }
+
+    String parentName = classLoader.getParent().getClass().getName();
+    if (parentName.startsWith("sun.misc.Launcher$AppClassLoader") || parentName.startsWith("jdk.internal.loader.ClassLoaders$")) {
       return getUrls(classLoader.getParent());
     }
 
