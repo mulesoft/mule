@@ -43,15 +43,11 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
-import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import io.qameta.allure.Feature;
 import org.junit.Before;
@@ -144,36 +140,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     assertThat(domain.getArtifactName(), is(domainName));
     assertThat(domain.getDescriptor(), is(descriptor));
     assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));
-  }
-
-  @Test
-  public void domainAlwaysCreatedWithDeprecatedDescriptorVersion() throws Exception {
-    final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
-    final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
-    final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
-        DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory();
-    final DefaultDomainFactory domainFactory =
-        new DefaultDomainFactory(new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
-                                                             ArtifactDescriptorValidatorBuilder.builder()),
-                                 deployableArtifactDescriptorFactory,
-                                 new DefaultDomainManager(),
-                                 null,
-                                 serviceRepository,
-                                 pluginDependenciesResolver,
-                                 domainClassLoaderBuilderFactory,
-                                 extensionModelLoaderManager,
-                                 licenseValidator,
-                                 getRuntimeLockFactory(),
-                                 mock(MemoryManagementService.class),
-                                 mock(ArtifactConfigurationProcessor.class));
-
-    Domain domain = domainFactory.createArtifact(getDomainFolder("domains/no-dependencies-heavyweight"), empty());
-
-    assertThat(domain.getDescriptor(), instanceOf(DomainDescriptor.class));
-  }
-
-  protected File getDomainFolder(String path) throws URISyntaxException {
-    return new File(getClass().getClassLoader().getResource(path).toURI());
   }
 
 }
