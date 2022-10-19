@@ -35,6 +35,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getParameterType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateFromParameter;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -328,7 +329,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(parameter);
+    return of(new SinceMuleVersionModelProperty(calculateFromParameter(parameter)));
   }
 
   private void collectAdditionalModelProperties() {

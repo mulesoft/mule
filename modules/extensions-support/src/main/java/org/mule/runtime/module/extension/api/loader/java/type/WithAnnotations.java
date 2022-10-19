@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.api.loader.java.type;
 import org.mule.api.annotation.NoImplement;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -48,4 +49,11 @@ public interface WithAnnotations {
   default boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
     return getAnnotation(annotation).isPresent();
   }
+
+  /**
+   * Returns all the annotations present within the component as a {@link Type}
+   *
+   * @return A {@code List} of the annotations as a {@link Type}
+   */
+  List<Type> getAnnotations();
 }

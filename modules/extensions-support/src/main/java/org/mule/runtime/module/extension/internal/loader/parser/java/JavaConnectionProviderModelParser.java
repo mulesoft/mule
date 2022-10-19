@@ -27,6 +27,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.conn
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateFromClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -227,7 +228,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(element);
+    return of(new SinceMuleVersionModelProperty(calculateFromClass(element)));
   }
 
   @Override

@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -140,6 +141,22 @@ public class JavaSourceModelParserTestCase {
   @Test
   public void sourceDoesNotEmitsResponse() {
     assertThat(parseEmitsResponseFromSourceClass(TestSource.class), is(false));
+  }
+
+  @Test
+  public void sdkSourceMinMuleVersion() {
+    mockSourceWrapperWithClass(SdkNonClusteredSource.class);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void sourceMinMuleVersion() {
+    mockSourceWrapperWithClass(TestSource.class);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.1.0"));
   }
 
   private boolean parseEmitsResponseFromSourceClass(Class<? extends Source> sourceClass) {

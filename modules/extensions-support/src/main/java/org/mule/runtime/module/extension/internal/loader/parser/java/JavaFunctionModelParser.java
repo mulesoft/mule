@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forFunction;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateFromMethod;
 
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -135,7 +136,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(functionElement);
+    return of(new SinceMuleVersionModelProperty(calculateFromMethod(functionElement)));
   }
 
   @Override
