@@ -18,7 +18,6 @@ import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.DefaultDslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.Optional;
 

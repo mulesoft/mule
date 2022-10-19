@@ -31,7 +31,6 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolutionException;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
@@ -155,26 +154,10 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                        (domainName,
                                         bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
                                                                                     artifactLocation)
-                                                                                        .getDescriptor(),
-                                       getDescriptorCreator());
+                                                                                        .getDescriptor());
     } else {
       return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
     }
-  }
-
-  private DeployableArtifactDescriptorCreator<ApplicationDescriptor> getDescriptorCreator() {
-    return new DeployableArtifactDescriptorCreator<ApplicationDescriptor>() {
-
-      @Override
-      public ApplicationDescriptor create(String name) {
-        return new org.mule.runtime.deployment.model.api.application.ApplicationDescriptor(name);
-      }
-
-      @Override
-      public ApplicationDescriptor create(String name, Optional<Properties> deploymentProperties) {
-        return new org.mule.runtime.deployment.model.api.application.ApplicationDescriptor(name, deploymentProperties);
-      }
-    };
   }
 
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {

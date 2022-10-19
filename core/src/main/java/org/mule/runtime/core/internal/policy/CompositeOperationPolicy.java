@@ -109,11 +109,14 @@ public class CompositeOperationPolicy
 
     Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this, featureFlaggingService);
     this.policySinks = newBuilder()
-        .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> value.dispose())
-        .build(componentLocation -> new TransactionAwareFluxSinkSupplier<>(factory,
-                                                                           new RoundRobinFluxSinkSupplier<>(getRuntime()
-                                                                               .availableProcessors(),
-                                                                                                            factory)));
+        .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
+          value.dispose();
+        })
+        .build(componentLocation -> {
+          return new TransactionAwareFluxSinkSupplier<>(factory,
+                                                        new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
+                                                                                         factory));
+        });
   }
 
   private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -139,9 +142,9 @@ public class CompositeOperationPolicy
             if (featureFlaggingService.isEnabled(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION)) {
               // Nullyfing error so that the error is resolved again by the operation's execution logic and its error mappings
               // (W-11147961)
-              if (compositeOperationPolicy.get().operation.equals(me.getFailingComponent())) {
-                me.setProcessedEvent(CoreEvent.builder(me.getEvent()).error(null).build());
-              }
+              final CoreEvent event = CoreEvent.builder(me.getEvent()).error(null)
+                  .build();
+              me.setProcessedEvent(event);
             }
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });

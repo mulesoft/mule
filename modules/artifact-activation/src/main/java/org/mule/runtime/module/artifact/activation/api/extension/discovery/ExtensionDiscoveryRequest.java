@@ -41,14 +41,9 @@ public interface ExtensionDiscoveryRequest {
   Collection<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
 
   /**
-   * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions.
+   * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
    */
   Set<ExtensionModel> getParentArtifactExtensions();
-
-  /**
-   * @return Whether OCS is enabled.
-   */
-  boolean isOCSEnabled();
 
   /**
    * Parallel discovery will try to parallelize only the discovery for extensions that do not depend on the DSL of other
@@ -74,7 +69,6 @@ public interface ExtensionDiscoveryRequest {
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
-    private boolean ocsEnabled;
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -96,14 +90,9 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
-    public ExtensionDiscoveryRequestBuilder setOCSEnabled(boolean ocsEnabled) {
-      this.ocsEnabled = ocsEnabled;
-      return this;
-    }
-
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, ocsEnabled);
+                                                  parallelDiscovery, enrichDescriptions);
     }
   }
 }

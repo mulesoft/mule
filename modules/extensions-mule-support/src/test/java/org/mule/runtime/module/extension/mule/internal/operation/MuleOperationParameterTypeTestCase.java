@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import io.qameta.allure.Feature;
@@ -33,10 +32,5 @@ public class MuleOperationParameterTypeTestCase extends MuleArtifactFunctionalTe
   public void operationReceivesByParameterWithATypeFromADependency() throws Exception {
     CoreEvent resultEvent = flowRunner("getDoorColorFlow").run();
     assertThat(resultEvent.getMessage().getPayload().getValue(), is("white"));
-  }
-
-  @Override
-  protected ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
-    return new FakeExpressionLanguageMetadataService();
   }
 }

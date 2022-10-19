@@ -16,8 +16,6 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,12 +23,9 @@ import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +36,7 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String MOCK_EXTENSION_PREFIX = "mock";
   private static final String MOCK_TYPE_ALIAS = "MockType";
-  private static final String MOCK_TYPE_ID = "MockTypeId";
+  private static final String FULL_CLASS_NAME_FOR_MOCK_TYPE = "full.class.name.for.MockType";
   private static final String MOCK_EXTENSION_NAME = "Mock Extension";
 
   private ApplicationTypeLoader applicationTypeLoader;
@@ -56,14 +51,12 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
     when(mockExtensionModel.getName()).thenReturn(MOCK_EXTENSION_NAME);
 
     ObjectType mockType = create(JAVA).objectType()
-        .id(MOCK_TYPE_ID)
+        .id(FULL_CLASS_NAME_FOR_MOCK_TYPE)
         .with(new TypeAliasAnnotation(MOCK_TYPE_ALIAS))
         .build();
     when(mockExtensionModel.getTypes()).thenReturn(singleton(mockType));
 
-    ExpressionLanguageMetadataService mockMetadataService = mock(ExpressionLanguageMetadataService.class);
-    when(mockMetadataService.evaluateTypeExpression(eq(MOCK_TYPE_ID), any())).thenReturn(mockType);
-    applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel), mockMetadataService);
+    applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel));
   }
 
   @Test
@@ -82,9 +75,13 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Issue("W-11706194")
-  @Description("The type expressions are resolved by the ExpressionLanguageMetadataService")
-  public void typeResolvedByExpressionLanguageMetadataService() {
-    assertThat(applicationTypeLoader.load(MOCK_TYPE_ID).isPresent(), is(true));
+  public void typeFromDependencyByExtensionPrefixAndTypeAlias() {
+    String stringWithSyntax = MOCK_EXTENSION_PREFIX + ":" + MOCK_TYPE_ALIAS;
+    assertThat(applicationTypeLoader.load(stringWithSyntax).isPresent(), is(true));
+  }
+
+  @Test
+  public void typeFromDependencyByFullName() {
+    assertThat(applicationTypeLoader.load(FULL_CLASS_NAME_FOR_MOCK_TYPE).isPresent(), is(true));
   }
 }

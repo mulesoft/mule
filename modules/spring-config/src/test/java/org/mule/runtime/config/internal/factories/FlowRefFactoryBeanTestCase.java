@@ -70,7 +70,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
@@ -482,8 +481,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
                                 emptyMap(), APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
                                 mock(MemoryManagementService.class),
-                                mock(FeatureFlaggingService.class),
-                                mock(ExpressionLanguageMetadataService.class)) {
+                                mock(FeatureFlaggingService.class)) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {

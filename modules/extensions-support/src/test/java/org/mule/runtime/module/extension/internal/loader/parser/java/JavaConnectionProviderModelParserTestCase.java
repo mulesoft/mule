@@ -18,6 +18,8 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -35,6 +37,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -200,6 +203,22 @@ public class JavaConnectionProviderModelParserTestCase {
   public void isSdkCachedConnectionProvider() {
     mockConnectionProviderWithClass(SdkCachedTransactionalConnectionProvider.class);
     assertThat(parser.getConnectionManagementType(), is(CACHED));
+  }
+
+  @Test
+  public void getMinMuleVersionConnectionProvider() {
+    mockConnectionProviderWithClass(BaseTestConnectionProvider.class);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    Assert.assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    Assert.assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.1.0"));
+  }
+
+  @Test
+  public void getMinMuleVersionSdkConnectionProvider() {
+    mockConnectionProviderWithClass(SdkCachedTransactionalConnectionProvider.class);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    Assert.assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    Assert.assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.5.0"));
   }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {

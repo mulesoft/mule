@@ -8,19 +8,17 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getNewExportedSpanCapturer;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getOpenTelemetryTracer;
 
 import static java.lang.System.getProperty;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.getOpenTelemetryTracer;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-
-import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
-
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.OpenTelemetrySpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 import java.util.Set;
 

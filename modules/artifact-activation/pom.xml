@@ -64,7 +64,7 @@
             <!-- provided by mule-maven-client-impl -->
             <scope>provided</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>

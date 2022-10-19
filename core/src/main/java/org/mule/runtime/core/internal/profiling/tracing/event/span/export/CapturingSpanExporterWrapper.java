@@ -8,10 +8,7 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.SERVICE_NAME_KEY;
-
 import static java.lang.String.valueOf;
-
-import static io.opentelemetry.api.trace.StatusCode.ERROR;
 
 import org.mule.runtime.core.privileged.profiling.CapturedEventData;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
@@ -147,11 +144,6 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       public String toString() {
         return String.format("a span with name: [%s], ID: [%s] and parent Span ID: [%s]", getName(), getSpanId(),
                              getParentSpanId());
-      }
-
-      @Override
-      public boolean hasErrorStatus() {
-        return spanData.getStatus().getStatusCode().equals(ERROR);
       }
     }
 

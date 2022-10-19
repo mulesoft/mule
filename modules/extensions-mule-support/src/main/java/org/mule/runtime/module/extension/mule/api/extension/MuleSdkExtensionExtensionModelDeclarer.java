@@ -15,32 +15,18 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CONSTRUCT_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_NAMESPACE_URI;
+import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider.MULE_EXTENSION_DSL_XSD_FILE_NAME;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 
 import java.util.Arrays;
 
@@ -50,6 +36,8 @@ import java.util.Arrays;
  * @since 4.5
  */
 public class MuleSdkExtensionExtensionModelDeclarer {
+
+  public static final String EXTENSION_CONSTRUCT_NAME = "extension";
 
   public ExtensionDeclarer declareExtensionModel() {
     final BaseTypeBuilder typeBuilder = create(JAVA);
@@ -62,11 +50,11 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
-            .setPrefix(MULE_SDK_EXTENSION_DSL_NAMESPACE)
-            .setNamespace(MULE_SDK_EXTENSION_DSL_NAMESPACE_URI)
+            .setPrefix(MULE_EXTENSION_DSL_NAMESPACE)
+            .setNamespace(MULE_EXTENSION_DSL_NAMESPACE_URI)
             .setSchemaVersion(MULE_VERSION)
-            .setXsdFileName(MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME)
-            .setSchemaLocation(MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION)
+            .setXsdFileName(MULE_EXTENSION_DSL_XSD_FILE_NAME)
+            .setSchemaLocation(MULE_EXTENSION_DSL_SCHEMA_LOCATION)
             .build());
 
     declareExtensionConstruct(extensionDeclarer, typeBuilder);
@@ -75,82 +63,54 @@ public class MuleSdkExtensionExtensionModelDeclarer {
   }
 
   private void declareExtensionConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct(MULE_SDK_EXTENSION_CONSTRUCT_NAME)
+    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct(EXTENSION_CONSTRUCT_NAME)
         .describedAs("Root element of an extension that contains configurations, connections, operations, sources and functions as children.")
         .allowingTopLevelDefinition();
 
-    declareDescriptionComponent(extensionConstruct, typeBuilder);
-  }
-
-  private void declareDescriptionComponent(ConstructDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    NestedComponentDeclarer<?, ?> descriptionDef = extensionDeclarer.withComponent(MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME)
-        .describedAs("Top level element of an extension that contains descriptive information about it.")
-        .withMinOccurs(1)
-        .withMaxOccurs(1);
-
-    final ParameterGroupDeclarer<?> params = descriptionDef.onDefaultParameterGroup();
-    params.withRequiredParameter(MULE_SDK_EXTENSION_NAME_PARAMETER_NAME)
+    final ParameterGroupDeclarer<?> params = extensionConstruct.onDefaultParameterGroup();
+    params.withRequiredParameter("name")
         .describedAs("Name of the extension that identifies it.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .asComponentId();
 
     String[] validCategories = Arrays.stream(Category.values()).map(Enum::name).toArray(String[]::new);
-    params.withOptionalParameter(MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME)
+    params.withOptionalParameter("category")
         .describedAs("Category of the extension.")
         .ofType(typeBuilder.stringType().enumOf(validCategories).build())
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(COMMUNITY.name());
 
-    params.withOptionalParameter(MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME)
+    params.withOptionalParameter("vendor")
         .describedAs("Vendor of the extension.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(MULESOFT);
 
-    declareLicensingComponent(descriptionDef);
-    declareXmlDslAttributesComponent(descriptionDef);
-  }
-
-  private void declareLicensingComponent(ComponentDeclarer<?, ?> def) {
-    NestedComponentDeclarer<?, ?> licensingDef = def.withComponent(MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME)
-        .describedAs("Child element of the extension's description that contains licensing information.")
-        .withMinOccurs(0)
-        .withMaxOccurs(1);
-
-    final ParameterGroupDeclarer<?> params = licensingDef.onDefaultParameterGroup();
-    params.withOptionalParameter(MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME)
+    params.withOptionalParameter("requiredEntitlement")
         .describedAs("The required entitlement in the customer extension license.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME)
+    params.withOptionalParameter("requiresEnterpriseLicense")
         .describedAs("If the extension requires an enterprise license to run.")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME)
+    params.withOptionalParameter("allowsEvaluationLicense")
         .describedAs("If the extension can be run with an evaluation license.")
         .ofType(BOOLEAN_TYPE)
         .defaultingTo(true)
         .withExpressionSupport(NOT_SUPPORTED);
-  }
 
-  private void declareXmlDslAttributesComponent(ComponentDeclarer<?, ?> def) {
-    NestedComponentDeclarer<?, ?> xmlDslAttributesDef = def.withComponent(MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME)
-        .describedAs("Child element of the extension's description that allows customization of XML schema attributes.")
-        .withMinOccurs(0)
-        .withMaxOccurs(1);
-
-    final ParameterGroupDeclarer<?> params = xmlDslAttributesDef.onDefaultParameterGroup();
-    params.withOptionalParameter(MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME)
+    params.withOptionalParameter("namespace")
         .describedAs("Expected namespace of the extension to look for when generating the schemas. If left empty it will " +
             "default to http://www.mulesoft.org/schema/mule/[prefix], where [prefix] is the attribute prefix attribute value.")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    params.withOptionalParameter(MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME)
+    params.withOptionalParameter("prefix")
         .describedAs("Expected prefix of the extension to look for when generating the schemas. If left empty it will create a " +
             "default one based on the extension's name, removing the words \"extension\", \"module\" or \"connector\" at " +
             "the end if they are present and hyphenizing the resulting name.")

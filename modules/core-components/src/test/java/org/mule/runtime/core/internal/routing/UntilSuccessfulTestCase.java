@@ -6,21 +6,9 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RETRY_CTX_INTERNAL_PARAM_KEY;
-import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
-import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
-import static org.mule.test.allure.AllureConstants.ScopeFeature.UntilSuccessfulStory.UNTIL_SUCCESSFUL;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -36,6 +24,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RETRY_CTX_INTERNAL_PARAM_KEY;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.UntilSuccessfulStory.UNTIL_SUCCESSFUL;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -305,7 +303,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
-    expected.expectCause(instanceOf(ExpressionRuntimeException.class));
+    expected.expect(ExpressionRuntimeException.class);
     expected.expectMessage(containsString("You called the function '+' with these arguments"));
     untilSuccessful.process(testEvent);
   }

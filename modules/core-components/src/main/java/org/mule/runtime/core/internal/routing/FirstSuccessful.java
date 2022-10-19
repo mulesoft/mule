@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAndAttemptSpanCustomizationInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 
 import java.util.ArrayList;
@@ -39,12 +38,9 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
 
   @Override
   public void initialise() throws InitialisationException {
-    Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setSpanCustomizationInfo(new NamedSpanBasedOnComponentIdentifierAndAttemptSpanCustomizationInfo(this, routeNumber));
       initialiseIfNeeded(route, muleContext);
-      routeNumber++;
     }
   }
 

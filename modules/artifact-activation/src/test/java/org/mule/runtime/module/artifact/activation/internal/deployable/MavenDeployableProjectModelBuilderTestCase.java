@@ -22,8 +22,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
@@ -33,7 +31,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -57,51 +54,6 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
                                          containsString("src/main/mule")));
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
-  }
-
-  @Test
-  public void createBasicDeployableProjectModelWithEmptyArtifactExportingAll() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic-with-empty-artifact-json", true);
-
-    assertThat(deployableProjectModel.getPackages(), contains("org.test"));
-    assertThat(deployableProjectModel.getResources(),
-               containsInAnyOrder("test-script.dwl", "app.xml"));
-
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main/resources"),
-                                         containsString("src/main/mule")));
-
-    assertThat(deployableProjectModel.getDependencies(), hasSize(3));
-
-    Map<String, Object> exportedResourcesAndClasses =
-        deployableProjectModel.getDeployableModel().getClassLoaderModelLoaderDescriptor().getAttributes();
-
-    List<String> exportedResources = (List<String>) exportedResourcesAndClasses.get("exportedResources");
-    assertThat(exportedResources.size(), is(2));
-    assertThat(exportedResources, containsInAnyOrder("test-script.dwl", "app.xml"));
-
-    List<String> exportedClasses = (List<String>) exportedResourcesAndClasses.get("exportedPackages");
-    assertThat(exportedClasses.size(), is(1));
-    assertThat(exportedClasses.get(0), is("org.test"));
-  }
-
-  @Test
-  public void createBasicDeployableProjectModelWithEmptyArtifactNotExportingResources() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic-with-empty-artifact-json", false);
-
-    assertThat(deployableProjectModel.getPackages(), contains("org.test"));
-    assertThat(deployableProjectModel.getResources(),
-               containsInAnyOrder("test-script.dwl", "app.xml"));
-
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main/resources"),
-                                         containsString("src/main/mule")));
-
-    assertThat(deployableProjectModel.getDependencies(), hasSize(3));
-
-    assertThat(deployableProjectModel.getDeployableModel().getClassLoaderModelLoaderDescriptor(), is(nullValue()));
   }
 
   @Test
@@ -200,20 +152,12 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
                         hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("spring-context"))))));
   }
 
-  private DeployableProjectModel getDeployableProjectModel(String deployablePath,
-                                                           boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor)
-      throws URISyntaxException {
-    DeployableProjectModel model =
-        new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath),
-                                               exportAllResourcesAndPackagesIfEmptyLoaderDescriptor).build();
+  private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
+    DeployableProjectModel model = new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath)).build();
 
     model.validate();
 
     return model;
-  }
-
-  private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    return getDeployableProjectModel(deployablePath, false);
   }
 
   protected File getDeployableFolder(String appPath) throws URISyntaxException {

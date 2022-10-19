@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
-import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.DOMAIN_CREATION;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -40,7 +39,6 @@ import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesR
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
@@ -49,7 +47,6 @@ import org.mule.runtime.module.license.api.LicenseValidator;
 import java.io.File;
 import java.io.IOException;
 
-import io.qameta.allure.Feature;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +57,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
-@Feature(DOMAIN_CREATION)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class})
 @PowerMockIgnore({"javax.management.*", "javax.script.*"})
@@ -123,8 +119,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     String domainName = "custom-domain";
 
     final DomainDescriptor descriptor = new DomainDescriptor(domainName);
-    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class)))
-        .thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any())).thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     when(domainArtifactClassLoader.getArtifactId()).thenReturn(domainName);

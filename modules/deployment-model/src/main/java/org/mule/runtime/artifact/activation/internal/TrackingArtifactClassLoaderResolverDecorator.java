@@ -19,8 +19,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
-import java.net.URL;
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -114,21 +112,6 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
         .createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver, pluginClassLoaderResolver);
     track(mulePluginClassLoader);
     return mulePluginClassLoader;
-  }
-
-  @Override
-  public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                        PluginClassLoaderResolver pluginClassLoaderResolver,
-                                                                        List<URL> additionalClassloaderUrls) {
-    throw new UnsupportedOperationException("Mule Server does not support loading additional classpath entries.");
-  }
-
-  @Override
-  public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                        Supplier<ArtifactClassLoader> domainClassLoader,
-                                                                        PluginClassLoaderResolver pluginClassLoaderResolver,
-                                                                        List<URL> additionalClassloaderUrls) {
-    throw new UnsupportedOperationException("Mule Server does not support loading additional classpath entries.");
   }
 
   private void trackDeployableArtifactClassLoader(MuleDeployableArtifactClassLoader artifactClassLoader) {

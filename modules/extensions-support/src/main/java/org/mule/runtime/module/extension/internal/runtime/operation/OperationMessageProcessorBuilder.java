@@ -62,13 +62,13 @@ public final class OperationMessageProcessorBuilder
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target,
                                                 targetValue,
                                                 errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate,
-                                                nestedChain, classLoader,
+                                                nestedChain,
                                                 extensionManager, policyManager, reflectionCache, resultTransformer,
                                                 terminationTimeout);
     } else {
       return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target, targetValue,
                                            errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain,
-                                           classLoader, extensionManager, policyManager, reflectionCache, resultTransformer,
+                                           extensionManager, policyManager, reflectionCache, resultTransformer,
                                            terminationTimeout);
     }
   }

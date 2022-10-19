@@ -51,7 +51,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
@@ -246,8 +245,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
                                     emptyMap(), APP, empty(), lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory(),
                                     mock(MemoryManagementService.class),
-                                    mock(FeatureFlaggingService.class),
-                                    mock(ExpressionLanguageMetadataService.class)) {
+                                    mock(FeatureFlaggingService.class)) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {

@@ -45,7 +45,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -152,13 +151,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                                  MemoryManagementService memoryManagementService,
-                                 FeatureFlaggingService featureFlaggingService,
-                                 ExpressionLanguageMetadataService expressionLanguageMetadataService)
+                                 FeatureFlaggingService featureFlaggingService)
       throws BeansException {
     super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
           artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
-          featureFlaggingService, expressionLanguageMetadataService);
+          featureFlaggingService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();

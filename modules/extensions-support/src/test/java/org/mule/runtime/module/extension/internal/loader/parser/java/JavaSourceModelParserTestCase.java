@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -31,7 +32,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.sdk.api.annotation.source.EmitsResponse;
-import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.Optional;
 
@@ -125,6 +125,22 @@ public class JavaSourceModelParserTestCase {
     assertThat(backPressureStrategyModelProperty.isPresent(), is(true));
     assertThat(backPressureStrategyModelProperty.get().getDefaultMode(), is(DROP));
     assertThat(backPressureStrategyModelProperty.get().getSupportedModes(), hasItems(FAIL, DROP));
+  }
+
+  @Test
+  public void sdkSourceMinMuleVersion() {
+    mockSourceWrapperWithClass(SdkNonClusteredSource.class);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void sourceMinMuleVersion() {
+    mockSourceWrapperWithClass(TestSource.class);
+    Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty = parser.getSinceMuleVersionModelProperty();
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
+    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.1.0"));
   }
 
   @Test

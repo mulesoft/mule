@@ -11,14 +11,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
-import static org.mule.metadata.api.model.MetadataFormat.JSON;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-
-import org.mule.metadata.api.builder.ObjectTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NumberType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
@@ -26,8 +19,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-
-import java.util.List;
 
 public class DefaultExpressionModuleBuilderTestCase extends AbstractMuleTestCase {
 
@@ -61,23 +52,6 @@ public class DefaultExpressionModuleBuilderTestCase extends AbstractMuleTestCase
     BindingContext bindingContext = bindingContextBuilder.build();
     assertThat(bindingContext.modules(), hasSize(1));
     assertThat(bindingContext.modules(), hasItem(module));
-  }
-
-  @Test
-  public void shouldBeAbleToAddDeclaredTypes() {
-    ExpressionModule.Builder builder = ExpressionModule.builder(namespace);
-    NumberType numberType = create(JSON).numberType().build();
-    ObjectTypeBuilder objectTypeBuilder = create(JSON).objectType();
-    objectTypeBuilder.addField().key("age").value(numberType).build();
-    ObjectType objectType = objectTypeBuilder.build();
-    builder.addType(objectType);
-    ExpressionModule module = builder.build();
-
-    List<MetadataType> declaredTypes = module.declaredTypes();
-    assertThat(declaredTypes, hasSize(1));
-    MetadataType declaredType = declaredTypes.get(0);
-    assertThat(declaredType, is(sameInstance(objectType)));
-    assertThat(((ObjectType) declaredType).getFieldByName("age").get().getValue(), is(sameInstance((numberType))));
   }
 
 }

@@ -26,12 +26,11 @@ import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,13 +45,13 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   private final Map<String, String> properties = new HashMap<>();
 
-  protected static Set<ExtensionModel> runtimeExtensionModels;
+  private static List<ExtensionModel> runtimeExtensionModels;
 
   protected abstract String getConfigFile();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    runtimeExtensionModels = new LinkedHashSet<>();
+    runtimeExtensionModels = new ArrayList<>();
     Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
         .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader());
     for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
@@ -110,9 +109,5 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   protected ComponentAst getChild(ComponentAst ast, String childName) {
     return ast.directChildrenStreamByIdentifier(null, childName).findFirst().get();
-  }
-
-  protected Optional<ComponentAst> getOptionalChild(ComponentAst ast, String childName) {
-    return ast.directChildrenStreamByIdentifier(null, childName).findFirst();
   }
 }

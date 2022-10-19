@@ -21,6 +21,7 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
 
   public static final String SPAN_NAME_SEPARATOR = ":";
   public static final String ROUTE_TAG = "route";
+  public static final String ATTEMPT_TAG = "attempt";
 
   protected Component component;
 
@@ -30,12 +31,12 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
 
   @Override
   public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
-    return ChildSpanCustomizationInfoResolver.getChildSpanCustomizationInfo();
+    return ChildSpanCustomizationInfoResolver.getChildSpanCustomizationInfo(component);
   }
 
   @Override
   public String getLocationAsString(CoreEvent coreEvent) {
-    // The location is based only on the component.
+    // The location is based only n the component.
     return CoreEventSpanUtils.getLocationAsString(component.getLocation());
   }
 
@@ -44,7 +45,12 @@ public abstract class AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizati
    */
   static class ChildSpanCustomizationInfoResolver {
 
-    public static ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
+    public static final String UNTIL_SUCCESSFUL = "until-successful";
+
+    public static ChildSpanCustomizationInfo getChildSpanCustomizationInfo(Component component) {
+      if (component.getIdentifier().getName().equals(UNTIL_SUCCESSFUL)) {
+        return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ATTEMPT_TAG);
+      }
       return new DefaultChildSpanCustomizationInfo(SPAN_NAME_SEPARATOR + ROUTE_TAG);
     }
   }

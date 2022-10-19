@@ -14,7 +14,6 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
-import org.mule.runtime.metadata.internal.generation.DslElementBasedValueProviderCacheIdGenerator;
 
 import java.util.Optional;
 

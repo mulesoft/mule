@@ -37,9 +37,9 @@ import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
 import org.mule.runtime.app.declaration.api.TopLevelParameterDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
-import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.List;
 import java.util.Optional;

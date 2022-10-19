@@ -126,19 +126,10 @@ public class MessageProcessors {
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
                                                                         String name) {
-    return buildNewChainWithListOfProcessors(processingStrategy, processors, messagingExceptionHandler, name, null);
-  }
-
-  public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
-                                                                        List<Processor> processors,
-                                                                        FlowExceptionHandler messagingExceptionHandler,
-                                                                        String name,
-                                                                        SpanCustomizationInfo spanCustomizationInfo) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
     defaultMessageProcessorChainBuilder.setName(name);
-    defaultMessageProcessorChainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
@@ -243,7 +234,7 @@ public class MessageProcessors {
           .switchIfEmpty(from(alternate))
           .doOnSuccess(completeSuccessIfNeeded((event.getContext()), completeContext))
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
-          .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
+          .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
           .block();
     } catch (Throwable e) {
       if (e.getCause() instanceof InterruptedException) {
@@ -301,7 +292,7 @@ public class MessageProcessors {
         .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
         .doOnSuccess(completeSuccessIfNeeded((event.getContext()), true))
         .doOnError(completeErrorIfNeeded((event.getContext()), true))
-        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
+        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
   }
 
   /**
@@ -507,7 +498,7 @@ public class MessageProcessors {
             .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
-        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
+        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
             .put(WITHIN_PROCESS_TO_APPLY, true));
   }
 

@@ -7,8 +7,6 @@
 package org.mule.test.infrastructure.deployment;
 
 import static org.apache.logging.log4j.LogManager.shutdown;
-
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
@@ -46,13 +44,6 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     muleServer.addZippedService(getSchedulerService());
     muleServer.addZippedService(getHttpService());
     muleServer.addZippedService(getExpressionLanguageService());
-    if (addExpressionLanguageMetadataService()) {
-      muleServer.addZippedService(getExpressionLanguageMetadataService());
-    }
-  }
-
-  protected boolean addExpressionLanguageMetadataService() {
-    return true;
   }
 
   @After
@@ -66,10 +57,6 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
   protected File getExpressionLanguageService() throws IOException {
     return buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
-  }
-
-  protected File getExpressionLanguageMetadataService() throws IOException {
-    return buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
   }
 
   protected File getSchedulerService() throws IOException {

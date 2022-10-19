@@ -33,7 +33,6 @@
         <module>launcher</module>
         <module>license-api</module>
         <module>logging</module>
-        <module>metadata-support</module>
         <module>http-api</module>
         <module>oauth-api</module>
         <module>reboot</module>

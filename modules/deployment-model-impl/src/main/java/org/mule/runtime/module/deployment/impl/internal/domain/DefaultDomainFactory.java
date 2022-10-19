@@ -32,7 +32,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -126,28 +125,10 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
       return deployableArtifactDescriptorFactory
           .createDomainDescriptor(createDeployableProjectModel(domainLocation),
                                   deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                      .orElse(emptyMap()),
-                                  getDescriptorCreator());
+                                      .orElse(emptyMap()));
     } else {
       return domainDescriptorFactory.create(domainLocation, deploymentProperties);
     }
-  }
-
-  private DeployableArtifactDescriptorCreator<DomainDescriptor> getDescriptorCreator() {
-    return new DeployableArtifactDescriptorCreator<DomainDescriptor>() {
-
-      @Override
-      public org.mule.runtime.deployment.model.api.domain.DomainDescriptor create(String name) {
-        return new org.mule.runtime.deployment.model.api.domain.DomainDescriptor(name);
-      }
-
-      @Override
-      public org.mule.runtime.deployment.model.api.domain.DomainDescriptor create(String name,
-                                                                                  Optional deploymentProperties) {
-        return new org.mule.runtime.deployment.model.api.domain.DomainDescriptor(name,
-                                                                                 deploymentProperties);
-      }
-    };
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader domainClassLoader,

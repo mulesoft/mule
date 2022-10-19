@@ -18,7 +18,6 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolutionException;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
@@ -47,7 +46,6 @@ public class ApplicationDescriptorFactory
     extends AbstractDeployableArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> {
 
   private final DomainDescriptorResolver domainDescriptorResolver;
-  private final DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator;
 
   public ApplicationDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                       Map<String, String> deploymentProperties,
@@ -55,12 +53,10 @@ public class ApplicationDescriptorFactory
                                       PluginModelResolver pluginModelResolver,
                                       PluginDescriptorResolver pluginDescriptorResolver,
                                       ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
-                                      DomainDescriptorResolver domainDescriptorResolver,
-                                      DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator) {
+                                      DomainDescriptorResolver domainDescriptorResolver) {
     super(deployableProjectModel, deploymentProperties, pluginPatchesResolver, pluginModelResolver, pluginDescriptorResolver,
           artifactDescriptorValidatorBuilder);
     this.domainDescriptorResolver = domainDescriptorResolver;
-    this.descriptorCreator = descriptorCreator;
   }
 
   @Override
@@ -155,6 +151,6 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected ApplicationDescriptor doCreateArtifactDescriptor() {
-    return descriptorCreator.create(getArtifactLocation().getName(), getDeploymentProperties());
+    return new ApplicationDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
   }
 }

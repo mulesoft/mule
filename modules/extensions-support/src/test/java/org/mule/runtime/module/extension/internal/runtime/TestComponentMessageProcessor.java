@@ -26,14 +26,14 @@ public abstract class TestComponentMessageProcessor extends ComponentMessageProc
                                        ConfigurationProvider configurationProvider, String target, String targetValue,
                                        ResolverSet resolverSet, CursorProviderFactory cursorProviderFactory,
                                        RetryPolicyTemplate retryPolicyTemplate, MessageProcessorChain nestedChain,
-                                       ClassLoader classLoader, ExtensionManager extensionManager, PolicyManager policyManager,
+                                       ExtensionManager extensionManager, PolicyManager policyManager,
                                        ReflectionCache reflectionCache, ResultTransformer resultTransformer,
                                        long terminationTimeout) {
     super(extensionModel, componentModel,
           configurationProvider != null ? new StaticValueResolver<>(configurationProvider) : null, target,
           targetValue,
           resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, nestedChain, classLoader, extensionManager, policyManager, reflectionCache, resultTransformer,
+          retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,
           terminationTimeout);
   }
 }

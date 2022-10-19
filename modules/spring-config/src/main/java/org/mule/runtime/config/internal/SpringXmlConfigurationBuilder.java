@@ -34,7 +34,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
@@ -194,8 +193,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
-                                                   baseMuleArtifactContext.getBean(FeatureFlaggingService.class),
-                                                   baseMuleArtifactContext.getBean(ExpressionLanguageMetadataService.class));
+                                                   baseMuleArtifactContext.getBean(FeatureFlaggingService.class));
     muleArtifactContext.setParent(baseMuleArtifactContext);
     createSpringRegistry((DefaultMuleContext) muleContext, baseMuleArtifactContext, muleArtifactContext);
   }
@@ -240,13 +238,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                        BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                        ContributedErrorTypeRepository errorTypeRepository,
                                                        ContributedErrorTypeLocator errorTypeLocator,
-                                                       FeatureFlaggingService featureFlaggingService,
-                                                       ExpressionLanguageMetadataService expressionLanguageMetadataService)
+                                                       FeatureFlaggingService featureFlaggingService)
       throws Exception {
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
     return doCreateApplicationContext(muleContext, artifactDeclaration, optionalObjectsController, parentConfigurationProperties,
                                       baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-                                      featureFlaggingService, expressionLanguageMetadataService);
+                                      featureFlaggingService);
   }
 
   protected OptionalObjectsController createApplicationObjectController() {
@@ -271,8 +268,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                          ContributedErrorTypeRepository errorTypeRepository,
                                                          ContributedErrorTypeLocator errorTypeLocator,
-                                                         FeatureFlaggingService featureFlaggingService,
-                                                         ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+                                                         FeatureFlaggingService featureFlaggingService) {
     ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
             .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
@@ -294,7 +290,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         runtimeLockFactory,
                                                         componentBuildingDefinitionRegistryFactory,
                                                         new ArtifactMemoryManagementService(memoryManagementService),
-                                                        featureFlaggingService, expressionLanguageMetadataService);
+                                                        featureFlaggingService);
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
                                                     optionalObjectsController,
@@ -304,7 +300,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistryFactory,
                                                     new ArtifactMemoryManagementService(memoryManagementService),
-                                                    featureFlaggingService, expressionLanguageMetadataService);
+                                                    featureFlaggingService);
       muleArtifactContext.initialize();
     }
 

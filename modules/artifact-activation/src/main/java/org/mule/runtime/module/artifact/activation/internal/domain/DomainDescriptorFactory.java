@@ -12,7 +12,6 @@ import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
@@ -21,6 +20,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,18 +31,14 @@ import java.util.Map;
  */
 public class DomainDescriptorFactory extends AbstractDeployableArtifactDescriptorFactory<MuleDomainModel, DomainDescriptor> {
 
-  private final DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator;
-
   public DomainDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                  Map<String, String> deploymentProperties,
                                  PluginPatchesResolver artifactPatches,
                                  PluginModelResolver pluginModelResolver,
                                  PluginDescriptorResolver pluginDescriptorResolver,
-                                 ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
-                                 DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator) {
+                                 ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel, deploymentProperties, artifactPatches, pluginModelResolver, pluginDescriptorResolver,
           artifactDescriptorValidatorBuilder);
-    this.descriptorCreator = descriptorCreator;
   }
 
   @Override
@@ -67,7 +63,7 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    return descriptorCreator.create(getArtifactLocation().getName(),
-                                    getDeploymentProperties());
+    return new DomainDescriptor(getArtifactLocation().getName(),
+                                getDeploymentProperties());
   }
 }

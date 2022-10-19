@@ -27,8 +27,6 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -148,42 +146,6 @@ public interface ArtifactClassLoaderResolver {
                                                                  PluginClassLoaderResolver pluginClassLoaderResolver);
 
   /**
-   * Creates a class loader for an application. This will create the class loader itself and all of its internal required state:
-   * regionClassLoader, classLoaders for plugins.
-   * </p>
-   * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies nor any other dependency).
-   *
-   * @param descriptor                the descriptor of the application to generate a class loader for.
-   * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
-   *                                  created.
-   * @param additionalClassloaderUrls a list of {@link URL} pointing to additional resources and classes
-   * @return a class loader for an application.
-   */
-  MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                 PluginClassLoaderResolver pluginClassLoaderResolver,
-                                                                 List<URL> additionalClassloaderUrls);
-
-  /**
-   * Creates a class loader for an application. This will create the class loader itself and all of its internal required state:
-   * regionClassLoader, classLoaders for plugins.
-   * </p>
-   * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies nor any other dependency).
-   *
-   * @param descriptor                the descriptor of the application to generate a class loader for.
-   * @param domainClassLoader         the class loader of the domain the application belongs to.
-   * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
-   *                                  created.
-   * @param additionalClassloaderUrls a list of {@link URL} pointing to additional resources and classes
-   * @return a class loader for an application.
-   */
-  MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                 Supplier<ArtifactClassLoader> domainClassLoader,
-                                                                 PluginClassLoaderResolver pluginClassLoaderResolver,
-                                                                 List<URL> additionalClassloaderUrls);
-
-  /**
    * Creates a class loader for a plugin.
    * <p>
    * The class loader for a plugin is based on the class loader of its owner artifact for some scenarios regarding exported
@@ -224,4 +186,5 @@ public interface ArtifactClassLoaderResolver {
                                                       ArtifactPluginDescriptor descriptor,
                                                       PluginDescriptorResolver pluginDescriptorResolver,
                                                       PluginClassLoaderResolver pluginClassLoaderResolver);
+
 }

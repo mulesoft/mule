@@ -168,7 +168,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     processor = new TestComponentMessageProcessor(extensionModel,
                                                   componentModel, null, null, null,
                                                   resolverSet, null, null, null,
-                                                  null, extensionManager,
+                                                  extensionManager,
                                                   policyManager, null, null,
                                                   muleContext.getConfiguration().getShutdownTimeout()) {
 
