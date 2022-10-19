@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.metadata.cache;
+package org.mule.runtime.metadata.api.generation;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 
 /**
  * Factory definition to create {@link MetadataCacheIdGenerator}s isolated from the application context in which it will be used.

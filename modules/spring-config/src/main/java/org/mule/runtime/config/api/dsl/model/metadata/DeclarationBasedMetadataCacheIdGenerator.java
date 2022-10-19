@@ -10,9 +10,9 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.generation.MetadataCacheId;
+import org.mule.runtime.metadata.api.generation.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.generation.DslElementBasedMetadataCacheIdGenerator;
 
 import java.util.Optional;

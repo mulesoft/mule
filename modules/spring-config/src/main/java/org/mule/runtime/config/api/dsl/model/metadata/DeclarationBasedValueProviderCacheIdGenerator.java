@@ -11,7 +11,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.metadata.internal.generation.DslElementBasedValueProviderCacheIdGenerator;

@@ -37,7 +37,7 @@ import org.mule.runtime.metadata.internal.generation.ComponentAstBasedValueProvi
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.metadata.internal.generation.DslElementBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;

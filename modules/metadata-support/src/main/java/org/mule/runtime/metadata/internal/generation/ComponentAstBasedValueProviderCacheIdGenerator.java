@@ -30,12 +30,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -230,7 +229,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     return valueProviderModel.getParameters()
         .stream()
         .map(ActingParameterModel::getExtractionExpression)
-        .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
+        .map(GenerationUtils::getParameterNameFromExtractionExpression)
         .filter(parameterModelsInformation::containsKey)
         .map(parameterModelsInformation::get)
         .map(ParameterModelInformation::getParameterAst)

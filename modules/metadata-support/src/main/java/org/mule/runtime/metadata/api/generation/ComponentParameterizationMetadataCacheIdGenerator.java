@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.metadata.api.generation;
 
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 
 import java.util.Optional;
