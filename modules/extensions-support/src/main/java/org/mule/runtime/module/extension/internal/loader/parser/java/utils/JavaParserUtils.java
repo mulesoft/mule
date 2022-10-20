@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static org.mule.sdk.api.util.SdkApiConstants.NON_ENFORCE_MIN_MULE_VERSION_CLASSES;
@@ -50,6 +49,7 @@ public class JavaParserUtils {
   }
 
   private static String calculateFromClass(Type clazz, Set<String> seenTypes) {
+    // TODO: fix http extension loading W-11938731
     if (clazz.getTypeName().startsWith("org.mule.extension.http") || clazz.getTypeName().startsWith("java.")
         || primitiveTypeNames.contains(clazz.getTypeName()) || seenTypes.contains(clazz.getTypeName())) {
       return firstMuleVersion;
@@ -60,32 +60,30 @@ public class JavaParserUtils {
     // Look for the annotation at the class level
     Optional<String> classLevelMMV = getMinMuleVersion(clazz);
     if (classLevelMMV.isPresent()) { // We cut the algorithm short (only compare against generics)
-      maxMMV = maxMMV(maxMMV, classLevelMMV.get(), clazz.getTypeName());
+      maxMMV = maxMMV(maxMMV, classLevelMMV.get());
     } else { // We keep calculating from class inspection
       // Parse the superClass
-      maxMMV = maxMMV(maxMMV, clazz.getSuperType().map(type -> calculateFromClass(type, seenTypes)).orElse("4.1.0"),
-                      clazz.getSuperType().map(Type::getTypeName).orElse("None"));
+      maxMMV = maxMMV(maxMMV, clazz.getSuperType().map(type -> calculateFromClass(type, seenTypes)).orElse("4.1.0"));
       // Parse the class interfaces
       for (Type type : clazz.getImplementingInterfaces()) {
-        maxMMV = maxMMV(maxMMV, calculateFromClass(type, seenTypes), type.getTypeName());
+        maxMMV = maxMMV(maxMMV, calculateFromClass(type, seenTypes));
       }
       // Parse the class annotations
       for (Type annotation : clazz.getAnnotations()) {
-        maxMMV = maxMMV(maxMMV, calculateFromClass(annotation, seenTypes), annotation.getTypeName());
+        maxMMV = maxMMV(maxMMV, calculateFromClass(annotation, seenTypes));
       }
       // Parse the class fields
       for (FieldElement field : clazz.getFields()) {
-        maxMMV = maxMMV(maxMMV, calculateFromParameter(field, seenTypes), field.getType().getTypeName());
+        maxMMV = maxMMV(maxMMV, calculateFromParameter(field, seenTypes));
       }
       // Parse the class methods
       for (MethodElement<?> method : clazz.getEnclosingMethods()) {
-        maxMMV = maxMMV(maxMMV, calculateFromMethod(method, seenTypes), "method:" + method.getName());
+        maxMMV = maxMMV(maxMMV, calculateFromMethod(method, seenTypes));
       }
     }
     // Finally we always parse the class generics
     for (TypeGeneric typeGeneric : clazz.getGenerics()) {
-      maxMMV = maxMMV(maxMMV, calculateFromClass(typeGeneric.getConcreteType(), seenTypes),
-                      typeGeneric.getConcreteType().getTypeName());
+      maxMMV = maxMMV(maxMMV, calculateFromClass(typeGeneric.getConcreteType(), seenTypes));
     }
     return maxMMV;
   }
@@ -97,15 +95,15 @@ public class JavaParserUtils {
     }
     String MaxMMV = firstMuleVersion;
     for (Type annotation : method.getAnnotations()) {
-      MaxMMV = maxMMV(MaxMMV, calculateFromClass(annotation, seenTypes), annotation.getTypeName());
+      MaxMMV = maxMMV(MaxMMV, calculateFromClass(annotation, seenTypes));
     }
     for (ExtensionParameter parameter : method.getParameters()) {
-      MaxMMV = maxMMV(MaxMMV, calculateFromParameter(parameter, seenTypes), parameter.getType().getTypeName());
+      MaxMMV = maxMMV(MaxMMV, calculateFromParameter(parameter, seenTypes));
     }
     for (Type exceptionType : method.getExceptionTypes()) {
-      MaxMMV = maxMMV(MaxMMV, calculateFromClass(exceptionType, seenTypes), exceptionType.getTypeName());
+      MaxMMV = maxMMV(MaxMMV, calculateFromClass(exceptionType, seenTypes));
     }
-    return maxMMV(MaxMMV, calculateFromClass(method.getReturnType(), seenTypes), method.getReturnType().getTypeName());
+    return maxMMV(MaxMMV, calculateFromClass(method.getReturnType(), seenTypes));
   }
 
   private static String calculateFromParameter(ExtensionParameter parameter, Set<String> seenTypes) {
@@ -117,10 +115,10 @@ public class JavaParserUtils {
     String maxMMV = firstMuleVersion;
     // Look at parameter annotations and check if they have @MinMuleVersion
     for (Type annotation : parameter.getAnnotations()) {
-      maxMMV = maxMMV(maxMMV, calculateFromClass(annotation, seenTypes), annotation.getTypeName());
+      maxMMV = maxMMV(maxMMV, calculateFromClass(annotation, seenTypes));
     }
     // Finally analyze the class
-    return maxMMV(maxMMV, calculateFromClass(parameter.getType(), seenTypes), parameter.getType().getTypeName());
+    return maxMMV(maxMMV, calculateFromClass(parameter.getType(), seenTypes));
   }
 
   private static Optional<String> getMinMuleVersion(Type type) {
@@ -136,11 +134,10 @@ public class JavaParserUtils {
     return type.getValueFromAnnotation(MinMuleVersion.class).map(fetcher -> fetcher.getStringValue(MinMuleVersion::value));
   }
 
-  public static String maxMMV(String currentMax, String candidate, String candidateTypeName) {
+  public static String maxMMV(String currentMax, String candidate) {
     if (new MuleVersion(currentMax).atLeast(candidate)) {
       return currentMax;
     }
-    LOGGER.info(format("Candidate %s with MMV %s beats %s%n", candidateTypeName, candidate, currentMax));
     return candidate;
   }
 }
