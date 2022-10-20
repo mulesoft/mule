@@ -205,7 +205,7 @@ public class ResolverSetUtils {
             resolver = new StaticValueResolver(value);
           }
           resolverReference
-              .set(getValueResolverFor(parameterName, arrayType, resolveAndinjectIfStatic(resolver, muleContext),
+              .set(getValueResolverFor(parameterName, arrayType, resolveAndInjectIfStatic(resolver, muleContext),
                                        getDefaultValue(type),
                                        getExpressionSupport(arrayType), false, modelProperties, actualAcceptReferences));
         } catch (MuleException e) {
@@ -238,7 +238,7 @@ public class ResolverSetUtils {
             }
           }
           resolverReference
-              .set(getValueResolverFor(parameterName, objectType, resolveAndinjectIfStatic(resolver, muleContext),
+              .set(getValueResolverFor(parameterName, objectType, resolveAndInjectIfStatic(resolver, muleContext),
                                        getDefaultValue(type),
                                        getExpressionSupport(objectType), false, modelProperties, actualAcceptReferences));
         } catch (MuleException e) {
@@ -264,7 +264,7 @@ public class ResolverSetUtils {
     return resolverReference.get();
   }
 
-  private static Object resolveAndinjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) throws MuleException {
+  private static Object resolveAndInjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) throws MuleException {
     if (valueResolver.isDynamic()) {
       return valueResolver;
     }
@@ -273,7 +273,9 @@ public class ResolverSetUtils {
       try (
           ValueResolvingContext ctx = ValueResolvingContext.builder(event, muleContext.getExpressionManager()).build()) {
         Object staticProduct = valueResolver.resolve(ctx);
-        muleContext.getInjector().inject(staticProduct);
+        if (staticProduct != null) {
+          muleContext.getInjector().inject(staticProduct);
+        }
         return staticProduct;
       }
     });
