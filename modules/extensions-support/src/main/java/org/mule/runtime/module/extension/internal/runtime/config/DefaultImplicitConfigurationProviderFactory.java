@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,8 +32,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConne
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import javax.inject.Inject;
 import java.util.concurrent.Callable;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ImplicitConfigurationProviderFactory}. Implicit configurations are created from
@@ -96,6 +98,9 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
       return new ConfigurationProviderToolingAdapter(providerName, extensionModel,
                                                      configurationModel, configurationInstance, reflectionCache,
                                                      muleContext);
+      // return new StaticConfigurationProvider(providerName, extensionModel,
+      // configurationModel, configurationInstance,
+      // muleContext);
 
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
