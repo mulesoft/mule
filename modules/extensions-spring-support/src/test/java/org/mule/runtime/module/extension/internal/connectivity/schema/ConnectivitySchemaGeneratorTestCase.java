@@ -7,6 +7,10 @@
 package org.mule.runtime.module.extension.internal.connectivity.schema;
 
 import static com.google.gson.JsonParser.parseString;
+import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeThat;
+
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
@@ -47,6 +51,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -58,6 +63,11 @@ public class ConnectivitySchemaGeneratorTestCase extends FileGenerationParameter
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchemas.updateExpectedFilesOnError");
 
+  // TODO: remove this check when W-11938563 is done.
+  @Before
+  public void setUp() throws Exception {
+    assumeThat(IS_JAVA_1_8, is(true));
+  }
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
