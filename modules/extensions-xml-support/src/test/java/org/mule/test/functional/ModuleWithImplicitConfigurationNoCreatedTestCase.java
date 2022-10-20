@@ -31,7 +31,7 @@ public class ModuleWithImplicitConfigurationNoCreatedTestCase extends AbstractCe
 
   @Override
   protected String getConfigFile() {
-    return "flows/flows-using-module-global-element-default-params-with-no-use.xml.xml";
+    return "flows/flows-using-module-global-element-default-params-with-no-use.xml";
   }
 
   @Test
