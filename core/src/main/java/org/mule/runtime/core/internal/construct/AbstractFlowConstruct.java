@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.String.format;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -16,6 +14,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.getSimpleName;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+
+import static java.lang.String.format;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -61,6 +63,8 @@ import java.util.Optional;
  * they need to perform any action on lifecycle transitions.
  */
 public abstract class AbstractFlowConstruct extends AbstractExecutableComponent implements FlowConstruct, Lifecycle {
+
+  public static final String FLOW_FLOW_CONSTRUCT_TYPE = "Flow";
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
@@ -196,11 +200,11 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     }
   }
 
-  public static FlowConstructStatistics createFlowStatistics(String flowName, MuleContext muleContext) {
-    DefaultFlowConstructStatistics statistics = new DefaultFlowConstructStatistics("Flow", flowName);
-    statistics.setEnabled(muleContext.getStatistics().isEnabled());
-    muleContext.getStatistics().add(statistics);
-    return statistics;
+  public static FlowConstructStatistics createFlowStatistics(String flowName, AllStatistics statistics) {
+    DefaultFlowConstructStatistics flowStatistics = new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, flowName);
+    flowStatistics.setEnabled(statistics.isEnabled());
+    statistics.add(flowStatistics);
+    return flowStatistics;
   }
 
   protected void doStartProcessingStrategy() throws MuleException {
