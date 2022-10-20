@@ -492,9 +492,21 @@ public interface AllureConstants {
 
   }
 
-  interface SampleData {
+  interface SdkToolingSupport {
 
-    String SAMPLE_DATA = "Sample Data";
+    String SDK_TOOLING_SUPPORT = "SDK Tooling Support";
+
+    interface MetadataTypeResolutionStory {
+
+      String METADATA_SERVICE = "Metadata Service";
+
+    }
+
+    interface ValueProvidersStory {
+
+      String VALUE_PROVIDERS_SERVICE = "Value Providers Service";
+
+    }
 
     interface SampleDataStory {
 

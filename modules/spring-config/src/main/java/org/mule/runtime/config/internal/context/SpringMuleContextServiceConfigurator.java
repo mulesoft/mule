@@ -279,7 +279,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     loadServiceConfigurators();
 
     registerContextServices(defaultContextServices);
-    if (addToolingObjectsToRegistry) {
+    if (isAddToolingObjectsToRegistry()) {
       registerContextServices(toolingContextServices);
     }
 
@@ -421,6 +421,10 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
 
   protected Map<String, String> getArtifactProperties() {
     return artifactProperties;
+  }
+
+  protected boolean isAddToolingObjectsToRegistry() {
+    return addToolingObjectsToRegistry;
   }
 
   protected MemoryManagementService getMemoryManagementService() {
