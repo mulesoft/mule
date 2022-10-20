@@ -380,6 +380,7 @@ public interface AllureConstants {
   interface OauthFeature {
 
     String OAUTH_EXTENSION = "OAuth Extension";
+    String SDK_OAUTH_SUPPORT = "SDK OAuth Extension";
     String OCS_SUPPORT = "OCS Support";
 
     interface OauthStory {
@@ -495,6 +496,12 @@ public interface AllureConstants {
   interface SdkToolingSupport {
 
     String SDK_TOOLING_SUPPORT = "SDK Tooling Support";
+
+    interface ConnectivityTestingStory {
+
+      String CONNECTIVITY_TESTING_SERVICE = "Connectivity Testing Service";
+
+    }
 
     interface MetadataTypeResolutionStory {
 
