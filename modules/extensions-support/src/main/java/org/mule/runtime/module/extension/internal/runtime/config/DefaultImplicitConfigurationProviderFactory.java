@@ -24,6 +24,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -95,13 +97,16 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                 expressionManager, muleContext);
       }
 
-      return new ConfigurationProviderToolingAdapter(providerName, extensionModel,
-                                                     configurationModel, configurationInstance, reflectionCache,
-                                                     muleContext);
-      // return new StaticConfigurationProvider(providerName, extensionModel,
-      // configurationModel, configurationInstance,
-      // muleContext);
-
+      return new DefaultRegistry(muleContext).<MuleMetadataService>lookupByType(MuleMetadataService.class)
+          .map(metadataService -> (StaticConfigurationProvider) new ConfigurationProviderToolingAdapter(providerName,
+                                                                                                        extensionModel,
+                                                                                                        configurationModel,
+                                                                                                        configurationInstance,
+                                                                                                        reflectionCache,
+                                                                                                        muleContext))
+          .orElseGet(() -> new StaticConfigurationProvider(providerName, extensionModel,
+                                                           configurationModel, configurationInstance,
+                                                           muleContext));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
                                                                 configurationModel.getName(),

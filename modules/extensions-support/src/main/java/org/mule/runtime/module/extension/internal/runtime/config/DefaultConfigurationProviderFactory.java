@@ -21,6 +21,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -93,7 +95,16 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         }
       }
 
-      return new StaticConfigurationProvider(name, extensionModel, configurationModel, configuration, muleContext);
+      return new DefaultRegistry(muleContext).<MuleMetadataService>lookupByType(MuleMetadataService.class)
+          .map(metadataService -> (StaticConfigurationProvider) new ConfigurationProviderToolingAdapter(name,
+                                                                                                        extensionModel,
+                                                                                                        configurationModel,
+                                                                                                        configuration,
+                                                                                                        reflectionCache,
+                                                                                                        muleContext))
+          .orElseGet(() -> new StaticConfigurationProvider(name, extensionModel,
+                                                           configurationModel, configuration,
+                                                           muleContext));
     });
   }
 
