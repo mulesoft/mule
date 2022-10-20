@@ -40,6 +40,7 @@ public final class ArtifactContextConfiguration {
   private ArtifactType artifactType;
   private boolean enableLazyInitialization;
   private boolean disableXmlValidations;
+  private boolean addToolingObjectsToRegistry;
   private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
   private Optional<ArtifactContext> parentArtifactContext = empty();
@@ -111,6 +112,15 @@ public final class ArtifactContextConfiguration {
    */
   public boolean isDisableXmlValidations() {
     return disableXmlValidations;
+  }
+
+  /**
+   * Allows to create an {@link ArtifactContext} that will contain the objects that enabling the tooling capabilities.
+   *
+   * @return {@code true} if tooling capabilities will be available on the artifact context, {@code false} otherwise.
+   */
+  public boolean isAddToolingObjectsToRegistry() {
+    return addToolingObjectsToRegistry;
   }
 
   /**
@@ -231,6 +241,18 @@ public final class ArtifactContextConfiguration {
      */
     public ArtifactContextConfigurationBuilder setDisableXmlValidations(boolean disableXmlValidations) {
       artifactContextConfiguration.disableXmlValidations = disableXmlValidations;
+      return this;
+    }
+
+    /**
+     * Allows to create an {@link ArtifactContext} that will contain the objects that enabling the tooling capabilities.
+     *
+     * @param addToolingObjectsToRegistry {@code true} if tooling capabilities will be available on the artifact context,
+     *                                    {@code false} otherwise.
+     * @return the builder
+     */
+    public ArtifactContextConfigurationBuilder setAddToolingObjectsToRegistry(boolean addToolingObjectsToRegistry) {
+      artifactContextConfiguration.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
       return this;
     }
 

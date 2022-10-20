@@ -147,7 +147,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                  ContributedErrorTypeRepository errorTypeRepository,
                                  ContributedErrorTypeLocator errorTypeLocator,
-                                 Map<String, String> artifactProperties, ArtifactType artifactType,
+                                 Map<String, String> artifactProperties,
+                                 boolean addToolingObjectsToRegistry,
+                                 ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
@@ -157,7 +159,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       throws BeansException {
     super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
+          artifactProperties, addToolingObjectsToRegistry,
+          artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
           featureFlaggingService, expressionLanguageMetadataService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
@@ -181,6 +184,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new LazySpringMuleContextServiceConfigurator(this,
                                                         artifactProperties,
+                                                        isAddToolingObjectsToRegistry(),
                                                         runtimeLockFactory,
                                                         getMuleContext(),
                                                         getCoreFunctionsProvider(),

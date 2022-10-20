@@ -40,7 +40,8 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
         new ArtifactAstConfigurationBuilder(artifactAst,
                                             artifactContextConfiguration.getArtifactProperties(),
                                             artifactContextConfiguration.getArtifactType(),
-                                            artifactContextConfiguration.isEnableLazyInitialization());
+                                            artifactContextConfiguration.isEnableLazyInitialization(),
+                                            artifactContextConfiguration.isAddToolingObjectsToRegistry());
 
     artifactContextConfiguration.getParentArtifactContext()
         .ifPresent(parentContext -> configurationBuilder.setParentContext(parentContext.getMuleContext(),

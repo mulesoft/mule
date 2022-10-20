@@ -97,7 +97,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -480,7 +479,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                emptyMap(), false, APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
                                 mock(MemoryManagementService.class),
                                 mock(FeatureFlaggingService.class),
                                 mock(ExpressionLanguageMetadataService.class)) {

@@ -45,7 +45,6 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
@@ -56,6 +55,7 @@ import org.mule.runtime.config.internal.registry.CompositeOptionalObjectsControl
 import org.mule.runtime.config.internal.registry.DefaultOptionalObjectsController;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -289,7 +289,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         parentConfigurationProperties,
                                                         baseConfigurationComponentLocator,
                                                         errorTypeRepository, errorTypeLocator,
-                                                        getArtifactProperties(), artifactType,
+                                                        getArtifactProperties(), true, artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
                                                         componentBuildingDefinitionRegistryFactory,
@@ -301,7 +301,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     parentConfigurationProperties,
                                                     baseConfigurationComponentLocator,
                                                     errorTypeRepository, errorTypeLocator,
-                                                    getArtifactProperties(), artifactType,
+                                                    getArtifactProperties(), true, artifactType,
                                                     componentBuildingDefinitionRegistryFactory,
                                                     new ArtifactMemoryManagementService(memoryManagementService),
                                                     featureFlaggingService, expressionLanguageMetadataService);

@@ -73,6 +73,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
 
   public LazySpringMuleContextServiceConfigurator(LazyComponentInitializerAdapter lazyComponentInitializer,
                                                   Map<String, String> artifactProperties,
+                                                  boolean addToolingObjectsToRegistry,
                                                   LockFactory runtimeLockFactory,
                                                   MuleContextWithRegistry muleContext,
                                                   MuleFunctionsBindingContextProvider coreFunctionsProvider,
@@ -84,7 +85,9 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   Registry serviceLocator,
                                                   ResourceLocator resourceLocator,
                                                   MemoryManagementService memoryManagementService) {
-    super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties, artifactType,
+    super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties,
+          addToolingObjectsToRegistry,
+          artifactType,
           artifactAst,
           optionalObjectsController,
           beanDefinitionRegistry,

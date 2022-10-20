@@ -78,7 +78,8 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
               new ArtifactAstConfigurationBuilder(emptyArtifact(),
                                                   artifactContextConfiguration.getArtifactProperties(),
                                                   artifactContextConfiguration.getArtifactType(),
-                                                  artifactContextConfiguration.isEnableLazyInitialization());
+                                                  artifactContextConfiguration.isEnableLazyInitialization(),
+                                                  artifactContextConfiguration.isAddToolingObjectsToRegistry());
 
           artifactContextConfiguration.getServiceConfigurators().stream()
               .forEach(configurationBuilder::addServiceConfigurator);

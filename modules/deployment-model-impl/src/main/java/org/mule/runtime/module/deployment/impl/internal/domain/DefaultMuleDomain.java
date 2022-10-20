@@ -156,20 +156,31 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
 
   @Override
   public void init() {
-    doInit(false, false);
+    doInit(false, false, false);
+  }
+
+  @Override
+  public void initTooling() {
+    doInit(false, false, true);
   }
 
   @Override
   public void lazyInit() {
-    doInit(true, true);
+    doInit(true, true, false);
   }
 
   @Override
   public void lazyInit(boolean disableXmlValidations) {
-    doInit(true, disableXmlValidations);
+    doInit(true, disableXmlValidations, false);
   }
 
-  public void doInit(boolean lazy, boolean disableXmlValidations) throws DeploymentInitException {
+  @Override
+  public void lazyInitTooling(boolean disableXmlValidations) {
+    doInit(true, disableXmlValidations, true);
+  }
+
+  public void doInit(boolean lazy, boolean disableXmlValidations, boolean addToolingObjectsToRegistry)
+      throws DeploymentInitException {
     withContextClassLoader(null, () -> {
       if (LOGGER.isInfoEnabled()) {
         log(miniSplash(format("Initializing domain '%s'", getArtifactName())));
@@ -186,6 +197,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)
           .setDisableXmlValidations(disableXmlValidations)
+          .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)
           .setClassLoaderRepository(classLoaderRepository)
           .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                 descriptor.getDeploymentProperties())))

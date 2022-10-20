@@ -6,28 +6,23 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -48,6 +43,15 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(MuleAstUtils.class)
 @Issue("W-10808757")
@@ -60,9 +64,9 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   private MuleContext mockMuleContext;
-  private ClassLoader executionClassloader = mock(ClassLoader.class);
-  private ClassLoader parentClassloader = mock(ClassLoader.class);
-  private DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(null);
+  private final ClassLoader executionClassloader = mock(ClassLoader.class);
+  private final ClassLoader parentClassloader = mock(ClassLoader.class);
+  private final DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(null);
   private ArtifactAstValidatorBuilder astValidatorBuilder;
 
   @Before
@@ -102,7 +106,7 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
         new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                emptyMap(), false, APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
                                 mock(MemoryManagementService.class),
                                 featureFlaggingService, mock(ExpressionLanguageMetadataService.class)) {
 

@@ -25,6 +25,8 @@ public class MuleDeploymentProperties {
       MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableDslDeclarationValidations";
   public static final String MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY =
       DEPLOYMENT_PROPERTY_PREFIX + ".lazyConnections";
+  public static final String MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY =
+      DEPLOYMENT_PROPERTY_PREFIX + ".addToolingObjectsToRegistry";
   public static final String MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY =
       DEPLOYMENT_PROPERTY_PREFIX + ".addArtifactAstToRegistry";
 
