@@ -969,7 +969,8 @@ public final class IntrospectionUtils {
   }
 
   public static Stream<ExecutableElement> getEnclosingMethodsStream(TypeElement typeElement) {
-    return typeElement.getEnclosedElements().stream().filter(elem -> elem.getKind().equals(METHOD)).map(elem -> (ExecutableElement) elem);
+    return typeElement.getEnclosedElements().stream().filter(elem -> elem.getKind().equals(METHOD))
+        .map(elem -> (ExecutableElement) elem);
   }
 
   private static List<TypeElement> getAllSuperTypes(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
