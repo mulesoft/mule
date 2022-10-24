@@ -49,43 +49,44 @@ public class JavaParserUtils {
   }
 
   private static String calculateFromClass(Type clazz, Set<String> seenTypes) {
-    // TODO: fix http extension loading W-11938731
+    // TODO W-11938731: fix http extension loading
     if (clazz.getTypeName().startsWith("org.mule.extension.http") || clazz.getTypeName().startsWith("java.")
         || primitiveTypeNames.contains(clazz.getTypeName()) || seenTypes.contains(clazz.getTypeName())) {
       return firstMuleVersion;
     } else {
       seenTypes.add(clazz.getTypeName());
     }
-    String maxMMV = firstMuleVersion;
+    String calculatedMMV = firstMuleVersion;
     // Look for the annotation at the class level
     Optional<String> classLevelMMV = getMinMuleVersion(clazz);
     if (classLevelMMV.isPresent()) { // We cut the algorithm short (only compare against generics)
-      maxMMV = maxMMV(maxMMV, classLevelMMV.get());
+      calculatedMMV = maxMMV(calculatedMMV, classLevelMMV.get());
     } else { // We keep calculating from class inspection
       // Parse the superClass
-      maxMMV = maxMMV(maxMMV, clazz.getSuperType().map(type -> calculateFromClass(type, seenTypes)).orElse("4.1.0"));
+      calculatedMMV =
+          maxMMV(calculatedMMV, clazz.getSuperType().map(type -> calculateFromClass(type, seenTypes)).orElse("4.1.0"));
       // Parse the class interfaces
       for (Type type : clazz.getImplementingInterfaces()) {
-        maxMMV = maxMMV(maxMMV, calculateFromClass(type, seenTypes));
+        calculatedMMV = maxMMV(calculatedMMV, calculateFromClass(type, seenTypes));
       }
       // Parse the class annotations
       for (Type annotation : clazz.getAnnotations()) {
-        maxMMV = maxMMV(maxMMV, calculateFromClass(annotation, seenTypes));
+        calculatedMMV = maxMMV(calculatedMMV, calculateFromClass(annotation, seenTypes));
       }
       // Parse the class fields
       for (FieldElement field : clazz.getFields()) {
-        maxMMV = maxMMV(maxMMV, calculateFromParameter(field, seenTypes));
+        calculatedMMV = maxMMV(calculatedMMV, calculateFromParameter(field, seenTypes));
       }
       // Parse the class methods
       for (MethodElement<?> method : clazz.getEnclosingMethods()) {
-        maxMMV = maxMMV(maxMMV, calculateFromMethod(method, seenTypes));
+        calculatedMMV = maxMMV(calculatedMMV, calculateFromMethod(method, seenTypes));
       }
     }
     // Finally we always parse the class generics
     for (TypeGeneric typeGeneric : clazz.getGenerics()) {
-      maxMMV = maxMMV(maxMMV, calculateFromClass(typeGeneric.getConcreteType(), seenTypes));
+      calculatedMMV = maxMMV(calculatedMMV, calculateFromClass(typeGeneric.getConcreteType(), seenTypes));
     }
-    return maxMMV;
+    return calculatedMMV;
   }
 
   private static String calculateFromMethod(MethodElement<?> method, Set<String> seenTypes) {
