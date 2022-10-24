@@ -13,6 +13,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.util.concurrent.locks.Lock;
 
@@ -21,11 +22,15 @@ import javax.inject.Named;
 
 public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
+  private static final long DEFAULT_LOCK_FACTORY_SHUTDOWN_TIMEOUT = 5000L;
   private LockGroup lockGroup;
   private LockProvider lockProvider;
 
   @Inject
   private SchedulerService schedulerService;
+
+  @Inject
+  private MuleConfiguration muleConfiguration;
 
   @Override
   public synchronized Lock createLock(String lockId) {
@@ -41,7 +46,15 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
   @Override
   public void initialise() throws InitialisationException {
-    lockGroup = new InstanceLockGroup(lockProvider);
+    lockGroup = new InstanceLockGroup(lockProvider, getShutdownTimeout());
+  }
+
+  private long getShutdownTimeout() {
+    if (muleConfiguration == null) {
+      return DEFAULT_LOCK_FACTORY_SHUTDOWN_TIMEOUT;
+    } else {
+      return muleConfiguration.getShutdownTimeout();
+    }
   }
 
   @Inject

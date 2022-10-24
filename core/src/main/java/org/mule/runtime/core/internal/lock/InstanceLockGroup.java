@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 
 /**
@@ -27,10 +28,12 @@ public class InstanceLockGroup implements LockGroup {
   private final Map<String, LockEntry> locks;
   private final Object lockAccessMonitor = new Object();
   private final LockProvider lockProvider;
+  private final long gracefulShutdownTimeoutMillis;
 
-  public InstanceLockGroup(LockProvider lockProvider) {
+  public InstanceLockGroup(LockProvider lockProvider, long shutdownTimeoutMillis) {
     this.lockProvider = lockProvider;
     this.locks = new HashMap<>();
+    this.gracefulShutdownTimeoutMillis = shutdownTimeoutMillis;
   }
 
   @Override
@@ -146,18 +149,24 @@ public class InstanceLockGroup implements LockGroup {
   }
 
   private void waitForLocksToBeUnlocked() {
+    long beginMillis = currentTimeMillis();
     synchronized (lockAccessMonitor) {
       try {
-        while (!locks.isEmpty()) {
-          // TODO: timeout?
-          lockAccessMonitor.wait();
+        boolean isTimeout = false;
+        while (!locks.isEmpty() && !isTimeout) {
+          long elapsedMillis = currentTimeMillis() - beginMillis;
+          long remainingMillis = gracefulShutdownTimeoutMillis - elapsedMillis;
+          if (remainingMillis > 0) {
+            lockAccessMonitor.wait(remainingMillis);
+          } else {
+            isTimeout = true;
+          }
         }
       } catch (InterruptedException e) {
         currentThread().interrupt();
       }
       if (!locks.isEmpty()) {
-        LOGGER.warn("Clearing unlocked locks while disposing lock group {}: {}", this, locks.keySet());
-        locks.clear();
+        LOGGER.warn("These locks weren't unlocked before disposing its lock group: {}", locks.keySet());
       }
     }
   }
