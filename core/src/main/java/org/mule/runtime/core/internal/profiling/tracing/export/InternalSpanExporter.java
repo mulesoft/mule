@@ -43,4 +43,13 @@ public interface InternalSpanExporter {
    * @return the name of the spans where the span hierarchy is exported again.
    */
   Set<String> noExportUntil();
+
+  /**
+   * Informs the exporter that the name of the span was updated.
+   *
+   * @param name the name to set to the current span.
+   */
+  default void onNameUpdated(String newName) {
+    // Nothing to do by default.
+  }
 }

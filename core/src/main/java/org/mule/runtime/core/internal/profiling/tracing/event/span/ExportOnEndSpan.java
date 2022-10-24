@@ -102,7 +102,7 @@ public class ExportOnEndSpan implements InternalSpan {
   @Override
   public void addAttribute(String key, String value) {
     runtimeInternalSpan.addAttribute(key, value);
-    spanExporter.visit(new AddAtributeVisitor(key, value));
+    spanExporter.visit(new AddAttributeVisitor(key, value));
   }
 
   @Override
@@ -127,17 +127,18 @@ public class ExportOnEndSpan implements InternalSpan {
   @Override
   public void updateName(String name) {
     runtimeInternalSpan.updateName(name);
+    spanExporter.onNameUpdated(name);
   }
 
   /**
    * Adds attribute to the exporter.
    */
-  private static class AddAtributeVisitor implements InternalSpanExporterVisitor<InternalSpanExporter> {
+  private static class AddAttributeVisitor implements InternalSpanExporterVisitor<InternalSpanExporter> {
 
     private final String key;
     private final String value;
 
-    public AddAtributeVisitor(String key, String value) {
+    public AddAttributeVisitor(String key, String value) {
       this.key = key;
       this.value = value;
     }

@@ -30,7 +30,6 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanV
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -71,21 +70,18 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
   private final Tracer tracer;
   private final Context remoteContext;
-  private Span openTelemetrySpan;
-  private final boolean exportable;
+  private final Span openTelemetrySpan;
   private Set<String> noExportUntil;
-  private final InternalSpan internalSpan;
-  private final Map<String, String> attributes = new HashMap<>();
 
   public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
                                    boolean exportable,
                                    Set<String> noExportUntil,
                                    InternalSpan internalSpan) {
     this.tracer = tracer;
-    this.internalSpan = internalSpan;
     this.noExportUntil = noExportUntil;
     remoteContext = resolveRemoteContext(eventContext);
-    this.exportable = exportable;
+    Set<String> parentNoExportUntil = resolveParentNoExportUntil(internalSpan);
+    openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan, parentNoExportUntil, noExportUntil, exportable);
   }
 
   private Set<String> resolveNoExportUntil(Set<String> noExportUntil, Set<String> parentNoExportUntil) {
@@ -114,15 +110,20 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   @Override
   public void export(InternalSpan internalSpan) {
     if (internalSpan.hasErrors()) {
-      getOpenTelemetrySpan().setStatus(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
+      openTelemetrySpan.setStatus(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
       recordSpanExceptions(internalSpan);
     }
-    getOpenTelemetrySpan().end(internalSpan.getDuration().getEnd(), NANOSECONDS);
+    openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
   @Override
   public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
     return internalSpanExporterVisitor.accept(this);
+  }
+
+  @Override
+  public void onNameUpdated(String newName) {
+    openTelemetrySpan.updateName(newName);
   }
 
   @Override
@@ -141,7 +142,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
                                                EXCEPTION_STACK_TRACE_KEY,
                                                InternalSpanError.getInternalSpanError(spanError).getErrorStacktrace().toString(),
                                                EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
-    getOpenTelemetrySpan().addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
+    openTelemetrySpan.addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
   }
 
   private Context resolveParentOpenTelemetrySpan(InternalSpan internalSpan) {
@@ -190,7 +191,8 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
   private synchronized Span resolveOpenTelemetrySpan(InternalSpan internalSpan,
                                                      Set<String> parentNoExportUntil,
-                                                     Set<String> noExportUntil) {
+                                                     Set<String> noExportUntil,
+                                                     boolean exportable) {
     // In case it was already resolved, return the same.
     if (openTelemetrySpan != null) {
       return openTelemetrySpan;
@@ -218,11 +220,8 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
     }
 
-    Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
+    return spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
-    attributes.forEach(span::setAttribute);
-
-    return span;
   }
 
   private boolean exportableAccordingToName(InternalSpan internalSpan, Set<String> parentNoExportUntil) {
@@ -230,20 +229,11 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   }
 
   public Span getOpenTelemetrySpan() {
-    if (openTelemetrySpan == null) {
-      Set<String> parentNoExportUntil = resolveParentNoExportUntil(internalSpan);
-      openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan, parentNoExportUntil, noExportUntil);
-    }
-
     return openTelemetrySpan;
   }
 
   public void setAttribute(String key, String value) {
-    if (openTelemetrySpan == null) {
-      this.attributes.put(key, value);
-    } else {
-      openTelemetrySpan.setAttribute(key, value);
-    }
+    openTelemetrySpan.setAttribute(key, value);
   }
 
   /**
