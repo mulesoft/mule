@@ -71,11 +71,12 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    MessageProcessorChain nestedChain,
+                                   ClassLoader classLoader,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
     this(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
-         cursorProviderFactory, retryPolicyTemplate, nestedChain,
+         cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
          extensionManager, policyManager, reflectionCache, null, -1);
   }
 
@@ -89,13 +90,14 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    MessageProcessorChain nestedChain,
+                                   ClassLoader classLoader,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
                                    ResultTransformer resultTransformer,
                                    long terminationTimeout) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-          cursorProviderFactory, retryPolicyTemplate, nestedChain,
+          cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
           extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.errorMappings = errorMappings;

@@ -141,8 +141,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     OperationMessageProcessor operationMessageProcessor =
         new TestOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, emptyList(),
                                           resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), null,
-                                          extensionManager,
-                                          mockPolicyManager, reflectionCache, null,
+                                          null, extensionManager, mockPolicyManager, reflectionCache, null,
                                           muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     operationMessageProcessor.setComponentLocator(componentLocator);
@@ -567,12 +566,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                          ConfigurationProvider configurationProvider, String target, String targetValue,
                                          List<EnrichedErrorMapping> errorMappings, ResolverSet resolverSet,
                                          CursorProviderFactory cursorProviderFactory, RetryPolicyTemplate retryPolicyTemplate,
-                                         MessageProcessorChain nestedChain, ExtensionManager extensionManager,
+                                         MessageProcessorChain nestedChain, ClassLoader classLoader,
+                                         ExtensionManager extensionManager,
                                          PolicyManager policyManager, ReflectionCache reflectionCache,
                                          ResultTransformer resultTransformer, long terminationTimeout) {
       super(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
-            cursorProviderFactory, retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache,
-            resultTransformer, terminationTimeout);
+            cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader, extensionManager, policyManager,
+            reflectionCache, resultTransformer, terminationTimeout);
     }
 
     @Override
