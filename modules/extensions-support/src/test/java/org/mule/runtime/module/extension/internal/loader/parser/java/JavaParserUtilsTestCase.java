@@ -7,9 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import org.hamcrest.CoreMatchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.sdk.api.annotation.Alias;
@@ -20,14 +23,19 @@ import org.mule.sdk.api.client.ExtensionsClient;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.tx.SourceTransactionalAction;
 import org.mule.sdk.api.tx.Transactional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateFromClass;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
 public class JavaParserUtilsTestCase {
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Test
   public void javaLangClassReturns410() {
@@ -90,9 +98,17 @@ public class JavaParserUtilsTestCase {
   }
 
   @Test
-  public void getFromFields() {
-    Type clazz = new TypeWrapper(WithAnnotatedField.class, TYPE_LOADER);
-    assertThat(calculateFromClass(clazz), is("4.4.0"));
+  public void getFromFieldThrowsException() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("Min Mule Version annotation is not allowed at the field level. Offending field: annotatedField in Class: 'WithAnnotatedField'");
+    calculateFromClass(new TypeWrapper(WithAnnotatedField.class, TYPE_LOADER));
+  }
+
+  @Test
+  public void getFromFieldAllowedInEnums() {
+    Type clazz = new TypeWrapper(SourceTransactionalAction.class, TYPE_LOADER);
+    assertThat(calculateFromClass(clazz), is("4.5.0"));
   }
 
   @Test
@@ -206,5 +222,10 @@ public class JavaParserUtilsTestCase {
 
     @MinMuleVersion("4.6.0")
     public void someMethod(ExtensionsClient extensionsClient) {}
+  }
+
+  private enum AnnotatedEnum {
+    NON_ANNOTATED_VALUE, @MinMuleVersion("4.6.0")
+    ANNOTATED_VALUE
   }
 }

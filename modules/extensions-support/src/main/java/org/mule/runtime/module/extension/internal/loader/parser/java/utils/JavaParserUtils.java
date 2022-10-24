@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static org.mule.sdk.api.util.SdkApiConstants.NON_ENFORCE_MIN_MULE_VERSION_CLASSES;
@@ -44,10 +46,6 @@ public class JavaParserUtils {
     return calculateFromMethod(method, new HashSet<>());
   }
 
-  public static String calculateFromParameter(ExtensionParameter parameter) {
-    return calculateFromParameter(parameter, new HashSet<>());
-  }
-
   private static String calculateFromClass(Type clazz, Set<String> seenTypes) {
     // TODO W-11938731: fix http extension loading
     if (clazz.getTypeName().startsWith("org.mule.extension.http") || clazz.getTypeName().startsWith("java.")
@@ -56,6 +54,7 @@ public class JavaParserUtils {
     } else {
       seenTypes.add(clazz.getTypeName());
     }
+    // TODO: get MMV from pom
     String calculatedMMV = firstMuleVersion;
     // Look for the annotation at the class level
     Optional<String> classLevelMMV = getMinMuleVersion(clazz);
@@ -75,7 +74,7 @@ public class JavaParserUtils {
       }
       // Parse the class fields
       for (FieldElement field : clazz.getFields()) {
-        calculatedMMV = maxMMV(calculatedMMV, calculateFromParameter(field, seenTypes));
+        calculatedMMV = maxMMV(calculatedMMV, calculateFromField(field, seenTypes));
       }
       // Parse the class methods
       for (MethodElement<?> method : clazz.getEnclosingMethods()) {
@@ -99,7 +98,7 @@ public class JavaParserUtils {
       MaxMMV = maxMMV(MaxMMV, calculateFromClass(annotation, seenTypes));
     }
     for (ExtensionParameter parameter : method.getParameters()) {
-      MaxMMV = maxMMV(MaxMMV, calculateFromParameter(parameter, seenTypes));
+      MaxMMV = maxMMV(MaxMMV, calculateFromField(parameter, seenTypes));
     }
     for (Type exceptionType : method.getExceptionTypes()) {
       MaxMMV = maxMMV(MaxMMV, calculateFromClass(exceptionType, seenTypes));
@@ -107,11 +106,14 @@ public class JavaParserUtils {
     return maxMMV(MaxMMV, calculateFromClass(method.getReturnType(), seenTypes));
   }
 
-  private static String calculateFromParameter(ExtensionParameter parameter, Set<String> seenTypes) {
-    // Look for the annotation at the parameter level (So far we DON'T allow this, should throw an error here?)
+  private static String calculateFromField(ExtensionParameter parameter, Set<String> seenTypes) {
     Optional<String> minMuleVersionAnnotation = getMinMuleVersionFromAnnotation(parameter);
     if (minMuleVersionAnnotation.isPresent()) {
-      return minMuleVersionAnnotation.get();
+      if (parameter.getType().isAssignableFrom(Enum.class)) {
+        return minMuleVersionAnnotation.get();
+      }
+      throw new IllegalModelDefinitionException(format("Min Mule Version annotation is not allowed at the field level. Offending field: %s in %s",
+                                                       parameter.getName(), parameter.getOwnerDescription()));
     }
     String maxMMV = firstMuleVersion;
     // Look at parameter annotations and check if they have @MinMuleVersion

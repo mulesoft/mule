@@ -65,8 +65,7 @@ public class JavaParameterModelParserTestCase {
         new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
         javaParameterModelParser.getSinceMuleVersionModelProperty();
-    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
-    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.1.0"));
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(false));
   }
 
   @Test
@@ -78,8 +77,7 @@ public class JavaParameterModelParserTestCase {
         new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
     Optional<SinceMuleVersionModelProperty> sinceMuleVersionModelProperty =
         javaParameterModelParser.getSinceMuleVersionModelProperty();
-    assertThat(sinceMuleVersionModelProperty.isPresent(), is(true));
-    assertThat(sinceMuleVersionModelProperty.get().getVersion().toString(), is("4.5.0"));
+    assertThat(sinceMuleVersionModelProperty.isPresent(), is(false));
   }
 
   private Optional<OAuthParameterModelProperty> getOAuthParameterModelPropertyFromParameterName(String parameterName)
