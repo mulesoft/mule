@@ -28,13 +28,12 @@ import org.mockito.internal.verification.VerificationModeFactory;
 
 public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
 
-  private static final long TEST_LOCK_SHUTDOWN_TIMEOUT = 5000L;
   public static final int THREAD_COUNT = 100;
   public static final int ITERATIONS_PER_THREAD = 100;
   private Latch threadStartLatch = new Latch();
   private String sharedKeyA = "A";
   private String sharedKeyB = "B";
-  private InstanceLockGroup instanceLockGroup = new InstanceLockGroup(new SingleServerLockProvider(), TEST_LOCK_SHUTDOWN_TIMEOUT);
+  private InstanceLockGroup instanceLockGroup = new InstanceLockGroup(new SingleServerLockProvider());
   private InMemoryObjectStore objectStore = new InMemoryObjectStore();
   private LockProvider mockLockProvider;
 
@@ -60,7 +59,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
 
   private void lockUnlockThenDestroy(int lockTimes) {
     mockLockProvider = Mockito.mock(LockProvider.class, Answers.RETURNS_DEEP_STUBS.get());
-    InstanceLockGroup instanceLockGroup = new InstanceLockGroup(mockLockProvider, TEST_LOCK_SHUTDOWN_TIMEOUT);
+    InstanceLockGroup instanceLockGroup = new InstanceLockGroup(mockLockProvider);
     for (int i = 0; i < lockTimes; i++) {
       instanceLockGroup.lock("lockId");
     }

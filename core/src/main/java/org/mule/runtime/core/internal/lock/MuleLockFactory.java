@@ -22,7 +22,6 @@ import javax.inject.Named;
 
 public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
-  private static final long DEFAULT_LOCK_FACTORY_SHUTDOWN_TIMEOUT = 5000L;
   private LockGroup lockGroup;
   private LockProvider lockProvider;
 
@@ -46,14 +45,10 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
   @Override
   public void initialise() throws InitialisationException {
-    lockGroup = new InstanceLockGroup(lockProvider, getShutdownTimeout());
-  }
-
-  private long getShutdownTimeout() {
     if (muleConfiguration == null) {
-      return DEFAULT_LOCK_FACTORY_SHUTDOWN_TIMEOUT;
+      lockGroup = new InstanceLockGroup(lockProvider);
     } else {
-      return muleConfiguration.getShutdownTimeout();
+      lockGroup = new InstanceLockGroup(lockProvider, muleConfiguration.getShutdownTimeout());
     }
   }
 

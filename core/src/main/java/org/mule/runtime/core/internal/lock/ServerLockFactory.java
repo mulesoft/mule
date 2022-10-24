@@ -7,12 +7,8 @@
 package org.mule.runtime.core.internal.lock;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 
-import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -23,13 +19,9 @@ import java.util.concurrent.locks.Lock;
  *
  * @since 4.3.0, 4.2.2
  */
-public class ServerLockFactory implements LockFactory, Initialisable, Disposable {
+public class ServerLockFactory implements LockFactory, Disposable {
 
-  private static final long DEFAULT_LOCK_FACTORY_SHUTDOWN_TIMEOUT = 5000L;
-  private LockGroup lockGroup;
-
-  @Inject
-  private MuleConfiguration muleConfiguration;
+  private LockGroup lockGroup = new InstanceLockGroup(new SingleServerLockProvider());
 
   @Override
   public synchronized Lock createLock(String lockId) {
@@ -40,19 +32,6 @@ public class ServerLockFactory implements LockFactory, Initialisable, Disposable
   public void dispose() {
     if (lockGroup != null) {
       lockGroup.dispose();
-    }
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    lockGroup = new InstanceLockGroup(new SingleServerLockProvider(), getShutdownTimeout());
-  }
-
-  private long getShutdownTimeout() {
-    if (muleConfiguration == null) {
-      return DEFAULT_LOCK_FACTORY_SHUTDOWN_TIMEOUT;
-    } else {
-      return muleConfiguration.getShutdownTimeout();
     }
   }
 

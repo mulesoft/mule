@@ -23,6 +23,7 @@ import static java.lang.Thread.currentThread;
  */
 public class InstanceLockGroup implements LockGroup {
 
+  private static final long DEFAULT_LOCK_GROUP_SHUTDOWN_TIMEOUT = 5000L;
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceLockGroup.class);
 
   private final Map<String, LockEntry> locks;
@@ -34,6 +35,10 @@ public class InstanceLockGroup implements LockGroup {
     this.lockProvider = lockProvider;
     this.locks = new HashMap<>();
     this.gracefulShutdownTimeoutMillis = shutdownTimeoutMillis;
+  }
+
+  public InstanceLockGroup(LockProvider lockProvider) {
+    this(lockProvider, DEFAULT_LOCK_GROUP_SHUTDOWN_TIMEOUT);
   }
 
   @Override
