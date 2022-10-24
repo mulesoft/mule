@@ -8,6 +8,7 @@
 package org.mule.runtime.extension.internal.ast;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 
@@ -58,12 +59,12 @@ public class XmlSdkImplicitConfigParameter implements ComponentParameterAst {
 
   @Override
   public String getRawValue() {
-    return null;
+    return value != null ? value.toString() : null;
   }
 
   @Override
   public String getResolvedRawValue() {
-    return null;
+    return value != null ? value.toString() : null;
   }
 
   @Override
