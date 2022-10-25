@@ -49,9 +49,9 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase {
                       (Function<FlowConstructStatistics, ResetOnQueryCounter>) FlowConstructStatistics::getEventsReceivedCounter,
                       (Consumer<DefaultFlowConstructStatistics>) DefaultFlowConstructStatistics::incReceivedEvents},
                   new Object[] {
-                      "messagesDispatched",
-                      (Function<FlowConstructStatistics, ResetOnQueryCounter>) FlowConstructStatistics::getMessagesDispatchedCounter,
-                      (Consumer<DefaultFlowConstructStatistics>) DefaultFlowConstructStatistics::incDispatchedMessages},
+                      "dispatchedMessages",
+                      (Function<FlowConstructStatistics, ResetOnQueryCounter>) FlowConstructStatistics::getDispatchedMessagesCounter,
+                      (Consumer<DefaultFlowConstructStatistics>) DefaultFlowConstructStatistics::incMessagesDispatched},
                   new Object[] {
                       "executionErrors",
                       (Function<FlowConstructStatistics, ResetOnQueryCounter>) FlowConstructStatistics::getExecutionErrorsCounter,

@@ -243,7 +243,7 @@ public class FlowProcessMediator implements Initialisable {
         sourceInterceptors.forEach(sourceInterceptor -> rootContext
             .onTerminated((e, t) -> sourceInterceptor.afterTerminated(messageSource.getLocation(), rootContext)));
 
-        flowConstruct.getStatistics().incDispatchedMessages();
+        flowConstruct.getStatistics().incMessagesDispatched();
         dispatch(event, policy, (Pipeline) flowConstruct, phaseContext);
       } catch (Exception e) {
         template.sendFailureResponseToClient(messageProcessContext.getMessagingExceptionResolver()

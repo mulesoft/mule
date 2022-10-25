@@ -163,7 +163,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
-  public void incDispatchedMessages() {
+  public void incMessagesDispatched() {
     dispatchedMessages.addAndGet(1);
     if (!messagesDispatchedCounters.isEmpty()) {
       messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
@@ -184,7 +184,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
-  public long getTotalMessagesDispatched() {
+  public long getTotalDispatchedMessages() {
     return dispatchedMessages.get();
   }
 
@@ -201,10 +201,10 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
-  public ResetOnQueryCounter getMessagesDispatchedCounter() {
+  public ResetOnQueryCounter getDispatchedMessagesCounter() {
     DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     messagesDispatchedCounters.add(counter);
-    counter.add(getTotalMessagesDispatched());
+    counter.add(getTotalDispatchedMessages());
     return counter;
   }
 
