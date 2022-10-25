@@ -23,10 +23,12 @@ import static org.mule.test.oauth.ConnectionType.DUO;
 import static org.mule.test.oauth.ConnectionType.HYPER;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -737,6 +739,37 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     String parameterValue =
         (String) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
                                                                XML_ORDER_DECLARER,
+                                                               getOperationModel(XML_STRING_OPERATION_NAME));
+    XMLAssert.assertXMLEqual(parameterValue, getFileString(XML_ORDER_FILE_PATH));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can desbribe a parameter whose type is InputStream that" +
+      " represents an xml ObjectType but is described as a TypedValue of a different DataType.")
+  public void inputStreamOfXmlObjectTypeParameterWithTypedValueOfDifferentDataType() throws Exception {
+    TypedValue typedValue = muleContext.getExpressionManager()
+        .evaluate("#[output application/json --- payload]",
+                  BindingContext.builder().addBinding("payload", new TypedValue<>(getFileString(XML_ORDER_FILE_PATH),
+                                                                                  DataType.XML_STRING))
+                      .build());
+
+    String parameterValue =
+        (String) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
+                                                               valueDeclarer -> valueDeclarer
+                                                                   .withValue(typedValue),
+                                                               getOperationModel(XML_STRING_OPERATION_NAME));
+    XMLAssert.assertXMLEqual(parameterValue, getFileString(XML_ORDER_FILE_PATH));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can desbribe a parameter whose type is InputStream that" +
+      " represents an xml ObjectType but is described as a TypedValue with the same DataType.")
+  public void inputStreamOfXmlObjectTypeParameterWithTypedValueSameDataType() throws Exception {
+    String parameterValue =
+        (String) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
+                                                               valueDeclarer -> valueDeclarer
+                                                                   .withValue(new TypedValue<>(getFileString(XML_ORDER_FILE_PATH),
+                                                                                               DataType.XML_STRING)),
                                                                getOperationModel(XML_STRING_OPERATION_NAME));
     XMLAssert.assertXMLEqual(parameterValue, getFileString(XML_ORDER_FILE_PATH));
   }
