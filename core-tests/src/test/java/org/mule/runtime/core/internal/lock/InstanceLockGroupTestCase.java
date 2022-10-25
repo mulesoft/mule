@@ -68,7 +68,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-11929632")
-  public void disposeDoesNotLossReferenceToTakenLocks() throws InterruptedException {
+  public void disposeDoesNotLoseReferenceToTakenLocks() throws InterruptedException {
     String testLockId = "TestLockId";
     instanceLockGroup.lock(testLockId);
     verify(lockProvider.getSpiedLock(testLockId)).lock();
@@ -84,7 +84,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("W-11929632")
   public void whenTryLockIsInterruptedTheLockGroupDoesNotGenerateALockEntry() {
-    lockProvider.makeLocksToRaiseExceptions();
+    lockProvider.makeLocksRaiseExceptions();
 
     try {
       String testLockId = "TestLockId";
@@ -98,7 +98,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("W-11929632")
   public void whenLockInterruptiblyIsInterruptedTheLockGroupDoesNotGenerateALockEntry() {
-    lockProvider.makeLocksToRaiseExceptions();
+    lockProvider.makeLocksRaiseExceptions();
 
     try {
       String testLockId = "TestLockId";
@@ -115,7 +115,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
     String testLockId = "TestLockId";
     instanceLockGroup.lock(testLockId);
 
-    lockProvider.makeLocksToRaiseExceptions();
+    lockProvider.makeLocksRaiseExceptions();
 
     try {
       instanceLockGroup.unlock(testLockId);

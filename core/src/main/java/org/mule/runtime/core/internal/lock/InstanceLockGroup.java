@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.lock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,9 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
-import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.currentThread;
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
 
 /**
  * {@link LockGroup} implementation for holding references to created locks inside a mule instance.

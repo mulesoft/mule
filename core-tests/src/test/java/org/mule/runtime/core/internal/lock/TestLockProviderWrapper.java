@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * <ul>
  * <li>Spy the provided locks and get them by using the method {@link #getSpiedLock(String)}.</li>
  * <li>Make those provided locks to raise exceptions for the methods that can do that, by calling the method
- * {@link #makeLocksToRaiseExceptions()}. The exceptions would be:</li>
+ * {@link #makeLocksRaiseExceptions()}. The exceptions would be:</li>
  * <ul>
  * <li>{@link Lock#lockInterruptibly()} will raise a {@link InterruptedException}</li>
  * <li>{@link Lock#tryLock(long, TimeUnit)} will raise a {@link InterruptedException}</li>
@@ -52,7 +52,7 @@ class TestLockProviderWrapper implements LockProvider {
     return providedLocks.get(lockId);
   }
 
-  public void makeLocksToRaiseExceptions() {
+  public void makeLocksRaiseExceptions() {
     newLocksShouldRaiseExceptions = true;
     for (LockWrapper lock : providedLocks.values()) {
       lock.raiseExceptions();
