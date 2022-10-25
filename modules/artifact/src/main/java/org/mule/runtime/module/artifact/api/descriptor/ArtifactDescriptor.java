@@ -11,6 +11,8 @@ import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.fromClassLoaderConfiguration;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -33,7 +35,8 @@ public class ArtifactDescriptor {
 
   private final String name;
   private File rootFolder;
-  private ClassLoaderModel classLoaderModel = ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+  // Keep compatibility with usages of the old ClassLoaderModel type
+  private ClassLoaderConfiguration classLoaderConfiguration = ClassLoaderModel.NULL_CLASSLOADER_MODEL;
   private BundleDescriptor bundleDescriptor;
   private MuleVersion minMuleVersion;
   private Product requiredProduct;
@@ -91,12 +94,26 @@ public class ArtifactDescriptor {
     this.minMuleVersion = minMuleVersion;
   }
 
-  public ClassLoaderModel getClassLoaderModel() {
-    return classLoaderModel;
+  // TODO: change the return type even after deprecation?
+  @Deprecated
+  public ClassLoaderConfiguration getClassLoaderModel() {
+    // maybe we can remove this if changed in all places (maven plugin and tooling client only apparently)?
+    return fromClassLoaderConfiguration(getClassLoaderConfiguration());
   }
 
-  public void setClassLoaderModel(ClassLoaderModel classLoaderModel) {
-    this.classLoaderModel = classLoaderModel;
+  @Deprecated
+  public void setClassLoaderModel(ClassLoaderConfiguration classLoaderConfiguration) {
+    setClassLoaderConfiguration(classLoaderConfiguration);
+  }
+
+  public ClassLoaderConfiguration getClassLoaderConfiguration() {
+    return classLoaderConfiguration;
+  }
+
+  public void setClassLoaderConfiguration(ClassLoaderConfiguration classLoaderConfiguration) {
+//    this.classLoaderConfiguration = fromClassLoaderConfiguration(classLoaderConfiguration);
+    // let's see with the new one
+    this.classLoaderConfiguration = classLoaderConfiguration;
   }
 
   public BundleDescriptor getBundleDescriptor() {

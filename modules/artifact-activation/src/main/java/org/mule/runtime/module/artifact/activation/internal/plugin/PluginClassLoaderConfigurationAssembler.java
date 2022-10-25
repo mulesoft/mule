@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.activation.internal.classloader.Abstract
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -72,7 +73,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+  protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfiguration.ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     // Patches resolution is done just for plugins because this should be the use case, but in the implementation previously used
     // in the Runtime (AbstractMavenClassLoaderModelLoader in versions <= 4.4), it's done for deployables (applications and
     // domains) as well
@@ -82,7 +83,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     if (ownerDescriptor != null) {
-      ownerDescriptor.getClassLoaderModel().getDependencies().stream()
+      ownerDescriptor.getClassLoaderConfiguration().getDependencies().stream()
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
               .equals(bundleDependency.getDescriptor().getGroupId())

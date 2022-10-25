@@ -129,7 +129,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
       pluginOptional.ifPresent(this::processAdditionalPluginLibraries);
     }
 
-    return super.build();
+    return (ClassLoaderModel) super.build();
   }
 
   private Optional<Plugin> findMuleMavenPluginDeclaration() {

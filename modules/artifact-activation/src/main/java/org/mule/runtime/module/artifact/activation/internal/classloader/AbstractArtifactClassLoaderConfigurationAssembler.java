@@ -26,8 +26,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployableClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -61,8 +61,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     this.muleArtifactLoaderDescriptor = muleArtifactLoaderDescriptor;
   }
 
-  public ClassLoaderModel createClassLoaderModel() {
-    ClassLoaderModelBuilder classLoaderConfigurationBuilder = getClassLoaderConfigurationBuilder();
+  public ClassLoaderConfiguration createClassLoaderConfiguration() {
+    ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = getClassLoaderConfigurationBuilder();
 
     if (muleArtifactLoaderDescriptor != null) {
       classLoaderConfigurationBuilder
@@ -100,7 +100,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     return (List<String>) attributeObject;
   }
 
-  protected abstract ClassLoaderModelBuilder getClassLoaderConfigurationBuilder();
+  protected abstract ClassLoaderConfigurationBuilder getClassLoaderConfigurationBuilder();
 
   protected boolean shouldPopulateLocalPackages() {
     return true;
@@ -110,16 +110,15 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
    * Loads the URLs of the class loader for this artifact.
    * <p>
    * It lets implementations add artifact specific URLs by letting them override
-   * {@link #addArtifactSpecificClassLoaderConfiguration(ClassLoaderModelBuilder)}
+   * {@link #addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder)}
    *
-   * @param artifactFile                    the artifact file for which the {@link ClassLoaderModel class loader configuration} is
-   *                                        being generated.
+   * @param artifactFile                    the artifact file for which the {@link ClassLoaderConfiguration class loader configuration} is being generated.
    * @param dependencies                    the dependencies resolved for this artifact.
-   * @param classLoaderConfigurationBuilder the builder of the {@link ClassLoaderModel class loader configuration}
+   * @param classLoaderConfigurationBuilder the builder of the {@link ClassLoaderConfiguration class loader configuration}
    */
   private List<URL> loadUrls(File artifactFile,
                              List<BundleDependency> dependencies,
-                             ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+                             ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     dependenciesArtifactsUrls.add(getUrl(artifactFile));
@@ -132,10 +131,9 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   /**
    * Template method to add artifact specific configuration to the {@link DeployableClassLoaderConfigurationBuilder}.
    *
-   * @param classLoaderConfigurationBuilder the builder used to generate {@link ClassLoaderModel class loader configuration} of
-   *                                        the artifact.
+   * @param classLoaderConfigurationBuilder the builder used to generate {@link ClassLoaderConfiguration class loader configuration} of the artifact.
    */
-  protected Collection<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+  protected Collection<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     return emptyList();
   }
 
@@ -186,7 +184,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   }
 
   protected void populateLocalPackages(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                       ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+                                       ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
     if (packagerClassLoaderModel.getPackages() != null) {
       packagesSetBuilder.add(packagerClassLoaderModel.getPackages());

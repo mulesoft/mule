@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
+import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.fromClassLoaderConfiguration;
 
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -15,6 +16,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.File;
@@ -52,9 +54,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     descriptor.setMinMuleVersion(new MuleVersion(artifactModel.getMinMuleVersion()));
     descriptor.setRequiredProduct(artifactModel.getRequiredProduct());
 
-    ClassLoaderModel classLoaderModel =
-        getClassLoaderModel(artifactModel.getClassLoaderModelLoaderDescriptor());
-    descriptor.setClassLoaderModel(classLoaderModel);
+    ClassLoaderConfiguration classLoaderConfiguration =
+        getClassLoaderConfiguration(artifactModel.getClassLoaderModelLoaderDescriptor());
+    descriptor.setClassLoaderConfiguration(classLoaderConfiguration);
 
     doDescriptorConfig(descriptor);
 
@@ -87,7 +89,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   protected abstract void doDescriptorConfig(T descriptor);
 
-  protected abstract ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor);
+  protected abstract ClassLoaderConfiguration getClassLoaderConfiguration(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor);
 
   protected abstract BundleDescriptor getBundleDescriptor();
 

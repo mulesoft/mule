@@ -121,10 +121,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     descriptor.setMinMuleVersion(new MuleVersion(artifactModel.getMinMuleVersion()));
     descriptor.setRequiredProduct(artifactModel.getRequiredProduct());
 
-    ClassLoaderModel classLoaderModel =
-        getClassLoaderModel(artifactLocation, deploymentProperties, artifactModel.getClassLoaderModelLoaderDescriptor(),
+    ClassLoaderConfiguration classLoaderModel =
+        getClassLoaderConfiguration(artifactLocation, deploymentProperties, artifactModel.getClassLoaderModelLoaderDescriptor(),
                             bundleDescriptor);
-    descriptor.setClassLoaderModel(classLoaderModel);
+    descriptor.setClassLoaderConfiguration(classLoaderModel);
 
     doDescriptorConfig(artifactModel, descriptor, artifactLocation);
 
@@ -187,7 +187,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     }
   }
 
-  private ClassLoaderModel getClassLoaderModel(File artifactFolder, Optional<Properties> deploymentProperties,
+  private ClassLoaderConfiguration getClassLoaderConfiguration(File artifactFolder, Optional<Properties> deploymentProperties,
                                                MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                BundleDescriptor bundleDescriptor) {
     ClassLoaderModelLoader classLoaderModelLoader;
@@ -200,16 +200,16 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                                                  classLoaderModelLoaderDescriptor));
     }
 
-    final ClassLoaderModel classLoaderModel;
+    final ClassLoaderConfiguration classLoaderConfiguration;
     try {
-      classLoaderModel = classLoaderModelLoader.load(artifactFolder, getClassLoaderModelAttributes(deploymentProperties,
+      classLoaderConfiguration = classLoaderModelLoader.load(artifactFolder, getClassLoaderModelAttributes(deploymentProperties,
                                                                                                    classLoaderModelLoaderDescriptor,
                                                                                                    bundleDescriptor),
                                                      getArtifactType());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
-    return classLoaderModel;
+    return classLoaderConfiguration;
   }
 
   protected Map<String, Object> getClassLoaderModelAttributes(Optional<Properties> deploymentProperties,
