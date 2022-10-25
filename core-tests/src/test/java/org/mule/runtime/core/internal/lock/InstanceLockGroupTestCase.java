@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
@@ -66,6 +67,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-11929632")
   public void disposeDoesNotLossReferenceToTakenLocks() throws InterruptedException {
     String testLockId = "TestLockId";
     instanceLockGroup.lock(testLockId);
@@ -80,6 +82,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-11929632")
   public void whenTryLockIsInterruptedTheLockGroupDoesNotGenerateALockEntry() {
     lockProvider.makeLocksToRaiseExceptions();
 
@@ -93,6 +96,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-11929632")
   public void whenLockInterruptiblyIsInterruptedTheLockGroupDoesNotGenerateALockEntry() {
     lockProvider.makeLocksToRaiseExceptions();
 
@@ -106,6 +110,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-11929632")
   public void whenUnlockRaisesIllegalMonitorStateExceptionTheLockGroupDoesNotReleaseTheEntry() {
     String testLockId = "TestLockId";
     instanceLockGroup.lock(testLockId);
