@@ -41,10 +41,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.event.NullEventFactory;
-import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -284,11 +280,12 @@ public class ResolverSetUtils {
   }
 
   private static Object convertValueWithExpressionLanguage(Object value, MetadataType type, ExpressionManager expressionManager) {
+    TypedValue typedValue = value instanceof TypedValue ? (TypedValue) value : TypedValue.of(value);
     return expressionManager.evaluate(PAYLOAD_EXPRESSION,
                                       DataType.builder().type(getType(type).orElse(Object.class))
                                           .mediaType(getFirstValidMimeType(type))
                                           .build(),
-                                      BindingContext.builder().addBinding(PAYLOAD, TypedValue.of(value)).build())
+                                      BindingContext.builder().addBinding(PAYLOAD, typedValue).build())
         .getValue();
   }
 
