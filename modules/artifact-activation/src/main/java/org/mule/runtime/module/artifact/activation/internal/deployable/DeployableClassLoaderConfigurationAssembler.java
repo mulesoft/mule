@@ -11,7 +11,6 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.File;
 import java.util.List;

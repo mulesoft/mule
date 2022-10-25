@@ -12,7 +12,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.net.URISyntaxException;
 
-public abstract class MavenClassLoaderModelLoaderTestCase extends AbstractMuleTestCase {
+public abstract class MavenClassLoaderConfigurationLoaderTestCase extends AbstractMuleTestCase {
 
   protected MavenClassLoaderConfigurationLoader mavenClassLoaderConfigurationLoader = new MavenClassLoaderConfigurationLoader();
 

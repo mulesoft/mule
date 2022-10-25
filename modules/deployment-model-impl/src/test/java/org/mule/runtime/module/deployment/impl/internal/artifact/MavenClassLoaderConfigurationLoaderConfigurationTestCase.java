@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MavenClassLoaderConfigurationLoaderConfigurationTestCase extends MavenClassLoaderModelLoaderTestCase {
+public class MavenClassLoaderConfigurationLoaderConfigurationTestCase extends MavenClassLoaderConfigurationLoaderTestCase {
 
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";
 

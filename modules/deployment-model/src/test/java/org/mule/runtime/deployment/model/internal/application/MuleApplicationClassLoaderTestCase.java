@@ -28,7 +28,8 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -100,9 +101,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
                                         mock(ClassLoaderLookupPolicy.class), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfigurationBuilder(applicationDescriptor.getClassLoaderConfiguration())
         .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
-    applicationDescriptor.setClassLoaderModel(classLoaderModel);
+    applicationDescriptor.setClassLoaderConfiguration(classLoaderConfiguration);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
                                            mock(ClassLoaderLookupPolicy.class));
   }

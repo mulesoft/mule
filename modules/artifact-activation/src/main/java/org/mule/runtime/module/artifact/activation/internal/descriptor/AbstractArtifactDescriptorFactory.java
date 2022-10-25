@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
-import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.fromClassLoaderConfiguration;
 
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -17,7 +16,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.File;
 

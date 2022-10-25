@@ -45,7 +45,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -170,7 +171,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
         .setBundleUri(new File("test").toURI())
         .build();
     plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     artifactPluginDescriptors.add(plugin1Descriptor);
@@ -219,16 +220,16 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
   @Test
   public void createsPluginWithPrivilegedPluginAccess() {
-    ClassLoaderModel plugin1ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration plugin1ClassLoaderConfiguration = new ClassLoaderConfigurationBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID2)).build();
-    plugin1Descriptor.setClassLoaderModel(plugin1ClassLoaderModel);
+    plugin1Descriptor.setClassLoaderConfiguration(plugin1ClassLoaderConfiguration);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(BundleScope.COMPILE).setDescriptor(
                                                                                                                    PLUGIN1_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
         .build();
     plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     artifactPluginDescriptors.add(plugin1Descriptor);

@@ -126,7 +126,7 @@ public interface AllureConstants {
       String ARTIFACT_DESCRIPTORS = "Artifact descriptors";
       String PATCHED_ARTIFACT_DESCRIPTORS = "Artifact descriptors with patched plugins";
       String ARTIFACT_DESCRIPTORS_WITH_CUSTOM_LOG_CONFIG = "Artifact descriptors with a custom logging configuration";
-      String CLASSLOADER_MODEL = "ClassLoader model";
+      String CLASSLOADER_CONFIGURATION = "ClassLoader configuration";
       String CLASSLOADER_GENERATION = "ClassLoader generation";
     }
 

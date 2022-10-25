@@ -18,7 +18,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,8 +55,8 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   @Override
   protected String[] getLocalResourceLocations() {
     // Always the first element corresponds to the application's classes folder
-    ClassLoaderModel classLoaderModel = this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderModel();
-    return new String[] {toFile(classLoaderModel.getUrls()[0]).getPath()};
+    ClassLoaderConfiguration classLoaderConfiguration = this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderConfiguration();
+    return new String[] {toFile(classLoaderConfiguration.getUrls()[0]).getPath()};
   }
 
 

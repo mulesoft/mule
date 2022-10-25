@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader.LIB_DIR;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -31,10 +31,10 @@ public class FileSystemPolicyClassLoaderConfigurationLoaderTestCase extends Abst
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private final FileSystemPolicyClassLoaderConfigurationLoader classLoaderModelLoader = new FileSystemPolicyClassLoaderConfigurationLoader();
+  private final FileSystemPolicyClassLoaderConfigurationLoader classLoaderConfigurationLoader = new FileSystemPolicyClassLoaderConfigurationLoader();
 
   @Test
-  public void createsClassLoaderModelFromFolder() throws Exception {
+  public void createsClassLoaderConfigurationFromFolder() throws Exception {
     File policyFolder = temporaryFolder.newFolder();
     File libFolder = new File(policyFolder, LIB_DIR);
     assertThat(libFolder.mkdir(), is(true));
@@ -44,13 +44,13 @@ public class FileSystemPolicyClassLoaderConfigurationLoaderTestCase extends Abst
     File file2 = new File(libFolder, "test2.jar");
     stringToFile(file2.getAbsolutePath(), "foo");
 
-    ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(policyFolder, null, POLICY);
+    ClassLoaderConfiguration classLoaderConfiguration = classLoaderConfigurationLoader.load(policyFolder, null, POLICY);
 
-    assertThat(classLoaderModel.getUrls().length, equalTo(3));
-    assertThat(classLoaderModel.getUrls()[0], equalTo(policyFolder.toURI().toURL()));
-    assertThat(asList(classLoaderModel.getUrls()), allOf(hasItem(file1.toURI().toURL()), hasItem(file2.toURI().toURL())));
-    assertThat(classLoaderModel.getDependencies(), is(empty()));
-    assertThat(classLoaderModel.getExportedPackages(), is(empty()));
-    assertThat(classLoaderModel.getExportedResources(), is(empty()));
+    assertThat(classLoaderConfiguration.getUrls().length, equalTo(3));
+    assertThat(classLoaderConfiguration.getUrls()[0], equalTo(policyFolder.toURI().toURL()));
+    assertThat(asList(classLoaderConfiguration.getUrls()), allOf(hasItem(file1.toURI().toURL()), hasItem(file2.toURI().toURL())));
+    assertThat(classLoaderConfiguration.getDependencies(), is(empty()));
+    assertThat(classLoaderConfiguration.getExportedPackages(), is(empty()));
+    assertThat(classLoaderConfiguration.getExportedResources(), is(empty()));
   }
 }

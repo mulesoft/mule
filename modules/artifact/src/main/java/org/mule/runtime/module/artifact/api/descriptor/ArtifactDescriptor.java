@@ -35,8 +35,7 @@ public class ArtifactDescriptor {
 
   private final String name;
   private File rootFolder;
-  // Keep compatibility with usages of the old ClassLoaderModel type
-  private ClassLoaderConfiguration classLoaderConfiguration = ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+  private ClassLoaderConfiguration classLoaderConfiguration = ClassLoaderConfiguration.NULL_CLASSLOADER_CONFIGURATION;
   private BundleDescriptor bundleDescriptor;
   private MuleVersion minMuleVersion;
   private Product requiredProduct;

@@ -17,7 +17,7 @@ import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.in
 import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderConfigurationLoaderConfigurationTestCase.MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModel;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends MavenClassLoaderModelLoaderTestCase {
+public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends MavenClassLoaderConfigurationLoaderTestCase {
 
   @ClassRule
   public static SystemProperty repositoryLocation = new SystemProperty(MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION,
@@ -52,8 +52,8 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
   @Test
   public void allApiDependenciesAreAddedRAML() throws Exception {
     File artifactFile = getApplicationFolder("apps/raml-api-app");
-    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
-    assertThat(classLoaderModel.getDependencies(), hasItems(
+    ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
+    assertThat(classLoaderConfiguration.getDependencies(), hasItems(
                                                             bundleDependency("raml-api-a"),
                                                             bundleDependency("raml-api-b"),
                                                             bundleDependency("raml-fragment", "1.0.0"),
@@ -63,8 +63,8 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
   @Test
   public void allApiDependenciesAreAddedWSDL() throws Exception {
     File artifactFile = getApplicationFolder("apps/wsdl-api-app");
-    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
-    assertThat(classLoaderModel.getDependencies(), hasItems(
+    ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
+    assertThat(classLoaderConfiguration.getDependencies(), hasItems(
                                                             bundleDependency("wsdl-api-a"),
                                                             bundleDependency("wsdl-api-b"),
                                                             bundleDependency("wsdl-fragment", "1.0.0"),
@@ -74,8 +74,8 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
   @Test
   public void allApiDependenciesAreAddedOAS() throws Exception {
     File artifactFile = getApplicationFolder("apps/oas-api-app");
-    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
-    assertThat(classLoaderModel.getDependencies(), hasItems(
+    ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
+    assertThat(classLoaderConfiguration.getDependencies(), hasItems(
                                                             bundleDependency("oas-api-a"),
                                                             bundleDependency("oas-api-b"),
                                                             bundleDependency("oas-fragment", "1.0.0"),
@@ -85,8 +85,8 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
   @Test
   public void apiDependsOnLibraryThatDependsOnApiThatDependsOnApi() throws Exception {
     File artifactFile = getApplicationFolder("apps/api-multiple-levels-app");
-    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
-    assertThat(classLoaderModel.getDependencies(), hasItems(
+    ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
+    assertThat(classLoaderConfiguration.getDependencies(), hasItems(
                                                             bundleDependency("raml-api-a"),
                                                             bundleDependency("library-depends-on-api"),
                                                             bundleDependency("api-depends-on-library"),
@@ -98,18 +98,18 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
   @Test
   public void apiTransitiveDependenciesDontOverrideMavenResolved() throws Exception {
     File artifactFile = getApplicationFolder("apps/api-app");
-    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
-    assertThat(classLoaderModel.getDependencies(), hasItems(
+    ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
+    assertThat(classLoaderConfiguration.getDependencies(), hasItems(
                                                             bundleDependency("wsdl-api-a"),
                                                             bundleDependency("wsdl-api-b"),
                                                             bundleDependency("wsdl-fragment", "1.0.0"),
                                                             bundleDependency("wsdl-fragment", "2.0.0"),
                                                             bundleDependency("library", "1.0.0")));
-    assertThat(classLoaderModel.getDependencies(), not(hasItem(
+    assertThat(classLoaderConfiguration.getDependencies(), not(hasItem(
                                                                bundleDependency("library", "2.0.0"))));
   }
 
-  private ClassLoaderModel loadClassLoaderModel(File artifactFile) throws InvalidDescriptorLoaderException {
+  private ClassLoaderConfiguration loadClassLoaderConfiguration(File artifactFile) throws InvalidDescriptorLoaderException {
     Model model = getPomModel(artifactFile);
     Map<String, Object> attributes =
         ImmutableMap.of(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),

@@ -12,7 +12,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.util.HashSet;
 import java.util.Optional;

@@ -28,7 +28,7 @@ import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundI
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -334,8 +334,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
           if (classLoader != null) {
             return classLoader.findResource(normalizedResource);
           } else {
-            ClassLoaderModel classLoaderModel = this.getArtifactDescriptor().getClassLoaderModel();
-            for (BundleDependency dependency : classLoaderModel.getDependencies()) {
+            ClassLoaderConfiguration classLoaderConfiguration = this.getArtifactDescriptor().getClassLoaderConfiguration();
+            for (BundleDependency dependency : classLoaderConfiguration.getDependencies()) {
               BundleDescriptor descriptor = dependency.getDescriptor();
               if (isRequestedArtifact(descriptor, requiredDescriptor, () -> false)) {
                 return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {

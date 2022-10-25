@@ -44,7 +44,7 @@ import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.CollectableReference;
 import org.mule.tck.util.EnumerationMatcher;
@@ -564,7 +564,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
@@ -578,7 +578,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
             .build()))
         .build();
 
-    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(appDescriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
 
     String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml", "zip", API_RESOURCE_NAME);
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
@@ -586,7 +586,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
-    verify(appDescriptor, times(1)).getClassLoaderModel();
+    verify(appDescriptor, times(1)).getClassLoaderConfiguration();
   }
 
   @Test
@@ -595,7 +595,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
@@ -609,11 +609,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
             .build()))
         .build();
 
-    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(appDescriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
 
     String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_SNAPSHOT_VERSION, "raml", "zip", API_RESOURCE_NAME);
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
-    verify(appDescriptor).getClassLoaderModel();
+    verify(appDescriptor).getClassLoaderConfiguration();
   }
 
   @Test
@@ -750,7 +750,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(apiLocation.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
@@ -764,7 +764,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
             .build()))
         .build();
 
-    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(appDescriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
 
     URL result = regionClassLoader.findResource(resource);
 
