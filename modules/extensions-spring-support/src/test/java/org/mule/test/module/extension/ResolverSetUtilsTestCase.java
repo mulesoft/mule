@@ -24,12 +24,14 @@ import static org.mule.test.oauth.ConnectionType.HYPER;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -52,6 +54,7 @@ import org.mule.test.oauth.ConnectionType;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.values.extension.MyPojo;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -63,8 +66,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import io.qameta.allure.Description;
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
 
@@ -244,12 +249,187 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     }
   };
 
+  private static final String CONTENT_PARAMETER_NAME = "content";
+  private static final String JSON_STREAM_OPERATION_NAME = "getStreamContentWithFlackyConnection";
+  private static final String XML_STREAM_OPERATION_NAME = "getXmlStreamContentWithFlackyConnection";
+  private static final String JSON_STRING_OPERATION_NAME = "getStringContentWithFlackyConnection";
+  private static final String XML_STRING_OPERATION_NAME = "getXmlStringContentWithFlackyConnection";
+
+  private static final Consumer<ValueDeclarer> JSON_ORDER_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(objectValueDeclarer -> objectValueDeclarer
+          .withField("orderPerson",
+                     "John Smith")
+          .withField("shipto",
+                     shipToValueDeclarer -> shipToValueDeclarer
+                         .objectValue(shipToObjectValueDeclarer -> shipToObjectValueDeclarer
+                             .withField("name",
+                                        "Mary Jane")
+                             .withField("address",
+                                        "Fake street  123")
+                             .withField("city",
+                                        "Springfield")
+                             .withField("country",
+                                        "Lalaland")
+                             .withField("observations", observationValueDeclarer -> observationValueDeclarer
+                                 .arrayValue(observationArrayValueDeclarer -> observationArrayValueDeclarer
+                                     .withItem("Try to find the house with the red door")
+                                     .withItem("Only available during week days")
+                                     .withItem("Be careful with the dog")))))
+          .withField("items",
+                     itemValueDeclarer -> itemValueDeclarer
+                         .arrayValue(itemArrayValueDeclarer -> itemArrayValueDeclarer
+                             .withItem(singleItemValueDeclarer -> singleItemValueDeclarer
+                                 .objectValue(itemObjectValueDeclarer -> itemObjectValueDeclarer
+                                     .withField("title",
+                                                "Nice T-shirt")
+                                     .withField("quantity",
+                                                "1")
+                                     .withField("price",
+                                                "100")
+                                     .withField("vendor", vendorValueDeclarer -> vendorValueDeclarer
+                                         .objectValue(vendorObjectValueDeclarer -> vendorObjectValueDeclarer
+                                             .withField("name", "Jerry Bolton")
+                                             .withField("age", "37")
+                                             .withField("rating", "4.7")))))
+                             .withItem(singleItemValueDeclarer -> singleItemValueDeclarer
+                                 .objectValue(itemObjectValueDeclarer -> itemObjectValueDeclarer
+                                     .withField("title",
+                                                "Nice Cap")
+                                     .withField("quantity",
+                                                "2")
+                                     .withField("price",
+                                                "101")))
+                             .withItem(singleItemValueDeclarer -> singleItemValueDeclarer
+                                 .objectValue(itemObjectValueDeclarer -> itemObjectValueDeclarer
+                                     .withField("title",
+                                                "Nice Socks")
+                                     .withField("quantity",
+                                                "3")
+                                     .withField("price",
+                                                "102")))))
+          .withField("arrays",
+                     arrayValueDeclarer -> arrayValueDeclarer.arrayValue(arrayDeclarer -> arrayDeclarer
+                         .withItem(innerValueDeclarer -> innerValueDeclarer
+                             .arrayValue(innerArrayValueDeclarer -> innerArrayValueDeclarer
+                                 .withItem("1")
+                                 .withItem("2")
+                                 .withItem("3")
+                                 .withItem("4")
+                                 .withItem("5")))
+                         .withItem(innerNumberValueDeclarer -> innerNumberValueDeclarer
+                             .arrayValue(innerArrayValueDeclarer -> innerArrayValueDeclarer
+                                 .withItem("6")
+                                 .withItem("7")
+                                 .withItem("8")
+                                 .withItem("9")
+                                 .withItem("10")))
+                         .withItem(innerNumberValueDeclarer -> innerNumberValueDeclarer
+                             .arrayValue(innerArrayValueDeclarer -> innerArrayValueDeclarer
+                                 .withItem("11")
+                                 .withItem("12")
+                                 .withItem("13")
+                                 .withItem("14")
+                                 .withItem("15"))))));
+
+  private static final String JSON_ORDER_FILE_PATH = "resolver/order.json";
+
+  private static final Consumer<ValueDeclarer> XML_ORDER_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(objectValueDeclarer -> objectValueDeclarer
+          .withField("shiporder",
+                     shipOrderValueDeclarer -> shipOrderValueDeclarer
+                         .objectValue(shipOrderObjectValueDeclarer -> shipOrderObjectValueDeclarer
+                             .withField("orderPerson",
+                                        "John Smith")
+                             .withField("shipto",
+                                        shipToValueDeclarer -> shipToValueDeclarer
+                                            .objectValue(shipToObjectValueDeclarer -> shipToObjectValueDeclarer
+                                                .withField("name",
+                                                           "Mary Jane")
+                                                .withField("address",
+                                                           "Fake street  123")
+                                                .withField("city",
+                                                           "Springfield")
+                                                .withField("country",
+                                                           "Lalaland")
+                                                .withField("observation", observationValueDeclarer -> observationValueDeclarer
+                                                    .arrayValue(observationArrayValueDeclarer -> observationArrayValueDeclarer
+                                                        .withItem("Try to find the house with the red door")
+                                                        .withItem("Only available during week days")
+                                                        .withItem("Be careful with the dog")))))
+                             .withField("item",
+                                        itemValueDeclarer -> itemValueDeclarer
+                                            .arrayValue(itemArrayValueDeclarer -> itemArrayValueDeclarer
+                                                .withItem(singleItemValueDeclarer -> singleItemValueDeclarer
+                                                    .objectValue(itemObjectValueDeclarer -> itemObjectValueDeclarer
+                                                        .withField("title",
+                                                                   "Nice T-shirt")
+                                                        .withField("quantity",
+                                                                   "1")
+                                                        .withField("price",
+                                                                   "100")
+                                                        .withField("vendor", vendorValueDeclarer -> vendorValueDeclarer
+                                                            .objectValue(vendorObjectValueDeclarer -> vendorObjectValueDeclarer
+                                                                .withField("name", "Jerry Bolton")
+                                                                .withField("age", "37")
+                                                                .withField("rating", "4.7")))))
+                                                .withItem(singleItemValueDeclarer -> singleItemValueDeclarer
+                                                    .objectValue(itemObjectValueDeclarer -> itemObjectValueDeclarer
+                                                        .withField("title",
+                                                                   "Nice Cap")
+                                                        .withField("quantity",
+                                                                   "2")
+                                                        .withField("price",
+                                                                   "101")))
+                                                .withItem(singleItemValueDeclarer -> singleItemValueDeclarer
+                                                    .objectValue(itemObjectValueDeclarer -> itemObjectValueDeclarer
+                                                        .withField("title",
+                                                                   "Nice Socks")
+                                                        .withField("quantity",
+                                                                   "3")
+                                                        .withField("price",
+                                                                   "102")))))
+                             .withField("array",
+                                        arrayValueDeclarer -> arrayValueDeclarer.arrayValue(arrayDeclarer -> arrayDeclarer
+                                            .withItem(innerValueDeclarer -> innerValueDeclarer
+                                                .objectValue(innerObjectValueDeclarer -> innerObjectValueDeclarer
+                                                    .withField("number",
+                                                               innerNumberValueDeclarer -> innerNumberValueDeclarer
+                                                                   .arrayValue(innerArrayValueDeclarer -> innerArrayValueDeclarer
+                                                                       .withItem("1")
+                                                                       .withItem("2")
+                                                                       .withItem("3")
+                                                                       .withItem("4")
+                                                                       .withItem("5")))))
+                                            .withItem(innerValueDeclarer -> innerValueDeclarer
+                                                .objectValue(innerObjectValueDeclarer -> innerObjectValueDeclarer
+                                                    .withField("number",
+                                                               innerNumberValueDeclarer -> innerNumberValueDeclarer
+                                                                   .arrayValue(innerArrayValueDeclarer -> innerArrayValueDeclarer
+                                                                       .withItem("6")
+                                                                       .withItem("7")
+                                                                       .withItem("8")
+                                                                       .withItem("9")
+                                                                       .withItem("10")))))
+                                            .withItem(innerValueDeclarer -> innerValueDeclarer
+                                                .objectValue(innerObjectValueDeclarer -> innerObjectValueDeclarer
+                                                    .withField("number",
+                                                               innerNumberValueDeclarer -> innerNumberValueDeclarer
+                                                                   .arrayValue(innerArrayValueDeclarer -> innerArrayValueDeclarer
+                                                                       .withItem("11")
+                                                                       .withItem("12")
+                                                                       .withItem("13")
+                                                                       .withItem("14")
+                                                                       .withItem("15"))))))))));
+
+  private static final String XML_ORDER_FILE_PATH = "resolver/order.xml";
+
   private ReflectionCache reflectionCache = new ReflectionCache();
 
   private ExpressionManager expressionManager;
 
   private ExtensionModel testOAuthExtensionModel;
   private ParameterizedModel testParameterizedModel;
+  private List<OperationModel> testOperationModels;
 
   @Before
   public void setup() throws Exception {
@@ -259,6 +439,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     testParameterizedModel = testOAuthExtensionModel.getConfigurationModels().get(0).getConnectionProviders().get(0);
     MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
     muleRegistry.registerObject("Extensions Manager Mock", mock(ExtensionManager.class));
+    testOperationModels = testOAuthExtensionModel.getConfigurationModels().get(0).getOperationModels();
   }
 
   @Test
@@ -520,6 +701,46 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     assertThat(stackedTypeParameter.resolve().getValue(), is(STACKED_MAP_PARAMETER_VALUE));
   }
 
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is an InputStream that represents a json ObjectType.")
+  public void inputStreamOfJsonObjectTypeParameter() throws Exception {
+    InputStream parameterValue =
+        (InputStream) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
+                                                                    JSON_ORDER_DECLARER,
+                                                                    getOperationModel(JSON_STREAM_OPERATION_NAME));
+    JSONAssert.assertEquals(IOUtils.toString(parameterValue), getFileString(JSON_ORDER_FILE_PATH), true);
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is an InputStream that represents an xml ObjectType.")
+  public void inputStreamOfXmlObjectTypeParameter() throws Exception {
+    InputStream parameterValue =
+        (InputStream) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
+                                                                    XML_ORDER_DECLARER,
+                                                                    getOperationModel(XML_STREAM_OPERATION_NAME));
+    XMLAssert.assertXMLEqual(IOUtils.toString(parameterValue), getFileString(XML_ORDER_FILE_PATH));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is an InputStream that represents a json ObjectType.")
+  public void stringOfJsonObjectTypeParameter() throws Exception {
+    String parameterValue =
+        (String) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
+                                                               JSON_ORDER_DECLARER,
+                                                               getOperationModel(JSON_STRING_OPERATION_NAME));
+    JSONAssert.assertEquals(parameterValue, getFileString(JSON_ORDER_FILE_PATH), true);
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is an InputStream that represents an xml ObjectType.")
+  public void stringOfXmlObjectTypeParameter() throws Exception {
+    String parameterValue =
+        (String) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
+                                                               XML_ORDER_DECLARER,
+                                                               getOperationModel(XML_STRING_OPERATION_NAME));
+    XMLAssert.assertXMLEqual(parameterValue, getFileString(XML_ORDER_FILE_PATH));
+  }
+
   private void testComponentParameterization(String parameterGroupName, String parameterName,
                                              Consumer<ValueDeclarer> valueDeclarer, Object valueToCompare)
       throws Exception {
@@ -538,17 +759,18 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
    *         group
    */
   private Object getResolvedValueFromComponentParameterization(String parameterGroupName, String parameterName,
-                                                               Consumer<ValueDeclarer> valueDeclarerConsumer)
+                                                               Consumer<ValueDeclarer> valueDeclarerConsumer,
+                                                               ParameterizedModel parameterizedModel)
       throws Exception {
     ResolverSet resolverSet =
         ResolverSetUtils.getResolverSetFromComponentParameterization(
-                                                                     ComponentParameterization.builder(testParameterizedModel)
+                                                                     ComponentParameterization.builder(parameterizedModel)
                                                                          .withParameter(parameterGroupName, parameterName,
                                                                                         valueDeclarerConsumer)
                                                                          .build(),
                                                                      muleContext, true, reflectionCache, expressionManager,
-                                                                     testParameterizedModel.getName());
-    ParameterGroupModel parameterGroupModel = testParameterizedModel.getParameterGroupModels().stream()
+                                                                     parameterizedModel.getName());
+    ParameterGroupModel parameterGroupModel = parameterizedModel.getParameterGroupModels().stream()
         .filter(pgm -> pgm.getName().equals(parameterGroupName)).findAny().get();
     ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(NullEventFactory.getNullEvent()).build();
     ResolverSetResult resolverSetResult = resolverSet.resolve(valueResolvingContext);
@@ -560,6 +782,13 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     } else {
       return resolverSetResult.get(parameterName);
     }
+  }
+
+  private Object getResolvedValueFromComponentParameterization(String parameterGroupName, String parameterName,
+                                                               Consumer<ValueDeclarer> valueDeclarerConsumer)
+      throws Exception {
+    return getResolvedValueFromComponentParameterization(parameterGroupName, parameterName, valueDeclarerConsumer,
+                                                         testParameterizedModel);
   }
 
   private static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
@@ -590,6 +819,15 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     };
 
     return loader.loadExtensionModel(pluginClassLoader, dslResolvingContext, params);
+  }
+
+  private OperationModel getOperationModel(String operationName) {
+    return testOperationModels.stream().filter(operationModel -> operationModel.getName().equals(operationName)).findFirst()
+        .get();
+  }
+
+  private String getFileString(String filePath) {
+    return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath));
   }
 
 }
