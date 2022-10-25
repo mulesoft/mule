@@ -128,6 +128,16 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
     return total;
   }
 
+  public long getTotalMessagesDispatched() {
+    long total = 0;
+    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
+      if (!(stats instanceof ApplicationStatistics)) {
+        total += stats.getTotalMessagesDispatched();
+      }
+    }
+    return total;
+  }
+
   @Override
   public ResetOnQueryCounter getEventsReceivedCounter() {
     Set<ResetOnQueryCounter> counters = new HashSet<>();
@@ -135,6 +145,19 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
     for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
       if (!(stats instanceof ApplicationStatistics)) {
         counters.add(stats.getEventsReceivedCounter());
+      }
+    }
+
+    return new CompositeResetOnQueryCounter(counters);
+  }
+
+  @Override
+  public ResetOnQueryCounter getMessagesDispatchedCounter() {
+    Set<ResetOnQueryCounter> counters = new HashSet<>();
+
+    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
+      if (!(stats instanceof ApplicationStatistics)) {
+        counters.add(stats.getMessagesDispatchedCounter());
       }
     }
 

@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.FLOW_FLOW_CONSTRUCT_TYPE;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
@@ -64,6 +65,7 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyEx
 import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
@@ -88,10 +90,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import org.hamcrest.Matchers;
+
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
@@ -195,6 +199,8 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(flow.getSource()).thenReturn(source);
     when(flow.getMuleContext()).thenReturn(muleContext);
+    when(flow.getStatistics())
+        .thenReturn(new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, "flow"));
 
     context = mock(MessageProcessContext.class);
     when(context.getMessageSource()).thenReturn(source);
