@@ -60,17 +60,13 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void incExecutionError() {
     executionError.addAndGet(1);
-    if (!executionErrorsCounters.isEmpty()) {
-      executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
+    executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
   public void incFatalError() {
     fatalError.addAndGet(1);
-    if (!fatalErrorsCounters.isEmpty()) {
-      fatalErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
+    fatalErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   /**
@@ -157,25 +153,19 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void incReceivedEvents() {
     receivedEvents.addAndGet(1);
-    if (!eventsReceivedCounters.isEmpty()) {
-      eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
+    eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
   public void incMessagesDispatched() {
     dispatchedMessages.addAndGet(1);
-    if (!messagesDispatchedCounters.isEmpty()) {
-      messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
+    messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
   public void incConnectionErrors() {
     connectionErrors.addAndGet(1);
-    if (!connectionErrorsCounters.isEmpty()) {
-      connectionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
+    connectionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
