@@ -17,9 +17,9 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
-import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
@@ -36,19 +36,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
- * {@link ClassLoaderModel}
+ * {@link ClassLoaderConfiguration}
  *
  * @since 4.0
  */
-public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoaderModelLoader {
+public class DeployableMavenClassLoaderConfigurationLoader extends AbstractMavenClassLoaderConfigurationLoader {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public DeployableMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
+  public DeployableMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient) {
     super(mavenClient);
   }
 
-  public DeployableMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
+  public DeployableMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
     super(mavenClient, jarExplorerFactory);
   }
 

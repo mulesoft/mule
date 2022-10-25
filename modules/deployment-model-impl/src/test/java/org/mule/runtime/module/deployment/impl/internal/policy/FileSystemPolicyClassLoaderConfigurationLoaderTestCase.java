@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader.LIB_DIR;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -26,12 +26,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class FileSystemPolicyClassLoaderModelLoaderTestCase extends AbstractMuleTestCase {
+public class FileSystemPolicyClassLoaderConfigurationLoaderTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private final FileSystemPolicyClassLoaderModelLoader classLoaderModelLoader = new FileSystemPolicyClassLoaderModelLoader();
+  private final FileSystemPolicyClassLoaderConfigurationLoader classLoaderModelLoader = new FileSystemPolicyClassLoaderConfigurationLoader();
 
   @Test
   public void createsClassLoaderModelFromFolder() throws Exception {

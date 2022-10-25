@@ -53,9 +53,9 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedClassLoaderModelAttributes;
+import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedClassLoaderConfigurationAttributes;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedDeploymentProperties;
-import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderConfigurationLoader;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
@@ -80,7 +80,7 @@ import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Description;
 
-public class DeployableMavenClassLoaderModelLoaderTestCase {
+public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
 
   private static final String APPS_FOLDER = "apps";
   private static final String PATCHED_PLUGIN_APP = "patched-plugin-app";
@@ -140,16 +140,16 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     applicationDescriptor.setClassLoaderModel(classLoaderModel);
     PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
         new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
-    PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
-        new PluginExtendedClassLoaderModelAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
-    pluginExtendedClassLoaderModelAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+    PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
+        new PluginExtendedClassLoaderConfigurationAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
+    pluginExtendedClassLoaderConfigurationAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
                                                  bundleDependency.getDescriptor());
 
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderModel pluginClassLoaderModel =
-        buildPluginClassLoaderModel(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderModelAttributes);
+        buildPluginClassLoaderModel(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderModel.getExportedPackages(), hasItem("org.mule.tests.simple.plugin.api"));
     assertThat(pluginClassLoaderModel.getLocalPackages(), everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderModel.getLocalPackages(),
@@ -230,16 +230,16 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     applicationDescriptor.setClassLoaderModel(classLoaderModel);
     PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
         new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
-    PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
-        new PluginExtendedClassLoaderModelAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
-    pluginExtendedClassLoaderModelAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+    PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
+        new PluginExtendedClassLoaderConfigurationAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
+    pluginExtendedClassLoaderConfigurationAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
                                                  bundleDependency.getDescriptor());
 
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderModel pluginClassLoaderModel =
-        buildPluginClassLoaderModel(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderModelAttributes);
+        buildPluginClassLoaderModel(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderModel.getLocalPackages(), everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderModel.getLocalPackages(), contains("org.mule.tests.simple.plugin.internal"));
 
@@ -468,8 +468,8 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private ClassLoaderModel buildClassLoaderModel(File rootApplication, Supplier<JarExplorer> supplier,
                                                  Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
-    DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(of(mockMavenClient), supplier);
+    DeployableMavenClassLoaderConfigurationLoader deployableMavenClassLoaderConfigurationLoader =
+        new DeployableMavenClassLoaderConfigurationLoader(of(mockMavenClient), supplier);
 
     Map<String, Object> mergedAttributes =
         ImmutableMap.<String, Object>builder()
@@ -483,20 +483,20 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
                      .build())
             .putAll(attributes)
             .build();
-    return deployableMavenClassLoaderModelLoader.load(rootApplication, mergedAttributes, APP);
+    return deployableMavenClassLoaderConfigurationLoader.load(rootApplication, mergedAttributes, APP);
   }
 
   public ClassLoaderModel buildPluginClassLoaderModel(File pluginLocation, Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
-    PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader =
-        new PluginMavenClassLoaderModelLoader(of(mockMavenClient));
+    PluginMavenClassLoaderConfigurationLoader pluginMavenClassLoaderConfigurationLoader =
+        new PluginMavenClassLoaderConfigurationLoader(of(mockMavenClient));
 
-    return pluginMavenClassLoaderModelLoader.load(pluginLocation, attributes, PLUGIN);
+    return pluginMavenClassLoaderConfigurationLoader.load(pluginLocation, attributes, PLUGIN);
 
   }
 
   protected static File getResourceFile(String resource) throws URISyntaxException {
-    return new File(DeployableMavenClassLoaderModelLoaderTestCase.class.getResource(resource).toURI());
+    return new File(DeployableMavenClassLoaderConfigurationLoaderTestCase.class.getResource(resource).toURI());
   }
 
 }

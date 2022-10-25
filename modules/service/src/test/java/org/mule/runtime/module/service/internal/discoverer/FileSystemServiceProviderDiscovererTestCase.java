@@ -31,7 +31,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -84,8 +84,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
 
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(BundleDescriptorLoader.class))))
         .thenReturn(bundleDescriptorLoaderMock);
-    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
-        .thenReturn(mock(ClassLoaderModelLoader.class));
+    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderConfigurationLoader.class))))
+        .thenReturn(mock(ClassLoaderConfigurationLoader.class));
 
     doNothing().when(artifactDescriptorValidator).validate(anyObject());
   }

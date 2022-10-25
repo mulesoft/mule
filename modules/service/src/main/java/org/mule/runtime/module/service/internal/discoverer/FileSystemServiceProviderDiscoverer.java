@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
@@ -54,7 +54,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *
    * @param containerClassLoader               container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
    *                                           null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator}
@@ -75,7 +75,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *
    * @param containerClassLoader               container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
    *                                           null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator}

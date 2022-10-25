@@ -42,8 +42,9 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstant
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
@@ -77,12 +78,12 @@ import org.eclipse.aether.version.VersionConstraint;
 import org.slf4j.Logger;
 
 /**
- * Abstract implementation of {@link ClassLoaderModelLoader} that resolves the dependencies for all the mule artifacts and create
- * the {@link ClassLoaderModel}. It lets the implementations of this class to add artifact's specific class loader URLs
+ * Abstract implementation of {@link ClassLoaderConfigurationLoader} that resolves the dependencies for all the mule artifacts and create
+ * the {@link ClassLoaderConfiguration}. It lets the implementations of this class to add artifact's specific class loader URLs
  *
  * @since 4.0
  */
-public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoaderModelLoader {
+public abstract class AbstractMavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
 
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR = "classloader-model-patch.json";
@@ -101,11 +102,11 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private final Optional<MavenClient> mavenClient;
   private final Supplier<JarExplorer> jarExplorerFactory;
 
-  public AbstractMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
+  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient) {
     this(mavenClient, () -> new FileJarExplorer());
   }
 
-  public AbstractMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
+  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
     this.mavenClient = mavenClient;
     this.jarExplorerFactory = jarExplorerFactory;
   }

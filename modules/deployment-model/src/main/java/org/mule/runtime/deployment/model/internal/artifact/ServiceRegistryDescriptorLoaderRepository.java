@@ -12,7 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
@@ -25,18 +25,18 @@ import java.util.Map;
 
 /**
  * Provides a {@link DescriptorLoaderRepository} that uses a {@link ServiceRegistry} to detect available implementations of
- * {@link ClassLoaderModelLoader}
+ * {@link ClassLoaderConfigurationLoader}
  */
 public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoaderRepository {
 
   private final ServiceRegistry serviceRegistry;
-  private final Class[] descriptorLoaderClasses = new Class[] {ClassLoaderModelLoader.class, BundleDescriptorLoader.class};
+  private final Class[] descriptorLoaderClasses = new Class[] {ClassLoaderConfigurationLoader.class, BundleDescriptorLoader.class};
   private Map<Class, List<DescriptorLoader>> descriptorLoaders;
 
   /**
    * Creates a new repository
    *
-   * @param serviceRegistry provides access to the {@link ClassLoaderModelLoader} that must be tracked on the repository. Non null
+   * @param serviceRegistry provides access to the {@link ClassLoaderConfigurationLoader} that must be tracked on the repository. Non null
    */
   public ServiceRegistryDescriptorLoaderRepository(ServiceRegistry serviceRegistry) {
     checkArgument(serviceRegistry != null, "serviceRegistry cannot be null");

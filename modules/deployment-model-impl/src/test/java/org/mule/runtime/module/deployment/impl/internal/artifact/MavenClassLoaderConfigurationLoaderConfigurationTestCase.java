@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClassLoaderModelLoaderTestCase {
+public class MavenClassLoaderConfigurationLoaderConfigurationTestCase extends MavenClassLoaderModelLoaderTestCase {
 
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";
 
@@ -60,7 +60,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     expectedException.expectCause(instanceOf(DependencyResolutionException.class));
     testWithSystemProperties(properties, () -> {
       GlobalConfigLoader.reset(); // Change local repository path
-      mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+      mavenClassLoaderConfigurationLoader.load(artifactFile, emptyMap(), APP);
     });
   }
 
@@ -71,7 +71,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     try {
       testWithSystemProperties(properties, () -> {
         GlobalConfigLoader.reset(); // Change local repository path
-        mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+        mavenClassLoaderConfigurationLoader.load(artifactFile, emptyMap(), APP);
       });
       fail();
     } catch (Exception e) {
@@ -94,7 +94,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
                                                                                  number -> {
                                                                                    GlobalConfigLoader.reset();
                                                                                    try {
-                                                                                     assertThat(mavenClassLoaderModelLoader
+                                                                                     assertThat(mavenClassLoaderConfigurationLoader
                                                                                          .load(artifactFile, attributes, APP)
                                                                                          .getDependencies(),
                                                                                                 hasItem(hasProperty("descriptor",

@@ -7,16 +7,14 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static com.google.common.io.Files.createTempDir;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.IsNot.not;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
 import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoaderConfigurationTestCase.MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderConfigurationLoaderConfigurationTestCase.MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModel;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -33,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassLoaderModelLoaderTestCase {
+public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends MavenClassLoaderModelLoaderTestCase {
 
   @ClassRule
   public static SystemProperty repositoryLocation = new SystemProperty(MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION,
@@ -45,7 +43,7 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
 
     // Install all dependencies
     File dependenciesFolder =
-        new File(MavenClassLoaderModelLoaderDependenciesTestCase.class.getClassLoader().getResource("dependencies").toURI());
+        new File(MavenClassLoaderConfigurationLoaderDependenciesTestCase.class.getClassLoader().getResource("dependencies").toURI());
     for (File dependencyFile : dependenciesFolder.listFiles()) {
       installArtifact(dependencyFile, new File(repositoryLocation.getValue()));
     }
@@ -122,6 +120,6 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
                             .setType("jar")
                             .setClassifier("mule-application")
                             .build());
-    return mavenClassLoaderModelLoader.load(artifactFile, attributes, APP);
+    return mavenClassLoaderConfigurationLoader.load(artifactFile, attributes, APP);
   }
 }

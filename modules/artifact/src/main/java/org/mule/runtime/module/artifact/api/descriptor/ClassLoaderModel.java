@@ -7,22 +7,18 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static java.lang.Boolean.FALSE;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
-import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Contains all the information needed to create a {@link ClassLoader} for a Mule artifact.
+ *
+ * @deprecated since 4.5 use {@link ClassLoaderConfiguration} instead.
  */
+@Deprecated
 public final class ClassLoaderModel extends ClassLoaderConfiguration {
 
   /**

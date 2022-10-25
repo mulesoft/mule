@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 
 public abstract class MavenClassLoaderModelLoaderTestCase extends AbstractMuleTestCase {
 
-  protected MavenClassLoaderModelLoader mavenClassLoaderModelLoader = new MavenClassLoaderModelLoader();
+  protected MavenClassLoaderConfigurationLoader mavenClassLoaderConfigurationLoader = new MavenClassLoaderConfigurationLoader();
 
   protected File getApplicationFolder(String appPath) throws URISyntaxException {
     return new File(getClass().getClassLoader().getResource(appPath).toURI());

@@ -30,8 +30,9 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.DependencyConverter;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
@@ -54,18 +55,18 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
- * {@link ClassLoaderModel}
+ * {@link ClassLoaderConfiguration}
  *
  * @since 4.0
  */
-public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderModelLoader {
+public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClassLoaderConfigurationLoader {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private static final String JAR = "jar";
   private static final String POM = "pom";
 
-  public PluginMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
+  public PluginMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient) {
     super(mavenClient);
   }
 
@@ -74,12 +75,12 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
                                                                 ArtifactType artifactType, MavenClient mavenClient) {
     // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the
     // META-INF/mule-artifact
-    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
-      PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
-          (PluginExtendedClassLoaderModelAttributes) attributes;
+    if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
+      PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
+          (PluginExtendedClassLoaderConfigurationAttributes) attributes;
       BundleDescriptor pluginBundleDescriptor =
-          (BundleDescriptor) pluginExtendedClassLoaderModelAttributes.get(BundleDescriptor.class.getName());
-      File rootFolder = pluginExtendedClassLoaderModelAttributes.getDeployableArtifactDescriptor().getRootFolder();
+          (BundleDescriptor) pluginExtendedClassLoaderConfigurationAttributes.get(BundleDescriptor.class.getName());
+      File rootFolder = pluginExtendedClassLoaderConfigurationAttributes.getDeployableArtifactDescriptor().getRootFolder();
       // mule-plugin has been found as a dependency from another mule-plugin and not present in the deployable dependency graph
       // (system scope dependencies)
       if (rootFolder != null) {
@@ -157,10 +158,10 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   @Override
   protected List<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
                                                                ArtifactType artifactType, MavenClient mavenClient) {
-    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
+    if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
       BundleDescriptor pluginBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
       ArtifactDescriptor deployableArtifactDescriptor =
-          ((PluginExtendedClassLoaderModelAttributes) attributes).getDeployableArtifactDescriptor();
+          ((PluginExtendedClassLoaderConfigurationAttributes) attributes).getDeployableArtifactDescriptor();
       Set<BundleDependency> deployableArtifactDescriptorDependencies =
           deployableArtifactDescriptor.getClassLoaderModel().getDependencies();
       BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream()
@@ -285,8 +286,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   private void configClassLoaderModelBuilder(ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
                                              Map<String, Object> attributes) {
-    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
-      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
+    if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
+      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderConfigurationAttributes) attributes)
           .getDeployableArtifactDescriptor());
     }
   }

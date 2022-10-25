@@ -17,7 +17,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDe
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
@@ -45,11 +45,11 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateE
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -86,8 +86,8 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(classLoaderFilterFactory.create(null, null))
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
-    when(descriptorLoaderRepository.get(MULE_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
-        .thenReturn(new PluginMavenClassLoaderModelLoader(of(mavenClientProvider
+    when(descriptorLoaderRepository.get(MULE_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
+        .thenReturn(new PluginMavenClassLoaderConfigurationLoader(of(mavenClientProvider
             .createMavenClient(newMavenConfigurationBuilder()
                 .localMavenRepositoryLocation(mavenClientProvider
                     .getLocalRepositorySuppliers()
@@ -95,9 +95,9 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
                     .get())
                 .build()))));
 
-    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
-        .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
-    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
+        .thenReturn(new FileSystemPolicyClassLoaderConfigurationLoader());
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, PLUGIN, BundleDescriptorLoader.class))
