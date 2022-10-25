@@ -6,9 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.api.component.location.Location.builder;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.FLOW_FLOW_CONSTRUCT_TYPE;
+import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -25,18 +35,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.component.location.Location.builder;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
-import org.mockito.ArgumentCaptor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -53,8 +53,9 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessMediator;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
-import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
+import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
@@ -74,16 +75,25 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.reactivestreams.Publisher;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Mock
   private SourceResultAdapter message;
@@ -302,6 +312,8 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(flow.getSource()).thenReturn(source);
     when(flow.getMuleContext()).thenReturn(muleContext);
+    when(flow.getStatistics())
+        .thenReturn(new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, "flow"));
 
     context = mock(MessageProcessContext.class);
     when(context.getMessageSource()).thenReturn(source);

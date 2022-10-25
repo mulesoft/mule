@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -32,6 +31,8 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -194,7 +195,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final Pipeline flowConstruct = (Pipeline) messageProcessContext.getFlowConstruct();
+      final FlowConstruct flowConstruct = messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
 
@@ -216,7 +217,8 @@ public class FlowProcessMediator implements Initialisable {
                                                                                                      responseCompletion);
         ((InternalEvent) event).setFlowProcessMediatorContext(phaseContext);
 
-        dispatch(event, policy, flowConstruct, phaseContext);
+        flowConstruct.getStatistics().incMessagesDispatched();
+        dispatch(event, policy, (Pipeline) flowConstruct, phaseContext);
       } catch (Exception e) {
         template.sendFailureResponseToClient(messageProcessContext.getMessagingExceptionResolver()
             .resolve(new MessagingException(event, e), errorTypeLocator, exceptionContextProviders),
