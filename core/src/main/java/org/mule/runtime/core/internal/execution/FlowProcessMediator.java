@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -33,6 +31,10 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCo
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -69,9 +71,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
-import org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -210,7 +210,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final Pipeline flowConstruct = (Pipeline) messageProcessContext.getFlowConstruct();
+      final FlowConstruct flowConstruct = messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor =
           new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, empty()),
@@ -243,7 +243,8 @@ public class FlowProcessMediator implements Initialisable {
         sourceInterceptors.forEach(sourceInterceptor -> rootContext
             .onTerminated((e, t) -> sourceInterceptor.afterTerminated(messageSource.getLocation(), rootContext)));
 
-        dispatch(event, policy, flowConstruct, phaseContext);
+        flowConstruct.getStatistics().incMessagesDispatched();
+        dispatch(event, policy, (Pipeline) flowConstruct, phaseContext);
       } catch (Exception e) {
         template.sendFailureResponseToClient(messageProcessContext.getMessagingExceptionResolver()
             .resolve(new MessagingException(event, e), errorTypeLocator, exceptionContextProviders),
