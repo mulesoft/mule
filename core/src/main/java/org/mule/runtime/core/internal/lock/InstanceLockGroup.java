@@ -17,6 +17,7 @@ import java.util.concurrent.locks.Lock;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * {@link LockGroup} implementation for holding references to created locks inside a mule instance.
@@ -24,7 +25,7 @@ import static java.lang.Thread.currentThread;
 public class InstanceLockGroup implements LockGroup {
 
   private static final long DEFAULT_LOCK_GROUP_SHUTDOWN_TIMEOUT = 5000L;
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceLockGroup.class);
+  private static final Logger LOGGER = getLogger(InstanceLockGroup.class);
 
   private final Map<String, LockEntry> locks;
   private final Object lockAccessMonitor = new Object();
@@ -94,6 +95,10 @@ public class InstanceLockGroup implements LockGroup {
       releaseLockEntry(lockId, lockEntry);
       throw e;
     }
+  }
+
+  int size() {
+    return locks.size();
   }
 
   public static class LockEntry {

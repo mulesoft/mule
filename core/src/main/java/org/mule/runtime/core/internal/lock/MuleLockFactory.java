@@ -13,6 +13,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.util.concurrent.locks.Lock;
@@ -29,7 +30,7 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
   private SchedulerService schedulerService;
 
   @Inject
-  private MuleConfiguration muleConfiguration;
+  private MuleContext muleContext;
 
   @Override
   public synchronized Lock createLock(String lockId) {
@@ -45,16 +46,25 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
   @Override
   public void initialise() throws InitialisationException {
-    if (muleConfiguration == null) {
-      lockGroup = new InstanceLockGroup(lockProvider);
-    } else {
-      lockGroup = new InstanceLockGroup(lockProvider, muleConfiguration.getShutdownTimeout());
-    }
+    lockGroup = createLockGroup();
   }
 
   @Inject
   @Named(OBJECT_LOCK_PROVIDER)
   public void setLockProvider(LockProvider lockProvider) {
     this.lockProvider = lockProvider;
+  }
+
+  private LockGroup createLockGroup() {
+    if (muleContext == null) {
+      return new InstanceLockGroup(lockProvider);
+    }
+
+    MuleConfiguration muleConfiguration = muleContext.getConfiguration();
+    if (muleConfiguration == null) {
+      return new InstanceLockGroup(lockProvider);
+    }
+
+    return new InstanceLockGroup(lockProvider, muleConfiguration.getShutdownTimeout());
   }
 }
