@@ -30,8 +30,8 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
   private SchedulerService schedulerService;
 
   // TODO (W-11958289): This MuleContext is injected just to obtain the MuleConfiguration, so the MuleConfiguration
-  //  should be injected instead. However, when injecting that class here it makes the test
-  //  LazyInitConfigurationComponentLocatorTestCase fail because the MuleLockFactory is instantiated twice.
+  // should be injected instead. However, when injecting that class here it makes the test
+  // LazyInitConfigurationComponentLocatorTestCase fail because the MuleLockFactory is instantiated twice.
   @Inject
   private MuleContext muleContext;
 
