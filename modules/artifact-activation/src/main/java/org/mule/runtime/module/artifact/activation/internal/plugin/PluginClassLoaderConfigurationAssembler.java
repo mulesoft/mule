@@ -20,8 +20,7 @@ import org.mule.runtime.module.artifact.activation.internal.classloader.Abstract
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
@@ -73,7 +72,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfiguration.ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+  protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     // Patches resolution is done just for plugins because this should be the use case, but in the implementation previously used
     // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications and
     // domains) as well
@@ -113,7 +112,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   }
 
   private List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency,
-                                                            ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+                                                            ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     return bundleDependency.getAdditionalDependenciesList().stream().map(additionalDependency -> {
       if (!isDenylisted(additionalDependency.getDescriptor())) {
         classLoaderConfigurationBuilder.withLocalPackages(additionalDependency.getPackages());
@@ -134,8 +133,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   }
 
   @Override
-  protected ClassLoaderModelBuilder getClassLoaderConfigurationBuilder() {
-    return new ClassLoaderModelBuilder();
+  protected ClassLoaderConfigurationBuilder getClassLoaderConfigurationBuilder() {
+    return new ClassLoaderConfigurationBuilder();
   }
 
   @Override

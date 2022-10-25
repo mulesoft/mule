@@ -31,12 +31,11 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader;
-import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.DependencyConverter;
-import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
-import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderConfigurationBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderConfigurationBuilder;
 
 import java.io.File;
 import java.net.URL;
@@ -71,8 +70,8 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   }
 
   @Override
-  protected ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes,
-                                                                ArtifactType artifactType, MavenClient mavenClient) {
+  protected ClassLoaderConfiguration createLightPackageClassLoaderConfiguration(File artifactFile, Map<String, Object> attributes,
+                                                                                ArtifactType artifactType, MavenClient mavenClient) {
     // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the
     // META-INF/mule-artifact
     if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
@@ -87,12 +86,12 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
         File muleArtifactJson =
             new File(rootFolder.getAbsolutePath(), getPathForMuleArtifactJson(pluginBundleDescriptor));
         if (muleArtifactJson.exists()) {
-          return createHeavyPackageClassLoaderModel(artifactFile, muleArtifactJson, attributes, empty());
+          return createHeavyPackageClassLoaderConfiguration(artifactFile, muleArtifactJson, attributes, empty());
         }
       }
     }
 
-    return super.createLightPackageClassLoaderModel(artifactFile, attributes, artifactType, mavenClient);
+    return super.createLightPackageClassLoaderConfiguration(artifactFile, attributes, artifactType, mavenClient);
   }
 
   private String getPathForMuleArtifactJson(BundleDescriptor pluginBundleDescriptor) {
@@ -113,7 +112,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder) {
     return classLoaderModelBuilder.includeAdditionalPluginDependencies();
   }
 
@@ -133,24 +132,24 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   }
 
   @Override
-  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
-                                                                                     BundleDescriptor artifactBundleDescriptor,
-                                                                                     MavenClient mavenClient,
-                                                                                     Map<String, Object> attributes,
-                                                                                     List<BundleDependency> nonProvidedDependencies) {
-    final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
+  protected LightweightClassLoaderConfigurationBuilder newLightweightClassLoaderConfigurationBuilder(File artifactFile,
+                                                                                                     BundleDescriptor artifactBundleDescriptor,
+                                                                                                     MavenClient mavenClient,
+                                                                                                     Map<String, Object> attributes,
+                                                                                                     List<BundleDependency> nonProvidedDependencies) {
+    final LightweightClassLoaderConfigurationBuilder lightweightClassLoaderModelBuilder =
+        new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
 
   @Override
-  protected HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
-                                                                                     BundleDescriptor artifactBundleDescriptor,
-                                                                                     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                                                                     Map<String, Object> attributes) {
-    final HeavyweightClassLoaderModelBuilder heavyweightClassLoaderModelBuilder =
-        new HeavyweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
+  protected HeavyweightClassLoaderConfigurationBuilder newHeavyWeightClassLoaderConfigurationBuilder(File artifactFile,
+                                                                                                     BundleDescriptor artifactBundleDescriptor,
+                                                                                                     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+                                                                                                     Map<String, Object> attributes) {
+    final HeavyweightClassLoaderConfigurationBuilder heavyweightClassLoaderModelBuilder =
+        new HeavyweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
     configClassLoaderModelBuilder(heavyweightClassLoaderModelBuilder, attributes);
     return heavyweightClassLoaderModelBuilder;
   }
@@ -284,7 +283,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
     return allTransitiveDependencies;
   }
 
-  private void configClassLoaderModelBuilder(ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
+  private void configClassLoaderModelBuilder(ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder,
                                              Map<String, Object> attributes) {
     if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
       classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderConfigurationAttributes) attributes)

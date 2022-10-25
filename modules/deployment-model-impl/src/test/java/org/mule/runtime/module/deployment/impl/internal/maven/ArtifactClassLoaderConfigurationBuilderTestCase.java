@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-public class ArtifactClassLoaderModelBuilderTestCase {
+public class ArtifactClassLoaderConfigurationBuilderTestCase {
 
   private List<Profile> profiles;
 
@@ -43,8 +43,8 @@ public class ArtifactClassLoaderModelBuilderTestCase {
         .setVersion("1.2.3")
         .build();
 
-    ArtifactClassLoaderModelBuilder artifactClassLoaderModelBuilder =
-        new ArtifactClassLoaderModelBuilder(artifactFolder, artifactBundleDescriptor) {
+    ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder =
+        new ArtifactClassLoaderConfigurationBuilder(artifactFolder, artifactBundleDescriptor) {
 
           @Override
           protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
@@ -58,7 +58,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
         };
 
     // When
-    artifactClassLoaderModelBuilder.findArtifactPackagerPlugin(model);
+    artifactClassLoaderConfigurationBuilder.findArtifactPackagerPlugin(model);
 
     // Then
     // No NPE is thrown

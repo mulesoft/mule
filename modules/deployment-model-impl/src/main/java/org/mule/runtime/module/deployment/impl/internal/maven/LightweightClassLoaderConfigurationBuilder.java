@@ -20,6 +20,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
@@ -35,19 +36,18 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 
 /**
- * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} responsible of resolving dependencies
- * when light weight packaging is used for an artifact.
+ * Builder for a {@link ClassLoaderConfiguration} responsible for resolving dependencies when lightweight packaging is used for an artifact.
  *
  * @since 4.2.0
  */
-public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
+public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoaderConfigurationBuilder {
 
   private final MavenClient mavenClient;
   private final List<BundleDependency> nonProvidedDependencies;
   private final Map<Pair<String, String>, Boolean> sharedLibraryAlreadyExported = new HashMap<>();
 
-  public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
-                                            MavenClient mavenClient, List<BundleDependency> nonProvidedDependencies) {
+  public LightweightClassLoaderConfigurationBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
+                                                    MavenClient mavenClient, List<BundleDependency> nonProvidedDependencies) {
     super(artifactFolder, artifactBundleDescriptor);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;

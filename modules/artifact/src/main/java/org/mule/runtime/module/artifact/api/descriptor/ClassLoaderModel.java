@@ -40,7 +40,10 @@ public final class ClassLoaderModel extends ClassLoaderConfiguration {
 
   /**
    * Builds a {@link ClassLoaderModel}
+   *
+   * @deprecated since 4.5 use {@link ClassLoaderConfigurationBuilder} instead.
    */
+  @Deprecated
   public static class ClassLoaderModelBuilder extends ClassLoaderConfigurationBuilder {
 
     @Override
