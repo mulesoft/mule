@@ -744,8 +744,8 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Description("Validates that ComponentParameterization API can desbribe a parameter whose type is InputStream that" +
-      " represents an xml ObjectType but is described as a TypedValue of a different DataType.")
+  @Description("Validates that ComponentParameterization API can desbribe a parameter whose type is String that" +
+      " represents an xml ObjectType and is described as a TypedValue of a different DataType.")
   public void inputStreamOfXmlObjectTypeParameterWithTypedValueOfDifferentDataType() throws Exception {
     TypedValue typedValue = muleContext.getExpressionManager()
         .evaluate("#[output application/json --- payload]",
@@ -762,8 +762,8 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Description("Validates that ComponentParameterization API can desbribe a parameter whose type is InputStream that" +
-      " represents an xml ObjectType but is described as a TypedValue with the same DataType.")
+  @Description("Validates that ComponentParameterization API can desbribe a parameter whose type is String that" +
+      " represents an xml ObjectType and is described as a TypedValue with the same DataType.")
   public void inputStreamOfXmlObjectTypeParameterWithTypedValueSameDataType() throws Exception {
     String parameterValue =
         (String) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, CONTENT_PARAMETER_NAME,
