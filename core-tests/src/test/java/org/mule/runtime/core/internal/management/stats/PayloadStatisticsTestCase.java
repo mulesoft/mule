@@ -6,11 +6,22 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.FLOW_FLOW_CONSTRUCT_TYPE;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -24,14 +35,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
-import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -66,6 +69,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.io.IOUtils;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -771,11 +775,15 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     initialiseIfNeeded(flowProcessMediator, muleContext);
     startIfNeeded(flowProcessMediator);
 
+    FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Pipeline.class));
+    when(flow.getStatistics())
+        .thenReturn(new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, "flow"));
+
     MessageProcessContext context = mock(MessageProcessContext.class);
     final CursorComponentDecoratorFactory componentDecoratorFactory = decoratorFactory.componentDecoratorFactory(component1);
     when(context.getComponentDecoratorFactory()).thenReturn(componentDecoratorFactory);
     when(context.getMessageSource()).thenReturn(mock(MessageSource.class));
-    when(context.getFlowConstruct()).thenReturn(mock(FlowConstruct.class, withSettings().extraInterfaces(Pipeline.class)));
+    when(context.getFlowConstruct()).thenReturn(flow);
     // finish preparing the mediator
 
     // propagate any exceptions
