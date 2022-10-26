@@ -33,7 +33,7 @@ import org.junit.Test;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class OpentelemetrySpanExporterTestCase {
+public class OpenTelemetrySpanExporterTestCase {
 
   public static final String TRACEPARENT_KEY = "traceparent";
   public static final String PARENT_TRACE_ID = "80e1afed08e019fc1110464cfa66635c";
