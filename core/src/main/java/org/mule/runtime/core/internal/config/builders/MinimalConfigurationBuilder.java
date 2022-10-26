@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.config.builders;
 
 
-import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
@@ -79,7 +78,6 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -149,8 +147,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
     registerStreamingManager(muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
-    // TODO W-11742823 review this
-    registerObject(METADATA_SERVICE_KEY, new MuleMetadataService(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
