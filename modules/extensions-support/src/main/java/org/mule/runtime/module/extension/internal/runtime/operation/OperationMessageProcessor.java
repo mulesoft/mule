@@ -105,30 +105,6 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     this.errorMappings = errorMappings;
   }
 
-  @Override
-  // TODO move elsewhere
-  public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
-  @Override
-  // TODO move elsewhere
-  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
-                                        .getEntityMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
   /**
    * Validates that the {@link #componentModel} is valid for the given {@code configurationProvider}
    *
@@ -192,4 +168,31 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   public List<EnrichedErrorMapping> getErrorMappings() {
     return errorMappings;
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // "Fat" Tooling support
+  /////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
+  @Override
+  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
+                                        .getEntityMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
 }

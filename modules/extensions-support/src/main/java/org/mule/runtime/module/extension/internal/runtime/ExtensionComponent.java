@@ -423,285 +423,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             getParameterValueResolver(),
-                                                                                                             reflectionCache)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataKey partialKey) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             partialKey,
-                                                                                                             reflectionCache)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getMetadata(context, getParameterValueResolver(),
-                                                     reflectionCache)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
-    }
-  }
-
-  @Override
-  // TODO move elsewhere
-  public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getInputMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
-    }
-  }
-
-  @Override
-  // TODO move elsewhere
-  public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getOutputMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  // TODO move elsewhere
-  public Set<Value> getValues(String parameterName) throws org.mule.runtime.extension.api.values.ValueResolvingException {
-    // TODO: MULE-19298 - throws org.mule.sdk.api.values.ValueResolvingException
-    try {
-      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getValueProviderMediator().getValues(
-                                                                                                                               parameterName,
-                                                                                                                               getParameterValueResolver(),
-                                                                                                                               (CheckedSupplier<Object>) () -> context
-                                                                                                                                   .getConnection()
-                                                                                                                                   .orElse(null),
-                                                                                                                               (CheckedSupplier<Object>) () -> context
-                                                                                                                                   .getConfig()
-                                                                                                                                   .orElse(null),
-                                                                                                                               context
-                                                                                                                                   .getConnectionProvider()
-                                                                                                                                   .orElse(null))));
-    } catch (MuleRuntimeException e) {
-      Throwable rootException = getRootException(e);
-      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
-        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
-      } else {
-        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
-            + e.getCause().getMessage(),
-                                                                                UNKNOWN, e);
-      }
-    } catch (Exception e) {
-      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
-          + e.getCause().getMessage(),
-                                                                              UNKNOWN, e);
-    }
-  }
-
-  // TODO move elsewhere
-  @Override
-  public Set<Value> getValues(String parameterName, String targetSelector)
-      throws org.mule.runtime.extension.api.values.ValueResolvingException {
-    try {
-      return runWithResolvingContext(context -> withContextClassLoader(classLoader,
-                                                                       () -> getValueProviderMediator()
-                                                                           .getValues(parameterName,
-                                                                                      getParameterValueResolver(), targetSelector,
-                                                                                      (CheckedSupplier<Object>) () -> context
-                                                                                          .getConnection().orElse(null),
-                                                                                      (CheckedSupplier<Object>) () -> context
-                                                                                          .getConfig().orElse(null),
-                                                                                      context.getConnectionProvider()
-                                                                                          .orElse(null))));
-    } catch (MuleRuntimeException e) {
-      Throwable rootException = getRootException(e);
-      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
-        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
-      } else {
-        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
-            + e.getCause().getMessage(),
-                                                                                UNKNOWN, e);
-      }
-    } catch (Exception e) {
-      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
-          + e.getCause().getMessage(),
-                                                                              UNKNOWN, e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  // TODO move elsewhere
-  public Message getSampleData() throws SampleDataException {
-    try {
-      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
-          .getSampleData(getParameterValueResolver(),
-                         (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
-                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null),
-                         (CheckedSupplier<ConnectionProvider>) () -> context.getConnectionProvider().orElse(null))));
-    } catch (MuleRuntimeException e) {
-      throw extractOfType(e, SampleDataException.class).orElseGet(
-                                                                  () -> new SampleDataException("An unknown error occurred trying to obtain Sample Data. "
-                                                                      + e.getCause().getMessage(),
-                                                                                                SampleDataException.UNKNOWN, e));
-    } catch (Exception e) {
-      throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
-                                    SampleDataException.UNKNOWN, e);
-    }
-  }
-
-  // TODO move elsewhere
-  protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
-      throws MetadataResolvingException, ConnectionException {
-    MetadataContext context = null;
-    try {
-      MetadataCacheId cacheId = getMetadataCacheId();
-      MetadataCache metadataCache = metadataService.get().getMetadataCache(cacheId.getValue());
-      context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
-      MetadataResult<R> result = contextConsumer.apply(context);
-      if (result.isSuccess()) {
-        metadataService.get().saveCache(cacheId.getValue(), metadataCache);
-      }
-
-      return result;
-    } catch (MuleRuntimeException e) {
-      // TODO(MULE-13621) this should be deleted once the configuration is created lazily in the getMetadataContext method.
-      try {
-        throw e.getCause();
-      } catch (MetadataResolvingException | ConnectionException cause) {
-        throw cause;
-      } catch (Throwable t) {
-        throw e;
-      }
-    } finally {
-      if (context != null) {
-        context.dispose();
-      }
-    }
-  }
-
-  // TODO move elsewhere
-  private MetadataCacheId getMetadataCacheId() {
-    return cacheIdGenerator.getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
-        .map(id -> {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(id.getParts().toString());
-          }
-          return id;
-        })
-        .orElseThrow(() -> new IllegalStateException(
-                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
-                                                         +
-                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
-                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
-  }
-
-  private <R> R runWithResolvingContext(Function<ExtensionResolvingContext, R> function) {
-    ExtensionResolvingContext context = getResolvingContext();
-    R result;
-    try {
-      result = function.apply(context);
-    } finally {
-      context.dispose();
-    }
-    return result;
-  }
-
-  // TODO move elsewhere
-  private MetadataContext getMetadataContext(MetadataCache cache)
-      throws MetadataResolvingException {
-    CoreEvent fakeEvent = null;
-    try {
-      fakeEvent = getNullEvent(muleContext);
-
-      Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
-
-      if (configuration.isPresent()) {
-        ValueResolver<ConfigurationProvider> configurationProviderResolver = findConfigurationProviderResolver()
-            .orElseThrow(
-                         () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                              INVALID_CONFIGURATION));
-
-        Optional<ConfigurationProvider> configurationProvider =
-            resolveConfigurationProviderStatically(configurationProviderResolver);
-        if (!configurationProvider.isPresent() || configurationProvider.get() instanceof DynamicConfigurationProvider) {
-          throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
-        }
-      }
-
-      return new DefaultMetadataContext(() -> configuration, connectionManager,
-                                        cache,
-                                        typeLoader);
-    } finally {
-      if (fakeEvent != null) {
-        ((BaseEventContext) fakeEvent.getContext()).success();
-      }
-    }
-  }
-
-  private ExtensionResolvingContext getResolvingContext() {
-    return new ExtensionResolvingContext(() -> {
-      CoreEvent fakeEvent = null;
-      try {
-        fakeEvent = getNullEvent(muleContext);
-        return getConfiguration(fakeEvent);
-      } finally {
-        if (fakeEvent != null) {
-          ((BaseEventContext) fakeEvent.getContext()).success();
-        }
-      }
-    }, connectionManager);
-  }
-
-  /**
    * @param event a {@link CoreEvent}
    * @return a configuration instance for the current component with a given {@link CoreEvent}
    */
@@ -858,13 +579,288 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Inject
-  public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory) {
-    this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
+  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
+    this.componentLocator = componentLocator;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // "Fat" Tooling support
+  /////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getMetadataKeys(context,
+                                                                                                             getParameterValueResolver(),
+                                                                                                             reflectionCache)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataKey partialKey) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getMetadataKeys(context,
+                                                                                                             partialKey,
+                                                                                                             reflectionCache)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getMetadata(context, getParameterValueResolver(),
+                                                     reflectionCache)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
+  public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getInputMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getOutputMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<Value> getValues(String parameterName) throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    // TODO: MULE-19298 - throws org.mule.sdk.api.values.ValueResolvingException
+    try {
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getValueProviderMediator().getValues(
+                                                                                                                               parameterName,
+                                                                                                                               getParameterValueResolver(),
+                                                                                                                               (CheckedSupplier<Object>) () -> context
+                                                                                                                                   .getConnection()
+                                                                                                                                   .orElse(null),
+                                                                                                                               (CheckedSupplier<Object>) () -> context
+                                                                                                                                   .getConfig()
+                                                                                                                                   .orElse(null),
+                                                                                                                               context
+                                                                                                                                   .getConnectionProvider()
+                                                                                                                                   .orElse(null))));
+    } catch (MuleRuntimeException e) {
+      Throwable rootException = getRootException(e);
+      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
+        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
+      } else {
+        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+            + e.getCause().getMessage(),
+                                                                                UNKNOWN, e);
+      }
+    } catch (Exception e) {
+      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+          + e.getCause().getMessage(),
+                                                                              UNKNOWN, e);
+    }
+  }
+
+  @Override
+  public Set<Value> getValues(String parameterName, String targetSelector)
+      throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    try {
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader,
+                                                                       () -> getValueProviderMediator()
+                                                                           .getValues(parameterName,
+                                                                                      getParameterValueResolver(), targetSelector,
+                                                                                      (CheckedSupplier<Object>) () -> context
+                                                                                          .getConnection().orElse(null),
+                                                                                      (CheckedSupplier<Object>) () -> context
+                                                                                          .getConfig().orElse(null),
+                                                                                      context.getConnectionProvider()
+                                                                                          .orElse(null))));
+    } catch (MuleRuntimeException e) {
+      Throwable rootException = getRootException(e);
+      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
+        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
+      } else {
+        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+            + e.getCause().getMessage(),
+                                                                                UNKNOWN, e);
+      }
+    } catch (Exception e) {
+      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+          + e.getCause().getMessage(),
+                                                                              UNKNOWN, e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Message getSampleData() throws SampleDataException {
+    try {
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
+          .getSampleData(getParameterValueResolver(),
+                         (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
+                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null),
+                         (CheckedSupplier<ConnectionProvider>) () -> context.getConnectionProvider().orElse(null))));
+    } catch (MuleRuntimeException e) {
+      throw extractOfType(e, SampleDataException.class).orElseGet(
+                                                                  () -> new SampleDataException("An unknown error occurred trying to obtain Sample Data. "
+                                                                      + e.getCause().getMessage(),
+                                                                                                SampleDataException.UNKNOWN, e));
+    } catch (Exception e) {
+      throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
+                                    SampleDataException.UNKNOWN, e);
+    }
+  }
+
+  protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
+      throws MetadataResolvingException, ConnectionException {
+    MetadataContext context = null;
+    try {
+      MetadataCacheId cacheId = getMetadataCacheId();
+      MetadataCache metadataCache = metadataService.get().getMetadataCache(cacheId.getValue());
+      context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
+      MetadataResult<R> result = contextConsumer.apply(context);
+      if (result.isSuccess()) {
+        metadataService.get().saveCache(cacheId.getValue(), metadataCache);
+      }
+
+      return result;
+    } catch (MuleRuntimeException e) {
+      // TODO(MULE-13621) this should be deleted once the configuration is created lazily in the getMetadataContext method.
+      try {
+        throw e.getCause();
+      } catch (MetadataResolvingException | ConnectionException cause) {
+        throw cause;
+      } catch (Throwable t) {
+        throw e;
+      }
+    } finally {
+      if (context != null) {
+        context.dispose();
+      }
+    }
+  }
+
+  private MetadataCacheId getMetadataCacheId() {
+    return cacheIdGenerator.getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
+        .map(id -> {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(id.getParts().toString());
+          }
+          return id;
+        })
+        .orElseThrow(() -> new IllegalStateException(
+                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
+                                                         +
+                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
+                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
+  }
+
+  private <R> R runWithResolvingContext(Function<ExtensionResolvingContext, R> function) {
+    ExtensionResolvingContext context = getResolvingContext();
+    R result;
+    try {
+      result = function.apply(context);
+    } finally {
+      context.dispose();
+    }
+    return result;
+  }
+
+  private MetadataContext getMetadataContext(MetadataCache cache)
+      throws MetadataResolvingException {
+    CoreEvent fakeEvent = null;
+    try {
+      fakeEvent = getNullEvent(muleContext);
+
+      Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
+
+      if (configuration.isPresent()) {
+        ValueResolver<ConfigurationProvider> configurationProviderResolver = findConfigurationProviderResolver()
+            .orElseThrow(
+                         () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
+                                                              INVALID_CONFIGURATION));
+
+        Optional<ConfigurationProvider> configurationProvider =
+            resolveConfigurationProviderStatically(configurationProviderResolver);
+        if (!configurationProvider.isPresent() || configurationProvider.get() instanceof DynamicConfigurationProvider) {
+          throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
+        }
+      }
+
+      return new DefaultMetadataContext(() -> configuration, connectionManager,
+                                        cache,
+                                        typeLoader);
+    } finally {
+      if (fakeEvent != null) {
+        ((BaseEventContext) fakeEvent.getContext()).success();
+      }
+    }
+  }
+
+  private ExtensionResolvingContext getResolvingContext() {
+    return new ExtensionResolvingContext(() -> {
+      CoreEvent fakeEvent = null;
+      try {
+        fakeEvent = getNullEvent(muleContext);
+        return getConfiguration(fakeEvent);
+      } finally {
+        if (fakeEvent != null) {
+          ((BaseEventContext) fakeEvent.getContext()).success();
+        }
+      }
+    }, connectionManager);
   }
 
   @Inject
-  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
-    this.componentLocator = componentLocator;
+  public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory) {
+    this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
   }
 
 }

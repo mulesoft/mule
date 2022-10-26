@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.withExtensionClassLoader;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -95,11 +97,16 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         }
       }
 
-      return new DefaultRegistry(muleContext).<MuleMetadataService>lookupByType(MuleMetadataService.class)
+      DefaultRegistry registry = new DefaultRegistry(muleContext);
+      return registry.<MuleMetadataService>lookupByType(MuleMetadataService.class)
           .map(metadataService -> (StaticConfigurationProvider) new ConfigurationProviderToolingAdapter(name,
                                                                                                         extensionModel,
                                                                                                         configurationModel,
                                                                                                         configuration,
+                                                                                                        metadataService,
+                                                                                                        registry
+                                                                                                            .<ConnectionManager>lookupByName(OBJECT_CONNECTION_MANAGER)
+                                                                                                            .get(),
                                                                                                         reflectionCache,
                                                                                                         muleContext))
           .orElseGet(() -> new StaticConfigurationProvider(name, extensionModel,
