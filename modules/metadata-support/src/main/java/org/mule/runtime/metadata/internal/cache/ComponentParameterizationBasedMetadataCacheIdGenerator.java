@@ -9,38 +9,31 @@ package org.mule.runtime.metadata.internal.cache;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparingInt;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.api.cache.ComponentParameterizationMetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.ConfigurationMetadataCacheIdGenerator;
+import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.metadata.internal.types.AttributesMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.ComponentParameterizationInputMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.KeysMetadataResolutionTypeInformation;
@@ -60,6 +53,12 @@ import java.util.function.Supplier;
  * Client, to generate the keys from the ComponentAst.
  */
 public class ComponentParameterizationBasedMetadataCacheIdGenerator implements ComponentParameterizationMetadataCacheIdGenerator {
+
+  private final ConfigurationMetadataCacheIdGenerator configIdGenerator;
+
+  public ComponentParameterizationBasedMetadataCacheIdGenerator(ConfigurationMetadataCacheIdGenerator configIdGenerator) {
+    this.configIdGenerator = configIdGenerator;
+  }
 
   @Override
   public Optional<MetadataCacheId> getIdForComponentOutputMetadata(ComponentParameterization<?> parameterization) {
@@ -119,10 +118,10 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (parameterization.getModel() instanceof ConfigurationModel) {
+      resolveDslTagId(parameterization).ifPresent(keyParts::add);
       if (parameterization.getModel() instanceof ComponentModel) {
         keyParts.add(resolveStereotypeId((ComponentModel) parameterization.getModel()));
       }
-      resolveGlobalElement(parameterization).ifPresent(keyParts::add);
       return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
     } else {
       Optional<MetadataCacheId> configId = resolveConfigId(parameterization);
@@ -140,6 +139,24 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
     }
   }
 
+  private Optional<MetadataCacheId> doResolve(ComponentParameterization<?> parameterization) {
+    List<MetadataCacheId> keyParts = new ArrayList<>();
+
+    resolveConfigId(parameterization).ifPresent(keyParts::add);
+
+    resolveCategoryId(parameterization).ifPresent(keyParts::add);
+
+    resolveDslTagId(parameterization).ifPresent(keyParts::add);
+
+    if (parameterization.getModel() instanceof ComponentModel) {
+      resolveMetadataKeyParts(parameterization, (ComponentModel) parameterization.getModel(), true).ifPresent(keyParts::add);
+    } else {
+      resolveNamedConfigId(parameterization).ifPresent(keyParts::add);
+    }
+
+    return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
+  }
+
   private Optional<MetadataCacheId> resolveCategoryId(ComponentParameterization<?> parameterization) {
     if (!(parameterization.getModel() instanceof ComponentModel)) {
       return empty();
@@ -154,30 +171,27 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (typeInformation.isDynamicType()) {
+      resolveDslTagNamespace(parameterization).ifPresent(keyParts::add);
       resolveConfigId(parameterization).ifPresent(keyParts::add);
 
       typeInformation.getResolverCategory()
-          .ifPresent(resolverCategory -> keyParts
-              .add(createCategoryMetadataCacheId(resolverCategory)));
+          .ifPresent(resolverCategory -> keyParts.add(createCategoryMetadataCacheId(resolverCategory)));
 
-      typeInformation.getResolverName()
-          .ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
+      typeInformation.getResolverName().ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
 
       keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
 
       if (parameterization.getModel() instanceof ComponentModel) {
-        keyParts.add(resolveStereotypeId((ComponentModel) parameterization.getModel()));
         resolveMetadataKeyParts(parameterization, (ComponentModel) parameterization.getModel(),
                                 typeInformation.shouldIncludeConfiguredMetadataKeys()).ifPresent(keyParts::add);
       }
     } else {
-      if (parameterization.getModel() instanceof ComponentModel) {
-        keyParts.add(resolveStereotypeId((ComponentModel) parameterization.getModel()));
-      }
+      resolveDslTagId(parameterization).ifPresent(keyParts::add);
 
       if (parameterization.getModel() instanceof ConfigurationModel) {
-        resolveGlobalElement(parameterization).ifPresent(keyParts::add);
+        resolveNamedConfigId(parameterization).ifPresent(keyParts::add);
       }
+
       keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
     }
 
@@ -188,22 +202,17 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
                                       .orElse(format("(%s):(%s)", sourceElementName(parameterization), "Unknown Type"))));
   }
 
-  private Optional<MetadataCacheId> doResolve(ComponentParameterization<?> parameterization) {
-    List<MetadataCacheId> keyParts = new ArrayList<>();
+  private Optional<MetadataCacheId> resolveDslTagNamespace(ComponentParameterization<?> parameterization) {
+    return parameterization.getComponentIdentifier().map(ComponentIdentifier::getNamespace)
+        .map(namespace -> new MetadataCacheId(namespace.toLowerCase().hashCode(), namespace));
+  }
 
-    resolveConfigId(parameterization).ifPresent(keyParts::add);
+  private Optional<MetadataCacheId> resolveDslTagId(ComponentParameterization<?> parameterization) {
+    return parameterization.getComponentIdentifier().map(this::resolveIdentifier);
+  }
 
-    resolveCategoryId(parameterization).ifPresent(keyParts::add);
-
-    if (parameterization.getModel() instanceof ComponentModel) {
-      ComponentModel model = (ComponentModel) parameterization.getModel();
-      keyParts.add(resolveStereotypeId(model));
-      resolveMetadataKeyParts(parameterization, model, true).ifPresent(keyParts::add);
-    } else {
-      resolveGlobalElement(parameterization).ifPresent(keyParts::add);
-    }
-
-    return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
+  private MetadataCacheId resolveIdentifier(ComponentIdentifier id) {
+    return new MetadataCacheId(id.hashCode(), id.toString());
   }
 
   private MetadataCacheId resolveStereotypeId(ComponentModel model) {
@@ -212,33 +221,32 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
   }
 
   private Optional<MetadataCacheId> resolveConfigId(ComponentParameterization<?> parameterization) {
-    return resolveConfigName(parameterization).flatMap(this::getHashedGlobal);
+    return resolveConfigName(parameterization).flatMap(name -> this.configIdGenerator.getConfigMetadataCacheId(name, false));
   }
 
-  private Optional<MetadataCacheId> resolveGlobalElement(ComponentParameterization<?> parameterization) {
-    List<String> parameterNamesRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(parameterization);
-
-    Map<Pair<ParameterGroupModel, ParameterModel>, Object> parameters = parameterization.getParameters();
-
-    List<MetadataCacheId> parts = parameters.keySet()
-        .stream()
-        .filter(p -> parameterNamesRequiredForMetadata.contains(p.getSecond().getName()))
-        .map(p -> resolveKeyFromSimpleValue(parameterization, p.getFirst(), p.getSecond()))
-        .collect(toList());
-
-    if (parts.isEmpty()) {
-      return empty();
-    }
-
-    return of(new MetadataCacheId(parts, parameterization.getModel().getName()));
+  private Optional<MetadataCacheId> resolveNamedConfigId(ComponentParameterization<?> parameterization) {
+    return resolveName(parameterization).flatMap(name -> this.configIdGenerator.getConfigMetadataCacheId(name, true));
   }
 
-  private List<String> parameterNamesRequiredForMetadataCacheId(ComponentParameterization<?> parameterization) {
-    if (!(parameterization.getModel() instanceof EnrichableModel)) {
-      return emptyList();
-    }
-    return ((EnrichableModel) parameterization.getModel()).getModelProperty(RequiredForMetadataModelProperty.class)
-        .map(RequiredForMetadataModelProperty::getRequiredParameters).orElse(emptyList());
+  private MetadataCacheId createCategoryMetadataCacheId(String category) {
+    return new MetadataCacheId(category.hashCode(), "category: " + category);
+  }
+
+  private MetadataCacheId createResolverMetadataCacheId(String resolverName) {
+    return new MetadataCacheId(resolverName.hashCode(), "resolver: " + resolverName);
+  }
+
+  public static String sourceElementName(ComponentParameterization<?> parameterization) {
+    return parameterization.getComponentIdentifier().map(id -> id.getNamespace() + ":").orElse("")
+        + parameterization.getModel().getName();
+  }
+
+  public static Optional<String> resolveConfigName(ComponentParameterization<?> parameterization) {
+    return ofNullable(parameterization.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME)).map(param -> (String) param);
+  }
+
+  public static Optional<String> resolveName(ComponentParameterization<?> parameterization) {
+    return ofNullable(parameterization.getParameter(DEFAULT_GROUP_NAME, NAME_ATTRIBUTE_NAME)).map(param -> (String) param);
   }
 
   private Optional<MetadataCacheId> resolveMetadataKeyParts(ComponentParameterization<?> parameterization,
@@ -264,67 +272,7 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
 
   private MetadataCacheId resolveKeyFromSimpleValue(ComponentParameterization<?> parameterization, ParameterGroupModel groupModel,
                                                     ParameterModel param) {
-    final MetadataCacheId notCheckingReferences =
-        computeIdFor(parameterization, groupModel, param, MetadataCacheIdBuilderAdapter::new);
-    if (parameterization.getParameter(groupModel, param) == null) {
-      return notCheckingReferences;
-    }
-
-    parameterization.getParameter(groupModel, param);
-
-    Reference<MetadataCacheId> reference = new Reference<>();
-
-    param.getType().accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitString(StringType stringType) {
-        if (!param.getAllowedStereotypes().isEmpty()) {
-          getHashedGlobal(param.toString()).ifPresent(reference::set);
-        }
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        if (param.getDslConfiguration().allowsReferences()) {
-          getHashedGlobal(param.toString()).ifPresent(reference::set);
-        }
-      }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (param.getDslConfiguration().allowsReferences()) {
-          getHashedGlobal(param.toString()).ifPresent(reference::set);
-        }
-      }
-
-    });
-
-    return reference.get() == null ? notCheckingReferences : reference.get();
-  }
-
-  private MetadataCacheId createCategoryMetadataCacheId(String category) {
-    return new MetadataCacheId(category.hashCode(), "category: " + category);
-  }
-
-  private MetadataCacheId createResolverMetadataCacheId(String resolverName) {
-    return new MetadataCacheId(resolverName.hashCode(), "resolver: " + resolverName);
-  }
-
-  private Optional<MetadataCacheId> getHashedGlobal(String name) {
-    if (isBlank(name)) {
-      return empty();
-    }
-    return of(new MetadataCacheId(name.hashCode(), "global: " + name));
-  }
-
-  public static String sourceElementName(ComponentParameterization<?> parameterization) {
-    Map<Pair<ParameterGroupModel, ParameterModel>, Object> parameters = parameterization.getParameters();
-    return parameters.keySet().stream().filter(p -> p.getSecond().getName().equals("config"))
-        .map(p -> parameterization.getParameter(p.getFirst(), p.getSecond()).toString()).findFirst().orElse(null);
-  }
-
-  public static Optional<String> resolveConfigName(ComponentParameterization<?> parameterization) {
-    return ofNullable(parameterization.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME)).map(param -> (String) param);
+    return computeIdFor(parameterization, groupModel, param, MetadataCacheIdBuilderAdapter::new);
   }
 
   public static <K> K computeIdFor(ComponentParameterization<?> parameterization,
@@ -336,39 +284,6 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
         cacheIdBuilderSupplier.get().withSourceElementName(name).withHashValue(Objects.hashCode(name));
     idBuilder.withHashValue(Objects.hashCode(parameterization.getParameter(groupModel, parameter)));
     return idBuilder.build();
-  }
-
-  private static class MetadataCacheIdBuilderAdapter implements CacheIdBuilderAdapter<MetadataCacheId> {
-
-    private String name;
-    private int value;
-    private final List<MetadataCacheId> parts = new ArrayList<>();
-
-    @Override
-    public CacheIdBuilderAdapter<MetadataCacheId> withSourceElementName(String name) {
-      this.name = name;
-      return this;
-    }
-
-    @Override
-    public CacheIdBuilderAdapter<MetadataCacheId> withHashValue(int value) {
-      this.value = value;
-      return this;
-    }
-
-    @Override
-    public CacheIdBuilderAdapter<MetadataCacheId> containing(List<MetadataCacheId> parts) {
-      this.parts.addAll(parts);
-      return this;
-    }
-
-    @Override
-    public MetadataCacheId build() {
-      if (parts.isEmpty()) {
-        return new MetadataCacheId(value, name);
-      }
-      return new MetadataCacheId(parts, name);
-    }
   }
 
 }
