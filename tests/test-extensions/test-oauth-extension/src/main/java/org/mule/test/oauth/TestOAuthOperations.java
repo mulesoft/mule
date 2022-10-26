@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.InputJsonType;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -126,13 +128,47 @@ public class TestOAuthOperations {
   }
 
   @MediaType(ANY)
-  public String getStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection, InputStream content) {
+  public String getStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection,
+                                                     @InputJsonType(schema = "person-schema.json") InputStream content) {
     String result = IOUtils.toString(content);
     if (executedCounter++ % 2 == 0) {
       throw new AccessTokenExpiredException();
     }
 
     return result;
+  }
+
+  @MediaType(ANY)
+  public String getXmlStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection,
+                                                        @InputXmlType(schema = "order.xsd",
+                                                            qname = "shiporder") InputStream content) {
+    String result = IOUtils.toString(content);
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+
+    return result;
+  }
+
+  @MediaType(ANY)
+  public String getStringContentWithFlackyConnection(@Connection TestOAuthConnection connection,
+                                                     @InputJsonType(schema = "person-schema.json") String content) {
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+
+    return content;
+  }
+
+  @MediaType(ANY)
+  public String getXmlStringContentWithFlackyConnection(@Connection TestOAuthConnection connection,
+                                                        @InputXmlType(schema = "order.xsd",
+                                                            qname = "shiporder") String content) {
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+
+    return content;
   }
 
   @OutputResolver(output = RefreshedOAuthMetadataResolver.class)

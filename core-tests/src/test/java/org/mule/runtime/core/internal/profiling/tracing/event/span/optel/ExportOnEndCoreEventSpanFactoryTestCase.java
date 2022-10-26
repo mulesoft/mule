@@ -66,6 +66,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
   public static final String APP_ID = "appId";
   public static final ChildSpanCustomizationInfo DEFAULT_CHILD_SPAN_INFO = ChildSpanCustomizationInfo.getDefaultChildSpanInfo();
   public static final String MULE_DUMMY_COMPONENT_NAME = "mule:dummy";
+  public static final String NO_EXPORTABLE = "noExportable";
   private final ExportOnEndCoreEventSpanFactory coreEventSpanFactory =
       new ExportOnEndCoreEventSpanFactory(getDefaultSpanExporterManager());
   public static final String CORRELATION_ID = "000-000-0000";
@@ -152,7 +153,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     setSpanMock(spanMock);
     ExportOnEndSpan parentSpan = mock(ExportOnEndSpan.class);
     InternalSpanExporter parentSpanExporter = mock(InternalSpanExporter.class);
-    when(parentSpanExporter.noExportUntil()).thenReturn(singleton("noExportable"));
+    when(parentSpanExporter.noExportUntil()).thenReturn(singleton(NO_EXPORTABLE));
     when(spanMock.getSpanExporter()).thenReturn(parentSpanExporter);
     when(spanMock.getParent()).thenReturn(parentSpan);
 
@@ -163,8 +164,9 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     InternalSpanExporter spanExporter = ((ExportOnEndSpan) span).getSpanExporter();
     assertThat(spanExporter, instanceOf(OpenTelemetrySpanExporter.class));
     OpenTelemetrySpanExporter openTelemetrySpanExporter = (OpenTelemetrySpanExporter) spanExporter;
-    assertThat(openTelemetrySpanExporter.noExportUntil(), hasSize(1));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), hasSize(2));
     assertThat(openTelemetrySpanExporter.noExportUntil(), hasItem(EXECUTE_NEXT));
+    assertThat(openTelemetrySpanExporter.noExportUntil(), hasItem(NO_EXPORTABLE));
     assertThat(openTelemetrySpanExporter.getOpenTelemetrySpan(), instanceOf(NoExportableOpenTelemetrySpan.class));
   }
 
