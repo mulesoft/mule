@@ -6,22 +6,6 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
@@ -31,12 +15,31 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIF
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.FLOW_FLOW_CONSTRUCT_TYPE;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
 import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
@@ -53,6 +56,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
@@ -73,10 +77,12 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import org.hamcrest.Matchers;
+
 import org.mockito.ArgumentCaptor;
 
 import reactor.core.publisher.Mono;
@@ -150,8 +156,10 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     final FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
-        .thenAnswer(invocationOnMock -> error(invocationOnMock.getArgumentAt(0, MessagingException.class)));
+        .thenAnswer(invocationOnMock -> error((MessagingException) invocationOnMock.getArgumentAt(0, Throwable.class)));
     when(flow.getMuleContext()).thenReturn(muleContext);
+    when(flow.getStatistics())
+        .thenReturn(new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, "flow"));
 
     context = mock(MessageProcessContext.class);
     final MessageSource source = mock(MessageSource.class);
