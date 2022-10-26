@@ -25,6 +25,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   protected boolean enabled = false;
   private long samplePeriod = 0;
   protected final AtomicLong receivedEvents = new AtomicLong(0);
+  protected final AtomicLong dispatchedMessages = new AtomicLong(0);
 
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
@@ -34,6 +35,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   private transient final AtomicLong connectionErrors = new AtomicLong(0);
 
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> messagesDispatchedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
@@ -88,6 +90,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public synchronized void clear() {
     receivedEvents.set(0);
+    dispatchedMessages.set(0);
     samplePeriod = currentTimeMillis();
 
     executionError.set(0);
@@ -154,6 +157,12 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
+  public void incMessagesDispatched() {
+    dispatchedMessages.addAndGet(1);
+    messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
+  }
+
+  @Override
   public void incConnectionErrors() {
     connectionErrors.addAndGet(1);
     connectionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
@@ -162,6 +171,11 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public long getTotalEventsReceived() {
     return receivedEvents.get();
+  }
+
+  @Override
+  public long getTotalDispatchedMessages() {
+    return dispatchedMessages.get();
   }
 
   public long getSamplePeriod() {
@@ -173,6 +187,14 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
     DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     eventsReceivedCounters.add(counter);
     counter.add(getTotalEventsReceived());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getDispatchedMessagesCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    messagesDispatchedCounters.add(counter);
+    counter.add(getTotalDispatchedMessages());
     return counter;
   }
 

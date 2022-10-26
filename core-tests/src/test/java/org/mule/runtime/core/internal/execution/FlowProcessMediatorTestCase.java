@@ -6,10 +6,30 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.FLOW_FLOW_CONSTRUCT_TYPE;
+import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
+import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
+import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
+import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
+import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -24,24 +44,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
-import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
-import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
-import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
-import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static reactor.core.Exceptions.propagate;
 
 import org.mule.runtime.api.component.Component;
@@ -62,6 +64,7 @@ import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
@@ -86,10 +89,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import org.hamcrest.Matchers;
+
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
@@ -193,6 +198,8 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(flow.getSource()).thenReturn(source);
     when(flow.getMuleContext()).thenReturn(muleContext);
+    when(flow.getStatistics())
+        .thenReturn(new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, "flow"));
 
     context = mock(MessageProcessContext.class);
     when(context.getMessageSource()).thenReturn(source);
