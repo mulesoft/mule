@@ -26,6 +26,11 @@ public interface FlowConstructStatistics extends Statistics {
   void incReceivedEvents();
 
   /**
+   * Indicates that a new message was dispatched from a message source
+   */
+  void incMessagesDispatched();
+
+  /**
    * Indicates that an execution error has ocurred
    */
   void incExecutionError();
@@ -78,6 +83,13 @@ public interface FlowConstructStatistics extends Statistics {
    * @return the number of event received at a given time
    */
   long getTotalEventsReceived();
+
+  /**
+   * @return the number of messages dispatched from a source of a flow at a given time
+   * 
+   * @since 4.5
+   */
+  long getTotalDispatchedMessages();
 
   /**
    * @return  indicates if the statistic is enabled or not.
@@ -133,5 +145,20 @@ public interface FlowConstructStatistics extends Statistics {
    * @since 4.5
    */
   ResetOnQueryCounter getEventsReceivedCounter();
+
+  /**
+   * Provides a counter for {@link #getTotalDispatchedMessages() total dispatched messages} that is not affected by calls to
+   * {@link #clear()} or {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
+   * <p>
+   * Counter initial value is set to the value of {@link #getTotalDispatchedMessages()} when this method is called.
+   * <p>
+   * If this is called concurrently with {@link #incReceivedEvents()}, there is chance of a race condition occurring where an
+   * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
+   * 
+   * @return a counter for {@link #getTotalDispatchedMessages()}.
+   * 
+   * @since 4.5
+   */
+  ResetOnQueryCounter getDispatchedMessagesCounter();
 
 }

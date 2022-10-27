@@ -21,6 +21,7 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
 
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> messagesDispatchedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
 
@@ -44,6 +45,12 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
   public void incReceivedEvents() {
     super.incReceivedEvents();
     eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
+  }
+
+  @Override
+  public void incMessagesDispatched() {
+    super.incMessagesDispatched();
+    messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
   }
 
   @Override
@@ -128,6 +135,14 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
     DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
     eventsReceivedCounters.add(counter);
     counter.add(getTotalEventsReceived());
+    return counter;
+  }
+
+  @Override
+  public ResetOnQueryCounter getDispatchedMessagesCounter() {
+    DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+    messagesDispatchedCounters.add(counter);
+    counter.add(getTotalDispatchedMessages());
     return counter;
   }
 
