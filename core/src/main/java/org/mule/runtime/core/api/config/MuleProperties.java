@@ -212,5 +212,13 @@ public class MuleProperties {
   public static final String MULE_MEL_AS_DEFAULT = SYSTEM_PROPERTY_PREFIX + "test.mel.default";
   public static final String MULE_DISABLE_RESPONSE_TIMEOUT = SYSTEM_PROPERTY_PREFIX + "timeout.disable";
 
+  /**
+   * When enabled this System Property, the statistics are enabled even if the monitoring service is not activated. This property
+   * is only read on deploying an app.
+   *
+   * @since 4.4, 4.3.1
+   */
+  public static final String MULE_ENABLE_STATISTICS = SYSTEM_PROPERTY_PREFIX + "enable.statistics";
+
   private MuleProperties() {}
 }
