@@ -6,7 +6,6 @@
  */
 package org.mule.test.petstore.extension;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
@@ -15,6 +14,9 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE_ONE;
 import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE_TWO;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
+
+import static java.lang.String.format;
+import static java.util.Collections.singletonMap;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -260,7 +262,7 @@ public class PetStoreOperations {
     distributedTraceContextManager.setCurrentSpanName("customSpanName");
     distributedTraceContextManager.addCurrentSpanAttribute("attributeAddedByAddCurrentSpanAttribute", "ok");
     distributedTraceContextManager
-        .addCurrentSpanAttributes(Collections.singletonMap("attributeAddedByAddCurrentSpanAttributes", "ok"));
+        .addCurrentSpanAttributes(singletonMap("attributeAddedByAddCurrentSpanAttributes", "ok"));
     return distributedTraceContextManager;
   }
 
@@ -271,7 +273,7 @@ public class PetStoreOperations {
     distributedTraceContextManager.setCurrentSpanName("customSpanName");
     distributedTraceContextManager.addCurrentSpanAttribute("attributeAddedByAddCurrentSpanAttribute", "ok");
     distributedTraceContextManager
-        .addCurrentSpanAttributes(Collections.singletonMap("attributeAddedByAddCurrentSpanAttributes", "ok"));
+        .addCurrentSpanAttributes(singletonMap("attributeAddedByAddCurrentSpanAttributes", "ok"));
     return distributedTraceContextManager;
   }
 
@@ -282,7 +284,7 @@ public class PetStoreOperations {
     distributedTraceContextManager.setCurrentSpanName("customSpanName");
     distributedTraceContextManager.addCurrentSpanAttribute("attributeAddedByAddCurrentSpanAttribute", "ok");
     distributedTraceContextManager
-        .addCurrentSpanAttributes(Collections.singletonMap("attributeAddedByAddCurrentSpanAttributes", "ok"));
+        .addCurrentSpanAttributes(singletonMap("attributeAddedByAddCurrentSpanAttributes", "ok"));
     return distributedTraceContextManager;
   }
 

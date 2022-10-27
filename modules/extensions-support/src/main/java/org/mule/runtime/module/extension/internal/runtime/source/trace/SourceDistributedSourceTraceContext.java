@@ -9,8 +9,11 @@ package org.mule.runtime.module.extension.internal.runtime.source.trace;
 
 import static java.util.Collections.emptyMap;
 
+import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextManager;
+import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextVisitor;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,9 +21,11 @@ import java.util.Map;
  *
  * @since 4.5.0
  */
-public class SourceDistributedSourceTraceContext implements DistributedTraceContextManager {
+public class SourceDistributedSourceTraceContext implements InternalDistributedTraceContextManager {
 
   private Map<String, String> remoteTraceContextMap = emptyMap();
+  private String name;
+  private Map<String, String> attributes = new HashMap<>();
 
   @Override
   public void setRemoteTraceContextMap(Map<String, String> remoteTraceContextMap) {
@@ -34,16 +39,29 @@ public class SourceDistributedSourceTraceContext implements DistributedTraceCont
 
   @Override
   public void setCurrentSpanName(String name) {
-    // Nothing to do in sources.
+    this.name = name;
   }
 
   @Override
   public void addCurrentSpanAttribute(String key, String value) {
-    // Nothing to do in sources.
+    attributes.put(key, value);
   }
 
   @Override
   public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    // Nothing to do in sources.
+    attributes.putAll(attributes);
+  }
+
+  public Map<String, String> getSpanRootAttributes() {
+    return attributes;
+  }
+
+  public String getSpanName() {
+    return name;
+  }
+
+  @Override
+  public <T> T visit(InternalDistributedTraceContextVisitor<T> visitor) {
+    return visitor.accept(this);
   }
 }

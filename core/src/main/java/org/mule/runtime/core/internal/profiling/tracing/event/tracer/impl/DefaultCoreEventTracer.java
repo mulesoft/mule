@@ -181,6 +181,9 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       InternalSpan span = distributedTraceContext.getCurrentSpan().orElse(null);
       if (span != null) {
         attributes.forEach((key, value) -> span.addAttribute(key, value));
+      } else {
+        // Set the root attributes.
+        attributes.forEach((key, value) -> distributedTraceContext.setSpanRootAttribute(key, value));
       }
     }
   }
@@ -207,6 +210,8 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
       InternalSpan span = distributedTraceContext.getCurrentSpan().orElse(null);
       if (span != null) {
         span.updateName(name);
+      } else {
+        distributedTraceContext.setRootSpanName(name);
       }
     }
   }

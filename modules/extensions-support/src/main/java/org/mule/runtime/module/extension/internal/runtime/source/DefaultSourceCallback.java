@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.ACCEPTED_POLL_ITEM_INFORMATION;
+import static org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextManager.getInternalDistributedTraceContextManager;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
@@ -44,8 +45,13 @@ import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextManager;
+import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextVisitor;
+import org.mule.runtime.module.extension.internal.runtime.tracing.SpanAttributesInternalDistributedTraceContextVisitor;
+import org.mule.runtime.module.extension.internal.runtime.tracing.SpanNameInternalDistributedTraceContextVisitor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.nio.charset.Charset;
@@ -64,6 +70,11 @@ import javax.transaction.TransactionManager;
  * @since 4.0
  */
 class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
+
+  private InternalDistributedTraceContextVisitor<String> spanNameVisitor = new SpanNameInternalDistributedTraceContextVisitor();
+  private InternalDistributedTraceContextVisitor<Map<String, String>> spanAttributesVisitor =
+      new SpanAttributesInternalDistributedTraceContextVisitor();
+
 
   /**
    * A Builder to create instance of {@link DefaultSourceCallback}
@@ -261,9 +272,15 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                                      encodingParam,
                                                                                      mimeTypeInitParam);
 
+    InternalDistributedTraceContextManager internalDistributedTraceContextManager =
+        getInternalDistributedTraceContextManager(context.getDistributedSourceTraceContext());
+
+
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context),
+                                internalDistributedTraceContextManager.visit(spanNameVisitor),
+                                internalDistributedTraceContextManager.visit(spanAttributesVisitor),
                                 context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(info -> (PollItemInformation) info));
 
     executeFlow(context, messageProcessContext, resultAdapter);
