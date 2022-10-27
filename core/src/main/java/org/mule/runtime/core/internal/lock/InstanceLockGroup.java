@@ -158,18 +158,13 @@ public class InstanceLockGroup implements LockGroup {
   }
 
   private void waitForLocksToBeUnlocked() {
-    long beginMillis = currentTimeMillis();
+    long timeOutMillis = currentTimeMillis() + gracefulShutdownTimeoutMillis;
     synchronized (lockAccessMonitor) {
       try {
-        boolean isTimeout = false;
-        while (!locks.isEmpty() && !isTimeout) {
-          long elapsedMillis = currentTimeMillis() - beginMillis;
-          long remainingMillis = gracefulShutdownTimeoutMillis - elapsedMillis;
-          if (remainingMillis > 0) {
-            lockAccessMonitor.wait(remainingMillis);
-          } else {
-            isTimeout = true;
-          }
+        long remainingMillis = timeOutMillis - currentTimeMillis();
+        while (!locks.isEmpty() && remainingMillis > 0) {
+          lockAccessMonitor.wait(remainingMillis);
+          remainingMillis = timeOutMillis - currentTimeMillis();
         }
       } catch (InterruptedException e) {
         currentThread().interrupt();

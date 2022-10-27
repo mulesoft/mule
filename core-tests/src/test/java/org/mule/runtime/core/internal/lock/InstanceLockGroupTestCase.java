@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.lock;
 
-import static java.lang.Thread.sleep;
+import static java.lang.Thread.State.TIMED_WAITING;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -19,6 +21,8 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +30,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Issue;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
@@ -68,17 +74,37 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-11929632")
-  public void disposeDoesNotLoseReferenceToTakenLocks() throws InterruptedException {
+  public void disposeDoesNotLoseReferenceToTakenLocks() {
     String testLockId = "TestLockId";
     instanceLockGroup.lock(testLockId);
     verify(lockProvider.getSpiedLock(testLockId)).lock();
 
-    // Spawn a task that disposes the lock group and wait some time to ensure that it actually started.
-    executor.submit(instanceLockGroup::dispose);
-    sleep(100);
+    // Spawn a task that disposes the lock group and get a reference to the thread that is doing such dispose.
+    AtomicReference<Thread> threadExecutingTheDispose = disposeAsynchronouslyAndGetThreadReference();
+
+    // Wait for the disposer thread to be in state TIMED_WAITING.
+    waitForThreadToBeInStateTimedWaiting(threadExecutingTheDispose);
 
     instanceLockGroup.unlock(testLockId);
     verify(lockProvider.getSpiedLock(testLockId)).unlock();
+  }
+
+  private static void waitForThreadToBeInStateTimedWaiting(AtomicReference<Thread> threadExecutingTheDispose) {
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      assertThat(threadExecutingTheDispose.get(), is(notNullValue()));
+      assertThat(threadExecutingTheDispose.get().getState(), is(TIMED_WAITING));
+      return true;
+    }));
+  }
+
+  @NotNull
+  private AtomicReference<Thread> disposeAsynchronouslyAndGetThreadReference() {
+    AtomicReference<Thread> threadExecutingTheDispose = new AtomicReference<>();
+    executor.submit(() -> {
+      threadExecutingTheDispose.set(currentThread());
+      instanceLockGroup.dispose();
+    });
+    return threadExecutingTheDispose;
   }
 
   @Test
