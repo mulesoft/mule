@@ -321,6 +321,14 @@ public class MuleProperties {
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
   /**
+   * When enabled this System Property, the statistics are enabled even if the monitoring service is not activated. This property
+   * is only read on deploying an app.
+   *
+   * @since 4.4, 4.3.1
+   */
+  public static final String MULE_ENABLE_STATISTICS = SYSTEM_PROPERTY_PREFIX + "enable.statistics";
+
+  /**
    * @return Whether MEL is set as the default EL according to {@link #MULE_MEL_AS_DEFAULT}
    * @since 4.2.0
    */

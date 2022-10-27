@@ -26,6 +26,7 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
@@ -165,6 +166,8 @@ public class ModuleFlowProcessingPhase
             policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
         final PhaseContext phaseContext =
             new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
+
+        flowConstruct.getStatistics().incMessagesDispatched();
 
         just(templateEvent)
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
