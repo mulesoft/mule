@@ -7,19 +7,20 @@
 package org.mule.test.module.extension.data.sample;
 
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
-import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
-import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.RESOLVE_THROUGH_TOOLING_API;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SampleDataStory.RESOLVE_THROUGH_TOOLING_API;
 
 import org.mule.test.data.sample.extension.ComplexActingParameter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Test;
 
-@Feature(SAMPLE_DATA)
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SDK_TOOLING_SUPPORT)
 @Story(RESOLVE_THROUGH_TOOLING_API)
 public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTestCase {
 

@@ -6,20 +6,24 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.MuleDeploymentProperties;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
@@ -111,26 +115,38 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   /**
    * Initializes the artifact by taking into account deployment properties
-   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_DEPLOYMENT_PROPERTY} and
-   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY}.
+   * {@link MuleDeploymentProperties#MULE_LAZY_INIT_DEPLOYMENT_PROPERTY},
+   * {@link MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY} and
+   * {@link MuleDeploymentProperties#MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY}.
    *
    * @param artifact the T artifact to be initialized
    */
   private void doInit(T artifact) {
     boolean lazyInit = false;
+    boolean addToolingObjectsToRegistry = false;
     boolean enableXmlValidations = false;
     if (artifact.getDescriptor().getDeploymentProperties().isPresent()) {
       Properties deploymentProperties = artifact.getDescriptor().getDeploymentProperties().get();
       lazyInit = valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"));
+      addToolingObjectsToRegistry =
+          valueOf((String) deploymentProperties.getOrDefault(MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY, "false"));
       enableXmlValidations =
           valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
                                                              "false"));
     }
 
     if (lazyInit) {
-      artifact.lazyInit(!enableXmlValidations);
+      if (addToolingObjectsToRegistry) {
+        artifact.lazyInitTooling(!enableXmlValidations);
+      } else {
+        artifact.lazyInit(!enableXmlValidations);
+      }
     } else {
-      artifact.init();
+      if (addToolingObjectsToRegistry) {
+        artifact.initTooling();
+      } else {
+        artifact.init();
+      }
     }
   }
 

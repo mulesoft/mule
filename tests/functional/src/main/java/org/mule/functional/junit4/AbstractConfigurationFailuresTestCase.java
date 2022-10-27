@@ -82,6 +82,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
                                                                                              disableXmlValidations(),
                                                                                              enableLazyInit(),
                                                                                              false,
+                                                                                             false,
                                                                                              new String[] {configuration},
                                                                                              getExpressionLanguageMetadataService());
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);

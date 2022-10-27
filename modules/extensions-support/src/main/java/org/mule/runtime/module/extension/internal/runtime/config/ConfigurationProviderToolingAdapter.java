@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
@@ -22,6 +20,8 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
+
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -44,7 +44,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -74,7 +73,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     implements MetadataKeyProvider, ConfigurationParameterValueProvider {
 
   private final MuleMetadataService metadataService;
-  protected final ConnectionManager connectionManager;
+  private final ConnectionManager connectionManager;
   private final ConfigurationInstance configuration;
   private final ReflectionCache reflectionCache;
 
@@ -82,15 +81,16 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
                                       ExtensionModel extensionModel,
                                       ConfigurationModel configurationModel,
                                       ConfigurationInstance configuration,
+                                      MuleMetadataService metadataService,
+                                      ConnectionManager connectionManager,
                                       ReflectionCache reflectionCache,
                                       MuleContext muleContext) {
     super(name, extensionModel, configurationModel, configuration, muleContext);
     this.configuration = configuration;
     this.reflectionCache = reflectionCache;
 
-    DefaultRegistry registry = new DefaultRegistry(muleContext);
-    this.connectionManager = registry.<ConnectionManager>lookupByName(OBJECT_CONNECTION_MANAGER).get();
-    this.metadataService = registry.<MuleMetadataService>lookupByType(MuleMetadataService.class).get();
+    this.connectionManager = connectionManager;
+    this.metadataService = metadataService;
   }
 
   /**

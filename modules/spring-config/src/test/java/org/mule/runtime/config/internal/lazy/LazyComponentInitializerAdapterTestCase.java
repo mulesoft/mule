@@ -243,7 +243,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
                                     optionalObjectsController, empty(),
                                     new BaseConfigurationComponentLocator(),
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                    emptyMap(), APP, empty(), lockFactory,
+                                    emptyMap(), false, APP, empty(), lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory(),
                                     mock(MemoryManagementService.class),
                                     mock(FeatureFlaggingService.class),

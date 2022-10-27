@@ -27,6 +27,7 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -226,10 +227,15 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   @Override
   public void init() {
-    doInit(false, false);
+    doInit(false, false, false);
   }
 
-  private void doInit(boolean lazy, boolean disableXmlValidations) {
+  @Override
+  public void initTooling() {
+    doInit(false, false, true);
+  }
+
+  private void doInit(boolean lazy, boolean disableXmlValidations, boolean addToolingObjectsToRegistry) {
     withContextClassLoader(null, () -> {
       log(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
     });
@@ -249,6 +255,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setExecutionClassloader(deploymentClassLoader.getClassLoader())
               .setEnableLazyInit(lazy)
               .setDisableXmlValidations(disableXmlValidations)
+              .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)
               .setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
@@ -303,12 +310,17 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   @Override
   public void lazyInit() {
-    doInit(true, true);
+    doInit(true, true, false);
   }
 
   @Override
   public void lazyInit(boolean disableXmlValidations) {
-    doInit(true, disableXmlValidations);
+    doInit(true, disableXmlValidations, false);
+  }
+
+  @Override
+  public void lazyInitTooling(boolean disableXmlValidations) {
+    doInit(true, disableXmlValidations, true);
   }
 
   protected void setArtifactContext(final ArtifactContext artifactContext) {

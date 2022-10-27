@@ -6,10 +6,14 @@
  */
 package org.mule.test.module.extension.values;
 
+import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.ValueProvidersStory.VALUE_PROVIDERS_SERVICE;
+
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
+
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
@@ -28,6 +32,11 @@ import javax.inject.Named;
 
 import org.hamcrest.Matcher;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SDK_TOOLING_SUPPORT)
+@Story(VALUE_PROVIDERS_SERVICE)
 @ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
 public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestCase {
 
@@ -42,6 +51,11 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
 
   @Override
   public boolean disableXmlValidations() {
+    return true;
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
     return true;
   }
 

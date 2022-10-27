@@ -44,4 +44,9 @@ public class ClassLoadingOnMetadataTestCase extends AbstractExtensionFunctionalT
     metadataService.getMetadataKeys(builder().globalName("none").build());
     verifyUsedClassLoaders(GET_METADATA);
   }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
+    return true;
+  }
 }

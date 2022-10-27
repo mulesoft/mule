@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
+
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
@@ -116,7 +117,7 @@ public class ApplicationContextBuilder {
 
   protected ConfigurationBuilder getAppBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources,
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, false, configResources,
                                                      expressionLanguageMetadataService);
     appBuilder.setParentArtifactContext(domainArtifactContext);
     return appBuilder;

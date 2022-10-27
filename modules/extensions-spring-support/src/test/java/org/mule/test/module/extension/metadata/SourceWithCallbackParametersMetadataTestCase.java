@@ -21,9 +21,9 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import org.junit.Test;
 
-public class SourceWithCallbackParametersMetadataTest extends MetadataExtensionFunctionalTestCase<SourceModel> {
+public class SourceWithCallbackParametersMetadataTestCase extends MetadataExtensionFunctionalTestCase<SourceModel> {
 
-  public SourceWithCallbackParametersMetadataTest(ResolutionType resolutionType) {
+  public SourceWithCallbackParametersMetadataTestCase(ResolutionType resolutionType) {
     super(resolutionType);
     this.provider = resolutionType == EXPLICIT_RESOLUTION ? MetadataService::getSourceMetadata
         : (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);

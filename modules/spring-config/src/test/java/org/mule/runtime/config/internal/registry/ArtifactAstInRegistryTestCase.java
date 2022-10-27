@@ -93,7 +93,7 @@ public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
                                                                                                                        addArtifactAstToRegistry
                                                                                                                            .toString()),
                                                                                                           APP,
-                                                                                                          lazyInit);
+                                                                                                          lazyInit, false);
 
     muleContext = (MuleContextWithRegistry) new DefaultMuleContextFactory()
         .createMuleContext(testServicesConfigurationBuilder,

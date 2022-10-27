@@ -6,11 +6,6 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
@@ -18,6 +13,8 @@ import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultFailureMatcher.isFailure;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getCarMetadata;
@@ -28,6 +25,13 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -65,8 +69,13 @@ import javax.inject.Named;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 //TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
+@Feature(SDK_TOOLING_SUPPORT)
+@Story(METADATA_SERVICE)
 public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel> extends AbstractExtensionFunctionalTestCase {
 
   protected static final String METADATA_TEST = "metadata-tests.xml";
@@ -153,6 +162,11 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   @Override
   public boolean disableXmlValidations() {
+    return true;
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
     return true;
   }
 

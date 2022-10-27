@@ -179,10 +179,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
       .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(LocalTimeSupplier.class))
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DelegateConnectionManagerAdapter.class))
-      .put(METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class))
       .put(OBJECT_MULE_CONFIGURATION, getBeanDefinition(DefaultMuleConfiguration.class))
-      .put(VALUE_PROVIDER_SERVICE_KEY, getBeanDefinition(MuleValueProviderService.class))
-      .put(SAMPLE_DATA_SERVICE_KEY, getBeanDefinition(MuleSampleDataService.class))
       .put(OBJECT_TRANSACTION_FACTORY_LOCATOR, getBeanDefinition(TransactionFactoryLocator.class))
       .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
       .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
@@ -212,7 +209,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
-      .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .put(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class))
@@ -220,21 +216,31 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
-      .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
       .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinitionForProfilingService())
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .put(FORWARD_COMPATIBILITY_HELPER_KEY, getBeanDefinition(DefaultForwardCompatibilityHelper.class))
       .build();
 
+  // Do not use static field. BeanDefinitions are reused and produce weird behaviour
+  private final ImmutableMap<String, BeanDefinition> toolingContextServices = ImmutableMap.<String, BeanDefinition>builder()
+      .put(METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class))
+      .put(VALUE_PROVIDER_SERVICE_KEY, getBeanDefinition(MuleValueProviderService.class))
+      .put(SAMPLE_DATA_SERVICE_KEY, getBeanDefinition(MuleSampleDataService.class))
+      .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
+      .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
+      .build();
+
   private final MuleFunctionsBindingContextProvider coreFunctionsProvider;
   private final ConfigurationProperties configurationProperties;
   private final Map<String, String> artifactProperties;
+  private final boolean addToolingObjectsToRegistry;
   private final MemoryManagementService memoryManagementService;
 
   public SpringMuleContextServiceConfigurator(MuleContextWithRegistry muleContext,
                                               MuleFunctionsBindingContextProvider coreFunctionsProvider,
                                               ConfigurationProperties configurationProperties,
                                               Map<String, String> artifactProperties,
+                                              boolean addToolingObjectsToRegistry,
                                               ArtifactType artifactType,
                                               ArtifactAst artifactAst,
                                               OptionalObjectsController optionalObjectsController,
@@ -248,6 +254,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     this.coreFunctionsProvider = coreFunctionsProvider;
     this.configurationProperties = configurationProperties;
     this.artifactProperties = artifactProperties;
+    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.artifactType = artifactType;
     this.artifactAst = artifactAst;
     this.optionalObjectsController = optionalObjectsController;
@@ -271,10 +278,10 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
     loadServiceConfigurators();
 
-    defaultContextServices.entrySet().stream()
-        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
-            || artifactType.equals(POLICY))
-        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
+    registerContextServices(defaultContextServices);
+    if (isAddToolingObjectsToRegistry()) {
+      registerContextServices(toolingContextServices);
+    }
 
     createBootstrapBeanDefinitions();
     createLocalObjectStoreBeanDefinitions();
@@ -290,6 +297,13 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     if (valueOf(artifactProperties.getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
     }
+  }
+
+  private void registerContextServices(Map<String, BeanDefinition> contextServices) {
+    contextServices.entrySet().stream()
+        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
+            || artifactType.equals(POLICY))
+        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
   }
 
   private void loadServiceConfigurators() {
@@ -407,6 +421,10 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
 
   protected Map<String, String> getArtifactProperties() {
     return artifactProperties;
+  }
+
+  protected boolean isAddToolingObjectsToRegistry() {
+    return addToolingObjectsToRegistry;
   }
 
   protected MemoryManagementService getMemoryManagementService() {

@@ -6,14 +6,15 @@
  */
 package org.mule.test.module.extension;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.tck.util.TestConnectivityUtils.disableAutomaticTestConnectivity;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.OAUTH2;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.sdk.api.exception.ModuleException;
@@ -21,11 +22,12 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
 import org.mule.test.some.extension.CustomConnectionException;
 
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.hamcrest.Matcher;
 
 public class ConnectivityErrorPropagationTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -47,6 +49,11 @@ public class ConnectivityErrorPropagationTestCase extends AbstractExtensionFunct
   @Override
   protected String getConfigFile() {
     return "connectivity-error-propagation-config.xml";
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
+    return true;
   }
 
   @Test

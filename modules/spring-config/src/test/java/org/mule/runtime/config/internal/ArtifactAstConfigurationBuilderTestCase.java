@@ -131,7 +131,7 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
                                                                                 boolean lazyInit)
       throws IOException {
     return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
-                                  () -> new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, lazyInit));
+                                  () -> new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, lazyInit, false));
   }
 
   public static final class TestExtensionSchemagenerator implements ExtensionSchemaGenerator {
