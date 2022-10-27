@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Issue;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
@@ -97,7 +96,6 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
     }));
   }
 
-  @NotNull
   private AtomicReference<Thread> disposeAsynchronouslyAndGetThreadReference() {
     AtomicReference<Thread> threadExecutingTheDispose = new AtomicReference<>();
     executor.submit(() -> {

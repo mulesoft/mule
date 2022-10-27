@@ -14,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * An implementation of {@link LockProvider} that includes some test capabilities, such as:
  * <ul>
@@ -92,7 +90,7 @@ class TestLockProviderWrapper implements LockProvider {
     }
 
     @Override
-    public boolean tryLock(long time, @NotNull TimeUnit unit) throws InterruptedException {
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
       if (shouldRaiseExceptions) {
         throw new InterruptedException();
       }
@@ -107,7 +105,6 @@ class TestLockProviderWrapper implements LockProvider {
       actual.unlock();
     }
 
-    @NotNull
     @Override
     public Condition newCondition() {
       return actual.newCondition();
