@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_ENABLE_STATISTICS",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "MULE_ENABLE_STATISTICS",
+          "elementKind": "field",
+          "justification": "W-11954914: account for `mule.enable.statistics` system property"
+        },
+        {
           "code": "java.method.added",
           "new": "method org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getFlowSummaryStatistics()",
           "package": "org.mule.runtime.core.api.management.stats",
