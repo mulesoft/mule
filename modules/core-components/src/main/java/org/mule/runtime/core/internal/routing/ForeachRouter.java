@@ -136,7 +136,8 @@ class ForeachRouter {
           }
         })
         .onErrorContinue(MessagingException.class, (e, o) -> {
-          this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
+          CoreEvent event = this.eventWithCurrentContextDeleted(restoreSequenceInfo(((MessagingException) e).getEvent()));
+          ((MessagingException) e).setProcessedEvent(event);
           downstreamRecorder.next(left(e));
           completeRouterIfNecessary();
         });
@@ -155,6 +156,16 @@ class ForeachRouter {
             return createResponseEvent(either.getRight());
           }
         });
+  }
+
+  /**
+   * When foreach has failed with an error in Scatter-Gather route, the sequence info will be restored.
+   */
+  private CoreEvent restoreSequenceInfo(CoreEvent currentEvent){
+    ForeachContext foreachContext = getContext(currentEvent);
+    CoreEvent.Builder responseBuilder =
+            builder(currentEvent).itemSequenceInfo(foreachContext.getItemSequenceInfo());
+    return responseBuilder.build();
   }
 
   /**
