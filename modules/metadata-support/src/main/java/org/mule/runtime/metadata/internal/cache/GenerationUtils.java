@@ -4,8 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
+/**
+ * Utils for {@link org.mule.runtime.metadata.api.generation.MetadataCacheId} generation.
+ *
+ * @since 4.5
+ */
 public class GenerationUtils {
 
   private GenerationUtils() {}

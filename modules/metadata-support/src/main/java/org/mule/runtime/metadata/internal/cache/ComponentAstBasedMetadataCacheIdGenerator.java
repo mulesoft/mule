@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -13,10 +13,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.getModelNameAst;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.getModelNameAst;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ArrayType;

@@ -14,7 +14,7 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.metadata.api.generation.MetadataCacheId;
 import org.mule.runtime.metadata.api.generation.MetadataCacheIdGenerator;
-import org.mule.runtime.metadata.internal.generation.DslElementBasedMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.internal.cache.DslElementBasedMetadataCacheIdGenerator;
 
 import java.util.Optional;
 

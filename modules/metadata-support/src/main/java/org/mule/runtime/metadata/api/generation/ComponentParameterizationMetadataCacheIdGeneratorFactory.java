@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.metadata.api.generation;
 
-import org.mule.runtime.metadata.internal.generation.ComponentParameterizationBasedMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.internal.cache.ComponentParameterizationBasedMetadataCacheIdGenerator;
 
 /**
  * A Factory of {@link ComponentParameterizationMetadataCacheIdGenerator}
