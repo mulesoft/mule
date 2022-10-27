@@ -238,7 +238,7 @@
         <allureReportVersion>2.3.4</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleApiAnnotationsVersion>1.0.2-20221024</muleApiAnnotationsVersion>
+        <muleApiAnnotationsVersion>1.0.2-20221027</muleApiAnnotationsVersion>
         <muleDslApiVersion>1.1.5-20221024</muleDslApiVersion>
         <muleExtensionsApiVersion>1.1.6-20221024</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.1.2-20221024</muleHttpPolicyApiVersion>
