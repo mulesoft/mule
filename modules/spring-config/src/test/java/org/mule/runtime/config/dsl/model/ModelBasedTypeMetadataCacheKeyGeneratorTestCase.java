@@ -28,7 +28,7 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.metadata.api.generation.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -65,7 +65,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;

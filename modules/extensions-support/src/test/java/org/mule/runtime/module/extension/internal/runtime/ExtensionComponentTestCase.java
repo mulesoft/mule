@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;

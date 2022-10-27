@@ -7,7 +7,7 @@
 package org.mule.runtime.metadata.internal.cache;
 
 /**
- * Utils for {@link org.mule.runtime.metadata.api.generation.MetadataCacheId} generation.
+ * Utils for {@link org.mule.runtime.metadata.api.cache.MetadataCacheId} generation.
  *
  * @since 4.5
  */

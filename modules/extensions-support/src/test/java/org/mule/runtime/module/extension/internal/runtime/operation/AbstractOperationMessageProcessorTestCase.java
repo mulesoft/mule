@@ -98,9 +98,9 @@ import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFacto
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
-import org.mule.runtime.metadata.api.generation.MetadataCacheId;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGenerator;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;

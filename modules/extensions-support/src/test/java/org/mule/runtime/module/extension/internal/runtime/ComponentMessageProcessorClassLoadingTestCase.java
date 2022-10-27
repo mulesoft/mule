@@ -32,7 +32,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;

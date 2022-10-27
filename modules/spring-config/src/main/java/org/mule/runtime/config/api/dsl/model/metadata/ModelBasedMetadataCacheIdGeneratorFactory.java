@@ -9,8 +9,8 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGenerator;
-import org.mule.runtime.metadata.api.generation.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 
 
 /**
