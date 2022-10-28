@@ -50,6 +50,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   private final TypeLoader typeLoader;
   private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
+  private ExtensionErrorMapper extensionErrorMapper;
 
   public MuleSdkExtensionModelParser(ArtifactAst ast,
                                      TypeLoader typeLoader,
@@ -60,7 +61,18 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   protected void init(ArtifactAst ast) {
+    extensionErrorMapper = parseExtensionErrorMapper(ast);
     operationModelParsers = computeOperationModelParsers(ast);
+  }
+
+  protected ExtensionErrorMapper parseExtensionErrorMapper(ArtifactAst ast) {
+    return (ns, type) -> {
+      if (ns.equals(getNamespace())) {
+        return type;
+      } else {
+        return ns + "_" + type;
+      }
+    };
   }
 
   @Override
@@ -163,7 +175,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
     final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
         getTopLevelElements(ast)
             .filter(c -> c.getComponentType() == OPERATION_DEF)
-            .map(c -> new MuleSdkOperationModelParserSdk(c, getNamespace(), typeLoader, extensionModelHelper))
+            .map(c -> createOperationModelParser(c, getNamespace()))
             .collect(toMap(c -> getSanitizedElementName(c::getName), identity()));
 
     // Some characteristics of the operation model parsers require knowledge about the other operation model parsers
@@ -171,5 +183,9 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
         .forEach(operationModelParser -> operationModelParser.computeCharacteristics(operationParsersByName));
 
     return new ArrayList<>(operationParsersByName.values());
+  }
+
+  protected MuleSdkOperationModelParserSdk createOperationModelParser(ComponentAst operation, String namespace) {
+    return new MuleSdkOperationModelParserSdk(operation, namespace, typeLoader, extensionModelHelper, extensionErrorMapper);
   }
 }

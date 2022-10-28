@@ -13,6 +13,7 @@ import static org.mule.runtime.ast.api.util.AstTraversalDirection.TOP_DOWN;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.FilteringCharacteristic;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -23,7 +24,6 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -106,10 +106,15 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   public MuleSdkOperationModelParserSdk(ComponentAst operation, String namespace, TypeLoader typeLoader,
                                         ExtensionModelHelper extensionModelHelper) {
+    this(operation, namespace, typeLoader, extensionModelHelper, null);
+  }
+
+  public MuleSdkOperationModelParserSdk(ComponentAst operation, String namespace, TypeLoader typeLoader,
+                                        ExtensionModelHelper extensionModelHelper, ExtensionErrorMapper extensionErrorMapper) {
     this.operation = operation;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    this.errorModels = new AggregatedErrorsCharacteristic(namespace);
+    this.errorModels = new AggregatedErrorsCharacteristic(namespace, extensionErrorMapper);
 
     parseStructure();
   }
