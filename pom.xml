@@ -254,7 +254,7 @@
         <muleVeganExtensionTestVersion>4.1.6-20221028</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.6-20221028</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.1.6-20221028</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.1.6-20221024</mulePetstoreExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.1.6-20221028</mulePetstoreExtensionTestVersion>
         <muleSubtypesExtensionTestVersion>4.1.6-20221024</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
