@@ -251,7 +251,7 @@
 
         <!-- Test Extensions -->
         <muleMetadataExtensionTestVersion>4.1.6-20221028</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.1.6-20221024</muleVeganExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.1.6-20221028</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.6-20221024</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.1.6-20221024</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.1.6-20221024</mulePetstoreExtensionTestVersion>
