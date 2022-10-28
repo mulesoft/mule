@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENABLE_STATISTICS;
+
+import static java.lang.Boolean.getBoolean;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
@@ -20,7 +24,7 @@ import java.util.Map;
 @NoExtend
 public class AllStatistics {
 
-  private boolean isStatisticsEnabled;
+  private boolean isStatisticsEnabled = getBoolean(MULE_ENABLE_STATISTICS);
   private long startTime;
   private final ApplicationStatistics appStats;
   private final FlowsSummaryStatistics flowSummaryStatistics;
