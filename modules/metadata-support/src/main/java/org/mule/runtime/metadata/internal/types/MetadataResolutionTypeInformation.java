@@ -7,7 +7,7 @@
 package org.mule.runtime.metadata.internal.types;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 
 import java.util.Optional;
 

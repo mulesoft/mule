@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -13,10 +13,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.getModelNameAst;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.getModelNameAst;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -34,9 +34,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
@@ -124,8 +124,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
         .map(cfgModel -> {
           keyParts.add(resolveDslTagId(elementModel));
 
-          resolveGlobalElement(elementModel)
-              .ifPresent(keyParts::add);
+          resolveGlobalElement(elementModel).ifPresent(keyParts::add);
 
           return new MetadataCacheId(keyParts, sourceElementName(elementModel));
         })
@@ -133,8 +132,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
           Optional<MetadataCacheId> configId = resolveConfigId(elementModel);
           if (configId.isPresent()) {
             keyParts.add(configId.get());
-            resolveCategoryId(elementModel)
-                .ifPresent(keyParts::add);
+            resolveCategoryId(elementModel).ifPresent(keyParts::add);
             return new MetadataCacheId(keyParts, sourceElementName(elementModel));
           }
 
@@ -159,11 +157,9 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
       resolveConfigId(component).ifPresent(keyParts::add);
 
       typeInformation.getResolverCategory()
-          .ifPresent(resolverCategory -> keyParts
-              .add(createCategoryMetadataCacheId(resolverCategory)));
+          .ifPresent(resolverCategory -> keyParts.add(createCategoryMetadataCacheId(resolverCategory)));
 
-      typeInformation.getResolverName()
-          .ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
+      typeInformation.getResolverName().ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
 
       keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
 
@@ -197,11 +193,9 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
   private Optional<MetadataCacheId> doResolve(ComponentAst elementModel) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
-    resolveConfigId(elementModel)
-        .ifPresent(keyParts::add);
+    resolveConfigId(elementModel).ifPresent(keyParts::add);
 
-    resolveCategoryId(elementModel)
-        .ifPresent(keyParts::add);
+    resolveCategoryId(elementModel).ifPresent(keyParts::add);
 
     keyParts.add(resolveDslTagId(elementModel));
 
@@ -256,21 +250,21 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
                                                             ComponentModel componentModel,
                                                             boolean resolveAllKeys) {
     boolean isPartialFetching = componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
-        .map(mp -> mp.isPartialTypeKeyResolver())
+        .map(TypeResolversInformationModelProperty::isPartialTypeKeyResolver)
         .orElse(false);
 
-    if (isPartialFetching || resolveAllKeys) {
-      List<MetadataCacheId> keyParts = elementModel.getParameters()
-          .stream()
-          .filter(p -> p.getValue().getValue().isPresent())
-          .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-          .sorted(comparingInt(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
-          .map(p -> resolveKeyFromSimpleValue(elementModel, p))
-          .collect(toList());
-      return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
+    if (!isPartialFetching && !resolveAllKeys) {
+      return empty();
     }
 
-    return empty();
+    List<MetadataCacheId> keyParts = elementModel.getParameters()
+        .stream()
+        .filter(p -> p.getValue().getValue().isPresent())
+        .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .sorted(comparingInt(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
+        .map(p -> resolveKeyFromSimpleValue(elementModel, p))
+        .collect(toList());
+    return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
   }
 
   private MetadataCacheId resolveKeyFromSimpleValue(ComponentAst elementModel, ComponentParameterAst param) {
@@ -336,11 +330,10 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
   }
 
   private Optional<MetadataCacheId> getHashedGlobal(String name) {
-    if (!isBlank(name)) {
-      return locator.get(Location.builder().globalName(name).build())
-          .map(global -> doResolve(global).orElse(null));
+    if (isBlank(name)) {
+      return empty();
     }
-    return empty();
+    return locator.get(Location.builder().globalName(name).build()).flatMap(this::doResolve);
   }
 
   private static class MetadataCacheIdBuilderAdapter implements CacheIdBuilderAdapter<MetadataCacheId> {

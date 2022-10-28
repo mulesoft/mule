@@ -24,7 +24,7 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.locator;
+package org.mule.runtime.metadata.api.locator;
 
 import org.mule.runtime.api.component.location.Location;
 

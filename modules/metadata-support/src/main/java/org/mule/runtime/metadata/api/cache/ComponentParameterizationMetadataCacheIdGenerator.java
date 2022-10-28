@@ -4,10 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.api.generation;
+package org.mule.runtime.metadata.api.cache;
 
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 
 import java.util.Optional;

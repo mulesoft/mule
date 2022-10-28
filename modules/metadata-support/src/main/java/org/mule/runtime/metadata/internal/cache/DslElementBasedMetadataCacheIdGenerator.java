@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -25,9 +25,9 @@ import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;

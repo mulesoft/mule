@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -12,10 +12,10 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.computeIdFor;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.resolveConfigName;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
-import static org.mule.runtime.metadata.internal.generation.ComponentBasedIdHelper.sourceElementName;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.computeIdFor;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveConfigName;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 
@@ -30,12 +30,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -230,7 +229,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     return valueProviderModel.getParameters()
         .stream()
         .map(ActingParameterModel::getExtractionExpression)
-        .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
+        .map(GenerationUtils::getParameterNameFromExtractionExpression)
         .filter(parameterModelsInformation::containsKey)
         .map(parameterModelsInformation::get)
         .map(ParameterModelInformation::getParameterAst)

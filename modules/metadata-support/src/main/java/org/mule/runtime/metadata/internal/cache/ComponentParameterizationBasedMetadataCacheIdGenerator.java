@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -33,14 +33,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
-import org.mule.runtime.metadata.api.generation.ComponentParameterizationMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.cache.ComponentParameterizationMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.internal.types.AttributesMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.ComponentParameterizationInputMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.KeysMetadataResolutionTypeInformation;

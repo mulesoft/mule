@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metadata.internal.generation;
+package org.mule.runtime.metadata.internal.cache;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -27,12 +27,11 @@ import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
-import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -221,7 +220,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
         .getParameters()
         .stream()
         .map(ActingParameterModel::getExtractionExpression)
-        .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
+        .map(GenerationUtils::getParameterNameFromExtractionExpression)
         .filter(parameterModelsInformation::containsKey)
         .map(parameterModelsInformation::get)
         .map(ParameterModelInformation::getParameterDslElementModel)
