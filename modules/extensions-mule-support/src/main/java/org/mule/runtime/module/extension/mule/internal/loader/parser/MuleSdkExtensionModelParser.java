@@ -47,18 +47,20 @@ import java.util.stream.Stream;
  */
 public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionModelParser implements ExtensionModelParser {
 
-  private final ArtifactAst ast;
   private final TypeLoader typeLoader;
-  private final List<OperationModelParser> operationModelParsers;
+  private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
 
   public MuleSdkExtensionModelParser(ArtifactAst ast,
                                      TypeLoader typeLoader,
                                      ExtensionModelHelper extensionModelHelper) {
-    this.ast = ast;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    operationModelParsers = computeOperationModelParsers();
+    init(ast);
+  }
+
+  protected void init(ArtifactAst ast) {
+    operationModelParsers = computeOperationModelParsers(ast);
   }
 
   @Override
@@ -157,7 +159,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
    */
   protected abstract Stream<ComponentAst> getTopLevelElements(ArtifactAst ast);
 
-  private List<OperationModelParser> computeOperationModelParsers() {
+  private List<OperationModelParser> computeOperationModelParsers(ArtifactAst ast) {
     final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
         getTopLevelElements(ast)
             .filter(c -> c.getComponentType() == OPERATION_DEF)

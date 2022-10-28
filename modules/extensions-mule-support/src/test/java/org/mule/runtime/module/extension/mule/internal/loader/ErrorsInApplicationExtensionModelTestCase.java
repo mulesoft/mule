@@ -42,7 +42,7 @@ import org.junit.Test;
 
 @Feature(REUSE)
 @Stories({@Story(APPLICATION_EXTENSION_MODEL), @Story(ERROR_HANDLING)})
-public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalTestCase {
+public class ErrorsInApplicationExtensionModelTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final Map<String, Set<String>> expectedErrors = new HashMap<>();
 

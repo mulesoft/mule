@@ -23,7 +23,6 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -51,7 +50,12 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     super(ast, typeLoader, extensionModelHelper);
+  }
+
+  @Override
+  protected void init(ArtifactAst ast) {
     parseStructure(getExtensionComponentAst(ast));
+    super.init(ast);
   }
 
   @Override
