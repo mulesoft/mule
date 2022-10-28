@@ -48,7 +48,8 @@ public class DeployableMavenClassLoaderConfigurationLoader extends AbstractMaven
     super(mavenClient);
   }
 
-  public DeployableMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
+  public DeployableMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient,
+                                                       Supplier<JarExplorer> jarExplorerFactory) {
     super(mavenClient, jarExplorerFactory);
   }
 
@@ -63,7 +64,8 @@ public class DeployableMavenClassLoaderConfigurationLoader extends AbstractMaven
                                                                                                      MavenClient mavenClient,
                                                                                                      Map<String, Object> attributes,
                                                                                                      List<BundleDependency> nonProvidedDependencies) {
-    return new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
+    return new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient,
+                                                          nonProvidedDependencies);
   }
 
   @Override

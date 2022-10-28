@@ -62,8 +62,8 @@ public interface ArtifactDescriptorFactoryProvider {
   /**
    * Creates a factory of descriptors for describing mule artifact plugins.
    * 
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be
    *                                           used. Non null.
    * @return a factory to create {@link ArtifactPluginDescriptor}s.

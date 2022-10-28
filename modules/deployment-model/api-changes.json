@@ -3,6 +3,28 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::setClassLoaderModel(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel)",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "methodName": "setClassLoaderModel",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::setClassLoaderModel(===org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel===)",
+          "new": "parameter void org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::setClassLoaderModel(===org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration===)",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "methodName": "setClassLoaderModel",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
           "old": "class org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants",
           "new": "class org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants",

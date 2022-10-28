@@ -101,8 +101,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
                                         mock(ClassLoaderLookupPolicy.class), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
-    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfigurationBuilder(applicationDescriptor.getClassLoaderConfiguration())
-        .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
+    ClassLoaderConfiguration classLoaderConfiguration =
+        new ClassLoaderConfigurationBuilder(applicationDescriptor.getClassLoaderConfiguration())
+            .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
     applicationDescriptor.setClassLoaderConfiguration(classLoaderConfiguration);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
                                            mock(ClassLoaderLookupPolicy.class));

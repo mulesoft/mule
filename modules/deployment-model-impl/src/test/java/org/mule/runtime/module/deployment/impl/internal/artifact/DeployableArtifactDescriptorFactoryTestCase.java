@@ -171,7 +171,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         get(getArtifactRootFolder(), "test", "repository", "org", "mule", "test", "shared", "1.0.0", "shared-1.0.0.jar");
     assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
     assertThat(desc.getClassLoaderConfiguration().getExportedPackages(), contains("org.foo"));
-    assertThat(desc.getClassLoaderConfiguration().getExportedResources(), containsInAnyOrder("META-INF/MANIFEST.MF", "README.txt"));
+    assertThat(desc.getClassLoaderConfiguration().getExportedResources(),
+               containsInAnyOrder("META-INF/MANIFEST.MF", "README.txt"));
   }
 
   @Test
@@ -280,7 +281,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(classLoaderConfiguration.getDependencies(), hasItem(testEmptyPluginDependencyMatcher()));
 
     assertThat(classLoaderConfiguration.getUrls().length, is(1));
-    assertThat(asList(classLoaderConfiguration.getUrls()), not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
   }
 
   @Test
@@ -298,7 +300,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(classLoaderConfiguration.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
 
     assertThat(classLoaderConfiguration.getUrls().length, is(1));
-    assertThat(asList(classLoaderConfiguration.getUrls()), not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
 
     ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
 
@@ -325,16 +328,18 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(classLoaderConfiguration.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
 
     assertThat(classLoaderConfiguration.getUrls().length, is(1));
-    assertThat(asList(classLoaderConfiguration.getUrls()), not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
 
     ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
 
     assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
     assertThat(pluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasItems(
-                                                                                  bundleDependency("library-with-dependency-a"),
-                                                                                  bundleDependency("library-with-dependency-b"),
-                                                                                  bundleDependency("library", "1.0.0")));
-    assertThat(pluginDescriptor.getClassLoaderConfiguration().getDependencies(), not(hasItem(bundleDependency("library", "2.0.0"))));
+                                                                                          bundleDependency("library-with-dependency-a"),
+                                                                                          bundleDependency("library-with-dependency-b"),
+                                                                                          bundleDependency("library", "1.0.0")));
+    assertThat(pluginDescriptor.getClassLoaderConfiguration().getDependencies(),
+               not(hasItem(bundleDependency("library", "2.0.0"))));
   }
 
   @Test
@@ -349,12 +354,14 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
-  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository() throws Exception {
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository()
+      throws Exception {
     assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight-local-repository");
   }
 
   @Test
-  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUsingSystemScope() throws Exception {
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUsingSystemScope()
+      throws Exception {
     assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-system-scope-lightweight");
   }
 
@@ -386,7 +393,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ArtifactPluginDescriptor testEmptyPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("test-empty-plugin")).findFirst().get();
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls().length, is(3));
-    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url)).collect(toList()),
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url))
+        .collect(toList()),
                everyItem(exists()));
 
     assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url).getName())
@@ -398,8 +406,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
 
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(19));
-    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasItems("org.apache.commons.collections",
-                                                                                            "org.apache.commons.io"));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(),
+               hasItems("org.apache.commons.collections",
+                        "org.apache.commons.io"));
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalResources(),
                hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
                         "META-INF/maven/commons-io/commons-io/pom.xml"));
@@ -450,9 +459,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .findFirst().isPresent(), is(true));
 
     assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("org.apache.commons.collections",
-                                                                "org.apache.commons.io"));
-    assertThat(classLoaderConfiguration.getExportedResources(), hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
-                                                                 "META-INF/maven/commons-io/commons-io/pom.xml"));
+                                                                        "org.apache.commons.io"));
+    assertThat(classLoaderConfiguration.getExportedResources(),
+               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+                        "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     assertThat(desc.getPlugins(), hasSize(2));
   }
@@ -497,7 +507,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
     assertThat(classLoaderConfiguration.getDependencies().size(), is(2));
-    assertThat(classLoaderConfiguration.getDependencies(), hasItems(dependantPluginDependencyMatcher(), emptyPluginDependencyMatcher()));
+    assertThat(classLoaderConfiguration.getDependencies(),
+               hasItems(dependantPluginDependencyMatcher(), emptyPluginDependencyMatcher()));
 
     assertThat(classLoaderConfiguration.getUrls().length, is(1));
     classLoaderConfiguration.getDependencies().stream()
@@ -547,8 +558,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
     assertThat(classLoaderConfiguration.getDependencies(), contains(
-                                                            bundleDependency("library"),
-                                                            bundleDependency("library")));
+                                                                    bundleDependency("library"),
+                                                                    bundleDependency("library")));
 
     assertThat(stream(classLoaderConfiguration.getUrls()).map(URL::getPath).collect(toList()),
                contains(

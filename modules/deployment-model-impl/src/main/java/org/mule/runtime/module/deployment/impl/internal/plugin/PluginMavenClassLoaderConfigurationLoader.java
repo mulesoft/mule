@@ -71,7 +71,8 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
 
   @Override
   protected ClassLoaderConfiguration createLightPackageClassLoaderConfiguration(File artifactFile, Map<String, Object> attributes,
-                                                                                ArtifactType artifactType, MavenClient mavenClient) {
+                                                                                ArtifactType artifactType,
+                                                                                MavenClient mavenClient) {
     // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the
     // META-INF/mule-artifact
     if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
@@ -138,7 +139,8 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
                                                                                                      Map<String, Object> attributes,
                                                                                                      List<BundleDependency> nonProvidedDependencies) {
     final LightweightClassLoaderConfigurationBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
+        new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient,
+                                                       nonProvidedDependencies);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
@@ -162,7 +164,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
       ArtifactDescriptor deployableArtifactDescriptor =
           ((PluginExtendedClassLoaderConfigurationAttributes) attributes).getDeployableArtifactDescriptor();
       Set<BundleDependency> deployableArtifactDescriptorDependencies =
-          deployableArtifactDescriptor.getClassLoaderModel().getDependencies();
+          deployableArtifactDescriptor.getClassLoaderConfiguration().getDependencies();
       BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream()
           .filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst()
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: "

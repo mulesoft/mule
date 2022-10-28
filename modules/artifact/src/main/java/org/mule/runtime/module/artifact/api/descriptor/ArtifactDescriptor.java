@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.fromClassLoaderConfiguration;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.deployment.meta.Product;
@@ -94,23 +93,24 @@ public class ArtifactDescriptor {
   }
 
   // TODO: change the return type even after deprecation?
-  @Deprecated
-  public ClassLoaderConfiguration getClassLoaderModel() {
-    // maybe we can remove this if changed in all places (maven plugin and tooling client only apparently)?
-    return fromClassLoaderConfiguration(getClassLoaderConfiguration());
-  }
-
-  @Deprecated
-  public void setClassLoaderModel(ClassLoaderConfiguration classLoaderConfiguration) {
-    setClassLoaderConfiguration(classLoaderConfiguration);
-  }
+  // @Deprecated
+  // public ClassLoaderConfiguration getClassLoaderModel() {
+  // // maybe we can remove this if changed in all places (maven plugin and tooling client only apparently)?
+  // return fromClassLoaderConfiguration(getClassLoaderConfiguration());
+  // // return getClassLoaderConfiguration();
+  // }
+  //
+  // @Deprecated
+  // public void setClassLoaderModel(ClassLoaderConfiguration classLoaderConfiguration) {
+  // setClassLoaderConfiguration(classLoaderConfiguration);
+  // }
 
   public ClassLoaderConfiguration getClassLoaderConfiguration() {
     return classLoaderConfiguration;
   }
 
   public void setClassLoaderConfiguration(ClassLoaderConfiguration classLoaderConfiguration) {
-//    this.classLoaderConfiguration = fromClassLoaderConfiguration(classLoaderConfiguration);
+    // this.classLoaderConfiguration = fromClassLoaderConfiguration(classLoaderConfiguration);
     // let's see with the new one
     this.classLoaderConfiguration = classLoaderConfiguration;
   }

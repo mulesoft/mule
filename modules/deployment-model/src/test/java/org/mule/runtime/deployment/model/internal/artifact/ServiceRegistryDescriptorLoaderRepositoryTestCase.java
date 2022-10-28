@@ -46,7 +46,8 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
   public void initializesClassLoaderConfigurationLoadersOnce() throws Exception {
     ClassLoaderConfigurationLoader expectedClassLoaderConfigurationLoader = mock(ClassLoaderConfigurationLoader.class);
     when(expectedClassLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
-    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders = singleton(expectedClassLoaderConfigurationLoader);
+    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders =
+        singleton(expectedClassLoaderConfigurationLoader);
     when(serviceRegistry.lookupProviders(ClassLoaderConfigurationLoader.class, getClass().getClassLoader()))
         .thenReturn(classLoaderConfigurationLoaders);
     when(expectedClassLoaderConfigurationLoader.supportsArtifactType(PLUGIN)).thenReturn(true);
@@ -73,10 +74,12 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
     ClassLoaderConfigurationLoader expectedClassLoaderConfigurationLoader = mock(ClassLoaderConfigurationLoader.class);
     when(expectedClassLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
     when(expectedClassLoaderConfigurationLoader.supportsArtifactType(PLUGIN)).thenReturn(true);
-    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders = singleton(expectedClassLoaderConfigurationLoader);
+    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders =
+        singleton(expectedClassLoaderConfigurationLoader);
     when(serviceRegistry.lookupProviders(ClassLoaderConfigurationLoader.class, getClass().getClassLoader()))
         .thenReturn(classLoaderConfigurationLoaders);
-    ClassLoaderConfigurationLoader classLoaderConfigurationLoader = repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
+    ClassLoaderConfigurationLoader classLoaderConfigurationLoader =
+        repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
 
     assertThat(classLoaderConfigurationLoader, is(expectedClassLoaderConfigurationLoader));
   }

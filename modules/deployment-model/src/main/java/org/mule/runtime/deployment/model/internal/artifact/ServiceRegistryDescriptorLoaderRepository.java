@@ -30,13 +30,15 @@ import java.util.Map;
 public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoaderRepository {
 
   private final ServiceRegistry serviceRegistry;
-  private final Class[] descriptorLoaderClasses = new Class[] {ClassLoaderConfigurationLoader.class, BundleDescriptorLoader.class};
+  private final Class[] descriptorLoaderClasses =
+      new Class[] {ClassLoaderConfigurationLoader.class, BundleDescriptorLoader.class};
   private Map<Class, List<DescriptorLoader>> descriptorLoaders;
 
   /**
    * Creates a new repository
    *
-   * @param serviceRegistry provides access to the {@link ClassLoaderConfigurationLoader} that must be tracked on the repository. Non null
+   * @param serviceRegistry provides access to the {@link ClassLoaderConfigurationLoader} that must be tracked on the repository.
+   *                        Non null
    */
   public ServiceRegistryDescriptorLoaderRepository(ServiceRegistry serviceRegistry) {
     checkArgument(serviceRegistry != null, "serviceRegistry cannot be null");

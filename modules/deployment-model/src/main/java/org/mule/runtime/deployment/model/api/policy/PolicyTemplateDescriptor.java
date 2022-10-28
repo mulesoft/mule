@@ -55,11 +55,6 @@ public final class PolicyTemplateDescriptor extends ArtifactDescriptor {
   }
 
   @Override
-  public void setClassLoaderModel(ClassLoaderConfiguration classLoaderModel) {
-    setClassLoaderConfiguration(classLoaderModel);
-  }
-
-  @Override
   public void setClassLoaderConfiguration(ClassLoaderConfiguration classLoaderConfiguration) {
     checkArgument(classLoaderConfiguration.getExportedPackages().isEmpty(), POLICY_EXPORTED_PACKAGES_ERROR);
     checkArgument(classLoaderConfiguration.getExportedResources().isEmpty(), POLICY_EXPORTED_RESOURCE_ERROR);

@@ -36,7 +36,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 
 /**
- * Builder for a {@link ClassLoaderConfiguration} responsible for resolving dependencies when lightweight packaging is used for an artifact.
+ * Builder for a {@link ClassLoaderConfiguration} responsible for resolving dependencies when lightweight packaging is used for an
+ * artifact.
  *
  * @since 4.2.0
  */

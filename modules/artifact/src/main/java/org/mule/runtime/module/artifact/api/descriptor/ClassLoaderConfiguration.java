@@ -34,7 +34,8 @@ public class ClassLoaderConfiguration {
    * Defines a {@link ClassLoaderConfiguration} with empty configuration
    */
   public static final ClassLoaderConfiguration NULL_CLASSLOADER_CONFIGURATION =
-      new ClassLoaderConfiguration(new URL[0], emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), false);
+      new ClassLoaderConfiguration(new URL[0], emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), emptySet(),
+                                   false);
 
   private final URL[] urls;
   private final Set<String> exportedPackages;
@@ -47,9 +48,9 @@ public class ClassLoaderConfiguration {
   private final boolean includeTestDependencies;
 
   protected ClassLoaderConfiguration(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources,
-                           Set<String> localPackages, Set<String> localResources,
-                           Set<BundleDependency> dependencies, Set<String> privilegedExportedPackages,
-                           Set<String> privilegedArtifacts, boolean includeTestDependencies) {
+                                     Set<String> localPackages, Set<String> localResources,
+                                     Set<BundleDependency> dependencies, Set<String> privilegedExportedPackages,
+                                     Set<String> privilegedArtifacts, boolean includeTestDependencies) {
     this.urls = urls;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
@@ -120,7 +121,8 @@ public class ClassLoaderConfiguration {
   }
 
   /**
-   * @return {@code true} if the configuration should include {@code test} scope dependencies when resolving the class loader {@link URL urls} for the artifact.
+   * @return {@code true} if the configuration should include {@code test} scope dependencies when resolving the class loader
+   *         {@link URL urls} for the artifact.
    */
   public boolean isIncludeTestDependencies() {
     return includeTestDependencies;
@@ -329,11 +331,11 @@ public class ClassLoaderConfiguration {
      */
     protected ClassLoaderConfiguration doBuild() {
       return new ClassLoaderConfiguration(urls.toArray(new URL[0]),
-                                  unmodifiableSet(packages), unmodifiableSet(resources),
-                                  unmodifiableSet(localPackages), unmodifiableSet(localResources),
-                                  unmodifiableSet(dependencies),
-                                  unmodifiableSet(privilegedExportedPackages), unmodifiableSet(privilegedArtifacts),
-                                  includeTestDependencies);
+                                          unmodifiableSet(packages), unmodifiableSet(resources),
+                                          unmodifiableSet(localPackages), unmodifiableSet(localResources),
+                                          unmodifiableSet(dependencies),
+                                          unmodifiableSet(privilegedExportedPackages), unmodifiableSet(privilegedArtifacts),
+                                          includeTestDependencies);
     }
   }
 }

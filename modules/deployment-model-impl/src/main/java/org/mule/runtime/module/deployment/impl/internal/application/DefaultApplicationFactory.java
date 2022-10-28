@@ -260,7 +260,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     if (descriptor.getPlugins().isEmpty()) {
       Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
 
-      for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
+      for (BundleDependency bundleDependency : descriptor.getClassLoaderConfiguration().getDependencies()) {
         if (bundleDependency.getDescriptor().isPlugin()) {
           File pluginZip = new File(bundleDependency.getBundleUri());
           try {

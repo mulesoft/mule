@@ -79,8 +79,9 @@ import org.eclipse.aether.version.VersionConstraint;
 import org.slf4j.Logger;
 
 /**
- * Abstract implementation of {@link ClassLoaderConfigurationLoader} that resolves the dependencies for all the mule artifacts and create
- * the {@link ClassLoaderConfiguration}. It lets the implementations of this class to add artifact's specific class loader URLs
+ * Abstract implementation of {@link ClassLoaderConfigurationLoader} that resolves the dependencies for all the mule artifacts and
+ * create the {@link ClassLoaderConfiguration}. It lets the implementations of this class to add artifact's specific class loader
+ * URLs
  *
  * @since 4.0
  */
@@ -107,7 +108,8 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     this(mavenClient, () -> new FileJarExplorer());
   }
 
-  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
+  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient,
+                                                     Supplier<JarExplorer> jarExplorerFactory) {
     this.mavenClient = mavenClient;
     this.jarExplorerFactory = jarExplorerFactory;
   }
@@ -122,11 +124,11 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
    * folder to look for the artifacts in it (which includes both JAR files as well as POM ones).
    * <p/>
    * It takes care of the transitive compile and runtime dependencies, from which will take the URLs to add them to the resulting
-   * {@link ClassLoaderConfiguration}, and it will also consume all Mule plugin dependencies so that further validations can check whether
-   * or not all plugins are loaded in memory before running an application.
+   * {@link ClassLoaderConfiguration}, and it will also consume all Mule plugin dependencies so that further validations can check
+   * whether or not all plugins are loaded in memory before running an application.
    * <p/>
-   * Finally, it will also tell the resulting {@link ClassLoaderConfiguration} which packages and/or resources has to export, consuming
-   * the attributes from the {@link MuleArtifactLoaderDescriptor#getAttributes()} map.
+   * Finally, it will also tell the resulting {@link ClassLoaderConfiguration} which packages and/or resources has to export,
+   * consuming the attributes from the {@link MuleArtifactLoaderDescriptor#getAttributes()} map.
    *
    * @param artifactFile {@link File} where the current plugin to work with.
    * @param attributes   a set of attributes to work with, where the current implementation of this class will look for
@@ -149,14 +151,14 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     if (bundleDescriptorMetadata != null) {
       // Avoid parsing the classLoaderModel from JSON again if that is already available from a previous process.
       return createHeavyPackageClassLoaderConfiguration(artifactFile, attributes,
-                                                of(getDeployableArtifactRepositoryFolder(artifactFile)),
-                                                bundleDescriptorMetadata);
+                                                        of(getDeployableArtifactRepositoryFolder(artifactFile)),
+                                                        bundleDescriptorMetadata);
     } else if (isHeavyPackage(artifactFile, attributes)) {
       return createHeavyPackageClassLoaderConfiguration(artifactFile, getClassLoaderModelDescriptor(artifactFile), attributes);
     } else {
       return createLightPackageClassLoaderConfiguration(artifactFile, attributes, artifactType,
-                                                mavenClient
-                                                    .orElseThrow(() -> new UnsupportedOperationException("A MavenClient must be provided in order to handle lightweight packages.")));
+                                                        mavenClient
+                                                            .orElseThrow(() -> new UnsupportedOperationException("A MavenClient must be provided in order to handle lightweight packages.")));
     }
   }
 
@@ -173,14 +175,15 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
   private ClassLoaderConfiguration createHeavyPackageClassLoaderConfiguration(File artifactFile, File classLoaderModelDescriptor,
                                                                               Map<String, Object> attributes) {
     return createHeavyPackageClassLoaderConfiguration(artifactFile, classLoaderModelDescriptor, attributes,
-                                              of(getDeployableArtifactRepositoryFolder(artifactFile)));
+                                                      of(getDeployableArtifactRepositoryFolder(artifactFile)));
   }
 
-  protected ClassLoaderConfiguration createHeavyPackageClassLoaderConfiguration(File artifactFile, File classLoaderModelDescriptor,
+  protected ClassLoaderConfiguration createHeavyPackageClassLoaderConfiguration(File artifactFile,
+                                                                                File classLoaderModelDescriptor,
                                                                                 Map<String, Object> attributes,
                                                                                 Optional<File> deployableArtifactRepositoryFolder) {
     return createHeavyPackageClassLoaderConfiguration(artifactFile, attributes, deployableArtifactRepositoryFolder,
-                                              getPackagerClassLoaderModel(classLoaderModelDescriptor));
+                                                      getPackagerClassLoaderModel(classLoaderModelDescriptor));
   }
 
   protected ClassLoaderConfiguration createHeavyPackageClassLoaderConfiguration(File artifactFile, Map<String, Object> attributes,
@@ -189,7 +192,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     BundleDescriptor artifactBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
     final ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder =
         newHeavyWeightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor,
-                                              packagerClassLoaderModel, attributes);
+                                                      packagerClassLoaderModel, attributes);
     final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
     final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
 
@@ -327,8 +330,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
   }
 
   /**
-   * Template method to deserialize a {@code classloader-model.json} into the expected
-   * {@link ClassLoaderModel} implementation
+   * Template method to deserialize a {@code classloader-model.json} into the expected {@link ClassLoaderModel} implementation
    *
    * @param classLoaderModelDescriptor
    * @return a {@link ClassLoaderModel}
@@ -450,7 +452,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     BundleDescriptor artifactBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
     final LightweightClassLoaderConfigurationBuilder classLoaderConfigurationBuilder =
         newLightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor,
-                                              mavenClient, attributes, nonProvidedDependencies);
+                                                      mavenClient, attributes, nonProvidedDependencies);
 
     final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
     final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
@@ -526,9 +528,9 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
    * It let's implementations to add artifact specific URLs by letting them override
    * {@link #addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder)}
    * 
-   * @param artifactFile            the artifact file for which the {@link ClassLoaderConfiguration} is being generated.
+   * @param artifactFile                    the artifact file for which the {@link ClassLoaderConfiguration} is being generated.
    * @param classLoaderConfigurationBuilder the builder of the {@link ClassLoaderConfiguration}.
-   * @param dependencies            the dependencies resolved for this artifact.
+   * @param dependencies                    the dependencies resolved for this artifact.
    * @param patches
    */
   private List<URL> loadUrls(File artifactFile, ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder,

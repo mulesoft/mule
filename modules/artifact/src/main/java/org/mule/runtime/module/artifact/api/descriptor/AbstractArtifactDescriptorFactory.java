@@ -56,8 +56,8 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   /**
    * Creates a new factory
    *
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
    *                                           once loaded.
@@ -123,7 +123,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
     ClassLoaderConfiguration classLoaderModel =
         getClassLoaderConfiguration(artifactLocation, deploymentProperties, artifactModel.getClassLoaderModelLoaderDescriptor(),
-                            bundleDescriptor);
+                                    bundleDescriptor);
     descriptor.setClassLoaderConfiguration(classLoaderModel);
 
     doDescriptorConfig(artifactModel, descriptor, artifactLocation);
@@ -188,8 +188,8 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   private ClassLoaderConfiguration getClassLoaderConfiguration(File artifactFolder, Optional<Properties> deploymentProperties,
-                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
-                                               BundleDescriptor bundleDescriptor) {
+                                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                               BundleDescriptor bundleDescriptor) {
     ClassLoaderConfigurationLoader classLoaderConfigurationLoader;
     try {
       classLoaderConfigurationLoader =
@@ -202,10 +202,11 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
     final ClassLoaderConfiguration classLoaderConfiguration;
     try {
-      classLoaderConfiguration = classLoaderConfigurationLoader.load(artifactFolder, getClassLoaderConfigurationAttributes(deploymentProperties,
-                                                                                                   classLoaderModelLoaderDescriptor,
-                                                                                                   bundleDescriptor),
-                                                     getArtifactType());
+      classLoaderConfiguration = classLoaderConfigurationLoader
+          .load(artifactFolder, getClassLoaderConfigurationAttributes(deploymentProperties,
+                                                                      classLoaderModelLoaderDescriptor,
+                                                                      bundleDescriptor),
+                getArtifactType());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }

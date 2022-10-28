@@ -14,9 +14,9 @@ import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoader
 import java.util.Map;
 
 /**
- * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration} when it
- * is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader} for plugins in order to
- * define in which deployable artifact the plugin is declared.
+ * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration}
+ * when it is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader} for plugins
+ * in order to define in which deployable artifact the plugin is declared.
  *
  * @since 4.2.0
  */

@@ -12,9 +12,9 @@ import java.util.Map;
 import org.apache.commons.collections.map.AbstractMapDecorator;
 
 /**
- * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration} when it
- * is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader} without changing the loader's
- * API.
+ * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration}
+ * when it is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader} without
+ * changing the loader's API.
  *
  * @since 4.2.0
  */

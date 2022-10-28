@@ -54,8 +54,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *
    * @param containerClassLoader               container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator}
    *                                           in order to check the state of the descriptor once loaded.
@@ -75,8 +75,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *
    * @param containerClassLoader               container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator}
    *                                           in order to check the state of the descriptor once loaded.

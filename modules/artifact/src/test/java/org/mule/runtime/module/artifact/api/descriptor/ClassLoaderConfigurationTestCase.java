@@ -35,6 +35,7 @@ public class ClassLoaderConfigurationTestCase extends AbstractMuleTestCase {
     ClassLoaderConfiguration classLoaderConfiguration =
         new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder().exportingResources(exportedResources).build();
 
-    assertThat(classLoaderConfiguration.getExportedResources(), containsInAnyOrder("META-INF/schemas/schema.xml", "META-INF/README.txt"));
+    assertThat(classLoaderConfiguration.getExportedResources(),
+               containsInAnyOrder("META-INF/schemas/schema.xml", "META-INF/README.txt"));
   }
 }

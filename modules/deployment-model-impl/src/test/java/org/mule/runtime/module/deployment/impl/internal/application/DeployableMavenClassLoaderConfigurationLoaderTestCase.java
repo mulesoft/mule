@@ -114,7 +114,7 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
   private void doTestPackagesResourcesLoaded(URL appUrl, boolean useJarExplorer) throws Exception {
     ClassLoaderConfiguration classLoaderConfiguration = buildClassLoaderConfiguration(toFile(appUrl), ImmutableMap
         .of(EXPORTED_PACKAGES, ImmutableList.of("com.mycompany.api"), EXPORTED_RESOURCES, ImmutableList.of("tls.properties")),
-                                                              useJarExplorer);
+                                                                                      useJarExplorer);
 
     assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("com.mycompany.api", "org.apache.commons.csv"));
     assertThat(classLoaderConfiguration.getLocalPackages(),
@@ -126,11 +126,11 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     assertThat(classLoaderConfiguration.getLocalResources(), hasItem("META-INF/maven/com/mycompany/test/pom.xml"));
 
     Optional<BundleDependency> mulePluginBundleDependency = classLoaderConfiguration.getDependencies().stream().filter(
-                                                                                                               bundleDependency -> MULE_PLUGIN_CLASSIFIER
-                                                                                                                   .equals(bundleDependency
-                                                                                                                       .getDescriptor()
-                                                                                                                       .getClassifier()
-                                                                                                                       .orElse(null)))
+                                                                                                                       bundleDependency -> MULE_PLUGIN_CLASSIFIER
+                                                                                                                           .equals(bundleDependency
+                                                                                                                               .getDescriptor()
+                                                                                                                               .getClassifier()
+                                                                                                                               .orElse(null)))
         .findFirst();
     assertThat(mulePluginBundleDependency.isPresent(), is(true));
 
@@ -142,21 +142,25 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
         new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
     PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
         new PluginExtendedClassLoaderConfigurationAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
-    pluginExtendedClassLoaderConfigurationAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
-                                                 bundleDependency.getDescriptor());
+    pluginExtendedClassLoaderConfigurationAttributes
+        .put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+             bundleDependency.getDescriptor());
 
     pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
     pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderConfiguration pluginClassLoaderConfiguration =
-        buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderConfigurationAttributes);
+        buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()),
+                                            pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderConfiguration.getExportedPackages(), hasItem("org.mule.tests.simple.plugin.api"));
-    assertThat(pluginClassLoaderConfiguration.getLocalPackages(), everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
+    assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
+               everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
                hasItems("org.mule.tests.simple.plugin.internal", "org.apache.commons.collections"));
 
     assertThat(pluginClassLoaderConfiguration.getExportedResources(), hasItem("simple-plugin.properties"));
-    assertThat(pluginClassLoaderConfiguration.getLocalResources(), everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
+    assertThat(pluginClassLoaderConfiguration.getLocalResources(),
+               everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
     assertThat(pluginClassLoaderConfiguration.getLocalResources(),
                hasItems("META-INF/simple-plugin/internal.txt", "META-INF/maven/commons-collections/commons-collections/pom.xml"));
   }
@@ -206,21 +210,25 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
 
   private void validateMissingPackagesAndResources(String appName) throws Exception {
     ClassLoaderConfiguration classLoaderConfiguration = buildClassLoaderConfiguration(
-                                                              toFile(
-                                                                     getClass().getClassLoader().getResource(Paths
-                                                                         .get(APPS_FOLDER, appName).toString())),
-                                                              ImmutableMap.of(EXPORTED_PACKAGES,
-                                                                              ImmutableList.of("com.mycompany.api"),
-                                                                              EXPORTED_RESOURCES,
-                                                                              ImmutableList.of("tls.properties")),
-                                                              false);
+                                                                                      toFile(
+                                                                                             getClass().getClassLoader()
+                                                                                                 .getResource(Paths
+                                                                                                     .get(APPS_FOLDER, appName)
+                                                                                                     .toString())),
+                                                                                      ImmutableMap.of(EXPORTED_PACKAGES,
+                                                                                                      ImmutableList
+                                                                                                          .of("com.mycompany.api"),
+                                                                                                      EXPORTED_RESOURCES,
+                                                                                                      ImmutableList
+                                                                                                          .of("tls.properties")),
+                                                                                      false);
 
     Optional<BundleDependency> mulePluginBundleDependency = classLoaderConfiguration.getDependencies().stream().filter(
-                                                                                                               bundleDependency -> MULE_PLUGIN_CLASSIFIER
-                                                                                                                   .equals(bundleDependency
-                                                                                                                       .getDescriptor()
-                                                                                                                       .getClassifier()
-                                                                                                                       .orElse(null)))
+                                                                                                                       bundleDependency -> MULE_PLUGIN_CLASSIFIER
+                                                                                                                           .equals(bundleDependency
+                                                                                                                               .getDescriptor()
+                                                                                                                               .getClassifier()
+                                                                                                                               .orElse(null)))
         .findFirst();
     assertThat(mulePluginBundleDependency.isPresent(), is(true));
 
@@ -232,18 +240,22 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
         new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
     PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
         new PluginExtendedClassLoaderConfigurationAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
-    pluginExtendedClassLoaderConfigurationAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
-                                                 bundleDependency.getDescriptor());
+    pluginExtendedClassLoaderConfigurationAttributes
+        .put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+             bundleDependency.getDescriptor());
 
     pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
     pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderConfiguration pluginClassLoaderConfiguration =
-        buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderConfigurationAttributes);
-    assertThat(pluginClassLoaderConfiguration.getLocalPackages(), everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
+        buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()),
+                                            pluginExtendedClassLoaderConfigurationAttributes);
+    assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
+               everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(), contains("org.mule.tests.simple.plugin.internal"));
 
-    assertThat(pluginClassLoaderConfiguration.getLocalResources(), everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
+    assertThat(pluginClassLoaderConfiguration.getLocalResources(),
+               everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
     assertThat(pluginClassLoaderConfiguration.getLocalResources(), contains("META-INF/simple-plugin/internal.txt"));
   }
 
@@ -266,15 +278,17 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
   @Test
   public void patchedApplicationWithWhitespaces() throws InvalidDescriptorLoaderException, IOException {
     ClassLoaderConfiguration classLoaderConfiguration = buildClassLoaderConfiguration(
-                                                              new File(toFile(getClass().getClassLoader()
-                                                                  .getResource(Paths.get(APPS_FOLDER).toString())),
-                                                                       PATCHED_JAR_APP_WHITESPACES));
+                                                                                      new File(toFile(getClass().getClassLoader()
+                                                                                          .getResource(Paths.get(APPS_FOLDER)
+                                                                                              .toString())),
+                                                                                               PATCHED_JAR_APP_WHITESPACES));
     assertThat(classLoaderConfiguration.getUrls().length, is(2));
     // It was not escaping the URL for rootArtifact
     assertThat(classLoaderConfiguration.getUrls()[0], equalTo(
-                                                      toFile(getClass().getClassLoader().getResource(Paths
-                                                          .get(APPS_FOLDER, PATCHED_JAR_APP_WHITESPACES).toString())).toURI()
-                                                              .toURL()));
+                                                              toFile(getClass().getClassLoader().getResource(Paths
+                                                                  .get(APPS_FOLDER, PATCHED_JAR_APP_WHITESPACES).toString()))
+                                                                      .toURI()
+                                                                      .toURL()));
   }
 
   /**
@@ -370,7 +384,8 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
 
     ClassLoaderConfiguration classLoaderConfiguration = buildClassLoaderConfiguration(app);
     assertThat(classLoaderConfiguration.getUrls().length, equalTo(5));
-    for (int i = 1; i < classLoaderConfiguration.getUrls().length; i++) { // The first one does not count because it's the main artifact.
+    for (int i = 1; i < classLoaderConfiguration.getUrls().length; i++) { // The first one does not count because it's the main
+                                                                          // artifact.
       org.mule.maven.client.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
       URL url = getDummyUriFor(dependency.getDescriptor().getGroupId(),
                                dependency.getDescriptor().getArtifactId(),
@@ -455,7 +470,8 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     }, emptyMap());
   }
 
-  private ClassLoaderConfiguration buildClassLoaderConfiguration(File rootApplication, Map<String, Object> attributes, boolean useJarExplorer)
+  private ClassLoaderConfiguration buildClassLoaderConfiguration(File rootApplication, Map<String, Object> attributes,
+                                                                 boolean useJarExplorer)
       throws InvalidDescriptorLoaderException {
     return buildClassLoaderConfiguration(rootApplication, () -> {
       if (useJarExplorer) {
@@ -466,7 +482,7 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
   }
 
   private ClassLoaderConfiguration buildClassLoaderConfiguration(File rootApplication, Supplier<JarExplorer> supplier,
-                                                 Map<String, Object> attributes)
+                                                                 Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderConfigurationLoader deployableMavenClassLoaderConfigurationLoader =
         new DeployableMavenClassLoaderConfigurationLoader(of(mockMavenClient), supplier);

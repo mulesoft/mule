@@ -53,8 +53,8 @@ public class ArtifactPluginDescriptorFactory
   /**
    * Creates a custom factory
    * 
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be
    *                                           used. Non null.
    */
@@ -90,7 +90,8 @@ public class ArtifactPluginDescriptorFactory
                                                                       MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                                       BundleDescriptor bundleDescriptor) {
     Map<String, Object> attributes =
-        super.getClassLoaderConfigurationAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor, bundleDescriptor);
+        super.getClassLoaderConfigurationAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor,
+                                                    bundleDescriptor);
 
     if (deploymentPropertiesOptional.isPresent()) {
       Properties deploymentProperties = deploymentPropertiesOptional.get();
@@ -98,7 +99,8 @@ public class ArtifactPluginDescriptorFactory
         PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
             (PluginExtendedDeploymentProperties) deploymentProperties;
         return new PluginExtendedClassLoaderConfigurationAttributes(attributes,
-                                                            pluginExtendedDeploymentProperties.getDeployableArtifactDescriptor());
+                                                                    pluginExtendedDeploymentProperties
+                                                                        .getDeployableArtifactDescriptor());
       }
     }
     return attributes;

@@ -25,7 +25,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * {@link ClassLoaderConfigurationBuilder ClassLoaderConfigurationBuilder} that adds the concept of Shared Library for the configured dependencies.
+ * {@link ClassLoaderConfigurationBuilder ClassLoaderConfigurationBuilder} that adds the concept of Shared Library for the
+ * configured dependencies.
  */
 public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfigurationBuilder {
 

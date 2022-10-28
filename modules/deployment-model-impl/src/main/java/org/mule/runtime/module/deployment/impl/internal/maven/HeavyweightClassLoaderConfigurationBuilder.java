@@ -33,7 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Plugin;
 
 /**
- * Builder for a {@link ClassLoaderConfiguration} with information from a {@link ClassLoaderModel} included when packaging the artifact in a heavyweight manner.
+ * Builder for a {@link ClassLoaderConfiguration} with information from a {@link ClassLoaderModel} included when packaging the
+ * artifact in a heavyweight manner.
  *
  * @since 4.2.0
  */

@@ -32,7 +32,8 @@ public class PolicyTemplateDescriptorTestCase extends AbstractMuleTestCase {
   @Test
   public void verifiesPolicyTemplateDoesNotExportPackages() throws Exception {
     PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_NAME);
-    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfigurationBuilder().exportingPackages(Collections.singleton("org.foo")).build();
+    ClassLoaderConfiguration classLoaderConfiguration =
+        new ClassLoaderConfigurationBuilder().exportingPackages(Collections.singleton("org.foo")).build();
 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(POLICY_EXPORTED_PACKAGES_ERROR);
@@ -42,7 +43,8 @@ public class PolicyTemplateDescriptorTestCase extends AbstractMuleTestCase {
   @Test
   public void verifiesPolicyTemplateDoesNotExportResources() throws Exception {
     PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_NAME);
-    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfigurationBuilder().exportingResources(Collections.singleton("META-INF/foo.xml")).build();
+    ClassLoaderConfiguration classLoaderConfiguration =
+        new ClassLoaderConfigurationBuilder().exportingResources(Collections.singleton("META-INF/foo.xml")).build();
 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(POLICY_EXPORTED_RESOURCE_ERROR);

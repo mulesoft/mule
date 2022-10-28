@@ -147,7 +147,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(DeployableArtifactDescriptor descriptor) {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
-    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderModel().getDependencies()) {
+    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderConfiguration().getDependencies()) {
       BundleDescriptor bundleDescriptor = bundlePluginDependency.getDescriptor();
       if (bundleDescriptor.isPlugin()) {
         if (bundlePluginDependency.getBundleUri() == null) {

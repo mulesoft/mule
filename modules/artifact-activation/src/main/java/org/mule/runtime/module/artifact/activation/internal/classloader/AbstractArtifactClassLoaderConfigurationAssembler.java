@@ -112,7 +112,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
    * It lets implementations add artifact specific URLs by letting them override
    * {@link #addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder)}
    *
-   * @param artifactFile                    the artifact file for which the {@link ClassLoaderConfiguration class loader configuration} is being generated.
+   * @param artifactFile                    the artifact file for which the {@link ClassLoaderConfiguration class loader
+   *                                        configuration} is being generated.
    * @param dependencies                    the dependencies resolved for this artifact.
    * @param classLoaderConfigurationBuilder the builder of the {@link ClassLoaderConfiguration class loader configuration}
    */
@@ -131,7 +132,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   /**
    * Template method to add artifact specific configuration to the {@link DeployableClassLoaderConfigurationBuilder}.
    *
-   * @param classLoaderConfigurationBuilder the builder used to generate {@link ClassLoaderConfiguration class loader configuration} of the artifact.
+   * @param classLoaderConfigurationBuilder the builder used to generate {@link ClassLoaderConfiguration class loader
+   *                                        configuration} of the artifact.
    */
   protected Collection<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     return emptyList();

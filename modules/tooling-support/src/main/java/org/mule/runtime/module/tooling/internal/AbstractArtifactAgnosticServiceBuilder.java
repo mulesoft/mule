@@ -137,7 +137,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
       applicationDescriptor
-          .setClassLoaderModel(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
+          .setClassLoaderConfiguration(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
               .createMavenClient(GlobalConfigLoader.getMavenConfig())))
                   .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
                                                         createTempBundleDescriptor()),

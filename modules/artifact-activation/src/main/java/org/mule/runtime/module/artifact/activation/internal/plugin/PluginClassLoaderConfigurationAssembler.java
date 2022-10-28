@@ -74,7 +74,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   @Override
   protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     // Patches resolution is done just for plugins because this should be the use case, but in the implementation previously used
-    // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications and
+    // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications
+    // and
     // domains) as well
     pluginPatchesResolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
         .forEach(classLoaderConfigurationBuilder::containing);

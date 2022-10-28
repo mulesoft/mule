@@ -31,7 +31,8 @@ public class FileSystemPolicyClassLoaderConfigurationLoaderTestCase extends Abst
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private final FileSystemPolicyClassLoaderConfigurationLoader classLoaderConfigurationLoader = new FileSystemPolicyClassLoaderConfigurationLoader();
+  private final FileSystemPolicyClassLoaderConfigurationLoader classLoaderConfigurationLoader =
+      new FileSystemPolicyClassLoaderConfigurationLoader();
 
   @Test
   public void createsClassLoaderConfigurationFromFolder() throws Exception {

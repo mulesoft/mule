@@ -69,7 +69,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .findFirst()
         .get();
 
-    assertThat(stream(httpPlugin.getClassLoaderModel().getUrls()).collect(toList()),
+    assertThat(stream(httpPlugin.getClassLoaderConfiguration().getUrls()).collect(toList()),
                hasItem(getClass().getClassLoader().getResource(deployableProjectFolder + PATCHES_LOCATION + "/http-patch.jar")));
 
     ArtifactPluginDescriptor dbPlugin = deployableArtifactDescriptor.getPlugins()
@@ -78,7 +78,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
         .findFirst()
         .get();
 
-    assertThat(stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
+    assertThat(stream(dbPlugin.getClassLoaderConfiguration().getUrls()).map(URL::toString).collect(toList()),
                not(hasItem(getClass().getClassLoader()
                    .getResource(deployableProjectFolder + PATCHES_LOCATION + "/db-patch.jar"))));
   }

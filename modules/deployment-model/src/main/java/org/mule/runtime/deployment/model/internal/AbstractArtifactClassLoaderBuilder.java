@@ -123,7 +123,8 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     int artifactPluginIndex = 0;
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
       final ArtifactClassLoaderFilter classLoaderFilter =
-          createPluginClassLoaderFilter(artifactPluginDescriptor, artifactDescriptor.getClassLoaderConfiguration().getExportedPackages(),
+          createPluginClassLoaderFilter(artifactPluginDescriptor,
+                                        artifactDescriptor.getClassLoaderConfiguration().getExportedPackages(),
                                         parentLookupPolicy);
       regionClassLoader.addClassLoader(artifactPluginClassLoaders.get(artifactPluginIndex), classLoaderFilter);
       artifactPluginIndex++;

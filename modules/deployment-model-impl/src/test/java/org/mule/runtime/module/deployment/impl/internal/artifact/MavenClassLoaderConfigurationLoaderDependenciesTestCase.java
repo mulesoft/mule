@@ -43,7 +43,8 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
 
     // Install all dependencies
     File dependenciesFolder =
-        new File(MavenClassLoaderConfigurationLoaderDependenciesTestCase.class.getClassLoader().getResource("dependencies").toURI());
+        new File(MavenClassLoaderConfigurationLoaderDependenciesTestCase.class.getClassLoader().getResource("dependencies")
+            .toURI());
     for (File dependencyFile : dependenciesFolder.listFiles()) {
       installArtifact(dependencyFile, new File(repositoryLocation.getValue()));
     }
@@ -54,10 +55,10 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
     File artifactFile = getApplicationFolder("apps/raml-api-app");
     ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
     assertThat(classLoaderConfiguration.getDependencies(), hasItems(
-                                                            bundleDependency("raml-api-a"),
-                                                            bundleDependency("raml-api-b"),
-                                                            bundleDependency("raml-fragment", "1.0.0"),
-                                                            bundleDependency("raml-fragment", "2.0.0")));
+                                                                    bundleDependency("raml-api-a"),
+                                                                    bundleDependency("raml-api-b"),
+                                                                    bundleDependency("raml-fragment", "1.0.0"),
+                                                                    bundleDependency("raml-fragment", "2.0.0")));
   }
 
   @Test
@@ -65,10 +66,10 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
     File artifactFile = getApplicationFolder("apps/wsdl-api-app");
     ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
     assertThat(classLoaderConfiguration.getDependencies(), hasItems(
-                                                            bundleDependency("wsdl-api-a"),
-                                                            bundleDependency("wsdl-api-b"),
-                                                            bundleDependency("wsdl-fragment", "1.0.0"),
-                                                            bundleDependency("wsdl-fragment", "2.0.0")));
+                                                                    bundleDependency("wsdl-api-a"),
+                                                                    bundleDependency("wsdl-api-b"),
+                                                                    bundleDependency("wsdl-fragment", "1.0.0"),
+                                                                    bundleDependency("wsdl-fragment", "2.0.0")));
   }
 
   @Test
@@ -76,10 +77,10 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
     File artifactFile = getApplicationFolder("apps/oas-api-app");
     ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
     assertThat(classLoaderConfiguration.getDependencies(), hasItems(
-                                                            bundleDependency("oas-api-a"),
-                                                            bundleDependency("oas-api-b"),
-                                                            bundleDependency("oas-fragment", "1.0.0"),
-                                                            bundleDependency("oas-fragment", "2.0.0")));
+                                                                    bundleDependency("oas-api-a"),
+                                                                    bundleDependency("oas-api-b"),
+                                                                    bundleDependency("oas-fragment", "1.0.0"),
+                                                                    bundleDependency("oas-fragment", "2.0.0")));
   }
 
   @Test
@@ -87,11 +88,11 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
     File artifactFile = getApplicationFolder("apps/api-multiple-levels-app");
     ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
     assertThat(classLoaderConfiguration.getDependencies(), hasItems(
-                                                            bundleDependency("raml-api-a"),
-                                                            bundleDependency("library-depends-on-api"),
-                                                            bundleDependency("api-depends-on-library"),
-                                                            bundleDependency("raml-fragment", "1.0.0"),
-                                                            bundleDependency("raml-fragment", "2.0.0")));
+                                                                    bundleDependency("raml-api-a"),
+                                                                    bundleDependency("library-depends-on-api"),
+                                                                    bundleDependency("api-depends-on-library"),
+                                                                    bundleDependency("raml-fragment", "1.0.0"),
+                                                                    bundleDependency("raml-fragment", "2.0.0")));
   }
 
 
@@ -100,13 +101,13 @@ public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends Mav
     File artifactFile = getApplicationFolder("apps/api-app");
     ClassLoaderConfiguration classLoaderConfiguration = loadClassLoaderConfiguration(artifactFile);
     assertThat(classLoaderConfiguration.getDependencies(), hasItems(
-                                                            bundleDependency("wsdl-api-a"),
-                                                            bundleDependency("wsdl-api-b"),
-                                                            bundleDependency("wsdl-fragment", "1.0.0"),
-                                                            bundleDependency("wsdl-fragment", "2.0.0"),
-                                                            bundleDependency("library", "1.0.0")));
+                                                                    bundleDependency("wsdl-api-a"),
+                                                                    bundleDependency("wsdl-api-b"),
+                                                                    bundleDependency("wsdl-fragment", "1.0.0"),
+                                                                    bundleDependency("wsdl-fragment", "2.0.0"),
+                                                                    bundleDependency("library", "1.0.0")));
     assertThat(classLoaderConfiguration.getDependencies(), not(hasItem(
-                                                               bundleDependency("library", "2.0.0"))));
+                                                                       bundleDependency("library", "2.0.0"))));
   }
 
   private ClassLoaderConfiguration loadClassLoaderConfiguration(File artifactFile) throws InvalidDescriptorLoaderException {

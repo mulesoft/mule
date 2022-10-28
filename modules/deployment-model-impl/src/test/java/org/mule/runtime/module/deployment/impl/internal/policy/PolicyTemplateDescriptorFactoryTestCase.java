@@ -156,9 +156,9 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
                                             ArtifactDescriptorValidatorBuilder.builder());
     PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder, empty());
 
-    assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(tempFolder.toString()));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
+    assertThat(desc.getClassLoaderConfiguration().getUrls().length, equalTo(2));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[0]).getPath(), equalTo(tempFolder.toString()));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[1]).getPath(),
                equalTo(new File(tempFolder, LIB_DIR + separator + JAR_FILE_NAME).toString()));
   }
 

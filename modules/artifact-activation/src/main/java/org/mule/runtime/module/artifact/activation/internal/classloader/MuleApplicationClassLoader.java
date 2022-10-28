@@ -55,7 +55,8 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   @Override
   protected String[] getLocalResourceLocations() {
     // Always the first element corresponds to the application's classes folder
-    ClassLoaderConfiguration classLoaderConfiguration = this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderConfiguration();
+    ClassLoaderConfiguration classLoaderConfiguration =
+        this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderConfiguration();
     return new String[] {toFile(classLoaderConfiguration.getUrls()[0]).getPath()};
   }
 
