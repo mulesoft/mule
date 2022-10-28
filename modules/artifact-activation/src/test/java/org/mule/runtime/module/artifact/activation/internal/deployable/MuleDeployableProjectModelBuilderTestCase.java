@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
@@ -43,28 +43,28 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
   @Test
   public void createBasicDeployableProjectModel() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/basic");
 
     testBasicDeployableProjectModel(deployableProjectModel);
   }
 
   @Test
   public void patchedApplicationLoadsUpdatedConnector() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/patched-plugin-app");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/patched-plugin-app");
 
     testPatchedDependency(deployableProjectModel.getDependencies(), "mule-objectstore-connector", "1.1.0");
   }
 
   @Test
   public void patchedApplicationLoadsUpdatedJar() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/patched-jar-app");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/patched-jar-app");
 
     testPatchedDependency(deployableProjectModel.getDependencies(), "commons-cli", "1.4");
   }
 
   @Test
   public void patchedApplicationLoadsUpdatedJarAndPlugin() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/patched-jar-and-plugin-app");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/patched-jar-and-plugin-app");
 
     testPatchedDependency(deployableProjectModel.getDependencies(), "mule-objectstore-connector", "1.1.0");
     testPatchedDependency(deployableProjectModel.getDependencies(), "commons-cli", "1.4");
@@ -82,7 +82,7 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
   @Test
   public void createDeployableProjectModelWithSharedLibrary() throws URISyntaxException {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/shared-lib");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/shared-lib");
 
     // checks there are no packages in the project
     assertThat(deployableProjectModel.getPackages(), hasSize(0));
@@ -92,7 +92,7 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
   @Test
   public void createDeployableProjectModelWithTransitiveSharedLibrary() throws URISyntaxException {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/shared-lib-transitive");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/shared-lib-transitive");
 
     assertThat(deployableProjectModel.getSharedLibraries(), hasSize(6));
     assertThat(deployableProjectModel.getSharedLibraries(), hasItem(hasProperty("artifactId", equalTo("spring-context"))));
@@ -100,7 +100,7 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
   @Test
   public void createDeployableProjectModelWithAdditionalPluginDependency() throws URISyntaxException {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/additional-plugin-dependency");
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/heavyweight/additional-plugin-dependency");
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
     assertThat(deployableProjectModel.getDependencies(),
@@ -114,7 +114,8 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
   @Test
   public void createDeployableProjectModelWithAdditionalPluginDependencyAndDependency() throws URISyntaxException {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/additional-plugin-dependency-and-dep");
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/heavyweight/additional-plugin-dependency-and-dep");
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(4));
     assertThat(deployableProjectModel.getDependencies(),
@@ -129,7 +130,8 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
   @Test
   public void createDeployableProjectModelWithTransitiveAdditionalPluginDependency() throws URISyntaxException {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/additional-plugin-dependency-transitive");
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/heavyweight/additional-plugin-dependency-transitive");
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(1));
     assertThat(deployableProjectModel.getDependencies(),
@@ -149,7 +151,8 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
       "classloader-model.json for its dependencies, and thus the deployable is considered for deployment as a heavy " +
       "package even though its dependencies aren't really packaged within it, the model is correctly built.")
   public void createDeployableProjectModelFromLightweightLocalRepository() throws URISyntaxException {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic-lightweight-local-repository");
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/heavyweight/basic-lightweight-local-repository");
 
     testBasicDeployableProjectModel(deployableProjectModel);
   }

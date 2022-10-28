@@ -13,6 +13,7 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
+import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
@@ -28,7 +29,7 @@ import java.util.Properties;
  * 
  * @param <D> the type of the {@link DeployableArtifactDescriptor}
  * @param <T> the type of the {@link DeployableArtifact}
- * @since 4.
+ * @since 4.z
  */
 public abstract class AbstractDeployableArtifactFactory<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
     implements ArtifactFactory<D, T> {
