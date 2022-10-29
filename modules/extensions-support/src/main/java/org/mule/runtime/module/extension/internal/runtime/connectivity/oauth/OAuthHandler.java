@@ -21,6 +21,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.util.LazyLookup;
@@ -47,6 +48,8 @@ import org.slf4j.Logger;
  */
 public abstract class OAuthHandler<Dancer> implements Lifecycle {
 
+  public static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
+  private static final boolean DEFAULT_PERSISTENCE_SETTING = true;
   private static final Logger LOGGER = getLogger(OAuthHandler.class);
 
   @Inject
@@ -122,8 +125,15 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
       String storeName = storeConfig
           .map(OAuthObjectStoreConfig::getObjectStoreName)
           .orElse(BASE_PERSISTENT_OBJECT_STORE_KEY);
-
-      return objectStoreManager.getObjectStore(storeName);
+      System.out.println("storeName" + storeName);
+      ObjectStore os = objectStoreManager.getOrCreateObjectStore(storeName, ObjectStoreSettings
+          .builder()
+          .entryTtl(0L)
+          .expirationInterval(0L)
+          .persistent(DEFAULT_PERSISTENCE_SETTING)
+          .build());
+      System.out.println("objectStore" + os);
+      return os;
     };
   }
 
