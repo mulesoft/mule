@@ -20,7 +20,8 @@ import java.util.Map;
  *
  * @since 4.2.0
  */
-public class PluginExtendedClassLoaderConfigurationAttributes extends ExtendedClassLoaderConfigurationAttributes {
+// TODO - W-11098291: rename accordingly
+public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoaderConfigurationAttributes {
 
   private ArtifactDescriptor deployableArtifactDescriptor;
 
@@ -30,8 +31,8 @@ public class PluginExtendedClassLoaderConfigurationAttributes extends ExtendedCl
    * @param originalAttributes           the original {@link Map} of attributes. No null.
    * @param deployableArtifactDescriptor {@link ArtifactDescriptor} which declares the plugin dependency. Not null.
    */
-  public PluginExtendedClassLoaderConfigurationAttributes(Map originalAttributes,
-                                                          ArtifactDescriptor deployableArtifactDescriptor) {
+  public PluginExtendedClassLoaderModelAttributes(Map originalAttributes,
+                                                  ArtifactDescriptor deployableArtifactDescriptor) {
     super(originalAttributes);
     checkNotNull(deployableArtifactDescriptor, "deployableArtifactDescriptor cannot be null");
     this.deployableArtifactDescriptor = deployableArtifactDescriptor;

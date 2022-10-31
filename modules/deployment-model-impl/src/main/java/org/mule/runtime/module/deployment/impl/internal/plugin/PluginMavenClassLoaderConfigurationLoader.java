@@ -31,7 +31,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader;
+import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.DependencyConverter;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderConfigurationBuilder;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClassLoaderConfigurationLoader {
+public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClassLoaderModelLoader {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -75,12 +75,12 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
                                                                                 MavenClient mavenClient) {
     // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the
     // META-INF/mule-artifact
-    if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
-      PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
-          (PluginExtendedClassLoaderConfigurationAttributes) attributes;
+    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
+      PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
+          (PluginExtendedClassLoaderModelAttributes) attributes;
       BundleDescriptor pluginBundleDescriptor =
-          (BundleDescriptor) pluginExtendedClassLoaderConfigurationAttributes.get(BundleDescriptor.class.getName());
-      File rootFolder = pluginExtendedClassLoaderConfigurationAttributes.getDeployableArtifactDescriptor().getRootFolder();
+          (BundleDescriptor) pluginExtendedClassLoaderModelAttributes.get(BundleDescriptor.class.getName());
+      File rootFolder = pluginExtendedClassLoaderModelAttributes.getDeployableArtifactDescriptor().getRootFolder();
       // mule-plugin has been found as a dependency from another mule-plugin and not present in the deployable dependency graph
       // (system scope dependencies)
       if (rootFolder != null) {
@@ -159,10 +159,10 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   @Override
   protected List<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
                                                                ArtifactType artifactType, MavenClient mavenClient) {
-    if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
+    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
       BundleDescriptor pluginBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
       ArtifactDescriptor deployableArtifactDescriptor =
-          ((PluginExtendedClassLoaderConfigurationAttributes) attributes).getDeployableArtifactDescriptor();
+          ((PluginExtendedClassLoaderModelAttributes) attributes).getDeployableArtifactDescriptor();
       Set<BundleDependency> deployableArtifactDescriptorDependencies =
           deployableArtifactDescriptor.getClassLoaderConfiguration().getDependencies();
       BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream()
@@ -287,8 +287,8 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
 
   private void configClassLoaderModelBuilder(ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder,
                                              Map<String, Object> attributes) {
-    if (attributes instanceof PluginExtendedClassLoaderConfigurationAttributes) {
-      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderConfigurationAttributes) attributes)
+    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
+      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
           .getDeployableArtifactDescriptor());
     }
   }

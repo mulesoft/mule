@@ -85,7 +85,8 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public abstract class AbstractMavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
+// TODO - W-11098291: rename accordingly
+public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoaderConfigurationLoader {
 
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR = "classloader-model-patch.json";
@@ -104,12 +105,12 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
   private final Optional<MavenClient> mavenClient;
   private final Supplier<JarExplorer> jarExplorerFactory;
 
-  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient) {
+  public AbstractMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
     this(mavenClient, () -> new FileJarExplorer());
   }
 
-  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient,
-                                                     Supplier<JarExplorer> jarExplorerFactory) {
+  public AbstractMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient,
+                                             Supplier<JarExplorer> jarExplorerFactory) {
     this.mavenClient = mavenClient;
     this.jarExplorerFactory = jarExplorerFactory;
   }

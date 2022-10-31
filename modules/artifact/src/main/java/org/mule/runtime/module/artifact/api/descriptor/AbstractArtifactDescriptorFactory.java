@@ -203,9 +203,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     final ClassLoaderConfiguration classLoaderConfiguration;
     try {
       classLoaderConfiguration = classLoaderConfigurationLoader
-          .load(artifactFolder, getClassLoaderConfigurationAttributes(deploymentProperties,
-                                                                      classLoaderModelLoaderDescriptor,
-                                                                      bundleDescriptor),
+          .load(artifactFolder, getClassLoaderModelAttributes(deploymentProperties,
+                                                              classLoaderModelLoaderDescriptor,
+                                                              bundleDescriptor),
                 getArtifactType());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
@@ -213,9 +213,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     return classLoaderConfiguration;
   }
 
-  protected Map<String, Object> getClassLoaderConfigurationAttributes(Optional<Properties> deploymentProperties,
-                                                                      MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
-                                                                      BundleDescriptor bundleDescriptor) {
+  // TODO - W-11098291: rename accordingly
+  protected Map<String, Object> getClassLoaderModelAttributes(Optional<Properties> deploymentProperties,
+                                                              MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                              BundleDescriptor bundleDescriptor) {
     // Adding BundleDescriptor to avoid resolving it again while loading the class loader configuration
     return ImmutableMap.<String, Object>builder()
         .putAll(classLoaderModelLoaderDescriptor.getAttributes())

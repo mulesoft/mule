@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.fromClassLoaderConfiguration;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.deployment.meta.Product;
@@ -90,6 +91,16 @@ public class ArtifactDescriptor {
    */
   public void setMinMuleVersion(MuleVersion minMuleVersion) {
     this.minMuleVersion = minMuleVersion;
+  }
+
+  @Deprecated
+  public ClassLoaderModel getClassLoaderModel() {
+    return fromClassLoaderConfiguration(getClassLoaderConfiguration());
+  }
+
+  @Deprecated
+  public void setClassLoaderModel(ClassLoaderModel classLoaderModel) {
+    setClassLoaderConfiguration(classLoaderModel);
   }
 
   public ClassLoaderConfiguration getClassLoaderConfiguration() {
