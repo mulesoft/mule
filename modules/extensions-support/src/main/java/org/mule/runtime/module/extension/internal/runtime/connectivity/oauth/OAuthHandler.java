@@ -147,4 +147,8 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
     }
   }
 
+  public Function<OAuthConfig, ObjectStore> getObjectStoreLocator() {
+    return objectStoreLocator;
+  }
+
 }

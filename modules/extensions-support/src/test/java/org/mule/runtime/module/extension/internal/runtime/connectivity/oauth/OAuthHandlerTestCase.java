@@ -10,21 +10,41 @@ import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_API_VERSION;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -35,12 +55,14 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.internal.config.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManagerTestCase;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -54,6 +76,8 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Named;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,25 +85,49 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
 
+
   // private MuleContext muleContext;
-  AuthorizationCodeOAuthHandler oauthHandler;
+
   private MuleContextWithRegistry muleContext;
-  private MuleObjectStoreManager storeManager;
+  @InjectMocks
+  AuthorizationCodeOAuthHandler oauthHandler = new AuthorizationCodeOAuthHandler();
+
+  @Mock
+  private ObjectStoreManager storeManager;
+
+  @Mock
+  private ObjectStore<MetadataCache> objectStore;
 
   private SimpleUnitTestSupportSchedulerService schedulerService;
   private volatile CountDownLatch expireDelayLatch = new CountDownLatch(0);
   private AtomicInteger expires = new AtomicInteger();
+  private ConfigurationProperties configurationProperties;
+  private static final String CLIENT_ID = "client_id";
+  private static final String SECRET_ID = "secret_id";
+  private static final String ORG_ID = "org_id";
+  private static final String SERVICE_URL = "service_url";
+  private static final String PLATFORM_AUTH_URL = "http://localhost/accounts";
+  private static final String PLATFORM_AUTH_PATH = "/token";
+  private static final String CUSTOM_OCS_API_VERSION = "v80";
 
   @Test
   public void initialise() throws InitialisationException {
-    oauthHandler = new AuthorizationCodeOAuthHandler();
+    PlatformManagedOAuthConfig config = PlatformManagedOAuthConfig.from("", "", null, null, null, null, configurationProperties);
+
+    // oauthHandler = new AuthorizationCodeOAuthHandler();
     oauthHandler.initialise();
+
+    ObjectStore os = oauthHandler.getObjectStoreLocator().apply(config);
+    assertThat(os, is(notNullValue()));
+    // assertThat(os.isPersistent(), is(notNullValue()));
   }
 
   @Rule
@@ -94,14 +142,27 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
     Registry registry = mock(Registry.class);
+
     createRegistryAndBaseStore(muleContext, registry);
     when(muleContext.getSchedulerBaseConfig())
-        .thenReturn(config().withPrefix(MuleObjectStoreManagerTestCase.class.getName() + "#" + name.getMethodName()));
+        .thenReturn(config().withPrefix(OAuthHandlerTestCase.class.getName() + "#" + name.getMethodName()));
 
-    storeManager = new MuleObjectStoreManager();
-    storeManager.setSchedulerService(schedulerService);
-    storeManager.setRegistry(registry);
-    storeManager.setMuleContext(muleContext);
+    /*
+     * storeManager = new MuleObjectStoreManager(); storeManager.setSchedulerService(schedulerService);
+     * storeManager.setRegistry(registry); storeManager.setMuleContext(muleContext);
+     */
+
+    when(storeManager.getOrCreateObjectStore(anyString(), any()))
+        .thenReturn(objectStore);
+
+    configurationProperties = mock(ConfigurationProperties.class);
+    when(configurationProperties.resolveStringProperty(OCS_CLIENT_SECRET)).thenReturn(of(SECRET_ID));
+    when(configurationProperties.resolveStringProperty(OCS_CLIENT_ID)).thenReturn(of(CLIENT_ID));
+    when(configurationProperties.resolveStringProperty(OCS_ORG_ID)).thenReturn(of(ORG_ID));
+    when(configurationProperties.resolveStringProperty(OCS_SERVICE_URL)).thenReturn(of(SERVICE_URL));
+    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL)).thenReturn(of(PLATFORM_AUTH_URL));
+    when(configurationProperties.resolveStringProperty(OCS_API_VERSION)).thenReturn(empty());
+    when(configurationProperties.resolveStringProperty(OCS_API_VERSION)).thenReturn(empty());
   }
 
   private void createRegistryAndBaseStore(MuleContextWithRegistry muleContext, Registry registry) {
@@ -179,4 +240,5 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
       }
     });
   }
+
 }
