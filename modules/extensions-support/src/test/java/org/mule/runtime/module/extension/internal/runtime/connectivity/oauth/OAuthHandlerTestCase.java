@@ -69,19 +69,18 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
 
   // private MuleContext muleContext;
   AuthorizationCodeOAuthHandler oauthHandler;
-
-  @Test
-  public void initialise() throws InitialisationException {
-    oauthHandler = new AuthorizationCodeOAuthHandler();
-    oauthHandler.initialise();
-  }
-
   private MuleContextWithRegistry muleContext;
   private MuleObjectStoreManager storeManager;
 
   private SimpleUnitTestSupportSchedulerService schedulerService;
   private volatile CountDownLatch expireDelayLatch = new CountDownLatch(0);
   private AtomicInteger expires = new AtomicInteger();
+
+  @Test
+  public void initialise() throws InitialisationException {
+    oauthHandler = new AuthorizationCodeOAuthHandler();
+    oauthHandler.initialise();
+  }
 
   @Rule
   public TemporaryFolder tempWorkDir = new TemporaryFolder();
@@ -134,7 +133,6 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
       }
     };
   }
-
 
   private void expireDelay() {
     try {
