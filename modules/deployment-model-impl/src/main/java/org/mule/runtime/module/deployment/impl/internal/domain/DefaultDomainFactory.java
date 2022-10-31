@@ -120,16 +120,11 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
       return new EmptyDomainDescriptor(new File(getMuleDomainsDir(), DEFAULT_DOMAIN_NAME));
     }
 
-    // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (isHeavyPackage(domainLocation)) {
-      return deployableArtifactDescriptorFactory
-          .createDomainDescriptor(createDeployableProjectModel(domainLocation),
-                                  deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                      .orElse(emptyMap()),
-                                  getDescriptorCreator());
-    } else {
-      return domainDescriptorFactory.create(domainLocation, deploymentProperties);
-    }
+    return deployableArtifactDescriptorFactory
+        .createDomainDescriptor(createDeployableProjectModel(domainLocation, true),
+                                deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
+                                    .orElse(emptyMap()),
+                                getDescriptorCreator());
   }
 
   private DeployableArtifactDescriptorCreator<DomainDescriptor> getDescriptorCreator() {
@@ -196,10 +191,10 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors = new ArrayList<>(domainDescriptor.getPlugins());
 
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (!isHeavyPackage(domainLocation)) {
-      resolvedArtifactPluginDescriptors =
-          pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(domainDescriptor.getPlugins()), true);
-    }
+    // if (!isHeavyPackage(domainLocation)) {
+    // resolvedArtifactPluginDescriptors =
+    // pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(domainDescriptor.getPlugins()), true);
+    // }
 
     DomainClassLoaderBuilder artifactClassLoaderBuilder =
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
@@ -225,7 +220,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
     if (isHeavyPackage(artifactLocation)) {
       return deployableArtifactDescriptorFactory
-          .createDomainDescriptor(createDeployableProjectModel(artifactLocation),
+          .createDomainDescriptor(createDeployableProjectModel(artifactLocation, true),
                                   deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
                                       .orElse(emptyMap()));
     } else {

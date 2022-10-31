@@ -73,8 +73,6 @@ import java.util.Set;
 public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory<ApplicationDescriptor, Application>
     implements ArtifactFactory<ApplicationDescriptor, Application> {
 
-  // TODO - W-11086334: remove old application descriptor factory with the migration
-  private final ApplicationDescriptorFactory applicationDescriptorFactory;
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory;
   private final DomainRepository domainRepository;
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
@@ -116,7 +114,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
-    this.applicationDescriptorFactory = applicationDescriptorFactory;
     this.deployableArtifactDescriptorFactory = deployableArtifactDescriptorFactory;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
@@ -145,20 +142,15 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   @Override
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
-    // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (isHeavyPackage(artifactLocation)) {
-      return deployableArtifactDescriptorFactory
-          .createApplicationDescriptor(createDeployableProjectModel(artifactLocation),
-                                       deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                           .orElse(emptyMap()),
-                                       (domainName,
-                                        bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
-                                                                                    artifactLocation)
-                                                                                        .getDescriptor(),
-                                       getDescriptorCreator());
-    } else {
-      return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
-    }
+    return deployableArtifactDescriptorFactory
+        .createApplicationDescriptor(createDeployableProjectModel(artifactLocation, false),
+                                     deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
+                                         .orElse(emptyMap()),
+                                     (domainName,
+                                      bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
+                                                                                  artifactLocation)
+                                                                                      .getDescriptor(),
+                                     getDescriptorCreator());
   }
 
   private DeployableArtifactDescriptorCreator<ApplicationDescriptor> getDescriptorCreator() {
@@ -180,15 +172,15 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     Domain domain = getDomainForDescriptor(descriptor);
 
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (!isHeavyPackage(descriptor.getArtifactLocation())) {
-      List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-          pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
-                                             new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
-
-      // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
-      Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>(resolvedArtifactPluginDescriptors);
-      descriptor.setPlugins(resolvedArtifactPlugins);
-    }
+    // if (!isHeavyPackage(descriptor.getArtifactLocation())) {
+    // List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+    // pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
+    // new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
+    //
+    // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
+    // Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>(resolvedArtifactPluginDescriptors);
+    // descriptor.setPlugins(resolvedArtifactPlugins);
+    // }
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
         applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
