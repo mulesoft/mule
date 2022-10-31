@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModel;
+import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
@@ -42,8 +43,10 @@ import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
+import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -58,6 +61,7 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,21 +89,11 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.5
  */
-// TODO - W-11086334: add support for lightweight packaged projects
-public class MuleDeployableProjectModelBuilder implements DeployableProjectModelBuilder {
+public class MuleDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleDeployableProjectModelBuilder.class);
 
-  public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
-  public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR = "classloader-model-patch.json";
 
-  public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION =
-      "META-INF/mule-artifact/" + CLASSLOADER_MODEL_JSON_DESCRIPTOR;
-  public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION =
-      "META-INF/mule-artifact/" + CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR;
-
-  public static final String CLASS_LOADER_MODEL_VERSION_120 = "1.2.0";
-  public static final String CLASS_LOADER_MODEL_VERSION_110 = "1.1.0";
 
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
@@ -465,23 +459,4 @@ public class MuleDeployableProjectModelBuilder implements DeployableProjectModel
   private ClassLoaderModel getPackagerClassLoaderModel(File classLoaderModelDescriptor) {
     return ClassLoaderModelJsonSerializer.deserialize(classLoaderModelDescriptor);
   }
-
-  private static File getClassLoaderModelDescriptor(File artifactFile) {
-    if (artifactFile.isDirectory()) {
-      return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
-    } else {
-      return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
-    }
-  }
-
-  /**
-   * Determines if the given project corresponds to a heavyweight package or a lightweight one.
-   *
-   * @param projectFolder the project package location.
-   * @return {@code true} if the given project corresponds to a heavyweight package, {@code false} otherwise.
-   */
-  public static boolean isHeavyPackage(File projectFolder) {
-    return getClassLoaderModelDescriptor(projectFolder).exists();
-  }
-
 }
