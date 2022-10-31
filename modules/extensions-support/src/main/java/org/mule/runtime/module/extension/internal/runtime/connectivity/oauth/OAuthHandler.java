@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static java.util.stream.Collectors.toMap;
+
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import static java.util.stream.Collectors.toMap;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -125,14 +129,13 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
       String storeName = storeConfig
           .map(OAuthObjectStoreConfig::getObjectStoreName)
           .orElse(BASE_PERSISTENT_OBJECT_STORE_KEY);
-      System.out.println("storeName" + storeName);
       ObjectStore os = objectStoreManager.getOrCreateObjectStore(storeName, ObjectStoreSettings
           .builder()
           .entryTtl(0L)
           .expirationInterval(0L)
           .persistent(DEFAULT_PERSISTENCE_SETTING)
           .build());
-      System.out.println("objectStore" + os);
+
       return os;
     };
   }
