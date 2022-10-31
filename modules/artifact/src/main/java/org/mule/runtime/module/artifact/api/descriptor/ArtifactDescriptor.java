@@ -92,26 +92,11 @@ public class ArtifactDescriptor {
     this.minMuleVersion = minMuleVersion;
   }
 
-  // TODO: change the return type even after deprecation?
-  // @Deprecated
-  // public ClassLoaderConfiguration getClassLoaderModel() {
-  // // maybe we can remove this if changed in all places (maven plugin and tooling client only apparently)?
-  // return fromClassLoaderConfiguration(getClassLoaderConfiguration());
-  // // return getClassLoaderConfiguration();
-  // }
-  //
-  // @Deprecated
-  // public void setClassLoaderModel(ClassLoaderConfiguration classLoaderConfiguration) {
-  // setClassLoaderConfiguration(classLoaderConfiguration);
-  // }
-
   public ClassLoaderConfiguration getClassLoaderConfiguration() {
     return classLoaderConfiguration;
   }
 
   public void setClassLoaderConfiguration(ClassLoaderConfiguration classLoaderConfiguration) {
-    // this.classLoaderConfiguration = fromClassLoaderConfiguration(classLoaderConfiguration);
-    // let's see with the new one
     this.classLoaderConfiguration = classLoaderConfiguration;
   }
 

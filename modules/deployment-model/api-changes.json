@@ -9,7 +9,7 @@
           "classSimpleName": "PolicyTemplateDescriptor",
           "methodName": "setClassLoaderModel",
           "elementKind": "method",
-          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
         },
         {
           "code": "java.method.parameterTypeChanged",
@@ -22,7 +22,7 @@
           "methodName": "setClassLoaderModel",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
         },
         {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
