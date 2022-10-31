@@ -161,10 +161,10 @@ class ForeachRouter {
   /**
    * When foreach has failed with an error in Scatter-Gather route, the sequence info will be restored.
    */
-  private CoreEvent restoreSequenceInfo(CoreEvent currentEvent){
+  private CoreEvent restoreSequenceInfo(CoreEvent currentEvent) {
     ForeachContext foreachContext = getContext(currentEvent);
     CoreEvent.Builder responseBuilder =
-            builder(currentEvent).itemSequenceInfo(foreachContext.getItemSequenceInfo());
+        builder(currentEvent).itemSequenceInfo(foreachContext.getItemSequenceInfo());
     return responseBuilder.build();
   }
 
