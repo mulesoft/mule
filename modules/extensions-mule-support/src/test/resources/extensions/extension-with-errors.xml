@@ -10,6 +10,12 @@
                                http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd">
     <description name="Errors"/>
 
+    <errors>
+        <error type="CUSTOM" parent="MULE:ANY" />
+        <error type="ONE" />
+        <error type="OTHER" parent="ONE" />
+    </errors>
+
     <operation:def name="raiseCustom">
         <operation:output>
             <operation:payload-type type="void"/>
