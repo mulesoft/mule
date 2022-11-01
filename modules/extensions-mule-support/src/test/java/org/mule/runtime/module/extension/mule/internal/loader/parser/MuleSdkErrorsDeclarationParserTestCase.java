@@ -205,11 +205,11 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
     ComponentAst extensionComponentAst = mock(ComponentAst.class);
     ComponentAst errorsComponentAst = mock(ComponentAst.class);
     when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-            MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-            .thenReturn(Stream.of(errorsComponentAst));
+                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
+                                                                    .thenReturn(Stream.of(errorsComponentAst));
     when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-            MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-            .thenReturn(Stream.of(errorsAsts));
+                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
+                                                                 .thenReturn(Stream.of(errorsAsts));
     return extensionComponentAst;
   }
 }
