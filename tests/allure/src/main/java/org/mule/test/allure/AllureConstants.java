@@ -1165,9 +1165,4 @@ public interface AllureConstants {
       String SERVICE_PROVIDER_DISCOVERER = "Service provider discoverer";
     }
   }
-
-  interface ServerPluginsFeature {
-
-    String SERVER_PLUGINS = "Server plugins";
-  }
 }
