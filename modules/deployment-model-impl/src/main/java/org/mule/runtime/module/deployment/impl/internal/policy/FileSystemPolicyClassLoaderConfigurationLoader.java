@@ -49,11 +49,11 @@ public class FileSystemPolicyClassLoaderConfigurationLoader implements ClassLoad
   public ClassLoaderConfiguration load(File artifactFolder, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
 
-    final ClassLoaderConfigurationBuilder classLoaderModelBuilder = new ClassLoaderConfigurationBuilder();
+    final ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder();
 
-    loadUrls(classLoaderModelBuilder, artifactFolder);
+    loadUrls(classLoaderConfigurationBuilder, artifactFolder);
 
-    return classLoaderModelBuilder.build();
+    return classLoaderConfigurationBuilder.build();
   }
 
   @Override
@@ -61,15 +61,15 @@ public class FileSystemPolicyClassLoaderConfigurationLoader implements ClassLoad
     return true;
   }
 
-  private void loadUrls(ClassLoaderConfigurationBuilder classLoaderModelBuilder, File artifactFolder)
+  private void loadUrls(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder, File artifactFolder)
       throws InvalidDescriptorLoaderException {
     try {
-      classLoaderModelBuilder.containing(artifactFolder.toURI().toURL());
+      classLoaderConfigurationBuilder.containing(artifactFolder.toURI().toURL());
       final File libDir = new File(artifactFolder, LIB_DIR);
       if (libDir.exists()) {
         final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(JAR_FILE));
         for (int i = 0; i < jars.length; i++) {
-          classLoaderModelBuilder.containing(jars[i].toURI().toURL());
+          classLoaderConfigurationBuilder.containing(jars[i].toURI().toURL());
         }
       }
     } catch (MalformedURLException e) {

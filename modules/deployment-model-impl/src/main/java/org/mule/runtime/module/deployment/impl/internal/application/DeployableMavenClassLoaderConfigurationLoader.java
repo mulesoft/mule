@@ -77,11 +77,11 @@ public class DeployableMavenClassLoaderConfigurationLoader extends AbstractMaven
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder) {
-    classLoaderModelBuilder.exportingSharedLibraries();
-    classLoaderModelBuilder.additionalPluginLibraries();
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+    classLoaderConfigurationBuilder.exportingSharedLibraries();
+    classLoaderConfigurationBuilder.additionalPluginLibraries();
 
-    return super.addArtifactSpecificClassloaderConfiguration(classLoaderModelBuilder);
+    return super.addArtifactSpecificClassloaderConfiguration(classLoaderConfigurationBuilder);
   }
 
   @Override

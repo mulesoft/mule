@@ -16,6 +16,10 @@ import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyM
 import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderConfigurationLoaderConfigurationTestCase.MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModel;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
+
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
@@ -26,11 +30,16 @@ import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.util.Map;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.apache.maven.model.Model;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})
 public class MavenClassLoaderConfigurationLoaderDependenciesTestCase extends MavenClassLoaderConfigurationLoaderTestCase {
 
   @ClassRule

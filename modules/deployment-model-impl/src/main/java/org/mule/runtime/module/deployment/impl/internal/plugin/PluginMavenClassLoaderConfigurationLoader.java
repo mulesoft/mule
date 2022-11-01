@@ -113,8 +113,8 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder) {
-    return classLoaderModelBuilder.includeAdditionalPluginDependencies();
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+    return classLoaderConfigurationBuilder.includeAdditionalPluginDependencies();
   }
 
   @Override
@@ -141,7 +141,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
     final LightweightClassLoaderConfigurationBuilder lightweightClassLoaderModelBuilder =
         new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient,
                                                        nonProvidedDependencies);
-    configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
+    configClassLoaderConfigurationBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
 
@@ -152,7 +152,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
                                                                                                      Map<String, Object> attributes) {
     final HeavyweightClassLoaderConfigurationBuilder heavyweightClassLoaderModelBuilder =
         new HeavyweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
-    configClassLoaderModelBuilder(heavyweightClassLoaderModelBuilder, attributes);
+    configClassLoaderConfigurationBuilder(heavyweightClassLoaderModelBuilder, attributes);
     return heavyweightClassLoaderModelBuilder;
   }
 
@@ -178,7 +178,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
       } else {
         if (logger.isWarnEnabled()) {
           logger.warn(format(
-                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
+                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader configuration. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
                              pluginDependencyInDeployableArtifact.getDescriptor()));
         }
       }
@@ -190,7 +190,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   private List<BundleDependency> resolveArtifactDependenciesUsingMavenClient(File artifactFile, MavenClient mavenClient) {
     if (logger.isWarnEnabled()) {
       logger.warn(format(
-                         "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader model. "
+                         "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader configuration. "
                              +
                              "Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
                          artifactFile));
@@ -285,10 +285,10 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
     return allTransitiveDependencies;
   }
 
-  private void configClassLoaderModelBuilder(ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder,
-                                             Map<String, Object> attributes) {
+  private void configClassLoaderConfigurationBuilder(ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder,
+                                                     Map<String, Object> attributes) {
     if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
-      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
+      classLoaderConfigurationBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
           .getDeployableArtifactDescriptor());
     }
   }

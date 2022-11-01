@@ -58,13 +58,13 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
           + (artifactFile != null ? artifactFile.getName() : null));
     }
 
-    ClassLoaderConfigurationBuilder classLoaderModelBuilder = new ClassLoaderConfigurationBuilder();
-    classLoaderModelBuilder.containing(getUrl(artifactFile));
+    ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder();
+    classLoaderConfigurationBuilder.containing(getUrl(artifactFile));
     for (URL url : getServiceUrls(artifactFile)) {
-      classLoaderModelBuilder.containing(url);
+      classLoaderConfigurationBuilder.containing(url);
     }
 
-    return classLoaderModelBuilder.build();
+    return classLoaderConfigurationBuilder.build();
   }
 
   private URL getUrl(File file) {
