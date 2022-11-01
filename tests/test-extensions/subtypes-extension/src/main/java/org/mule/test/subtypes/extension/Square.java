@@ -20,6 +20,13 @@ public class Square extends ParentShape {
     return side;
   }
 
+  public Square() {}
+
+  public Square(Integer area, Integer side) {
+    super(area);
+    this.side = side;
+  }
+
   public void setSide(Integer side) {
     this.side = side;
   }

@@ -3,7 +3,24 @@
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/test-oauth" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/subtypes" schemaLocation="http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/values" schemaLocation="http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd"></xs:import>
+  <xs:complexType name="org.mule.test.oauth.Rectangle">
+    <xs:complexContent>
+      <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="base"></xs:attribute>
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="height"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="test-oauth:org.mule.test.oauth.Rectangle" substitutionGroup="subtypes:abstract-parent-shape" abstract="true" name="abstract-rectangle"></xs:element>
+  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" substitutionGroup="test-oauth:abstract-rectangle" name="rectangle">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="test-oauth:org.mule.test.oauth.Rectangle"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="auth-code-config">
     <xs:complexType>
       <xs:complexContent>
@@ -104,6 +121,24 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -242,6 +277,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -259,6 +296,14 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-field">
+            <xs:complexType>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+              </xs:choice>
+            </xs:complexType>
+          </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="connectionDescription"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="connectionPropertyGrade"></xs:attribute>
@@ -266,6 +311,7 @@
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="connectionType"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="extensionManager"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="importedPojo"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="subTypedField"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -360,6 +406,24 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -498,6 +562,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -587,6 +653,24 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -725,6 +809,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -811,6 +897,24 @@
                       <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
                     </xs:complexType>
                   </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
@@ -952,6 +1056,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -1038,6 +1144,24 @@
                       <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
                     </xs:complexType>
                   </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
@@ -1130,6 +1254,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -1216,6 +1342,24 @@
                       <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
                     </xs:complexType>
                   </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
@@ -1357,6 +1501,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -1443,6 +1589,24 @@
                       <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
                     </xs:complexType>
                   </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
@@ -1584,6 +1748,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -1670,6 +1836,24 @@
                       <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
                     </xs:complexType>
                   </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
@@ -1811,6 +1995,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="withAlias"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="defaultPlacement"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="queryParam"></xs:attribute>
@@ -2403,6 +2589,24 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="random-headers">
               <xs:complexType>
                 <xs:sequence>
@@ -2504,6 +2708,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="knownCustomHeader"></xs:attribute>
           <xs:attribute type="mule:substitutableName" use="optional" name="randomHeaders"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
@@ -2630,6 +2836,24 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -2768,6 +2992,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -2874,6 +3100,24 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-parameter">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="sub-typed-values">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                  </xs:choice>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -3012,6 +3256,8 @@
           <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="subTypedParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="subTypedValues"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>

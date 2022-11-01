@@ -15,6 +15,12 @@ public class ParentShape {
   @Port
   private Integer area;
 
+  public ParentShape() {}
+
+  public ParentShape(Integer area) {
+    this.area = area;
+  }
+
   public Integer getArea() {
     return area;
   }

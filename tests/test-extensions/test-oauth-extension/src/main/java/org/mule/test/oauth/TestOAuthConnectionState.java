@@ -126,6 +126,10 @@ public abstract class TestOAuthConnectionState {
   @Optional
   private ParentShape subTypedParameter;
 
+  @Parameter
+  @Optional
+  private List<ParentShape> subTypedValues;
+
   public Double getApiVersion() {
     return apiVersion;
   }
@@ -222,5 +226,9 @@ public abstract class TestOAuthConnectionState {
 
   public ParentShape getSubTypedParameter() {
     return subTypedParameter;
+  }
+
+  public List<ParentShape> getSubTypedValues() {
+    return subTypedValues;
   }
 }

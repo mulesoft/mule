@@ -12,7 +12,20 @@
     "xsdFileName": "mule-test-oauth.xsd"
   },
   "resources": [],
-  "subTypes": [],
+  "subTypes": [
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.oauth.Rectangle"
+        }
+      ]
+    }
+  ],
   "privilegedPackages": [],
   "privilegedArtifacts": [],
   "externalLibraries": [],
@@ -71,6 +84,217 @@
         }
       },
       "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.ParentShape",
+        "classInformation": {
+          "classname": "org.mule.test.subtypes.extension.ParentShape",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "ParentShape"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.Square",
+        "classInformation": {
+          "classname": "org.mule.test.subtypes.extension.Square",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "org.mule.test.subtypes.extension.ParentShape",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "Square"
+        },
+        "stereotype": {
+          "allowedStereotypes": []
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "side"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.Triangle",
+        "classInformation": {
+          "classname": "org.mule.test.subtypes.extension.Triangle",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "org.mule.test.subtypes.extension.ParentShape",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "triangleAlias"
+        },
+        "stereotype": {
+          "allowedStereotypes": []
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "height"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
     },
     {
       "format": "java",
@@ -10620,6 +10844,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -10657,7 +10960,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10703,7 +11006,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10747,7 +11050,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10793,7 +11096,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10822,7 +11125,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -11036,7 +11339,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -11092,7 +11395,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11123,7 +11426,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11155,7 +11458,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11187,7 +11490,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11219,7 +11522,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -11248,7 +11551,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11279,7 +11582,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11313,7 +11616,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11365,7 +11668,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11403,7 +11706,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11434,7 +11737,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11465,7 +11768,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -11514,7 +11817,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -11582,6 +11885,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -12400,6 +12705,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -12437,7 +12821,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12483,7 +12867,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12527,7 +12911,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12573,7 +12957,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12602,7 +12986,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12816,7 +13200,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -12872,7 +13256,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12903,7 +13287,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12935,7 +13319,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12967,7 +13351,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12998,7 +13382,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13027,7 +13411,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13058,7 +13442,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -13092,7 +13476,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -13144,7 +13528,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -13182,7 +13566,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13213,7 +13597,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13244,7 +13628,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13293,7 +13677,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -13360,6 +13744,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -14263,6 +14649,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -14300,7 +14765,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14346,7 +14811,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14390,7 +14855,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14436,7 +14901,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14465,7 +14930,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14679,7 +15144,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -14735,7 +15200,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14766,7 +15231,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14798,7 +15263,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14830,7 +15295,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14861,7 +15326,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14890,7 +15355,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14921,7 +15386,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -14955,7 +15420,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15007,7 +15472,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15045,7 +15510,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15076,7 +15541,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15107,7 +15572,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15156,7 +15621,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15223,6 +15688,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -16041,6 +16508,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -16078,7 +16624,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16124,7 +16670,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16168,7 +16714,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16214,7 +16760,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16243,7 +16789,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16457,7 +17003,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -16513,7 +17059,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16544,7 +17090,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16576,7 +17122,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16608,7 +17154,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16640,7 +17186,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16669,7 +17215,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16700,7 +17246,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -16734,7 +17280,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -16786,7 +17332,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -16824,7 +17370,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16855,7 +17401,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16886,7 +17432,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -16935,7 +17481,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -17003,6 +17549,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -17821,6 +18369,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -17858,7 +18485,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -17904,7 +18531,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -17948,7 +18575,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -17994,7 +18621,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -18023,7 +18650,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -18237,7 +18864,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -18293,7 +18920,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -18324,7 +18951,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -18356,7 +18983,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -18388,7 +19015,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -18435,7 +19062,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -18500,6 +19127,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -19310,6 +19939,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -19347,7 +20055,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -19393,7 +20101,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -19437,7 +20145,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -19483,7 +20191,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -19512,7 +20220,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -19726,7 +20434,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -19782,7 +20490,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -19813,7 +20521,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -19845,7 +20553,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -19877,7 +20585,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -19909,7 +20617,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -19938,7 +20646,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -19969,7 +20677,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -20003,7 +20711,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -20055,7 +20763,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -20093,7 +20801,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -20124,7 +20832,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -20155,7 +20863,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -20204,7 +20912,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -20272,6 +20980,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -21090,6 +21800,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -21127,7 +21916,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -21173,7 +21962,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -21217,7 +22006,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -21263,7 +22052,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -21292,7 +22081,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -21506,7 +22295,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -21562,7 +22351,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21593,7 +22382,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21625,7 +22414,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21657,7 +22446,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21688,7 +22477,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -21717,7 +22506,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21748,7 +22537,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -21782,7 +22571,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -21834,7 +22623,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -21872,7 +22661,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21903,7 +22692,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21934,7 +22723,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -21983,7 +22772,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -22050,6 +22839,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -22872,18 +23663,18 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String"
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -22894,25 +23685,46 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
-                  "name": "withAlias",
+                  "name": "subTypedParameter",
                   "description": "",
                   "modelProperties": {}
                 },
                 {
                   "type": {
                     "format": "java",
-                    "type": "String"
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -22923,7 +23735,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
-                  "name": "defaultPlacement",
+                  "name": "subTypedValues",
                   "description": "",
                   "modelProperties": {}
                 },
@@ -22952,7 +23764,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
-                  "name": "queryParam",
+                  "name": "withAlias",
                   "description": "",
                   "modelProperties": {}
                 },
@@ -22978,6 +23790,64 @@
                     "text": false,
                     "query": false,
                     "order": 22
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "defaultPlacement",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 23
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "queryParam",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23021,7 +23891,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23067,7 +23937,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23111,7 +23981,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23157,7 +24027,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23186,7 +24056,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23400,7 +24270,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28,
+                    "order": 30,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -23456,7 +24326,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23487,7 +24357,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23519,7 +24389,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23551,7 +24421,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23583,7 +24453,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23612,7 +24482,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23643,7 +24513,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23677,7 +24547,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23729,7 +24599,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23767,7 +24637,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 38
+                    "order": 40
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23798,7 +24668,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 39
+                    "order": 41
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23829,7 +24699,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 40
+                    "order": 42
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23878,7 +24748,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 41
+                    "order": 43
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23946,6 +24816,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "withAlias",
                 "defaultPlacement",
                 "queryParam",
@@ -34800,6 +35672,85 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -34818,7 +35769,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34868,7 +35819,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34912,7 +35863,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34958,7 +35909,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35002,7 +35953,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35048,7 +35999,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35077,7 +36028,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35291,7 +36242,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26,
+                    "order": 28,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -35347,7 +36298,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35378,7 +36329,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35410,7 +36361,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35442,7 +36393,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35489,7 +36440,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -35554,6 +36505,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "knownCustomHeader",
                 "randomHeaders",
                 "anotherConnectionProperties",
@@ -45446,6 +46399,85 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -45464,7 +46496,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45514,7 +46546,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45558,7 +46590,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45604,7 +46636,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45648,7 +46680,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45694,7 +46726,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45723,7 +46755,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45937,7 +46969,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26,
+                    "order": 28,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -45993,7 +47025,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46024,7 +47056,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46056,7 +47088,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46088,7 +47120,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -46135,7 +47167,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -46200,6 +47232,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "knownCustomHeader",
                 "randomHeaders",
                 "anotherConnectionProperties",
@@ -47012,6 +48046,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -47049,7 +48162,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -47095,7 +48208,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -47139,7 +48252,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -47185,7 +48298,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -47214,7 +48327,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -47428,7 +48541,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -47484,7 +48597,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47515,7 +48628,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47547,7 +48660,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47579,7 +48692,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47611,7 +48724,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -47640,7 +48753,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47671,7 +48784,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -47705,7 +48818,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -47757,7 +48870,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -47795,7 +48908,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47826,7 +48939,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47857,7 +48970,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -47906,7 +49019,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -47974,6 +49087,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -57953,6 +59068,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -57990,7 +59184,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -58036,7 +59230,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -58080,7 +59274,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -58126,7 +59320,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -58155,7 +59349,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -58369,7 +59563,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -58585,7 +59779,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25,
+                    "order": 27,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -58641,7 +59835,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -58672,7 +59866,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -58704,7 +59898,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -58736,7 +59930,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -58767,7 +59961,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -58796,7 +59990,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -58827,7 +60021,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -58861,7 +60055,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -58913,7 +60107,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [
                     {
@@ -58951,7 +60145,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -58982,7 +60176,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -59013,7 +60207,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -59062,7 +60256,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 38
+                    "order": 40
                   },
                   "allowedStereotypeModels": [
                     {
@@ -59129,6 +60323,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -69023,6 +70219,85 @@
                   "name": "stackedTypeMapParameter",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 19
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "org.mule.test.subtypes.extension.ParentShape"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "subTypedValues",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -69060,7 +70335,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -69106,7 +70381,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -69150,7 +70425,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -69196,7 +70471,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -69225,7 +70500,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -69439,7 +70714,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -69495,7 +70770,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69526,7 +70801,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69558,7 +70833,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69590,7 +70865,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69621,7 +70896,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -69650,7 +70925,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69681,7 +70956,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -69715,7 +70990,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -69767,7 +71042,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -69805,7 +71080,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69836,7 +71111,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69867,7 +71142,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -69916,7 +71191,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 39
                   },
                   "allowedStereotypeModels": [
                     {
@@ -69983,6 +71258,8 @@
                 "stackedTypePojoParameter",
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
+                "subTypedParameter",
+                "subTypedValues",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -70585,7 +71862,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -70599,7 +71875,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -70750,8 +72027,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "http://example.com/example.json",
-        "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -70765,7 +72040,9 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "http://example.com/example.json",
+        "label": "Person"
       },
       "open": {
         "type": "Any"
@@ -71030,6 +72307,161 @@
           },
           "annotations": {
             "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "subTypedField"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.ParentShape",
+              "classInformation": {
+                "classname": "org.mule.test.subtypes.extension.ParentShape",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "typeAlias": {
+                "value": "ParentShape"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "area"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.lang.Integer",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "java.lang.Number",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "int": {}
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.oauth.Rectangle",
+        "classInformation": {
+          "classname": "org.mule.test.oauth.Rectangle",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "org.mule.test.subtypes.extension.ParentShape",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "Rectangle"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "base"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "height"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
           }
         }
       ]
@@ -71332,6 +72764,62 @@
                       "annotations": {
                         "visibility": "READ_ONLY"
                       }
+                    },
+                    {
+                      "key": {
+                        "name": "subTypedField"
+                      },
+                      "model": {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                          "classInformation": {
+                            "classname": "org.mule.test.subtypes.extension.ParentShape",
+                            "hasDefaultConstructor": true,
+                            "isInterface": false,
+                            "isInstantiable": true,
+                            "isAbstract": false,
+                            "isFinal": false,
+                            "implementedInterfaces": [],
+                            "parent": "",
+                            "genericTypes": [],
+                            "isMap": false
+                          },
+                          "typeAlias": {
+                            "value": "ParentShape"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "area"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "classInformation": {
+                                  "classname": "java.lang.Integer",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "int": {}
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "annotations": {
+                        "visibility": "READ_ONLY"
+                      }
                     }
                   ]
                 },
@@ -71576,6 +73064,62 @@
                                         "isFinal": true,
                                         "implementedInterfaces": [],
                                         "parent": "",
+                                        "genericTypes": [],
+                                        "isMap": false
+                                      },
+                                      "int": {}
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "annotations": {
+                              "visibility": "READ_ONLY"
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "subTypedField"
+                            },
+                            "model": {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                                "classInformation": {
+                                  "classname": "org.mule.test.subtypes.extension.ParentShape",
+                                  "hasDefaultConstructor": true,
+                                  "isInterface": false,
+                                  "isInstantiable": true,
+                                  "isAbstract": false,
+                                  "isFinal": false,
+                                  "implementedInterfaces": [],
+                                  "parent": "",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "typeAlias": {
+                                  "value": "ParentShape"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "area"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "classInformation": {
+                                        "classname": "java.lang.Integer",
+                                        "hasDefaultConstructor": false,
+                                        "isInterface": false,
+                                        "isInstantiable": false,
+                                        "isAbstract": false,
+                                        "isFinal": true,
+                                        "implementedInterfaces": [
+                                          "java.lang.Comparable"
+                                        ],
+                                        "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
                                       },
@@ -71871,6 +73415,62 @@
                                         "isFinal": true,
                                         "implementedInterfaces": [],
                                         "parent": "",
+                                        "genericTypes": [],
+                                        "isMap": false
+                                      },
+                                      "int": {}
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "annotations": {
+                              "visibility": "READ_ONLY"
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "subTypedField"
+                            },
+                            "model": {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                                "classInformation": {
+                                  "classname": "org.mule.test.subtypes.extension.ParentShape",
+                                  "hasDefaultConstructor": true,
+                                  "isInterface": false,
+                                  "isInstantiable": true,
+                                  "isAbstract": false,
+                                  "isFinal": false,
+                                  "implementedInterfaces": [],
+                                  "parent": "",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "typeAlias": {
+                                  "value": "ParentShape"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "area"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "classInformation": {
+                                        "classname": "java.lang.Integer",
+                                        "hasDefaultConstructor": false,
+                                        "isInterface": false,
+                                        "isInstantiable": false,
+                                        "isAbstract": false,
+                                        "isFinal": true,
+                                        "implementedInterfaces": [
+                                          "java.lang.Comparable"
+                                        ],
+                                        "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
                                       },
@@ -72221,6 +73821,62 @@
                         "annotations": {
                           "visibility": "READ_ONLY"
                         }
+                      },
+                      {
+                        "key": {
+                          "name": "subTypedField"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                            "classInformation": {
+                              "classname": "org.mule.test.subtypes.extension.ParentShape",
+                              "hasDefaultConstructor": true,
+                              "isInterface": false,
+                              "isInstantiable": true,
+                              "isAbstract": false,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ParentShape"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "area"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "classInformation": {
+                                    "classname": "java.lang.Integer",
+                                    "hasDefaultConstructor": false,
+                                    "isInterface": false,
+                                    "isInstantiable": false,
+                                    "isAbstract": false,
+                                    "isFinal": true,
+                                    "implementedInterfaces": [
+                                      "java.lang.Comparable"
+                                    ],
+                                    "parent": "java.lang.Number",
+                                    "genericTypes": [],
+                                    "isMap": false
+                                  },
+                                  "int": {}
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "visibility": "READ_ONLY"
+                        }
                       }
                     ]
                   }
@@ -72510,6 +74166,62 @@
                                     "isFinal": true,
                                     "implementedInterfaces": [],
                                     "parent": "",
+                                    "genericTypes": [],
+                                    "isMap": false
+                                  },
+                                  "int": {}
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "visibility": "READ_ONLY"
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "subTypedField"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                            "classInformation": {
+                              "classname": "org.mule.test.subtypes.extension.ParentShape",
+                              "hasDefaultConstructor": true,
+                              "isInterface": false,
+                              "isInstantiable": true,
+                              "isAbstract": false,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ParentShape"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "area"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "classInformation": {
+                                    "classname": "java.lang.Integer",
+                                    "hasDefaultConstructor": false,
+                                    "isInterface": false,
+                                    "isInstantiable": false,
+                                    "isAbstract": false,
+                                    "isFinal": true,
+                                    "implementedInterfaces": [
+                                      "java.lang.Comparable"
+                                    ],
+                                    "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
                                   },
@@ -72912,6 +74624,143 @@
                     }
                   },
                   "fields": []
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "subTypedParameter"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                    "classInformation": {
+                      "classname": "org.mule.test.subtypes.extension.ParentShape",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "typeAlias": {
+                      "value": "ParentShape"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "area"
+                      },
+                      "model": {
+                        "type": "Number",
+                        "annotations": {
+                          "classInformation": {
+                            "classname": "java.lang.Integer",
+                            "hasDefaultConstructor": false,
+                            "isInterface": false,
+                            "isInstantiable": false,
+                            "isAbstract": false,
+                            "isFinal": true,
+                            "implementedInterfaces": [
+                              "java.lang.Comparable"
+                            ],
+                            "parent": "java.lang.Number",
+                            "genericTypes": [],
+                            "isMap": false
+                          },
+                          "int": {}
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "subTypedValues"
+                },
+                "model": {
+                  "type": "Array",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.List",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.util.Collection"
+                      ],
+                      "parent": "",
+                      "genericTypes": [
+                        "org.mule.test.subtypes.extension.ParentShape"
+                      ],
+                      "isMap": false
+                    }
+                  },
+                  "item": {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.test.subtypes.extension.ParentShape",
+                      "classInformation": {
+                        "classname": "org.mule.test.subtypes.extension.ParentShape",
+                        "hasDefaultConstructor": true,
+                        "isInterface": false,
+                        "isInstantiable": true,
+                        "isAbstract": false,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "typeAlias": {
+                        "value": "ParentShape"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "area"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "classInformation": {
+                              "classname": "java.lang.Integer",
+                              "hasDefaultConstructor": false,
+                              "isInterface": false,
+                              "isInstantiable": false,
+                              "isAbstract": false,
+                              "isFinal": true,
+                              "implementedInterfaces": [
+                                "java.lang.Comparable"
+                              ],
+                              "parent": "java.lang.Number",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "int": {}
+                          }
+                        }
+                      }
+                    ]
+                  }
                 },
                 "annotations": {
                   "expressionSupport": {

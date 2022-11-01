@@ -7,7 +7,10 @@
 package org.mule.test.oauth;
 
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.values.extension.MyPojo;
 
 import java.time.ZonedDateTime;
@@ -25,15 +28,19 @@ public class ConnectionProperties {
   private ZonedDateTime connectionTime;
   private MyPojo importedPojo;
 
+  private ParentShape subTypedField;
+
   public ConnectionProperties() {}
 
   public ConnectionProperties(String connectionDescription, ConnectionType connectionType,
-                              Literal<String> connectionPropertyGrade, ZonedDateTime connectionTime, MyPojo importedPojo) {
+                              Literal<String> connectionPropertyGrade, ZonedDateTime connectionTime, MyPojo importedPojo,
+                              ParentShape subTypedField) {
     this.connectionDescription = connectionDescription;
     this.connectionType = connectionType;
     this.connectionPropertyGrade = connectionPropertyGrade;
     this.connectionTime = connectionTime;
     this.importedPojo = importedPojo;
+    this.subTypedField = subTypedField;
   }
 
   public Literal<String> getConnectionPropertyGrade() {
@@ -60,6 +67,10 @@ public class ConnectionProperties {
     return importedPojo;
   }
 
+  public ParentShape getSubTypedField() {
+    return subTypedField;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -69,6 +80,9 @@ public class ConnectionProperties {
 
     ConnectionProperties that = (ConnectionProperties) o;
 
+    if (subTypedField != null ? !subTypedField.equals(that.subTypedField)
+        : that.subTypedField != null)
+      return false;
     if (connectionDescription != null ? !connectionDescription.equals(that.connectionDescription)
         : that.connectionDescription != null)
       return false;
@@ -95,6 +109,7 @@ public class ConnectionProperties {
     result =
         31 * result + (connectionPropertyGrade != null ? connectionPropertyGrade.getLiteralValue().orElse("").hashCode() : 0);
     result = 31 * result + (connectionTime != null ? connectionTime.hashCode() : 0);
+    result = 31 * result + (subTypedField != null ? subTypedField.hashCode() : 0);
     return result;
   }
 }

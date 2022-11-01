@@ -6,13 +6,18 @@
  */
 package org.mule.test.module.extension;
 
+import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
@@ -22,6 +27,8 @@ import static org.mule.runtime.module.extension.internal.resources.BaseExtension
 import static org.mule.test.oauth.ConnectionType.DUO;
 import static org.mule.test.oauth.ConnectionType.HYPER;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -40,6 +47,7 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.extension.api.component.value.ObjectValueDeclarer;
 import org.mule.runtime.extension.api.component.value.ValueDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
@@ -53,23 +61,17 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.model.shapes.Circle;
-import org.mule.test.oauth.ConnectionProfile;
-import org.mule.test.oauth.ConnectionProperties;
-import org.mule.test.oauth.ConnectionType;
-import org.mule.test.oauth.TestOAuthExtension;
+import org.mule.test.oauth.*;
 import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.subtypes.extension.Square;
+import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.values.extension.MyPojo;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import io.qameta.allure.Description;
@@ -109,6 +111,51 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
       new MyPojo(IMPORTED_POJO_ID_FIELD_VALUE, IMPORTED_POJO_NAME_FIELD_VALUE, IMPORTED_POJO_NUMBER_FIELD_VALUE,
                  IMPORTED_POJO_BOOLEAN_FIELD_VALUE);
 
+  private static final int SQUARE_SIDE_VALUE = 2;
+  private static final int SQUARE_AREA_VALUE = 4;
+
+  private static final String SQUARE_SIDE_NAME = "side";
+  private static final String SQUARE_AREA_NAME = "area";
+
+  private static final Square TEST_SQUARE = new Square(SQUARE_AREA_VALUE, SQUARE_SIDE_VALUE);
+
+  private static final Consumer<ObjectValueDeclarer> SQUARE_OBJECT_VALUE_DECLARER =
+      objectValueDeclarer -> objectValueDeclarer.withField(SQUARE_AREA_NAME, SQUARE_AREA_VALUE)
+          .withField(SQUARE_SIDE_NAME, SQUARE_SIDE_VALUE);
+
+  private static final String SUBTYPE_EXTENSION_IDENTIFIER = "subtypes";
+  private static final String SQUARE_TYPE_IDENTIFIER = "org.mule.test.subtypes.extension.Square";
+  private static final String SQUARE_TYPE_ALIAS = "Square";
+
+  private static final Consumer<ValueDeclarer> SQUARE_WITH_TYPE_ID_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SUBTYPE_EXTENSION_IDENTIFIER, SQUARE_TYPE_IDENTIFIER);
+  private static final Consumer<ValueDeclarer> SQUARE_WITH_TYPE_ALIAS_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SUBTYPE_EXTENSION_IDENTIFIER, SQUARE_TYPE_ALIAS);
+
+  private static final int RECTANGLE_BASE_VALUE = 3;
+  private static final int RECTANGLE_HEIGHT_VALUE = 4;
+  private static final int RECTANGLE_AREA_VALUE = 12;
+
+  private static final String RECTANGLE_BASE_NAME = "base";
+  private static final String RECTANGLE_HEIGHT_NAME = "height";
+  private static final String RECTANGLE_AREA_NAME = "area";
+
+  private static final String OAUTH_EXTENSION_IDENTIFIER = "test-oauth";
+  private static final String RECTANGLE_TYPE_IDENTIFIER = "org.mule.test.oauth.Rectangle";
+
+  private static final Consumer<ObjectValueDeclarer> RECTANGLE_OBJECT_VALUE_DECLARER =
+      objectValueDeclarer -> objectValueDeclarer.withField(RECTANGLE_BASE_NAME, RECTANGLE_BASE_VALUE)
+          .withField(RECTANGLE_HEIGHT_NAME, RECTANGLE_HEIGHT_VALUE)
+          .withField(RECTANGLE_AREA_NAME, RECTANGLE_AREA_VALUE);
+
+  private static final Consumer<ValueDeclarer> RECTANGLE_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(RECTANGLE_OBJECT_VALUE_DECLARER, OAUTH_EXTENSION_IDENTIFIER, RECTANGLE_TYPE_IDENTIFIER);
+
+  private static final Rectangle TEST_RECTANGLE =
+      new Rectangle(RECTANGLE_AREA_VALUE, RECTANGLE_BASE_VALUE, RECTANGLE_HEIGHT_VALUE);
+
+  private static final String POJO_SUBTYPED_FIELD = "subTypedField";
+
   private static final ConnectionProperties POJO_PARAMETER_VALUE =
       new ConnectionProperties(POJO_CONNECTION_DESCRIPTION_FIELD_VALUE, POJO_CONNECTION_TYPE_FIELD_VALUE, new Literal<String>() {
 
@@ -121,7 +168,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
         public Class<String> getType() {
           return null;
         }
-      }, POJO_CONNECTION_TIME_FIELD_VALUE, POJO_CONNECTION_IMPORTED_POJO_FIELD_VALUE);
+      }, POJO_CONNECTION_TIME_FIELD_VALUE, POJO_CONNECTION_IMPORTED_POJO_FIELD_VALUE, TEST_SQUARE);
 
   private static final Consumer<ValueDeclarer> IMPORTED_POJO_VALUE_DECLARER =
       importedPojoValueDeclarer -> importedPojoValueDeclarer.objectValue(objectValueDeclarer -> objectValueDeclarer
@@ -130,13 +177,15 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
           .withField(IMPORTED_POJO_NUMBER_FIELD_NAME, IMPORTED_POJO_NUMBER_FIELD_VALUE.toString())
           .withField(IMPORTED_POJO_BOOLEAN_FIELD_NAME, String.valueOf(IMPORTED_POJO_BOOLEAN_FIELD_VALUE)));
 
+  private static final Consumer<ObjectValueDeclarer> POJO_OBJECT_VALUE_DECLARER = objectValueDeclarer -> objectValueDeclarer
+      .withField(POJO_CONNECTION_DESCRIPTION_FIELD_NAME, POJO_CONNECTION_DESCRIPTION_FIELD_VALUE)
+      .withField(POJO_CONNECTION_TYPE_FIELD_NAME, POJO_CONNECTION_TYPE_FIELD_VALUE.name())
+      .withField(POJO_CONNECTION_PROPERTY_GRADE_FIELD_NAME, POJO_CONNECTION_PROPERTY_GRADE_FIELD_VALUE)
+      .withField(POJO_CONNECTION_TIME_FIELD_NAME, POJO_CONNECTION_TIME_FIELD_VALUE_AS_STRING)
+      .withField(POJO_CONNECTION_IMPORTED_POJO_FIELD_NAME, IMPORTED_POJO_VALUE_DECLARER)
+      .withField(POJO_SUBTYPED_FIELD, SQUARE_WITH_TYPE_ID_VALUE_DECLARER);
   private static final Consumer<ValueDeclarer> POJO_VALUE_DECLARER =
-      valueDeclarer -> valueDeclarer.objectValue(objectValueDeclarer -> objectValueDeclarer
-          .withField(POJO_CONNECTION_DESCRIPTION_FIELD_NAME, POJO_CONNECTION_DESCRIPTION_FIELD_VALUE)
-          .withField(POJO_CONNECTION_TYPE_FIELD_NAME, POJO_CONNECTION_TYPE_FIELD_VALUE.name())
-          .withField(POJO_CONNECTION_PROPERTY_GRADE_FIELD_NAME, POJO_CONNECTION_PROPERTY_GRADE_FIELD_VALUE)
-          .withField(POJO_CONNECTION_TIME_FIELD_NAME, POJO_CONNECTION_TIME_FIELD_VALUE_AS_STRING)
-          .withField(POJO_CONNECTION_IMPORTED_POJO_FIELD_NAME, IMPORTED_POJO_VALUE_DECLARER));
+      valueDeclarer -> valueDeclarer.objectValue(POJO_OBJECT_VALUE_DECLARER);
 
   private static String CONNECTION_PROFILE_PARAMETER_GROUP_NAME = "Connection profile";
   private static final String COMPLEX_PARAMETER_NAME_IN_SHOWINDSL_PARAMETER_GROUP = "profileConnectionProperties";
@@ -432,23 +481,64 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
 
   private static final String SUBTYPED_PARAMETER_NAME = "subTypedParameter";
 
+  private static final String SUBTYPED_ARRAY_PARAMETER_NAME = "subTypedValues";
+
+  private static final List<ParentShape> SUBTYPED_ARRAY_PARAMETER_VALUE = asList(TEST_RECTANGLE, TEST_SQUARE);
+
+  private static final Consumer<ValueDeclarer> SUBTYPED_ARRAY_PARAMETER_VALUE_DECLARER =
+      valueDeclarer -> valueDeclarer.arrayValue(arrayValueDeclarer -> arrayValueDeclarer
+          .withItem(RECTANGLE_VALUE_DECLARER)
+          .withItem(SQUARE_WITH_TYPE_ID_VALUE_DECLARER));
+
+  private static final String INVALID_EXTENSION_IDENTIFIER = "invalid-extension-identifier";
+  private static final String INVALID_TYPE_IDENTIFIER = "FakeTypeIdentifier";
+
+  private static final Consumer<ValueDeclarer> INVALID_EXTENSION_IDENTIFIER_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, INVALID_EXTENSION_IDENTIFIER, SQUARE_TYPE_IDENTIFIER);
+  private static final Consumer<ValueDeclarer> INVALID_TYPE_IDENTIFIER_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SUBTYPE_EXTENSION_IDENTIFIER, INVALID_TYPE_IDENTIFIER);
+  private static final Consumer<ValueDeclarer> INVALID_TYPE_USED_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(POJO_OBJECT_VALUE_DECLARER, OAUTH_EXTENSION_IDENTIFIER, RECTANGLE_TYPE_IDENTIFIER);
+
+  private static final String EXTENSION_WITH_ID_NOT_FOUND_MESSAGE =
+      format("No extension found with identifier [%s]", INVALID_EXTENSION_IDENTIFIER);
+
+  private static final String TYPE_WITH_ID_NOT_FOUND_MESSAGE =
+      format("No type with identifier [%s] was found for extension [%s]", INVALID_TYPE_IDENTIFIER,
+             SUBTYPE_EXTENSION_IDENTIFIER);
+
+  private static final String INVALID_TYPE_USED_FOR_VALUE_MESSAGE =
+      format("Value of type [%s] cannot be applied to parameter/field of type [%s]",
+             RECTANGLE_TYPE_IDENTIFIER, ConnectionProperties.class.getName());
+
   private ReflectionCache reflectionCache = new ReflectionCache();
 
   private ExpressionManager expressionManager;
 
   private ExtensionModel testOAuthExtensionModel;
+
+  private ExtensionModel testSubtypesExtensionModel;
   private ParameterizedModel testParameterizedModel;
   private List<OperationModel> testOperationModels;
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Before
   public void setup() throws Exception {
     testOAuthExtensionModel = loadExtension(TestOAuthExtension.class, new DefaultJavaExtensionModelLoader());
+    testSubtypesExtensionModel = loadExtension(SubTypesMappingConnector.class, new DefaultJavaExtensionModelLoader());
+
+    Set<ExtensionModel> extensionModels = new HashSet<>();
+    extensionModels.add(testOAuthExtensionModel);
+    extensionModels.add(testSubtypesExtensionModel);
 
     expressionManager = muleContext.getExpressionManager();
     testParameterizedModel = testOAuthExtensionModel.getConfigurationModels().get(0).getConnectionProviders().get(0);
     MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
     muleRegistry.registerObject("Extensions Manager Mock", mock(ExtensionManager.class));
     testOperationModels = testOAuthExtensionModel.getConfigurationModels().get(0).getOperationModels();
+    when(muleContext.getExtensionManager().getExtensions()).thenReturn(extensionModels);
   }
 
   @Test
@@ -784,54 +874,80 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("Validates that ComponentParameterization API can describe a parameter whose type is defined with a SubtypeMapping.")
   public void subtypedParameter() throws Exception {
-    Integer squareArea = 4;
-    Integer squareSide = 2;
-    Square subtypedParameterValue = new Square();
-    subtypedParameterValue.setArea(squareArea);
-    subtypedParameterValue.setSide(squareSide);
-    ObjectType valueObjectType = testOAuthExtensionModel.getImportedTypes().stream()
-        .filter(importedTypeModel -> importedTypeModel.getImportedType().getAnnotation(TypeIdAnnotation.class)
-            .map(typeIdAnnotation -> typeIdAnnotation.getValue().contains("Square")).orElse(false))
-        .findFirst().get().getImportedType();
-    Consumer<ValueDeclarer> subtypedParameterValueDeclarer = valueDeclarer -> valueDeclarer
-        .objectValue(objectValueDeclarer -> objectValueDeclarer.withField("area", squareArea.toString())
-            // USE STATIC VARIABLES
-            .withField("side", squareSide.toString()), "SubtypesConnector", "Square");
     ParentShape shapeParameter =
         (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
                                                                     SUBTYPED_PARAMETER_NAME,
-                                                                    subtypedParameterValueDeclarer);
-    assertThat(shapeParameter, is(subtypedParameterValue));
+                                                                    SQUARE_WITH_TYPE_ID_VALUE_DECLARER);
+    assertThat(shapeParameter, is(TEST_SQUARE));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is defined with a SubtypeMapping.")
+  public void subtypedParameterUsingTypeAlias() throws Exception {
+    ParentShape shapeParameter =
+        (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+                                                                    SUBTYPED_PARAMETER_NAME,
+                                                                    SQUARE_WITH_TYPE_ALIAS_VALUE_DECLARER);
+    assertThat(shapeParameter, is(TEST_SQUARE));
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API can describe a parameter whose type is defined with a SubtypeMapping"
+      +
+      "on a different extension than the base type.")
+  public void subtypedParameterFromDifferentExtension() throws Exception {
+    ParentShape shapeParameter =
+        (ParentShape) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+                                                                    SUBTYPED_PARAMETER_NAME,
+                                                                    RECTANGLE_VALUE_DECLARER);
+    assertThat(shapeParameter, is(TEST_RECTANGLE));
   }
 
   @Test
   @Description("Validates that ComponentParameterization API can describe a pojo parameter with a field whose type is defined with a SubtypeMapping.")
   public void pojoWithSubtypedField() throws Exception {
-    // ADD TEST
+    ConnectionProperties connectionProperties =
+        (ConnectionProperties) getResolvedValueFromComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, POJO_PARAMETER_NAME,
+                                                                             POJO_VALUE_DECLARER);
+    assertThat(connectionProperties.getSubTypedField(), is(TEST_SQUARE));
   }
 
   @Test
   @Description("Validates that ComponentParameterization API can describe a pojo parameter with a field whose type is defined with a SubtypeMapping.")
   public void arrayOfSubtypedItems() throws Exception {
-    // ADD TEST
-  }
-
-  @Test
-  @Description("Validates that ComponentParameterization API can describe a pojo parameter whose type is defined with a SubtypeMapping on another extension.")
-  public void pojoWithSubtypedFieldThatIsDefinedOnADifferentExtension() throws Exception {
-    // ADD TEST , DEFINE SUBTYPEMAPPING ON ANOTHER EXTENSION
+    testComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, SUBTYPED_ARRAY_PARAMETER_NAME,
+                                  SUBTYPED_ARRAY_PARAMETER_VALUE_DECLARER,
+                                  SUBTYPED_ARRAY_PARAMETER_VALUE);
   }
 
   @Test
   @Description("Validates that ComponentParameterization API fails when an object type is described with an invalid extension name.")
   public void pojoWithInvalidExtensionName() throws Exception {
-    // ADD TEST
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(EXTENSION_WITH_ID_NOT_FOUND_MESSAGE);
+    testComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+                                  SUBTYPED_PARAMETER_NAME,
+                                  INVALID_EXTENSION_IDENTIFIER_VALUE_DECLARER, TEST_SQUARE);
   }
 
   @Test
   @Description("Validates that ComponentParameterization API fails when an object type is described with an invalid typeId or alias.")
   public void pojoWithInvalidTypeIdOrAlias() throws Exception {
-    // ADD TEST
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(TYPE_WITH_ID_NOT_FOUND_MESSAGE);
+    testComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
+                                  SUBTYPED_PARAMETER_NAME,
+                                  INVALID_TYPE_IDENTIFIER_VALUE_DECLARER, TEST_SQUARE);
+  }
+
+  @Test
+  @Description("Validates that ComponentParameterization API fails when an object type is described with a type that is" +
+      " invalid for that parameter.")
+  public void pojoWithInvalidTypeForParameter() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(INVALID_TYPE_USED_FOR_VALUE_MESSAGE);
+    testComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, POJO_PARAMETER_NAME, INVALID_TYPE_USED_VALUE_DECLARER,
+                                  POJO_PARAMETER_VALUE);
   }
 
   private void testComponentParameterization(String parameterGroupName, String parameterName,

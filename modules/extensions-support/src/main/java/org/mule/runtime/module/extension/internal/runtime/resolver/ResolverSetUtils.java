@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.util.ExtensionsSubTypeFinder.getSubtype;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -31,6 +32,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -199,8 +201,8 @@ public class ResolverSetUtils {
                                                          boolean acceptsReferences)
       throws MuleException {
     if (value instanceof EnrichedValue) {
+      type = getTypeFromEnrichedValue((EnrichedValue) value, muleContext.getExtensionManager().getExtensions(), type);
       value = ((EnrichedValue) value).getValue();
-      type = getTypeFromEnrichedValue((EnrichedValue) value, type);
     }
     Object finalValue = value;
     Reference<ValueResolver> resolverReference = new Reference<>();
@@ -313,10 +315,12 @@ public class ResolverSetUtils {
                                    expressionSupport, required, modelProperties, acceptsReferences);
   }
 
-  private static MetadataType getTypeFromEnrichedValue(EnrichedValue value) {
-    // Call the runtime provided API (Provide two ways, give the actual type loader, or create it here.)
-    value.getTypeInformation();
-    return null;
+  private static MetadataType getTypeFromEnrichedValue(EnrichedValue value, Collection<ExtensionModel> extensionModels,
+                                                       MetadataType baseType) {
+    return value.getTypeInformation().isPresent()
+        ? getSubtype(extensionModels, value.getTypeInformation().get().getFirst(), value.getTypeInformation().get().getSecond(),
+                     baseType)
+        : baseType;
   }
 
   private static Object resolveAndInjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) throws MuleException {
