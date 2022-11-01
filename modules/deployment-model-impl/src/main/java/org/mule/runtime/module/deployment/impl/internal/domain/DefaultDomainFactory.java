@@ -7,15 +7,13 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
-import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Maps.fromProperties;
@@ -51,13 +49,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import com.google.common.collect.Maps;
-
 public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<DomainDescriptor, Domain> {
 
   private final DomainManager domainManager;
-  // TODO - W-11086334: remove old domain descriptor factory with the migration
-  private final DomainDescriptorFactory domainDescriptorFactory;
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory;
   private final ClassLoaderRepository classLoaderRepository;
   private final ServiceRepository serviceRepository;
@@ -106,7 +100,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
-    this.domainDescriptorFactory = domainDescriptorFactory;
     this.deployableArtifactDescriptorFactory = deployableArtifactDescriptorFactory;
     this.domainManager = domainManager;
     this.serviceRepository = serviceRepository;
@@ -190,12 +183,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors = new ArrayList<>(domainDescriptor.getPlugins());
 
-    // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    // if (!isHeavyPackage(domainLocation)) {
-    // resolvedArtifactPluginDescriptors =
-    // pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(domainDescriptor.getPlugins()), true);
-    // }
-
     DomainClassLoaderBuilder artifactClassLoaderBuilder =
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
     MuleDeployableArtifactClassLoader domainClassLoader =
@@ -218,13 +205,9 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
   @Override
   public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
-    if (isHeavyPackage(artifactLocation)) {
-      return deployableArtifactDescriptorFactory
-          .createDomainDescriptor(createDeployableProjectModel(artifactLocation, true),
-                                  deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                      .orElse(emptyMap()));
-    } else {
-      return domainDescriptorFactory.create(artifactLocation, deploymentProperties);
-    }
+    return deployableArtifactDescriptorFactory
+        .createDomainDescriptor(createDeployableProjectModel(artifactLocation, true),
+                                deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
+                                    .orElse(emptyMap()));
   }
 }

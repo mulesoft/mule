@@ -113,6 +113,13 @@ public class ApplicationsCreatedWithDeprecatedDescriptorClassTestCase extends Ab
     assertThat(application.getDescriptor(), instanceOf(ApplicationDescriptor.class));
   }
 
+  @Test
+  public void lightweightApplicationWithDependency() throws Exception {
+    Application application = applicationFactory.createArtifact(getApplicationFolder("apps/single-dependency"), empty());
+
+    assertThat(application.getDescriptor(), instanceOf(ApplicationDescriptor.class));
+  }
+
   protected File getApplicationFolder(String path) throws URISyntaxException {
     return new File(getClass().getClassLoader().getResource(path).toURI());
   }

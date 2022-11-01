@@ -172,15 +172,15 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     Domain domain = getDomainForDescriptor(descriptor);
 
     // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    // if (!isHeavyPackage(descriptor.getArtifactLocation())) {
-    // List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-    // pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
-    // new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
-    //
-    // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
-    // Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>(resolvedArtifactPluginDescriptors);
-    // descriptor.setPlugins(resolvedArtifactPlugins);
-    // }
+    if (!isHeavyPackage(descriptor.getArtifactLocation())) {
+      List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+          pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
+                                             new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
+
+      // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
+      Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>(resolvedArtifactPluginDescriptors);
+      descriptor.setPlugins(resolvedArtifactPlugins);
+    }
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
         applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();

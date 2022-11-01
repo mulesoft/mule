@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.maven.model.Model;
 
@@ -56,25 +57,25 @@ public class LightweightDeployableProjectModelBuilder extends MavenDeployablePro
 
     resolveAdditionalPluginDependencies(aetherMavenClient, pomModel, activeProfiles, pluginsArtifactDependencies);
 
-    // Get exported resources and packages
-    // try {
-    // getAvailablePackagesAndResources(pomModel.getBuild());
-    // } catch (IOException e) {
-    // throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
-    // }
+    Supplier<MuleDeployableModel> modelResolver = getModelResolver();
 
-    return new DeployableProjectModel(packages, resources, resourcesPath,
+    List<String> exportedPackages =
+        (List<String>) modelResolver.get().getClassLoaderModelLoaderDescriptor().getAttributes().get("exportedPackages");
+
+    List<String> exportedResources =
+        (List<String>) modelResolver.get().getClassLoaderModelLoaderDescriptor().getAttributes().get("exportedResources");
+
+    return new DeployableProjectModel(exportedPackages, exportedResources, emptyList(),
                                       buildBundleDescriptor(deployableArtifactCoordinates),
-                                      getModelResolver(),
+                                      modelResolver,
                                       projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
   private File getPomFromFolder(File projectFolder) {
     File mavenFolder = new File(projectFolder, "META-INF/maven");
-    try {
-      List<Path> pomLists =
-          find(mavenFolder.toPath(), 3, (p, m) -> p.getFileName().toString().equals("pom.xml")).collect(toList());
+    try (Stream<Path> stream = find(mavenFolder.toPath(), 3, (p, m) -> p.getFileName().toString().equals("pom.xml"))) {
+      List<Path> pomLists = stream.collect(toList());
       if (pomLists.size() != 1) {
         throw new MuleRuntimeException(createStaticMessage(""));
       }
