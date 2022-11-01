@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.service.internal.manager;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Proxy.getInvocationHandler;
-import static java.lang.reflect.Proxy.isProxyClass;
-import static java.lang.reflect.Proxy.newProxyInstance;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
+
+import static java.lang.String.format;
+import static java.lang.reflect.Proxy.getInvocationHandler;
+import static java.lang.reflect.Proxy.isProxyClass;
+import static java.lang.reflect.Proxy.newProxyInstance;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -33,6 +35,7 @@ import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.manager.ServiceProxyInvocationHandler;
 import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
 
 import java.lang.reflect.InvocationHandler;
@@ -50,7 +53,7 @@ import org.slf4j.Logger;
  *
  * @since 4.2
  */
-public class LazyServiceProxy implements InvocationHandler {
+public class LazyServiceProxy implements ServiceProxyInvocationHandler {
 
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
 
@@ -58,8 +61,8 @@ public class LazyServiceProxy implements InvocationHandler {
   private final ServiceRegistry serviceRegistry;
   private final LazyValue<Service> service;
 
-  private AtomicBoolean started = new AtomicBoolean(false);
-  private AtomicBoolean stopped = new AtomicBoolean(false);
+  private final AtomicBoolean started = new AtomicBoolean(false);
+  private final AtomicBoolean stopped = new AtomicBoolean(false);
   private MethodInvoker methodInvoker = new DefaultMethodInvoker();
 
   /**
@@ -120,7 +123,7 @@ public class LazyServiceProxy implements InvocationHandler {
     } else if (methodClass == TypeSupplier.class) {
       return assembly.getServiceContract();
     } else {
-      return methodInvoker.invoke(service.get(), method, args);
+      return methodInvoker.invoke(getService(), method, args);
     }
   }
 
@@ -151,7 +154,7 @@ public class LazyServiceProxy implements InvocationHandler {
 
   protected synchronized Object handleStart() {
     if (service.isComputed() && started.compareAndSet(false, true)) {
-      doStart(service.get());
+      doStart(getService());
       stopped.set(false);
     }
     return null;
@@ -179,7 +182,7 @@ public class LazyServiceProxy implements InvocationHandler {
   private synchronized void doStop() {
     withServiceClassLoader(() -> {
       try {
-        stopIfNeeded(service.get());
+        stopIfNeeded(getService());
       } catch (Exception e) {
         LOGGER.warn(format("Service '%s' was not stopped properly: %s", assembly.getName(), e.getMessage()), e);
       }
@@ -212,5 +215,10 @@ public class LazyServiceProxy implements InvocationHandler {
     }
 
     return false;
+  }
+
+  @Override
+  public Service getService() {
+    return service.get();
   }
 }

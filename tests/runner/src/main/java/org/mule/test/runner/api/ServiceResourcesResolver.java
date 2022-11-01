@@ -7,16 +7,12 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.String.format;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+
+import static java.lang.String.format;
+
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 
@@ -25,9 +21,6 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -49,11 +42,7 @@ public class ServiceResourcesResolver {
    * @return {@link ArtifactUrlClassification} with the resources resolved
    */
   public ArtifactUrlClassification resolveServiceResourcesFor(ArtifactUrlClassification serviceUrlClassification) {
-    final Set<String> exportPackages = newHashSet();
-    final Set<String> exportResources = newHashSet();
-    final Set<String> privilegedExportedPackages = newHashSet();
-    final Set<String> privilegedArtifacts = newHashSet();
-
+    // TODO A
     try (URLClassLoader classLoader = new URLClassLoader(serviceUrlClassification.getUrls().toArray(new URL[0]), null)) {
       logger.debug("Loading service '{}' descriptor", serviceUrlClassification.getName());
       URL artifactJsonUrl = classLoader.findResource(META_INF + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
@@ -72,28 +61,6 @@ public class ServiceResourcesResolver {
         throw new IllegalArgumentException(format("Could not read extension describer on service '%s'", artifactJsonUrl),
                                            e);
       }
-
-      MuleArtifactLoaderDescriptor classLoaderModelDescriptor = muleServiceModel.getClassLoaderModelLoaderDescriptor();
-      exportPackages
-          .addAll((List<String>) classLoaderModelDescriptor
-              .getAttributes().getOrDefault(EXPORTED_PACKAGES,
-                                            new ArrayList<>()));
-      exportResources
-          .addAll((List<String>) classLoaderModelDescriptor
-              .getAttributes().getOrDefault(EXPORTED_RESOURCES,
-                                            new ArrayList<>()));
-
-      privilegedExportedPackages
-          .addAll((List<String>) classLoaderModelDescriptor
-              .getAttributes()
-              .getOrDefault(PRIVILEGED_EXPORTED_PACKAGES,
-                            new ArrayList<>()));
-
-      privilegedArtifacts
-          .addAll((List<String>) classLoaderModelDescriptor
-              .getAttributes()
-              .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
-                            new ArrayList<>()));
 
       // TODO: MULE-15471: to fix one service per artifact assumption
       return new ArtifactUrlClassification(serviceUrlClassification.getArtifactId(),
