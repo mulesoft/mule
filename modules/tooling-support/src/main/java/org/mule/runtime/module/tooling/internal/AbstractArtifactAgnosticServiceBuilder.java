@@ -27,7 +27,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 
 import java.io.File;
@@ -137,7 +137,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
       applicationDescriptor
-          .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(of(mavenClientProvider
+          .setClassLoaderConfiguration(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
               .createMavenClient(GlobalConfigLoader.getMavenConfig())))
                   .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
                                                         createTempBundleDescriptor()),

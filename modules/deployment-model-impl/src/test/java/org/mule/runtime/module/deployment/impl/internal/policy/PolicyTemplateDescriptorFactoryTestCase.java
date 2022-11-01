@@ -16,14 +16,15 @@ import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDe
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidBundleDescriptorLoaderIdError;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader.LIB_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
@@ -52,10 +53,10 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateE
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
-import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -70,12 +71,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
+@Story(ARTIFACT_DESCRIPTORS)
 public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String POLICY_NAME = "testPolicy";
@@ -102,13 +105,13 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Before
   public void setUp() throws Exception {
-    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
-        .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
-    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, POLICY, ClassLoaderConfigurationLoader.class))
+        .thenReturn(new FileSystemPolicyClassLoaderConfigurationLoader());
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderConfigurationLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
     MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
-    when(descriptorLoaderRepository.get(MULE_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
-        .thenReturn(new DeployableMavenClassLoaderModelLoader(of(mavenClientProvider
+    when(descriptorLoaderRepository.get(MULE_LOADER_ID, POLICY, ClassLoaderConfigurationLoader.class))
+        .thenReturn(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
             .createMavenClient(newMavenConfigurationBuilder()
                 .localMavenRepositoryLocation(mavenClientProvider
                     .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
@@ -156,9 +159,9 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
                                             ArtifactDescriptorValidatorBuilder.builder());
     PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder, empty());
 
-    assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(tempFolder.toString()));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
+    assertThat(desc.getClassLoaderConfiguration().getUrls().length, equalTo(2));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[0]).getPath(), equalTo(tempFolder.toString()));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[1]).getPath(),
                equalTo(new File(tempFolder, LIB_DIR + separator + JAR_FILE_NAME).toString()));
   }
 

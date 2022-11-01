@@ -39,7 +39,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
@@ -61,13 +62,13 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 
 /**
- * ClassLoaderModelBuilder that adds the concept of Shared Library for the configured dependencies.
+ * ClassLoaderConfigurationBuilder that adds the concept of Shared Library for the configured dependencies.
  *
  * @since 4.2.0
  */
-public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
+public abstract class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderConfigurationBuilder {
 
-  private static final Logger LOGGER = getLogger(ArtifactClassLoaderModelBuilder.class);
+  private static final Logger LOGGER = getLogger(ArtifactClassLoaderConfigurationBuilder.class);
 
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
@@ -84,7 +85,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   protected ArtifactDescriptor deployableArtifactDescriptor;
   protected BundleDescriptor artifactBundleDescriptor;
 
-  public ArtifactClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor) {
+  public ArtifactClassLoaderConfigurationBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor) {
     requireNonNull(artifactFolder, "artifactFolder cannot be null");
     requireNonNull(artifactBundleDescriptor, "artifactBundleDescriptor cannot be null");
     this.artifactBundleDescriptor = artifactBundleDescriptor;
@@ -92,12 +93,12 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   /**
-   * Sets a flag to export the configured shared libraries when building the ClassLoaderModel
+   * Sets a flag to export the configured shared libraries when building the ClassLoaderConfiguration
    *
    * @return this builder
    * @since 4.2.0
    */
-  public ClassLoaderModel.ClassLoaderModelBuilder exportingSharedLibraries() {
+  public ClassLoaderConfigurationBuilder exportingSharedLibraries() {
     this.processSharedLibraries = true;
     return this;
   }
@@ -106,8 +107,9 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
    * Sets a flag to include additional dependencies for each plugin if the deployable artifact defines them.
    *
    * @since 4.2.0
+   * @return
    */
-  public ClassLoaderModel.ClassLoaderModelBuilder additionalPluginLibraries() {
+  public ClassLoaderConfigurationBuilder additionalPluginLibraries() {
     this.processAdditionalPluginLibraries = true;
     return this;
   }
@@ -117,7 +119,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   @Override
-  public ClassLoaderModel build() {
+  public ClassLoaderConfiguration build() {
     Optional<Plugin> pluginOptional = empty();
     if (processSharedLibraries || processAdditionalPluginLibraries) {
       pluginOptional = findMuleMavenPluginDeclaration();
@@ -331,7 +333,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     if (deployableArtifactDescriptor != null) {
-      deployableArtifactDescriptor.getClassLoaderModel().getDependencies().stream()
+      deployableArtifactDescriptor.getClassLoaderConfiguration().getDependencies().stream()
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
               .equals(this.artifactBundleDescriptor.getGroupId())

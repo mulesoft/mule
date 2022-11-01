@@ -9,18 +9,19 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoaderModelAttributes;
+import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoaderConfigurationAttributes;
 
 import java.util.Map;
 
 /**
- * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} when it
- * is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader} for plugins in order to
- * define in which deployable artifact the plugin is declared.
+ * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration}
+ * when it is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader} for plugins
+ * in order to define in which deployable artifact the plugin is declared.
  *
  * @since 4.2.0
  */
-public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoaderModelAttributes {
+// TODO - W-11098291: rename accordingly
+public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoaderConfigurationAttributes {
 
   private ArtifactDescriptor deployableArtifactDescriptor;
 

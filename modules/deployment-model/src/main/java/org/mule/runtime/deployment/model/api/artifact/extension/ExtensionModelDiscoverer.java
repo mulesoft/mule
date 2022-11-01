@@ -120,7 +120,7 @@ public class ExtensionModelDiscoverer {
       discoveryRequest.getArtifactPlugins()
           .stream()
           .map(p -> p.getFirst())
-          .forEach(apd -> apd.getClassLoaderModel().getDependencies().stream()
+          .forEach(apd -> apd.getClassLoaderConfiguration().getDependencies().stream()
               .filter(dep -> dep.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false))
               .forEach(dep -> depsGraph.addEdge(apd.getBundleDescriptor(), dep.getDescriptor(), new DefaultEdge())));
       TransitiveReduction.INSTANCE.reduce(depsGraph);

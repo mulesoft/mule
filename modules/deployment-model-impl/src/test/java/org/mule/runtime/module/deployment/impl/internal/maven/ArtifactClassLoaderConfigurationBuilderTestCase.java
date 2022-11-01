@@ -6,22 +6,32 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_BUILDER;
+
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.junit.Test;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-public class ArtifactClassLoaderModelBuilderTestCase {
+@Feature(CLASSLOADING_ISOLATION)
+@Stories({@Story(CLASSLOADER_CONFIGURATION_BUILDER), @Story(CLASSLOADER_CONFIGURATION)})
+public class ArtifactClassLoaderConfigurationBuilderTestCase {
 
   private List<Profile> profiles;
 
@@ -43,8 +53,8 @@ public class ArtifactClassLoaderModelBuilderTestCase {
         .setVersion("1.2.3")
         .build();
 
-    ArtifactClassLoaderModelBuilder artifactClassLoaderModelBuilder =
-        new ArtifactClassLoaderModelBuilder(artifactFolder, artifactBundleDescriptor) {
+    ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder =
+        new ArtifactClassLoaderConfigurationBuilder(artifactFolder, artifactBundleDescriptor) {
 
           @Override
           protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
@@ -58,7 +68,7 @@ public class ArtifactClassLoaderModelBuilderTestCase {
         };
 
     // When
-    artifactClassLoaderModelBuilder.findArtifactPackagerPlugin(model);
+    artifactClassLoaderConfigurationBuilder.findArtifactPackagerPlugin(model);
 
     // Then
     // No NPE is thrown

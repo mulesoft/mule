@@ -84,7 +84,7 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(T descriptor)
       throws IOException {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
-    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderModel().getDependencies()) {
+    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderConfiguration().getDependencies()) {
       if (bundlePluginDependency.getDescriptor().isPlugin()) {
         if (bundlePluginDependency.getBundleUri() == null) {
           LOGGER

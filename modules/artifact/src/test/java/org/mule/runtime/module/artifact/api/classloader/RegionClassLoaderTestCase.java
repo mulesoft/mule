@@ -17,6 +17,8 @@ import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.tck.util.CollectableReference.collectedByGc;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_CLASSLOADERS;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -44,7 +46,7 @@ import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.CollectableReference;
 import org.mule.tck.util.EnumerationMatcher;
@@ -60,13 +62,17 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Story(ARTIFACT_CLASSLOADERS)
 public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String PACKAGE_NAME = "java.lang";
@@ -564,7 +570,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
@@ -578,7 +584,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
             .build()))
         .build();
 
-    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(appDescriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
 
     String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml", "zip", API_RESOURCE_NAME);
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
@@ -586,7 +592,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
-    verify(appDescriptor, times(1)).getClassLoaderModel();
+    verify(appDescriptor, times(1)).getClassLoaderConfiguration();
   }
 
   @Test
@@ -595,7 +601,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
@@ -609,11 +615,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
             .build()))
         .build();
 
-    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(appDescriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
 
     String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_SNAPSHOT_VERSION, "raml", "zip", API_RESOURCE_NAME);
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
-    verify(appDescriptor).getClassLoaderModel();
+    verify(appDescriptor).getClassLoaderConfiguration();
   }
 
   @Test
@@ -750,7 +756,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(apiLocation.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
@@ -764,7 +770,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
             .build()))
         .build();
 
-    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(appDescriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
 
     URL result = regionClassLoader.findResource(resource);
 

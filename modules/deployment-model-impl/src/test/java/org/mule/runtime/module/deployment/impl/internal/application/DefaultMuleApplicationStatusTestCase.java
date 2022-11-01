@@ -9,6 +9,8 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.ApplicationStatus.APPLICATION_STATUS_STORY;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -36,7 +38,8 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProce
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -46,12 +49,16 @@ import java.net.URL;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 /**
- * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
+ * These tests verify that the {@link DefaultMuleApplication} status is set correctly depending on its
  * {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
  */
+@Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
+@Story(APPLICATION_STATUS_STORY)
 public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase {
 
   private static final int PROBER_TIMEOUT = 1000;
@@ -72,8 +79,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
     when(mockArtifactContext.getRegistry()).thenReturn(new DefaultRegistry(muleContext));
     ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS.get());
-    when(applicationDescriptorMock.getClassLoaderModel())
-        .thenReturn(new ClassLoaderModel.ClassLoaderModelBuilder().containing(new URL("file:/target/classes")).build());
+    when(applicationDescriptorMock.getClassLoaderConfiguration())
+        .thenReturn(new ClassLoaderConfigurationBuilder().containing(new URL("file:/target/classes")).build());
     application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
