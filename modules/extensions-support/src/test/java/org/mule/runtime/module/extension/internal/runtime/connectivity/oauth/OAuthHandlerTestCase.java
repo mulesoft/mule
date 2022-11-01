@@ -36,7 +36,6 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -73,7 +72,6 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
   @Mock
   private ObjectStore<MetadataCache> objectStore;
 
-  private SimpleUnitTestSupportSchedulerService schedulerService;
   private ConfigurationProperties configurationProperties;
   private static final String CLIENT_ID = "client_id";
   private static final String SECRET_ID = "secret_id";
