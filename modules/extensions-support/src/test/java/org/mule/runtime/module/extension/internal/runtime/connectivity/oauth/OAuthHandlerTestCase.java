@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_API_VERSION;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
@@ -119,7 +118,6 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
   @Override
   protected void doTearDown() throws Exception {
     oauthHandler.stop();
-    currentMuleContext.set(null);
   }
 
 }
