@@ -23,6 +23,7 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
   @Override
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy) {
-    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(), parent, lookupPolicy);
+    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
+                                       lookupPolicy);
   }
 }

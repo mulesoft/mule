@@ -30,12 +30,12 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
-import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.DependencyConverter;
-import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
-import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderConfigurationBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderConfigurationBuilder;
 
 import java.io.File;
 import java.net.URL;
@@ -54,24 +54,25 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
- * {@link ClassLoaderModel}
+ * {@link ClassLoaderConfiguration}
  *
  * @since 4.0
  */
-public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderModelLoader {
+public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClassLoaderModelLoader {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private static final String JAR = "jar";
   private static final String POM = "pom";
 
-  public PluginMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
+  public PluginMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient) {
     super(mavenClient);
   }
 
   @Override
-  protected ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes,
-                                                                ArtifactType artifactType, MavenClient mavenClient) {
+  protected ClassLoaderConfiguration createLightPackageClassLoaderConfiguration(File artifactFile, Map<String, Object> attributes,
+                                                                                ArtifactType artifactType,
+                                                                                MavenClient mavenClient) {
     // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the
     // META-INF/mule-artifact
     if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
@@ -86,12 +87,12 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
         File muleArtifactJson =
             new File(rootFolder.getAbsolutePath(), getPathForMuleArtifactJson(pluginBundleDescriptor));
         if (muleArtifactJson.exists()) {
-          return createHeavyPackageClassLoaderModel(artifactFile, muleArtifactJson, attributes, empty());
+          return createHeavyPackageClassLoaderConfiguration(artifactFile, muleArtifactJson, attributes, empty());
         }
       }
     }
 
-    return super.createLightPackageClassLoaderModel(artifactFile, attributes, artifactType, mavenClient);
+    return super.createLightPackageClassLoaderConfiguration(artifactFile, attributes, artifactType, mavenClient);
   }
 
   private String getPathForMuleArtifactJson(BundleDescriptor pluginBundleDescriptor) {
@@ -112,8 +113,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
-    return classLoaderModelBuilder.includeAdditionalPluginDependencies();
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+    return classLoaderConfigurationBuilder.includeAdditionalPluginDependencies();
   }
 
   @Override
@@ -132,25 +133,26 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
-  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
-                                                                                     BundleDescriptor artifactBundleDescriptor,
-                                                                                     MavenClient mavenClient,
-                                                                                     Map<String, Object> attributes,
-                                                                                     List<BundleDependency> nonProvidedDependencies) {
-    final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
-    configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
+  protected LightweightClassLoaderConfigurationBuilder newLightweightClassLoaderConfigurationBuilder(File artifactFile,
+                                                                                                     BundleDescriptor artifactBundleDescriptor,
+                                                                                                     MavenClient mavenClient,
+                                                                                                     Map<String, Object> attributes,
+                                                                                                     List<BundleDependency> nonProvidedDependencies) {
+    final LightweightClassLoaderConfigurationBuilder lightweightClassLoaderModelBuilder =
+        new LightweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, mavenClient,
+                                                       nonProvidedDependencies);
+    configClassLoaderConfigurationBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
 
   @Override
-  protected HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
-                                                                                     BundleDescriptor artifactBundleDescriptor,
-                                                                                     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                                                                     Map<String, Object> attributes) {
-    final HeavyweightClassLoaderModelBuilder heavyweightClassLoaderModelBuilder =
-        new HeavyweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
-    configClassLoaderModelBuilder(heavyweightClassLoaderModelBuilder, attributes);
+  protected HeavyweightClassLoaderConfigurationBuilder newHeavyWeightClassLoaderConfigurationBuilder(File artifactFile,
+                                                                                                     BundleDescriptor artifactBundleDescriptor,
+                                                                                                     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+                                                                                                     Map<String, Object> attributes) {
+    final HeavyweightClassLoaderConfigurationBuilder heavyweightClassLoaderModelBuilder =
+        new HeavyweightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
+    configClassLoaderConfigurationBuilder(heavyweightClassLoaderModelBuilder, attributes);
     return heavyweightClassLoaderModelBuilder;
   }
 
@@ -162,7 +164,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       ArtifactDescriptor deployableArtifactDescriptor =
           ((PluginExtendedClassLoaderModelAttributes) attributes).getDeployableArtifactDescriptor();
       Set<BundleDependency> deployableArtifactDescriptorDependencies =
-          deployableArtifactDescriptor.getClassLoaderModel().getDependencies();
+          deployableArtifactDescriptor.getClassLoaderConfiguration().getDependencies();
       BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream()
           .filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst()
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: "
@@ -176,7 +178,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       } else {
         if (logger.isWarnEnabled()) {
           logger.warn(format(
-                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
+                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader configuration. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
                              pluginDependencyInDeployableArtifact.getDescriptor()));
         }
       }
@@ -188,7 +190,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   private List<BundleDependency> resolveArtifactDependenciesUsingMavenClient(File artifactFile, MavenClient mavenClient) {
     if (logger.isWarnEnabled()) {
       logger.warn(format(
-                         "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader model. "
+                         "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader configuration. "
                              +
                              "Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
                          artifactFile));
@@ -283,10 +285,10 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
     return allTransitiveDependencies;
   }
 
-  private void configClassLoaderModelBuilder(ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                                             Map<String, Object> attributes) {
+  private void configClassLoaderConfigurationBuilder(ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder,
+                                                     Map<String, Object> attributes) {
     if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
-      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
+      classLoaderConfigurationBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
           .getDeployableArtifactDescriptor());
     }
   }

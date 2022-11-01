@@ -3,6 +3,143 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::<init>(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::build()",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::build() @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "build",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::containing(java.net.URL)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::containing(java.net.URL) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "containing",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::dependingOn(java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::dependingOn(java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "dependingOn",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::exportingPackages(java.util.Set<java.lang.String>)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::exportingPackages(java.util.Set<java.lang.String>) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "exportingPackages",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::exportingPrivilegedPackages(java.util.Set<java.lang.String>, java.util.Set<java.lang.String>)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::exportingPrivilegedPackages(java.util.Set<java.lang.String>, java.util.Set<java.lang.String>) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "exportingPrivilegedPackages",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::exportingResources(java.util.Set<java.lang.String>)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::exportingResources(java.util.Set<java.lang.String>) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "exportingResources",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::includeTestDependencies(boolean)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::includeTestDependencies(boolean) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "includeTestDependencies",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::withLocalPackages(java.util.Set<java.lang.String>)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::withLocalPackages(java.util.Set<java.lang.String>) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "withLocalPackages",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::withLocalResources(java.util.Set<java.lang.String>)",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder::withLocalResources(java.util.Set<java.lang.String>) @ org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "withLocalResources",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "elementKind": "class",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader",
+          "new": "interface org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader",
+          "interface": "org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel>",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelLoader",
+          "elementKind": "interface",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
+        },
+        {
           "code": "java.annotation.added",
           "old": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",
           "new": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",

@@ -57,7 +57,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -368,9 +369,9 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
         .setBundleUri(new File("test").toURI())
         .build();
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
     plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(singleton(plugin2ExportedPackage))
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(singleton(plugin2ExportedPackage))
             .build());
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
@@ -403,16 +404,16 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
   @Test
   public void createsPluginClassLoaderWithPrivilegedPluginAccess() {
-    ClassLoaderModel plugin2ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration plugin2ClassLoaderConfiguration = new ClassLoaderConfigurationBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID1)).build();
-    plugin2Descriptor.setClassLoaderModel(plugin2ClassLoaderModel);
+    plugin2Descriptor.setClassLoaderConfiguration(plugin2ClassLoaderConfiguration);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
                                                                                                        PLUGIN2_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
         .build();
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(singletonList(plugin2Descriptor));
 
@@ -428,16 +429,16 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   public void pluginClassLoadersOfDependenciesMustAlreadyExist() {
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptyList());
 
-    ClassLoaderModel plugin2ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration plugin2ClassLoaderConfiguration = new ClassLoaderConfigurationBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID1)).build();
-    plugin2Descriptor.setClassLoaderModel(plugin2ClassLoaderModel);
+    plugin2Descriptor.setClassLoaderConfiguration(plugin2ClassLoaderConfiguration);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
                                                                                                        PLUGIN2_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
         .build();
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
@@ -449,16 +450,16 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptyList());
     String pluginPackage = "plugin-package";
 
-    ClassLoaderModel plugin2ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration plugin2ClassLoaderConfiguration = new ClassLoaderConfigurationBuilder()
         .exportingPackages(singleton(pluginPackage)).build();
-    plugin2Descriptor.setClassLoaderModel(plugin2ClassLoaderModel);
+    plugin2Descriptor.setClassLoaderConfiguration(plugin2ClassLoaderConfiguration);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
                                                                                                        PLUGIN2_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
         .build();
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().withLocalPackages(singleton(pluginPackage))
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().withLocalPackages(singleton(pluginPackage))
             .dependingOn(singleton(pluginDependency)).build());
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
@@ -484,7 +485,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptyList());
 
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder()
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
             .withLocalPackages(Stream.of(package1Name, package2Name).collect(toSet())).build());
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
@@ -499,16 +500,16 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
   @Test
   public void createPluginClassLoaderWithCachedPlugin() {
-    ClassLoaderModel plugin2ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration plugin2ClassLoaderConfiguration = new ClassLoaderConfigurationBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID1)).build();
-    plugin2Descriptor.setClassLoaderModel(plugin2ClassLoaderModel);
+    plugin2Descriptor.setClassLoaderConfiguration(plugin2ClassLoaderConfiguration);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
                                                                                                        PLUGIN2_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
         .build();
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     MuleDeployableArtifactClassLoader domainClassLoader =
         getTestDomainClassLoader(emptyList());
@@ -549,7 +550,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     DomainDescriptor descriptor = getTestDomainDescriptor(domainName);
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
     descriptor.setPlugins(new HashSet<>(plugins));
-    descriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(exportedPackages).build());
+    descriptor.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(exportedPackages).build());
 
     return artifactClassLoaderResolver.createDomainClassLoader(descriptor);
   }
@@ -566,7 +567,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     ApplicationDescriptor descriptor = new ApplicationDescriptor(applicationName);
     descriptor.setArtifactLocation(new File(muleHomeFolder, applicationName));
     descriptor.setPlugins(new HashSet<>(plugins));
-    descriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(exportedPackages).build());
+    descriptor.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(exportedPackages).build());
 
     return artifactClassLoaderResolver.createApplicationClassLoader(descriptor, () -> domainClassLoader);
   }

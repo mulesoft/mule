@@ -45,7 +45,8 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.internal.AbstractApplicationDeploymentTestCase;
 import org.mule.runtime.module.deployment.internal.DefaultArtifactDeployer;
@@ -110,8 +111,8 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
     when(defaultRegistryMock.lookupByType(any())).thenReturn(Optional.of(notificationListenerRegistryMock));
 
     ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS.get());
-    when(applicationDescriptorMock.getClassLoaderModel())
-        .thenReturn(new ClassLoaderModel.ClassLoaderModelBuilder().containing(new URL("file:/target/classes")).build());
+    when(applicationDescriptorMock.getClassLoaderConfiguration())
+        .thenReturn(new ClassLoaderConfigurationBuilder().containing(new URL("file:/target/classes")).build());
     application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),

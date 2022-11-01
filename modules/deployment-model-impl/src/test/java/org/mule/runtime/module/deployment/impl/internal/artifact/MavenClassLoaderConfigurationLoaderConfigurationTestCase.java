@@ -19,6 +19,9 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
 
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -30,13 +33,18 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClassLoaderModelLoaderTestCase {
+@Feature(CLASSLOADING_ISOLATION)
+@Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})
+public class MavenClassLoaderConfigurationLoaderConfigurationTestCase extends MavenClassLoaderConfigurationLoaderTestCase {
 
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";
 
@@ -60,7 +68,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     expectedException.expectCause(instanceOf(DependencyResolutionException.class));
     testWithSystemProperties(properties, () -> {
       GlobalConfigLoader.reset(); // Change local repository path
-      mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+      mavenClassLoaderConfigurationLoader.load(artifactFile, emptyMap(), APP);
     });
   }
 
@@ -71,7 +79,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     try {
       testWithSystemProperties(properties, () -> {
         GlobalConfigLoader.reset(); // Change local repository path
-        mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+        mavenClassLoaderConfigurationLoader.load(artifactFile, emptyMap(), APP);
       });
       fail();
     } catch (Exception e) {
@@ -94,7 +102,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
                                                                                  number -> {
                                                                                    GlobalConfigLoader.reset();
                                                                                    try {
-                                                                                     assertThat(mavenClassLoaderModelLoader
+                                                                                     assertThat(mavenClassLoaderConfigurationLoader
                                                                                          .load(artifactFile, attributes, APP)
                                                                                          .getDependencies(),
                                                                                                 hasItem(hasProperty("descriptor",

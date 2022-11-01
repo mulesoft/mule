@@ -23,7 +23,8 @@ public final class ArtifactPluginClassLoaderFactory implements ArtifactClassLoad
   public ArtifactClassLoader create(String artifactId, ArtifactPluginDescriptor descriptor,
                                     ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy) {
-    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(), parent, lookupPolicy);
+    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
+                                       lookupPolicy);
   }
 
 

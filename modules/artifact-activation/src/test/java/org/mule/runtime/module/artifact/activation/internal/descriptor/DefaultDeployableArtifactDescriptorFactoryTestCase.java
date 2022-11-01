@@ -50,30 +50,32 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   public void createBasicApplicationDescriptor() throws Exception {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basic");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(3));
   }
 
   @Test
   public void createApplicationDescriptorWithSharedLibrary() throws URISyntaxException {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/shared-lib");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), everyItem(startsWith("org.apache.derby")));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), hasItems(startsWith("org/apache/derby")));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(),
+               everyItem(startsWith("org.apache.derby")));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedResources(),
+               hasItems(startsWith("org/apache/derby")));
   }
 
   @Test
   public void createApplicationDescriptorWithTransitiveSharedLibrary() throws URISyntaxException {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/shared-lib-transitive");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(),
                hasItems(startsWith("org.springframework.context"),
                         startsWith("org.springframework.beans"),
                         startsWith("org.springframework.core")));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedResources(),
                hasItems(startsWith("org/springframework/context"),
                         startsWith("org/springframework/beans")));
   }
@@ -82,14 +84,14 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   public void createApplicationDescriptorWithAdditionalPluginDependency() throws URISyntaxException {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/additional-plugin-dependency");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(3));
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(),
                hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     List<BundleDependency> additionalDependencies =
-        applicationDescriptor.getClassLoaderModel().getDependencies().stream()
+        applicationDescriptor.getClassLoaderConfiguration().getDependencies().stream()
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-db-connector")).findAny()
             .get().getAdditionalDependenciesList();
 
@@ -102,23 +104,23 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
         .findFirst()
         .get();
 
-    assertThat(dbPlugin.getClassLoaderModel().getLocalPackages(), hasItems(startsWith("org.apache.derby")));
-    assertThat(dbPlugin.getClassLoaderModel().getLocalResources(), hasItems(startsWith("org/apache/derby")));
+    assertThat(dbPlugin.getClassLoaderConfiguration().getLocalPackages(), hasItems(startsWith("org.apache.derby")));
+    assertThat(dbPlugin.getClassLoaderConfiguration().getLocalResources(), hasItems(startsWith("org/apache/derby")));
   }
 
   @Test
   public void createApplicationDescriptorWithAdditionalPluginDependencyAndDependency() throws URISyntaxException {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/additional-plugin-dependency-and-dep");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(4));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(4));
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(),
                hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
                         hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     List<BundleDependency> additionalDependencies =
-        applicationDescriptor.getClassLoaderModel().getDependencies().stream()
+        applicationDescriptor.getClassLoaderConfiguration().getDependencies().stream()
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-db-connector")).findAny()
             .get().getAdditionalDependenciesList();
 
@@ -131,22 +133,22 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
         .findFirst()
         .get();
 
-    assertThat(dbPlugin.getClassLoaderModel().getLocalPackages(), hasItems(startsWith("org.apache.derby")));
-    assertThat(dbPlugin.getClassLoaderModel().getLocalResources(), hasItems(startsWith("org/apache/derby")));
+    assertThat(dbPlugin.getClassLoaderConfiguration().getLocalPackages(), hasItems(startsWith("org.apache.derby")));
+    assertThat(dbPlugin.getClassLoaderConfiguration().getLocalResources(), hasItems(startsWith("org/apache/derby")));
   }
 
   @Test
   public void createApplicationDescriptorWithTransitiveAdditionalPluginDependency() throws URISyntaxException {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/additional-plugin-dependency-transitive");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(1));
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(),
                hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-spring-module")))));
 
     List<BundleDependency> additionalDependencies =
-        applicationDescriptor.getClassLoaderModel().getDependencies().stream()
+        applicationDescriptor.getClassLoaderConfiguration().getDependencies().stream()
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-spring-module")).findAny()
             .get().getAdditionalDependenciesList();
 
@@ -159,11 +161,11 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
         .findFirst()
         .get();
 
-    assertThat(springPlugin.getClassLoaderModel().getLocalPackages(),
+    assertThat(springPlugin.getClassLoaderConfiguration().getLocalPackages(),
                hasItems(startsWith("org.springframework.context"),
                         startsWith("org.springframework.beans"),
                         startsWith("org.springframework.core")));
-    assertThat(springPlugin.getClassLoaderModel().getLocalResources(),
+    assertThat(springPlugin.getClassLoaderConfiguration().getLocalResources(),
                hasItems(startsWith("org/springframework/context"),
                         startsWith("org/springframework/beans")));
   }
@@ -172,8 +174,8 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   public void createApplicationDescriptorWithExportedPackagesAndResourcesInMuleArtifactJson() throws URISyntaxException {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/exported-packages-resources-model");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.exported-test"));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), contains("exported-test-script.dwl"));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), contains("org.exported-test"));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedResources(), contains("exported-test-script.dwl"));
   }
 
   @Test
@@ -183,7 +185,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   public void applicationDescriptorWithDomainProvidingAPluginAllowsClassLoadersCreation() throws Exception {
     DomainDescriptor domainDescriptor = createDomainDescriptor("domains/basic");
 
-    assertThat(domainDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
+    assertThat(domainDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(1));
     assertThat(domainDescriptor.getPlugins(), contains(hasProperty("name", equalTo("Sockets"))));
 
     ApplicationDescriptor applicationDescriptor =
@@ -192,11 +194,11 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
           return domainDescriptor;
         });
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedResources(), hasSize(0));
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(4));
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(4));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(),
                hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("basic")))));
 
     assertThat(applicationDescriptor.getPlugins(), hasSize(2));

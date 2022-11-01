@@ -52,7 +52,8 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
@@ -134,13 +135,13 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void createsApplication() throws Exception {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
-    descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
+    descriptor.setClassLoaderConfiguration(createClassLoaderConfigurationWithDomain());
     final File[] resourceFiles = new File[] {new File("mule-config.xml")};
     when(deployableArtifactDescriptorFactory
         .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class))).thenReturn(descriptor);
 
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = new ArtifactPluginDescriptor(FAKE_ARTIFACT_PLUGIN);
-    coreArtifactPluginDescriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().build());
+    coreArtifactPluginDescriptor.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().build());
 
     final ArtifactPlugin appPlugin = mock(ArtifactPlugin.class);
     final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
@@ -183,11 +184,11 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     verify(applicationClassLoaderBuilderMock).setArtifactDescriptor(descriptor);
   }
 
-  private ClassLoaderModel createClassLoaderModelWithDomain() {
+  private ClassLoaderConfiguration createClassLoaderConfigurationWithDomain() {
     BundleDescriptor domainDescriptor = createDomainBundleDescriptor(DOMAIN_NAME);
     Set<BundleDependency> domainDependency =
         Collections.singleton(new BundleDependency.Builder().setDescriptor(domainDescriptor).build());
-    return new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(domainDependency).build();
+    return new ClassLoaderConfigurationBuilder().dependingOn(domainDependency).build();
   }
 
   private BundleDescriptor createDomainBundleDescriptor(String domainName) {
@@ -216,7 +217,7 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void applicationDeployFailDueToDomainNotDeployed() throws Exception {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
-    descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
+    descriptor.setClassLoaderConfiguration(createClassLoaderConfigurationWithDomain());
     descriptor.setArtifactLocation(new File("some/location"));
     when(deployableArtifactDescriptorFactory
         .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class))).thenReturn(descriptor);

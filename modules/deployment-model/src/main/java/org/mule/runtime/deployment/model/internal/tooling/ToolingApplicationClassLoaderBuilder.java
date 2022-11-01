@@ -130,10 +130,10 @@ public class ToolingApplicationClassLoaderBuilder
     Map<String, LookupStrategy> lookupStrategies = new HashMap<>();
 
     DomainDescriptor descriptor = parentClassLoader.getArtifactDescriptor();
-    descriptor.getClassLoaderModel().getExportedPackages().forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+    descriptor.getClassLoaderConfiguration().getExportedPackages().forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
-      artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
+      artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages()
           .forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
     }
 

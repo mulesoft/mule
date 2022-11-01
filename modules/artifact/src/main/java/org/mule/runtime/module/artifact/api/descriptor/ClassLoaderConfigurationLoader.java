@@ -4,20 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.artifact.api.descriptor;
 
 /**
- * Loads the {@link ClassLoaderModel} for Mule artifacts
+ * Loads the {@link ClassLoaderConfiguration} for Mule artifacts
  * <p/>
  * Explicitly defined to enable definition of implementations using SPI.
  *
- * @deprecated since 4.5 use {@link ClassLoaderConfigurationLoader}.
+ * @since 4.5
  */
-// TODO - W-11098291: remove this class
-@Deprecated
-public interface ClassLoaderModelLoader extends ClassLoaderConfigurationLoader {
-
-
-
+public interface ClassLoaderConfigurationLoader extends DescriptorLoader<ClassLoaderConfiguration> {
 }

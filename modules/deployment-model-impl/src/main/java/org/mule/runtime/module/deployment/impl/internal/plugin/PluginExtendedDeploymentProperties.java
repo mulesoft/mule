@@ -15,7 +15,7 @@ import java.util.Properties;
 
 /**
  * Extends deployment properties to provide more context when resolving the
- * {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} for plugins.
+ * {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration} for plugins.
  *
  * @since 4.2.0
  */

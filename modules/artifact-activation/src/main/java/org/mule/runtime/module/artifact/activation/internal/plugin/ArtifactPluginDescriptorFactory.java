@@ -16,7 +16,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
@@ -71,7 +71,7 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
-  protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+  protected ClassLoaderConfiguration getClassLoaderConfiguration(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     return new PluginClassLoaderConfigurationAssembler(bundleDependency,
                                                        sharedProjectDependencies,
                                                        getArtifactLocation(),
@@ -79,7 +79,7 @@ public class ArtifactPluginDescriptorFactory
                                                        bundleDependencies,
                                                        ownerDescriptor,
                                                        pluginPatchesResolver)
-                                                           .createClassLoaderModel();
+                                                           .createClassLoaderConfiguration();
   }
 
   @Override
