@@ -4,71 +4,12 @@
       "ignore": [
         {
           "code": "java.method.removed",
-          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel()",
-          "package": "org.mule.runtime.module.artifact.api.descriptor",
-          "classSimpleName": "ArtifactDescriptor",
-          "methodName": "getClassLoaderModel",
-          "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel)",
-          "package": "org.mule.runtime.module.artifact.api.descriptor",
-          "classSimpleName": "ArtifactDescriptor",
-          "methodName": "setClassLoaderModel",
-          "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
-          "package": "org.mule.runtime.module.artifact.api.descriptor",
-          "classSimpleName": "ClassLoaderModel",
-          "elementKind": "class",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
-        },
-        {
-          "code": "java.class.removed",
-          "old": "interface org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader",
-          "package": "org.mule.runtime.module.artifact.api.descriptor",
-          "classSimpleName": "ClassLoaderModelLoader",
-          "elementKind": "interface",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
-        },
-        {
-          "code": "java.method.returnTypeChanged",
-          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel()",
-          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel()",
-          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
-          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration",
-          "package": "org.mule.runtime.module.artifact.api.descriptor",
-          "classSimpleName": "ArtifactDescriptor",
-          "methodName": "getClassLoaderModel",
-          "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(===org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel===)",
-          "new": "parameter void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(===org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration===)",
-          "oldType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
-          "newType": "org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration",
-          "package": "org.mule.runtime.module.artifact.api.descriptor",
-          "classSimpleName": "ArtifactDescriptor",
-          "methodName": "setClassLoaderModel",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
-        },
-        {
-          "code": "java.method.removed",
           "old": "method void org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::<init>(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel)",
           "package": "org.mule.runtime.module.artifact.api.descriptor",
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "<init>",
           "elementKind": "constructor",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -80,7 +21,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "build",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -92,7 +33,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "containing",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -104,7 +45,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "dependingOn",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -116,7 +57,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "exportingPackages",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -128,7 +69,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "exportingPrivilegedPackages",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -140,7 +81,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "exportingResources",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -152,7 +93,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "includeTestDependencies",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -164,7 +105,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "withLocalPackages",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -176,7 +117,7 @@
           "classSimpleName": "ClassLoaderModelBuilder",
           "methodName": "withLocalResources",
           "elementKind": "method",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
@@ -186,7 +127,7 @@
           "package": "org.mule.runtime.module.artifact.api.descriptor",
           "classSimpleName": "ClassLoaderModelBuilder",
           "elementKind": "class",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.class.noLongerImplementsInterface",
@@ -196,7 +137,7 @@
           "package": "org.mule.runtime.module.artifact.api.descriptor",
           "classSimpleName": "ClassLoaderModelLoader",
           "elementKind": "interface",
-          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed"
         },
         {
           "code": "java.annotation.added",
