@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_API_VERSION;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
@@ -15,7 +14,6 @@ import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -31,15 +29,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -48,8 +43,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
@@ -71,7 +64,6 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
   private static final String OTHER_KEY = "1874947571-1840879217-123123123-1745289126";
 
   private static final List<String> OBJECT_STORE_ENTRIES = Arrays.asList(SOME_KEY, OTHER_KEY);
-  private MuleContextWithRegistry muleContext;
 
   @InjectMocks
   AuthorizationCodeOAuthHandler oauthHandler = new AuthorizationCodeOAuthHandler();
@@ -109,8 +101,6 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setup() throws ObjectStoreException {
-    schedulerService = new SimpleUnitTestSupportSchedulerService();
-    muleContext = mock(MuleContextWithRegistry.class);
 
     when(storeManager.getOrCreateObjectStore(anyString(), any()))
         .thenReturn(objectStore);
@@ -126,33 +116,10 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
     when(configurationProperties.resolveStringProperty(OCS_API_VERSION)).thenReturn(empty());
   }
 
-
   @Override
   protected void doTearDown() throws Exception {
     oauthHandler.stop();
     currentMuleContext.set(null);
-  }
-
-
-  @After
-  public void after() throws MuleException {
-    schedulerService.stop();
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_CLASSLOADER_REPOSITORY, new ClassLoaderRepository() {
-
-      @Override
-      public Optional<String> getId(ClassLoader classLoader) {
-        return null;
-      }
-
-      @Override
-      public Optional<ClassLoader> find(String classLoaderId) {
-        return null;
-      }
-    });
   }
 
 }

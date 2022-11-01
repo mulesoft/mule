@@ -129,12 +129,8 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
       String storeName = storeConfig
           .map(OAuthObjectStoreConfig::getObjectStoreName)
           .orElse(BASE_PERSISTENT_OBJECT_STORE_KEY);
-      ObjectStore os = objectStoreManager.getOrCreateObjectStore(storeName, ObjectStoreSettings
-          .builder()
-          .entryTtl(0L)
-          .expirationInterval(0L)
-          .persistent(DEFAULT_PERSISTENCE_SETTING)
-          .build());
+      ObjectStore os =
+          objectStoreManager.getOrCreateObjectStore(storeName, ObjectStoreSettings.builder().persistent(true).build());
 
       return os;
     };
