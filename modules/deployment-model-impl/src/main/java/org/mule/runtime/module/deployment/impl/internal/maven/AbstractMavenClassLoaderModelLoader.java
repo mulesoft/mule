@@ -434,7 +434,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     Optional<File> mavenRepository = ofNullable(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation());
     if (!mavenRepository.isPresent()) {
       throw new MuleRuntimeException(createStaticMessage(
-                                                         format("Missing Maven local repository configuration while trying to resolve class loader model for lightweight artifact: %s",
+                                                         format("Missing Maven local repository configuration while trying to resolve class loader configuration for lightweight artifact: %s",
                                                                 artifactFile.getName())));
     }
     return mavenRepository;
