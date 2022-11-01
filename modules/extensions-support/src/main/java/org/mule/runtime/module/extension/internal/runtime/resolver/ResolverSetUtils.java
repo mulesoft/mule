@@ -20,7 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.util.ExtensionsSubTypeFinder.getSubtype;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.util.ExtensionsSubTypeUtils.getSubtype;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataFormat;

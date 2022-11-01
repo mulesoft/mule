@@ -24,7 +24,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
  * 
  * @since 4.5
  */
-public class ExtensionsSubTypeFinder {
+public class ExtensionsSubTypeUtils {
 
   /**
    * Retrieves a {@link MetadataType}
