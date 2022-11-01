@@ -145,14 +145,16 @@
                     <xsd:attribute name="type" use="required" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Type
+                                Type of the error. The namespace of this error can be only the namespace of the current
+                                extension. If it isn't specified, it defaults to such namespace.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
                     <xsd:attribute name="parent" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Parent
+                                Parent of the error. The namespace of this error can be only the namespace of the current
+                                extension or "MULE". If it isn't specified, it defaults to the extension one.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

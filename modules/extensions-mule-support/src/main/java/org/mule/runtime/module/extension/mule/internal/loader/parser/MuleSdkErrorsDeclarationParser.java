@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 
 /**
  * Parses the declared {@code errors} in an extension AST.
+ *
+ * @since 4.5
  */
 public class MuleSdkErrorsDeclarationParser {
 

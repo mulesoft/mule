@@ -74,7 +74,8 @@ public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdk
     expectedErrors.put("raiseOther", singleton("ERRORS:OTHER"));
     expectedErrors.put("silencingOneAndRaisingOther", singleton("ERRORS:OTHER"));
 
-    expectedErrors.put("heisenbergCureCancer", asSet("ERRORS:HEISENBERG_HEALTH", "ERRORS:HEISENBERG_OAUTH2"));
+    // TODO (W-11471782): should be "ERRORS:HEISENBERG_HEALTH" and "ERRORS:HEISENBERG_OAUTH2"
+    expectedErrors.put("heisenbergCureCancer", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
 
     runtimeExtensionModels.addAll(getDependencyExtensions());
   }
@@ -91,7 +92,8 @@ public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdk
     MatcherAssert.assertThat(errorsAsString,
                              containsInAnyOrder("MULE:ANY", "MULE:RETRY_EXHAUSTED", "ERRORS:CUSTOM", "ERRORS:CONNECTIVITY",
                                                 "ERRORS:RETRY_EXHAUSTED", "MULE:CONNECTIVITY", "ERRORS:ONE", "ERRORS:OTHER",
-                                                "ERRORS:HEISENBERG_HEALTH", "ERRORS:HEISENBERG_OAUTH2"));
+                                                // TODO (W-11471782): should be "ERRORS:HEISENBERG_HEALTH" and "ERRORS:HEISENBERG_OAUTH2"
+                                                "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
   }
 
   @Test

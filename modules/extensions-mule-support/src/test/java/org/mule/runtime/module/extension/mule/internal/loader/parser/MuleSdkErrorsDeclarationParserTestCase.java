@@ -11,6 +11,9 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockErrorAst;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
 
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.hasKey;
@@ -29,10 +32,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Feature(REUSE)
+@Stories({@Story(EXTENSION_EXTENSION_MODEL), @Story(ERROR_HANDLING)})
 public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase {
 
   private static final String TEST = "TEST";
@@ -71,7 +79,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
 
   @Test
   public void errorWithoutNamespace() {
-    // Given an error without namespace: <error type="WITHOUT_NS" />
+    // Given an error without namespace:
+    // <error type="WITHOUT_NS" />
     ComponentAst errorAst = mockErrorAst("WITHOUT_NS", null);
     ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
@@ -88,7 +97,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
 
   @Test
   public void errorWithNamespaceOfSameExtension() {
-    // Given an error with the namespace of the same extension: <error type="TEST:WITH_NS" />
+    // Given an error with the namespace of the same extension:
+    // <error type="TEST:WITH_NS" />
     ComponentAst errorAst = mockErrorAst("TEST:WITH_NS", null);
     ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
@@ -105,7 +115,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
 
   @Test
   public void errorWithNamespaceOtherThanTheExtensionOneIsForbidden() {
-    // Given an error without namespace: <error type="OTHER_THAN_TEST:WITH_NS" />
+    // Given an error without namespace:
+    // <error type="OTHER_THAN_TEST:WITH_NS" />
     ComponentAst errorAst = mockErrorAst("OTHER_THAN_TEST:WITH_NS", null);
     ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
@@ -118,8 +129,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
 
   @Test
   public void parentWithNamespaceOtherThanTheExtensionOneOrMuleIsForbidden() {
-    // Given an error with a parent that has namespace other than the extension one or mule: <error type="CUSTOM_ERROR"
-    // parent="OTHER_THAN_TEST_OR_MULE:PARENT" />
+    // Given an error with a parent that has namespace other than the extension one or mule:
+    // <error type="CUSTOM_ERROR" parent="OTHER_THAN_TEST_OR_MULE:PARENT" />
     ComponentAst errorAst = mockErrorAst("CUSTOM_ERROR", "OTHER_THAN_TEST_OR_MULE:PARENT");
     ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
@@ -132,7 +143,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
 
   @Test
   public void errorWithParentFromCore() {
-    // Given an error with a parent with namespace MULE: <error type="CUSTOM_ERROR" parent="MULE:ANY" />
+    // Given an error with a parent with namespace MULE:
+    // <error type="CUSTOM_ERROR" parent="MULE:ANY" />
     ComponentAst errorAst = mockErrorAst("CUSTOM_ERROR", "MULE:PARENT");
     ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
