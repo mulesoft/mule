@@ -83,7 +83,7 @@ public class OAuthHandlerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Issue("W-11410770")
-  @Description("Verify that ObjectStore is always created, if none exists a new one is created")
+  @Description("Verify that ObjectStore is created, if none exists by calling getOrCreateObjectStore")
   public void verifyThatObjectStoreisAlwaysCreated() throws InitialisationException, ObjectStoreException {
     PlatformManagedOAuthConfig config = PlatformManagedOAuthConfig.from("", "", null, null, null, null, configurationProperties);
 
