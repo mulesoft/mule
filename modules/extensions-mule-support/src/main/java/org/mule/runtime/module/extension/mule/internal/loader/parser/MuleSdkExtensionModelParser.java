@@ -50,7 +50,6 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   private final TypeLoader typeLoader;
   private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
-  private ExtensionErrorMapper extensionErrorMapper;
 
   public MuleSdkExtensionModelParser(ArtifactAst ast,
                                      TypeLoader typeLoader,
@@ -61,18 +60,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   protected void init(ArtifactAst ast) {
-    extensionErrorMapper = parseExtensionErrorMapper(ast);
     operationModelParsers = computeOperationModelParsers(ast);
-  }
-
-  protected ExtensionErrorMapper parseExtensionErrorMapper(ArtifactAst ast) {
-    return (ns, type) -> {
-      if (ns.equals(getNamespace())) {
-        return type;
-      } else {
-        return ns + "_" + type;
-      }
-    };
   }
 
   @Override
@@ -186,6 +174,6 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   protected MuleSdkOperationModelParserSdk createOperationModelParser(ComponentAst operation, String namespace) {
-    return new MuleSdkOperationModelParserSdk(operation, namespace, typeLoader, extensionModelHelper, extensionErrorMapper);
+    return new MuleSdkOperationModelParserSdk(operation, namespace, typeLoader, extensionModelHelper);
   }
 }

@@ -68,7 +68,7 @@ public class MuleSdkErrorsDeclarationParser {
     Map<ComponentIdentifier, ErrorModelParser> parserByIdentifier = new HashMap<>();
     new TopologicalOrderIterator<>(graph).forEachRemaining(errorIdentifier -> {
       ErrorModelParser parent = getParent(errorIdToParentId, parserByIdentifier, errorIdentifier);
-      LOGGER.info("Creating parser for error '{}' with parent '{}'", errorIdentifier, parent);
+      LOGGER.debug("Creating parser for error '{}' with parent '{}'", errorIdentifier, parent);
       parserByIdentifier.put(errorIdentifier,
                              new MuleSdkErrorModelParser(errorIdentifier.getNamespace(), errorIdentifier.getName(), parent));
     });
@@ -103,7 +103,7 @@ public class MuleSdkErrorsDeclarationParser {
               ComponentIdentifier errorIdentifier = getType(extensionErrorNamespace, errorAst);
               ComponentIdentifier parentIdentifier = getParent(extensionErrorNamespace, errorAst);
               validateMapping(errorIdentifier, parentIdentifier, extensionErrorNamespace);
-              LOGGER.info("Found declared error type '{}' with parent '{}' in the AST", errorIdentifier, parentIdentifier);
+              LOGGER.debug("Found declared error type '{}' with parent '{}' in the AST", errorIdentifier, parentIdentifier);
               errorToParent.put(errorIdentifier, parentIdentifier);
             }));
     return errorToParent;

@@ -106,15 +106,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   public MuleSdkOperationModelParserSdk(ComponentAst operation, String namespace, TypeLoader typeLoader,
                                         ExtensionModelHelper extensionModelHelper) {
-    this(operation, namespace, typeLoader, extensionModelHelper, null);
-  }
-
-  public MuleSdkOperationModelParserSdk(ComponentAst operation, String namespace, TypeLoader typeLoader,
-                                        ExtensionModelHelper extensionModelHelper, ExtensionErrorMapper extensionErrorMapper) {
     this.operation = operation;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    this.errorModels = new AggregatedErrorsCharacteristic(namespace, extensionErrorMapper);
+    this.errorModels = new AggregatedErrorsCharacteristic(namespace);
 
     parseStructure();
   }
