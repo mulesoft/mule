@@ -56,7 +56,7 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedClassLoaderModelAttributes;
+import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedClassLoaderConfigurationAttributes;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedDeploymentProperties;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderConfigurationLoader;
 import org.mule.tck.util.CompilerUtils;
@@ -148,18 +148,18 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     applicationDescriptor.setClassLoaderConfiguration(classLoaderConfiguration);
     PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
         new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
-    PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
-        new PluginExtendedClassLoaderModelAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
-    pluginExtendedClassLoaderModelAttributes
+    PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
+        new PluginExtendedClassLoaderConfigurationAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
+    pluginExtendedClassLoaderConfigurationAttributes
         .put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
              bundleDependency.getDescriptor());
 
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderConfiguration pluginClassLoaderConfiguration =
         buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()),
-                                            pluginExtendedClassLoaderModelAttributes);
+                                            pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderConfiguration.getExportedPackages(), hasItem("org.mule.tests.simple.plugin.api"));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
                everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
@@ -246,18 +246,18 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     applicationDescriptor.setClassLoaderConfiguration(classLoaderConfiguration);
     PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
         new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
-    PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
-        new PluginExtendedClassLoaderModelAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
-    pluginExtendedClassLoaderModelAttributes
+    PluginExtendedClassLoaderConfigurationAttributes pluginExtendedClassLoaderConfigurationAttributes =
+        new PluginExtendedClassLoaderConfigurationAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
+    pluginExtendedClassLoaderConfigurationAttributes
         .put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
              bundleDependency.getDescriptor());
 
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
+    pluginExtendedClassLoaderConfigurationAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderConfiguration pluginClassLoaderConfiguration =
         buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()),
-                                            pluginExtendedClassLoaderModelAttributes);
+                                            pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
                everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(), contains("org.mule.tests.simple.plugin.internal"));

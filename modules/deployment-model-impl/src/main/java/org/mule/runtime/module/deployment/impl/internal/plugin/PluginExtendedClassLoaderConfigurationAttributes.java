@@ -7,9 +7,11 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoaderConfigurationAttributes;
 
 import java.util.Map;
 
@@ -19,9 +21,9 @@ import java.util.Map;
  *
  * @since 4.2.0
  */
-// TODO - W-11098291: remove
-@Deprecated
-public class PluginExtendedClassLoaderModelAttributes extends PluginExtendedClassLoaderConfigurationAttributes {
+public class PluginExtendedClassLoaderConfigurationAttributes extends ExtendedClassLoaderConfigurationAttributes {
+
+  private ArtifactDescriptor deployableArtifactDescriptor;
 
   /**
    * Creates an instance of this extended attributes for the given descriptor.
@@ -29,8 +31,17 @@ public class PluginExtendedClassLoaderModelAttributes extends PluginExtendedClas
    * @param originalAttributes           the original {@link Map} of attributes. No null.
    * @param deployableArtifactDescriptor {@link ArtifactDescriptor} which declares the plugin dependency. Not null.
    */
-  public PluginExtendedClassLoaderModelAttributes(Map originalAttributes, ArtifactDescriptor deployableArtifactDescriptor) {
-    super(originalAttributes, deployableArtifactDescriptor);
+  public PluginExtendedClassLoaderConfigurationAttributes(Map originalAttributes,
+                                                          ArtifactDescriptor deployableArtifactDescriptor) {
+    super(originalAttributes);
+    checkNotNull(deployableArtifactDescriptor, "deployableArtifactDescriptor cannot be null");
+    this.deployableArtifactDescriptor = deployableArtifactDescriptor;
   }
 
+  /**
+   * @return the {@link ArtifactDescriptor} which declares the dependency to the plugin.
+   */
+  public ArtifactDescriptor getDeployableArtifactDescriptor() {
+    return deployableArtifactDescriptor;
+  }
 }
