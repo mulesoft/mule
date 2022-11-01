@@ -11,7 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASS_LOADER_MODEL_VERSION_120;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
