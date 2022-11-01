@@ -14,7 +14,7 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
 
 import static java.lang.String.format;
-import static java.util.Locale.ROOT;
+import static java.util.Locale.getDefault;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 public class MuleSdkErrorsDeclarationParser {
 
   private static final Logger LOGGER = getLogger(MuleSdkErrorsDeclarationParser.class);
-  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
+  private static final String MULE = CORE_PREFIX.toUpperCase(getDefault());
   private static final ComponentIdentifier MULE_ANY = parseErrorType("ANY", MULE);
 
   private final ComponentAst extensionComponentAst;

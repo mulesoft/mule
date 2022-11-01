@@ -59,14 +59,7 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
   @Test
   public void extensionWithEmptyErrorsTag() {
     // Given an extension with an empty <errors /> tag
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.empty());
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(/* empty */);
 
     // When we parse it.
     Map<ComponentIdentifier, ErrorModelParser> errorParsersMap =
@@ -79,15 +72,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
   @Test
   public void errorWithoutNamespace() {
     // Given an error without namespace: <error type="WITHOUT_NS" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst errorAst = mockErrorAst("WITHOUT_NS", null);
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(errorAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
     // When we parse it.
     Map<ComponentIdentifier, ErrorModelParser> errorParsersMap =
@@ -103,15 +89,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
   @Test
   public void errorWithNamespaceOfSameExtension() {
     // Given an error with the namespace of the same extension: <error type="TEST:WITH_NS" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst errorAst = mockErrorAst("TEST:WITH_NS", null);
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(errorAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
     // When we parse it.
     Map<ComponentIdentifier, ErrorModelParser> errorParsersMap =
@@ -127,15 +106,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
   @Test
   public void errorWithNamespaceOtherThanTheExtensionOneIsForbidden() {
     // Given an error without namespace: <error type="OTHER_THAN_TEST:WITH_NS" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst errorAst = mockErrorAst("OTHER_THAN_TEST:WITH_NS", null);
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(errorAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
     // When we parse it, we expect an exception.
     expected.expect(IllegalArgumentException.class);
@@ -148,15 +120,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
   public void parentWithNamespaceOtherThanTheExtensionOneOrMuleIsForbidden() {
     // Given an error with a parent that has namespace other than the extension one or mule: <error type="CUSTOM_ERROR"
     // parent="OTHER_THAN_TEST_OR_MULE:PARENT" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst errorAst = mockErrorAst("CUSTOM_ERROR", "OTHER_THAN_TEST_OR_MULE:PARENT");
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(errorAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
     // When we parse it, we expect an exception.
     expected.expect(IllegalArgumentException.class);
@@ -168,15 +133,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
   @Test
   public void errorWithParentFromCore() {
     // Given an error with a parent with namespace MULE: <error type="CUSTOM_ERROR" parent="MULE:ANY" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst errorAst = mockErrorAst("CUSTOM_ERROR", "MULE:PARENT");
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(errorAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(errorAst);
 
     // When we parse it.
     Map<ComponentIdentifier, ErrorModelParser> errorParsersMap =
@@ -197,16 +155,9 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
     // Given two errors where one is the parent of the other:
     // <error type="PARENT" />
     // <error type="CHILD" parent="PARENT" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst parentErrorAst = mockErrorAst("PARENT", null);
     ComponentAst childErrorAst = mockErrorAst("CHILD", "PARENT");
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(parentErrorAst, childErrorAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(childErrorAst, parentErrorAst);
 
     // When we parse it.
     Map<ComponentIdentifier, ErrorModelParser> errorParsersMap =
@@ -227,21 +178,26 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
     // Given two errors each is the parent of the other:
     // <error type="A" parent="B" />
     // <error type="B" parent="A" />
-    ComponentAst extensionComponentAst = mock(ComponentAst.class);
-    ComponentAst errorsComponentAst = mock(ComponentAst.class);
     ComponentAst aAst = mockErrorAst("A", "B");
     ComponentAst bAst = mockErrorAst("B", "A");
-    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                                MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
-                                                                    .thenReturn(Stream.of(errorsComponentAst));
-    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
-                                                             MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(aAst, bAst));
+    ComponentAst extensionComponentAst = mockExtensionAstWithErrors(aAst, bAst);
 
     // When we parse it, we expect an exception.
     // TODO: Is this exception ok? It's pretty clear...
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Graph is not a DAG");
     new MuleSdkErrorsDeclarationParser(extensionComponentAst, TEST).parse();
+  }
+
+  private static ComponentAst mockExtensionAstWithErrors(ComponentAst... errorsAsts) {
+    ComponentAst extensionComponentAst = mock(ComponentAst.class);
+    ComponentAst errorsComponentAst = mock(ComponentAst.class);
+    when(extensionComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
+            MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME))
+            .thenReturn(Stream.of(errorsComponentAst));
+    when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
+            MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
+            .thenReturn(Stream.of(errorsAsts));
+    return extensionComponentAst;
   }
 }
