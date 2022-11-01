@@ -17,6 +17,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
+import static org.mule.test.allure.AllureConstants.DescriptorLoaderFeature.DESCRIPTOR_LOADER;
+import static org.mule.test.allure.AllureConstants.ServicesFeature.SERVICES;
+import static org.mule.test.allure.AllureConstants.ServicesFeature.ServicesStory.SERVICE_REGISTRY;
 
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
@@ -27,11 +30,16 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
+@Features({@Feature(SERVICES), @Feature(DESCRIPTOR_LOADER)})
+@Story(SERVICE_REGISTRY)
 public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractMuleTestCase {
 
   private static final String LOADER_ID = "loader";

@@ -23,6 +23,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -38,12 +40,14 @@ import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import java.io.File;
 import java.util.Map;
 
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
+@Story(ARTIFACT_DESCRIPTORS)
 public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String SERVICE_NAME = "testService";

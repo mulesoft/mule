@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+import static org.mule.test.allure.AllureConstants.SplashScreenFeature.SPLASH_SCREEN;
 
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -28,10 +29,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
+import io.qameta.allure.Feature;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+@Feature(SPLASH_SCREEN)
 public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreenTestCase<ApplicationStartedSplashScreen> {
 
   private static final String APP_NAME = "simpleApp";

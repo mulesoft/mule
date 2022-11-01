@@ -9,6 +9,8 @@ package org.mule.runtime.deployment.model.internal.application;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_CLASSLOADERS;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
@@ -39,6 +41,8 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,6 +50,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 @SmallTest
+@Feature(CLASSLOADING_ISOLATION)
+@Story(ARTIFACT_CLASSLOADERS)
 public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String RESOURCE_IN_CLASSES_AND_JAR = "test-resource-1.txt";

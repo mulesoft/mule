@@ -24,9 +24,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
@@ -73,8 +71,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
@@ -82,6 +78,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
+@Story(ARTIFACT_DESCRIPTORS)
 public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String POLICY_NAME = "testPolicy";
@@ -233,8 +230,6 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  @Feature(CLASSLOADING_ISOLATION)
-  @Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})
   public void detectsInvalidClassLoaderModelLoaderId() throws Exception {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
         .setName(POLICY_NAME)

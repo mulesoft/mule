@@ -11,6 +11,9 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDesc
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -55,6 +58,9 @@ import java.util.Set;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -63,6 +69,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Stories({@Story(ARTIFACT_DESCRIPTORS), @Story(CLASSLOADER_CONFIGURATION)})
 public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCase {
 
   private static final String FOO_PLUGIN = "foo";

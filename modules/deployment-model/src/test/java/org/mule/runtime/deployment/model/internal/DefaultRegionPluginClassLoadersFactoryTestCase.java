@@ -8,6 +8,8 @@
 package org.mule.runtime.deployment.model.internal;
 
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_GENERATION;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -56,11 +58,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.ArgumentCaptor;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Story(CLASSLOADER_GENERATION)
 public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String REGION_ID = "regionId";
