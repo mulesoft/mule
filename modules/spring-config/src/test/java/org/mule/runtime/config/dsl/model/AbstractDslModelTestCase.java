@@ -173,7 +173,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected List<ParameterModel> configParameterModels;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     initMocks(this);
 
     final MetadataType stringType = TYPE_LOADER.load(String.class);
