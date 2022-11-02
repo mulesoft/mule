@@ -9,19 +9,19 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoaderConfigurationAttributes;
 
 import java.util.Map;
 
 /**
- * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration}
- * when it is being loaded by {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader} for plugins
- * in order to define in which deployable artifact the plugin is declared.
+ * Allows to extends the attributes defined for a {@link ClassLoaderConfiguration} when it is being loaded by
+ * {@link ClassLoaderConfigurationLoader} for plugins in order to define in which deployable artifact the plugin is declared.
  *
  * @since 4.2.0
  */
-// TODO - W-11098291: rename accordingly
-public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoaderConfigurationAttributes {
+public class PluginExtendedClassLoaderConfigurationAttributes extends ExtendedClassLoaderConfigurationAttributes {
 
   private ArtifactDescriptor deployableArtifactDescriptor;
 
@@ -31,8 +31,8 @@ public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoade
    * @param originalAttributes           the original {@link Map} of attributes. No null.
    * @param deployableArtifactDescriptor {@link ArtifactDescriptor} which declares the plugin dependency. Not null.
    */
-  public PluginExtendedClassLoaderModelAttributes(Map originalAttributes,
-                                                  ArtifactDescriptor deployableArtifactDescriptor) {
+  public PluginExtendedClassLoaderConfigurationAttributes(Map originalAttributes,
+                                                          ArtifactDescriptor deployableArtifactDescriptor) {
     super(originalAttributes);
     checkNotNull(deployableArtifactDescriptor, "deployableArtifactDescriptor cannot be null");
     this.deployableArtifactDescriptor = deployableArtifactDescriptor;
