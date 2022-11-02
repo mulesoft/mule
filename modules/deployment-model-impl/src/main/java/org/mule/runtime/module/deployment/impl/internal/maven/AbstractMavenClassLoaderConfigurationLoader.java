@@ -85,8 +85,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-// TODO - W-11098291: rename accordingly
-public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoaderConfigurationLoader {
+public abstract class AbstractMavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
 
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR = "classloader-model-patch.json";
@@ -105,12 +104,12 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private final Optional<MavenClient> mavenClient;
   private final Supplier<JarExplorer> jarExplorerFactory;
 
-  public AbstractMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient) {
+  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient) {
     this(mavenClient, () -> new FileJarExplorer());
   }
 
-  public AbstractMavenClassLoaderModelLoader(Optional<MavenClient> mavenClient,
-                                             Supplier<JarExplorer> jarExplorerFactory) {
+  public AbstractMavenClassLoaderConfigurationLoader(Optional<MavenClient> mavenClient,
+                                                     Supplier<JarExplorer> jarExplorerFactory) {
     this.mavenClient = mavenClient;
     this.jarExplorerFactory = jarExplorerFactory;
   }
@@ -140,11 +139,11 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   @Override
   public final ClassLoaderConfiguration load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    return createClassLoaderModel(artifactFile, attributes, artifactType);
+    return createClassLoaderConfiguration(artifactFile, attributes, artifactType);
   }
 
-  protected final ClassLoaderConfiguration createClassLoaderModel(File artifactFile, Map<String, Object> attributes,
-                                                                  ArtifactType artifactType)
+  protected final ClassLoaderConfiguration createClassLoaderConfiguration(File artifactFile, Map<String, Object> attributes,
+                                                                          ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
 
     ClassLoaderModel bundleDescriptorMetadata =
@@ -191,13 +190,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                 Optional<File> deployableArtifactRepositoryFolder,
                                                                                 ClassLoaderModel packagerClassLoaderModel) {
     BundleDescriptor artifactBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
-    final ArtifactClassLoaderConfigurationBuilder classLoaderModelBuilder =
+    final ArtifactClassLoaderConfigurationBuilder classLoaderConfigurationBuilder =
         newHeavyWeightClassLoaderConfigurationBuilder(artifactFile, artifactBundleDescriptor,
                                                       packagerClassLoaderModel, attributes);
     final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
     final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
 
-    classLoaderModelBuilder
+    classLoaderConfigurationBuilder
         .exportingPackages(exportedPackages)
         .exportingResources(exportedResources)
         .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -229,7 +228,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
     // This is already filtering out mule-plugin dependencies,
     // since for this case we explicitly need to consume the exported API from the plugin.
-    final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies, patches);
+    final List<URL> dependenciesArtifactsUrls =
+        loadUrls(artifactFile, classLoaderConfigurationBuilder, bundleDependencies, patches);
 
     ArtifactAttributes artifactAttributes;
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
@@ -238,12 +238,12 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       artifactAttributes = collectLocalPackages(packagerClassLoaderModel);
     }
     if (!isDenylisted(artifactBundleDescriptor)) {
-      populateLocalPackages(artifactAttributes, classLoaderModelBuilder);
+      populateLocalPackages(artifactAttributes, classLoaderConfigurationBuilder);
     }
 
-    classLoaderModelBuilder.dependingOn(new HashSet<>(bundleDependencies));
+    classLoaderConfigurationBuilder.dependingOn(new HashSet<>(bundleDependencies));
 
-    return classLoaderModelBuilder.build();
+    return classLoaderConfigurationBuilder.build();
   }
 
   private ArtifactAttributes collectLocalPackages(ClassLoaderModel packagerClassLoaderModel) {
