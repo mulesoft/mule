@@ -6,27 +6,22 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.asSet;
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.assertRaisedErrors;
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.getRaisedErrors;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 
-import static java.lang.String.format;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +32,7 @@ import javax.inject.Inject;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -74,6 +70,8 @@ public class ErrorsInApplicationExtensionModelTestCase extends MuleArtifactFunct
   @Inject
   private ExtensionManager extensionManager;
 
+  private ExtensionModel appExtensionModel;
+
   @Override
   protected String[] getConfigFiles() {
     return new String[] {
@@ -82,10 +80,14 @@ public class ErrorsInApplicationExtensionModelTestCase extends MuleArtifactFunct
     };
   }
 
+  @Before
+  public void setUp() {
+    appExtensionModel = getAppExtensionModel();
+  }
+
   @Test
   public void appExtensionModelContainsRaisedErrors() {
-    ExtensionModel extensionModel = getAppExtensionModel();
-    Set<String> raisedErrors = getRaisedErrors(extensionModel);
+    Set<String> raisedErrors = getRaisedErrors(appExtensionModel);
     assertThat(raisedErrors,
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
                                   "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH",
@@ -98,40 +100,11 @@ public class ErrorsInApplicationExtensionModelTestCase extends MuleArtifactFunct
     for (Entry<String, Set<String>> expectedForOperation : expectedErrors.entrySet()) {
       String operationName = expectedForOperation.getKey();
       Set<String> expected = expectedForOperation.getValue();
-      assertRaisedErrors(operationName, expected);
+      assertRaisedErrors(appExtensionModel, operationName, expected);
     }
-  }
-
-  private void assertRaisedErrors(String operationName, Collection<String> expectedSetOfErrors) {
-    OperationModel operationModel = getOperationModel(operationName);
-    Set<String> actualRaisedErrors = getRaisedErrors(operationModel);
-
-    assertThat(format("Actual set for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors,
-               hasSize(expectedSetOfErrors.size()));
-    for (String item : expectedSetOfErrors) {
-      assertThat(format("Actual set for '%s': %s", operationName, actualRaisedErrors), actualRaisedErrors, hasItem(item));
-    }
-  }
-
-  private OperationModel getOperationModel(String operationName) {
-    return getAppExtensionModel().getOperationModel(operationName)
-        .orElseThrow(() -> new IllegalArgumentException(format("Operation '%s' not found in application's extension model",
-                                                               operationName)));
-  }
-
-  private static Set<String> getRaisedErrors(ExtensionModel extensionModel) {
-    return extensionModel.getErrorModels().stream().map(ErrorModel::toString).collect(toSet());
-  }
-
-  private static Set<String> getRaisedErrors(OperationModel operationModel) {
-    return operationModel.getErrorModels().stream().map(ErrorModel::toString).collect(toSet());
   }
 
   private ExtensionModel getAppExtensionModel() {
     return extensionManager.getExtension(muleContext.getConfiguration().getId()).get();
-  }
-
-  private static <T> Set<T> asSet(T... a) {
-    return stream(a).collect(toSet());
   }
 }
