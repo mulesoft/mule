@@ -220,11 +220,23 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
     when(parameterGroupModel.getParameterModels()).thenReturn(componentParameterModels);
-    when(parameterGroupModel.getParameter(CONFIG_REF_NAME)).thenReturn(of(configRefParameter));
-    when(parameterGroupModel.getParameter(KEY_NAME)).thenReturn(of(keyParameter));
-    when(parameterGroupModel.getParameter(CONTENT_NAME)).thenReturn(of(contentParameter));
-    when(parameterGroupModel.getParameter(LIST_NAME)).thenReturn(of(listParameter));
-    when(parameterGroupModel.getParameter(BEHAVIOUR_NAME)).thenReturn(of(behaviourParameter));
+    when(parameterGroupModel.getParameter(anyString()))
+        .then(invocation -> {
+          String paramName = invocation.getArgument(0);
+          switch (paramName) {
+            case CONFIG_REF_NAME:
+              return of(configRefParameter);
+            case KEY_NAME:
+              return of(keyParameter);
+            case CONTENT_NAME:
+              return of(contentParameter);
+            case LIST_NAME:
+              return of(listParameter);
+            case BEHAVIOUR_NAME:
+              return of(behaviourParameter);
+          }
+          return Optional.empty();
+        });
 
     this.anotherComponentParameterModels = asList(configRefParameter, anotherContentParameter, listParameter, keyParameter);
     when(anotherParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
