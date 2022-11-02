@@ -55,7 +55,6 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
 
   private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelLoaderTestCase.class);
 
-
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
