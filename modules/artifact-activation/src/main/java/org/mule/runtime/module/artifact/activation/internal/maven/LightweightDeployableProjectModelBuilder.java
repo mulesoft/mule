@@ -30,12 +30,14 @@ import java.util.stream.Stream;
 
 import org.apache.maven.model.Model;
 
-public class LightweightDeployableProjectModelBuilder extends MavenDeployableProjectModelBuilder {
+public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeployableProjectModelBuilder {
 
   private final boolean isDomain;
+  private final File projectFolder;
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, boolean isDomain) {
-    super(projectFolder);
+    super(getDefaultMavenConfiguration());
+    this.projectFolder = projectFolder;
     this.isDomain = isDomain;
   }
 
