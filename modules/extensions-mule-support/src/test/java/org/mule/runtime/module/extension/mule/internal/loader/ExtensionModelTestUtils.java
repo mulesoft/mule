@@ -34,10 +34,11 @@ import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensi
 import org.mule.runtime.module.extension.mule.internal.operation.FakeExpressionLanguageMetadataService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
+/**
+ * Utility class providing convenient methods to make test cases more readable.
+ */
 public final class ExtensionModelTestUtils {
 
   private ExtensionModelTestUtils() {
@@ -148,10 +149,10 @@ public final class ExtensionModelTestUtils {
    * @return the corresponding {@link ExtensionModel}.
    */
   public static ExtensionModel loadJavaSdkExtension(Class<?> extensionClass, Set<ExtensionModel> dependencies) {
-    Map<String, Object> ctx = new HashMap<>();
-    ctx.put(TYPE_PROPERTY_NAME, extensionClass.getName());
-    ctx.put(VERSION, "1.0.0-SNAPSHOT");
-    return new DefaultJavaExtensionModelLoader()
-        .loadExtensionModel(currentThread().getContextClassLoader(), getDefault(dependencies), ctx);
+    ExtensionModelLoadingRequest loadingRequest = builder(currentThread().getContextClassLoader(), getDefault(dependencies))
+        .addParameter(TYPE_PROPERTY_NAME, extensionClass.getName())
+        .addParameter(VERSION, "1.0.0-SNAPSHOT")
+        .build();
+    return new DefaultJavaExtensionModelLoader().loadExtensionModel(loadingRequest);
   }
 }

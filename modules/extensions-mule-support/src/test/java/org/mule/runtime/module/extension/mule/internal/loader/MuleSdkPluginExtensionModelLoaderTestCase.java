@@ -159,8 +159,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   private ExtensionModel getExtensionModelFrom(String extensionFile) {
-    return loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(),
-                                                        astParserExtensionModels);
+    return loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(), astParserExtensionModels);
   }
 
   @Override
