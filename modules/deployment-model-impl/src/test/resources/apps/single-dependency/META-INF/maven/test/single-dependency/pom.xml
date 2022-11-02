@@ -14,6 +14,12 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-http-connector</artifactId>
+            <version>1.5.24</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
     </dependencies>
 
 </project>
