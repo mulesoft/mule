@@ -213,15 +213,6 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     return classLoaderConfiguration;
   }
 
-  // TODO - W-11098291: remove
-  @Deprecated
-  protected Map<String, Object> getClassLoaderModelAttributes(Optional<Properties> deploymentProperties,
-                                                              MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
-                                                              BundleDescriptor bundleDescriptor) {
-    // Adding BundleDescriptor to avoid resolving it again while loading the class loader configuration
-    return getClassLoaderConfigurationAttributes(deploymentProperties, classLoaderModelLoaderDescriptor, bundleDescriptor);
-  }
-
   protected Map<String, Object> getClassLoaderConfigurationAttributes(Optional<Properties> deploymentProperties,
                                                                       MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                                       BundleDescriptor bundleDescriptor) {
