@@ -103,6 +103,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private ObjectStore<RedeliveryCounter> store;
   private ObjectStore<RedeliveryCounter> privateStore;
   private String idrId;
+  private boolean isOwnedObjectStore;
 
 
   /**
@@ -158,6 +159,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private void initialiseStore() throws InitialisationException {
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
+
+    isOwnedObjectStore = privateStore != null || store == null;
+
     if (store != null && privateStore != null) {
       throw new InitialisationException(
                                         createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
@@ -167,27 +171,28 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     if (store == null) {
       // If no object store was defined, create one
       if (privateStore == null) {
-        this.store = internalObjectStoreSupplier().get();
+        this.store = createInternalObjectStore();
       } else {
         // If object store was defined privately
         this.store = privateStore;
       }
     }
-    initialiseIfNeeded(store, true, muleContext);
+
+    if (isOwnedObjectStore) {
+      initialiseIfNeeded(store, true, muleContext);
+    }
   }
 
-  private Supplier<ObjectStore> internalObjectStoreSupplier() {
-    return () -> objectStoreManager.createObjectStore(getObjectStoreName(),
-                                                      ObjectStoreSettings.builder()
-                                                          .persistent(false)
-                                                          .entryTtl((long) 60 * 5 * 1000)
-                                                          .expirationInterval(6000L).build());
+  private ObjectStore<RedeliveryCounter> createInternalObjectStore() {
+    return objectStoreManager.createObjectStore(getObjectStoreName(), ObjectStoreSettings.builder().persistent(false).entryTtl((long) 60 * 5 * 1000).expirationInterval(6000L).build());
   }
 
   @Override
   public void dispose() {
+    if (isOwnedObjectStore) {
+      disposeStore();
+    }
     super.dispose();
-    disposeStore();
   }
 
   private void disposeStore() {

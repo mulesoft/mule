@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -218,13 +219,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void objectStoreIsClosed() throws Exception {
-    irp.setObjectStore(mockObjectStore);
-    irp.dispose();
-    verify(mockObjectStore).close();
-  }
-
-  @Test
   public void javaObject() throws MuleException {
     final Object payloadValue = mock(Object.class);
     event = spy(CoreEvent.builder(testEvent()).addVariable("hash", payloadValue.hashCode()).build());
@@ -239,11 +233,37 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void objectStoreIsRemovedWhenDisposed() throws Exception {
-    irp.setObjectStore(mockObjectStore);
+  public void objectStoreIsClosedOnDisposeWhenItIsOwnedByTheRedeliveryPolicy() throws Exception {
+    irp.setPrivateObjectStore(mockObjectStore);
+    irp.initialise();
+    irp.dispose();
+    verify(mockObjectStore).close();
+  }
+
+  @Test
+  public void objectStoreIsRemovedOnDisposeWhenItIsOwnedByTheRedeliveryPolicy() throws Exception {
+    irp.setPrivateObjectStore(mockObjectStore);
+    irp.initialise();
     irp.dispose();
     verify(mockObjectStoreManager)
         .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
+  }
+
+  @Test
+  public void objectStoreIsNotClosedOnDisposeWhenItIsNotOwnedByTheRedeliveryPolicy() throws Exception {
+    irp.setObjectStore(mockObjectStore);
+    irp.initialise();
+    irp.dispose();
+    verify(mockObjectStore, never()).close();
+  }
+
+  @Test
+  public void objectStoreIsNotRemovedOnDisposeWhenItIsNotOwnedByTheRedeliveryPolicy() throws Exception {
+    irp.setObjectStore(mockObjectStore);
+    irp.initialise();
+    irp.dispose();
+    verify(mockObjectStoreManager, never())
+            .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
   }
 
   private void processUntilFailure() {
