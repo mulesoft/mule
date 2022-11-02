@@ -13,42 +13,21 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
-import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
-import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
-import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
-import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
-import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
-import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.walk;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.concat;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static com.google.common.collect.Sets.newHashSet;
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
-import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
@@ -57,34 +36,21 @@ import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
-import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
-import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.ApplicationGAVModel;
-import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Implementation of {@link DeployableProjectModelBuilder} that uses Maven.
