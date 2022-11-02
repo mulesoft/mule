@@ -16,7 +16,7 @@ import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
-import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
+import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.inject.Inject;
@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class ServiceRegistryTestCase extends AbstractMuleTestCase {
 
-  private final ServiceRegistry serviceRegistry = new ServiceRegistry();
+  private final DefaultServiceRegistry serviceRegistry = new DefaultServiceRegistry();
 
   @Test
   public void injectsDependencies() throws Exception {

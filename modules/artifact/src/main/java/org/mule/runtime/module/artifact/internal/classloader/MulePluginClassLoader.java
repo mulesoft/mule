@@ -10,8 +10,6 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 
 import static java.lang.reflect.Modifier.isAbstract;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
@@ -27,15 +25,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.Driver;
 
-import org.slf4j.Logger;
-
+/**
+ * Abstract implementation of the ArtifactClassLoader interface, that manages shutdown listeners and has resource releasers.
+ */
 public class MulePluginClassLoader extends MuleArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
   }
-
-  private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
 
   private static final String DB_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/JdbcResourceReleaser.class";
@@ -125,6 +122,7 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader {
     return jdbcResourceReleaserInstance;
   }
 
+  @Override
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
     this.dbResourceReleaserClassLocation = resourceReleaserClassLocation;
   }

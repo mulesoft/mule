@@ -16,6 +16,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -37,7 +38,7 @@ import javax.inject.Qualifier;
  *
  * @since 4.2
  */
-public class ServiceRegistry {
+public class DefaultServiceRegistry implements ServiceRegistry {
 
   private final Map<Class<? extends Service>, Service> services = new HashMap<>();
 
@@ -89,13 +90,7 @@ public class ServiceRegistry {
     return asOptional ? ofNullable(dependency) : dependency;
   }
 
-
-  /**
-   * Tracks the given {@code service}
-   *
-   * @param service  the {@link Service} to be tracked
-   * @param assembly the {@code service}'s {@link ServiceAssembly}
-   */
+  @Override
   public void register(Service service, ServiceAssembly assembly) {
     services.put(assembly.getServiceContract(), service);
   }
@@ -104,11 +99,13 @@ public class ServiceRegistry {
     services.put(serviceContract, service);
   }
 
+  @Override
   public <S extends Service> void unregister(Class<? extends S> serviceContract) {
     services.remove(serviceContract);
   }
 
-  public <S extends Service> Optional<S> getService(Class<S> serviceInterface) {
+  @Override
+  public <S extends Service> Optional<S> getService(Class<? extends S> serviceInterface) {
     return services
         .values()
         .stream()

@@ -19,7 +19,7 @@ import java.lang.reflect.Proxy;
 public interface ServiceProxyInvocationHandler extends InvocationHandler {
 
   /**
-   * @return the proxied service. May be {@code null} before the first proxy is started.
+   * @return the proxied service.
    */
   public abstract Service getService();
 

@@ -92,7 +92,7 @@ import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
-import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
+import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -276,7 +276,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new ServiceRegistry(), this)));
+                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
     pluginDependenciesResolver =

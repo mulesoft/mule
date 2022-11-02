@@ -36,6 +36,7 @@ import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.api.manager.ServiceProxyInvocationHandler;
+import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
 
 import java.lang.reflect.InvocationHandler;
@@ -58,7 +59,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
 
   private final ServiceAssembly assembly;
-  private final ServiceRegistry serviceRegistry;
+  private final DefaultServiceRegistry serviceRegistry;
   private final LazyValue<Service> service;
 
   private final AtomicBoolean started = new AtomicBoolean(false);
@@ -69,11 +70,11 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
    * Creates a new proxy based on the given {@code assembly} and {@code serviceRegistry}
    *
    * @param assembly        the {@link ServiceAssembly}
-   * @param serviceRegistry the {@link ServiceRegistry}
+   * @param serviceRegistry the {@link DefaultServiceRegistry}
    * @return a new {@link Service} proxy
    */
   public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry, Injector containerInjector) {
-    return proxy(assembly, new LazyServiceProxy(assembly, serviceRegistry, containerInjector));
+    return proxy(assembly, new LazyServiceProxy(assembly, (DefaultServiceRegistry) serviceRegistry, containerInjector));
   }
 
   private static Service proxy(ServiceAssembly assembly, InvocationHandler handler) {
@@ -83,14 +84,14 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
                                       handler);
   }
 
-  protected LazyServiceProxy(ServiceAssembly assembly, ServiceRegistry serviceRegistry, Injector containerInjector) {
+  protected LazyServiceProxy(ServiceAssembly assembly, DefaultServiceRegistry serviceRegistry, Injector containerInjector) {
     this.assembly = assembly;
     this.serviceRegistry = serviceRegistry;
     this.service = new LazyValue<>(createService(containerInjector));
   }
 
   protected LazyServiceProxy(ServiceAssembly assembly,
-                             ServiceRegistry serviceRegistry,
+                             DefaultServiceRegistry serviceRegistry,
                              LazyValue<Service> service) {
     this.assembly = assembly;
     this.serviceRegistry = serviceRegistry;

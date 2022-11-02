@@ -36,7 +36,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ServiceRegistryTestCase extends AbstractMuleTestCase {
 
-  private ServiceRegistry serviceRegistry;
+  private DefaultServiceRegistry serviceRegistry;
   private ServiceA serviceA;
   @Mock
   private ServiceProvider serviceProviderA;
@@ -45,7 +45,7 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    serviceRegistry = new ServiceRegistry();
+    serviceRegistry = new DefaultServiceRegistry();
     serviceA = new ServiceA();
   }
 
