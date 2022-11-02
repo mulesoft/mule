@@ -68,12 +68,16 @@ public class MuleSdkErrorsDeclarationParser {
     // Walk the TRANSPOSED graph in a topological order (so the parent parser already created when we see each child).
     Graph<ComponentIdentifier, DefaultEdge> graph = buildTransposedGraph(errorIdToParentId);
     Map<ComponentIdentifier, ErrorModelParser> parserByIdentifier = new HashMap<>();
-    new TopologicalOrderIterator<>(graph).forEachRemaining(errorIdentifier -> {
-      ErrorModelParser parent = getParent(errorIdToParentId, parserByIdentifier, errorIdentifier);
-      LOGGER.debug("Creating parser for error '{}' with parent '{}'", errorIdentifier, parent);
-      parserByIdentifier.put(errorIdentifier,
-                             new MuleSdkErrorModelParser(errorIdentifier.getNamespace(), errorIdentifier.getName(), parent));
-    });
+    try {
+      new TopologicalOrderIterator<>(graph).forEachRemaining(errorIdentifier -> {
+        ErrorModelParser parent = getParent(errorIdToParentId, parserByIdentifier, errorIdentifier);
+        LOGGER.debug("Creating parser for error '{}' with parent '{}'", errorIdentifier, parent);
+        parserByIdentifier.put(errorIdentifier,
+                               new MuleSdkErrorModelParser(errorIdentifier.getNamespace(), errorIdentifier.getName(), parent));
+      });
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Error while trying to parse the errors hierarchy, maybe there is a cycle", e);
+    }
     return parserByIdentifier;
   }
 

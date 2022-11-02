@@ -195,9 +195,8 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
     ComponentAst extensionComponentAst = mockExtensionAstWithErrors(aAst, bAst);
 
     // When we parse it, we expect an exception.
-    // TODO: Is this exception ok? It's pretty clear...
     expected.expect(IllegalArgumentException.class);
-    expected.expectMessage("Graph is not a DAG");
+    expected.expectMessage("Error while trying to parse the errors hierarchy, maybe there is a cycle");
     new MuleSdkErrorsDeclarationParser(extensionComponentAst, TEST).parse();
   }
 
