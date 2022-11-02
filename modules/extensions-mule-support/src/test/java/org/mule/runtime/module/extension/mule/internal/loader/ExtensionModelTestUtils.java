@@ -124,15 +124,14 @@ public final class ExtensionModelTestUtils {
   /**
    * Creates a MuleSDK plugin's {@link ExtensionModel} for the file passed in the parameter {@code extensionFile}.
    * 
-   * @param extensionFile            name of the file declaring an extension with the MuleSDK.
-   * @param classLoader              classLoader to be used to load the plugin.
-   * @param astParserExtensionModels set of extension models available for the {@link DslResolvingContext}.
+   * @param extensionFile name of the file declaring an extension with the MuleSDK.
+   * @param classLoader   classLoader to be used to load the plugin.
+   * @param dependencies  set of extension models available for the {@link DslResolvingContext}.
    * @return the corresponding {@link ExtensionModel}.
    */
-  public static ExtensionModel loadMuleSdkExtension(String extensionFile,
-                                                    ClassLoader classLoader,
-                                                    Set<ExtensionModel> astParserExtensionModels) {
-    ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(astParserExtensionModels))
+  public static ExtensionModel loadMuleSdkExtension(String extensionFile, ClassLoader classLoader,
+                                                    Set<ExtensionModel> dependencies) {
+    ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(dependencies))
         .addParameter(VERSION_PROPERTY_NAME, TEST_ARTIFACT_COORDINATES.getVersion())
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
         .addParameter(MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME, expressionLanguageMetadataService)
@@ -142,17 +141,43 @@ public final class ExtensionModelTestUtils {
   }
 
   /**
-   * Creates a JavaSDK plugin's {@link ExtensionModel} for the main class passed in the parameter {@code extensionFile}.
-   * 
-   * @param extensionClass main class of the extension.
-   * @param dependencies   classLoader to be used to load the plugin.
+   * Creates a MuleSDK plugin's {@link ExtensionModel} for the file passed in the parameter {@code extensionFile}, with the thread
+   * context class loader.
+   *
+   * @param extensionFile name of the file declaring an extension with the MuleSDK.
+   * @param dependencies  set of extension models available for the {@link DslResolvingContext}.
    * @return the corresponding {@link ExtensionModel}.
    */
-  public static ExtensionModel loadJavaSdkExtension(Class<?> extensionClass, Set<ExtensionModel> dependencies) {
-    ExtensionModelLoadingRequest loadingRequest = builder(currentThread().getContextClassLoader(), getDefault(dependencies))
+  public static ExtensionModel loadMuleSdkExtension(String extensionFile, Set<ExtensionModel> dependencies) {
+    return loadMuleSdkExtension(extensionFile, currentThread().getContextClassLoader(), dependencies);
+  }
+
+  /**
+   * Creates a JavaSDK plugin's {@link ExtensionModel} for the main class passed in the parameter {@code extensionFile}.
+   *
+   * @param extensionClass main class of the extension.
+   * @param classLoader    classLoader to be used to load the plugin.
+   * @param dependencies   set of extension models available for the {@link DslResolvingContext}.
+   * @return the corresponding {@link ExtensionModel}.
+   */
+  public static ExtensionModel loadJavaSdkExtension(Class<?> extensionClass, ClassLoader classLoader,
+                                                    Set<ExtensionModel> dependencies) {
+    ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(dependencies))
         .addParameter(TYPE_PROPERTY_NAME, extensionClass.getName())
         .addParameter(VERSION, "1.0.0-SNAPSHOT")
         .build();
     return new DefaultJavaExtensionModelLoader().loadExtensionModel(loadingRequest);
+  }
+
+  /**
+   * Creates a JavaSDK plugin's {@link ExtensionModel} for the main class passed in the parameter {@code extensionFile}, with the
+   * thread context class loader.
+   *
+   * @param extensionClass main class of the extension.
+   * @param dependencies   set of extension models available for the {@link DslResolvingContext}.
+   * @return the corresponding {@link ExtensionModel}.
+   */
+  public static ExtensionModel loadJavaSdkExtension(Class<?> extensionClass, Set<ExtensionModel> dependencies) {
+    return loadJavaSdkExtension(extensionClass, currentThread().getContextClassLoader(), dependencies);
   }
 }
