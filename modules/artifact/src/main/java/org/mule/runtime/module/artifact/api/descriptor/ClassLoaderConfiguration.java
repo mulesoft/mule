@@ -7,12 +7,14 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.lang.Boolean.FALSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.api.annotation.NoExtend;
 
@@ -260,6 +262,18 @@ public class ClassLoaderConfiguration {
     public ClassLoaderConfigurationBuilder containing(URL url) {
       checkArgument(url != null, "url cannot be null");
       urls.add(url);
+      return this;
+    }
+
+    /**
+     * Adds {@link URL}s to the configuration.
+     *
+     * @param urls indicates which resources to add. Non-null.
+     * @return same builder instance.
+     */
+    public ClassLoaderConfigurationBuilder containing(List<URL> urls) {
+      checkArgument(urls != null, "urls cannot be null");
+      urls.addAll(urls);
       return this;
     }
 
