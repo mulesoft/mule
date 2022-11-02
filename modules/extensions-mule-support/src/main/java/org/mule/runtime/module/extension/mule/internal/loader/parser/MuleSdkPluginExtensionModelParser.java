@@ -60,7 +60,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
 
   @Override
   protected void init(ArtifactAst ast) {
-    parseStructure(ast);
+    parseStructure(getExtensionComponentAst(ast));
     super.init(ast);
   }
 
@@ -105,8 +105,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
     return ast.topLevelComponents().get(0);
   }
 
-  private void parseStructure(ArtifactAst ast) {
-    ComponentAst extensionComponentAst = getExtensionComponentAst(ast);
+  private void parseStructure(ComponentAst extensionComponentAst) {
     ComponentAst descriptionComponentAst =
         getRequiredSingleChild(extensionComponentAst, MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME);
     name = getParameter(descriptionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);

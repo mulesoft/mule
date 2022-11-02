@@ -60,6 +60,10 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
     }
   }
 
+  protected static void addDependencyExtension(ExtensionModel extension) {
+    astParserExtensionModels.add(extension);
+  }
+
   @Before
   public void before() {
     properties.clear();

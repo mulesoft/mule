@@ -10,6 +10,7 @@ import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionMo
 import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.assertRaisedErrors;
 import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.getRaisedErrors;
 import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.loadJavaSdkExtension;
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.loadMuleSdkExtension;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
@@ -19,9 +20,7 @@ import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
-import org.mule.runtime.module.extension.mule.internal.operation.FakeExpressionLanguageMetadataService;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.util.HashMap;
@@ -40,13 +39,10 @@ import org.junit.Test;
 @Stories({@Story(EXTENSION_EXTENSION_MODEL), @Story(ERROR_HANDLING)})
 public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdkAstTestCase {
 
-  private static final ExpressionLanguageMetadataService expressionLanguageMetadataService =
-      new FakeExpressionLanguageMetadataService();
-
   private static final Map<String, Set<String>> expectedErrors = new HashMap<>();
 
   @BeforeClass
-  public static void setupExpectedErrors() {
+  public static void setUp() {
     expectedErrors.put("raiseCustom", singleton("ERRORS:CUSTOM"));
     expectedErrors.put("raiseOther", singleton("ERRORS:OTHER"));
     expectedErrors.put("silencingOneAndRaisingOther", singleton("ERRORS:OTHER"));
@@ -54,7 +50,7 @@ public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdk
     // TODO (W-11471782): should be "ERRORS:HEISENBERG_HEALTH" and "ERRORS:HEISENBERG_OAUTH2"
     expectedErrors.put("heisenbergCureCancer", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
 
-    astParserExtensionModels.addAll(getDependencyExtensions());
+    addDependencyExtension(loadJavaSdkExtension(HeisenbergExtension.class, emptySet()));
   }
 
   @Override
@@ -85,12 +81,6 @@ public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdk
   }
 
   private ExtensionModel getExtensionModelFrom(String extensionFile) {
-    return ExtensionModelTestUtils.loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(),
-                                                        astParserExtensionModels);
-  }
-
-  private static Set<ExtensionModel> getDependencyExtensions() {
-    ExtensionModel petstore = loadJavaSdkExtension(HeisenbergExtension.class, emptySet());
-    return asSet(petstore);
+    return loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(), astParserExtensionModels);
   }
 }

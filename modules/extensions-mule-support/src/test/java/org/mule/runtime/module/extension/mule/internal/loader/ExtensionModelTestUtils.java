@@ -40,6 +40,10 @@ import java.util.Set;
 
 public final class ExtensionModelTestUtils {
 
+  private ExtensionModelTestUtils() {
+    // Empty private constructor in order to avoid incorrect instantiations.
+  }
+
   private static final ExpressionLanguageMetadataService expressionLanguageMetadataService =
       new FakeExpressionLanguageMetadataService();
 
@@ -150,5 +154,4 @@ public final class ExtensionModelTestUtils {
     return new DefaultJavaExtensionModelLoader()
         .loadExtensionModel(currentThread().getContextClassLoader(), getDefault(dependencies), ctx);
   }
-
 }

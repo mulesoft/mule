@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.TEST_ARTIFACT_COORDINATES;
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.loadMuleSdkExtension;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
 
@@ -112,7 +113,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
     testClassLoader.addResource(nonexistentResourceName, existentResource);
 
     // Trying to load the model from the resource by its non-existent name should only succeed if the right class loader is used.
-    ExtensionModelTestUtils.loadMuleSdkExtension(nonexistentResourceName, testClassLoader, astParserExtensionModels);
+    loadMuleSdkExtension(nonexistentResourceName, testClassLoader, astParserExtensionModels);
 
     // Control test to verify that loading from the non-existent name will actually fail if using the wrong class loader.
     expectedException.expect(MuleRuntimeException.class);
@@ -159,7 +160,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   private ExtensionModel getExtensionModelFrom(String extensionFile) {
-    return ExtensionModelTestUtils.loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(),
+    return loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(),
                                                         astParserExtensionModels);
   }
 
