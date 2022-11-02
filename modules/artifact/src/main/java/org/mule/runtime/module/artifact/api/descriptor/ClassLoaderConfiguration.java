@@ -261,7 +261,7 @@ public class ClassLoaderConfiguration {
      */
     public ClassLoaderConfigurationBuilder containing(URL url) {
       checkArgument(url != null, "url cannot be null");
-      urls.add(url);
+      this.urls.add(url);
       return this;
     }
 
@@ -273,7 +273,7 @@ public class ClassLoaderConfiguration {
      */
     public ClassLoaderConfigurationBuilder containing(List<URL> urls) {
       checkArgument(urls != null, "urls cannot be null");
-      urls.addAll(urls);
+      this.urls.addAll(urls);
       return this;
     }
 
