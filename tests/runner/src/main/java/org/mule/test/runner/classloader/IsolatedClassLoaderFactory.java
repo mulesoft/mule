@@ -146,13 +146,12 @@ public class IsolatedClassLoaderFactory {
       containerClassLoader =
           createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
 
-      serviceArtifactClassLoaders =
-          createServiceClassLoaders(containerClassLoader.getClassLoader(), containerClassLoader.getClassLoaderLookupPolicy(),
-                                    artifactsUrlClassification);
-
       childClassLoaderLookupPolicy =
           testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
-      final ClassLoaderLookupPolicy appLookupPolicy = childClassLoaderLookupPolicy.extend(pluginsLookupStrategies);
+
+      serviceArtifactClassLoaders =
+          createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
+                                    artifactsUrlClassification);
 
       regionClassLoader = new TestRegionClassLoader(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy);
 
@@ -193,6 +192,7 @@ public class IsolatedClassLoaderFactory {
                                testJarInfo.getPackages());
       }
 
+      final ClassLoaderLookupPolicy appLookupPolicy = childClassLoaderLookupPolicy.extend(pluginsLookupStrategies);
       ArtifactClassLoader appClassLoader =
           createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification);
 
