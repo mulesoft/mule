@@ -17,8 +17,10 @@ import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLoca
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
+import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
 import java.net.URI;
@@ -31,12 +33,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Plugin;
 
 /**
- * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} with information from a
- * {@link org.mule.tools.api.classloader.model.ClassLoaderModel} included when packaging the artifact in a heavyweight manner.
+ * Builder for a {@link ClassLoaderConfiguration} with information from a {@link ClassLoaderModel} included when packaging the
+ * artifact in a heavyweight manner.
  *
  * @since 4.2.0
  */
-public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
+public class HeavyweightClassLoaderConfigurationBuilder extends ArtifactClassLoaderConfigurationBuilder {
 
   public static final Semver CLASS_LOADER_MODEL_VERSION_110 = new Semver("1.1.0", LOOSE);
 
@@ -44,8 +46,8 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   private Semver classLoaderModelVersion;
 
-  public HeavyweightClassLoaderModelBuilder(File applicationFolder, BundleDescriptor artifactBundleDescriptor,
-                                            org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
+  public HeavyweightClassLoaderConfigurationBuilder(File applicationFolder, BundleDescriptor artifactBundleDescriptor,
+                                                    org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     super(applicationFolder, artifactBundleDescriptor);
     this.packagerClassLoaderModel = packagerClassLoaderModel;
     this.classLoaderModelVersion = new Semver(packagerClassLoaderModel.getVersion(), LOOSE);
@@ -140,8 +142,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   /**
-   * Exports shared libraries resources and packages getting the information from the packager
-   * {@link org.mule.tools.api.classloader.model.ClassLoaderModel}.
+   * Exports shared libraries resources and packages getting the information from the packager {@link ClassLoaderModel}.
    */
   private void exportSharedLibrariesResourcesAndPackages() {
     packagerClassLoaderModel.getDependencies().stream()

@@ -18,7 +18,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 
 /**
@@ -62,8 +62,8 @@ public interface ArtifactDescriptorFactoryProvider {
   /**
    * Creates a factory of descriptors for describing mule artifact plugins.
    * 
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be
    *                                           used. Non null.
    * @return a factory to create {@link ArtifactPluginDescriptor}s.

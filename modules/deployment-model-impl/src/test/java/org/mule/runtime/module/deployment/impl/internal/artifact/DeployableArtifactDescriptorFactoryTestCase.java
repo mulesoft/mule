@@ -53,7 +53,7 @@ import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
@@ -165,13 +165,14 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     D desc = createArtifactDescriptor();
 
-    assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(getArtifactFolder().toString()));
+    assertThat(desc.getClassLoaderConfiguration().getUrls().length, equalTo(2));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[0]).getPath(), equalTo(getArtifactFolder().toString()));
     Path expectedPathEnd =
         get(getArtifactRootFolder(), "test", "repository", "org", "mule", "test", "shared", "1.0.0", "shared-1.0.0.jar");
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
-    assertThat(desc.getClassLoaderModel().getExportedPackages(), contains("org.foo"));
-    assertThat(desc.getClassLoaderModel().getExportedResources(), containsInAnyOrder("META-INF/MANIFEST.MF", "README.txt"));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
+    assertThat(desc.getClassLoaderConfiguration().getExportedPackages(), contains("org.foo"));
+    assertThat(desc.getClassLoaderConfiguration().getExportedResources(),
+               containsInAnyOrder("META-INF/MANIFEST.MF", "README.txt"));
   }
 
   @Test
@@ -182,12 +183,12 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     D desc = createArtifactDescriptor();
 
-    assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(getArtifactFolder().toString()));
-    assertThat(desc.getClassLoaderModel().getExportedPackages(), is(empty()));
+    assertThat(desc.getClassLoaderConfiguration().getUrls().length, equalTo(2));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[0]).getPath(), equalTo(getArtifactFolder().toString()));
+    assertThat(desc.getClassLoaderConfiguration().getExportedPackages(), is(empty()));
     Path expectedPathEnd =
         get(getArtifactRootFolder(), "test", "repository", "org", "mule", "test", "runtime", "1.0.0", "runtime-1.0.0.jar");
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
+    assertThat(toFile(desc.getClassLoaderConfiguration().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
   }
 
   @Test
@@ -199,15 +200,15 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(desc.getConfigResources(), hasSize(1));
     assertThat(desc.getConfigResources(), hasItem(getDefaultConfigurationResourceLocation()));
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
-    assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(toFile(classLoaderModel.getUrls()[0]).getPath(),
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
+    assertThat(classLoaderConfiguration.getDependencies().isEmpty(), is(true));
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
+    assertThat(toFile(classLoaderConfiguration.getUrls()[0]).getPath(),
                is(getArtifact(artifactPath).getAbsolutePath()));
 
-    assertThat(classLoaderModel.getExportedPackages().isEmpty(), is(true));
-    assertThat(classLoaderModel.getExportedResources().isEmpty(), is(true));
-    assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
+    assertThat(classLoaderConfiguration.getExportedPackages().isEmpty(), is(true));
+    assertThat(classLoaderConfiguration.getExportedResources().isEmpty(), is(true));
+    assertThat(classLoaderConfiguration.getDependencies().isEmpty(), is(true));
   }
 
   @Test
@@ -219,96 +220,98 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
-  public void classLoaderModelWithIncludeTestDependencies() throws Exception {
+  public void classLoaderConfigurationWithIncludeTestDependencies() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/include-test-dependencies");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.isIncludeTestDependencies(), is(true));
+    assertThat(classLoaderConfiguration.isIncludeTestDependencies(), is(true));
   }
 
   @Test
-  public void classLoaderModelWithoutIncludeTestDependencies() throws Exception {
+  public void classLoaderConfigurationWithoutIncludeTestDependencies() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/do-not-include-test-dependencies");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.isIncludeTestDependencies(), is(false));
+    assertThat(classLoaderConfiguration.isIncludeTestDependencies(), is(false));
   }
 
   @Test
-  public void classLoaderModelDefaultIncludeTestDependencies() throws Exception {
+  public void classLoaderConfigurationDefaultIncludeTestDependencies() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/custom-config-files");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.isIncludeTestDependencies(), is(false));
+    assertThat(classLoaderConfiguration.isIncludeTestDependencies(), is(false));
   }
 
   @Test
-  public void classLoaderModelWithSingleDependency() throws Exception {
+  public void classLoaderConfigurationWithSingleDependency() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/single-dependency");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies(), hasSize(1));
-    BundleDependency commonsCollectionDependency = classLoaderModel.getDependencies().iterator().next();
+    assertThat(classLoaderConfiguration.getDependencies(), hasSize(1));
+    BundleDependency commonsCollectionDependency = classLoaderConfiguration.getDependencies().iterator().next();
     assertThat(commonsCollectionDependency, commonsCollectionDependencyMatcher());
 
-    assertThat(classLoaderModel.getUrls().length, is(2));
-    assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUri().toURL()));
+    assertThat(classLoaderConfiguration.getUrls().length, is(2));
+    assertThat(asList(classLoaderConfiguration.getUrls()), hasItem(commonsCollectionDependency.getBundleUri().toURL()));
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyDeclaredAsProvided() throws Exception {
+  public void classLoaderConfigurationWithPluginDependencyDeclaredAsProvided() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/provided-plugin-dependency");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(),
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(1));
+    assertThat(classLoaderConfiguration.getDependencies(),
                hasItem(testEmptyPluginDependencyMatcher(PROVIDED, false, true)));
   }
 
   @Test
-  public void classLoaderModelWithPluginDependency() throws Exception {
+  public void classLoaderConfigurationWithPluginDependency() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher()));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(1));
+    assertThat(classLoaderConfiguration.getDependencies(), hasItem(testEmptyPluginDependencyMatcher()));
 
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyWithTransitiveDependency() throws Exception {
+  public void classLoaderConfigurationWithPluginDependencyWithTransitiveDependency() throws Exception {
     installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
     installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependency");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
     final String expectedPluginArtifactId = "plugin-with-transitive-dependency";
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(1));
+    assertThat(classLoaderConfiguration.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
 
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
 
     ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
 
     assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
-    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItem(bundleDependency("library")));
+    assertThat(pluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasItem(bundleDependency("library")));
   }
 
 
   @Test
-  public void classLoaderModelWithPluginDependencyWithMultipleTransitiveDependenciesLevels() throws Exception {
+  public void classLoaderConfigurationWithPluginDependencyWithMultipleTransitiveDependenciesLevels() throws Exception {
     installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies"), new File(repositoryLocation.getValue()));
     installArtifact(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"), new File(repositoryLocation.getValue()));
     installArtifact(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"), new File(repositoryLocation.getValue()));
@@ -317,142 +320,149 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependencies");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
     final String expectedPluginArtifactId = "plugin-with-transitive-dependencies";
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(1));
+    assertThat(classLoaderConfiguration.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
 
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next())));
 
     ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
 
     assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
-    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItems(
-                                                                                  bundleDependency("library-with-dependency-a"),
-                                                                                  bundleDependency("library-with-dependency-b"),
-                                                                                  bundleDependency("library", "1.0.0")));
-    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), not(hasItem(bundleDependency("library", "2.0.0"))));
+    assertThat(pluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasItems(
+                                                                                          bundleDependency("library-with-dependency-a"),
+                                                                                          bundleDependency("library-with-dependency-b"),
+                                                                                          bundleDependency("library", "1.0.0")));
+    assertThat(pluginDescriptor.getClassLoaderConfiguration().getDependencies(),
+               not(hasItem(bundleDependency("library", "2.0.0"))));
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
-  }
-
-  @Test
-  @Issue("MULE-19282")
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesInProfileLightweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-lightweight");
-  }
-
-  @Test
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight-local-repository");
-  }
-
-  @Test
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweightUsingSystemScope() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-system-scope-lightweight");
-  }
-
-  @Test
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
   }
 
   @Test
   @Issue("MULE-19282")
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesInProfileHeavyweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-heavyweight");
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesInProfileLightweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-lightweight");
   }
 
-  private void assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
+  @Test
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository()
+      throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight-local-repository");
+  }
+
+  @Test
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUsingSystemScope()
+      throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-system-scope-lightweight");
+  }
+
+  @Test
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
+  }
+
+  @Test
+  @Issue("MULE-19282")
+  public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesInProfileHeavyweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-heavyweight");
+  }
+
+  private void assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + location);
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(2));
-    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(2));
+    assertThat(classLoaderConfiguration.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
 
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()),
-               not(hasItem(classLoaderModel.getDependencies().iterator().next().getBundleUri().toURL())));
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
+    assertThat(asList(classLoaderConfiguration.getUrls()),
+               not(hasItem(classLoaderConfiguration.getDependencies().iterator().next().getBundleUri().toURL())));
 
     assertThat(desc.getPlugins(), hasSize(2));
 
     ArtifactPluginDescriptor testEmptyPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("test-empty-plugin")).findFirst().get();
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getUrls().length, is(3));
-    assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url)).collect(toList()),
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls().length, is(3));
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url))
+        .collect(toList()),
                everyItem(exists()));
 
-    assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName())
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url).getName())
         .collect(toList()),
                hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"),
                         equalTo("commons-collections-3.2.1.jar")));
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the
     // urls
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
 
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), hasSize(19));
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), hasItems("org.apache.commons.collections",
-                                                                                            "org.apache.commons.io"));
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalResources(),
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(19));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(),
+               hasItems("org.apache.commons.collections",
+                        "org.apache.commons.io"));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalResources(),
                hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
                         "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
-    assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
-    assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
+    assertThat(dependantPluginDescriptor.getClassLoaderConfiguration().getUrls().length, is(1));
+    assertThat(dependantPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(1));
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyAndSharedLibrariesLightweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-lightweight");
-  }
-
-  @Test
-  @Issue("MULE-19282")
-  public void classLoaderModelWithPluginDependencyAndSharedLibrariesInProfileLightweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-lightweight");
-  }
-
-  @Test
-  public void classLoaderModelWithPluginDependencyAndSharedLibrariesHeavyweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-heavyweight");
+  public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesLightweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-lightweight");
   }
 
   @Test
   @Issue("MULE-19282")
-  public void classLoaderModelWithPluginDependencyAndSharedLibrariesInProfileHeavyweight() throws Exception {
-    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-heavyweight");
+  public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesInProfileLightweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-lightweight");
   }
 
-  private void assertClassLoaderModelWithPluginDependencyAndSharedLibraries(String location) throws Exception {
+  @Test
+  public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesHeavyweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-heavyweight");
+  }
+
+  @Test
+  @Issue("MULE-19282")
+  public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesInProfileHeavyweight() throws Exception {
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-heavyweight");
+  }
+
+  private void assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(String location) throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + location);
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(4));
-    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(4));
+    assertThat(classLoaderConfiguration.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
 
-    assertThat(classLoaderModel.getUrls().length, is(3));
+    assertThat(classLoaderConfiguration.getUrls().length, is(3));
 
-    assertThat(classLoaderModel.getDependencies().stream()
+    assertThat(classLoaderConfiguration.getDependencies().stream()
         .filter(dep -> "commons-collections".equals(dep.getDescriptor().getArtifactId()))
         .findFirst().isPresent(), is(true));
-    assertThat(classLoaderModel.getDependencies().stream()
+    assertThat(classLoaderConfiguration.getDependencies().stream()
         .filter(dep -> "commons-io".equals(dep.getDescriptor().getArtifactId()))
         .findFirst().isPresent(), is(true));
 
-    assertThat(classLoaderModel.getExportedPackages(), hasItems("org.apache.commons.collections",
-                                                                "org.apache.commons.io"));
-    assertThat(classLoaderModel.getExportedResources(), hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
-                                                                 "META-INF/maven/commons-io/commons-io/pom.xml"));
+    assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("org.apache.commons.collections",
+                                                                        "org.apache.commons.io"));
+    assertThat(classLoaderConfiguration.getExportedResources(),
+               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+                        "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     assertThat(desc.getPlugins(), hasSize(2));
   }
@@ -483,26 +493,27 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-as-system");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(1));
 
-    assertThat(classLoaderModel.getUrls().length, is(1));
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyWithAnotherPlugin() throws Exception {
+  public void classLoaderConfigurationWithPluginDependencyWithAnotherPlugin() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-another-plugin");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(2));
-    assertThat(classLoaderModel.getDependencies(), hasItems(dependantPluginDependencyMatcher(), emptyPluginDependencyMatcher()));
+    assertThat(classLoaderConfiguration.getDependencies().size(), is(2));
+    assertThat(classLoaderConfiguration.getDependencies(),
+               hasItems(dependantPluginDependencyMatcher(), emptyPluginDependencyMatcher()));
 
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    classLoaderModel.getDependencies().stream()
+    assertThat(classLoaderConfiguration.getUrls().length, is(1));
+    classLoaderConfiguration.getDependencies().stream()
         .forEach(bundleDependency -> {
-          assertThat(asList(classLoaderModel.getUrls()), not(hasItem(bundleDependency.getBundleUri())));
+          assertThat(asList(classLoaderConfiguration.getUrls()), not(hasItem(bundleDependency.getBundleUri())));
         });
   }
 
@@ -544,13 +555,13 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/same-dep-diff-classifier");
 
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
 
-    assertThat(classLoaderModel.getDependencies(), contains(
-                                                            bundleDependency("library"),
-                                                            bundleDependency("library")));
+    assertThat(classLoaderConfiguration.getDependencies(), contains(
+                                                                    bundleDependency("library"),
+                                                                    bundleDependency("library")));
 
-    assertThat(stream(classLoaderModel.getUrls()).map(URL::getPath).collect(toList()),
+    assertThat(stream(classLoaderConfiguration.getUrls()).map(URL::getPath).collect(toList()),
                contains(
                         containsString("same-dep-diff-classifier"),
                         containsString("library-1.0.0.jar"),
@@ -567,7 +578,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier");
 
     ArtifactPluginDescriptor plugin = desc.getPlugins().iterator().next();
-    ClassLoaderModel pluginClassLoderModel = plugin.getClassLoaderModel();
+    ClassLoaderConfiguration pluginClassLoderModel = plugin.getClassLoaderConfiguration();
 
     assertThat(pluginClassLoderModel.getDependencies(), contains(
                                                                  bundleDependency("library"),
@@ -588,7 +599,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier-as-additional");
 
     ArtifactPluginDescriptor plugin = desc.getPlugins().iterator().next();
-    ClassLoaderModel pluginClassLoderModel = plugin.getClassLoaderModel();
+    ClassLoaderConfiguration pluginClassLoderModel = plugin.getClassLoaderConfiguration();
 
     assertThat(pluginClassLoderModel.getDependencies(), is(empty()));
 

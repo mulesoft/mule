@@ -25,7 +25,7 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -105,7 +105,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
                                                                   parentLookupPolicy);
 
     ArtifactClassLoaderFilter artifactClassLoaderFilter =
-        createArtifactClassLoaderFilter(artifactDescriptor.getClassLoaderModel(),
+        createArtifactClassLoaderFilter(artifactDescriptor.getClassLoaderConfiguration(),
                                         parentLookupPolicy);
 
     Map<String, LookupStrategy> appAdditionalLookupStrategy =
@@ -123,7 +123,8 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     int artifactPluginIndex = 0;
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
       final ArtifactClassLoaderFilter classLoaderFilter =
-          createPluginClassLoaderFilter(artifactPluginDescriptor, artifactDescriptor.getClassLoaderModel().getExportedPackages(),
+          createPluginClassLoaderFilter(artifactPluginDescriptor,
+                                        artifactDescriptor.getClassLoaderConfiguration().getExportedPackages(),
                                         parentLookupPolicy);
       regionClassLoader.addClassLoader(artifactPluginClassLoaders.get(artifactPluginIndex), classLoaderFilter);
       artifactPluginIndex++;
@@ -163,19 +164,19 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    */
   protected abstract ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader);
 
-  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(ClassLoaderModel classLoaderModel,
+  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(ClassLoaderConfiguration classLoaderConfiguration,
                                                                     ClassLoaderLookupPolicy classLoaderLookupPolicy) {
     Set<String> artifactExportedPackages = sanitizeExportedPackages(classLoaderLookupPolicy,
-                                                                    classLoaderModel.getExportedPackages());
+                                                                    classLoaderConfiguration.getExportedPackages());
 
-    return new DefaultArtifactClassLoaderFilter(artifactExportedPackages, classLoaderModel.getExportedResources());
+    return new DefaultArtifactClassLoaderFilter(artifactExportedPackages, classLoaderConfiguration.getExportedResources());
   }
 
   private ArtifactClassLoaderFilter createPluginClassLoaderFilter(ArtifactPluginDescriptor pluginDescriptor,
                                                                   Set<String> parentArtifactExportedPackages,
                                                                   ClassLoaderLookupPolicy classLoaderLookupPolicy) {
     Set<String> sanitizedArtifactExportedPackages =
-        sanitizeExportedPackages(classLoaderLookupPolicy, pluginDescriptor.getClassLoaderModel().getExportedPackages());
+        sanitizeExportedPackages(classLoaderLookupPolicy, pluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
 
     Set<String> replacedPackages =
         parentArtifactExportedPackages.stream().filter(p -> sanitizedArtifactExportedPackages.contains(p)).collect(toSet());
@@ -185,7 +186,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
           + replacedPackages);
     }
     return new DefaultArtifactClassLoaderFilter(sanitizedArtifactExportedPackages,
-                                                pluginDescriptor.getClassLoaderModel().getExportedResources());
+                                                pluginDescriptor.getClassLoaderConfiguration().getExportedResources());
   }
 
   private Set<String> sanitizeExportedPackages(ClassLoaderLookupPolicy classLoaderLookupPolicy,

@@ -14,7 +14,8 @@ import static com.google.common.collect.Sets.newHashSet;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
 
@@ -24,10 +25,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * {@link ClassLoaderModel.ClassLoaderModelBuilder ClassLoaderModelBuilder} that adds the concept of Shared Library for the
+ * {@link ClassLoaderConfigurationBuilder ClassLoaderConfigurationBuilder} that adds the concept of Shared Library for the
  * configured dependencies.
  */
-public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
+public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfigurationBuilder {
 
   private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
   private final File artifactFolder;
@@ -43,7 +44,7 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.
   }
 
   @Override
-  public ClassLoaderModel build() {
+  public ClassLoaderConfiguration build() {
     exportSharedLibrariesResourcesAndPackages();
     processAdditionalPluginLibraries();
 

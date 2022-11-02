@@ -14,7 +14,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
-import static org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder.CLASS_LOADER_MODEL_VERSION_110;
+import static org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderConfigurationBuilder.CLASS_LOADER_MODEL_VERSION_110;
 import static org.mule.tck.ZipUtils.compress;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
 

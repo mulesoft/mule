@@ -31,7 +31,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
@@ -94,9 +94,9 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   }
 
   @Override
-  protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+  protected ClassLoaderConfiguration getClassLoaderConfiguration(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     return new DeployableClassLoaderConfigurationAssembler(deployableProjectModel, muleArtifactLoaderDescriptor)
-        .createClassLoaderModel();
+        .createClassLoaderConfiguration();
   }
 
   @Override
@@ -147,7 +147,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(DeployableArtifactDescriptor descriptor) {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
-    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderModel().getDependencies()) {
+    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderConfiguration().getDependencies()) {
       BundleDescriptor bundleDescriptor = bundlePluginDependency.getDescriptor();
       if (bundleDescriptor.isPlugin()) {
         if (bundlePluginDependency.getBundleUri() == null) {

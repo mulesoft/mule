@@ -31,7 +31,7 @@ public class PolicyTemplateClassLoaderFactory implements DeployableArtifactClass
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = parent.getClassLoaderLookupPolicy();
 
     MuleDeployableArtifactClassLoader deployableArtifactClassLoader =
-        new MuleDeployableArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
+        new MuleDeployableArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
                                               parent.getClassLoader(),
                                               classLoaderLookupPolicy);
 

@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_POLICY_ISOLATION_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.NULL_CLASSLOADER_CONFIGURATION;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyExtensionManagerFactory.HTTP_EXTENSION_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyExtensionManagerFactory.SOCKETS_EXTENSION_NAME;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -62,6 +62,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -260,7 +261,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
         .setArtifactId(name)
         .setVersion("1.0.0")
         .build());
-    when(artifactPluginDescriptor.getClassLoaderModel()).thenReturn(NULL_CLASSLOADER_MODEL);
+    when(artifactPluginDescriptor.getClassLoaderConfiguration()).thenReturn(NULL_CLASSLOADER_CONFIGURATION);
 
     ArtifactPlugin artifactPlugin = mock(ArtifactPlugin.class);
     when(artifactPlugin.getDescriptor()).thenReturn(artifactPluginDescriptor);

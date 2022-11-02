@@ -61,8 +61,8 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
 
     return new MuleApplicationClassLoader(artifactId, descriptor, parent.getClassLoader(),
                                           nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
-                                                                            descriptor.getClassLoaderModel().getUrls()),
-                                          Arrays.asList(descriptor.getClassLoaderModel().getUrls()),
+                                                                            descriptor.getClassLoaderConfiguration().getUrls()),
+                                          Arrays.asList(descriptor.getClassLoaderConfiguration().getUrls()),
                                           classLoaderLookupPolicy);
   }
 
@@ -78,7 +78,7 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
     final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
-      artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
+      artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages()
           .forEach(p -> pluginsLookupStrategies.put(p, PARENT_FIRST));
     }
 

@@ -11,6 +11,9 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDesc
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -37,8 +40,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -55,6 +58,9 @@ import java.util.Set;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -63,6 +69,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Stories({@Story(ARTIFACT_DESCRIPTORS), @Story(CLASSLOADER_CONFIGURATION)})
 public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCase {
 
   private static final String FOO_PLUGIN = "foo";
@@ -174,7 +182,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void resolvesPluginOrderedDependency() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
+    barPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
@@ -186,7 +195,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void resolvesPluginDisorderedDependency() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(barPlugin, fooPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
+    barPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
@@ -202,7 +212,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     updatedFooPlugin.setBundleDescriptor(createTestBundleDescriptor(FOO_PLUGIN, "1.1"));
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(updatedFooPlugin, barPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
         .dependingOn(singleton(createBundleDependency(FOO_BUNDLE_DESCRIPTOR))).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
@@ -219,7 +229,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     updatedFooPlugin.setBundleDescriptor(createTestBundleDescriptor(FOO_PLUGIN, "1.1-SNAPSHOT"));
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(updatedFooPlugin, barPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
         .dependingOn(singleton(createBundleDependency(FOO_BUNDLE_DESCRIPTOR))).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
@@ -237,7 +247,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(updatedFooPlugin, barPlugin);
     BundleDescriptor fooBundleDescriptor = createTestBundleDescriptor(FOO_PLUGIN, "1.0-SNAPSHOT");
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
         .dependingOn(singleton(createBundleDependency(fooBundleDescriptor))).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
@@ -253,7 +263,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     ArtifactPluginDescriptor majorUpdatedFooPlugin = new ArtifactPluginDescriptor(FOO_PLUGIN);
     majorUpdatedFooPlugin.setBundleDescriptor(createTestBundleDescriptor(FOO_PLUGIN, "2.0"));
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(majorUpdatedFooPlugin, barPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
         .dependingOn(singleton(createBundleDependency(FOO_BUNDLE_DESCRIPTOR))).build());
 
     dependenciesResolver.resolve(emptySet(), pluginDescriptors, true);
@@ -267,7 +277,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin);
 
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
         .dependingOn(singleton(createBundleDependency(majorUpdatedFooPlugin.getBundleDescriptor()))).build());
 
     dependenciesResolver.resolve(emptySet(), pluginDescriptors, true);
@@ -276,7 +286,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void detectsUnresolvablePluginDependency() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin);
-    fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(BAR_PLUGIN_DESCRIPTOR)).build());
+    fooPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(BAR_PLUGIN_DESCRIPTOR)).build());
 
     expectedException.expect(PluginResolutionError.class);
     expectedException.expectMessage(format(DEPENDENCY_PROVIDER_ERROR_MESSAGE, BAR_BUNDLE_DESCRIPTOR));
@@ -286,8 +297,10 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void resolvesTransitiveDependencies() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin, bazPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
-    bazPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
+    barPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
+    bazPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
@@ -299,8 +312,10 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void resolvesMultipleDependencies() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(bazPlugin, barPlugin, fooPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
-    bazPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
+    barPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
+    bazPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
@@ -312,9 +327,12 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void resolvesPluginWithNewestVersionOnDependency() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(barPlugin, bazPlugin, fooPlugin);
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(LATEST_BAZ_PLUGIN_DESCRIPTOR)).build());
-    bazPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
-    latestBazPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
+        .dependingOn(singleton(LATEST_BAZ_PLUGIN_DESCRIPTOR)).build());
+    bazPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
+    latestBazPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
 
     when(artifactDescriptorFactory
         .create(argThat(hasProperty("absolutePath", endsWith(latestBazPlugin.getBundleDescriptor().getArtifactFileName()))),
@@ -330,9 +348,12 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   @Test
   public void resolvesDependenciesTwoVersionWhenLatestComesFromTransitiveMinor() throws Exception {
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, latestEchoPlugin, bazPlugin);
-    latestEchoPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
-    fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(ECHO_PLUGIN_DESCRIPTOR)).build());
-    echoPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(LATEST_BAZ_PLUGIN_DESCRIPTOR)).build());
+    latestEchoPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
+    fooPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(ECHO_PLUGIN_DESCRIPTOR))
+        .build());
+    echoPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
+        .dependingOn(singleton(LATEST_BAZ_PLUGIN_DESCRIPTOR)).build());
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
@@ -343,9 +364,10 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
   @Test
   public void sanitizesDependantPluginExportedPackages() throws Exception {
-    fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getFooExportedPackages()).build());
+    fooPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(getFooExportedPackages()).build());
 
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR))
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR))
         .exportingPackages(getBarExportedPackages()).build());
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin);
@@ -361,12 +383,14 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
   @Test
   public void sanitizesTransitiveDependantPluginExportedPackages() throws Exception {
-    fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getFooExportedPackages()).build());
+    fooPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(getFooExportedPackages()).build());
 
-    bazPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getBazExportedPackages())
+    bazPlugin.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(getBazExportedPackages())
         .dependingOn(singleton(FOO_PLUGIN_DESCRIPTOR)).build());
 
-    barPlugin.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(getBarExportedPackages())
+    barPlugin.setClassLoaderConfiguration(new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
+        .exportingPackages(getBarExportedPackages())
         .dependingOn(singleton(BAZ_PLUGIN_DESCRIPTOR)).build());
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin, bazPlugin);
@@ -383,9 +407,11 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
   @Test
   public void detectsDuplicateExportedPackagesOnIndependentPlugins() throws Exception {
-    fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getFooExportedPackages()).build());
+    fooPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(getFooExportedPackages()).build());
 
-    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getBarExportedPackages()).build());
+    barPlugin
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(getBarExportedPackages()).build());
 
     final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin);
 
@@ -464,8 +490,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   }
 
   private void assertPluginExportedPackages(ArtifactPluginDescriptor pluginDescriptor, String... exportedPackages) {
-    assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages().size(), equalTo(exportedPackages.length));
-    assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages(), containsInAnyOrder(exportedPackages));
+    assertThat(pluginDescriptor.getClassLoaderConfiguration().getExportedPackages().size(), equalTo(exportedPackages.length));
+    assertThat(pluginDescriptor.getClassLoaderConfiguration().getExportedPackages(), containsInAnyOrder(exportedPackages));
   }
 
   private List<ArtifactPluginDescriptor> createPluginDescriptors(ArtifactPluginDescriptor... descriptors) {

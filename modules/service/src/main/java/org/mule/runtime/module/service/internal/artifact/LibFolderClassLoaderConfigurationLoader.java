@@ -13,8 +13,9 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVER_PLU
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
@@ -30,12 +31,12 @@ import java.util.Set;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
- * This class is responsible for loading the {@link ClassLoaderModelLoader} for artifacts that uses a lib folder to store
+ * This class is responsible for loading the {@link ClassLoaderConfigurationLoader} for artifacts that uses a lib folder to store
  * dependencies, like {@link ArtifactType#SERVICE} and {@link ArtifactType#SERVER_PLUGIN}
  *
  * @since 4.0
  */
-public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
+public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
 
   static final String LIB_FOLDER = "lib";
 
@@ -50,20 +51,20 @@ public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
   }
 
   @Override
-  public ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
+  public ClassLoaderConfiguration load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
     if (artifactFile == null || !artifactFile.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: "
           + (artifactFile != null ? artifactFile.getName() : null));
     }
 
-    ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
-    classLoaderModelBuilder.containing(getUrl(artifactFile));
+    ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder();
+    classLoaderConfigurationBuilder.containing(getUrl(artifactFile));
     for (URL url : getServiceUrls(artifactFile)) {
-      classLoaderModelBuilder.containing(url);
+      classLoaderConfigurationBuilder.containing(url);
     }
 
-    return classLoaderModelBuilder.build();
+    return classLoaderConfigurationBuilder.build();
   }
 
   private URL getUrl(File file) {

@@ -8,6 +8,8 @@
 package org.mule.runtime.deployment.model.internal;
 
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_GENERATION;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -45,7 +47,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -55,11 +58,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.ArgumentCaptor;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Story(CLASSLOADER_GENERATION)
 public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String REGION_ID = "regionId";
@@ -170,7 +177,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
         .setBundleUri(new File("test").toURI())
         .build();
     plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     artifactPluginDescriptors.add(plugin1Descriptor);
@@ -219,16 +226,16 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
   @Test
   public void createsPluginWithPrivilegedPluginAccess() {
-    ClassLoaderModel plugin1ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+    ClassLoaderConfiguration plugin1ClassLoaderConfiguration = new ClassLoaderConfigurationBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID2)).build();
-    plugin1Descriptor.setClassLoaderModel(plugin1ClassLoaderModel);
+    plugin1Descriptor.setClassLoaderConfiguration(plugin1ClassLoaderConfiguration);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(BundleScope.COMPILE).setDescriptor(
                                                                                                                    PLUGIN1_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
         .build();
     plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
+        .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().dependingOn(singleton(pluginDependency)).build());
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     artifactPluginDescriptors.add(plugin1Descriptor);

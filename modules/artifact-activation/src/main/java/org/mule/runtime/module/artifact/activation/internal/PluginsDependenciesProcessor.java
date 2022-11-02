@@ -59,7 +59,7 @@ public class PluginsDependenciesProcessor {
         .forEach(apd -> depsGraph.addVertex(apd.getBundleDescriptor()));
     artifactPlugins
         .stream()
-        .forEach(apd -> apd.getClassLoaderModel().getDependencies().stream()
+        .forEach(apd -> apd.getClassLoaderConfiguration().getDependencies().stream()
             .filter(dep -> dep.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false)
                 // account for dependencies from parent artifact
                 // TODO W-10927591 use the data form the extension model instead of assuming this (check with the failing test
