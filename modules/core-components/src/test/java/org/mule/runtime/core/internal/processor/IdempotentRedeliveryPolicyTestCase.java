@@ -250,7 +250,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void objectStoreIsNotClosedOnDisposeWhenItIsNotOwnedByTheRedeliveryPolicy() throws Exception {
+  public void objectStoreIsNotClosedOnDisposeWhenTheRedeliveryPolicyReferencesItByName() throws Exception {
     irp.setObjectStore(mockObjectStore);
     irp.initialise();
     irp.dispose();
@@ -258,7 +258,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void objectStoreIsNotRemovedOnDisposeWhenItIsNotOwnedByTheRedeliveryPolicy() throws Exception {
+  public void objectStoreIsNotRemovedOnDisposeWhenTheRedeliveryPolicyReferencesItByName() throws Exception {
     irp.setObjectStore(mockObjectStore);
     irp.initialise();
     irp.dispose();
