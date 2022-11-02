@@ -54,13 +54,13 @@ public class MuleSdkErrorsDeclarationParser {
 
   public Map<ComponentIdentifier, ErrorModelParser> parse() {
     if (parserByIdentifier == null) {
-      parserByIdentifier = actualParse(extensionComponentAst, extensionErrorNamespace);
+      parserByIdentifier = doParse(extensionComponentAst, extensionErrorNamespace);
     }
     return parserByIdentifier;
   }
 
-  private static Map<ComponentIdentifier, ErrorModelParser> actualParse(ComponentAst extensionComponentAst,
-                                                                        String extensionErrorNamespace) {
+  private static Map<ComponentIdentifier, ErrorModelParser> doParse(ComponentAst extensionComponentAst,
+                                                                    String extensionErrorNamespace) {
     // Just parse the mappings in the AST, without creating the ErrorModelParser yet.
     Map<ComponentIdentifier, ComponentIdentifier> errorIdToParentId =
         extractMappingFromErrorsToParent(extensionComponentAst, extensionErrorNamespace);
