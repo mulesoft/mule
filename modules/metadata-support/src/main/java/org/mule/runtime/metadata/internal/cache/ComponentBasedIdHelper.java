@@ -93,7 +93,7 @@ public class ComponentBasedIdHelper {
         .orElse(emptyList());
   }
 
-  public static MetadataCacheId resolveDslTagId(ComponentAst elementModel) {
+  public static MetadataCacheId resolveComponentIdentifierMetadataCacheId(ComponentAst elementModel) {
     final ComponentIdentifier id = elementModel.getIdentifier();
     return new MetadataCacheId(id.hashCode(), id.toString());
   }

@@ -8,7 +8,7 @@ package org.mule.runtime.metadata.internal.cache;
 
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.parameterNamesRequiredForMetadataCacheId;
-import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveDslTagId;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveComponentIdentifierMetadataCacheId;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveKeyFromSimpleValue;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveMetadataKeyParts;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.sourceElementName;
@@ -33,16 +33,18 @@ import java.util.stream.Stream;
 
 public class AstConfigurationMetadataCacheIdGenerator implements ConfigurationMetadataCacheIdGenerator {
 
+  // configInternals keeps the ids just considering the child elements of the Config
+  private final Map<String, LazyValue<MetadataCacheId>> configInternals = new HashMap<>();
+  // configIds keeps the ids of the entire config (considering the config parameters, as well as the internal ones)
   private final Map<String, LazyValue<MetadataCacheId>> configIds = new HashMap<>();
-  private final Map<String, LazyValue<MetadataCacheId>> configAsGlobalsIds = new HashMap<>();
 
   @Override
-  public Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean asGlobalElement) {
+  public Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean justProviders) {
     if (isBlank(configName)) {
       return empty();
     }
 
-    Map<String, LazyValue<MetadataCacheId>> ids = asGlobalElement ? configAsGlobalsIds : configIds;
+    Map<String, LazyValue<MetadataCacheId>> ids = justProviders ? configInternals : configIds;
 
     MetadataCacheId result = ids.containsKey(configName) ? ids.get(configName).get() : null;
     return ofNullable(result);
@@ -51,25 +53,25 @@ public class AstConfigurationMetadataCacheIdGenerator implements ConfigurationMe
   @Override
   public void addConfiguration(ComponentAst configAst) {
     String configLocation = configAst.getLocation().getRootContainerName();
-    configAsGlobalsIds.put(configLocation, new LazyValue<>(() -> resolveGlobalElement(configAst)));
+    configInternals.put(configLocation, new LazyValue<>(() -> resolveInternalComponents(configAst)));
     configIds.put(configLocation, new LazyValue<>(() -> doResolve(configAst)));
   }
 
   private MetadataCacheId doResolve(ComponentAst elementModel) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
-    keyParts.add(resolveDslTagId(elementModel));
+    keyParts.add(resolveComponentIdentifierMetadataCacheId(elementModel));
 
     elementModel.getModel(ComponentModel.class)
         .map(model -> resolveMetadataKeyParts(elementModel, model, true,
                                               configName -> getConfigMetadataCacheId(configName, false)))
-        .orElseGet(() -> ofNullable(resolveGlobalElement(elementModel)))
+        .orElseGet(() -> ofNullable(resolveInternalComponents(elementModel)))
         .ifPresent(keyParts::add);
 
     return new MetadataCacheId(keyParts, sourceElementName(elementModel));
   }
 
-  private MetadataCacheId resolveGlobalElement(ComponentAst elementModel) {
+  private MetadataCacheId resolveInternalComponents(ComponentAst elementModel) {
     List<String> parameterNamesRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel);
 
     List<MetadataCacheId> parts = Stream.concat(

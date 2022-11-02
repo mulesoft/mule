@@ -22,11 +22,11 @@ public interface ConfigurationMetadataCacheIdGenerator {
   /**
    * Returns the {@link MetadataCacheId} corresponding to the configuration.
    * 
-   * @param configName      - the configuration name to get the {@link MetadataCacheId}
-   * @param asGlobalElement - if true, it will return the id corresponding to the calculation of this config as a global element.
-   *                        If false, it will return the id corresponding to a referenced value.
+   * @param configName    the configuration name to get the {@link MetadataCacheId} for
+   * @param justProviders if true, it will return the id corresponding to the calculation of this config internal/child elements.
+   *                      If false, it will return the id of the whole config.
    */
-  Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean asGlobalElement);
+  Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean justProviders);
 
   /**
    * Adds the config to be considered when getting the Cache Ids. If the config was already set before, the values will be

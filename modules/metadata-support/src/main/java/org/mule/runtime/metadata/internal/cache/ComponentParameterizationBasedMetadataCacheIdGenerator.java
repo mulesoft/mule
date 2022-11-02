@@ -118,7 +118,7 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (parameterization.getModel() instanceof ConfigurationModel) {
-      resolveDslTagId(parameterization).ifPresent(keyParts::add);
+      resolveComponentIdentifierMetadataCacheId(parameterization).ifPresent(keyParts::add);
       if (parameterization.getModel() instanceof ComponentModel) {
         keyParts.add(resolveStereotypeId((ComponentModel) parameterization.getModel()));
       }
@@ -146,7 +146,7 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
 
     resolveCategoryId(parameterization).ifPresent(keyParts::add);
 
-    resolveDslTagId(parameterization).ifPresent(keyParts::add);
+    resolveComponentIdentifierMetadataCacheId(parameterization).ifPresent(keyParts::add);
 
     if (parameterization.getModel() instanceof ComponentModel) {
       resolveMetadataKeyParts(parameterization, (ComponentModel) parameterization.getModel(), true).ifPresent(keyParts::add);
@@ -171,7 +171,7 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (typeInformation.isDynamicType()) {
-      resolveDslTagNamespace(parameterization).ifPresent(keyParts::add);
+      resolveComponentExtensionMetadataCacheId(parameterization).ifPresent(keyParts::add);
       resolveConfigId(parameterization).ifPresent(keyParts::add);
 
       typeInformation.getResolverCategory()
@@ -186,7 +186,7 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
                                 typeInformation.shouldIncludeConfiguredMetadataKeys()).ifPresent(keyParts::add);
       }
     } else {
-      resolveDslTagId(parameterization).ifPresent(keyParts::add);
+      resolveComponentIdentifierMetadataCacheId(parameterization).ifPresent(keyParts::add);
 
       if (parameterization.getModel() instanceof ConfigurationModel) {
         resolveNamedConfigId(parameterization).ifPresent(keyParts::add);
@@ -202,16 +202,16 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
                                       .orElse(format("(%s):(%s)", sourceElementName(parameterization), "Unknown Type"))));
   }
 
-  private Optional<MetadataCacheId> resolveDslTagNamespace(ComponentParameterization<?> parameterization) {
+  private Optional<MetadataCacheId> resolveComponentExtensionMetadataCacheId(ComponentParameterization<?> parameterization) {
     return parameterization.getComponentIdentifier().map(ComponentIdentifier::getNamespace)
         .map(namespace -> new MetadataCacheId(namespace.toLowerCase().hashCode(), namespace));
   }
 
-  private Optional<MetadataCacheId> resolveDslTagId(ComponentParameterization<?> parameterization) {
-    return parameterization.getComponentIdentifier().map(this::resolveIdentifier);
+  private Optional<MetadataCacheId> resolveComponentIdentifierMetadataCacheId(ComponentParameterization<?> parameterization) {
+    return parameterization.getComponentIdentifier().map(this::resolveForIdentifier);
   }
 
-  private MetadataCacheId resolveIdentifier(ComponentIdentifier id) {
+  private MetadataCacheId resolveForIdentifier(ComponentIdentifier id) {
     return new MetadataCacheId(id.hashCode(), id.toString());
   }
 

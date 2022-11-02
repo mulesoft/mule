@@ -11,7 +11,7 @@ import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.ge
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.parameterNamesRequiredForMetadataCacheId;
-import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveDslTagId;
+import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveComponentIdentifierMetadataCacheId;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveKeyFromSimpleValue;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveMetadataKeyParts;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -109,7 +109,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
     return of(elementModel.getModel(ConfigurationModel.class)
         .map(cfgModel -> {
-          keyParts.add(resolveDslTagId(elementModel));
+          keyParts.add(resolveComponentIdentifierMetadataCacheId(elementModel));
 
           resolveGlobalElement(elementModel).ifPresent(keyParts::add);
 
@@ -123,7 +123,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
             return new MetadataCacheId(keyParts, sourceElementName(elementModel));
           }
 
-          return resolveDslTagId(elementModel);
+          return resolveComponentIdentifierMetadataCacheId(elementModel);
         }));
   }
 
@@ -156,7 +156,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
           .ifPresent(keyParts::add);
     } else {
-      keyParts.add(resolveDslTagId(component));
+      keyParts.add(resolveComponentIdentifierMetadataCacheId(component));
 
       component.getModel(ConfigurationModel.class)
           .flatMap(cfgModel -> resolveGlobalElement(component))
@@ -184,7 +184,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
     resolveCategoryId(elementModel).ifPresent(keyParts::add);
 
-    keyParts.add(resolveDslTagId(elementModel));
+    keyParts.add(resolveComponentIdentifierMetadataCacheId(elementModel));
 
     elementModel.getModel(ComponentModel.class)
         .map(model -> resolveMetadataKeyParts(elementModel, model, true, this::getHashedGlobal))
