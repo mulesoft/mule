@@ -86,13 +86,14 @@ public class MuleSdkExtensionExtensionModelDeclarer {
   }
 
   private void declareErrorsComponent(ConstructDeclarer extensionDeclarer) {
-    NestedComponentDeclarer<?, ?> errorsDef = extensionDeclarer.withComponent(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
+    NestedComponentDeclarer<?, ?> errorsDef = extensionDeclarer.withOptionalComponent(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
         .describedAs("Top level element of an extension that contains the errors that the extension's operations are able to raise.")
-        .withMinOccurs(1)
+        .withMinOccurs(0)
         .withMaxOccurs(1);
 
     NestedComponentDeclarer<?, ?> eachErrorDef = errorsDef.withOptionalComponent(MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME)
-        .describedAs("Declares an error, and may define the parent.");
+        .describedAs("Declares an error, and may define the parent.")
+        .withMinOccurs(0);
 
     ParameterGroupDeclarer<?> eachErrorParams = eachErrorDef.onDefaultParameterGroup();
     eachErrorParams.withRequiredParameter("type")
