@@ -20,11 +20,12 @@ import java.util.Optional;
 public interface ConfigurationMetadataCacheIdGenerator {
 
   /**
-   * Returns the {@link MetadataCacheId} corresponding to the configuration.
-   * 
    * @param configName    the configuration name to get the {@link MetadataCacheId} for
    * @param justProviders if true, it will return the id corresponding to the calculation of this config internal/child elements.
    *                      If false, it will return the id of the whole config.
+   * @return the {{@link MetadataCacheId} corresponding to the configuration}. In case the config was not provided previously
+   *         using {@link #addConfiguration(ComponentAst) AddConfiguration}. This could happen, for example, when just performing
+   *         a Type Resolution, without Propagation.
    */
   Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean justProviders);
 
