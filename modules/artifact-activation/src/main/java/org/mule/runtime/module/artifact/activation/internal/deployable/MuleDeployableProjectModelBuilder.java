@@ -99,9 +99,15 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
   private static final String ARTIFACT_ID = "artifactId";
 
   private final File projectFolder;
+  private Optional<MuleDeployableModel> model;
 
   public MuleDeployableProjectModelBuilder(File projectFolder) {
     this.projectFolder = projectFolder;
+  }
+
+  public MuleDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model) {
+    this.projectFolder = projectFolder;
+    this.model = model;
   }
 
   @Override
@@ -414,14 +420,16 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
   }
 
   private Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
-    final File muleArtifactFolder = new File(projectFolder, MULE_ARTIFACT_FOLDER);
-    if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
-      return () -> applicationModelResolver().resolve(muleArtifactFolder);
-    } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
-      return () -> domainModelResolver().resolve(muleArtifactFolder);
-    } else {
-      throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
-    }
+    return () -> model.orElseGet(() -> {
+      final File muleArtifactFolder = new File(projectFolder, MULE_ARTIFACT_FOLDER);
+      if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
+        return applicationModelResolver().resolve(muleArtifactFolder);
+      } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
+        return domainModelResolver().resolve(muleArtifactFolder);
+      } else {
+        throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
+      }
+    });
   }
 
   private BundleDescriptor buildBundleDescriptor(ArtifactCoordinates artifactCoordinates) {

@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -35,9 +36,19 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
   private final boolean isDomain;
   private final File projectFolder;
 
+  private Optional<MuleDeployableModel> model;
+
+
   public LightweightDeployableProjectModelBuilder(File projectFolder, boolean isDomain) {
     super(getDefaultMavenConfiguration());
     this.projectFolder = projectFolder;
+    this.isDomain = isDomain;
+  }
+
+  public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain) {
+    super(getDefaultMavenConfiguration());
+    this.projectFolder = projectFolder;
+    this.model = model;
     this.isDomain = isDomain;
   }
 
@@ -88,11 +99,13 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
   }
 
   private Supplier<MuleDeployableModel> getModelResolver() {
-    if (isDomain) {
-      return () -> domainModelResolver().resolve(new File(projectFolder, "META-INF/mule-artifact"));
-    } else {
-      return () -> applicationModelResolver().resolve(new File(projectFolder, "META-INF/mule-artifact"));
-    }
+    return () -> model.orElseGet(() -> {
+      if (isDomain) {
+        return domainModelResolver().resolve(new File(projectFolder, "META-INF/mule-artifact"));
+      } else {
+        return applicationModelResolver().resolve(new File(projectFolder, "META-INF/mule-artifact"));
+      }
+    });
   }
 
 }

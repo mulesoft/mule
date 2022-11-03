@@ -7,10 +7,14 @@
 
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import javax.swing.text.html.Option;
+
+import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
 
 import java.io.File;
+import java.util.Optional;
 
 public abstract class AbstractDeployableProjectModelBuilder implements DeployableProjectModelBuilder {
 
@@ -43,11 +47,13 @@ public abstract class AbstractDeployableProjectModelBuilder implements Deployabl
     }
   }
 
-  public static AbstractDeployableProjectModelBuilder defaultDeployableProjectModelBuilder(File projectFolder, boolean isDomain) {
+  public static AbstractDeployableProjectModelBuilder defaultDeployableProjectModelBuilder(File projectFolder,
+                                                                                           Optional<MuleDeployableModel> model,
+                                                                                           boolean isDomain) {
     if (isHeavyPackage(projectFolder)) {
-      return new MuleDeployableProjectModelBuilder(projectFolder);
+      return new MuleDeployableProjectModelBuilder(projectFolder, model);
     } else {
-      return new LightweightDeployableProjectModelBuilder(projectFolder, isDomain);
+      return new LightweightDeployableProjectModelBuilder(projectFolder, model, isDomain);
     }
   }
 

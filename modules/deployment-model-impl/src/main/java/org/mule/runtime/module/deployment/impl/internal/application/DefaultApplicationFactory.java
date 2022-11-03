@@ -31,6 +31,7 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
+import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolutionException;
@@ -142,10 +143,15 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   @Override
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
+    return createArtifactDescriptor(artifactLocation, createDeployableProjectModel(artifactLocation, false),
+                                    deploymentProperties);
+  }
+
+  public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, DeployableProjectModel model,
+                                                        Optional<Properties> deploymentProperties) {
     return deployableArtifactDescriptorFactory
-        .createApplicationDescriptor(createDeployableProjectModel(artifactLocation, false),
-                                     deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                         .orElse(emptyMap()),
+        .createApplicationDescriptor(model, deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
+            .orElse(emptyMap()),
                                      (domainName,
                                       bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
                                                                                   artifactLocation)
