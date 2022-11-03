@@ -33,14 +33,12 @@ import java.util.stream.Stream;
 
 public class AstConfigurationMetadataCacheIdGenerator implements ConfigurationMetadataCacheIdGenerator {
 
-  private static final int CACHE_SIZE = 1000;
-
   // configInternals keeps the ids just considering the child elements of the Config
   private final LoadingCache<String, LazyValue<MetadataCacheId>> configInternals =
-      newBuilder().maximumSize(CACHE_SIZE).build(config -> new LazyValue<>(() -> null));
+      newBuilder().build(config -> new LazyValue<>(() -> null));
   // configIds keeps the ids of the entire config (considering the config parameters, as well as the internal ones)
   private final LoadingCache<String, LazyValue<MetadataCacheId>> configIds =
-      newBuilder().maximumSize(CACHE_SIZE).build(config -> new LazyValue<>(() -> null));
+      newBuilder().build(config -> new LazyValue<>(() -> null));
 
   @Override
   public Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean justProviders) {
