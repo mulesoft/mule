@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://www.mulesoft.org/schema/mule/mule-extension"
+           xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+           xmlns:core="http://www.mulesoft.org/schema/mule/core"
+           xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+           xsi:schemaLocation="http://www.mulesoft.org/schema/mule/mule-extension http://www.mulesoft.org/schema/mule/mule-extension/current/mule-extension.xsd
+                               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+                               http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd">
+    <description name="Errors"/>
+
+    <errors>
+        <error type="CUSTOM" parent="MULE:ANY" />
+        <error type="ONE" />
+        <error type="OTHER" parent="ONE" />
+    </errors>
+
+    <operation:def name="raiseCustom">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <operation:raise-error type="CUSTOM" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="raiseOther">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <operation:raise-error type="OTHER" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="silencingOneAndRaisingOther">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <core:try>
+                <operation:raise-error type="ONE" />
+                <core:error-handler>
+                    <core:on-error-continue>
+                        <operation:raise-error type="OTHER" />
+                    </core:on-error-continue>
+                </core:error-handler>
+            </core:try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="heisenbergCureCancer">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <heisenberg:cure-cancer />
+        </operation:body>
+    </operation:def>
+</extension>
