@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.metadata.internal.cache;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.parameterNamesRequiredForMetadataCacheId;
 import static org.mule.runtime.metadata.internal.cache.ComponentBasedIdHelper.resolveComponentIdentifierMetadataCacheId;
@@ -18,7 +17,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
@@ -27,18 +25,18 @@ import org.mule.runtime.metadata.api.cache.ConfigurationMetadataCacheIdGenerator
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class AstConfigurationMetadataCacheIdGenerator implements ConfigurationMetadataCacheIdGenerator {
 
   // configInternals keeps the ids just considering the child elements of the Config
-  private final LoadingCache<String, LazyValue<MetadataCacheId>> configInternals =
-      newBuilder().build(config -> new LazyValue<>(() -> null));
+  private final Map<String, LazyValue<MetadataCacheId>> configInternals = new HashMap<>();
   // configIds keeps the ids of the entire config (considering the config parameters, as well as the internal ones)
-  private final LoadingCache<String, LazyValue<MetadataCacheId>> configIds =
-      newBuilder().build(config -> new LazyValue<>(() -> null));
+  private final Map<String, LazyValue<MetadataCacheId>> configIds = new HashMap<>();
 
   @Override
   public Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean justProviders) {
@@ -46,8 +44,10 @@ public class AstConfigurationMetadataCacheIdGenerator implements ConfigurationMe
       return empty();
     }
 
-    LoadingCache<String, LazyValue<MetadataCacheId>> ids = justProviders ? configInternals : configIds;
-    return ofNullable(ids.get(configName).get());
+    Map<String, LazyValue<MetadataCacheId>> ids = justProviders ? configInternals : configIds;
+
+    MetadataCacheId result = ids.containsKey(configName) ? ids.get(configName).get() : null;
+    return ofNullable(result);
   }
 
   @Override
