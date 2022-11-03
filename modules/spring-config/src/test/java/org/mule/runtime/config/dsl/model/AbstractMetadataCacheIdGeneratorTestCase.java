@@ -8,8 +8,11 @@ package org.mule.runtime.config.dsl.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CONFIG;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.createComponentParameterizationFromComponentAst;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -20,9 +23,13 @@ import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
+import org.mule.runtime.metadata.api.cache.ConfigurationMetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.ComponentAstBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCacheIdGenerator;
+import org.mule.runtime.metadata.internal.cache.ComponentParameterizationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.DslElementBasedMetadataCacheIdGenerator;
+import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.metadata.internal.cache.AstConfigurationMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
@@ -72,7 +79,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
         createDslBasedGenerator(app, dslFactory).getIdForComponentOutputMetadata(dslFactory.create(component).get()).get();
     MetadataCacheId declarationBasedId =
         createDeclarationBasedGenerator(declaration).getIdForComponentOutputMetadata(elementDeclaration).get();
+    MetadataCacheId parameterizationBasedId = createComponentParameterizationBasedGenerator(app)
+        .getIdForComponentOutputMetadata(createComponentParameterizationFromComponentAst(component)).get();
 
+    assertThat(parameterizationBasedId, equalTo(modelBasedId));
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
     assertThat(declarationBasedId, equalTo(astBasedId));
@@ -96,7 +106,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
         createDslBasedGenerator(app, dslFactory).getIdForComponentAttributesMetadata(dslFactory.create(component).get()).get();
     MetadataCacheId declarationBasedId =
         createDeclarationBasedGenerator(declaration).getIdForComponentAttributesMetadata(elementDeclaration).get();
+    MetadataCacheId parameterizationBasedId = createComponentParameterizationBasedGenerator(app)
+        .getIdForComponentAttributesMetadata(createComponentParameterizationFromComponentAst(component)).get();
 
+    assertThat(parameterizationBasedId, equalTo(modelBasedId));
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
     assertThat(declarationBasedId, equalTo(astBasedId));
@@ -120,7 +133,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
         .getIdForComponentInputMetadata(dslFactory.create(component).get(), parameterName).get();
     MetadataCacheId declarationBasedId =
         createDeclarationBasedGenerator(declaration).getIdForComponentInputMetadata(elementDeclaration, parameterName).get();
+    MetadataCacheId parameterizationBasedId = createComponentParameterizationBasedGenerator(app)
+        .getIdForComponentInputMetadata(createComponentParameterizationFromComponentAst(component), parameterName).get();
 
+    assertThat(parameterizationBasedId, equalTo(modelBasedId));
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
     assertThat(declarationBasedId, equalTo(astBasedId));
@@ -143,7 +159,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
         createDslBasedGenerator(app, dslFactory).getIdForComponentMetadata(dslFactory.create(component).get()).get();
     MetadataCacheId declarationBasedId =
         createDeclarationBasedGenerator(declaration).getIdForComponentMetadata(elementDeclaration).get();
+    MetadataCacheId parameterizationBasedId = createComponentParameterizationBasedGenerator(app)
+        .getIdForComponentMetadata(createComponentParameterizationFromComponentAst(component)).get();
 
+    assertThat(parameterizationBasedId, equalTo(modelBasedId));
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
     assertThat(declarationBasedId, equalTo(astBasedId));
@@ -166,7 +185,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
         createDslBasedGenerator(app, dslFactory).getIdForMetadataKeys(dslFactory.create(component).get()).get();
     MetadataCacheId declarationBasedId =
         createDeclarationBasedGenerator(declaration).getIdForMetadataKeys(elementDeclaration).get();
+    MetadataCacheId parameterizationBasedId = createComponentParameterizationBasedGenerator(app)
+        .getIdForMetadataKeys(createComponentParameterizationFromComponentAst(component)).get();
 
+    assertThat(parameterizationBasedId, equalTo(modelBasedId));
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
     assertThat(declarationBasedId, equalTo(astBasedId));
@@ -189,7 +211,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
         createDslBasedGenerator(app, dslFactory).getIdForGlobalMetadata(dslFactory.create(component).get()).get();
     MetadataCacheId declarationBasedId =
         createDeclarationBasedGenerator(declaration).getIdForGlobalMetadata(elementDeclaration).get();
+    MetadataCacheId parameterizationBasedId = createComponentParameterizationBasedGenerator(app)
+        .getIdForGlobalMetadata(createComponentParameterizationFromComponentAst(component)).get();
 
+    assertThat(parameterizationBasedId, equalTo(modelBasedId));
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
     assertThat(declarationBasedId, equalTo(astBasedId));
@@ -212,6 +237,13 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
     ComponentLocator<ComponentAst> astLocator = new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app);
     ComponentLocator<DslElementModel<?>> dslLocator = l -> astLocator.get(l).map(e -> factory.create(e).orElse(null));
     return new DslElementBasedMetadataCacheIdGenerator(dslLocator);
+  }
+
+  private MetadataCacheIdGenerator<ComponentParameterization<?>> createComponentParameterizationBasedGenerator(ArtifactAst app) {
+    ConfigurationMetadataCacheIdGenerator configGenerator = new AstConfigurationMetadataCacheIdGenerator();
+    configGenerator.addConfigurations(app.topLevelComponentsStream()
+        .filter(potentialConfig -> potentialConfig.getComponentType().equals(CONFIG)).collect(toList()));
+    return new ComponentParameterizationBasedMetadataCacheIdGenerator(configGenerator);
   }
 
   private MetadataCacheIdGenerator<ElementDeclaration> createDeclarationBasedGenerator(ArtifactDeclaration app) {
