@@ -47,18 +47,20 @@ import java.util.stream.Stream;
  */
 public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionModelParser implements ExtensionModelParser {
 
-  private final ArtifactAst ast;
   private final TypeLoader typeLoader;
-  private final List<OperationModelParser> operationModelParsers;
+  private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
 
   public MuleSdkExtensionModelParser(ArtifactAst ast,
                                      TypeLoader typeLoader,
                                      ExtensionModelHelper extensionModelHelper) {
-    this.ast = ast;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    operationModelParsers = computeOperationModelParsers();
+    init(ast);
+  }
+
+  protected void init(ArtifactAst ast) {
+    operationModelParsers = computeOperationModelParsers(ast);
   }
 
   @Override
@@ -157,11 +159,11 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
    */
   protected abstract Stream<ComponentAst> getTopLevelElements(ArtifactAst ast);
 
-  private List<OperationModelParser> computeOperationModelParsers() {
+  private List<OperationModelParser> computeOperationModelParsers(ArtifactAst ast) {
     final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
         getTopLevelElements(ast)
             .filter(c -> c.getComponentType() == OPERATION_DEF)
-            .map(c -> new MuleSdkOperationModelParserSdk(c, getNamespace(), typeLoader, extensionModelHelper))
+            .map(c -> createOperationModelParser(c, getNamespace()))
             .collect(toMap(c -> getSanitizedElementName(c::getName), identity()));
 
     // Some characteristics of the operation model parsers require knowledge about the other operation model parsers
@@ -169,5 +171,9 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
         .forEach(operationModelParser -> operationModelParser.computeCharacteristics(operationParsersByName));
 
     return new ArrayList<>(operationParsersByName.values());
+  }
+
+  protected MuleSdkOperationModelParserSdk createOperationModelParser(ComponentAst operation, String namespace) {
+    return new MuleSdkOperationModelParserSdk(operation, namespace, typeLoader, extensionModelHelper);
   }
 }
