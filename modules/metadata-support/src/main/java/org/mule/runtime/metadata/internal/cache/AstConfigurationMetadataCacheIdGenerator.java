@@ -51,10 +51,14 @@ public class AstConfigurationMetadataCacheIdGenerator implements ConfigurationMe
   }
 
   @Override
-  public void addConfiguration(ComponentAst configAst) {
-    String configLocation = configAst.getLocation().getRootContainerName();
-    configInternals.put(configLocation, new LazyValue<>(() -> resolveInternalComponents(configAst)));
-    configIds.put(configLocation, new LazyValue<>(() -> doResolve(configAst)));
+  public void addConfigurations(List<ComponentAst> configAsts) {
+    configInternals.clear();
+    configIds.clear();
+    configAsts.forEach(config -> {
+      String configLocation = config.getLocation().getRootContainerName();
+      configInternals.put(configLocation, new LazyValue<>(() -> resolveInternalComponents(config)));
+      configIds.put(configLocation, new LazyValue<>(() -> doResolve(config)));
+    });
   }
 
   private MetadataCacheId doResolve(ComponentAst elementModel) {

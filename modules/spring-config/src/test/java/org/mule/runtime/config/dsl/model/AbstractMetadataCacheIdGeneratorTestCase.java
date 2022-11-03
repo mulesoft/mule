@@ -12,6 +12,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.ast.api.util.MuleAstUtils.createComponentParameterizationFromComponentAst;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -240,8 +241,8 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
   private MetadataCacheIdGenerator<ComponentParameterization<?>> createComponentParameterizationBasedGenerator(ArtifactAst app) {
     ConfigurationMetadataCacheIdGenerator configGenerator = new AstConfigurationMetadataCacheIdGenerator();
-    app.topLevelComponentsStream().filter(potentialConfig -> potentialConfig.getComponentType().equals(CONFIG))
-        .forEach(configGenerator::addConfiguration);
+    configGenerator.addConfigurations(app.topLevelComponentsStream()
+        .filter(potentialConfig -> potentialConfig.getComponentType().equals(CONFIG)).collect(toList()));
     return new ComponentParameterizationBasedMetadataCacheIdGenerator(configGenerator);
   }
 

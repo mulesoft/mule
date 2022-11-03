@@ -8,6 +8,7 @@ package org.mule.runtime.metadata.api.cache;
 
 import org.mule.runtime.ast.api.ComponentAst;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,15 +25,15 @@ public interface ConfigurationMetadataCacheIdGenerator {
    * @param justProviders if true, it will return the id corresponding to the calculation of this config internal/child elements.
    *                      If false, it will return the id of the whole config.
    * @return the {{@link MetadataCacheId} corresponding to the configuration}. In case the config was not provided previously
-   *         using {@link #addConfiguration(ComponentAst) AddConfiguration}. This could happen, for example, when just performing
-   *         a Type Resolution, without Propagation.
+   *         using {@link #addConfigurations(List) AddConfiguration}. This could happen, for example, when just performing a Type
+   *         Resolution, without Propagation.
    */
   Optional<MetadataCacheId> getConfigMetadataCacheId(String configName, boolean justProviders);
 
   /**
-   * Adds the config to be considered when getting the Cache Ids. If the config was already set before, the values will be
+   * Adds the configs to be considered when getting the Cache Ids. If the config was already set before, the values will be
    * recalculated.
    */
-  void addConfiguration(ComponentAst configAst);
+  void addConfigurations(List<ComponentAst> configAsts);
 
 }
