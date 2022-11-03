@@ -92,23 +92,27 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
                                                     List<ComponentAst> hierarchy) {
       Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
       operationModel.ifPresent(model -> model.getErrorModels().stream()
-          .map(errorModel -> createErrorModelParser(errorModel, operationAst))
+          .map(errorModel -> applyMappingsAndCreateErrorModelParser(errorModel, operationAst))
           .forEach(errorModelParser -> addParserAndMarkIfSuppressed(errorModelParser, models, hierarchy)));
     }
 
-    private MuleSdkErrorModelParser createErrorModelParser(ErrorModel errorModel, ComponentAst operationAst) {
+    private MuleSdkErrorModelParser applyMappingsAndCreateErrorModelParser(ErrorModel errorModel, ComponentAst operationAst) {
       final ComponentParameterAst errorMappingsParam = operationAst.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME);
       if (errorMappingsParam == null) {
-        return new MuleSdkErrorModelParser(errorModel);
+        return createErrorModelParser(errorModel);
       }
 
       Optional<List<ErrorMapping>> errorMappingsOpt = errorMappingsParam.<List<ErrorMapping>>getValue().getValue();
       if (!errorMappingsOpt.isPresent()) {
-        return new MuleSdkErrorModelParser(errorModel);
+        return createErrorModelParser(errorModel);
       }
 
       List<ErrorMapping> errorMappings = errorMappingsOpt.get();
       return applyMappingIfSomeMatches(errorModel, errorMappings);
+    }
+
+    private MuleSdkErrorModelParser createErrorModelParser(ErrorModel errorModel) {
+      return new MuleSdkErrorModelParser(errorModel);
     }
 
     private MuleSdkErrorModelParser applyMappingIfSomeMatches(ErrorModel errorModel, List<ErrorMapping> errorMappings) {
@@ -116,7 +120,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
           .filter(errorMapping -> doesMappingSourceMatch(errorMapping, errorModel))
           .map(Aggregator::buildParserFromTarget)
           .findFirst()
-          .orElseGet(() -> new MuleSdkErrorModelParser(errorModel));
+          .orElseGet(() -> createErrorModelParser(errorModel));
     }
 
     private static MuleSdkErrorModelParser buildParserFromTarget(ErrorMapping errorMapping) {
@@ -146,7 +150,8 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
     private boolean doesMappingSourceMatch(ErrorMapping errorMapping, ErrorModel errorModel) {
       String mappingSourceAsString = errorMapping.getSource();
       ComponentIdentifier sourceErrorId = parseErrorType(mappingSourceAsString, CORE_ERROR_NAMESPACE);
-      return new SingleErrorModelParserMatcher(sourceErrorId).matches(new MuleSdkErrorModelParser(errorModel));
+      return new SingleErrorModelParserMatcher(sourceErrorId)
+          .matches(createErrorModelParser(errorModel));
     }
 
     private void handleRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels, List<ComponentAst> hierarchy) {
@@ -243,7 +248,7 @@ public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorMod
         return ErrorModelParserMatcher.ANY_ERROR_PARSER_MATCHER;
       }
       String[] errorTypeIdentifiers = typesAsString.split(",");
-      List<ErrorModelParserMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
+      List<ErrorModelParserMatcher> matchers = stream(errorTypeIdentifiers).map(identifier -> {
         String parsedIdentifier = identifier.trim();
         final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
 
