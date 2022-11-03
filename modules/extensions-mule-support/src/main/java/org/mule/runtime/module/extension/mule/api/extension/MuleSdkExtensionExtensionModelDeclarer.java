@@ -19,6 +19,8 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CONSTRUCT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
@@ -80,6 +82,29 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .allowingTopLevelDefinition();
 
     declareDescriptionComponent(extensionConstruct, typeBuilder);
+    declareErrorsComponent(extensionConstruct);
+  }
+
+  private void declareErrorsComponent(ConstructDeclarer extensionDeclarer) {
+    NestedComponentDeclarer<?, ?> errorsDef = extensionDeclarer
+        .withOptionalComponent(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
+        .describedAs("Top level element of an extension that contains the errors that the extension's operations are able to raise.")
+        .withMinOccurs(0)
+        .withMaxOccurs(1);
+
+    NestedComponentDeclarer<?, ?> eachErrorDef = errorsDef.withOptionalComponent(MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME)
+        .describedAs("Declares an error, and may define the parent.")
+        .withMinOccurs(0);
+
+    ParameterGroupDeclarer<?> eachErrorParams = eachErrorDef.onDefaultParameterGroup();
+    eachErrorParams.withRequiredParameter("type")
+        .describedAs("Type of the error being declared")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+    eachErrorParams.withOptionalParameter("parent")
+        .describedAs("Parent of the error being declared")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
   }
 
   private void declareDescriptionComponent(ConstructDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
