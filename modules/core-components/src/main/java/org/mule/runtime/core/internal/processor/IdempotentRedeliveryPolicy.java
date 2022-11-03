@@ -214,13 +214,17 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Override
   public void start() throws MuleException {
     super.start();
-    startIfNeeded(store);
+    if (isOwnedObjectStore) {
+      startIfNeeded(store);
+    }
   }
 
   @Override
   public void stop() throws MuleException {
+    if (isOwnedObjectStore) {
+      stopIfNeeded(store);
+    }
     super.stop();
-    stopIfNeeded(store);
   }
 
   @Override

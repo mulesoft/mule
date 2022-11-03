@@ -6,6 +6,17 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
+import static org.mule.runtime.core.internal.processor.IdempotentRedeliveryPolicy.SECURE_HASH_EXPR_FORMAT;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.REDELIVERY;
+
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -14,7 +25,6 @@ import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,21 +36,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.internal.processor.IdempotentRedeliveryPolicy.SECURE_HASH_EXPR_FORMAT;
-import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
-import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.REDELIVERY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
-import org.junit.After;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -73,16 +72,15 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.reactivestreams.Publisher;
-
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 @Feature(SOURCES)
@@ -101,7 +99,8 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   private final CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
   private final AtomicInteger count = new AtomicInteger();
-  private final ObjectStore mockObjectStore = mock(ObjectStore.class);
+  private final ObjectStore<RedeliveryCounter> mockObjectStore = mock(ObjectStore.class);
+  private final InMemoryObjectStore inMemoryObjectStore = spy(new InMemoryObjectStore());
   private CoreEvent event;
   private ExpressionManager expressionManager;
 
@@ -137,7 +136,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     MuleLockFactory muleLockFactory = new MuleLockFactory();
     muleLockFactory.setLockProvider(new SingleServerLockProvider());
     muleLockFactory.initialise();
-    final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
     when(mockObjectStoreManager.getObjectStore(anyString())).thenReturn(inMemoryObjectStore);
     when(mockObjectStoreManager.createObjectStore(any(), any())).thenReturn(inMemoryObjectStore);
     when(event.getMessage()).thenReturn(message);
@@ -233,34 +231,67 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  @Issue("W-11985583")
   public void objectStoreIsClosedOnDisposeWhenItIsOwnedByTheRedeliveryPolicy() throws Exception {
     irp.setPrivateObjectStore(mockObjectStore);
     irp.initialise();
+    irp.start();
+    irp.stop();
     irp.dispose();
     verify(mockObjectStore).close();
   }
 
   @Test
+  @Issue("W-11985583")
   public void objectStoreIsRemovedOnDisposeWhenItIsOwnedByTheRedeliveryPolicy() throws Exception {
     irp.setPrivateObjectStore(mockObjectStore);
     irp.initialise();
+    irp.start();
+    irp.stop();
     irp.dispose();
     verify(mockObjectStoreManager)
         .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
   }
 
   @Test
+  @Issue("W-11985583")
+  public void objectStoreIsClosedOnDisposeWhenItIsTheImplicitOne() throws Exception {
+    irp.initialise();
+    irp.start();
+    irp.stop();
+    irp.dispose();
+    verify(inMemoryObjectStore).close();
+  }
+
+  @Test
+  @Issue("W-11985583")
+  public void objectStoreIsRemovedOnDisposeWhenItIsTheImplicitOne() throws Exception {
+    irp.initialise();
+    irp.start();
+    irp.stop();
+    irp.dispose();
+    verify(mockObjectStoreManager)
+            .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
+  }
+
+  @Test
+  @Issue("W-11985583")
   public void objectStoreIsNotClosedOnDisposeWhenTheRedeliveryPolicyReferencesItByName() throws Exception {
     irp.setObjectStore(mockObjectStore);
     irp.initialise();
+    irp.start();
+    irp.stop();
     irp.dispose();
     verify(mockObjectStore, never()).close();
   }
 
   @Test
+  @Issue("W-11985583")
   public void objectStoreIsNotRemovedOnDisposeWhenTheRedeliveryPolicyReferencesItByName() throws Exception {
     irp.setObjectStore(mockObjectStore);
     irp.initialise();
+    irp.start();
+    irp.stop();
     irp.dispose();
     verify(mockObjectStoreManager, never())
             .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
