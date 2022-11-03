@@ -10,6 +10,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -29,10 +30,11 @@ public interface ServiceRegistry {
   /**
    * Tracks the given {@code service}
    *
-   * @param service  the {@link Service} to be tracked
-   * @param assembly the {@code service}'s {@link ServiceAssembly}
+   * @param service          the {@link Service} to be tracked
+   * @param serviceInterface the interface of the service to unregister, as declared in
+   *                         {@link ServiceAssembly#getServiceContract()} on {@link #register(Service, ServiceAssembly)}.
    */
-  void register(Service service, ServiceAssembly assembly);
+  <S extends Service> void register(S service, Class<? extends S> serviceContract);
 
   /**
    * Un-tracks the given {@code service}.
@@ -49,8 +51,13 @@ public interface ServiceRegistry {
    * @param <S>             the specific service interface
    * @param serviceContract the interface of the service to get, as declared in {@link ServiceAssembly#getServiceContract()} on
    *                        {@link #register(Service, ServiceAssembly)}.
-   * @return
+   * @return a previously {@link #register(Service, ServiceAssembly) registered} service for the provided
+   *         {@code servcieInterface}.
    */
   <S extends Service> Optional<S> getService(Class<? extends S> serviceInterface);
 
+  /**
+   * @return all previously {@link #register(Service, ServiceAssembly) registered} services.
+   */
+  Collection<Service> getAllServices();
 }

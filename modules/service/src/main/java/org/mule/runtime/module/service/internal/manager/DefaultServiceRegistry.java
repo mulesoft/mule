@@ -14,7 +14,6 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 
@@ -23,6 +22,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -91,8 +91,8 @@ public class DefaultServiceRegistry implements ServiceRegistry {
   }
 
   @Override
-  public void register(Service service, ServiceAssembly assembly) {
-    services.put(assembly.getServiceContract(), service);
+  public <S extends Service> void register(S service, Class<? extends S> serviceContract) {
+    services.put(serviceContract, service);
   }
 
   public <S extends Service> void register(Class<? extends S> serviceContract, S service) {
@@ -114,7 +114,8 @@ public class DefaultServiceRegistry implements ServiceRegistry {
         .findAny();
   }
 
+  @Override
   public Collection<Service> getAllServices() {
-    return services.values();
+    return new HashSet<>(services.values());
   }
 }

@@ -11,8 +11,8 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
-import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,22 +30,21 @@ import java.util.List;
  */
 public class ReflectionServiceResolver implements ServiceResolver {
 
-  private final DefaultServiceRegistry serviceRegistry;
+  private final ServiceRegistry serviceRegistry;
   private final Injector containerInjector;
 
-  public ReflectionServiceResolver(DefaultServiceRegistry serviceRegistry, Injector containerInjector) {
+  public ReflectionServiceResolver(ServiceRegistry serviceRegistry, Injector containerInjector) {
     this.serviceRegistry = serviceRegistry;
     this.containerInjector = containerInjector;
   }
 
   @Override
   public List<Service> resolveServices(List<ServiceAssembly> assemblies) {
-
     List<Service> services = new ArrayList<>(assemblies.size());
     for (ServiceAssembly assembly : assemblies) {
       Service service = LazyServiceProxy.from(assembly, serviceRegistry, containerInjector);
 
-      serviceRegistry.register(service, assembly);
+      serviceRegistry.register(service, assembly.getServiceContract());
       services.add(service);
     }
 

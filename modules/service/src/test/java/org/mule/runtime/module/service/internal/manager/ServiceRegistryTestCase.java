@@ -8,16 +8,17 @@
 package org.mule.runtime.module.service.internal.manager;
 
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -29,12 +30,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 public class ServiceRegistryTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   private DefaultServiceRegistry serviceRegistry;
   private ServiceA serviceA;
@@ -50,8 +54,7 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
   }
 
   private void registerServiceA() {
-    serviceRegistry.register(serviceA, new ImmutableServiceAssembly(serviceA.getName(), serviceProviderA,
-                                                                    this.getClass().getClassLoader(), ServiceA.class));
+    serviceRegistry.register(serviceA, ServiceA.class);
   }
 
   @Test

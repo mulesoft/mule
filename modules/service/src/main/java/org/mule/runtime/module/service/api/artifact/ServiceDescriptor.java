@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.artifact;
+package org.mule.runtime.module.service.api.artifact;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;

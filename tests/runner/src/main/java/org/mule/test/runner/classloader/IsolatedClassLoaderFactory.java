@@ -55,8 +55,8 @@ import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoad
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;

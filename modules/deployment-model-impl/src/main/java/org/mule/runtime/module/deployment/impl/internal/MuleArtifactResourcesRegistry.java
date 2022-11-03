@@ -86,9 +86,9 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;

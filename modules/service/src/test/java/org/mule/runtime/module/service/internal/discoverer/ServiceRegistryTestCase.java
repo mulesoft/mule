@@ -10,11 +10,10 @@ package org.mule.runtime.module.service.internal.discoverer;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,9 +38,7 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
 
   private FooService mockFooService() {
     FooService service = mock(FooService.class);
-    ServiceAssembly assembly = mock(ServiceAssembly.class);
-    when(assembly.getServiceContract()).thenReturn((Class) FooService.class);
-    serviceRegistry.register(service, assembly);
+    serviceRegistry.register(service, (Class) FooService.class);
 
     return service;
   }
