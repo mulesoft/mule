@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModel;
-import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
@@ -43,10 +42,8 @@ import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
-import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -61,7 +58,6 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;

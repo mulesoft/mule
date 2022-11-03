@@ -7,8 +7,6 @@
 
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import javax.swing.text.html.Option;
-
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
