@@ -45,7 +45,6 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
@@ -75,7 +74,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   private final ClassLoaderRepository classLoaderRepository;
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
-  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final LicenseValidator licenseValidator;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
@@ -87,7 +85,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    ClassLoaderRepository classLoaderRepository,
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
-                                   ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                    LicenseValidator licenseValidator,
                                    LockFactory runtimeLockFactory,
                                    MemoryManagementService memoryManagementService,
@@ -102,7 +99,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     checkArgument(classLoaderRepository != null, "classLoaderRepository cannot be null");
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyClassLoaderBuilderFactory cannot be null");
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
-    checkArgument(artifactPluginDescriptorLoader != null, "artifactPluginDescriptorLoader cannot be null");
     checkArgument(memoryManagementService != null, "memoryManagementService cannot be null");
     checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
 
@@ -114,7 +110,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
-    this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
     this.licenseValidator = licenseValidator;
   }
 

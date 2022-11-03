@@ -70,7 +70,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
       mock(DeployableArtifactDescriptorFactory.class);
-  private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
@@ -79,7 +78,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
                                                                               new DefaultDomainManager(),
                                                                               null,
                                                                               serviceRepository,
-                                                                              pluginDependenciesResolver,
                                                                               domainClassLoaderBuilderFactory,
                                                                               extensionModelLoaderManager,
                                                                               licenseValidator,
@@ -99,7 +97,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
         PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
     when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
     whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
-    when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList(), anyBoolean())).thenReturn(emptyList());
   }
 
   @Test

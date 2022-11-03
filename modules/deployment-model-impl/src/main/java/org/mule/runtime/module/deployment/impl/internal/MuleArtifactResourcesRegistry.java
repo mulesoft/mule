@@ -283,7 +283,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, deployableArtifactDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
-                                             pluginDependenciesResolver, domainClassLoaderBuilderFactory,
+                                             domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
                                              runtimeLockFactory,
                                              this.memoryManagementService,
@@ -300,7 +300,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        extensionModelLoaderManager,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
-                                                       artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        runtimeLockFactory,
                                                        this.memoryManagementService,

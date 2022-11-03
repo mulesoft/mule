@@ -102,14 +102,12 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
-  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, mock(ApplicationDescriptorFactory.class),
                                     deployableArtifactDescriptorFactory,
                                     domainRepository, serviceRepository,
                                     extensionModelLoaderRepository,
                                     classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
-                                    artifactPluginDescriptorLoader,
                                     discoverLicenseValidator(getClass().getClassLoader()),
                                     getRuntimeLockFactory(),
                                     mock(MemoryManagementService.class),

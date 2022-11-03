@@ -51,7 +51,6 @@ public class DomainsCreatedWithDeprecatedDescriptorClassTestCase extends Abstrac
                                new DefaultDomainManager(),
                                null,
                                mock(ServiceRepository.class),
-                               mock(PluginDependenciesResolver.class),
                                new DomainClassLoaderBuilderFactory(ArtifactClassLoaderResolver.defaultClassLoaderResolver()),
                                mock(ExtensionModelLoaderManager.class),
                                mock(LicenseValidator.class),

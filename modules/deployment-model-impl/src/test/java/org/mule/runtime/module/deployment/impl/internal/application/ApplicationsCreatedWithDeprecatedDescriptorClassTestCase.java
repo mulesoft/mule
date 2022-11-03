@@ -69,7 +69,6 @@ public class ApplicationsCreatedWithDeprecatedDescriptorClassTestCase extends Ab
                                     mock(ClassLoaderRepository.class),
                                     mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                     mock(PluginDependenciesResolver.class),
-                                    mock(ArtifactPluginDescriptorLoader.class),
                                     mock(LicenseValidator.class),
                                     getRuntimeLockFactory(),
                                     mock(MemoryManagementService.class),

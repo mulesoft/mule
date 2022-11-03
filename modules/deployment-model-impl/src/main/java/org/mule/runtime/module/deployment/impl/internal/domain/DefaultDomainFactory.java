@@ -27,7 +27,6 @@ import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
@@ -55,9 +54,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory;
   private final ClassLoaderRepository classLoaderRepository;
   private final ServiceRepository serviceRepository;
-  private final PluginDependenciesResolver pluginDependenciesResolver;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
-
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
 
   /**
@@ -69,8 +66,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
    * @param domainManager                       tracks the domains deployed on the container. Non null.
    * @param classLoaderRepository               contains all the class loaders in the container. Non null.
    * @param serviceRepository                   repository of available services. Non null.
-   * @param pluginDependenciesResolver          resolver for the plugins on which the {@code artifactPluginDescriptor} declares it
-   *                                            depends. Non null.
    * @param domainClassLoaderBuilderFactory     creates builders to build the classloaders for each domain. Non null.
    * @param extensionModelLoaderManager         manager capable of resolve {@link ExtensionModel extension models}. Non null.
    * @param artifactConfigurationProcessor      the processor to use for building the application model. Non null.
@@ -80,7 +75,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               DomainManager domainManager,
                               ClassLoaderRepository classLoaderRepository,
                               ServiceRepository serviceRepository,
-                              PluginDependenciesResolver pluginDependenciesResolver,
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager,
                               LicenseValidator licenseValidator,
@@ -94,7 +88,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");
-    checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(domainClassLoaderBuilderFactory != null, "domainClassLoaderBuilderFactory cannot be null");
     checkArgument(extensionModelLoaderManager != null, "extensionModelLoaderManager cannot be null");
     checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
@@ -103,7 +96,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     this.deployableArtifactDescriptorFactory = deployableArtifactDescriptorFactory;
     this.domainManager = domainManager;
     this.serviceRepository = serviceRepository;
-    this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.domainClassLoaderBuilderFactory = domainClassLoaderBuilderFactory;
     this.extensionModelLoaderManager = extensionModelLoaderManager;
   }
