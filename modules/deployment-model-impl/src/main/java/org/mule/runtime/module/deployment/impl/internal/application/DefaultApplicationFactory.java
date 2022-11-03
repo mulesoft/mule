@@ -208,23 +208,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getDomainForDescriptor(ApplicationDescriptor descriptor) {
-    // TODO - W-11086334: remove this conditional during lightweight deployment migration
-    if (isHeavyPackage(descriptor.getArtifactLocation())) {
-      return getDomainForDescriptor(descriptor.getDomainName(), descriptor.getDomainDescriptor().orElse(null),
-                                    descriptor.getArtifactLocation());
-    } else {
-      try {
-        return getApplicationDomain(domainRepository, descriptor);
-      } catch (DomainNotFoundException e) {
-        throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
-                                                                 e.getDomainName(), descriptor.getName())),
-                                      e);
-      } catch (IncompatibleDomainException e) {
-        throw new DeploymentException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"), e);
-      } catch (AmbiguousDomainReferenceException e) {
-        throw new DeploymentException(createStaticMessage("Multiple domains were found"), e);
-      }
-    }
+    return getDomainForDescriptor(descriptor.getDomainName(), descriptor.getDomainDescriptor().orElse(null),
+                                  descriptor.getArtifactLocation());
   }
 
   private Domain getDomainForDescriptor(String domainName, BundleDescriptor domainBundleDescriptor, File artifactLocation) {
@@ -239,26 +224,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
       throw new DeploymentException(createStaticMessage(format("Problems found while retrieving domain '%s'", domainName)), e);
     } catch (AmbiguousDomainReferenceException e) {
       throw new DeploymentException(createStaticMessage("Multiple domains were found"), e);
-    }
-  }
-
-  private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(ApplicationDescriptor descriptor) {
-    if (descriptor.getPlugins().isEmpty()) {
-      Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
-
-      for (BundleDependency bundleDependency : descriptor.getClassLoaderConfiguration().getDependencies()) {
-        if (bundleDependency.getDescriptor().isPlugin()) {
-          File pluginZip = new File(bundleDependency.getBundleUri());
-          try {
-            pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginZip, bundleDependency.getDescriptor(), descriptor));
-          } catch (IOException e) {
-            throw new IllegalStateException("Cannot create plugin descriptor: " + pluginZip.getAbsolutePath(), e);
-          }
-        }
-      }
-      return pluginDescriptors;
-    } else {
-      return descriptor.getPlugins();
     }
   }
 
