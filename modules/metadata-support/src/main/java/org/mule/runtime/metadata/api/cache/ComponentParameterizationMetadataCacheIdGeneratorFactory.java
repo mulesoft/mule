@@ -18,7 +18,7 @@ public class ComponentParameterizationMetadataCacheIdGeneratorFactory {
   /**
    * @return a new instance of an implementation of {@link ComponentParameterizationMetadataCacheIdGenerator}
    */
-  public ComponentParameterizationMetadataCacheIdGenerator create() {
-    return new ComponentParameterizationBasedMetadataCacheIdGenerator();
+  public ComponentParameterizationMetadataCacheIdGenerator create(ConfigurationMetadataCacheIdGenerator configIdGenerator) {
+    return new ComponentParameterizationBasedMetadataCacheIdGenerator(configIdGenerator);
   }
 }

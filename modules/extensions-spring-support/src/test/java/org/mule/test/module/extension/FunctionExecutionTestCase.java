@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.NodeList;
 
@@ -101,6 +102,7 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
   }
 
   @Test
+  @Ignore("W-11999534")
   public void xpathWithOverrides() throws Exception {
     Object value =
         flowRunner("xpathWithOverrides")
