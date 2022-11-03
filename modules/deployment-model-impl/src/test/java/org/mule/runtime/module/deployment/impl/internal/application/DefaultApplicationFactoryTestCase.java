@@ -103,7 +103,7 @@ class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
   private final DefaultApplicationFactory applicationFactory =
-      new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, mock(ApplicationDescriptorFactory.class),
+      new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                     deployableArtifactDescriptorFactory,
                                     domainRepository, serviceRepository,
                                     extensionModelLoaderRepository,

@@ -77,7 +77,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   private final LicenseValidator licenseValidator;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
-                                   ApplicationDescriptorFactory applicationDescriptorFactory,
                                    DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
                                    DomainRepository domainRepository,
                                    ServiceRepository serviceRepository,
@@ -91,7 +90,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
-    checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");

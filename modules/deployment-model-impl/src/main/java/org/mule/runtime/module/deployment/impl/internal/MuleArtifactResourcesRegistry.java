@@ -294,7 +294,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
         new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
 
-    applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
+    applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,
                                                        domainManager, serviceManager,
                                                        extensionModelLoaderManager,

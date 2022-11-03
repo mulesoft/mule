@@ -59,9 +59,6 @@ public class ApplicationsCreatedWithDeprecatedDescriptorClassTestCase extends Ab
   private final DomainManager domainManager = new DefaultDomainManager();
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
-                                    new ApplicationDescriptorFactory(mock(ArtifactPluginDescriptorLoader.class),
-                                                                     new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
-                                                                     ArtifactDescriptorValidatorBuilder.builder()),
                                     DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
                                     domainManager,
                                     mock(ServiceRepository.class),
