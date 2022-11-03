@@ -271,7 +271,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     irp.stop();
     irp.dispose();
     verify(mockObjectStoreManager)
-            .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
+        .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
   }
 
   @Test
@@ -294,7 +294,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     irp.stop();
     irp.dispose();
     verify(mockObjectStoreManager, never())
-            .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
+        .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
   }
 
   private void processUntilFailure() {

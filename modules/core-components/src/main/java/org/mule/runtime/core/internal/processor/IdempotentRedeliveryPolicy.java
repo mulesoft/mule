@@ -184,7 +184,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   private ObjectStore<RedeliveryCounter> createInternalObjectStore() {
-    return objectStoreManager.createObjectStore(getObjectStoreName(), ObjectStoreSettings.builder().persistent(false).entryTtl((long) 60 * 5 * 1000).expirationInterval(6000L).build());
+    return objectStoreManager.createObjectStore(getObjectStoreName(), ObjectStoreSettings.builder().persistent(false)
+        .entryTtl((long) 60 * 5 * 1000).expirationInterval(6000L).build());
   }
 
   @Override
