@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.IdentifierParsingUtils.parseErrorType;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_IDENTIFIER;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
 
@@ -18,6 +18,7 @@ import static java.util.Locale.getDefault;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 
@@ -42,28 +43,28 @@ public class MuleSdkErrorsDeclarationParser {
   private static final String MULE = CORE_PREFIX.toUpperCase(getDefault());
   private static final ComponentIdentifier MULE_ANY = parseErrorType("ANY", MULE);
 
-  private final ComponentAst extensionComponentAst;
+  private final ArtifactAst artifactAst;
   private final String extensionErrorNamespace;
   private Map<ComponentIdentifier, ErrorModelParser> parserByIdentifier;
 
-  public MuleSdkErrorsDeclarationParser(ComponentAst extensionComponentAst, String extensionErrorNamespace) {
-    this.extensionComponentAst = extensionComponentAst;
+  public MuleSdkErrorsDeclarationParser(ArtifactAst artifactAst, String extensionErrorNamespace) {
+    this.artifactAst = artifactAst;
     this.extensionErrorNamespace = extensionErrorNamespace;
     this.parserByIdentifier = null;
   }
 
   public Map<ComponentIdentifier, ErrorModelParser> parse() {
     if (parserByIdentifier == null) {
-      parserByIdentifier = doParse(extensionComponentAst, extensionErrorNamespace);
+      parserByIdentifier = doParse(artifactAst, extensionErrorNamespace);
     }
     return parserByIdentifier;
   }
 
-  private static Map<ComponentIdentifier, ErrorModelParser> doParse(ComponentAst extensionComponentAst,
+  private static Map<ComponentIdentifier, ErrorModelParser> doParse(ArtifactAst artifactAst,
                                                                     String extensionErrorNamespace) {
     // Just parse the mappings in the AST, without creating the ErrorModelParser yet.
     Map<ComponentIdentifier, ComponentIdentifier> errorIdToParentId =
-        extractMappingFromErrorsToParent(extensionComponentAst, extensionErrorNamespace);
+        extractMappingFromErrorsToParent(artifactAst, extensionErrorNamespace);
 
     // Walk the TRANSPOSED graph in a topological order (so the parent parser already created when we see each child).
     Graph<ComponentIdentifier, DefaultEdge> graph = buildTransposedGraph(errorIdToParentId);
@@ -98,11 +99,12 @@ public class MuleSdkErrorsDeclarationParser {
     return graphBuilder.buildAsUnmodifiable();
   }
 
-  private static Map<ComponentIdentifier, ComponentIdentifier> extractMappingFromErrorsToParent(ComponentAst extensionComponentAst,
+  private static Map<ComponentIdentifier, ComponentIdentifier> extractMappingFromErrorsToParent(ArtifactAst artifactAst,
                                                                                                 String extensionErrorNamespace) {
     Map<ComponentIdentifier, ComponentIdentifier> errorToParent = new HashMap<>();
-    extensionComponentAst
-        .directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE, MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
+    artifactAst
+        .topLevelComponentsStream()
+        .filter(c -> c.getIdentifier().equals(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_IDENTIFIER))
         .forEach(errorsAst -> errorsAst
             .directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE, MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME)
             .forEach(errorAst -> {

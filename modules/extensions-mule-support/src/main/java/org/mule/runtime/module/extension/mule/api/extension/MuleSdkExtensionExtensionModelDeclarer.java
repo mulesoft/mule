@@ -17,10 +17,9 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STR
 import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CONSTRUCT_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_CONSTRUCT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
@@ -71,26 +70,16 @@ public class MuleSdkExtensionExtensionModelDeclarer {
             .setSchemaLocation(MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION)
             .build());
 
-    declareExtensionConstruct(extensionDeclarer, typeBuilder);
+    declareErrorsConstruct(extensionDeclarer);
+    declareDescriptionConstruct(extensionDeclarer, typeBuilder);
 
     return extensionDeclarer;
   }
 
-  private void declareExtensionConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    ConstructDeclarer extensionConstruct = extensionDeclarer.withConstruct(MULE_SDK_EXTENSION_CONSTRUCT_NAME)
-        .describedAs("Root element of an extension that contains configurations, connections, operations, sources and functions as children.")
-        .allowingTopLevelDefinition();
-
-    declareDescriptionComponent(extensionConstruct, typeBuilder);
-    declareErrorsComponent(extensionConstruct);
-  }
-
-  private void declareErrorsComponent(ConstructDeclarer extensionDeclarer) {
-    NestedComponentDeclarer<?, ?> errorsDef = extensionDeclarer
-        .withOptionalComponent(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
+  private void declareErrorsConstruct(ExtensionDeclarer extensionDeclarer) {
+    ConstructDeclarer errorsDef = extensionDeclarer.withConstruct(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
         .describedAs("Top level element of an extension that contains the errors that the extension's operations are able to raise.")
-        .withMinOccurs(0)
-        .withMaxOccurs(1);
+        .allowingTopLevelDefinition();
 
     NestedComponentDeclarer<?, ?> eachErrorDef = errorsDef.withOptionalComponent(MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME)
         .describedAs("Declares an error, and may define the parent.")
@@ -107,11 +96,10 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED);
   }
 
-  private void declareDescriptionComponent(ConstructDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    NestedComponentDeclarer<?, ?> descriptionDef = extensionDeclarer.withComponent(MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME)
+  private void declareDescriptionConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
+    ConstructDeclarer descriptionDef = extensionDeclarer.withConstruct(MULE_SDK_EXTENSION_DESCRIPTION_CONSTRUCT_NAME)
         .describedAs("Top level element of an extension that contains descriptive information about it.")
-        .withMinOccurs(1)
-        .withMaxOccurs(1);
+        .allowingTopLevelDefinition();
 
     final ParameterGroupDeclarer<?> params = descriptionDef.onDefaultParameterGroup();
     params.withRequiredParameter(MULE_SDK_EXTENSION_NAME_PARAMETER_NAME)

@@ -10,7 +10,7 @@ import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.g
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
@@ -60,7 +60,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
 
   @Override
   protected void init(ArtifactAst ast) {
-    parseStructure(getExtensionComponentAst(ast));
+    parseStructure(ast);
     super.init(ast);
   }
 
@@ -96,18 +96,12 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
 
   @Override
   protected Stream<ComponentAst> getTopLevelElements(ArtifactAst ast) {
-    return getExtensionComponentAst(ast).directChildrenStream();
+    return ast.topLevelComponentsStream();
   }
 
-  private ComponentAst getExtensionComponentAst(ArtifactAst ast) {
-    // At this point we can assume there is only one top level component which is the extension:extension component
-    // We don't need to check for this because it should be guaranteed by previous validations
-    return ast.topLevelComponents().get(0);
-  }
-
-  private void parseStructure(ComponentAst extensionComponentAst) {
+  private void parseStructure(ArtifactAst ast) {
     ComponentAst descriptionComponentAst =
-        getRequiredSingleChild(extensionComponentAst, MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME);
+        getRequiredTopLevelComponent(ast, MULE_SDK_EXTENSION_DESCRIPTION_IDENTIFIER);
     name = getParameter(descriptionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);
     category = Category
         .valueOf(this.<String>getParameter(descriptionComponentAst, MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME).toUpperCase());
@@ -119,12 +113,12 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
     // use dummy version since this is just for obtaining the namespace
     this.namespace = getExtensionsNamespace(getXmlDslModel(name, "1.0.0", xmlDslConfiguration));
 
-    parseErrorsDeclaration(extensionComponentAst);
+    parseErrorsDeclaration(ast);
   }
 
-  private void parseErrorsDeclaration(ComponentAst extensionComponentAst) {
+  private void parseErrorsDeclaration(ArtifactAst ast) {
     errorModelParsers =
-        new ArrayList<>(new MuleSdkErrorsDeclarationParser(extensionComponentAst, namespace.toUpperCase(getDefault())).parse()
+        new ArrayList<>(new MuleSdkErrorsDeclarationParser(ast, namespace.toUpperCase(getDefault())).parse()
             .values());
   }
 

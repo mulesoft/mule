@@ -12,8 +12,10 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 
@@ -77,15 +79,17 @@ abstract class BaseMuleSdkExtensionModelParser {
   }
 
   /**
-   * @param component a {@link ComponentAst}
-   * @param childName the child element name
-   * @return The first direct child with the given {@code childName}
+   * @param ast             a {@link ComponentAst}
+   * @param childIdentifier the child {@link ComponentIdentifier}
+   * @return The first top level component with the given {@code childIdentifier}
    * @throws MuleRuntimeException if not found.
    */
-  protected ComponentAst getRequiredSingleChild(ComponentAst component, String childName) {
-    return getSingleChild(component, childName)
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("The content of element '%s' is not complete. '%s' is expected.",
-                                                                               component.getIdentifier(), childName))));
+  protected ComponentAst getRequiredTopLevelComponent(ArtifactAst ast, ComponentIdentifier childIdentifier) {
+    return ast.topLevelComponentsStream()
+        .filter(c -> c.getIdentifier().equals(childIdentifier))
+        .findFirst()
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Extension from artifact '%s' is missing a required top level element. '%s' is expected.",
+                                                                               ast.getArtifactName(), childIdentifier))));
   }
 
   /**

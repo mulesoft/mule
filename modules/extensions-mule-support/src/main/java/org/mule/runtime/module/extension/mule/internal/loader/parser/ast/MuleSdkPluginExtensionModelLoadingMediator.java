@@ -78,8 +78,7 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
 
   @Override
   protected boolean containsReusableComponents(ArtifactAst ast) {
-    return ast.topLevelComponents().size() == 1 &&
-        ast.topLevelComponents().get(0).directChildrenStream()
-            .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
+    return ast.topLevelComponentsStream()
+        .anyMatch(component -> REUSABLE_COMPONENT_TYPES.contains(component.getComponentType()));
   }
 }

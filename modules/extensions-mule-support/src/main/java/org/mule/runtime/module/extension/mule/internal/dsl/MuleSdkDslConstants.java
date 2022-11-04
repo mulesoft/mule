@@ -22,8 +22,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 @NoImplement
 public interface MuleSdkDslConstants {
 
-  String MULE_SDK_EXTENSION_CONSTRUCT_NAME = "extension";
-  String MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME = "description";
+  String MULE_SDK_EXTENSION_DESCRIPTION_CONSTRUCT_NAME = "description";
   String MULE_SDK_EXTENSION_NAME_PARAMETER_NAME = "name";
   String MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME = "category";
   String MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME = "vendor";
@@ -43,9 +42,13 @@ public interface MuleSdkDslConstants {
   String MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION =
       buildSchemaLocation(MULE_SDK_EXTENSION_DSL_NAMESPACE, MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME);
 
-  ComponentIdentifier MULE_SDK_EXTENSION_ROOT_IDENTIFIER = ComponentIdentifier.builder()
+  ComponentIdentifier MULE_SDK_EXTENSION_DESCRIPTION_IDENTIFIER = ComponentIdentifier.builder()
       .namespace(MULE_SDK_EXTENSION_DSL_NAMESPACE)
       .namespaceUri(MULE_SDK_EXTENSION_DSL_NAMESPACE_URI)
-      .name(MULE_SDK_EXTENSION_CONSTRUCT_NAME)
+      .name(MULE_SDK_EXTENSION_DESCRIPTION_CONSTRUCT_NAME)
+      .build();
+  ComponentIdentifier MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_IDENTIFIER = ComponentIdentifier.builder()
+      .namespace(MULE_SDK_EXTENSION_DSL_NAMESPACE)
+      .name(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME)
       .build();
 }
