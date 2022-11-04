@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver.noOpPluginPatchesResolver;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
 import static java.util.Collections.emptyMap;
@@ -32,7 +33,7 @@ public class AbstractDeployableArtifactDescriptorFactoryTestCase extends Abstrac
   protected DomainDescriptor createDomainDescriptor(String domainPath) throws URISyntaxException {
     DeployableProjectModel model = getDeployableProjectModel(domainPath);
 
-    return deployableArtifactDescriptorFactory.createDomainDescriptor(model, emptyMap());
+    return deployableArtifactDescriptorFactory.createDomainDescriptor(model, emptyMap(), noOpPluginPatchesResolver());
   }
 
   protected ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
@@ -44,7 +45,8 @@ public class AbstractDeployableArtifactDescriptorFactoryTestCase extends Abstrac
     DeployableProjectModel model = getDeployableProjectModel(appPath);
 
     return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
-                                                                           domainDescriptorResolver);
+                                                                           domainDescriptorResolver,
+                                                                           noOpPluginPatchesResolver());
   }
 
   protected DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.internal.plugin;
+package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
@@ -20,13 +20,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
+import org.mule.runtime.module.artifact.activation.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,7 +41,6 @@ import org.slf4j.Logger;
  *
  * @since 4.5
  */
-// TODO W-11086334 - move out of this module as part of the migration of the Runtime to use the descriptors generation API
 public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
 
   private static final Logger LOGGER = getLogger(DefaultPluginPatchesResolver.class);

@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
 import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.DOMAIN_CREATION;
 
@@ -43,7 +44,9 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -62,7 +65,8 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
 @Feature(DOMAIN_CREATION)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class})
+@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class,
+    AbstractDeployableProjectModelBuilder.class})
 @PowerMockIgnore({"javax.management.*", "javax.script.*"})
 @PowerMockRunnerDelegate(JUnit4.class)
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
@@ -89,8 +93,9 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   @Before
   public void setUp() throws Exception {
-    mockStatic(MuleDeployableProjectModelBuilder.class);
-    given(isHeavyPackage(any())).willReturn(true);
+    mockStatic(AbstractDeployableProjectModelBuilder.class);
+    when(isHeavyPackage(any())).thenReturn(true);
+    when(defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
     DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
     doNothing().when(deployableProjectModelMock).validate();
     MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
@@ -120,8 +125,9 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     String domainName = "custom-domain";
 
     final DomainDescriptor descriptor = new DomainDescriptor(domainName);
-    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class)))
-        .thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class),
+                                                                    any()))
+                                                                        .thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     when(domainArtifactClassLoader.getArtifactId()).thenReturn(domainName);

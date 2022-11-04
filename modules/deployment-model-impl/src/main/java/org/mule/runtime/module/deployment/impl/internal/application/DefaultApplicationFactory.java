@@ -46,6 +46,7 @@ import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainRe
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
+import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
@@ -142,7 +143,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                       bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
                                                                                   artifactLocation)
                                                                                       .getDescriptor(),
-                                     getDescriptorCreator());
+                                     getDescriptorCreator(), new DefaultPluginPatchesResolver());
   }
 
   private DeployableArtifactDescriptorCreator<ApplicationDescriptor> getDescriptorCreator() {

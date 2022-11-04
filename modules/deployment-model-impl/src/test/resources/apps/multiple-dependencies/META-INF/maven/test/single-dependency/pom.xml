@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>test</groupId>
-    <artifactId>single-dependency</artifactId>
+    <artifactId>multiple-dependencies</artifactId>
     <version>1.0.0</version>
 
     <dependencies>
@@ -13,6 +13,12 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-http-connector</artifactId>
+            <version>1.5.24</version>
+            <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
 

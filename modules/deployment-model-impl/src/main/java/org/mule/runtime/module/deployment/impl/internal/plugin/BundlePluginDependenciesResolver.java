@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;

@@ -16,9 +16,9 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import static java.lang.Boolean.valueOf;
@@ -39,6 +39,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
+import org.mule.runtime.module.artifact.activation.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -279,7 +280,8 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
       if (muleArtifactPatchesFolder.exists()) {
         String[] jarFiles = muleArtifactPatchesFolder.list((dir, name) -> name != null && name.endsWith(".jar"));
         for (String jarFile : jarFiles) {
-          MuleArtifactPatchingModel muleArtifactPatchingModel = MuleArtifactPatchingModel.loadModel(jarFile);
+          MuleArtifactPatchingModel muleArtifactPatchingModel =
+              MuleArtifactPatchingModel.loadModel(new File(muleArtifactPatchesFolder, jarFile));
           GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
           Version thisArtifactCoordinatesVersion;
           try {

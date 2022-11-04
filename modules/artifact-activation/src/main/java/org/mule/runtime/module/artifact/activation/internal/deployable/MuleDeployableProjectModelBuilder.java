@@ -89,16 +89,14 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleDeployableProjectModelBuilder.class);
 
-
-
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
 
   private final File projectFolder;
-  private Optional<MuleDeployableModel> model;
+  private final Optional<MuleDeployableModel> model;
 
   public MuleDeployableProjectModelBuilder(File projectFolder) {
-    this.projectFolder = projectFolder;
+    this(projectFolder, empty());
   }
 
   public MuleDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model) {

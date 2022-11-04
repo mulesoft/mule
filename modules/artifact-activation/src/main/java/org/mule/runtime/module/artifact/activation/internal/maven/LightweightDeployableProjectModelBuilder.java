@@ -13,6 +13,7 @@ import static org.mule.runtime.module.artifact.activation.api.deployable.Artifac
 
 import static java.nio.file.Files.find;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.maven.client.internal.AetherMavenClient;
@@ -35,14 +36,11 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
 
   private final boolean isDomain;
   private final File projectFolder;
-
-  private Optional<MuleDeployableModel> model;
+  private final Optional<MuleDeployableModel> model;
 
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, boolean isDomain) {
-    super(getDefaultMavenConfiguration());
-    this.projectFolder = projectFolder;
-    this.isDomain = isDomain;
+    this(projectFolder, empty(), isDomain);
   }
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain) {
@@ -90,7 +88,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
     try (Stream<Path> stream = find(mavenFolder.toPath(), 3, (p, m) -> p.getFileName().toString().equals("pom.xml"))) {
       List<Path> pomLists = stream.collect(toList());
       if (pomLists.size() != 1) {
-        throw new MuleRuntimeException(createStaticMessage(""));
+        throw new MuleRuntimeException(createStaticMessage("Could find the pom in " + mavenFolder.toPath()));
       }
       return pomLists.get(0).toFile();
     } catch (IOException e) {

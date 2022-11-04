@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-class MuleArtifactPatchingModel {
+public class MuleArtifactPatchingModel {
 
   private static final String MULE_ARTIFACT_PATCH_JSON_FILE_NAME = "mule-artifact-patch.json";
 
@@ -33,7 +33,7 @@ class MuleArtifactPatchingModel {
   private ArtifactCoordinates artifactCoordinates;
   private List<String> affectedVersions;
 
-  static synchronized MuleArtifactPatchingModel loadModel(File pluginPatchJarFile) throws IOException {
+  public static synchronized MuleArtifactPatchingModel loadModel(File pluginPatchJarFile) throws IOException {
     final String key = pluginPatchJarFile.toString();
     if (!loadedModelByJar.containsKey(key)) {
       Optional<byte[]> muleArtifactPatchContent =

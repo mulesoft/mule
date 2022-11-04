@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.descriptor;
 import static org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver.noDomainDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.pluginModelResolver;
-import static org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver.pluginPatchesResolver;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
@@ -52,8 +51,9 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   @Override
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model, Map<String, String> deploymentProperties,
                                                            PluginModelResolver pluginModelResolver,
-                                                           PluginDescriptorResolver pluginDescriptorResolver) {
-    return createApplicationDescriptor(model, deploymentProperties, pluginPatchesResolver(), pluginModelResolver,
+                                                           PluginDescriptorResolver pluginDescriptorResolver,
+                                                           PluginPatchesResolver pluginPatchesResolver) {
+    return createApplicationDescriptor(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver,
                                        pluginDescriptorResolver,
                                        noDomainDescriptorResolver(),
                                        DeployableArtifactDescriptorCreator.applicationDescriptorCreator());
@@ -62,8 +62,9 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   @Override
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties,
-                                                           DomainDescriptorResolver domainDescriptorResolver) {
-    return createApplicationDescriptor(model, deploymentProperties, pluginPatchesResolver(), pluginModelResolver(),
+                                                           DomainDescriptorResolver domainDescriptorResolver,
+                                                           PluginPatchesResolver pluginPatchesResolver) {
+    return createApplicationDescriptor(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver(),
                                        pluginDescriptorResolver(), domainDescriptorResolver,
                                        DeployableArtifactDescriptorCreator.applicationDescriptorCreator());
   }
@@ -72,17 +73,19 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties,
                                                            DomainDescriptorResolver domainDescriptorResolver,
-                                                           DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator) {
-    return createApplicationDescriptor(model, deploymentProperties, pluginPatchesResolver(), pluginModelResolver(),
+                                                           DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator,
+                                                           PluginPatchesResolver pluginPatchesResolver) {
+    return createApplicationDescriptor(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver(),
                                        pluginDescriptorResolver(), domainDescriptorResolver,
                                        descriptorCreator);
   }
 
   @Override
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
-                                                           Map<String, String> deploymentProperties) {
+                                                           Map<String, String> deploymentProperties,
+                                                           PluginPatchesResolver pluginPatchesResolver) {
     return createApplicationDescriptor(model, deploymentProperties, noDomainDescriptorResolver(),
-                                       DeployableArtifactDescriptorCreator.applicationDescriptorCreator());
+                                       DeployableArtifactDescriptorCreator.applicationDescriptorCreator(), pluginPatchesResolver);
   }
 
   @Override
@@ -101,14 +104,16 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
 
   @Override
   public DomainDescriptor createDomainDescriptor(DeployableProjectModel model, Map<String, String> deploymentProperties,
-                                                 DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator) {
-    return createDomainDescriptor(model, deploymentProperties, pluginPatchesResolver(), pluginModelResolver(),
+                                                 DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator,
+                                                 PluginPatchesResolver pluginPatchesResolver) {
+    return createDomainDescriptor(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver(),
                                   pluginDescriptorResolver(), descriptorCreator);
   }
 
   @Override
-  public DomainDescriptor createDomainDescriptor(DeployableProjectModel model, Map<String, String> deploymentProperties) {
-    return createDomainDescriptor(model, deploymentProperties, pluginPatchesResolver(), pluginModelResolver(),
+  public DomainDescriptor createDomainDescriptor(DeployableProjectModel model, Map<String, String> deploymentProperties,
+                                                 PluginPatchesResolver pluginPatchesResolver) {
+    return createDomainDescriptor(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver(),
                                   pluginDescriptorResolver(), DeployableArtifactDescriptorCreator.domainDescriptorCreator());
   }
 }

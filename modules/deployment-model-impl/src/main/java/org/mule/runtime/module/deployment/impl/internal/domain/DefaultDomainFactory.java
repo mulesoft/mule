@@ -38,6 +38,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
+import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -109,7 +110,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
         .createDomainDescriptor(createDeployableProjectModel(domainLocation, true),
                                 deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
                                     .orElse(emptyMap()),
-                                getDescriptorCreator());
+                                getDescriptorCreator(), new DefaultPluginPatchesResolver());
   }
 
   private DeployableArtifactDescriptorCreator<DomainDescriptor> getDescriptorCreator() {
@@ -200,6 +201,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     return deployableArtifactDescriptorFactory
         .createDomainDescriptor(createDeployableProjectModel(artifactLocation, true),
                                 deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                    .orElse(emptyMap()));
+                                    .orElse(emptyMap()),
+                                new DefaultPluginPatchesResolver());
   }
 }
