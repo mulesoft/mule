@@ -146,8 +146,8 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    * are references left from outside the application context. So, it retains instances and leaks the application ClassLoader.
    * This method removes the knownLevels registered by the Classes Loaded by the driver ClassLoader. This only applies to JDK8. *
    * https://bugs.openjdk.java.net/browse/JDK-6543126 *
-   * https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/logging/Level.java#L534 *
-   * https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.logging/share/classes/java/util/logging/Level.java#L563
+   * https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/2544d2a351eca1a3d62276f969dd2d95e4a4d2b6/jdk/src/share/classes/java/util/logging/Level.java#L534
+   * https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/19fb8f93c59dfd791f62d41f332db9e306bc1422/src/java.logging/share/classes/java/util/logging/Level.java#L563
    */
   // TODO MULE-19714 Promote IBM ResourceReleaser features as Generic Features
   public void cleanJULKnownLevels() {
