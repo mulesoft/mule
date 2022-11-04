@@ -70,11 +70,11 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
 
     Supplier<MuleDeployableModel> modelResolver = getModelResolver();
 
-    List<String> exportedPackages =
-        (List<String>) modelResolver.get().getClassLoaderModelLoaderDescriptor().getAttributes().get("exportedPackages");
+    List<String> exportedPackages = (List<String>) modelResolver.get()
+        .getClassLoaderModelLoaderDescriptor().getAttributes().getOrDefault("exportedPackages", emptyList());
 
-    List<String> exportedResources =
-        (List<String>) modelResolver.get().getClassLoaderModelLoaderDescriptor().getAttributes().get("exportedResources");
+    List<String> exportedResources = (List<String>) modelResolver.get().getClassLoaderModelLoaderDescriptor().getAttributes()
+        .getOrDefault("exportedResources", emptyList());
 
     return new DeployableProjectModel(exportedPackages, exportedResources, emptyList(),
                                       buildBundleDescriptor(deployableArtifactCoordinates),
