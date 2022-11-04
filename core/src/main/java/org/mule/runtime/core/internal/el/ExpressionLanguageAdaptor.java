@@ -161,6 +161,6 @@ public interface ExpressionLanguageAdaptor {
 
   default ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
                                                                            TypeBindings bindings) {
-    throw new UnsupportedOperationException("The bal");
+    throw new UnsupportedOperationException("The current ExpressionLanguage does not support collectScopePhaseValidationMessages() method. Please update the expression language version");
   }
 }

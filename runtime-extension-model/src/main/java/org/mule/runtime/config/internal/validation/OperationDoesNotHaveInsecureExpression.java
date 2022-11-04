@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.internal.validation;
 
+import static org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind.DEPRECATED;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.core.internal.util.ExpressionUtils.getUnfixedExpression;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 
 import org.mule.metadata.message.api.el.TypeBindings;
@@ -47,9 +49,11 @@ public class OperationDoesNotHaveInsecureExpression extends OperationValidation 
     if (!isExpression(expression)) {
       return false;
     }
+    String actualExpression = getUnfixedExpression(expression);
     ScopePhaseValidationMessages result =
-        expressionLanguage.collectScopePhaseValidationMessages(expression, "tuvieja", TypeBindings.builder().build());
-    return false;
+        expressionLanguage.collectScopePhaseValidationMessages(actualExpression, "tuvieja", TypeBindings.builder().build());
+
+    return result.getWarnings().stream().anyMatch(warning -> warning.getKind().equals(DEPRECATED) && warning.getParams().get("function").equals("lookup"));
   }
 
   /**
