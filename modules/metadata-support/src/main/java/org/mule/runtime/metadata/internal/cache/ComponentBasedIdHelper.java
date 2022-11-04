@@ -6,23 +6,40 @@
  */
 package org.mule.runtime.metadata.internal.cache;
 
-import static java.util.Comparator.comparing;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.Typed;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -67,6 +84,18 @@ public class ComponentBasedIdHelper {
     // .map(p -> p.getValue().reduce(identity(), v -> v.toString()));
     return ofNullable(elementModel.getParameter(DEFAULT_GROUP_NAME, CONFIG_ATTRIBUTE_NAME))
         .map(param -> param.getResolvedRawValue());
+  }
+
+  public static List<String> parameterNamesRequiredForMetadataCacheId(ComponentAst component) {
+    return component.getModel(EnrichableModel.class)
+        .flatMap(model -> model.getModelProperty(RequiredForMetadataModelProperty.class)
+            .map(RequiredForMetadataModelProperty::getRequiredParameters))
+        .orElse(emptyList());
+  }
+
+  public static MetadataCacheId resolveComponentIdentifierMetadataCacheId(ComponentAst elementModel) {
+    final ComponentIdentifier id = elementModel.getIdentifier();
+    return new MetadataCacheId(id.hashCode(), id.toString());
   }
 
   /**
@@ -203,6 +232,83 @@ public class ComponentBasedIdHelper {
         }
       });
     }
+  }
+
+  public static Optional<MetadataCacheId> resolveMetadataKeyParts(ComponentAst elementModel,
+                                                                  ComponentModel componentModel,
+                                                                  boolean resolveAllKeys,
+                                                                  Function<String, Optional<MetadataCacheId>> calculateForElement) {
+    boolean isPartialFetching = componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
+        .map(TypeResolversInformationModelProperty::isPartialTypeKeyResolver)
+        .orElse(false);
+
+    if (!isPartialFetching && !resolveAllKeys) {
+      return empty();
+    }
+
+    List<MetadataCacheId> keyParts = elementModel.getParameters()
+        .stream()
+        .filter(p -> p.getValue().getValue().isPresent())
+        .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .sorted(comparingInt(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
+        .map(p -> resolveKeyFromSimpleValue(elementModel, p, calculateForElement))
+        .collect(toList());
+    return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
+  }
+
+  public static MetadataCacheId resolveKeyFromSimpleValue(ComponentAst elementModel, ComponentParameterAst param,
+                                                          Function<String, Optional<MetadataCacheId>> calculateForElement) {
+    final MetadataCacheId notCheckingReferences = computeIdFor(elementModel, param, MetadataCacheIdBuilderAdapter::new);
+    return param.getValue().reduce(v -> notCheckingReferences,
+                                   v -> {
+                                     Reference<MetadataCacheId> reference = new Reference<>();
+                                     if (v instanceof ComponentAst) {
+                                       param.getModel().getType().accept(new MetadataTypeVisitor() {
+
+                                         @Override
+                                         public void visitArrayType(ArrayType arrayType) {
+                                           calculateForElement.apply(param.getResolvedRawValue()).ifPresent(reference::set);
+                                         }
+
+                                         @Override
+                                         public void visitObject(ObjectType objectType) {
+                                           boolean canBeGlobal = objectType.getAnnotation(TypeDslAnnotation.class)
+                                               .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
+
+                                           if (canBeGlobal) {
+                                             calculateForElement.apply(param.getResolvedRawValue()).ifPresent(reference::set);
+                                           }
+                                         }
+                                       });
+                                     } else {
+                                       final ParameterModel paramModel = param.getModel();
+                                       paramModel.getType().accept(new MetadataTypeVisitor() {
+
+                                         @Override
+                                         public void visitString(StringType stringType) {
+                                           if (!paramModel.getAllowedStereotypes().isEmpty()) {
+                                             calculateForElement.apply(v.toString()).ifPresent(reference::set);
+                                           }
+                                         }
+
+                                         @Override
+                                         public void visitArrayType(ArrayType arrayType) {
+                                           if (paramModel.getDslConfiguration().allowsReferences() && v instanceof String) {
+                                             calculateForElement.apply(v.toString()).ifPresent(reference::set);
+                                           }
+                                         }
+
+                                         @Override
+                                         public void visitObject(ObjectType objectType) {
+                                           if (paramModel.getDslConfiguration().allowsReferences()) {
+                                             calculateForElement.apply(v.toString()).ifPresent(reference::set);
+                                           }
+                                         }
+
+                                       });
+                                     }
+                                     return reference.get() == null ? notCheckingReferences : reference.get();
+                                   });
   }
 
 }
