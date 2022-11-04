@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -13,6 +14,7 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -156,4 +158,9 @@ public interface ExpressionLanguageAdaptor {
    * @since 4.3.0
    */
   CompiledExpression compile(String expression, BindingContext bindingContext);
+
+  default ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
+                                                                           TypeBindings bindings) {
+    throw new UnsupportedOperationException("The bal");
+  }
 }
