@@ -137,6 +137,7 @@
         <operation:body>
             <this:hello-world greeting="#[params.greeting]"
                               receiver="#[if(params.city != null) params.city else params.country]"/>
+            <logger message="#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]"/>
         </operation:body>
     </operation:def>
 

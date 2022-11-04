@@ -11,8 +11,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 
+import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -45,8 +47,9 @@ public class OperationDoesNotHaveInsecureExpression extends OperationValidation 
     if (!isExpression(expression)) {
       return false;
     }
-    ValidationResult result = expressionLanguage.validate(expression);
-    return !result.isSuccess();
+    ScopePhaseValidationMessages result =
+        expressionLanguage.collectScopePhaseValidationMessages(expression, "tuvieja", TypeBindings.builder().build());
+    return false;
   }
 
   /**
