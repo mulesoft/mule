@@ -111,7 +111,7 @@ public final class AnnotatedObjectInvocationHandler {
           if (overridingMethod.isPresent()) {
             annotatedObjectInvocationHandler.getOverridingMethods().put(method, overridingMethod.get());
             return annotatedObjectInvocationHandler;
-          } else if (method.getName().equals("toString")) {
+          } else if (isToStringFromObject(method)) {
             return (MethodInterceptor) (obj, toStringMethod, args, proxy) -> {
               String base = obj.getClass().getName() + "@" + toHexString(obj.hashCode()) + "; location: ";
               if (((Component) obj).getLocation() != null) {
@@ -140,6 +140,10 @@ public final class AnnotatedObjectInvocationHandler {
     registerStaticCallbacks(annotatedClass, callbackHelper.getCallbacks());
 
     return annotatedClass;
+  }
+
+  private static boolean isToStringFromObject(Method method) {
+    return method.getName().equals("toString") && method.getDeclaringClass().equals(Object.class);
   }
 
   /**
