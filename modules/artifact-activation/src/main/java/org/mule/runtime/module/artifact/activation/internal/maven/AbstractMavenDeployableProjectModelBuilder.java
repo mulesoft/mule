@@ -38,7 +38,6 @@ import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
@@ -92,12 +91,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     final MavenClientProvider mavenClientProvider =
         discoverProvider(MavenDeployableProjectModelBuilder.class.getClassLoader());
 
-
-    File localRepository = new File(MuleFoldersUtil.getMuleBaseFolder(), "repository");
-
-    final Supplier<File> localMavenRepository = localRepository.exists() ? () -> localRepository
-        : mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
-
+    final Supplier<File> localMavenRepository =
+        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
     final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
     final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
     final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier();
