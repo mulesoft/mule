@@ -59,7 +59,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                     : singletonMap("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT",
                                                                                    true),
                                                                 artifactPluginDescriptor,
-                                                                discoveryRequest.isOCSEnabled()))
+                                                                discoveryRequest.isOCSEnabled(),
+                                                                discoveryRequest.isEnableIgnoredComponents()))
         .orElse(null);
   }
 
@@ -77,6 +78,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
    *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest}.
    * @param artifactPluginDescriptor       {@link ArtifactPluginDescriptor} of the extension.
    * @param ocsEnabled                     whether OCS is enabled.
+   * @param enableIgnoredComponents        whether components that have been disabled with the {@code Ignore} directive are to be
+   *                                       included.
    * @throws IllegalArgumentException there is no {@link ExtensionModelLoader} for the ID in the {@link MulePluginModel}.
    */
   private ExtensionModel discoverExtensionThroughJsonDescriber(ExtensionModelLoaderRepository extensionModelLoaderRepository,
@@ -86,7 +89,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                String artifactName,
                                                                Map<String, Object> additionalAttributes,
                                                                ArtifactPluginDescriptor artifactPluginDescriptor,
-                                                               boolean ocsEnabled) {
+                                                               boolean ocsEnabled,
+                                                               boolean enableIgnoredComponents) {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
@@ -96,6 +100,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
     return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies))
         .addParameters(attributes)
         .setOCSEnabled(ocsEnabled)
+        .setEnableIgnoredComponents(enableIgnoredComponents)
         .setArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }

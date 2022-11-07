@@ -46,11 +46,6 @@ public interface ExtensionDiscoveryRequest {
   Set<ExtensionModel> getParentArtifactExtensions();
 
   /**
-   * @return Whether OCS is enabled.
-   */
-  boolean isOCSEnabled();
-
-  /**
    * Parallel discovery will try to parallelize only the discovery for extensions that do not depend on the DSL of other
    * extensions.
    * <p>
@@ -67,6 +62,16 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isEnrichDescriptions();
 
+  /**
+   * @return whether OCS is enabled.
+   */
+  boolean isOCSEnabled();
+
+  /**
+   * @return whether components that have been disabled with the {@code Ignore} directive are to be included.
+   */
+  boolean isEnableIgnoredComponents();
+
   @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
@@ -74,7 +79,8 @@ public interface ExtensionDiscoveryRequest {
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
-    private boolean ocsEnabled;
+    private boolean ocsEnabled = false;
+    private boolean enableIgnoredComponents = false;
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -101,9 +107,15 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
+    public ExtensionDiscoveryRequestBuilder setEnableIgnoredComponents(boolean enableIgnoredComponents) {
+      this.enableIgnoredComponents = enableIgnoredComponents;
+      return this;
+    }
+
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, ocsEnabled);
+                                                  parallelDiscovery, enrichDescriptions, ocsEnabled,
+                                                  enableIgnoredComponents);
     }
   }
 }

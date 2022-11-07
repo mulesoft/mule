@@ -27,22 +27,24 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   private final boolean parallelDiscovery;
   private final boolean enrichDescriptions;
   private final boolean ocsEnabled;
+  private final boolean enableIgnoredComponents;
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
-    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false);
+    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, false);
   }
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions, boolean parallelDiscovery,
-                                          boolean enrichDescriptions, boolean ocsEnabled) {
+                                          boolean enrichDescriptions, boolean ocsEnabled, boolean enableIgnoredComponents) {
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
     this.parallelDiscovery = parallelDiscovery;
     this.enrichDescriptions = enrichDescriptions;
     this.ocsEnabled = ocsEnabled;
+    this.enableIgnoredComponents = enableIgnoredComponents;
   }
 
   @Override
@@ -68,6 +70,11 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   @Override
   public boolean isOCSEnabled() {
     return ocsEnabled;
+  }
+
+  @Override
+  public boolean isEnableIgnoredComponents() {
+    return enableIgnoredComponents;
   }
 
 }
