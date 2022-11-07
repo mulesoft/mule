@@ -7,9 +7,8 @@
 package org.mule.runtime.module.extension.mule.internal.dsl;
 
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
-
-import static java.lang.String.format;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -34,8 +33,6 @@ public interface MuleSdkDslConstants {
   String MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME = "namespace";
   String MULE_SDK_EXTENSION_PREFIX_PARAMETER_NAME = "prefix";
 
-  String MULE_SDK_EXTENSION_DSL_NAMESPACE_URI = format(DEFAULT_NAMESPACE_URI_MASK, "mule-extension");
-  String MULE_SDK_EXTENSION_DSL_NAMESPACE = "extension";
   String MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME = "errors";
   String MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME = "error";
   String MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME = "mule-extension.xsd";

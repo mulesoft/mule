@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_NAME;
@@ -27,8 +29,6 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME;
