@@ -169,7 +169,7 @@ public class SourceResultAdapter {
   }
 
   /**
-   * @return the span root attributes. This will be added to the flow span associated to this source.
+   * @return the span root attributes. This will be added to the span associated to this source.
    *
    * @since 4.5.0
    */
