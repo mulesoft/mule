@@ -217,14 +217,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void objectStoreIsRemovedWhenDisposed() throws Exception {
-    irp.setObjectStore(mockObjectStore);
-    irp.dispose();
-    verify(mockObjectStoreManager)
-        .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
-  }
-
-  @Test
   @Issue("W-11985583")
   public void objectStoreIsClosedOnDisposeWhenItIsOwnedByTheRedeliveryPolicy() throws Exception {
     irp.setPrivateObjectStore(mockObjectStore);
