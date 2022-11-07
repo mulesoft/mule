@@ -111,13 +111,13 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
 
   private BundleDescriptor buildBundleDescriptor(ArtifactCoordinates artifactCoordinates, boolean isDomain) {
     return new BundleDescriptor.Builder()
-      .setArtifactId(artifactCoordinates.getArtifactId())
-      .setGroupId(artifactCoordinates.getGroupId())
-      .setVersion(artifactCoordinates.getVersion())
-      .setBaseVersion(artifactCoordinates.getVersion())
-      .setType(artifactCoordinates.getType())
-      .setClassifier(isDomain ? MULE_DOMAIN_CLASSIFIER : MULE_APPLICATION_CLASSIFIER)
-      .build();
+        .setArtifactId(artifactCoordinates.getArtifactId())
+        .setGroupId(artifactCoordinates.getGroupId())
+        .setVersion(artifactCoordinates.getVersion())
+        .setBaseVersion(artifactCoordinates.getVersion())
+        .setType(artifactCoordinates.getType())
+        .setClassifier(isDomain ? MULE_DOMAIN_CLASSIFIER : MULE_APPLICATION_CLASSIFIER)
+        .build();
   }
 
 }
