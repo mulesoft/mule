@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.component;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -117,6 +119,27 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     Class<Component> annotatedClass = addAnnotationsToClass(childCl.loadClass(Delegator.class.getName()));
 
     assertThat(annotatedClass.getClassLoader(), instanceOf(CompositeClassLoader.class));
+  }
+
+  @Test
+  @Issue("W-10781796")
+  public void whenClassDoesntDeclareToStringThenTheObjectToStringIsDecoratedWithLocation() throws Exception {
+    Component annotated = addAnnotationsToClass(NotOverridingToString.class).newInstance();
+    assertThat(annotated.toString(), containsString("location"));
+  }
+
+  @Test
+  @Issue("W-10781796")
+  public void whenClassDoesDeclareToStringThenTheOverriddenToStringIsUsed() throws Exception {
+    Component annotated = addAnnotationsToClass(OverridingToString.class).newInstance();
+    assertThat(annotated.toString(), is("Expected string"));
+  }
+
+  @Test
+  @Issue("W-10781796")
+  public void whenClassExtendsAnotherThatDeclaresToStringThenTheOverriddenToStringIsUsed() throws Exception {
+    Component annotated = addAnnotationsToClass(ExtendingClassThatOverridesToString.class).newInstance();
+    assertThat(annotated.toString(), is("Expected string"));
   }
 
   private ClassLoader createDelegatorClassLoader() {
@@ -212,6 +235,24 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
       this.value = value;
     }
 
+  }
+
+  public static class OverridingToString {
+
+    @Override
+    public String toString() {
+      return "Expected string";
+    }
+  }
+
+  public static class ExtendingClassThatOverridesToString extends OverridingToString {
+
+    // Doesnt override toString, but extends a class which does it.
+  }
+
+  public static class NotOverridingToString {
+
+    // Doesnt override toString.
   }
 
 }
