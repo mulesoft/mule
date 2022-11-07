@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
@@ -239,7 +240,7 @@ public class DefaultToolingService implements ToolingService {
   private Application doCreateApplication(ApplicationDescriptor applicationDescriptor) throws IOException {
     Application application = applicationFactory.createArtifact(applicationDescriptor);
     application.install();
-    application.lazyInit();
+    application.lazyInitTooling(true);
     application.start();
     return application;
   }
@@ -286,7 +287,7 @@ public class DefaultToolingService implements ToolingService {
     Optional<Properties> mergedDeploymentProperties = of(createDeploymentProperties(deploymentProperties));
     Domain domain = domainFactory.createArtifact(toolingDomainContent, mergedDeploymentProperties);
     domain.install();
-    domain.lazyInit();
+    domain.lazyInitTooling(true);
     domain.start();
     return new ToolingDomainWrapper(domain);
   }
@@ -303,6 +304,7 @@ public class DefaultToolingService implements ToolingService {
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY,
                            String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, "false"))));
     properties.setProperty(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath());
+    properties.setProperty(MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY, "true");
     return properties;
   }
 
