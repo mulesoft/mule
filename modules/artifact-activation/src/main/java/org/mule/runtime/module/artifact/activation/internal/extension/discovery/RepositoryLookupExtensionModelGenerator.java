@@ -15,6 +15,7 @@ import static java.util.Collections.singletonMap;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
@@ -78,7 +79,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
    *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest}.
    * @param artifactPluginDescriptor       {@link ArtifactPluginDescriptor} of the extension.
    * @param ocsEnabled                     whether OCS is enabled.
-   * @param enableIgnoredComponents        whether components that have been disabled with the {@code Ignore} directive are to be
+   * @param enableIgnoredComponents        whether components that have been disabled with the {@link Ignore} directive are to be
    *                                       included.
    * @throws IllegalArgumentException there is no {@link ExtensionModelLoader} for the ID in the {@link MulePluginModel}.
    */

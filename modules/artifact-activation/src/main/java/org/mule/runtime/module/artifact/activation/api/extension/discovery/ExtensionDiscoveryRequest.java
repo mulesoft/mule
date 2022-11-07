@@ -12,6 +12,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -68,7 +69,7 @@ public interface ExtensionDiscoveryRequest {
   boolean isOCSEnabled();
 
   /**
-   * @return whether components that have been disabled with the {@code Ignore} directive are to be included.
+   * @return whether components that have been disabled with the {@link Ignore} directive are to be included.
    */
   boolean isEnableIgnoredComponents();
 
