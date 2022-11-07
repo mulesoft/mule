@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
@@ -47,7 +48,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
   }
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain) {
-    super(getDefaultMavenConfiguration());
+    super(getMavenConfig().getLocalMavenRepositoryLocation().exists() ? getMavenConfig() : getDefaultMavenConfiguration());
     this.projectFolder = projectFolder;
     this.model = model;
     this.isDomain = isDomain;
