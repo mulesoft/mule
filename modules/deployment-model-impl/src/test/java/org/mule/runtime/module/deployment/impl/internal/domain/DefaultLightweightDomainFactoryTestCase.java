@@ -27,6 +27,7 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -41,6 +42,7 @@ import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.Before;
 import org.junit.Test;
 
 @Feature(DOMAIN_CREATION)
@@ -61,6 +63,12 @@ public class DefaultLightweightDomainFactoryTestCase extends AbstractMuleTestCas
                                getRuntimeLockFactory(),
                                mock(MemoryManagementService.class),
                                mock(ArtifactConfigurationProcessor.class));
+
+  @Before
+  public void before() {
+    GlobalConfigLoader.reset();
+  }
+
 
   @Test
   public void lightweightDomain() throws Exception {
