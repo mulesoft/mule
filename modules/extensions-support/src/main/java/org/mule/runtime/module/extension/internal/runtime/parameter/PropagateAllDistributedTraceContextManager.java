@@ -14,6 +14,8 @@ import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
+import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextManager;
+import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextVisitor;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.util.HashMap;
@@ -24,7 +26,7 @@ import java.util.Map;
  *
  * @since 4.5.0
  */
-public class PropagateAllDistributedTraceContextManager implements DistributedTraceContextManager {
+public class PropagateAllDistributedTraceContextManager implements InternalDistributedTraceContextManager {
 
   private Map<String, String> contextMap;
   private final CoreEvent coreEvent;
@@ -68,5 +70,10 @@ public class PropagateAllDistributedTraceContextManager implements DistributedTr
   @Override
   public void addCurrentSpanAttributes(Map<String, String> attributes) {
     coreEventTracer.addCurrentSpanAttributes(coreEvent, attributes);
+  }
+
+  @Override
+  public <T> T visit(InternalDistributedTraceContextVisitor<T> visitor) {
+    return visitor.accept(this);
   }
 }

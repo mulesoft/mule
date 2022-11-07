@@ -66,6 +66,22 @@ public interface DistributedTraceContext extends CurrentSpanAware {
   void recordErrorAtCurrentSpan(InternalSpanError error);
 
   /**
+   * Set the initial overridden span name
+   * 
+   * @param name the name to set.
+   */
+  void setRootSpanName(String name);
+
+  /**
+   * @return set the initial overridden span name.
+   */
+  String getRootSpanName();
+
+  void setSpanRootAttribute(String key, String value);
+
+  Map<String, String> getSpanRootAttributes();
+
+  /**
    * @return a {@link DistributedTraceContext} that has no fields nor baggage set.
    */
   static DistributedTraceContext emptyDistributedEventContext() {
@@ -104,6 +120,26 @@ public interface DistributedTraceContext extends CurrentSpanAware {
       @Override
       public void recordErrorAtCurrentSpan(InternalSpanError error) {
         // Nothing to do.
+      }
+
+      @Override
+      public void setRootSpanName(String name) {
+
+      }
+
+      @Override
+      public String getRootSpanName() {
+        return null;
+      }
+
+      @Override
+      public void setSpanRootAttribute(String key, String value) {
+
+      }
+
+      @Override
+      public Map<String, String> getSpanRootAttributes() {
+        return null;
       }
 
       @Override

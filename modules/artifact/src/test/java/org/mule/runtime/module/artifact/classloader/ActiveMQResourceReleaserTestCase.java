@@ -7,18 +7,20 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
-import static java.lang.Thread.enumerate;
+
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.currentThread;
-import static org.mockito.Mockito.mock;
+import static java.lang.Thread.enumerate;
+
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.junit.Assert.assertFalse;
 import static org.awaitility.Awaitility.await;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
@@ -28,9 +30,10 @@ import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,12 +46,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
@@ -64,7 +69,7 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   String driverVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
-  MuleArtifactClassLoader artifactClassLoader = null;
+  MulePluginClassLoader artifactClassLoader = null;
 
   public ActiveMQResourceReleaserTestCase(String driverVersion) {
     this.driverVersion = driverVersion;
@@ -129,9 +134,9 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
     artifactClassLoader =
-        new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                    new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
+        new MulePluginClassLoader("ActiveMQResourceReleaserTestCase", mock(ArtifactDescriptor.class),
+                                  new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
 
     CompositeClassLoader classLoader = from(artifactClassLoader);
     currentThread().setContextClassLoader(classLoader);
@@ -158,12 +163,7 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   private Callable<Boolean> listOfThreadsContainInactivityMonitorThread() {
-    return new Callable<Boolean>() {
-
-      public Boolean call() {
-        return getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
-      }
-    };
+    return () -> getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
   }
 
   private List<String> getNameListOfActiveThreads() {
