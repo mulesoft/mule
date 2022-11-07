@@ -160,7 +160,7 @@ public class SourceResultAdapter {
   }
 
   /**
-   * @return the root name. This will override the name of the flow associated to the source.
+   * @return the root name. This will override the name of the span associated to the source.
    *
    * @since 4.5.0
    */

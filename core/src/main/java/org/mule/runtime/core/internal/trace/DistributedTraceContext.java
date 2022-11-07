@@ -73,7 +73,7 @@ public interface DistributedTraceContext extends CurrentSpanAware {
   void setRootSpanName(String name);
 
   /**
-   * @return set the initial overridden span nam.
+   * @return set the initial overridden span name.
    */
   String getRootSpanName();
 
