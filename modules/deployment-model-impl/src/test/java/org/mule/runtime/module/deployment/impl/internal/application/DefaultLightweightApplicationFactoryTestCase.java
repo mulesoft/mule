@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
@@ -33,6 +34,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -44,6 +46,7 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -52,11 +55,20 @@ import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(APP_CREATION)
 @Issue("W-11086334")
 public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
+                                                                discoverProvider(ApplicationDescriptorFactoryTestCase.class
+                                                                    .getClassLoader()).getLocalRepositorySuppliers()
+                                                                        .environmentMavenRepositorySupplier().get()
+                                                                        .getAbsolutePath());
 
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
       mock(ApplicationClassLoaderBuilderFactory.class);
@@ -128,6 +140,11 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
     domainManager.addDomain(defaultDomain);
   }
 
+  @Before
+  public void before() {
+    GlobalConfigLoader.reset();
+  }
+
   @Test
   public void lightweightApplication() throws Exception {
     String appName = "no-dependencies";
@@ -163,5 +180,4 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
   protected File getApplicationFolder(String path) throws URISyntaxException {
     return new File(getClass().getClassLoader().getResource(path).toURI());
   }
-
 }

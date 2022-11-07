@@ -48,7 +48,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
   }
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain) {
-    super(getMavenConfig().getLocalMavenRepositoryLocation().exists() ? getMavenConfig() : getDefaultMavenConfiguration());
+    super(getMavenConfig());
     this.projectFolder = projectFolder;
     this.model = model;
     this.isDomain = isDomain;
