@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -50,7 +50,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -100,6 +99,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private ObjectStore<RedeliveryCounter> store;
   private ObjectStore<RedeliveryCounter> privateStore;
   private String idrId;
+  private boolean isOwnedObjectStore;
 
 
   /**
@@ -144,6 +144,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     }
 
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
+
+    isOwnedObjectStore = privateStore != null || store == null;
+
     if (store != null && privateStore != null) {
       throw new InitialisationException(
                                         createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
@@ -157,27 +160,26 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     if (store == null) {
       // If no object store was defined, create one
       if (privateStore == null) {
-        this.store = internalObjectStoreSupplier().get();
+        this.store = createInternalObjectStore();
       } else {
         // If object store was defined privately
         this.store = privateStore;
       }
     }
-    initialiseIfNeeded(store, true, muleContext);
+
+    if (isOwnedObjectStore) {
+      initialiseIfNeeded(store, true, muleContext);
+    }
   }
 
-  private Supplier<ObjectStore> internalObjectStoreSupplier() {
-    return () -> objectStoreManager.createObjectStore(getObjectStoreName(),
-                                                      ObjectStoreSettings.builder()
-                                                          .persistent(false)
-                                                          .entryTtl((long) 60 * 5 * 1000)
-                                                          .expirationInterval(6000L).build());
+  private ObjectStore<RedeliveryCounter> createInternalObjectStore() {
+    return objectStoreManager.createObjectStore(getObjectStoreName(), ObjectStoreSettings.builder().persistent(false)
+        .entryTtl((long) 60 * 5 * 1000).expirationInterval(6000L).build());
   }
 
   @Override
   public void dispose() {
-    super.dispose();
-    if (store != null) {
+    if (isOwnedObjectStore && store != null) {
       try {
         store.close();
       } catch (ObjectStoreException e) {
@@ -190,18 +192,23 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
       store = null;
     }
+    super.dispose();
   }
 
   @Override
   public void start() throws MuleException {
     super.start();
-    startIfNeeded(store);
+    if (isOwnedObjectStore) {
+      startIfNeeded(store);
+    }
   }
 
   @Override
   public void stop() throws MuleException {
+    if (isOwnedObjectStore) {
+      stopIfNeeded(store);
+    }
     super.stop();
-    stopIfNeeded(store);
   }
 
   @Override
