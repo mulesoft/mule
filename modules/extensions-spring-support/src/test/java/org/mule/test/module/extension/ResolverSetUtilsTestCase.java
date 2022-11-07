@@ -9,7 +9,6 @@ package org.mule.test.module.extension;
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +16,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
@@ -29,8 +27,6 @@ import static org.mule.test.oauth.ConnectionType.HYPER;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-import org.mule.metadata.api.annotation.TypeIdAnnotation;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -42,6 +38,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.event.NullEventFactory;
@@ -60,8 +57,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUt
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.test.metadata.extension.model.shapes.Circle;
-import org.mule.test.oauth.*;
+import org.mule.test.oauth.ConnectionProfile;
+import org.mule.test.oauth.ConnectionProperties;
+import org.mule.test.oauth.ConnectionType;
+import org.mule.test.oauth.Rectangle;
+import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.subtypes.extension.Square;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
@@ -78,6 +78,7 @@ import io.qameta.allure.Description;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
@@ -123,14 +124,12 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
       objectValueDeclarer -> objectValueDeclarer.withField(SQUARE_AREA_NAME, SQUARE_AREA_VALUE)
           .withField(SQUARE_SIDE_NAME, SQUARE_SIDE_VALUE);
 
-  private static final String SUBTYPE_EXTENSION_IDENTIFIER = "subtypes";
-  private static final String SQUARE_TYPE_IDENTIFIER = "org.mule.test.subtypes.extension.Square";
-  private static final String SQUARE_TYPE_ALIAS = "Square";
+  private static final String SQUARE_TYPE_IDENTIFIER = "subtypes:Square";
 
   private static final Consumer<ValueDeclarer> SQUARE_WITH_TYPE_ID_VALUE_DECLARER = valueDeclarer -> valueDeclarer
-      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SUBTYPE_EXTENSION_IDENTIFIER, SQUARE_TYPE_IDENTIFIER);
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SQUARE_TYPE_IDENTIFIER);
   private static final Consumer<ValueDeclarer> SQUARE_WITH_TYPE_ALIAS_VALUE_DECLARER = valueDeclarer -> valueDeclarer
-      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SUBTYPE_EXTENSION_IDENTIFIER, SQUARE_TYPE_ALIAS);
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SQUARE_TYPE_IDENTIFIER);
 
   private static final int RECTANGLE_BASE_VALUE = 3;
   private static final int RECTANGLE_HEIGHT_VALUE = 4;
@@ -141,7 +140,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private static final String RECTANGLE_AREA_NAME = "area";
 
   private static final String OAUTH_EXTENSION_IDENTIFIER = "test-oauth";
-  private static final String RECTANGLE_TYPE_IDENTIFIER = "org.mule.test.oauth.Rectangle";
+  private static final String RECTANGLE_TYPE_IDENTIFIER = "test-oauth:Rectangle";
 
   private static final Consumer<ObjectValueDeclarer> RECTANGLE_OBJECT_VALUE_DECLARER =
       objectValueDeclarer -> objectValueDeclarer.withField(RECTANGLE_BASE_NAME, RECTANGLE_BASE_VALUE)
@@ -149,7 +148,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
           .withField(RECTANGLE_AREA_NAME, RECTANGLE_AREA_VALUE);
 
   private static final Consumer<ValueDeclarer> RECTANGLE_VALUE_DECLARER = valueDeclarer -> valueDeclarer
-      .objectValue(RECTANGLE_OBJECT_VALUE_DECLARER, OAUTH_EXTENSION_IDENTIFIER, RECTANGLE_TYPE_IDENTIFIER);
+      .objectValue(RECTANGLE_OBJECT_VALUE_DECLARER, RECTANGLE_TYPE_IDENTIFIER);
 
   private static final Rectangle TEST_RECTANGLE =
       new Rectangle(RECTANGLE_AREA_VALUE, RECTANGLE_BASE_VALUE, RECTANGLE_HEIGHT_VALUE);
@@ -491,20 +490,25 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
           .withItem(SQUARE_WITH_TYPE_ID_VALUE_DECLARER));
 
   private static final String INVALID_EXTENSION_IDENTIFIER = "invalid-extension-identifier";
+
+  private static final String INVALID_EXTENSION_TYPE_IDENTIFIER = INVALID_EXTENSION_IDENTIFIER + ":Square";
+
   private static final String INVALID_TYPE_IDENTIFIER = "FakeTypeIdentifier";
 
   private static final Consumer<ValueDeclarer> INVALID_EXTENSION_IDENTIFIER_VALUE_DECLARER = valueDeclarer -> valueDeclarer
-      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, INVALID_EXTENSION_IDENTIFIER, SQUARE_TYPE_IDENTIFIER);
-  private static final Consumer<ValueDeclarer> INVALID_TYPE_IDENTIFIER_VALUE_DECLARER = valueDeclarer -> valueDeclarer
-      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, SUBTYPE_EXTENSION_IDENTIFIER, INVALID_TYPE_IDENTIFIER);
-  private static final Consumer<ValueDeclarer> INVALID_TYPE_USED_VALUE_DECLARER = valueDeclarer -> valueDeclarer
-      .objectValue(POJO_OBJECT_VALUE_DECLARER, OAUTH_EXTENSION_IDENTIFIER, RECTANGLE_TYPE_IDENTIFIER);
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, INVALID_EXTENSION_TYPE_IDENTIFIER);
 
+  private static final String SUBTYPE_EXTENSION_IDENTIFIER = "subtypes";
+
+  private static final String INVALID_TYPE_IDENTIFIER_FOR_MODULE = SUBTYPE_EXTENSION_IDENTIFIER + ":" + INVALID_TYPE_IDENTIFIER;
+  private static final Consumer<ValueDeclarer> INVALID_TYPE_IDENTIFIER_VALUE_DECLARER = valueDeclarer -> valueDeclarer
+      .objectValue(SQUARE_OBJECT_VALUE_DECLARER, INVALID_TYPE_IDENTIFIER_FOR_MODULE);
   private static final String EXTENSION_WITH_ID_NOT_FOUND_MESSAGE =
       format("No extension found with identifier [%s]", INVALID_EXTENSION_IDENTIFIER);
 
   private static final String TYPE_WITH_ID_NOT_FOUND_MESSAGE =
-      format("No type with identifier [%s] was found for extension [%s]", INVALID_TYPE_IDENTIFIER,
+      format("No type with identifier [%s] was found for extension [%s]",
+             INVALID_TYPE_IDENTIFIER,
              SUBTYPE_EXTENSION_IDENTIFIER);
 
   private static final String INVALID_TYPE_USED_FOR_VALUE_MESSAGE =
@@ -520,6 +524,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
   private ExtensionModel testSubtypesExtensionModel;
   private ParameterizedModel testParameterizedModel;
   private List<OperationModel> testOperationModels;
+  private ApplicationTypeLoader applicationTypeLoader;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -539,6 +544,10 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
     muleRegistry.registerObject("Extensions Manager Mock", mock(ExtensionManager.class));
     testOperationModels = testOAuthExtensionModel.getConfigurationModels().get(0).getOperationModels();
     when(muleContext.getExtensionManager().getExtensions()).thenReturn(extensionModels);
+
+
+    applicationTypeLoader = new ApplicationTypeLoader(muleContext.getExtensionManager().getExtensions(),
+                                                      new WeaveExpressionLanguageMetadataServiceImpl());
   }
 
   @Test
@@ -932,22 +941,13 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("Validates that ComponentParameterization API fails when an object type is described with an invalid typeId or alias.")
-  public void pojoWithInvalidTypeIdOrAlias() throws Exception {
+  public void pojoWithInvalidTypeIdOrAlias()
+      throws Exception {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(TYPE_WITH_ID_NOT_FOUND_MESSAGE);
     testComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME,
                                   SUBTYPED_PARAMETER_NAME,
                                   INVALID_TYPE_IDENTIFIER_VALUE_DECLARER, TEST_SQUARE);
-  }
-
-  @Test
-  @Description("Validates that ComponentParameterization API fails when an object type is described with a type that is" +
-      " invalid for that parameter.")
-  public void pojoWithInvalidTypeForParameter() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(INVALID_TYPE_USED_FOR_VALUE_MESSAGE);
-    testComponentParameterization(DEFAULT_PARAMETER_GROUP_NAME, POJO_PARAMETER_NAME, INVALID_TYPE_USED_VALUE_DECLARER,
-                                  POJO_PARAMETER_VALUE);
   }
 
   private void testComponentParameterization(String parameterGroupName, String parameterName,
@@ -978,7 +978,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
                                                                                         valueDeclarerConsumer)
                                                                          .build(),
                                                                      muleContext, true, reflectionCache, expressionManager,
-                                                                     parameterizedModel.getName());
+                                                                     parameterizedModel.getName(), applicationTypeLoader);
     ParameterGroupModel parameterGroupModel = parameterizedModel.getParameterGroupModels().stream()
         .filter(pgm -> pgm.getName().equals(parameterGroupName)).findAny().get();
     ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(NullEventFactory.getNullEvent()).build();

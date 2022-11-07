@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.type.catalog;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.core.internal.type.catalog.ModuleTypesUtils.getType;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -71,6 +72,21 @@ public class ApplicationTypeLoader implements TypeLoader {
       LOGGER.error("Failed to evaluate type expression '{}'", typeExpression, exception);
       return empty();
     }
+  }
+
+  /**
+   *
+   * @param typeIdentifier
+   * @return the located type.
+   */
+  public MetadataType lookupType(String typeIdentifier) {
+    if (!typeIdentifier.contains(":")) {
+      throw new IllegalArgumentException("Must have the format ADD EXPLANATION");
+    }
+    int separatorIndex = typeIdentifier.indexOf(":");
+    String extensionIdentifier = typeIdentifier.substring(0, separatorIndex);
+    String typeIdOrAlias = typeIdentifier.substring(separatorIndex + 1);
+    return getType(moduleDefinitions, extensionIdentifier, typeIdOrAlias);
   }
 
   private static Collection<ModuleDefinition> extensionModelsToModuleDefinitions(Collection<ExtensionModel> extensionModels) {
