@@ -14,10 +14,11 @@ import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifac
 import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -72,6 +73,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private final Map<String, String> artifactProperties;
   private final boolean disableXmlValidations;
   private final boolean enableLazyInit;
+  private final boolean addToolingObjectsToRegistry;
   private final boolean ignoreCaches;
 
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
@@ -87,11 +89,13 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean enableLazyInit,
+                                                  boolean addToolingObjectsToRegistry,
                                                   ArtifactDeclaration artifactDeclaration,
                                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = false;
     this.enableLazyInit = enableLazyInit;
+    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.ignoreCaches = false;
 
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
@@ -102,12 +106,14 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean disableXmlValidations,
                                                   boolean enableLazyInit,
+                                                  boolean addToolingObjectsToRegistry,
                                                   boolean ignoreCaches,
                                                   String[] configResources,
                                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = disableXmlValidations;
     this.enableLazyInit = enableLazyInit;
+    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.ignoreCaches = ignoreCaches;
 
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
@@ -140,7 +146,8 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     }
 
     artifactAstConfigurationBuilder =
-        new ArtifactAstConfigurationBuilder(artifactAst, artifactProperties, resolveArtifactType(), enableLazyInit);
+        new ArtifactAstConfigurationBuilder(artifactAst, artifactProperties, resolveArtifactType(), enableLazyInit,
+                                            addToolingObjectsToRegistry);
     this.serviceConfigurators.forEach(artifactAstConfigurationBuilder::addServiceConfigurator);
     artifactAstConfigurationBuilder.setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
     if (parentArtifactContext != null) {

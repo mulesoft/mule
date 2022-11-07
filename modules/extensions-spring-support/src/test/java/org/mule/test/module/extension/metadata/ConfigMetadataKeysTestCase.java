@@ -6,10 +6,13 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -25,6 +28,11 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SDK_TOOLING_SUPPORT)
+@Story(METADATA_SERVICE)
 public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Inject
@@ -33,6 +41,11 @@ public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestC
   @Override
   protected String getConfigFile() {
     return "vegan-config.xml";
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
+    return true;
   }
 
   @Test

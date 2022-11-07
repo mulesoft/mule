@@ -88,6 +88,11 @@ public class TestDomainWrapper implements Domain {
   }
 
   @Override
+  public void initTooling() {
+    delegate.initTooling();
+  }
+
+  @Override
   public void lazyInit() {
     delegate.lazyInit();
   }
@@ -95,6 +100,11 @@ public class TestDomainWrapper implements Domain {
   @Override
   public void lazyInit(boolean disableXmlValidations) {
     delegate.lazyInit(disableXmlValidations);
+  }
+
+  @Override
+  public void lazyInitTooling(boolean disableXmlValidations) {
+    delegate.lazyInitTooling(disableXmlValidations);
   }
 
   @Override

@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -33,7 +34,7 @@ public class ArtifactDescriptor {
 
   private final String name;
   private File rootFolder;
-  private ClassLoaderModel classLoaderModel = ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+  private ClassLoaderConfiguration classLoaderConfiguration = ClassLoaderConfiguration.NULL_CLASSLOADER_CONFIGURATION;
   private BundleDescriptor bundleDescriptor;
   private MuleVersion minMuleVersion;
   private Product requiredProduct;
@@ -91,12 +92,12 @@ public class ArtifactDescriptor {
     this.minMuleVersion = minMuleVersion;
   }
 
-  public ClassLoaderModel getClassLoaderModel() {
-    return classLoaderModel;
+  public ClassLoaderConfiguration getClassLoaderConfiguration() {
+    return classLoaderConfiguration;
   }
 
-  public void setClassLoaderModel(ClassLoaderModel classLoaderModel) {
-    this.classLoaderModel = classLoaderModel;
+  public void setClassLoaderConfiguration(ClassLoaderConfiguration classLoaderConfiguration) {
+    this.classLoaderConfiguration = classLoaderConfiguration;
   }
 
   public BundleDescriptor getBundleDescriptor() {

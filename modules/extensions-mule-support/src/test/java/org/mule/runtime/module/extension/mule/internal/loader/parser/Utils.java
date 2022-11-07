@@ -110,6 +110,17 @@ final class Utils {
     when(componentAst.directChildrenStreamByIdentifier(null, childName)).thenAnswer(invocation -> Stream.of(childAst));
   }
 
+  public static ComponentAst mockErrorAst(String type, String parent) {
+    ComponentParameterAst typeParam = singleParameterAst(type);
+    ComponentParameterAst parentParam = singleParameterAst(parent);
+
+    ComponentAst errorAst = mock(ComponentAst.class);
+    when(errorAst.getParameter(DEFAULT_GROUP_NAME, "type")).thenReturn(typeParam);
+    when(errorAst.getParameter(DEFAULT_GROUP_NAME, "parent")).thenReturn(parentParam);
+
+    return errorAst;
+  }
+
   private static void mockTypeElement(ComponentAst outputAst, String elementName, String typeName) {
     when(outputAst.directChildrenStreamByIdentifier(null, elementName)).thenAnswer(invocation -> {
       if (typeName != null) {

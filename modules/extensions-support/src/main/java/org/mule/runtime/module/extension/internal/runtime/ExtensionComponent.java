@@ -67,11 +67,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -81,6 +77,10 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
@@ -161,7 +161,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected StreamingManager streamingManager;
 
   @Inject
-  protected MuleMetadataService metadataService;
+  protected Optional<MuleMetadataService> metadataService;
 
   protected ConfigurationComponentLocator componentLocator;
 
@@ -423,6 +423,171 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   /**
+   * @param event a {@link CoreEvent}
+   * @return a configuration instance for the current component with a given {@link CoreEvent}
+   */
+  protected Optional<ConfigurationInstance> getConfiguration(CoreEvent event) {
+    return configurationResolver.apply(event);
+  }
+
+  protected boolean requiresConfig() {
+    return requiresConfig.get();
+  }
+
+  private ConfigurationProvider resolveConfigurationProvider(ValueResolver<ConfigurationProvider> configurationProviderResolver,
+                                                             CoreEvent event)
+      throws MuleException {
+    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event)
+        .withExpressionManager(expressionManager)
+        .build();
+
+    return configurationProviderResolver.resolve(valueResolvingContext);
+  }
+
+  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ValueResolver<ConfigurationProvider> configurationProviderResolver) {
+    // If the resolver is dynamic, then it cannot be resolved statically
+    if (configurationProviderResolver.isDynamic()) {
+      return empty();
+    }
+
+    // Since the resolver is not dynamic, we can resolve it using a null Event
+    CoreEvent nullEvent = getNullEvent(muleContext);
+
+    try {
+      return of(resolveConfigurationProvider(configurationProviderResolver, nullEvent));
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      if (nullEvent != null) {
+        ((BaseEventContext) nullEvent.getContext()).success();
+      }
+    }
+  }
+
+  protected Optional<ConfigurationProvider> getConfigurationProvider() {
+    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
+  }
+
+  protected boolean usesDynamicConfiguration() {
+    // TODO W-11267571: if not being able to resolve the ValueResolver<ConfigurationProvider> at this point, hence
+    // treating it as dynamic, ends up causing performance issues.
+    return isConfigurationSpecified()
+        && (doesConfigurationDependOnEvent() || getConfigurationProvider().map(ConfigurationProvider::isDynamic).orElse(true));
+  }
+
+  /**
+   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProviderResolver} is static.
+   * Otherwise, returns an empty value.
+   */
+  protected Optional<ConfigurationInstance> getStaticConfiguration() {
+    if (!requiresConfig()) {
+      return empty();
+    }
+
+    if (configurationResolver == null || usesDynamicConfiguration()) {
+      return empty();
+    }
+
+    CoreEvent initialiserEvent = null;
+    try {
+      initialiserEvent = getNullEvent(muleContext);
+      return configurationResolver.apply(initialiserEvent);
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+    }
+  }
+
+  protected CursorProviderFactory getCursorProviderFactory() {
+    return cursorProviderFactory;
+  }
+
+  private Optional<ValueResolver<ConfigurationProvider>> findConfigurationProviderResolver() {
+    if (isConfigurationSpecified()) {
+      return of(configurationProviderResolver.get());
+    }
+
+    return extensionManager.getConfigurationProvider(extensionModel, componentModel)
+        .map(StaticValueResolver::new);
+  }
+
+  private boolean isConfigurationSpecified() {
+    return configurationProviderResolver.get() != null;
+  }
+
+  private boolean doesConfigurationDependOnEvent() {
+    return isConfigurationSpecified() && configurationProviderResolver.get().isDynamic();
+  }
+
+  private boolean computeRequiresConfig() {
+    return ExtensionModelUtils.requiresConfig(extensionModel, componentModel);
+  }
+
+  private void setCacheIdGenerator() {
+    DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
+    ComponentLocator<ComponentAst> configLocator = location -> componentLocator
+        .find(location)
+        .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+
+    this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
+  }
+
+  private ValueProviderMediator getValueProviderMediator() {
+    if (valueProviderMediator == null) {
+      synchronized (this) {
+        if (valueProviderMediator == null) {
+          valueProviderMediator =
+              new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+        }
+      }
+    }
+
+    return valueProviderMediator;
+  }
+
+  private SampleDataProviderMediator getSampleDataProviderMediator() {
+    if (sampleDataProviderMediator == null) {
+      synchronized (this) {
+        if (sampleDataProviderMediator == null) {
+          sampleDataProviderMediator = new SampleDataProviderMediator(
+                                                                      extensionModel,
+                                                                      componentModel,
+                                                                      this,
+                                                                      muleContext,
+                                                                      reflectionCache,
+                                                                      streamingManager);
+        }
+      }
+    }
+
+    return sampleDataProviderMediator;
+  }
+
+  protected abstract ParameterValueResolver getParameterValueResolver();
+
+  /**
+   * @return the extension model where the component has been defined.
+   */
+  public ExtensionModel getExtensionModel() {
+    return extensionModel;
+  }
+
+  @Override
+  public List<ValueProviderModel> getModels(String providerName) {
+    return getValueProviderModels(componentModel.getAllParameterModels());
+  }
+
+  @Inject
+  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
+    this.componentLocator = componentLocator;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // "Fat" Tooling support
+  /////////////////////////////////////////////////////////////////////////////
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -598,11 +763,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     MetadataContext context = null;
     try {
       MetadataCacheId cacheId = getMetadataCacheId();
-      MetadataCache metadataCache = metadataService.getMetadataCache(cacheId.getValue());
+      MetadataCache metadataCache = metadataService.get().getMetadataCache(cacheId.getValue());
       context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
       MetadataResult<R> result = contextConsumer.apply(context);
       if (result.isSuccess()) {
-        metadataService.saveCache(cacheId.getValue(), metadataCache);
+        metadataService.get().saveCache(cacheId.getValue(), metadataCache);
       }
 
       return result;
@@ -693,170 +858,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }, connectionManager);
   }
 
-  /**
-   * @param event a {@link CoreEvent}
-   * @return a configuration instance for the current component with a given {@link CoreEvent}
-   */
-  protected Optional<ConfigurationInstance> getConfiguration(CoreEvent event) {
-    return configurationResolver.apply(event);
-  }
-
-  protected boolean requiresConfig() {
-    return requiresConfig.get();
-  }
-
-  private ConfigurationProvider resolveConfigurationProvider(ValueResolver<ConfigurationProvider> configurationProviderResolver,
-                                                             CoreEvent event)
-      throws MuleException {
-    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event)
-        .withExpressionManager(expressionManager)
-        .build();
-
-    return configurationProviderResolver.resolve(valueResolvingContext);
-  }
-
-  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ValueResolver<ConfigurationProvider> configurationProviderResolver) {
-    // If the resolver is dynamic, then it cannot be resolved statically
-    if (configurationProviderResolver.isDynamic()) {
-      return empty();
-    }
-
-    // Since the resolver is not dynamic, we can resolve it using a null Event
-    CoreEvent nullEvent = getNullEvent(muleContext);
-
-    try {
-      return of(resolveConfigurationProvider(configurationProviderResolver, nullEvent));
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    } finally {
-      if (nullEvent != null) {
-        ((BaseEventContext) nullEvent.getContext()).success();
-      }
-    }
-  }
-
-  protected Optional<ConfigurationProvider> getConfigurationProvider() {
-    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
-  }
-
-  protected boolean usesDynamicConfiguration() {
-    // TODO W-11267571: if not being able to resolve the ValueResolver<ConfigurationProvider> at this point, hence
-    // treating it as dynamic, ends up causing performance issues.
-    return isConfigurationSpecified()
-        && (doesConfigurationDependOnEvent() || getConfigurationProvider().map(ConfigurationProvider::isDynamic).orElse(true));
-  }
-
-  /**
-   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProviderResolver} is static.
-   * Otherwise, returns an empty value.
-   */
-  protected Optional<ConfigurationInstance> getStaticConfiguration() {
-    if (!requiresConfig()) {
-      return empty();
-    }
-
-    if (configurationResolver == null || usesDynamicConfiguration()) {
-      return empty();
-    }
-
-    CoreEvent initialiserEvent = null;
-    try {
-      initialiserEvent = getNullEvent(muleContext);
-      return configurationResolver.apply(initialiserEvent);
-    } finally {
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
-      }
-    }
-  }
-
-  protected CursorProviderFactory getCursorProviderFactory() {
-    return cursorProviderFactory;
-  }
-
-  private Optional<ValueResolver<ConfigurationProvider>> findConfigurationProviderResolver() {
-    if (isConfigurationSpecified()) {
-      return of(configurationProviderResolver.get());
-    }
-
-    return extensionManager.getConfigurationProvider(extensionModel, componentModel)
-        .map(StaticValueResolver::new);
-  }
-
-  private boolean isConfigurationSpecified() {
-    return configurationProviderResolver.get() != null;
-  }
-
-  private boolean doesConfigurationDependOnEvent() {
-    return isConfigurationSpecified() && configurationProviderResolver.get().isDynamic();
-  }
-
-  private boolean computeRequiresConfig() {
-    return ExtensionModelUtils.requiresConfig(extensionModel, componentModel);
-  }
-
-  private void setCacheIdGenerator() {
-    DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
-    ComponentLocator<ComponentAst> configLocator = location -> componentLocator
-        .find(location)
-        .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
-
-    this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
-  }
-
-  private ValueProviderMediator getValueProviderMediator() {
-    if (valueProviderMediator == null) {
-      synchronized (this) {
-        if (valueProviderMediator == null) {
-          valueProviderMediator =
-              new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
-        }
-      }
-    }
-
-    return valueProviderMediator;
-  }
-
-  private SampleDataProviderMediator getSampleDataProviderMediator() {
-    if (sampleDataProviderMediator == null) {
-      synchronized (this) {
-        if (sampleDataProviderMediator == null) {
-          sampleDataProviderMediator = new SampleDataProviderMediator(
-                                                                      extensionModel,
-                                                                      componentModel,
-                                                                      this,
-                                                                      muleContext,
-                                                                      reflectionCache,
-                                                                      streamingManager);
-        }
-      }
-    }
-
-    return sampleDataProviderMediator;
-  }
-
-  protected abstract ParameterValueResolver getParameterValueResolver();
-
-  /**
-   * @return the extension model where the component has been defined.
-   */
-  public ExtensionModel getExtensionModel() {
-    return extensionModel;
-  }
-
-  @Override
-  public List<ValueProviderModel> getModels(String providerName) {
-    return getValueProviderModels(componentModel.getAllParameterModels());
-  }
-
   @Inject
   public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory) {
     this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
-  }
-
-  @Inject
-  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
-    this.componentLocator = componentLocator;
   }
 
 }

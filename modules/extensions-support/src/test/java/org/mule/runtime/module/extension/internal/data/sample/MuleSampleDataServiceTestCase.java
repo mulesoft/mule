@@ -6,8 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.data.sample;
 
+import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
+import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
+import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
+import static org.mule.sdk.api.data.sample.SampleDataException.NO_DATA_AVAILABLE;
+import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SampleDataStory.SAMPLE_DATA_SERVICE;
+
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -15,13 +24,6 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
-import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
-import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
-import static org.mule.sdk.api.data.sample.SampleDataException.NO_DATA_AVAILABLE;
-import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
-import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
-import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.SAMPLE_DATA_SERVICE;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -32,24 +34,28 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
-@Feature(SAMPLE_DATA)
+@Feature(SDK_TOOLING_SUPPORT)
 @Story(SAMPLE_DATA_SERVICE)
 public class MuleSampleDataServiceTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Mock
   private Location location;
@@ -63,7 +69,7 @@ public class MuleSampleDataServiceTestCase extends AbstractMuleTestCase {
   @Mock
   private Message message;
 
-  private MuleSampleDataService sampleDataService = new MuleSampleDataService();
+  private final MuleSampleDataService sampleDataService = new MuleSampleDataService();
 
   @Before
   public void before() throws SampleDataException {

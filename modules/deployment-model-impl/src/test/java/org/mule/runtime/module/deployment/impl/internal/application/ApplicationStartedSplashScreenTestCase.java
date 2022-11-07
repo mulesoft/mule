@@ -13,11 +13,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+import static org.mule.test.allure.AllureConstants.SplashScreenFeature.SPLASH_SCREEN;
 
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import java.io.File;
@@ -27,10 +29,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
+import io.qameta.allure.Feature;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+@Feature(SPLASH_SCREEN)
 public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreenTestCase<ApplicationStartedSplashScreen> {
 
   private static final String APP_NAME = "simpleApp";
@@ -61,9 +65,9 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   @Before
   public void setUp() {
     splashScreen = new ApplicationStartedSplashScreen();
-    ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
-    runtimeLibs.stream().forEach(classLoaderModelBuilder::containing);
-    ClassLoaderModel classLoaderModel = classLoaderModelBuilder.build();
+    ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder();
+    runtimeLibs.stream().forEach(classLoaderConfigurationBuilder::containing);
+    ClassLoaderConfiguration classLoaderConfiguration = classLoaderConfigurationBuilder.build();
 
     ArtifactPluginDescriptor pluginDescriptor = new ArtifactPluginDescriptor(PLUGIN_NAME);
     pluginDescriptor.setBundleDescriptor(new BundleDescriptor.Builder()
@@ -75,7 +79,7 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
     when(descriptor.getName()).thenReturn(APP_NAME);
     when(descriptor.getAppProperties()).thenReturn(new HashMap<>());
     when(descriptor.getPlugins()).thenReturn(newHashSet(pluginDescriptor));
-    when(descriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+    when(descriptor.getClassLoaderConfiguration()).thenReturn(classLoaderConfiguration);
   }
 
   @Override

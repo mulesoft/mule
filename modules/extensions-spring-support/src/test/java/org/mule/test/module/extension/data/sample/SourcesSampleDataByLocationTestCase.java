@@ -7,8 +7,9 @@
 package org.mule.test.module.extension.data.sample;
 
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
-import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
-import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.RESOLVE_THROUGH_TOOLING_API;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG;
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_ERROR_MSG;
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_FAILURE;
@@ -17,12 +18,14 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.Optional;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Test;
 
-@Feature(SAMPLE_DATA)
-@Story(RESOLVE_THROUGH_TOOLING_API)
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
+
+@Features({@Feature(SOURCES), @Feature(SDK_TOOLING_SUPPORT)})
+@Story(METADATA_SERVICE)
 public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestCase {
 
   @Override

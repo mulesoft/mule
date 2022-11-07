@@ -126,8 +126,13 @@ public interface AllureConstants {
       String ARTIFACT_DESCRIPTORS = "Artifact descriptors";
       String PATCHED_ARTIFACT_DESCRIPTORS = "Artifact descriptors with patched plugins";
       String ARTIFACT_DESCRIPTORS_WITH_CUSTOM_LOG_CONFIG = "Artifact descriptors with a custom logging configuration";
+      @Deprecated
       String CLASSLOADER_MODEL = "ClassLoader model";
+      String CLASSLOADER_CONFIGURATION = "ClassLoader configuration";
+      String CLASSLOADER_CONFIGURATION_LOADER = "ClassLoader configuration loader";
+      String CLASSLOADER_CONFIGURATION_BUILDER = "ClassLoader configuration builder";
       String CLASSLOADER_GENERATION = "ClassLoader generation";
+      String ARTIFACT_CLASSLOADERS = "Artifact class loaders";
     }
 
   }
@@ -380,6 +385,7 @@ public interface AllureConstants {
   interface OauthFeature {
 
     String OAUTH_EXTENSION = "OAuth Extension";
+    String SDK_OAUTH_SUPPORT = "SDK OAuth Extension";
     String OCS_SUPPORT = "OCS Support";
 
     interface OauthStory {
@@ -492,9 +498,27 @@ public interface AllureConstants {
 
   }
 
-  interface SampleData {
+  interface SdkToolingSupport {
 
-    String SAMPLE_DATA = "Sample Data";
+    String SDK_TOOLING_SUPPORT = "SDK Tooling Support";
+
+    interface ConnectivityTestingStory {
+
+      String CONNECTIVITY_TESTING_SERVICE = "Connectivity Testing Service";
+
+    }
+
+    interface MetadataTypeResolutionStory {
+
+      String METADATA_SERVICE = "Metadata Service";
+
+    }
+
+    interface ValueProvidersStory {
+
+      String VALUE_PROVIDERS_SERVICE = "Value Providers Service";
+
+    }
 
     interface SampleDataStory {
 
@@ -739,6 +763,11 @@ public interface AllureConstants {
     interface GracefulShutdownStory {
 
       String GRACEFUL_SHUTDOWN_STORY = "Graceful shutdown";
+    }
+
+    interface ApplicationStatus {
+
+      String APPLICATION_STATUS_STORY = "Application status";
     }
   }
 
@@ -1114,5 +1143,26 @@ public interface AllureConstants {
     String APP_CREATION = "Application creation";
     String DOMAIN_CREATION = "Domain creation";
 
+  }
+
+  interface SplashScreenFeature {
+
+    String SPLASH_SCREEN = "Splash screen";
+  }
+
+  interface DescriptorLoaderFeature {
+
+    String DESCRIPTOR_LOADER = "Descriptor loader";
+  }
+
+  interface ServicesFeature {
+
+    String SERVICES = "Services";
+
+    interface ServicesStory {
+
+      String SERVICE_REGISTRY = "Service registry";
+      String SERVICE_PROVIDER_DISCOVERER = "Service provider discoverer";
+    }
   }
 }

@@ -6,11 +6,14 @@
  */
 package org.mule.test.module.extension.source;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.isA;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.isA;
 
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.component.location.Location;
@@ -23,14 +26,17 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import org.hamcrest.Matcher;
+
 import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 
-@Feature(SOURCES)
-@Story(POLLING)
+@Features({@Feature(SOURCES), @Feature(SDK_TOOLING_SUPPORT)})
+@Stories({@Story(POLLING), @Story(METADATA_SERVICE)})
 public class LazyPollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
@@ -40,6 +46,11 @@ public class LazyPollingSourceTestCase extends AbstractExtensionFunctionalTestCa
 
   @Override
   public boolean disableXmlValidations() {
+    return true;
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
     return true;
   }
 

@@ -1,0 +1,20 @@
+{
+  "title": "Person",
+  "type": "object",
+  "id": "http://example.com/example.json",
+  "properties": {
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "age": {
+      "description": "Age in years",
+      "title": "Age",
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": ["firstName", "lastName"]
+}

@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.crea
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
+
 import static org.mockito.Mockito.mock;
 
 import org.mule.functional.api.flow.FlowRunner;
@@ -104,6 +105,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     if (artifactDeclaration != null) {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           enableLazyInit(),
+                                                          addToolingObjectsToRegistry(),
                                                           artifactDeclaration,
                                                           getExpressionLanguageMetadataService());
     }
@@ -112,6 +114,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     if (configResources != null) {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           disableXmlValidations(), enableLazyInit(),
+                                                          addToolingObjectsToRegistry(),
                                                           mustRegenerateExtensionModels(),
                                                           new String[] {configResources},
                                                           getExpressionLanguageMetadataService());
@@ -123,12 +126,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       }
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                           disableXmlValidations(), enableLazyInit(),
+                                                          addToolingObjectsToRegistry(),
                                                           mustRegenerateExtensionModels(),
                                                           new String[] {configResources},
                                                           getExpressionLanguageMetadataService());
     }
     return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
                                                         disableXmlValidations(), enableLazyInit(),
+                                                        addToolingObjectsToRegistry(),
                                                         mustRegenerateExtensionModels(),
                                                         getConfigFiles(),
                                                         getExpressionLanguageMetadataService());
@@ -258,6 +263,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    *         initialized on demand.
    */
   public boolean enableLazyInit() {
+    return false;
+  }
+
+  /**
+   * @return a boolean indicating if the Tooling capabilities should be added to the registry of the Mule App.
+   */
+  public boolean addToolingObjectsToRegistry() {
     return false;
   }
 

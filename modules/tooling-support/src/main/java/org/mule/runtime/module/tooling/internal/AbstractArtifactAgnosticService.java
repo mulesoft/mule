@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static com.google.common.base.Throwables.getCausalChain;
-import static com.google.common.base.Throwables.propagateIfPossible;
-import static java.lang.System.currentTimeMillis;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
+
+import static java.lang.System.currentTimeMillis;
+
+import static com.google.common.base.Throwables.getCausalChain;
+import static com.google.common.base.Throwables.propagateIfPossible;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.api.LazyComponentInitializer;
@@ -72,7 +74,7 @@ public abstract class AbstractArtifactAgnosticService {
 
         if (isLazyInit()) {
           try {
-            application.lazyInit(!isLazyInitEnableXmlValidations());
+            application.lazyInitTooling(!isLazyInitEnableXmlValidations());
             // Force the initialization of the app components so that the registry is populated with the configs
             application.getArtifactContext().getRegistry().lookupByType(LazyComponentInitializer.class)
                 .ifPresent(lazyInit -> lazyInit.initializeComponents(comp -> true));
@@ -85,7 +87,7 @@ public abstract class AbstractArtifactAgnosticService {
             }
           }
         } else {
-          application.init();
+          application.initTooling();
         }
 
         application.start();

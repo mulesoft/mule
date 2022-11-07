@@ -7,6 +7,9 @@
 package org.mule.test.module.extension.data.sample;
 
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SampleDataStory.RESOLVE_THROUGH_TOOLING_API;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 
 import org.mule.test.data.sample.extension.ComplexActingParameter;
 
@@ -15,6 +18,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
+
+@Features({@Feature(SOURCES), @Feature(SDK_TOOLING_SUPPORT)})
+@Story(RESOLVE_THROUGH_TOOLING_API)
 public class SourcesSampleDataThroughApiTestCase extends AbstractSampleDataTestCase {
 
   @Override

@@ -73,6 +73,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
 
   public LazySpringMuleContextServiceConfigurator(LazyComponentInitializerAdapter lazyComponentInitializer,
                                                   Map<String, String> artifactProperties,
+                                                  boolean addToolingObjectsToRegistry,
                                                   LockFactory runtimeLockFactory,
                                                   MuleContextWithRegistry muleContext,
                                                   MuleFunctionsBindingContextProvider coreFunctionsProvider,
@@ -84,7 +85,9 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   Registry serviceLocator,
                                                   ResourceLocator resourceLocator,
                                                   MemoryManagementService memoryManagementService) {
-    super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties, artifactType,
+    super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties,
+          addToolingObjectsToRegistry,
+          artifactType,
           artifactAst,
           optionalObjectsController,
           beanDefinitionRegistry,
@@ -100,26 +103,28 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
     registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, getMemoryManagementService());
 
-    registerConstantBeanDefinition(CONNECTIVITY_TESTING_SERVICE_KEY,
-                                   new LazyConnectivityTestingService(lazyComponentInitializer, () -> getRegistry()
-                                       .<ConnectivityTestingService>lookupObject(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)));
-    registerBeanDefinition(NON_LAZY_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class));
+    if (isAddToolingObjectsToRegistry()) {
+      registerConstantBeanDefinition(CONNECTIVITY_TESTING_SERVICE_KEY,
+                                     new LazyConnectivityTestingService(lazyComponentInitializer, () -> getRegistry()
+                                         .<ConnectivityTestingService>lookupObject(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)));
+      registerBeanDefinition(NON_LAZY_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class));
 
-    registerConstantBeanDefinition(METADATA_SERVICE_KEY,
-                                   new LazyMetadataService(lazyComponentInitializer, () -> getRegistry()
-                                       .<MetadataService>lookupObject(NON_LAZY_METADATA_SERVICE_KEY)));
-    registerBeanDefinition(NON_LAZY_METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class));
+      registerConstantBeanDefinition(METADATA_SERVICE_KEY,
+                                     new LazyMetadataService(lazyComponentInitializer, () -> getRegistry()
+                                         .<MetadataService>lookupObject(NON_LAZY_METADATA_SERVICE_KEY)));
+      registerBeanDefinition(NON_LAZY_METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class));
 
-    registerConstantBeanDefinition(VALUE_PROVIDER_SERVICE_KEY,
-                                   new LazyValueProviderService(lazyComponentInitializer, () -> getRegistry()
-                                       .<ValueProviderService>lookupObject(NON_LAZY_VALUE_PROVIDER_SERVICE),
-                                                                () -> getMuleContext().getConfigurationComponentLocator()));
-    registerBeanDefinition(NON_LAZY_VALUE_PROVIDER_SERVICE, getBeanDefinition(MuleValueProviderService.class));
+      registerConstantBeanDefinition(VALUE_PROVIDER_SERVICE_KEY,
+                                     new LazyValueProviderService(lazyComponentInitializer, () -> getRegistry()
+                                         .<ValueProviderService>lookupObject(NON_LAZY_VALUE_PROVIDER_SERVICE),
+                                                                  () -> getMuleContext().getConfigurationComponentLocator()));
+      registerBeanDefinition(NON_LAZY_VALUE_PROVIDER_SERVICE, getBeanDefinition(MuleValueProviderService.class));
 
-    registerConstantBeanDefinition(SAMPLE_DATA_SERVICE_KEY,
-                                   new LazySampleDataService(lazyComponentInitializer, () -> getRegistry()
-                                       .<SampleDataService>lookupObject(NON_LAZY_SAMPLE_DATA_SERVICE)));
-    registerBeanDefinition(NON_LAZY_SAMPLE_DATA_SERVICE, getBeanDefinition(MuleSampleDataService.class));
+      registerConstantBeanDefinition(SAMPLE_DATA_SERVICE_KEY,
+                                     new LazySampleDataService(lazyComponentInitializer, () -> getRegistry()
+                                         .<SampleDataService>lookupObject(NON_LAZY_SAMPLE_DATA_SERVICE)));
+      registerBeanDefinition(NON_LAZY_SAMPLE_DATA_SERVICE, getBeanDefinition(MuleSampleDataService.class));
+    }
 
     registerConstantBeanDefinition(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, lazyComponentInitializer);
 
@@ -136,16 +141,20 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
       osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
       registerConstantBeanDefinition(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
 
-      registerBeanDefinition(DEFAULT_METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class));
-      registerConstantBeanDefinition(METADATA_CACHE_MANAGER_KEY,
-                                     new DelegateMetadataCacheManager(() -> {
-                                       DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager = getRegistry()
-                                           .<DefaultPersistentMetadataCacheManager>lookupObject(DEFAULT_METADATA_CACHE_MANAGER_KEY);
-                                       defaultPersistentMetadataCacheManager.setLockFactory(runtimeLockFactory);
-                                       defaultPersistentMetadataCacheManager.setObjectStoreManager(getRegistry()
-                                           .<ObjectStoreManager>lookupObject(LAZY_MULE_OBJECT_STORE_MANAGER));
-                                       return defaultPersistentMetadataCacheManager;
-                                     }));
+      if (isAddToolingObjectsToRegistry()) {
+        registerBeanDefinition(DEFAULT_METADATA_CACHE_MANAGER_KEY,
+                               getBeanDefinition(DefaultPersistentMetadataCacheManager.class));
+        registerConstantBeanDefinition(METADATA_CACHE_MANAGER_KEY,
+                                       new DelegateMetadataCacheManager(() -> {
+                                         DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager =
+                                             getRegistry()
+                                                 .<DefaultPersistentMetadataCacheManager>lookupObject(DEFAULT_METADATA_CACHE_MANAGER_KEY);
+                                         defaultPersistentMetadataCacheManager.setLockFactory(runtimeLockFactory);
+                                         defaultPersistentMetadataCacheManager.setObjectStoreManager(getRegistry()
+                                             .<ObjectStoreManager>lookupObject(LAZY_MULE_OBJECT_STORE_MANAGER));
+                                         return defaultPersistentMetadataCacheManager;
+                                       }));
+      }
     }
   }
 

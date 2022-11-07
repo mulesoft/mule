@@ -95,7 +95,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
             domainClassLoader = getDefaultDomainClassLoader(parent, parent.getClassLoaderLookupPolicy());
           } else {
             NativeLibraryFinder nativeLibraryFinder =
-                nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderModel().getUrls());
+                nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
+                                                  descriptor.getClassLoaderConfiguration().getUrls());
             domainClassLoader = getCustomDomainClassLoader(parent, descriptor, nativeLibraryFinder);
           }
 
@@ -127,7 +128,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
 
     ArtifactClassLoader classLoader =
         new MuleSharedDomainClassLoader(domain, parent.getClassLoader(), classLoaderLookupPolicy, Arrays
-            .asList(domain.getClassLoaderModel().getUrls()), nativeLibraryFinder);
+            .asList(domain.getClassLoaderConfiguration().getUrls()), nativeLibraryFinder);
 
     return classLoader;
   }
@@ -138,7 +139,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
-      artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
+      artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages()
           .forEach(p -> pluginsLookupStrategies.put(p, PARENT_FIRST));
     }
 

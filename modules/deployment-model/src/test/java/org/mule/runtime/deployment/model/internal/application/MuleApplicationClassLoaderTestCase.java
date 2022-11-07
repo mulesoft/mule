@@ -9,6 +9,8 @@ package org.mule.runtime.deployment.model.internal.application;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_CLASSLOADERS;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
@@ -28,7 +30,8 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -38,6 +41,8 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,6 +50,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 @SmallTest
+@Feature(CLASSLOADING_ISOLATION)
+@Story(ARTIFACT_CLASSLOADERS)
 public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String RESOURCE_IN_CLASSES_AND_JAR = "test-resource-1.txt";
@@ -100,9 +107,10 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
                                         mock(ClassLoaderLookupPolicy.class), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
-        .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
-    applicationDescriptor.setClassLoaderModel(classLoaderModel);
+    ClassLoaderConfiguration classLoaderConfiguration =
+        new ClassLoaderConfigurationBuilder(applicationDescriptor.getClassLoaderConfiguration())
+            .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
+    applicationDescriptor.setClassLoaderConfiguration(classLoaderConfiguration);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
                                            mock(ClassLoaderLookupPolicy.class));
   }

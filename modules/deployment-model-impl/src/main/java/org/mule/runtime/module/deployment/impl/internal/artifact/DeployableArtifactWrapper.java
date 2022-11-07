@@ -90,6 +90,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   }
 
   @Override
+  public void initTooling() {
+    executeWithinArtifactClassLoader(delegate::initTooling);
+  }
+
+  @Override
   public void lazyInit() {
     getDelegate().lazyInit();
   }
@@ -97,6 +102,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   @Override
   public void lazyInit(boolean disableXmlValidations) {
     getDelegate().lazyInit(disableXmlValidations);
+  }
+
+  @Override
+  public void lazyInitTooling(boolean disableXmlValidations) {
+    getDelegate().lazyInitTooling(disableXmlValidations);
   }
 
   @Override

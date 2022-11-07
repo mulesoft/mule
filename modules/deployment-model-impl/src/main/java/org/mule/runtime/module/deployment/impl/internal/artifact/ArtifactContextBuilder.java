@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
@@ -25,6 +22,11 @@ import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -36,7 +38,6 @@ import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -112,6 +113,7 @@ public class ArtifactContextBuilder {
   private ExtensionModelLoaderRepository extensionModelLoaderRepository = loaderDescriber -> empty();
   private boolean enableLazyInit;
   private boolean disableXmlValidations;
+  private boolean addToolingObjectsToRegistry;
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
   private PolicyProvider policyProvider;
@@ -358,6 +360,18 @@ public class ArtifactContextBuilder {
   }
 
   /**
+   * Allows to create an {@link ArtifactContext} that will contain the objects that enabling the tooling capabilities.
+   *
+   * @param addToolingObjectsToRegistry {@code true} if tooling capabilities will be available on the artifact context,
+   *                                    {@code false} otherwise.
+   * @return the builder
+   */
+  public ArtifactContextBuilder setAddToolingObjectsToRegistry(boolean addToolingObjectsToRegistry) {
+    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
+    return this;
+  }
+
+  /**
    * Provides a {@link ClassLoaderRepository} containing all registered class loaders on the container.
    *
    * @param classLoaderRepository repository of available class loaders. Non null.
@@ -467,6 +481,7 @@ public class ArtifactContextBuilder {
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
+                    .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)
                     .setServiceConfigurators(serviceConfigurators)
                     .setRuntimeLockFactory(runtimeLockFactory)
                     .setMemoryManagementService(memoryManagementService)

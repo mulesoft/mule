@@ -6,39 +6,44 @@
  */
 package org.mule.runtime.core.internal.lock;
 
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
+import org.slf4j.Logger;
+
 /**
  * {@link LockGroup} implementation for holding references to created locks inside a mule instance.
  */
 public class InstanceLockGroup implements LockGroup {
 
-  private Map<String, LockEntry> locks;
-  private Object lockAccessMonitor = new Object();
-  private LockProvider lockProvider;
+  private static final long DEFAULT_LOCK_GROUP_SHUTDOWN_TIMEOUT = 5000L;
+  private static final Logger LOGGER = getLogger(InstanceLockGroup.class);
 
-  public InstanceLockGroup(LockProvider lockProvider) {
+  private final Map<String, LockEntry> locks;
+  private final Object lockAccessMonitor = new Object();
+  private final LockProvider lockProvider;
+  private final long gracefulShutdownTimeoutMillis;
+
+  public InstanceLockGroup(LockProvider lockProvider, long shutdownTimeoutMillis) {
     this.lockProvider = lockProvider;
     this.locks = new HashMap<>();
+    this.gracefulShutdownTimeoutMillis = shutdownTimeoutMillis;
+  }
+
+  public InstanceLockGroup(LockProvider lockProvider) {
+    this(lockProvider, DEFAULT_LOCK_GROUP_SHUTDOWN_TIMEOUT);
   }
 
   @Override
   public void lock(String lockId) {
-    LockEntry lockEntry;
-    synchronized (lockAccessMonitor) {
-      if (locks.containsKey(lockId)) {
-        lockEntry = locks.get(lockId);
-      } else {
-        lockEntry = new LockEntry(lockProvider.createLock(lockId));
-        locks.put(lockId, lockEntry);
-      }
-      lockEntry.incrementLockCount();
-      lockAccessMonitor.notifyAll();
-    }
+    LockEntry lockEntry = getOrCreateLockEntry(lockId);
     lockEntry.getLock().lock();
   }
 
@@ -47,86 +52,58 @@ public class InstanceLockGroup implements LockGroup {
     synchronized (lockAccessMonitor) {
       LockEntry lockEntry = locks.get(key);
       if (lockEntry != null) {
-        lockEntry.decrementLockCount();
-        if (!lockEntry.hasPendingLocks()) {
-          locks.remove(key);
-        }
         lockEntry.getLock().unlock();
+        releaseLockEntry(key, lockEntry);
+      } else {
+        LOGGER.warn("Trying to unlock a lock with id {} that wasn't previously locked", key);
       }
-      lockAccessMonitor.notifyAll();
     }
   }
 
   @Override
   public boolean tryLock(String lockId, long timeout, TimeUnit timeUnit) throws InterruptedException {
-    LockEntry lockEntry;
-    synchronized (lockAccessMonitor) {
-      if (locks.containsKey(lockId)) {
-        lockEntry = locks.get(lockId);
-      } else {
-        lockEntry = new LockEntry(lockProvider.createLock(lockId));
-        locks.put(lockId, lockEntry);
+    LockEntry lockEntry = getOrCreateLockEntry(lockId);
+    try {
+      boolean lockAcquired = lockEntry.getLock().tryLock(timeout, timeUnit);
+      if (!lockAcquired) {
+        releaseLockEntry(lockId, lockEntry);
       }
-      lockEntry.incrementLockCount();
-      lockAccessMonitor.notifyAll();
+      return lockAcquired;
+    } catch (InterruptedException interruptedException) {
+      releaseLockEntry(lockId, lockEntry);
+      throw interruptedException;
     }
-    boolean lockAcquired = lockEntry.getLock().tryLock(timeout, timeUnit);
-    if (!lockAcquired) {
-      synchronized (lockAccessMonitor) {
-        lockEntry.decrementLockCount();
-        if (!lockEntry.hasPendingLocks()) {
-          locks.remove(lockId);
-        }
-      }
-    }
-    return lockAcquired;
   }
 
   @Override
   public boolean tryLock(String lockId) {
-    LockEntry lockEntry;
-    synchronized (lockAccessMonitor) {
-      if (locks.containsKey(lockId)) {
-        lockEntry = locks.get(lockId);
-      } else {
-        lockEntry = new LockEntry(lockProvider.createLock(lockId));
-        locks.put(lockId, lockEntry);
-      }
-      lockEntry.incrementLockCount();
-      lockAccessMonitor.notifyAll();
-    }
+    LockEntry lockEntry = getOrCreateLockEntry(lockId);
     boolean lockAcquired = lockEntry.getLock().tryLock();
     if (!lockAcquired) {
-      synchronized (lockAccessMonitor) {
-        lockEntry.decrementLockCount();
-        if (!lockEntry.hasPendingLocks()) {
-          locks.remove(lockId);
-        }
-      }
+      releaseLockEntry(lockId, lockEntry);
     }
     return lockAcquired;
   }
 
   @Override
   public void lockInterruptibly(String lockId) throws InterruptedException {
-    LockEntry lockEntry;
-    synchronized (lockAccessMonitor) {
-      if (locks.containsKey(lockId)) {
-        lockEntry = locks.get(lockId);
-      } else {
-        lockEntry = new LockEntry(lockProvider.createLock(lockId));
-        locks.put(lockId, lockEntry);
-      }
-      lockEntry.incrementLockCount();
-      lockAccessMonitor.notifyAll();
+    LockEntry lockEntry = getOrCreateLockEntry(lockId);
+    try {
+      lockEntry.getLock().lockInterruptibly();
+    } catch (InterruptedException e) {
+      releaseLockEntry(lockId, lockEntry);
+      throw e;
     }
-    lockEntry.getLock().lockInterruptibly();
+  }
+
+  int size() {
+    return locks.size();
   }
 
   public static class LockEntry {
 
-    private AtomicInteger lockCount = new AtomicInteger(0);
-    private Lock lock;
+    private final AtomicInteger lockCount = new AtomicInteger(0);
+    private final Lock lock;
 
     public LockEntry(Lock lock) {
       this.lock = lock;
@@ -151,8 +128,50 @@ public class InstanceLockGroup implements LockGroup {
 
   @Override
   public void dispose() {
+    waitForLocksToBeUnlocked();
+  }
+
+  private LockEntry getOrCreateLockEntry(String lockId) {
+    LockEntry lockEntry;
     synchronized (lockAccessMonitor) {
-      locks.clear();
+      if (locks.containsKey(lockId)) {
+        lockEntry = locks.get(lockId);
+      } else {
+        lockEntry = new LockEntry(lockProvider.createLock(lockId));
+        locks.put(lockId, lockEntry);
+      }
+      lockEntry.incrementLockCount();
+    }
+    return lockEntry;
+  }
+
+  private void releaseLockEntry(String lockId, LockEntry lockEntry) {
+    synchronized (lockAccessMonitor) {
+      lockEntry.decrementLockCount();
+      if (!lockEntry.hasPendingLocks()) {
+        locks.remove(lockId);
+        if (locks.isEmpty()) {
+          lockAccessMonitor.notifyAll();
+        }
+      }
+    }
+  }
+
+  private void waitForLocksToBeUnlocked() {
+    long timeOutMillis = currentTimeMillis() + gracefulShutdownTimeoutMillis;
+    synchronized (lockAccessMonitor) {
+      try {
+        long remainingMillis = timeOutMillis - currentTimeMillis();
+        while (!locks.isEmpty() && remainingMillis > 0) {
+          lockAccessMonitor.wait(remainingMillis);
+          remainingMillis = timeOutMillis - currentTimeMillis();
+        }
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
+      if (!locks.isEmpty()) {
+        LOGGER.warn("These locks weren't unlocked before disposing its lock group: {}", locks.keySet());
+      }
     }
   }
 }

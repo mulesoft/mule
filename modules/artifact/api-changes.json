@@ -3,6 +3,40 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel()",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ArtifactDescriptor",
+          "methodName": "getClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ArtifactDescriptor",
+          "methodName": "setClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModel",
+          "elementKind": "class",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelLoader",
+          "elementKind": "interface",
+          "justification": "W-11098291: usages of ClassLoaderModel, ClassLoaderModelBuilder and ClassLoaderModelLoader are going to be completely removed."
+        },
+        {
           "code": "java.annotation.added",
           "old": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",
           "new": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",

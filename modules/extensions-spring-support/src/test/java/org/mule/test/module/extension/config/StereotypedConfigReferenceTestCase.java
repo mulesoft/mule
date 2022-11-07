@@ -6,10 +6,13 @@
  */
 package org.mule.test.module.extension.config;
 
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
+
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -23,7 +26,12 @@ import javax.inject.Named;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @RunnerDelegateTo(Parameterized.class)
+@Feature(SDK_TOOLING_SUPPORT)
+@Story(METADATA_SERVICE)
 public class StereotypedConfigReferenceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Inject
@@ -53,6 +61,11 @@ public class StereotypedConfigReferenceTestCase extends AbstractExtensionFunctio
 
   @Override
   public boolean disableXmlValidations() {
+    return true;
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
     return true;
   }
 

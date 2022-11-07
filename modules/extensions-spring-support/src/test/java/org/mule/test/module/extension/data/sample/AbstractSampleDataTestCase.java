@@ -6,18 +6,20 @@
  */
 package org.mule.test.module.extension.data.sample;
 
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
+import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
+import static org.mule.test.data.sample.extension.SampleDataExtension.EXTENSION_NAME;
+
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
-import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
-import static org.mule.test.data.sample.extension.SampleDataExtension.EXTENSION_NAME;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
@@ -60,6 +62,11 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
 
   @Override
   public boolean disableXmlValidations() {
+    return true;
+  }
+
+  @Override
+  public boolean addToolingObjectsToRegistry() {
     return true;
   }
 

@@ -70,7 +70,8 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory,
     ComponentBuildingDefinitionRegistryFactoryAware {
 
-  private boolean enableLazyInit = false;
+  private final boolean enableLazyInit;
+  private final boolean addToolingObjectsToRegistry;
 
   private final ArtifactAst artifactAst;
   private final Map<String, String> artifactProperties;
@@ -82,21 +83,22 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
 
   private ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
-                                          ArtifactType artifactType, boolean enableLazyInit,
+                                          ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry,
                                           LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService)
       throws ConfigurationException {
     this.artifactAst = artifactAst;
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.enableLazyInit = enableLazyInit;
+    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
   }
 
   public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
-                                         ArtifactType artifactType, boolean enableLazyInit)
+                                         ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry)
       throws ConfigurationException {
-    this(artifactAst, artifactProperties, artifactType, enableLazyInit,
+    this(artifactAst, artifactProperties, artifactType, enableLazyInit, addToolingObjectsToRegistry,
          getRuntimeLockFactory(),
          DefaultMemoryManagementService.getInstance());
   }
@@ -204,7 +206,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          resolveParentConfigurationProperties(),
                                          baseConfigurationComponentLocator,
                                          errorTypeRepository, errorTypeLocator,
-                                         getArtifactProperties(), artifactType,
+                                         getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
                                          resolveComponentModelInitializer(),
                                          runtimeLockFactory,
                                          resolvedComponentBuildingDefinitionRegistryFactory,
@@ -217,7 +219,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                         resolveParentConfigurationProperties(),
                                         baseConfigurationComponentLocator,
                                         errorTypeRepository, errorTypeLocator,
-                                        getArtifactProperties(), artifactType,
+                                        getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
                                         resolvedComponentBuildingDefinitionRegistryFactory,
                                         new ArtifactMemoryManagementService(memoryManagementService),
                                         featureFlaggingService, expressionLanguageMetadataService);

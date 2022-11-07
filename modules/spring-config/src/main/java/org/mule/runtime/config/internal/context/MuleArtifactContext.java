@@ -36,8 +36,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifactExtensionModel;
+import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 
 import static java.lang.String.format;
@@ -173,6 +173,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final ContributedErrorTypeRepository errorTypeRepository;
   private final ContributedErrorTypeLocator errorTypeLocator;
   private final Map<String, String> artifactProperties;
+  private final boolean addToolingObjectsToRegistry;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
   // TODO W-10855416: remove this
@@ -204,7 +205,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                              ContributedErrorTypeRepository errorTypeRepository,
                              ContributedErrorTypeLocator errorTypeLocator,
-                             Map<String, String> artifactProperties, ArtifactType artifactType,
+                             Map<String, String> artifactProperties,
+                             boolean addToolingObjectsToRegistry,
+                             ArtifactType artifactType,
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                              MemoryManagementService memoryManagementService,
                              FeatureFlaggingService featureFlaggingService,
@@ -222,6 +225,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.errorTypeRepository = errorTypeRepository;
     this.errorTypeLocator = errorTypeLocator;
     this.artifactProperties = artifactProperties;
+    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.memoryManagementService = memoryManagementService;
 
     extensionManager = muleContext.getExtensionManager();
@@ -608,6 +612,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                     getCoreFunctionsProvider(),
                                                     getConfigurationProperties(),
                                                     artifactProperties,
+                                                    addToolingObjectsToRegistry,
                                                     getArtifactType(),
                                                     getApplicationModel(),
                                                     getOptionalObjectsController(),
@@ -757,5 +762,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected DefaultResourceLocator getResourceLocator() {
     return resourceLocator;
+  }
+
+  public boolean isAddToolingObjectsToRegistry() {
+    return addToolingObjectsToRegistry;
   }
 }

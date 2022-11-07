@@ -23,6 +23,9 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
+import static org.mule.test.allure.AllureConstants.ServicesFeature.SERVICES;
+import static org.mule.test.allure.AllureConstants.ServicesFeature.ServicesStory.SERVICE_PROVIDER_DISCOVERER;
+
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -31,7 +34,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -45,11 +48,15 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+@Feature(SERVICES)
+@Story(SERVICE_PROVIDER_DISCOVERER)
 public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTestCase {
 
   @Rule
@@ -84,8 +91,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
 
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(BundleDescriptorLoader.class))))
         .thenReturn(bundleDescriptorLoaderMock);
-    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
-        .thenReturn(mock(ClassLoaderModelLoader.class));
+    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderConfigurationLoader.class))))
+        .thenReturn(mock(ClassLoaderConfigurationLoader.class));
 
     doNothing().when(artifactDescriptorValidator).validate(anyObject());
   }

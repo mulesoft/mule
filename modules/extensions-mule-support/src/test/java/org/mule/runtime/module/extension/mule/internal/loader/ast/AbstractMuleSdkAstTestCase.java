@@ -46,18 +46,22 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   private final Map<String, String> properties = new HashMap<>();
 
-  protected static Set<ExtensionModel> runtimeExtensionModels;
+  protected static Set<ExtensionModel> astParserExtensionModels;
 
   protected abstract String getConfigFile();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    runtimeExtensionModels = new LinkedHashSet<>();
+    astParserExtensionModels = new LinkedHashSet<>();
     Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
         .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader());
     for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
-      runtimeExtensionModels.add(runtimeExtensionModelProvider.createExtensionModel());
+      astParserExtensionModels.add(runtimeExtensionModelProvider.createExtensionModel());
     }
+  }
+
+  protected static void addDependencyExtension(ExtensionModel extension) {
+    astParserExtensionModels.add(extension);
   }
 
   @Before
@@ -66,7 +70,7 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
     classLoader = this.getClass().getClassLoader();
 
     Builder astParserBuilder = builder()
-        .withExtensionModels(runtimeExtensionModels)
+        .withExtensionModels(astParserExtensionModels)
         .withPropertyResolver(propertyKey -> properties.getOrDefault(propertyKey, propertyKey));
 
     if (!validateSchema()) {

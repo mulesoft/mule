@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -15,6 +14,8 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -40,8 +41,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import javax.inject.Inject;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
@@ -101,28 +103,6 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
           extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.errorMappings = errorMappings;
-  }
-
-  @Override
-  public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
-  @Override
-  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
-                                        .getEntityMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
   }
 
   /**
@@ -188,4 +168,31 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   public List<EnrichedErrorMapping> getErrorMappings() {
     return errorMappings;
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // "Fat" Tooling support
+  /////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
+  @Override
+  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
+                                        .getEntityMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
 }
