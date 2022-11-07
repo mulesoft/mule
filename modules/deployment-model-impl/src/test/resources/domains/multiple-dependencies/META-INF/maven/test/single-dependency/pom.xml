@@ -8,6 +8,18 @@
     <artifactId>multiple-dependencies</artifactId>
     <version>1.0.0</version>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.mulesoft.mule.runtime.bom</groupId>
+                <artifactId>mule-test-dependencies-bom</artifactId>
+                <version>1.x-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -17,7 +29,6 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
-            <version>1.5.24</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
