@@ -278,6 +278,26 @@ public class ResolverUtils {
       }
 
       @Override
+      public void setRootSpanName(String name) {
+        // Nothing to do.
+      }
+
+      @Override
+      public String getRootSpanName() {
+        return null;
+      }
+
+      @Override
+      public void setSpanRootAttribute(String key, String value) {
+
+      }
+
+      @Override
+      public Map<String, String> getSpanRootAttributes() {
+        return null;
+      }
+
+      @Override
       public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) {
         // Nothing to do.
       }
