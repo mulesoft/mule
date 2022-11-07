@@ -240,7 +240,7 @@ public class DefaultToolingService implements ToolingService {
   private Application doCreateApplication(ApplicationDescriptor applicationDescriptor) throws IOException {
     Application application = applicationFactory.createArtifact(applicationDescriptor);
     application.install();
-    application.lazyInit();
+    application.lazyInitTooling(true);
     application.start();
     return application;
   }
@@ -287,7 +287,7 @@ public class DefaultToolingService implements ToolingService {
     Optional<Properties> mergedDeploymentProperties = of(createDeploymentProperties(deploymentProperties));
     Domain domain = domainFactory.createArtifact(toolingDomainContent, mergedDeploymentProperties);
     domain.install();
-    domain.lazyInit();
+    domain.lazyInitTooling(true);
     domain.start();
     return new ToolingDomainWrapper(domain);
   }
