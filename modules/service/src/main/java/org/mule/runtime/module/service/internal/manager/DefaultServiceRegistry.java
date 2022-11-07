@@ -8,17 +8,21 @@ package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -34,7 +38,7 @@ import javax.inject.Qualifier;
  *
  * @since 4.2
  */
-public class ServiceRegistry {
+public class DefaultServiceRegistry implements ServiceRegistry {
 
   private final Map<Class<? extends Service>, Service> services = new HashMap<>();
 
@@ -66,7 +70,8 @@ public class ServiceRegistry {
           field.set(serviceProvider, dependency);
         } else if (!asOptional) {
           throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
-                                                  field.getName(), dependencyType.getName()));
+                                                  field.getName(),
+                                                  serviceProvider.getServiceDefinition().getServiceClass().getName()));
         }
       } catch (Exception e) {
         throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(),
@@ -85,15 +90,32 @@ public class ServiceRegistry {
     return asOptional ? ofNullable(dependency) : dependency;
   }
 
-
-  /**
-   * Tracks the given {@code service}
-   *
-   * @param service  the {@link Service} to be tracked
-   * @param assembly the {@code service}'s {@link ServiceAssembly}
-   */
-  public void register(Service service, ServiceAssembly assembly) {
-    services.put(assembly.getServiceContract(), service);
+  @Override
+  public <S extends Service> void register(S service, Class<? extends S> serviceContract) {
+    services.put(serviceContract, service);
   }
 
+  public <S extends Service> void register(Class<? extends S> serviceContract, S service) {
+    services.put(serviceContract, service);
+  }
+
+  @Override
+  public <S extends Service> void unregister(Class<? extends S> serviceContract) {
+    services.remove(serviceContract);
+  }
+
+  @Override
+  public <S extends Service> Optional<S> getService(Class<? extends S> serviceInterface) {
+    return services
+        .values()
+        .stream()
+        .filter(s -> serviceInterface.isInstance(s))
+        .map(s -> (S) s)
+        .findAny();
+  }
+
+  @Override
+  public Collection<Service> getAllServices() {
+    return new HashSet<>(services.values());
+  }
 }

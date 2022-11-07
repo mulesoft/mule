@@ -17,8 +17,8 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -102,10 +102,10 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testMySqlDriverCleanupThreadClassIsFound() throws ClassNotFoundException, IOException {
-    try (MuleArtifactClassLoader artifactClassLoader =
-        new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                    new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
-                                    currentThread().getContextClassLoader(), testLookupPolicy)) {
+    try (MulePluginClassLoader artifactClassLoader =
+        new MulePluginClassLoader("test", mock(ArtifactDescriptor.class),
+                                  new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
+                                  currentThread().getContextClassLoader(), testLookupPolicy)) {
       artifactClassLoader.setResourceReleaserClassLocation(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION);
       // Force to load a Driver class so the jdbc resource releaser is created and executed
       artifactClassLoader.loadClass(TestDriver.class.getName());

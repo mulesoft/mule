@@ -8,6 +8,7 @@ package org.mule.test.classloading.api;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
+
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,6 +44,6 @@ public class ClassLoadingHelper {
     assertThat(classLoader.toString(),
                allOf(containsString("classloading-extension"),
                      anyOf(containsString(".TestRegionClassLoader[Region] @"),
-                           containsString("MuleArtifactClassLoader"))));
+                           containsString("MulePluginClassLoader"))));
   }
 }

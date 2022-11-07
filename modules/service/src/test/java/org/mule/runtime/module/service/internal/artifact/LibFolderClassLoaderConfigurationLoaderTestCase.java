@@ -23,6 +23,7 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

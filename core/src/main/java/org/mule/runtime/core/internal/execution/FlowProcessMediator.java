@@ -557,7 +557,7 @@ public class FlowProcessMediator implements Initialisable {
         createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter),
                            adapter.getDistributedTraceContextGetter());
 
-    return eventBuilder.message(eventCtx -> {
+    CoreEvent coreEvent = eventBuilder.message(eventCtx -> {
       final Result<?, ?> result = adapter.getResult();
       final Object resultValue = result.getOutput();
 
@@ -579,6 +579,10 @@ public class FlowProcessMediator implements Initialisable {
 
       return eventMessage;
     }).build();
+
+    coreEventTracer.setCurrentSpanName(coreEvent, adapter.getRootSpanName());
+    coreEventTracer.addCurrentSpanAttributes(coreEvent, adapter.getSpanRootAttributes());
+    return coreEvent;
   }
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
