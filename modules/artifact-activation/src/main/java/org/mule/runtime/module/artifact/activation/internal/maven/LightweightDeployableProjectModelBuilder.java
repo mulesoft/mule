@@ -10,6 +10,8 @@ import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 
 import static java.nio.file.Files.find;
 import static java.util.Collections.emptyList;
@@ -20,6 +22,7 @@ import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
@@ -77,7 +80,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
         .getOrDefault("exportedResources", emptyList());
 
     return new DeployableProjectModel(exportedPackages, exportedResources, emptyList(),
-                                      buildBundleDescriptor(deployableArtifactCoordinates),
+                                      buildBundleDescriptor(deployableArtifactCoordinates, isDomain),
                                       modelResolver,
                                       projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
@@ -104,6 +107,17 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
         return applicationModelResolver().resolve(new File(projectFolder, "META-INF/mule-artifact"));
       }
     });
+  }
+
+  private BundleDescriptor buildBundleDescriptor(ArtifactCoordinates artifactCoordinates, boolean isDomain) {
+    return new BundleDescriptor.Builder()
+      .setArtifactId(artifactCoordinates.getArtifactId())
+      .setGroupId(artifactCoordinates.getGroupId())
+      .setVersion(artifactCoordinates.getVersion())
+      .setBaseVersion(artifactCoordinates.getVersion())
+      .setType(artifactCoordinates.getType())
+      .setClassifier(isDomain ? MULE_DOMAIN_CLASSIFIER : MULE_APPLICATION_CLASSIFIER)
+      .build();
   }
 
 }
