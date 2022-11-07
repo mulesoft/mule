@@ -44,7 +44,7 @@ public class LazyServiceTestCase extends AbstractMuleTestCase {
   private ServiceProvider serviceProvider;
 
   @Mock
-  private ServiceRegistry serviceRegistry;
+  private DefaultServiceRegistry serviceRegistry;
 
   private TestService lazyService;
 

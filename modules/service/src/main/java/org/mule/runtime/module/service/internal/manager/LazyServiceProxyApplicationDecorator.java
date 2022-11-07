@@ -22,7 +22,7 @@ public class LazyServiceProxyApplicationDecorator extends LazyServiceProxy {
 
 
   public LazyServiceProxyApplicationDecorator(ServiceAssembly assembly,
-                                              ServiceRegistry serviceRegistry,
+                                              DefaultServiceRegistry serviceRegistry,
                                               LazyValue<Service> service,
                                               MethodInvoker methodInvoker) {
     super(assembly, serviceRegistry, service);

@@ -28,9 +28,9 @@ import static org.mockito.Mockito.mock;
 import org.mule.module.artifact.classloader.JdbcResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -121,7 +121,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
   }
 
-  private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MuleArtifactClassLoader classLoader) throws Exception {
+  private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MulePluginClassLoader classLoader) throws Exception {
     assertThat(classLoader.getClass().getClassLoader(), is(currentThread().getContextClassLoader()));
     classLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
 
@@ -179,7 +179,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     ResourceReleaser getResourceReleaserInstance();
   }
 
-  private static class TestArtifactClassLoader extends MuleArtifactClassLoader implements KeepResourceReleaserInstance {
+  private static class TestArtifactClassLoader extends MulePluginClassLoader implements KeepResourceReleaserInstance {
 
     private ResourceReleaser resourceReleaserInstance;
 

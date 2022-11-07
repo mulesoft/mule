@@ -52,6 +52,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 
 import java.io.File;
 import java.net.URL;
@@ -370,8 +371,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                                           pluginClassLoaderResolver);
 
     MuleArtifactClassLoader pluginClassLoader =
-        new MuleArtifactClassLoader(pluginArtifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
-                                    regionClassLoader, pluginLookupPolicy);
+        new MulePluginClassLoader(pluginArtifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
+                                  regionClassLoader, pluginLookupPolicy);
     return pluginClassLoader;
   }
 
