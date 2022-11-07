@@ -52,7 +52,7 @@ public interface ServiceRegistry {
    * @param serviceContract the interface of the service to get, as declared in {@link ServiceAssembly#getServiceContract()} on
    *                        {@link #register(Service, ServiceAssembly)}.
    * @return a previously {@link #register(Service, ServiceAssembly) registered} service for the provided
-   *         {@code servcieInterface}.
+   *         {@code serviceInterface}.
    */
   <S extends Service> Optional<S> getService(Class<? extends S> serviceInterface);
 

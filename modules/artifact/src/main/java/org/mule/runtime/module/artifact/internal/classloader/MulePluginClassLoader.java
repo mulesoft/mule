@@ -26,7 +26,8 @@ import java.net.URL;
 import java.sql.Driver;
 
 /**
- * Abstract implementation of the ArtifactClassLoader interface, that manages shutdown listeners and has resource releasers.
+ * Implementation of the ArtifactClassLoader interface for {@code mule-plugin}s, that manages shutdown listeners and has resource
+ * releasers.
  */
 public class MulePluginClassLoader extends MuleArtifactClassLoader {
 
@@ -47,7 +48,7 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader {
   private final ResourceReleaser mvelClassLoaderReleaserInstance;
 
   /**
-   * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
+   * Constructs a new {@link MulePluginClassLoader} for the given URLs
    *
    * @param artifactId         artifact unique ID. Non empty.
    * @param artifactDescriptor descriptor for the artifact owning the created class loader. Non null.

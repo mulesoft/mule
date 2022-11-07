@@ -23,7 +23,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Loads a {@link MuleServiceModel} by parsing the descriptor within the servcie classloader.
+ * Loads a {@link MuleServiceModel} by parsing the descriptor within the service classloader.
  * 
  * @since 4.5
  */
