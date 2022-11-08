@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.mule.runtime.core.privileged.util.MapUtils.mapWithKeysAndValues;
+
 /**
  * A {@link SpanCustomizationInfo} that resolves the attributes from the {@link CoreEvent} with a default behaviour.
  *
@@ -30,18 +32,20 @@ public abstract class AbstractDefaultAttributesResolvingSpanCustomizationInfo im
   public static final String ARTIFACT_TYPE_ID = "artifactType";
   public static final String THREAD_START_ID_KEY = "threadStartId";
   public static final String THREAD_START_NAME_KEY = "threadStartName";
+  public static final String[] KEYS =
+      {LOCATION_KEY, CORRELATION_ID_KEY, ARTIFACT_ID_KEY, ARTIFACT_TYPE_ID, THREAD_START_ID_KEY, THREAD_START_NAME_KEY};
 
   @Override
   public Map<String, String> getAttributes(CoreEvent coreEvent, MuleConfiguration muleConfiguration, ArtifactType artifactType) {
-    Map<String, String> attributes = new HashMap<>();
-    attributes.put(LOCATION_KEY, getLocationAsString(coreEvent));
-    attributes.put(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
-    attributes.put(ARTIFACT_ID_KEY, muleConfiguration.getId());
-    attributes.put(ARTIFACT_TYPE_ID, artifactType.getAsString());
-    attributes.put(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
-    attributes.put(THREAD_START_NAME_KEY, Thread.currentThread().getName());
-    addLoggingVariablesAsAttributes(coreEvent, attributes);
-    return attributes;
+    Map<String, String> map = mapWithLoggingVariables(coreEvent);
+    Map<String, String> attributes = mapWithKeysAndValues(HashMap.class, KEYS,
+                                                          new String[] {getLocationAsString(coreEvent),
+                                                              coreEvent.getCorrelationId(), muleConfiguration.getId(),
+                                                              artifactType.getAsString(),
+                                                              Long.toString(Thread.currentThread().getId()),
+                                                              Thread.currentThread().getName()});
+    map.putAll(attributes);
+    return map;
   }
 
   /**
@@ -52,14 +56,15 @@ public abstract class AbstractDefaultAttributesResolvingSpanCustomizationInfo im
   public abstract String getLocationAsString(CoreEvent coreEvent);
 
 
-  private void addLoggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+  private Map<String, String> mapWithLoggingVariables(CoreEvent coreEvent) {
+    Map<String, String> attributes = new HashMap<>();
     if (coreEvent instanceof PrivilegedEvent) {
       Optional<Map<String, String>> loggingVariables = ((PrivilegedEvent) coreEvent).getLoggingVariables();
       if (loggingVariables.isPresent()) {
-        for (Map.Entry<String, String> entry : ((PrivilegedEvent) coreEvent).getLoggingVariables().get().entrySet()) {
-          attributes.put(entry.getKey(), entry.getValue());
-        }
+        attributes.putAll(loggingVariables.get());
       }
     }
+
+    return attributes;
   }
 }

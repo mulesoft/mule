@@ -68,13 +68,7 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                           spanCustomizationInfo.isExportable(coreEvent),
                                                           spanCustomizationInfo.noExportUntil());
 
-
-    Map<String, String> attributes =
-        spanCustomizationInfo.getAttributes(coreEvent, muleConfiguration, artifactType);
-
-    for (Map.Entry<String, String> entry : attributes.entrySet()) {
-      exportOnEndSpan.addAttribute(entry.getKey(), entry.getValue());
-    }
+    exportOnEndSpan.addAttributes(spanCustomizationInfo.getAttributes(coreEvent, muleConfiguration, artifactType));
 
     return exportOnEndSpan;
   }

@@ -130,6 +130,10 @@ public class ExportOnEndSpan implements InternalSpan {
     spanExporter.onNameUpdated(name);
   }
 
+  public void addAttributes(Map<String, String> attributes) {
+    runtimeInternalSpan.addAttributes(attributes);
+  }
+
   /**
    * Adds attribute to the exporter.
    */

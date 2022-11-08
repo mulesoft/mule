@@ -101,6 +101,11 @@ public class ExecutionSpan implements InternalSpan {
     this.name = name;
   }
 
+  @Override
+  public void addAttributes(Map<String, String> attributes) {
+    attributes.putAll(attributes);
+  }
+
   /**
    * An default implementation for a {@link SpanDuration}
    */

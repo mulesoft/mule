@@ -107,6 +107,13 @@ public interface InternalSpan extends Span {
   }
 
   /**
+   * Add attributes to the span.
+   *
+   * @param attributes the attributes to the span.
+   */
+  void addAttributes(Map<String, String> attributes);
+
+  /**
    * A wrapper as InternalSpan for other type of {@link Span}
    */
   class SpanInternalWrapper implements InternalSpan {
@@ -160,6 +167,11 @@ public interface InternalSpan extends Span {
     @Override
     public <T> T visit(InternalSpanVisitor<T> visitor) {
       return visitor.accept(this);
+    }
+
+    @Override
+    public void addAttributes(Map<String, String> attributes) {
+      // Nothing to do.
     }
   }
 }
