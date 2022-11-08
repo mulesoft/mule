@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.privileged.util.MapUtils.mapWithKeysAndValues;
+
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -16,8 +18,6 @@ import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static org.mule.runtime.core.privileged.util.MapUtils.mapWithKeysAndValues;
 
 /**
  * A {@link SpanCustomizationInfo} that resolves the attributes from the {@link CoreEvent} with a default behaviour.
