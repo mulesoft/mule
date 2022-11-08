@@ -91,9 +91,4 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
     return ocsEnabled;
   }
 
-  @Override
-  public boolean isEnableIgnoredComponents() {
-    return false;
-  }
-
 }

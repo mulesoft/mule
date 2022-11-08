@@ -89,11 +89,6 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isOCSEnabled();
 
-  /**
-   * @return whether components that have been disabled with the {@link Ignore} directive are to be included.
-   */
-  boolean isEnableIgnoredComponents();
-
   @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
