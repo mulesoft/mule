@@ -44,15 +44,15 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   private static final Boolean CORRECT_USE_OF_BACKSLASH = valueOf(getProperty("mule.properties.correct.backslash.use", "true"));
   public static final String PLACEHOLDER_PREFIX = "${";
   public static final String PLACEHOLDER_SUFFIX = "}";
-  private final Optional<ConfigurationPropertiesResolver> parentResolver;
+  private final Optional<ConfigurationPropertiesResolver> nextResolver;
   private final ConfigurationPropertiesProvider configurationPropertiesProvider;
   private final Cache<String, Object> resolutionCache = CacheBuilder.<String, String>newBuilder().build();
   private boolean initialized = false;
   private Optional<ConfigurationPropertiesResolver> rootResolver = empty();
 
-  public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> parentResolver,
+  public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> nextResolver,
                                                 ConfigurationPropertiesProvider configurationPropertiesProvider) {
-    this.parentResolver = parentResolver;
+    this.nextResolver = nextResolver;
     this.configurationPropertiesProvider = requireNonNull(configurationPropertiesProvider);
   }
 
@@ -119,7 +119,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(parentResolver);
+    initialiseIfNeeded(nextResolver);
     if (!initialized) {
       initialiseIfNeeded(configurationPropertiesProvider);
       initialized = true;
@@ -129,7 +129,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   @Override
   public void dispose() {
     disposeIfNeeded(configurationPropertiesProvider, LOGGER);
-    disposeIfNeeded(parentResolver, LOGGER);
+    disposeIfNeeded(nextResolver, LOGGER);
     initialized = false;
   }
 
@@ -151,9 +151,9 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       } else {
         return foundValueOptional.get();
       }
-    } else if (parentResolver.isPresent()) {
+    } else if (nextResolver.isPresent()) {
       try {
-        return parentResolver.get().resolvePlaceholderKeyValue(placeholderKey);
+        return nextResolver.get().resolvePlaceholderKeyValue(placeholderKey);
       } catch (PropertyNotFoundException e) {
         throw new PropertyNotFoundException(e, new Pair<>(configurationPropertiesProvider.getDescription(), placeholderKey));
       }
@@ -201,7 +201,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   }
 
   private void propagateRootResolver(ConfigurationPropertiesResolver rootResolver) {
-    this.parentResolver.ifPresent(resolver -> {
+    this.nextResolver.ifPresent(resolver -> {
       if (resolver instanceof DefaultConfigurationPropertiesResolver) {
         ((DefaultConfigurationPropertiesResolver) resolver).setRootResolver(rootResolver);
       }
