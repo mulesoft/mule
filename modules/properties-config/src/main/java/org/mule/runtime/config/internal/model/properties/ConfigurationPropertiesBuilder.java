@@ -10,13 +10,24 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.config.internal.dsl.model.config.*;
+import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 
