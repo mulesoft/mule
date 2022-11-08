@@ -297,6 +297,10 @@ public class ResolverUtils {
         return null;
       }
 
+      @Override public void updateSpanNameAndAttributes(InternalSpan exportOnEndSpan) {
+        // Nothing to do.
+      }
+
       @Override
       public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) {
         // Nothing to do.

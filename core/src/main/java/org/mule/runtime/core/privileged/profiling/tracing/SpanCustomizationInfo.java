@@ -76,4 +76,10 @@ public interface SpanCustomizationInfo {
     return emptySet();
   }
 
+  /**
+   * @return whether this corresponds to a policy span.
+   */
+  default boolean isPolicySpan() {
+    return false;
+  }
 }

@@ -107,6 +107,20 @@ public interface InternalSpan extends Span {
   }
 
   /**
+   * @return whether the span corresponds to an root component within a chain.
+   */
+  default boolean isPolicySpan() {
+    return false;
+  }
+
+  /**
+   * @return indicates whether the original name of the span was updated.
+   */
+  default boolean isOriginalNameUpdated() {
+    return false;
+  }
+
+  /**
    * A wrapper as InternalSpan for other type of {@link Span}
    */
   class SpanInternalWrapper implements InternalSpan {
