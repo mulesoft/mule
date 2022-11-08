@@ -73,8 +73,8 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
       mock(ApplicationClassLoaderBuilderFactory.class);
 
-  private static final String SOCKET_CONNECTOR = "/plugin/Sockets";
-  private static final String HTTP_CONNECTOR = "/plugin/HTTP";
+  private static final String EMPTY_PLUGIN = "/plugin/empty-plugin";
+  private static final String DEPENDANT_CONNECTOR = "/plugin/dependant-plugin";
   private MuleApplicationClassLoader classloader;
 
   private final DomainManager domainManager = new DefaultDomainManager();
@@ -102,28 +102,28 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
     when(applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder())
         .thenReturn(applicationClassLoaderBuilderMock);
 
-    final ArtifactPluginDescriptor socketArtifactPluginDescriptor = new ArtifactPluginDescriptor(SOCKET_CONNECTOR);
-    socketArtifactPluginDescriptor
+    final ArtifactPluginDescriptor emptyPluginArtifactPluginDescriptor = new ArtifactPluginDescriptor(EMPTY_PLUGIN);
+    emptyPluginArtifactPluginDescriptor
         .setClassLoaderConfiguration(new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder().build());
-    final ArtifactPlugin socketPlugin = mock(ArtifactPlugin.class);
-    final ArtifactClassLoader socketClassloader = mock(ArtifactClassLoader.class);
-    when(socketPlugin.getArtifactClassLoader()).thenReturn(socketClassloader);
-    when(socketClassloader.getArtifactId()).thenReturn(SOCKET_CONNECTOR);
-    when(socketPlugin.getDescriptor()).thenReturn(socketArtifactPluginDescriptor);
+    final ArtifactPlugin emptyPlugin = mock(ArtifactPlugin.class);
+    final ArtifactClassLoader emptyPluginClassloader = mock(ArtifactClassLoader.class);
+    when(emptyPlugin.getArtifactClassLoader()).thenReturn(emptyPluginClassloader);
+    when(emptyPluginClassloader.getArtifactId()).thenReturn(EMPTY_PLUGIN);
+    when(emptyPlugin.getDescriptor()).thenReturn(emptyPluginArtifactPluginDescriptor);
 
 
-    final ArtifactPluginDescriptor httpArtifactPluginDescriptor = new ArtifactPluginDescriptor(HTTP_CONNECTOR);
-    socketArtifactPluginDescriptor
+    final ArtifactPluginDescriptor dependantArtifactPluginDescriptor = new ArtifactPluginDescriptor(DEPENDANT_CONNECTOR);
+    dependantArtifactPluginDescriptor
         .setClassLoaderConfiguration(new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder().build());
-    final ArtifactPlugin httpPlugin = mock(ArtifactPlugin.class);
-    final ArtifactClassLoader httpClassloader = mock(ArtifactClassLoader.class);
-    when(httpPlugin.getArtifactClassLoader()).thenReturn(httpClassloader);
-    when(httpClassloader.getArtifactId()).thenReturn(HTTP_CONNECTOR);
-    when(httpPlugin.getDescriptor()).thenReturn(httpArtifactPluginDescriptor);
+    final ArtifactPlugin dependantPlugin = mock(ArtifactPlugin.class);
+    final ArtifactClassLoader dependantClassloader = mock(ArtifactClassLoader.class);
+    when(dependantPlugin.getArtifactClassLoader()).thenReturn(dependantClassloader);
+    when(dependantClassloader.getArtifactId()).thenReturn(DEPENDANT_CONNECTOR);
+    when(dependantPlugin.getDescriptor()).thenReturn(dependantArtifactPluginDescriptor);
 
     List<ArtifactClassLoader> pluginClassLoaders = new ArrayList<>();
-    pluginClassLoaders.add(socketClassloader);
-    pluginClassLoaders.add(httpClassloader);
+    pluginClassLoaders.add(emptyPluginClassloader);
+    pluginClassLoaders.add(dependantClassloader);
     when(classloader.getArtifactPluginClassLoaders()).thenReturn(pluginClassLoaders);
 
     createDefaultDomain();
@@ -173,8 +173,8 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
     List<ArtifactPlugin> plugins = application.getArtifactPlugins();
     assertThat(plugins.size(), is(2));
     assertThat(plugins, contains(
-                                 hasProperty("artifactId", is(appName + "/plugin/Sockets")),
-                                 hasProperty("artifactId", is(appName + "/plugin/HTTP"))));
+                                 hasProperty("artifactId", is(appName + EMPTY_PLUGIN)),
+                                 hasProperty("artifactId", is(appName + DEPENDANT_CONNECTOR))));
   }
 
   protected File getApplicationFolder(String path) throws URISyntaxException {

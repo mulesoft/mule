@@ -100,8 +100,8 @@ public class DefaultLightweightDomainFactoryTestCase extends AbstractMuleTestCas
     List<ArtifactPlugin> plugins = domain.getArtifactPlugins();
     assertThat(plugins.size(), is(2));
     assertThat(plugins, contains(
-                                 hasProperty("artifactId", is("domain/" + domainName + "/plugin/Sockets")),
-                                 hasProperty("artifactId", is("domain/" + domainName + "/plugin/HTTP"))));
+                                 hasProperty("artifactId", is("domain/" + domainName + "/plugin/empty-plugin")),
+                                 hasProperty("artifactId", is("domain/" + domainName + "/plugin/dependant-plugin"))));
   }
 
   protected File getDomainFolder(String path) throws URISyntaxException {
