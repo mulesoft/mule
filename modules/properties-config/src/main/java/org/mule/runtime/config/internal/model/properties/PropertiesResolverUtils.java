@@ -67,7 +67,7 @@ public class PropertiesResolverUtils {
                                                                                                ResourceProvider externalResourceProvider,
                                                                                                Optional<FeatureFlaggingService> featureFlaggingService) {
 
-    ConfigurationPropertiesBuilder builder = new ConfigurationPropertiesBuilder();
+    ConfigurationPropertiesHierarchyBuilder builder = new ConfigurationPropertiesHierarchyBuilder();
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
     // If this FeatureFlag is ever removed (and DeploymentProperties are always set), then remove the
@@ -103,7 +103,7 @@ public class PropertiesResolverUtils {
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
                                                                                                ResourceProvider externalResourceProvider) {
-    ConfigurationPropertiesBuilder builder = new ConfigurationPropertiesBuilder()
+    ConfigurationPropertiesHierarchyBuilder builder = new ConfigurationPropertiesHierarchyBuilder()
         .withDeploymentProperties(deploymentProperties)
         .withSystemProperties()
         .withEnvironmentProperties()

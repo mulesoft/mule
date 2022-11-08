@@ -30,61 +30,102 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-
-public class ConfigurationPropertiesBuilder {
+/**
+ * Builder of {@link ConfigurationPropertiesResolver} with the full hierarchy, considering the properties to be used. The
+ * hierarchy to consider is: 1. Deployment Properties 2. System Properties 3. Environment Properties 4. Application Properties
+ * (this includes file properties) 5. Global (Default) Properties This means that (for example) if we have a property 'hello' both
+ * in System Properties level and Application Properties level, then the value to be use is going to be the System Properties one.
+ * Also, lower-hierarchy properties can depend their values on higher level properties (e.g. an application property can depend
+ * its value on a system property)
+ */
+public class ConfigurationPropertiesHierarchyBuilder {
 
   private Optional<ConfigurationPropertiesProvider> deploymentProperties = empty();
   private Optional<ConfigurationPropertiesProvider> systemProperties = empty();
   private Optional<ConfigurationPropertiesProvider> environmentProperties = empty();
   private Optional<ConfigurationPropertiesProvider> fileProperties = empty();
   private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
-  private Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
-  private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = () -> globalProperties;
+  private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
 
-  public ConfigurationPropertiesBuilder withDeploymentProperties(Map<String, String> properties) {
+  /**
+   * @param properties the deployment properties to consider, as a map.
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withDeploymentProperties(Map<String, String> properties) {
     if (!properties.isEmpty()) {
       this.deploymentProperties = of(new MapConfigurationPropertiesProvider(properties, "Deployment properties"));
     }
     return this;
   }
 
-  public ConfigurationPropertiesBuilder withSystemProperties() {
+  /**
+   * Sets that system properties added to the JVM are considered in the hierarchy.
+   * 
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withSystemProperties() {
     this.systemProperties = of(new SystemPropertiesConfigurationProvider());
     return this;
   }
 
-  public ConfigurationPropertiesBuilder withEnvironmentProperties() {
+  /**
+   * Sets that environment properties (from OS) should be considered in the hierarchy.
+   * 
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withEnvironmentProperties() {
     this.environmentProperties = of(new EnvironmentPropertiesConfigurationProvider());
     return this;
   }
 
-  public ConfigurationPropertiesBuilder withPropertiesFile(ResourceProvider resourceProvider) {
+  /**
+   * Sets an external resource provider to get the file content to then use a File Configuration Property.
+   * 
+   * @param resourceProvider
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withPropertiesFile(ResourceProvider resourceProvider) {
     this.fileProperties = of(new FileConfigurationPropertiesProvider(resourceProvider, "External Files"));
     return this;
   }
 
-  public ConfigurationPropertiesBuilder withApplicationProperties(ConfigurationPropertiesProvider provider) {
+  /**
+   * Sets a {@link ConfigurationPropertiesProvider} to use as application property, gotten from a custom provider (such as the
+   * Secure Configuration Properties) or properties set with the configuration-properties tag.
+   * 
+   * @param provider
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withApplicationProperties(ConfigurationPropertiesProvider provider) {
     this.appProperties.add(provider);
     return this;
   }
 
-  public ConfigurationPropertiesBuilder withGlobalProperties(String name, ConfigurationProperty value) {
-    this.globalProperties.put(name, value);
-    return this;
-  }
-
-  public ConfigurationPropertiesBuilder withGlobalPropertiesSupplier(Supplier<Map<String, ConfigurationProperty>> supplier) {
+  /**
+   * Sets a supplier to retrieve the Global Properties from.
+   * 
+   * @param supplier
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withGlobalPropertiesSupplier(Supplier<Map<String, ConfigurationProperty>> supplier) {
     this.globalPropertiesSupplier = supplier;
     return this;
   }
 
-  public ConfigurationPropertiesBuilder withDomainPropertiesResolver(ConfigurationProperties domainResolver) {
+  /**
+   * Sets to consider the domain properties in the hierarchy, setting a previously resolved {@link ConfigurationProperty} to
+   * reoslve.
+   * 
+   * @param domainProperties
+   * @return
+   */
+  public ConfigurationPropertiesHierarchyBuilder withDomainPropertiesResolver(ConfigurationProperties domainProperties) {
     this.domainResolver = of(new ConfigurationPropertiesProvider() {
 
       @Override
       public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
-        return domainResolver.resolveProperty(configurationAttributeKey)
+        return domainProperties.resolveProperty(configurationAttributeKey)
             .map(value -> new DefaultConfigurationProperty(domainResolver, configurationAttributeKey, value));
       }
 
@@ -105,6 +146,10 @@ public class ConfigurationPropertiesBuilder {
     hierarchy.add(new DefaultConfigurationPropertiesResolver(parent, newProvider));
   }
 
+
+  /**
+   * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
+   */
   public ConfigurationPropertiesResolver build() {
     List<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayList<>();
 
