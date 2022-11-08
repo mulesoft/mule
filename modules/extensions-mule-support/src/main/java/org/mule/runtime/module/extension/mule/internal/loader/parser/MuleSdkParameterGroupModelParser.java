@@ -20,6 +20,8 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
@@ -109,5 +111,10 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
     return emptyList();
+  }
+
+  @Override
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
+    return empty();
   }
 }

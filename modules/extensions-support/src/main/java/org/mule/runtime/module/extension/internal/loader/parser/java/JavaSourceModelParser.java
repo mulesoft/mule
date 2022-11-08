@@ -13,11 +13,11 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getSourceParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forSource;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaSourceModelParserUtils.fromLegacySourceClusterSupport;
@@ -25,6 +25,9 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sour
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceOutputType;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
@@ -57,8 +60,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
@@ -228,10 +236,15 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   private void resolveOutputTypes() {
+    Optional<OutputResolverModelParser> outputResolverModelParser =
+        parseOutputResolverModelParser(extensionElement, sourceElement);
+    boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();
+    outputType = new DefaultOutputModelParser(getSourceOutputType(sourceElement), isDynamicResolver);
 
-    // TODO: Should be possible to parse dynamic types right here
-    outputType = new DefaultOutputModelParser(getSourceOutputType(sourceElement), false);
-    outputAttributesType = new DefaultOutputModelParser(getSourceAttributesType(sourceElement), false);
+    Optional<AttributesResolverModelParser> attributesResolverModelParser =
+        parseAttributesResolverModelParser(extensionElement, sourceElement);
+    isDynamicResolver = attributesResolverModelParser.isPresent() && attributesResolverModelParser.get().hasAttributesResolver();
+    outputAttributesType = new DefaultOutputModelParser(getSourceAttributesType(sourceElement), isDynamicResolver);
   }
 
   private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {
@@ -246,9 +259,9 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   private Optional<SourceCallbackModelParser> parseSourceCallback(Optional<MethodElement> methodElement) {
     return methodElement
-        .map(method -> new JavaSourceCallbackModelParser(getParameterGroupParsers(
-                                                                                  method.getParameters(),
-                                                                                  forSource(getName()))));
+        .map(method -> new JavaSourceCallbackModelParser(method, getParameterGroupParsers(
+                                                                                          method.getParameters(),
+                                                                                          forSource(getName()))));
   }
 
   @Override
@@ -312,6 +325,21 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
+  public Optional<OutputResolverModelParser> getOutputResolverModelParser() {
+    return parseOutputResolverModelParser(extensionElement, sourceElement);
+  }
+
+  @Override
+  public Optional<AttributesResolverModelParser> getAttributesResolverModelParser() {
+    return parseAttributesResolverModelParser(extensionElement, sourceElement);
+  }
+
+  @Override
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser() {
+    return parseKeyIdResolverModelParser(extensionElement, sourceElement);
+  }
+
+  @Override
   public ComponentVisibility getComponentVisibility() {
     return PUBLIC;
   }
@@ -333,14 +361,29 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   private static class JavaSourceCallbackModelParser implements SourceCallbackModelParser {
 
     private final List<ParameterGroupModelParser> groupModelParsers;
+    private final MethodElement<?> methodElement;
 
-    public JavaSourceCallbackModelParser(List<ParameterGroupModelParser> groupModelParsers) {
+    public JavaSourceCallbackModelParser(MethodElement<?> methodElement, List<ParameterGroupModelParser> groupModelParsers) {
+      this.methodElement = methodElement;
       this.groupModelParsers = groupModelParsers;
     }
 
     @Override
     public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
       return groupModelParsers;
+    }
+
+    @Override
+    public List<InputResolverModelParser> getInputResolverModelParsers() {
+      return groupModelParsers.stream()
+          .map(ParameterGroupModelParser::getParameterParsers)
+          .flatMap(List::stream)
+          .collect(toList())
+          .stream()
+          .map(ParameterModelParser::getInputResolverModelParser)
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .collect(toList());
     }
   }
 }
