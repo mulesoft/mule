@@ -95,21 +95,18 @@ public class ConfigurationPropertiesBuilder {
 
   public ConfigurationPropertiesResolver build() {
     List<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayList<>();
-    deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
-    environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
-    systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+
+    addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(globalPropertiesSupplier));
     domainResolver.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     if (!appProperties.isEmpty()) {
       addToHierarchy(hierarchy, new CompositeConfigurationPropertiesProvider(appProperties));
     }
     fileProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
-    if (!globalProperties.isEmpty()) {
-      addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(() -> globalProperties));
-    }
-    if (hierarchy.isEmpty()) {
-      throw new RuntimeException(); // TBD
-    }
-    hierarchy.get(0).setAsRootResolver();
+    systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+
+    hierarchy.get(hierarchy.size() - 1).setAsRootResolver();
     return hierarchy.get(hierarchy.size() - 1);
   }
 }
