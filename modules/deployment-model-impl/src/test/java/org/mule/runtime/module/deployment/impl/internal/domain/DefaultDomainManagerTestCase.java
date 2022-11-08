@@ -116,9 +116,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   private Domain createDomain(String artifactId, String version, String artifactName) throws IOException {
     final DomainDescriptor descriptor = new DomainDescriptor(artifactName);
     descriptor.setBundleDescriptor(createBundleDescriptor(artifactId, version));
-    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class),
-                                                                    any()))
-                                                                        .thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class)))
+        .thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     when(domainArtifactClassLoader.getArtifactId()).thenReturn(artifactId);

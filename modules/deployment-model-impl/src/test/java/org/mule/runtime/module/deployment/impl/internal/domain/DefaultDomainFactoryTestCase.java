@@ -125,9 +125,8 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     String domainName = "custom-domain";
 
     final DomainDescriptor descriptor = new DomainDescriptor(domainName);
-    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class),
-                                                                    any()))
-                                                                        .thenReturn(descriptor);
+    when(deployableArtifactDescriptorFactory.createDomainDescriptor(any(), any(), any(DeployableArtifactDescriptorCreator.class)))
+        .thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     when(domainArtifactClassLoader.getArtifactId()).thenReturn(domainName);

@@ -107,7 +107,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractMul
   protected DomainDescriptor createDomainDescriptor(String domainPath) throws URISyntaxException {
     DeployableProjectModel model = getDeployableProjectModel(domainPath);
 
-    return deployableArtifactDescriptorFactory.createDomainDescriptor(model, emptyMap(), new DefaultPluginPatchesResolver());
+    return deployableArtifactDescriptorFactory.createDomainDescriptor(model, emptyMap());
   }
 
   protected ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
@@ -119,8 +119,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractMul
     DeployableProjectModel model = getDeployableProjectModel(appPath);
 
     return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
-                                                                           domainDescriptorResolver,
-                                                                           new DefaultPluginPatchesResolver());
+                                                                           domainDescriptorResolver);
   }
 
   protected DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {

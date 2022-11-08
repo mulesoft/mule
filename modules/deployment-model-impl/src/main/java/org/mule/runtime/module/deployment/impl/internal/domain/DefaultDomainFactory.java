@@ -110,7 +110,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
         .createDomainDescriptor(createDeployableProjectModel(domainLocation, true),
                                 deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
                                     .orElse(emptyMap()),
-                                getDescriptorCreator(), new DefaultPluginPatchesResolver());
+                                getDescriptorCreator());
   }
 
   private DeployableArtifactDescriptorCreator<DomainDescriptor> getDescriptorCreator() {
@@ -201,7 +201,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     return deployableArtifactDescriptorFactory
         .createDomainDescriptor(createDeployableProjectModel(artifactLocation, true),
                                 deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-                                    .orElse(emptyMap()),
-                                new DefaultPluginPatchesResolver());
+                                    .orElse(emptyMap()));
   }
 }

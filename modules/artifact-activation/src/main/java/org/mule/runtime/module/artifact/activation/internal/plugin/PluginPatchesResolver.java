@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.api.plugin;
-
-import static java.util.Collections.emptyList;
+package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
@@ -19,10 +17,6 @@ import java.util.List;
  * @since 4.5
  */
 public interface PluginPatchesResolver {
-
-  static PluginPatchesResolver noOpPluginPatchesResolver() {
-    return pluginArtifactCoordinates -> emptyList();
-  }
 
   /**
    * @param pluginArtifactCoordinates artifact coordinates of the plugin to resolve patches for.
