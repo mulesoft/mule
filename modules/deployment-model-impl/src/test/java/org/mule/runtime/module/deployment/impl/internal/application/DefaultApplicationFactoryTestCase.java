@@ -60,7 +60,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
-import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -140,7 +139,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     descriptor.setClassLoaderConfiguration(createClassLoaderConfigurationWithDomain());
     final File[] resourceFiles = new File[] {new File("mule-config.xml")};
     when(deployableArtifactDescriptorFactory
-        .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class), any()))
+        .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class)))
             .thenReturn(descriptor);
 
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = new ArtifactPluginDescriptor(FAKE_ARTIFACT_PLUGIN);
@@ -223,7 +222,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     descriptor.setClassLoaderConfiguration(createClassLoaderConfigurationWithDomain());
     descriptor.setArtifactLocation(new File("some/location"));
     when(deployableArtifactDescriptorFactory
-        .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class), any()))
+        .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class)))
             .thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());

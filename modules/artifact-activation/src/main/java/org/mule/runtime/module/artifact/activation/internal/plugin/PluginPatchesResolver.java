@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.api.plugin;
+package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static java.util.Collections.emptyList;
 

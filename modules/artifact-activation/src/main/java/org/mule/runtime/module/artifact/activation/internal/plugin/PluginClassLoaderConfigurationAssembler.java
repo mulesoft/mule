@@ -11,11 +11,13 @@ import static org.mule.runtime.module.artifact.activation.internal.plugin.Plugin
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -29,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -41,15 +44,15 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   private final List<BundleDependency> bundleDependencies;
   private final BundleDependency bundleDependency;
   private final DeployableArtifactDescriptor ownerDescriptor;
-  private final PluginPatchesResolver pluginPatchesResolver;
+  private final Collection<PluginPatchesResolver> pluginPatchesResolvers;
+  private final ServiceRegistry registry = new SpiServiceRegistry();
 
   public PluginClassLoaderConfigurationAssembler(BundleDependency bundleDependency,
                                                  Set<BundleDescriptor> sharedProjectDependencies,
                                                  File artifactLocation,
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
-                                                 DeployableArtifactDescriptor ownerDescriptor,
-                                                 PluginPatchesResolver pluginPatchesResolver) {
+                                                 DeployableArtifactDescriptor ownerDescriptor) {
     super(new ClassLoaderModelAssembler(new ArtifactCoordinates(bundleDependency.getDescriptor().getGroupId(),
                                                                 bundleDependency.getDescriptor().getArtifactId(),
                                                                 bundleDependency.getDescriptor().getVersion(),
@@ -64,7 +67,13 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     this.bundleDependencies = bundleDependencies;
     this.bundleDependency = bundleDependency;
     this.ownerDescriptor = ownerDescriptor;
-    this.pluginPatchesResolver = pluginPatchesResolver;
+    Collection<PluginPatchesResolver> resolverRegistered =
+        registry.lookupProviders(PluginPatchesResolver.class, this.getClass().getClassLoader());
+    if (resolverRegistered.isEmpty()) {
+      pluginPatchesResolvers = singletonList(new NullPluginPatchesResolver());
+    } else {
+      pluginPatchesResolvers = resolverRegistered;
+    }
   }
 
   private static List<String> attributeToList(Set<String> attribute) {
@@ -77,8 +86,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications
     // and
     // domains) as well
-    pluginPatchesResolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
-        .forEach(classLoaderConfigurationBuilder::containing);
+    pluginPatchesResolvers.forEach(resolver -> resolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
+        .forEach(classLoaderConfigurationBuilder::containing));
 
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 

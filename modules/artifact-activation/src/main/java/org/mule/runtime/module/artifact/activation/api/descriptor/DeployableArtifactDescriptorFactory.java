@@ -11,7 +11,6 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.DefaultDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -39,7 +38,6 @@ public interface DeployableArtifactDescriptorFactory {
    * @param model                    model describing the structure of the domain with all the necessary information to build its
    *                                 descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
-   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @param pluginModelResolver      resolves {@link MulePluginModel} from a dependency. Default implementation is
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
@@ -49,7 +47,6 @@ public interface DeployableArtifactDescriptorFactory {
    */
   DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                           Map<String, String> deploymentProperties,
-                                          PluginPatchesResolver pluginPatchesResolver,
                                           PluginModelResolver pluginModelResolver,
                                           PluginDescriptorResolver pluginDescriptorResolver,
                                           DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator);
@@ -57,30 +54,26 @@ public interface DeployableArtifactDescriptorFactory {
   /**
    * Creates a descriptor for a domain, including its plugin descriptors, using the default resolvers.
    *
-   * @param model                 model describing the structure of the domain with all the necessary information to build its
-   *                              descriptor.
-   * @param deploymentProperties  properties that affect how the artifact is deployed.
-   * @param descriptorCreator     creates the descriptor's instance that will be populated by the factory.
-   * @param pluginPatchesResolver resolves what patches should be applied to the deployable's plugins, if any.
+   * @param model                model describing the structure of the domain with all the necessary information to build its
+   *                             descriptor.
+   * @param deploymentProperties properties that affect how the artifact is deployed.
+   * @param descriptorCreator    creates the descriptor's instance that will be populated by the factory.
    * @return a descriptor for a domain.
    */
   DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                           Map<String, String> deploymentProperties,
-                                          DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator,
-                                          PluginPatchesResolver pluginPatchesResolver);
+                                          DeployableArtifactDescriptorCreator<DomainDescriptor> descriptorCreator);
 
   /**
    * Creates a descriptor for a domain, including its plugin descriptors, using the default resolvers.
    *
-   * @param model                 model describing the structure of the domain with all the necessary information to build its
-   *                              descriptor.
-   * @param deploymentProperties  properties that affect how the artifact is deployed.
-   * @param pluginPatchesResolver resolves what patches should be applied to the deployable's plugins, if any.
+   * @param model                model describing the structure of the domain with all the necessary information to build its
+   *                             descriptor.
+   * @param deploymentProperties properties that affect how the artifact is deployed.
    * @return a descriptor for a domain.
    */
   DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
-                                          Map<String, String> deploymentProperties,
-                                          PluginPatchesResolver pluginPatchesResolver);
+                                          Map<String, String> deploymentProperties);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors.
@@ -88,7 +81,6 @@ public interface DeployableArtifactDescriptorFactory {
    * @param model                    model describing the structure of the application with all the necessary information to build
    *                                 its descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
-   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @param pluginModelResolver      resolves {@link MulePluginModel} from a dependency. Default implementation is
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
@@ -99,7 +91,6 @@ public interface DeployableArtifactDescriptorFactory {
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
-                                                    PluginPatchesResolver pluginPatchesResolver,
                                                     PluginModelResolver pluginModelResolver,
                                                     PluginDescriptorResolver pluginDescriptorResolver,
                                                     DomainDescriptorResolver domainDescriptorResolver,
@@ -115,14 +106,12 @@ public interface DeployableArtifactDescriptorFactory {
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
-   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
                                                     PluginModelResolver pluginModelResolver,
-                                                    PluginDescriptorResolver pluginDescriptorResolver,
-                                                    PluginPatchesResolver pluginPatchesResolver);
+                                                    PluginDescriptorResolver pluginDescriptorResolver);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
@@ -131,13 +120,11 @@ public interface DeployableArtifactDescriptorFactory {
    *                                 its descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
    * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}.
-   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
-                                                    DomainDescriptorResolver domainDescriptorResolver,
-                                                    PluginPatchesResolver pluginPatchesResolver);
+                                                    DomainDescriptorResolver domainDescriptorResolver);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
@@ -147,26 +134,22 @@ public interface DeployableArtifactDescriptorFactory {
    * @param deploymentProperties     properties that affect how the artifact is deployed.
    * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}.
    * @param descriptorCreator        creates the descriptor's instance that will be populated by the factory.
-   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
                                                     DomainDescriptorResolver domainDescriptorResolver,
-                                                    DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator,
-                                                    PluginPatchesResolver pluginPatchesResolver);
+                                                    DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
    *
-   * @param model                 model describing the structure of the application with all the necessary information to build
-   *                              its descriptor.
-   * @param deploymentProperties  properties that affect how the artifact is deployed.
-   * @param pluginPatchesResolver resolves what patches should be applied to the deployable's plugins, if any.
+   * @param model                model describing the structure of the application with all the necessary information to build its
+   *                             descriptor.
+   * @param deploymentProperties properties that affect how the artifact is deployed.
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
-                                                    Map<String, String> deploymentProperties,
-                                                    PluginPatchesResolver pluginPatchesResolver);
+                                                    Map<String, String> deploymentProperties);
 
 }
