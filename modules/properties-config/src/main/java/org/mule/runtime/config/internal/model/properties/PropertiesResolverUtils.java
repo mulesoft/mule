@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.model.properties;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
@@ -69,7 +70,6 @@ public class PropertiesResolverUtils {
     // Nothing to do
   }
 
-  // TODO MULE-18786 refactor this
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(ArtifactAst artifactAst,
                                                                                                Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
@@ -77,24 +77,35 @@ public class PropertiesResolverUtils {
                                                                                                Optional<FeatureFlaggingService> featureFlaggingService) {
 
     ConfigurationPropertiesBuilder builder = new ConfigurationPropertiesBuilder();
-    ConfigurationPropertiesResolver partialResolver = builder.withFeatureFlaggingService(featureFlaggingService)
-        .withDeploymentProperties(deploymentProperties)
+
+    // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
+    // If this FeatureFlag is ever removed (and DeploymentProperties are always set), then remove the
+    // referenced line below that adds the deployment properties, in case they weren't added here.
+    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      builder.withDeploymentProperties(deploymentProperties);
+    }
+
+    ConfigurationPropertiesResolver partialResolver = builder
         .withSystemProperties()
         .withEnvironmentProperties()
         .withGlobalPropertiesSupplier(createGlobalPropertiesSupplier(artifactAst))
-        .build(true);
+        .build();
 
     artifactAst.updatePropertiesResolver(partialResolver);
 
     // Some configuration properties providers may depend their parameters on other properties, so we use the
-    // partial resolution to create this resolvers, and then complete the entire hierarchy
+    // partial resolution to create these resolvers, and then complete the entire hierarchy
     getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
         .forEach(builder::withApplicationProperties);
     builder.withPropertiesFile(externalResourceProvider);
 
     parentConfigurationProperties.ifPresent(builder::withDomainPropertiesResolver);
 
-    return new PropertiesResolverConfigurationProperties(builder.build(false));
+    // MULE-17659: Adding deployment properties to final resolver, in case the feature was not enabled to add
+    // them for partial resolution.
+    builder.withDeploymentProperties(deploymentProperties);
+
+    return new PropertiesResolverConfigurationProperties(builder.build());
 
   }
 
