@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
-import static org.mule.runtime.extension.internal.declaration.type.MetadataTypeConstants.CONFIG_TYPE;
-
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
@@ -18,6 +13,10 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.extension.internal.declaration.type.MetadataTypeConstants.CONFIG_TYPE;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAnnotation;
@@ -32,6 +31,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
@@ -39,6 +39,8 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueType
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 
@@ -247,5 +249,20 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   @Override
   public Set<String> getSemanticTerms() {
     return unmodifiableSet(parameterLayoutParser.getSemanticTerms());
+  }
+
+  @Override
+  public Optional<InputResolverModelParser> getInputResolverModelParser() {
+    return empty();
+  }
+
+  @Override
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
+    return empty();
+  }
+
+  @Override
+  public Optional<Pair<Integer, Boolean>> getMetadataKeyPart() {
+    return empty();
   }
 }

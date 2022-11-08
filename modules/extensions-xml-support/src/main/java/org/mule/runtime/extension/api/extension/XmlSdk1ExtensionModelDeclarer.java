@@ -16,6 +16,9 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider.ID;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE_URI;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
 import static org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.builder;
@@ -62,11 +65,11 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withCategory(SELECT)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
-            .setPrefix("module")
-            .setNamespace("http://www.mulesoft.org/schema/mule/module")
+            .setPrefix(MODULE_DSL_NAMESPACE)
+            .setNamespace(MODULE_DSL_NAMESPACE_URI)
             .setSchemaVersion(MULE_VERSION)
             .setXsdFileName("mule-module.xsd")
-            .setSchemaLocation(buildSchemaLocation("module", "http://www.mulesoft.org/schema/mule/module"))
+            .setSchemaLocation(buildSchemaLocation(MODULE_DSL_NAMESPACE, MODULE_DSL_NAMESPACE_URI))
             .build());
 
     declareModuleConstruct(extensionDeclarer, typeBuilder);
@@ -90,7 +93,7 @@ public class XmlSdk1ExtensionModelDeclarer {
   }
 
   private void declareModuleConstruct(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder) {
-    ConstructDeclarer module = extensionDeclarer.withConstruct("module")
+    ConstructDeclarer module = extensionDeclarer.withConstruct(MODULE_ROOT_NODE_NAME)
         .describedAs("A module is defined by three types of elements: properties, global elements and operations.")
         .allowingTopLevelDefinition();
 

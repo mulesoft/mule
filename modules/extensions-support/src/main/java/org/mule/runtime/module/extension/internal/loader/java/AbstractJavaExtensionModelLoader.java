@@ -24,7 +24,7 @@ import org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateFact
 import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DefaultEncodingDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.DynamicMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.DsqlDynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaConfigurationDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaMimeTypeParametersDeclarationEnricher;
@@ -108,7 +108,7 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                                // TODO: MOVE TO EXT_API when
                                                                                                // https://www.mulesoft.org/jira/browse/MULE-13070
                                                                                                new JavaMimeTypeParametersDeclarationEnricher(),
-                                                                                               new DynamicMetadataDeclarationEnricher(),
+                                                                                               new DsqlDynamicMetadataDeclarationEnricher(),
                                                                                                new RequiredForMetadataDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),

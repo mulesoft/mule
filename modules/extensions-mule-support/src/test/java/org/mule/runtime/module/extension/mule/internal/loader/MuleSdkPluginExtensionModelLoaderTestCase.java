@@ -89,7 +89,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   public void whenResourceIsAppInsteadOfExtensionThenFails() {
     expectedException.expect(MuleRuntimeException.class);
     expectedException
-        .expectMessage("Expected a single top level component matching identifier [extension:extension], but got: [flow]");
+        .expectMessage("Extension from artifact 'artifact' is missing a required top level element. 'extension:description' is expected.");
     getExtensionModelFrom("app-as-mule-extension.xml");
   }
 
@@ -97,7 +97,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   public void whenResourceIsEmptyAppInsteadOfExtensionThenFails() {
     expectedException.expect(MuleRuntimeException.class);
     expectedException
-        .expectMessage("Expected a single top level component matching identifier [extension:extension]");
+        .expectMessage("Extension from artifact 'artifact' is missing a required top level element. 'extension:description' is expected.");
     getExtensionModelFrom("mule-empty-app-config.xml");
   }
 
