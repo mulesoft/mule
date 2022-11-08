@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.util.Collections.emptySet;
 
 import org.mule.api.annotation.NoImplement;
@@ -18,6 +20,9 @@ import org.mule.runtime.module.artifact.activation.internal.extension.discovery.
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -35,6 +40,22 @@ public interface ExtensionDiscoveryRequest {
   static ExtensionDiscoveryRequestBuilder builder() {
     return new ExtensionDiscoveryRequestBuilder();
   }
+
+  /**
+   * Obtains the custom parameter registered under {@code key}.
+   *
+   * @param key the key under which the wanted value is registered.
+   * @param <T> generic type of the expected value.
+   * @return an {@link Optional} value.
+   */
+  <T> Optional<T> getParameter(String key);
+
+  /**
+   * Returns all the parameters for this discovery request.
+   *
+   * @return parameters for this discovery request.
+   */
+  Map<String, Object> getParameters();
 
   /**
    * @return {@link ArtifactPluginDescriptor}s for artifact plugins deployed inside the artifact. Non-null.
@@ -81,7 +102,7 @@ public interface ExtensionDiscoveryRequest {
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
     private boolean ocsEnabled = false;
-    private boolean enableIgnoredComponents = false;
+    private final Map<String, Object> customParameters = new HashMap<>();
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -108,15 +129,34 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
-    public ExtensionDiscoveryRequestBuilder setEnableIgnoredComponents(boolean enableIgnoredComponents) {
-      this.enableIgnoredComponents = enableIgnoredComponents;
-      return this;
+    /**
+     * Adds a custom parameter registered under {@code key}.
+     *
+     * @param key   the key under which the {@code value} is to be registered.
+     * @param value the custom parameter value.
+     * @throws IllegalArgumentException if {@code key} or {@code value} are {@code null}.
+     */
+    public void addParameter(String key, Object value) {
+      checkArgument(key != null && key.length() > 0, "key cannot be blank");
+      checkArgument(value != null, "value cannot be null");
+
+      customParameters.put(key, value);
+    }
+
+    /**
+     * Adds the contents of the given map as custom parameters.
+     *
+     * @param parameters a map with custom parameters.
+     */
+    public void addParameters(Map<String, Object> parameters) {
+      checkArgument(parameters != null, "cannot add null parameters");
+
+      parameters.forEach(this::addParameter);
     }
 
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, ocsEnabled,
-                                                  enableIgnoredComponents);
+                                                  parallelDiscovery, enrichDescriptions, ocsEnabled, customParameters);
     }
   }
 }

@@ -51,7 +51,7 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(validators);
 
-    if (IGNORE_DISABLED || context.isEnableIgnoredComponents()) {
+    if (IGNORE_DISABLED && !context.getParameter(DISABLE_COMPONENT_IGNORE).isPresent()) {
       context.addParameter(DISABLE_COMPONENT_IGNORE, true);
     }
     if (ENABLE_POLLING_SOURCE_LIMIT) {
