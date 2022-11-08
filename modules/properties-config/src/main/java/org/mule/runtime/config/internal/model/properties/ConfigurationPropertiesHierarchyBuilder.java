@@ -142,8 +142,8 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   private void addToHierarchy(List<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
-    Optional<ConfigurationPropertiesResolver> parent = hierarchy.isEmpty() ? empty() : of(hierarchy.get(hierarchy.size() - 1));
-    hierarchy.add(new DefaultConfigurationPropertiesResolver(parent, newProvider));
+    Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.get(hierarchy.size() - 1));
+    hierarchy.add(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider));
   }
 
 
