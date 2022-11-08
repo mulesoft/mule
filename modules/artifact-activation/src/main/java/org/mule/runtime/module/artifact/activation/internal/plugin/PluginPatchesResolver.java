@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.plugin;
 
-import static java.util.Collections.emptyList;
-
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.net.URL;
@@ -19,10 +17,6 @@ import java.util.List;
  * @since 4.5
  */
 public interface PluginPatchesResolver {
-
-  static PluginPatchesResolver noOpPluginPatchesResolver() {
-    return pluginArtifactCoordinates -> emptyList();
-  }
 
   /**
    * @param pluginArtifactCoordinates artifact coordinates of the plugin to resolve patches for.

@@ -13,7 +13,12 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import java.net.URL;
 import java.util.List;
 
-public class NullPluginPatchesResolver implements PluginPatchesResolver {
+/**
+ * Implementation of {@link PluginPatchesResolver} which always returns an empty list
+ *
+ * @since 4.5
+ */
+class NullPluginPatchesResolver implements PluginPatchesResolver {
 
   @Override
   public List<URL> resolve(ArtifactCoordinates pluginArtifactCoordinates) {

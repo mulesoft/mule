@@ -11,11 +11,10 @@ import static org.mule.runtime.module.artifact.activation.internal.plugin.Plugin
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
@@ -44,8 +43,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   private final List<BundleDependency> bundleDependencies;
   private final BundleDependency bundleDependency;
   private final DeployableArtifactDescriptor ownerDescriptor;
-  private final Collection<PluginPatchesResolver> pluginPatchesResolvers;
-  private final ServiceRegistry registry = new SpiServiceRegistry();
+  private final PluginPatchesResolver pluginPatchesResolver;
 
   public PluginClassLoaderConfigurationAssembler(BundleDependency bundleDependency,
                                                  Set<BundleDescriptor> sharedProjectDependencies,
@@ -68,11 +66,14 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     this.bundleDependency = bundleDependency;
     this.ownerDescriptor = ownerDescriptor;
     Collection<PluginPatchesResolver> resolverRegistered =
-        registry.lookupProviders(PluginPatchesResolver.class, this.getClass().getClassLoader());
+        new SpiServiceRegistry().lookupProviders(PluginPatchesResolver.class, this.getClass().getClassLoader());
+    if (resolverRegistered.size() > 1) {
+      throw new MuleRuntimeException(createStaticMessage("There is more than 1 PluginPatchesResolver implementation registered"));
+    }
     if (resolverRegistered.isEmpty()) {
-      pluginPatchesResolvers = singletonList(new NullPluginPatchesResolver());
+      pluginPatchesResolver = new NullPluginPatchesResolver();
     } else {
-      pluginPatchesResolvers = resolverRegistered;
+      pluginPatchesResolver = resolverRegistered.iterator().next();
     }
   }
 
@@ -86,8 +87,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications
     // and
     // domains) as well
-    pluginPatchesResolvers.forEach(resolver -> resolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
-        .forEach(classLoaderConfigurationBuilder::containing));
+    pluginPatchesResolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
+        .forEach(classLoaderConfigurationBuilder::containing);
 
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
