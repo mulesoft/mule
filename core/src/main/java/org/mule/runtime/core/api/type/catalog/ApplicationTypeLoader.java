@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.type.catalog;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
@@ -37,6 +38,8 @@ import org.slf4j.LoggerFactory;
 public class ApplicationTypeLoader implements TypeLoader {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationTypeLoader.class);
+  private static final String TYPE_IDENTIFIER_ERROR =
+      "TypeIdentifier [%s] does not follow the correct format, is must contain a colon.";
 
   private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
@@ -75,13 +78,15 @@ public class ApplicationTypeLoader implements TypeLoader {
   }
 
   /**
+   * Locates the {@link MetadataType} indicated by the typeIdentifier within the existing extensions.
    *
-   * @param typeIdentifier
+   * @param typeIdentifier identifier that consists of the extension prefix and the typeId or typeAlias, separated by a colon
    * @return the located type.
    */
   public MetadataType lookupType(String typeIdentifier) {
     if (!typeIdentifier.contains(":")) {
-      throw new IllegalArgumentException("Must have the format ADD EXPLANATION");
+      throw new IllegalArgumentException(format(TYPE_IDENTIFIER_ERROR,
+                                                typeIdentifier));
     }
     int separatorIndex = typeIdentifier.indexOf(":");
     String extensionIdentifier = typeIdentifier.substring(0, separatorIndex);
