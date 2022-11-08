@@ -13,6 +13,7 @@ import static org.mule.runtime.module.artifact.activation.internal.deployable.Ab
 import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
 
 import static java.util.Optional.empty;
 
@@ -70,6 +71,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,6 +83,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @Feature(APP_CREATION)
+@Story(HEAVYWEIGHT)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultApplicationFactory.class,
     AbstractDeployableProjectModelBuilder.class})

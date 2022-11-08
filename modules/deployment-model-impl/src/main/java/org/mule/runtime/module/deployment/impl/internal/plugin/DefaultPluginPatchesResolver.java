@@ -20,7 +20,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
-import org.mule.runtime.module.artifact.activation.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;

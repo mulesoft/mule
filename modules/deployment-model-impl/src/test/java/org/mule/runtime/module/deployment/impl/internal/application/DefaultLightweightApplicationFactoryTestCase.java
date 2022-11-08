@@ -10,6 +10,7 @@ import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
 import static java.util.Optional.empty;
 
@@ -55,11 +56,13 @@ import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(APP_CREATION)
+@Story(LIGHTWEIGHT)
 @Issue("W-11086334")
 public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTestCase {
 

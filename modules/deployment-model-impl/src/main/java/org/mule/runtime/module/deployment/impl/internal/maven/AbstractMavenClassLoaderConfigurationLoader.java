@@ -39,7 +39,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
-import org.mule.runtime.module.artifact.activation.internal.plugin.MuleArtifactPatchingModel;
+import org.mule.runtime.module.deployment.impl.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;

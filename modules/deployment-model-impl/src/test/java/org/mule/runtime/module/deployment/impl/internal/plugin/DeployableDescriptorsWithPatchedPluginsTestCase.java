@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ArtifactPatchingFeature.ARTIFACT_PATCHING;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.PATCHED_ARTIFACT_DESCRIPTORS;
 
 import static java.util.Arrays.asList;
@@ -36,6 +37,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +45,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+@Feature(ARTIFACT_PATCHING)
 @Story(PATCHED_ARTIFACT_DESCRIPTORS)
 @RunWith(Parameterized.class)
 public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractMuleTestCase {

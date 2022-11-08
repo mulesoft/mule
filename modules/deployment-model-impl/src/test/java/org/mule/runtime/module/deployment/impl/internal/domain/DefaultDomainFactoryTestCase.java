@@ -11,6 +11,7 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
 import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.DOMAIN_CREATION;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -53,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +66,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
 @Feature(DOMAIN_CREATION)
+@Story(HEAVYWEIGHT)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class,
     AbstractDeployableProjectModelBuilder.class})

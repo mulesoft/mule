@@ -68,7 +68,9 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     Collection<PluginPatchesResolver> resolverRegistered =
         new SpiServiceRegistry().lookupProviders(PluginPatchesResolver.class, this.getClass().getClassLoader());
     if (resolverRegistered.size() > 1) {
-      throw new MuleRuntimeException(createStaticMessage("There is more than 1 PluginPatchesResolver implementation registered"));
+      throw new MuleRuntimeException(
+                                     createStaticMessage("There is more than 1 PluginPatchesResolver implementation registered: "
+                                         + resolverRegistered));
     }
     if (resolverRegistered.isEmpty()) {
       pluginPatchesResolver = new NullPluginPatchesResolver();
