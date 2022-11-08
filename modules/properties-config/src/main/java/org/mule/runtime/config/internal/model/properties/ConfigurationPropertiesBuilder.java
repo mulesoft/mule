@@ -8,12 +8,15 @@ package org.mule.runtime.config.internal.model.properties;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.config.*;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 
 public class ConfigurationPropertiesBuilder {
@@ -24,9 +27,13 @@ public class ConfigurationPropertiesBuilder {
   private Optional<ConfigurationPropertiesProvider> fileProperties = empty();
   private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
+  private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = () -> globalProperties;
+  private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
 
   public ConfigurationPropertiesBuilder withDeploymentProperties(Map<String, String> properties) {
-    this.deploymentProperties = of(new MapConfigurationPropertiesProvider(properties, "Deployment properties"));
+    if (!properties.isEmpty()) {
+      this.deploymentProperties = of(new MapConfigurationPropertiesProvider(properties, "Deployment properties"));
+    }
     return this;
   }
 
@@ -55,6 +62,31 @@ public class ConfigurationPropertiesBuilder {
     return this;
   }
 
+  public ConfigurationPropertiesBuilder withGlobalPropertiesSupplier(Supplier<Map<String, ConfigurationProperty>> supplier) {
+    this.globalPropertiesSupplier = supplier;
+    return this;
+  }
+
+  public ConfigurationPropertiesBuilder withDomainPropertiesResolver(ConfigurationProperties domainResolver) {
+    this.domainResolver = of(new ConfigurationPropertiesProvider() {
+
+      @Override
+      public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
+        return domainResolver.resolveProperty(configurationAttributeKey)
+            .map(value -> new DefaultConfigurationProperty(domainResolver, configurationAttributeKey, value));
+      }
+
+      @Override
+      public String getDescription() {
+        return "Domain properties";
+      }
+    });
+    this.deploymentProperties = empty();
+    this.environmentProperties = empty();
+    this.systemProperties = empty();
+    return this;
+  }
+
   private void addToHierarchy(List<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
     Optional<ConfigurationPropertiesResolver> parent = hierarchy.isEmpty() ? empty() : of(hierarchy.get(hierarchy.size() - 1));
@@ -66,9 +98,11 @@ public class ConfigurationPropertiesBuilder {
     deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    domainResolver.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     if (!appProperties.isEmpty()) {
       addToHierarchy(hierarchy, new CompositeConfigurationPropertiesProvider(appProperties));
     }
+    fileProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     if (!globalProperties.isEmpty()) {
       addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(() -> globalProperties));
     }
@@ -76,6 +110,6 @@ public class ConfigurationPropertiesBuilder {
       throw new RuntimeException(); // TBD
     }
     hierarchy.get(0).setAsRootResolver();
-    return hierarchy.get(0);
+    return hierarchy.get(hierarchy.size() - 1);
   }
 }
