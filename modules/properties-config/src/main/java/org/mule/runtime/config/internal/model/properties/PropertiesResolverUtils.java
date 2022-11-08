@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.model.properties;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
@@ -78,26 +77,24 @@ public class PropertiesResolverUtils {
                                                                                                Optional<FeatureFlaggingService> featureFlaggingService) {
 
     ConfigurationPropertiesBuilder builder = new ConfigurationPropertiesBuilder();
-    ConfigurationPropertiesResolver localResolver = builder.withDeploymentProperties(deploymentProperties)
+    ConfigurationPropertiesResolver partialResolver = builder.withFeatureFlaggingService(featureFlaggingService)
+        .withDeploymentProperties(deploymentProperties)
         .withSystemProperties()
         .withEnvironmentProperties()
         .withGlobalPropertiesSupplier(createGlobalPropertiesSupplier(artifactAst))
-        .build();
+        .build(true);
 
-    // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
-    // if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-    // localResolver.setRootResolver(parentLocalResolver);
-    // }
+    artifactAst.updatePropertiesResolver(partialResolver);
 
-    artifactAst.updatePropertiesResolver(localResolver);
-
-    getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, localResolver)
+    // Some configuration properties providers may depend their parameters on other properties, so we use the
+    // partial resolution to create this resolvers, and then complete the entire hierarchy
+    getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
         .forEach(builder::withApplicationProperties);
     builder.withPropertiesFile(externalResourceProvider);
 
     parentConfigurationProperties.ifPresent(builder::withDomainPropertiesResolver);
 
-    return new PropertiesResolverConfigurationProperties(builder.build());
+    return new PropertiesResolverConfigurationProperties(builder.build(false));
 
   }
 

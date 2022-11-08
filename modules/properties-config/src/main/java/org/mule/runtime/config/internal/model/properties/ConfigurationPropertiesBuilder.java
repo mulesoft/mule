@@ -8,8 +8,10 @@ package org.mule.runtime.config.internal.model.properties;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.config.internal.dsl.model.config.*;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
@@ -29,6 +31,7 @@ public class ConfigurationPropertiesBuilder {
   private Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = () -> globalProperties;
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
+  private Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   public ConfigurationPropertiesBuilder withDeploymentProperties(Map<String, String> properties) {
     if (!properties.isEmpty()) {
@@ -87,13 +90,18 @@ public class ConfigurationPropertiesBuilder {
     return this;
   }
 
+  public ConfigurationPropertiesBuilder withFeatureFlaggingService(Optional<FeatureFlaggingService> featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+    return this;
+  }
+
   private void addToHierarchy(List<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
     Optional<ConfigurationPropertiesResolver> parent = hierarchy.isEmpty() ? empty() : of(hierarchy.get(hierarchy.size() - 1));
     hierarchy.add(new DefaultConfigurationPropertiesResolver(parent, newProvider));
   }
 
-  public ConfigurationPropertiesResolver build() {
+  public ConfigurationPropertiesResolver build(boolean isPartialResolution) {
     List<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayList<>();
 
     addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(globalPropertiesSupplier));
@@ -102,11 +110,21 @@ public class ConfigurationPropertiesBuilder {
       addToHierarchy(hierarchy, new CompositeConfigurationPropertiesProvider(appProperties));
     }
     fileProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
-    systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
-    hierarchy.get(hierarchy.size() - 1).setAsRootResolver();
-    return hierarchy.get(hierarchy.size() - 1);
+    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.get(hierarchy.size() - 1);
+
+    if (!isPartialResolution || featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      lastResolver.setAsRootResolver();
+    } else {
+      // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
+      if (deploymentProperties.isPresent()) {
+        lastResolver = hierarchy.get(hierarchy.size() - 2);
+      }
+    }
+
+    return lastResolver;
   }
 }
