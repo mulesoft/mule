@@ -109,7 +109,7 @@ public interface InternalSpan extends Span {
   /**
    * Add attributes to the span.
    *
-   * @param attributes the attributes to the span.
+   * @param attributes the attributes to add to the span.
    */
   void addAttributes(Map<String, String> attributes);
 
