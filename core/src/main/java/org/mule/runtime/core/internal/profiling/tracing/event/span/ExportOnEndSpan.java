@@ -103,7 +103,7 @@ public class ExportOnEndSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    if (runtimeInternalSpan.isPolicySpan()) {
+    if (!runtimeInternalSpan.isPolicySpan()) {
       runtimeInternalSpan.addAttribute(key, value);
       spanExporter.visit(new AddAttributeVisitor(key, value));
     } else {

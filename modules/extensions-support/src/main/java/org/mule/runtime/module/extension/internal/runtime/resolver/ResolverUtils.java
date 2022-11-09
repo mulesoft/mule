@@ -297,7 +297,8 @@ public class ResolverUtils {
         return null;
       }
 
-      @Override public void updateSpanNameAndAttributes(InternalSpan exportOnEndSpan) {
+      @Override
+      public void updateSpanNameAndAttributes(InternalSpan exportOnEndSpan) {
         // Nothing to do.
       }
 
