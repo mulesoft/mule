@@ -23,31 +23,41 @@ import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.function.Supplier;
 
 /**
  * Builder of {@link ConfigurationPropertiesResolver} with the full hierarchy, considering the properties to be used. The
- * hierarchy to consider is: 1. Deployment Properties 2. System Properties 3. Environment Properties 4. Application Properties
- * (this includes file properties) 5. Global (Default) Properties This means that (for example) if we have a property 'hello' both
- * in System Properties level and Application Properties level, then the value to be use is going to be the System Properties one.
- * Also, lower-hierarchy properties can depend their values on higher level properties (e.g. an application property can depend
- * its value on a system property)
+ * hierarchy to consider is:
+ * <ol>
+ * <li>Deployment Properties</li>
+ * <li>System Properties</li>
+ * <li>Environment Properties</li>
+ * <li>Application Properties (this includes file properties)</li>
+ * <li>5. Global (Default) Properties</li>
+ * </ol>
+ * This means that (for example) if we have a property 'hello' both in System Properties level and Application Properties level,
+ * then the value to be use is going to be the System Properties one. Also, lower-hierarchy properties can depend their values on
+ * higher level properties (e.g. an application property can depend its value on a system property)
+ *
+ * @since 4.5
  */
 public class ConfigurationPropertiesHierarchyBuilder {
 
+  // Every type of property could be set or not, upon requirements of usages
+  // if a type of property is not used, then it won't be added to the hierarchy.
   private Optional<ConfigurationPropertiesProvider> deploymentProperties = empty();
   private Optional<ConfigurationPropertiesProvider> systemProperties = empty();
   private Optional<ConfigurationPropertiesProvider> environmentProperties = empty();
   private Optional<ConfigurationPropertiesProvider> fileProperties = empty();
+  private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
   private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
-  private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
 
   /**
    * @param properties the deployment properties to consider, as a map.
@@ -83,7 +93,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   /**
    * Sets an external resource provider to get the file content to then use a File Configuration Property.
    * 
-   * @param resourceProvider
+   * @param resourceProvider the {@link ResourceProvider} to use to read the files to use when resolving a file-value property.
    * @return this builder.
    */
   public ConfigurationPropertiesHierarchyBuilder withPropertiesFile(ResourceProvider resourceProvider) {
@@ -95,7 +105,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
    * Sets a {@link ConfigurationPropertiesProvider} to use as application property, gotten from a custom provider (such as the
    * Secure Configuration Properties) or properties set with the configuration-properties tag.
    * 
-   * @param provider
+   * @param provider the {@link ConfigurationPropertiesProvider} to add to the hierarchy as Application Properties.
    * @return this builder.
    */
   public ConfigurationPropertiesHierarchyBuilder withApplicationProperties(ConfigurationPropertiesProvider provider) {
@@ -106,11 +116,11 @@ public class ConfigurationPropertiesHierarchyBuilder {
   /**
    * Sets a supplier to retrieve the Global Properties from.
    * 
-   * @param supplier
+   * @param globalPropertiesSupplier a {@link Supplier} of a {@link Map} of properties, to be used as Global/Default properties.
    * @return this builder.
    */
-  public ConfigurationPropertiesHierarchyBuilder withGlobalPropertiesSupplier(Supplier<Map<String, ConfigurationProperty>> supplier) {
-    this.globalPropertiesSupplier = supplier;
+  public ConfigurationPropertiesHierarchyBuilder withGlobalPropertiesSupplier(Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier) {
+    this.globalPropertiesSupplier = globalPropertiesSupplier;
     return this;
   }
 
@@ -118,8 +128,9 @@ public class ConfigurationPropertiesHierarchyBuilder {
    * Sets to consider the domain properties in the hierarchy, setting a previously resolved {@link ConfigurationProperty} to
    * reoslve.
    * 
-   * @param domainProperties
-   * @return
+   * @param domainProperties the {@link ConfigurationProperties} previously generated for the domain, to be used in this
+   *                         hierarchy.
+   * @return this builder.
    */
   public ConfigurationPropertiesHierarchyBuilder withDomainPropertiesResolver(ConfigurationProperties domainProperties) {
     this.domainResolver = of(new ConfigurationPropertiesProvider() {
@@ -141,7 +152,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
     return this;
   }
 
-  private void addToHierarchy(Stack<DefaultConfigurationPropertiesResolver> hierarchy,
+  private void addToHierarchy(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
     Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.peek());
     hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider));
@@ -152,7 +163,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
    * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
    */
   public ConfigurationPropertiesResolver build() {
-    Stack<DefaultConfigurationPropertiesResolver> hierarchy = new Stack<>();
+    ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayDeque<>();
 
     addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(globalPropertiesSupplier));
     domainResolver.ifPresent(provider -> addToHierarchy(hierarchy, provider));
