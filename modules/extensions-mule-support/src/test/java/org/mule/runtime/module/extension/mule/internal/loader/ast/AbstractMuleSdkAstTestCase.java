@@ -8,8 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.ast;
 
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
-
-import static java.lang.Thread.currentThread;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -22,16 +21,13 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
-import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,12 +48,7 @@ public abstract class AbstractMuleSdkAstTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    astParserExtensionModels = new LinkedHashSet<>();
-    Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader());
-    for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
-      astParserExtensionModels.add(runtimeExtensionModelProvider.createExtensionModel());
-    }
+    astParserExtensionModels = new LinkedHashSet<>(discoverRuntimeExtensionModels());
   }
 
   protected static void addDependencyExtension(ExtensionModel extension) {

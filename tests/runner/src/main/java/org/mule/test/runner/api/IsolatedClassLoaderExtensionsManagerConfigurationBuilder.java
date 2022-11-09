@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.api;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -33,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +154,10 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
 
   private List<ExtensionModel> loadRuntimeExtensionModels() {
     return new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, Thread.currentThread().getContextClassLoader())
-        .stream().map(RuntimeExtensionModelProvider::createExtensionModel).collect(toList());
+        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
+        .stream()
+        .map(RuntimeExtensionModelProvider::createExtensionModel)
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 }

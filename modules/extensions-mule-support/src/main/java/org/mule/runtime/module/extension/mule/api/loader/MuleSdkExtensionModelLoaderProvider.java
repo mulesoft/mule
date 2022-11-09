@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.mule.api.loader;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
+
+import static java.lang.Boolean.getBoolean;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -23,11 +27,17 @@ import java.util.Set;
  */
 public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
+  private final boolean isMuleSdkEnabled = getBoolean(ENABLE_MULE_SDK_PROPERTY);
+
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {
-    Set<ExtensionModelLoader> loaders = new HashSet<>();
-    loaders.add(new MuleSdkPluginExtensionModelLoader());
-    loaders.add(new MuleSdkApplicationExtensionModelLoader());
-    return unmodifiableSet(loaders);
+    if (isMuleSdkEnabled) {
+      Set<ExtensionModelLoader> loaders = new HashSet<>();
+      loaders.add(new MuleSdkPluginExtensionModelLoader());
+      loaders.add(new MuleSdkApplicationExtensionModelLoader());
+      return unmodifiableSet(loaders);
+    } else {
+      return emptySet();
+    }
   }
 }

@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getOperationDslExtensionModel;
+
+import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
@@ -17,8 +20,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
  */
 public final class OperationDslExtensionModelProvider implements RuntimeExtensionModelProvider {
 
+  private final boolean isMuleSdkEnabled = getBoolean(ENABLE_MULE_SDK_PROPERTY);
+
   @Override
   public ExtensionModel createExtensionModel() {
-    return getOperationDslExtensionModel();
+    return isMuleSdkEnabled ? getOperationDslExtensionModel() : null;
   }
 }

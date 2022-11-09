@@ -48,6 +48,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new NamedTopLevelElementsHaveName(),
                                                           new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
+                                                          new AllComponentsBelongToSomeExtensionModel(),
                                                           // make this general for all references via stereotypes
                                                           new FlowRefPointsToExistingFlow(),
                                                           new SourceErrorMappingAnyNotRepeated(),

@@ -19,6 +19,7 @@ import org.mule.runtime.module.artifact.activation.internal.extension.discovery.
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.RepositoryLookupExtensionModelGenerator;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -74,6 +75,7 @@ public interface ExtensionModelDiscoverer {
         .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
         .stream()
         .map(RuntimeExtensionModelProvider::createExtensionModel)
+        .filter(Objects::nonNull)
         .collect(toSet()));
   }
 
