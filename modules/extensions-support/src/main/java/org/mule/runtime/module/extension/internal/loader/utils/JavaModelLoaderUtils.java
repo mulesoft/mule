@@ -7,8 +7,9 @@
 
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;

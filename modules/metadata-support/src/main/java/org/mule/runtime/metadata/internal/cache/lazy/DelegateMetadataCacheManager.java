@@ -4,17 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.metadata.cache;
+package org.mule.runtime.metadata.internal.cache.lazy;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 
 import java.util.function.Supplier;
 
 public class DelegateMetadataCacheManager implements MetadataCacheManager, Initialisable {
 
-  private Supplier<MetadataCacheManager> metadataCacheManagerSupplier;
+  private final Supplier<MetadataCacheManager> metadataCacheManagerSupplier;
   private MetadataCacheManager metadataCacheManagerDelegate;
 
   public DelegateMetadataCacheManager(Supplier<MetadataCacheManager> metadataCacheManagerSupplier) {

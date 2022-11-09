@@ -67,7 +67,6 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -81,6 +80,7 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
@@ -174,7 +174,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
-  private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
+  private Optional<MetadataCacheIdGeneratorFactory<ComponentAst>> cacheIdGeneratorFactory;
 
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
@@ -244,7 +244,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       throw new InitialisationException(e, this);
     });
 
-    setCacheIdGenerator();
+    initCacheIdGenerator();
   }
 
   private void initConfigurationResolver() {
@@ -524,13 +524,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return ExtensionModelUtils.requiresConfig(extensionModel, componentModel);
   }
 
-  private void setCacheIdGenerator() {
-    DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
-    ComponentLocator<ComponentAst> configLocator = location -> componentLocator
-        .find(location)
-        .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+  private void initCacheIdGenerator() {
+    this.cacheIdGenerator = cacheIdGeneratorFactory
+        .map(f -> {
+          DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
+          ComponentLocator<ComponentAst> configLocator = location -> componentLocator
+              .find(location)
+              .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
 
-    this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
+          return f.create(context, configLocator);
+        })
+        .orElse(null);
   }
 
   private ValueProviderMediator getValueProviderMediator() {
@@ -859,7 +863,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Inject
-  public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory) {
+  public void setCacheIdGeneratorFactory(Optional<MetadataCacheIdGeneratorFactory<ComponentAst>> cacheIdGeneratorFactory) {
     this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
   }
 
