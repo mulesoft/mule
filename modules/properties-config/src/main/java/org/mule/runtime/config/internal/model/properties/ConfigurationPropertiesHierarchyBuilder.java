@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.function.Supplier;
 
 /**
@@ -140,10 +141,10 @@ public class ConfigurationPropertiesHierarchyBuilder {
     return this;
   }
 
-  private void addToHierarchy(List<DefaultConfigurationPropertiesResolver> hierarchy,
+  private void addToHierarchy(Stack<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
-    Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.get(hierarchy.size() - 1));
-    hierarchy.add(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider));
+    Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.peek());
+    hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider));
   }
 
 
@@ -151,7 +152,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
    * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
    */
   public ConfigurationPropertiesResolver build() {
-    List<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayList<>();
+    Stack<DefaultConfigurationPropertiesResolver> hierarchy = new Stack<>();
 
     addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(globalPropertiesSupplier));
     domainResolver.ifPresent(provider -> addToHierarchy(hierarchy, provider));
@@ -163,10 +164,8 @@ public class ConfigurationPropertiesHierarchyBuilder {
     systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
-    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.get(hierarchy.size() - 1);
-
+    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
     lastResolver.setAsRootResolver();
-
     return lastResolver;
   }
 }
