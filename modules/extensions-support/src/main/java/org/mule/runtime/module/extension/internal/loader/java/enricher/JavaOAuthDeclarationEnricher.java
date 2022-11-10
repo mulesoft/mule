@@ -60,34 +60,25 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
 
   @Override
   public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
-
     return of(new DeclarationEnricherWalkDelegate() {
 
       private ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      private Set<Reference<ConnectionProviderDeclaration>> visitedProviders = new HashSet<>();
       private Set<Reference<ConfigurationDeclaration>> oauthConfigs = new HashSet<>();
-      private Reference<Boolean> oauthGloballySupported = new Reference<>(false);
-      private Reference<Boolean> supportsAuthCode = new Reference<>(false);
-      private Reference<Boolean> supportsClientCredentials = new Reference<>(false);
+      private boolean oauthGloballySupported = false;
+      private boolean supportsAuthCode = false;
 
       @Override
       public void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
-        if (!visitedProviders.add(new Reference<>(declaration))) {
-          return;
-        }
-
         declaration.getModelProperty(OAuthModelProperty.class).ifPresent(mp -> {
           mp.getGrantTypes().forEach(grantType -> grantType.accept(new OAuthGrantTypeVisitor() {
 
             @Override
             public void visit(AuthorizationCodeGrantType grantType) {
-              supportsAuthCode.set(true);
+              supportsAuthCode = true;
             }
 
             @Override
-            public void visit(ClientCredentialsGrantType grantType) {
-              supportsClientCredentials.set(true);
-            }
+            public void visit(ClientCredentialsGrantType grantType) {}
 
             @Override
             public void visit(PlatformManagedOAuthGrantType grantType) {
@@ -96,7 +87,7 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
           }));
 
           if (owner instanceof ExtensionDeclaration) {
-            oauthGloballySupported.set(true);
+            oauthGloballySupported = true;
           } else if (owner instanceof ConfigurationDeclaration) {
             oauthConfigs.add(new Reference<>((ConfigurationDeclaration) owner));
           }
@@ -106,14 +97,14 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
       @Override
       public void onWalkFinished() {
         List<ConfigurationDeclaration> configs;
-        if (oauthGloballySupported.get()) {
+        if (oauthGloballySupported) {
           configs = extensionDeclaration.getConfigurations();
         } else {
           configs = oauthConfigs.stream().map(Reference::get).collect(toList());
         }
 
         if (!configs.isEmpty()) {
-          final OperationDeclaration unauthorize = buildUnauthorizeOperation(supportsAuthCode.get());
+          final OperationDeclaration unauthorize = buildUnauthorizeOperation(supportsAuthCode);
           configs.forEach(c -> c.addOperation(unauthorize));
         }
       }
