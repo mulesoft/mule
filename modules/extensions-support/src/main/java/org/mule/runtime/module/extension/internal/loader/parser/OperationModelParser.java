@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
-import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -170,28 +169,4 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
   List<ErrorModelParser> getErrorModelParsers();
 
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
-
-  /**
-   * @return an {@link Optional} {@link OutputResolverModelParser} that encapsulates the operation's output resolver if dynamic
-   *         metadata were defined
-   */
-  Optional<OutputResolverModelParser> getOutputResolverModelParser();
-
-  /**
-   * @return an {@link Optional} {@link AttributesResolverModelParser} that encapsulates the operation's attribute resolver if
-   *         dynamic metadata were defined
-   */
-  Optional<AttributesResolverModelParser> getAttributesResolverModelParser();
-
-  /**
-   * @return a {@link List} of {@link InputResolverModelParser} that encapsulates the operation's input resolvers if dynamic
-   *         metadata were defined
-   */
-  List<InputResolverModelParser> getInputResolverModelParsers();
-
-  /**
-   * @return an {@link Optional} {@link KeyIdResolverModelParser} that encapsulates the operation's key id resolver if dynamic
-   *         metadata were defined
-   */
-  Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser();
 }
