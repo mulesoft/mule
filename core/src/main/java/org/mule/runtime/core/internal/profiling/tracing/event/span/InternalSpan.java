@@ -109,6 +109,7 @@ public interface InternalSpan extends Span {
   /**
    * @return whether the span corresponds to an root component within a chain.
    */
+  // TODO: Technical debt: verify order of spans in the case of policies (W-12041739)
   default boolean isPolicySpan() {
     return false;
   }
