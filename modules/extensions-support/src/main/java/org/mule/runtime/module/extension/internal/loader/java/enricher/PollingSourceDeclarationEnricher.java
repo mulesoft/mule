@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
+import static java.util.Optional.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -35,19 +36,22 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -56,38 +60,40 @@ import javax.xml.namespace.QName;
  *
  * @since 4.1
  */
-public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnricher {
 
   private static final String POLLING_SOURCE_LIMIT_MULE_VERSION = "4.4.0";
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    final int schedulingStrategyParameterSequence =
-        getInfrastructureType(new TypeWrapper(SchedulingStrategy.class,
-                                              new DefaultExtensionsTypeLoaderFactory()
-                                                  .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
-                                                      .map(infrastructureType -> infrastructureType.getSequence()).orElse(0);
-    ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
-    Reference<Boolean> thereArePollingSources = new Reference<>(false);
+  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+    return of(new IdempotentDeclarationEnricherWalkDelegate() {
 
-    new IdempotentDeclarationWalker() {
+      final int schedulingStrategyParameterSequence =
+          getInfrastructureType(new TypeWrapper(SchedulingStrategy.class,
+              new DefaultExtensionsTypeLoaderFactory()
+                  .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
+              .map(infrastructureType -> infrastructureType.getSequence()).orElse(0);
+      ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+      ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
+      boolean thereArePollingSources = false;
 
       @Override
       protected void onSource(SourceDeclaration source) {
-        extractType(source).ifPresent(type -> {
-          if (type.isAssignableTo(PollingSource.class)
-              || type.isAssignableTo(org.mule.sdk.api.runtime.source.PollingSource.class)) {
+        source.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+            .map(ExtensionTypeDescriptorModelProperty::getType)
+            .ifPresent(type -> {
+              if (type.isAssignableTo(PollingSource.class)
+                  || type.isAssignableTo(org.mule.sdk.api.runtime.source.PollingSource.class)) {
 
-            thereArePollingSources.set(true);
+                thereArePollingSources = true;
 
-            source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declareSchedulingStrategyParameter(loader));
+                source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declareSchedulingStrategyParameter(loader));
 
-            if (isPollingSourceLimitEnabled(extensionLoadingContext)) {
-              source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declarePollingSourceLimitParameter());
-            }
-          }
-        });
+                if (isPollingSourceLimitEnabled(extensionLoadingContext)) {
+                  source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declarePollingSourceLimitParameter());
+                }
+              }
+            });
       }
 
       private ParameterDeclaration declarePollingSourceLimitParameter() {
@@ -111,7 +117,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new InfrastructureParameterModelProperty(schedulingStrategyParameterSequence));
         parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
-                                                                    CORE_PREFIX)));
+            CORE_PREFIX)));
         parameter.setDslConfiguration(ParameterDslConfiguration.builder()
             .allowsInlineDefinition(true)
             .allowsReferences(false)
@@ -120,12 +126,15 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
 
         return parameter;
       }
-    }.walk(extensionDeclarer.getDeclaration());
 
-    if (thereArePollingSources.get() && !isSchedulerAlreadyImported(extensionDeclarer.getDeclaration())) {
-      ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-      extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) loadSchedulingStrategyType(typeLoader)));
-    }
+      @Override
+      public void onWalkFinished() {
+        if (thereArePollingSources && !isSchedulerAlreadyImported(extensionDeclarer.getDeclaration())) {
+          ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+          extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) loadSchedulingStrategyType(typeLoader)));
+        }
+      }
+    });
   }
 
   /**
@@ -134,7 +143,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
    *
    * <p>
    * It isn't implemented as an {@link UnionType} because of backwards compatibility (see MULE-19167 and
-   * {@link MuleExtensionModelDeclarer}).
+   * {@code org.mule.runtime.core.api.extension.MuleExtensionModelDeclarer}).
    *
    * @param loader The type loader.
    * @return The {@code scheduling-strategy} parameter type.

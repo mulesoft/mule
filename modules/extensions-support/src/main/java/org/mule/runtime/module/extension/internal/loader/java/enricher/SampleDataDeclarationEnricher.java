@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.module.extension.internal.data.sample.SampleDataUtils.getSampleDataProviderId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 
@@ -24,10 +23,11 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
@@ -56,11 +56,11 @@ import java.util.stream.Collectors;
  *
  * @since 4.4.0
  */
-public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+public class SampleDataDeclarationEnricher implements WalkingDeclarationEnricher {
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    new IdempotentDeclarationWalker() {
+  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+    return of(new IdempotentDeclarationEnricherWalkDelegate() {
 
       @Override
       public void onSource(SourceDeclaration declaration) {
@@ -82,7 +82,7 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
           }
         });
       }
-    }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+    });
   }
 
   private SampleDataProviderModel createSampleDataModel(SampleData annotation, ExecutableComponentDeclaration declaration) {

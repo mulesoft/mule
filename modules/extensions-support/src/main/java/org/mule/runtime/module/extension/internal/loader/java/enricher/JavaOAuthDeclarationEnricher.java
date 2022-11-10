@@ -104,7 +104,7 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
       }
 
       @Override
-      public void finishEnrichment() {
+      public void onWalkFinished() {
         List<ConfigurationDeclaration> configs;
         if (oauthGloballySupported.get()) {
           configs = extensionDeclaration.getConfigurations();

@@ -51,6 +51,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
@@ -782,6 +783,20 @@ public class MuleExtensionUtils {
     }.walk(extensionModel);
 
     return ofNullable(operation.get());
+  }
+
+  /**
+   * Returns the annotated {@link Class} that was used to construct the {@code declaration}.
+   * <p/>
+   * The annotated type is determined by querying the {@code declaration} for the {@link ImplementingTypeModelProperty} model
+   * property
+   *
+   * @param declaration a {@link BaseDeclaration} to be enriched
+   * @return a {@link Class} or {@code null} if the model doesn't have a {@link ImplementingTypeModelProperty}
+   * @since 4.5.0
+   */
+  public static Optional<ImplementingTypeModelProperty> extractImplementingTypeProperty(BaseDeclaration<? extends BaseDeclaration> declaration) {
+    return declaration.getModelProperty(ImplementingTypeModelProperty.class);
   }
 
   public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {

@@ -30,7 +30,7 @@ import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaConfi
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaMimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaObjectStoreParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.ParameterAllowedStereotypesDeclarionEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.ParameterAllowedStereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.PollingSourceDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.RequiredForMetadataDeclarationEnricher;
@@ -115,7 +115,7 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new SampleDataDeclarationEnricher(),
-                                                                                               new ParameterAllowedStereotypesDeclarionEnricher(),
+                                                                                               new ParameterAllowedStereotypesDeclarationEnricher(),
                                                                                                new JavaObjectStoreParameterDeclarationEnricher(),
                                                                                                new PollingSourceDeclarationEnricher()));
 

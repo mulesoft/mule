@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
+import static java.util.Optional.of;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -17,14 +19,14 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Enriches all parameters of type {@link ObjectStore} adding the {@link MuleStereotypes#OBJECT_STORE} stereotype if not already
@@ -33,14 +35,13 @@ import java.util.List;
  *
  * @since 4.1
  */
-public class JavaObjectStoreParameterDeclarationEnricher implements DeclarationEnricher {
+public class JavaObjectStoreParameterDeclarationEnricher implements WalkingDeclarationEnricher {
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    final ExtensionDeclaration extension = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-    final Reference<Boolean> hasObjectStoreParams = new Reference<>(false);
-
-    new IdempotentDeclarationWalker() {
+  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+    return of(new IdempotentDeclarationEnricherWalkDelegate() {
+      final ExtensionDeclaration extension = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+      boolean hasObjectStoreParams = false;
 
       @Override
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration parameter) {
@@ -49,16 +50,18 @@ public class JavaObjectStoreParameterDeclarationEnricher implements DeclarationE
           if (!stereotypes.contains(OBJECT_STORE)) {
             stereotypes.add(OBJECT_STORE);
           }
-          hasObjectStoreParams.set(true);
+          hasObjectStoreParams = true;
         }
       }
-    }.walk(extension);
 
-
-    if (hasObjectStoreParams.get() && !isObjectStoreAlreadyImported(extension)) {
-      ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-      extension.getImportedTypes().add(new ImportedTypeModel((ObjectType) typeLoader.load(ObjectStore.class)));
-    }
+      @Override
+      public void onWalkFinished() {
+        if (hasObjectStoreParams && !isObjectStoreAlreadyImported(extension)) {
+          ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+          extension.getImportedTypes().add(new ImportedTypeModel((ObjectType) typeLoader.load(ObjectStore.class)));
+        }
+      }
+    });
   }
 
   private boolean isObjectStoreAlreadyImported(ExtensionDeclaration extension) {
