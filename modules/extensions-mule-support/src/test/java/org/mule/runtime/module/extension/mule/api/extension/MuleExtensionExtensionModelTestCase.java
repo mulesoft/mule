@@ -64,18 +64,17 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
   @Test
   public void configFileCanBeParsedAndHasExpectedExtensionModel() {
     ArtifactAst extensionAst = getArtifactAst();
-    ComponentAst extensionComponentAst = getRootComponent(extensionAst);
+    ComponentAst extensionComponentAst = getDescriptionComponent(extensionAst);
 
     ExtensionModel extensionExtensionModel = extensionComponentAst.getExtensionModel();
     assertThat(extensionExtensionModel.getName(), is("Mule Extension DSL"));
   }
 
   @Test
-  public void operationsCanBeRetrievedAsChildrenOfTopLevel() {
+  public void operationsCanBeRetrievedAsTopLevel() {
     ArtifactAst extensionAst = getArtifactAst();
-    ComponentAst extensionComponentAst = getRootComponent(extensionAst);
 
-    List<ComponentAst> operationsComponentAst = extensionComponentAst.directChildrenStream()
+    List<ComponentAst> operationsComponentAst = extensionAst.topLevelComponentsStream()
         .filter(c -> c.getComponentType() == OPERATION_DEF)
         .collect(Collectors.toList());
 
@@ -92,9 +91,7 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
   public void parametersAreParsedAndHaveTheRightValueWhenFullyDefined() {
     ArtifactAst extensionAst = getArtifactAst();
 
-    ComponentAst extensionComponentAst = getRootComponent(extensionAst);
-
-    ComponentAst descriptionComponentAst = getChild(extensionComponentAst, "description");
+    ComponentAst descriptionComponentAst = getDescriptionComponent(extensionAst);
     ComponentAst licensingComponentAst = getChild(descriptionComponentAst, "licensing");
     ComponentAst xmlDslAttributesComponentAst = getChild(descriptionComponentAst, "xml-dsl-attributes");
 
@@ -113,9 +110,7 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
   public void parametersAreParsedAndHaveTheRightValueWhenMinimallyDefined() {
     ArtifactAst extensionAst = getArtifactAst("extensions/extension-minimally-parameterized.xml");
 
-    ComponentAst extensionComponentAst = getRootComponent(extensionAst);
-
-    ComponentAst descriptionComponentAst = getChild(extensionComponentAst, "description");
+    ComponentAst descriptionComponentAst = getDescriptionComponent(extensionAst);
     Optional<ComponentAst> licensingComponentAst = getOptionalChild(descriptionComponentAst, "licensing");
     Optional<ComponentAst> xmlDslAttributesComponentAst = getOptionalChild(descriptionComponentAst, "xml-dsl-attributes");
 
@@ -143,12 +138,8 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
 
   @Test
   public void notAnExtensionFailsWhenValidating() {
-    ValidationResult validationResult = parseAstExpectingValidationErrors("app-as-mule-extension.xml");
-    List<String> validationMessages = validationResult.getItems().stream()
-        .map(ValidationResultItem::getMessage)
-        .collect(toList());
-    assertThat(validationMessages,
-               hasItems("Expected a single top level component matching identifier [extension:extension], but got: [flow]"));
+    // TODO: W-12020311 we need root element validation during parsing, everything else should come free from the schema
+    // validations
   }
 
   @Override
@@ -156,19 +147,17 @@ public class MuleExtensionExtensionModelTestCase extends AbstractMuleSdkAstTestC
     astParserBuilder.withArtifactType(MULE_EXTENSION);
   }
 
-  private ComponentAst getRootComponent(ArtifactAst ast) {
-    // Checks there is only one top level component, which should be the root element
-    assertThat(ast.topLevelComponents(), hasSize(1));
+  private ComponentAst getDescriptionComponent(ArtifactAst ast) {
+    ComponentIdentifier descriptionIdentifier = ComponentIdentifier.builder()
+        .namespaceUri("http://www.mulesoft.org/schema/mule/mule-extension")
+        .namespace("extension")
+        .name("description")
+        .build();
 
-    ComponentAst onlyTopLevelComponent = ast.topLevelComponentsStream().findFirst().get();
-
-    // Checks the only top level component was the one we expected
-    ComponentIdentifier extensionIdentifier = onlyTopLevelComponent.getIdentifier();
-    assertThat(extensionIdentifier.getName(), is("extension"));
-    assertThat(extensionIdentifier.getNamespace(), is("extension"));
-    assertThat(extensionIdentifier.getNamespaceUri(), is("http://www.mulesoft.org/schema/mule/mule-extension"));
-
-    return onlyTopLevelComponent;
+    return ast.topLevelComponentsStream()
+        .filter(c -> c.getIdentifier().equals(descriptionIdentifier))
+        .findFirst()
+        .get();
   }
 
   private <T> T getParameterValue(ComponentAst componentAst, String paramName) {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
@@ -45,4 +46,8 @@ public interface MetadataScopeAdapter {
   OutputTypeResolver getOutputResolver();
 
   AttributesTypeResolver getAttributesResolver();
+
+  MetadataType getKeyResolverMetadataType();
+
+  String getKeyResolverParameterName();
 }

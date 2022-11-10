@@ -9,34 +9,47 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isStaticResolver;
 
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
-import org.mule.runtime.api.metadata.resolving.StaticResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
 import org.mule.sdk.api.annotation.metadata.TypeResolver;
 
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Helper class for introspecting input metadata.
+ *
+ * @since 4.5
+ */
 public class JavaInputResolverModelParserUtils {
 
-  public static List<JavaInputResolverModelParser> parseInputResolversModelParser(OperationDeclaration declaration) {
-    return declaration.getAllParameters().stream()
-        .map(param -> param.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
-        .filter(Optional::isPresent)
-        .map(modelProperty -> modelProperty.get().getExtensionParameter())
+  public static List<InputResolverModelParser> parseInputResolversModelParser(MethodElement<?> methodElement) {
+
+    List<InputResolverModelParser> parameterInputResolvers = methodElement.getParameters().stream()
         .map(JavaInputResolverModelParserUtils::getResolverParser)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(toList());
+
+    List<InputResolverModelParser> parameterGroupInputResolvers = methodElement.getParameterGroups().stream()
+        .map(JavaInputResolverModelParserUtils::getResolverParser)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
+
+    return concat(parameterInputResolvers.stream(), parameterGroupInputResolvers.stream()).collect(toList());
   }
 
-  public static List<JavaInputResolverModelParser> parseInputResolversModelParser(SourceCallbackDeclaration sourceCallbackDeclaration) {
+  public static List<InputResolverModelParser> parseInputResolversModelParser(SourceCallbackDeclaration sourceCallbackDeclaration) {
     return sourceCallbackDeclaration.getAllParameters().stream()
         .map(param -> param.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
         .filter(Optional::isPresent)
@@ -47,7 +60,7 @@ public class JavaInputResolverModelParserUtils {
         .collect(toList());
   }
 
-  private static Optional<JavaInputResolverModelParser> getResolverParser(ExtensionParameter extensionParameter) {
+  public static Optional<InputResolverModelParser> getResolverParser(ExtensionParameter extensionParameter) {
     Optional<Type> type = mapReduceSingleAnnotation(extensionParameter, "parameter", extensionParameter.getName(),
                                                     org.mule.runtime.extension.api.annotation.metadata.TypeResolver.class,
                                                     TypeResolver.class,
@@ -58,7 +71,7 @@ public class JavaInputResolverModelParserUtils {
     return type.flatMap(t -> getJavaInputResolverParser(extensionParameter.getName(), t));
   }
 
-  private static Optional<JavaInputResolverModelParser> getJavaInputResolverParser(String parameterName, Type type) {
+  private static Optional<InputResolverModelParser> getJavaInputResolverParser(String parameterName, Type type) {
     Class<?> resolverClazz;
     if (type.getDeclaringClass().isPresent()) {
       resolverClazz = type.getDeclaringClass().get();
@@ -73,8 +86,4 @@ public class JavaInputResolverModelParserUtils {
     return of(new JavaInputResolverModelParser(parameterName, resolverClazz));
   }
 
-  private static boolean isStaticResolver(Class<?> resolverClazz) {
-    return StaticResolver.class.isAssignableFrom(resolverClazz)
-        || org.mule.sdk.api.metadata.resolving.StaticResolver.class.isAssignableFrom(resolverClazz);
-  }
 }

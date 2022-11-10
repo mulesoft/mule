@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -44,6 +47,13 @@ abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupMo
         })
         .collect(toList());
   }
+
+  @Override
+  public Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName) {
+    return getGroupParameter().flatMap(groupParameter -> parseKeyIdResolverModelParser(groupParameter, categoryName, getName()));
+  }
+
+  protected abstract Optional<ExtensionParameter> getGroupParameter();
 
   protected abstract Stream<ExtensionParameter> doGetParameters();
 }

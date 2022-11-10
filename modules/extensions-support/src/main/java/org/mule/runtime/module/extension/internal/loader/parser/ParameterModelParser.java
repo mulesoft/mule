@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 
@@ -114,4 +115,19 @@ public interface ParameterModelParser extends SemanticTermsParser, AllowedStereo
   Optional<OAuthParameterModelProperty> getOAuthParameterModelProperty();
 
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
+
+  /**
+   * @return the parameter's {@link InputResolverModelParser} if dynamic metadata were defined
+   */
+  Optional<InputResolverModelParser> getInputResolverModelParser();
+
+  /**
+   * @return the parameter's {@link KeyIdResolverModelParser} if dynamic metadata were defined
+   */
+  Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser(String categoryName);
+
+  /**
+   * @return the order and the existence of a key resolver if metadata key part were defined on the parameter
+   */
+  Optional<Pair<Integer, Boolean>> getMetadataKeyPart();
 }
