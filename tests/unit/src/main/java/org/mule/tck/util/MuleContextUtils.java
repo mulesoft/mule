@@ -43,6 +43,7 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -86,8 +87,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -306,6 +309,19 @@ public class MuleContextUtils {
     when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getCoreEventTracer()).thenReturn(muleCoreEventTracer);
     return mockContextWithServicesWithProfilingService(profilingService);
+  }
+
+  /**
+   * Adds an extension model to a mocked {@link MuleContext}.
+   * 
+   * @param muleContext    the mocked {@link MuleContext}.
+   * @param extensionModel the {@link ExtensionModel} to be added.
+   */
+  public static void addExtensionModelToMock(MuleContext muleContext, ExtensionModel extensionModel) {
+    ExtensionManager extensionManager = muleContext.getExtensionManager();
+    Set<ExtensionModel> extensionModels = new LinkedHashSet<>(extensionManager.getExtensions());
+    extensionModels.add(extensionModel);
+    when(extensionManager.getExtensions()).thenReturn(extensionModels);
   }
 
   /**
