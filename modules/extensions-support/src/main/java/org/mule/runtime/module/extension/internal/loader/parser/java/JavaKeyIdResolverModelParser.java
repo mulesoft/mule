@@ -31,14 +31,11 @@ import org.mule.sdk.api.metadata.resolving.PartialTypeKeysResolver;
  */
 public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
 
-  private final String parameterName;
   private final MetadataType metadataType;
   private final String categoryName;
   private final Class<?> keyIdResolverDeclarationClass;
 
-  public JavaKeyIdResolverModelParser(String parameterName, String categoryName, MetadataType metadataType,
-                                      Class<?> keyIdResolverDeclarationClass) {
-    this.parameterName = parameterName;
+  public JavaKeyIdResolverModelParser(String categoryName, MetadataType metadataType, Class<?> keyIdResolverDeclarationClass) {
     this.metadataType = metadataType;
     this.categoryName = categoryName;
     this.keyIdResolverDeclarationClass = keyIdResolverDeclarationClass;
@@ -76,21 +73,6 @@ public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
     }
 
     return typeKeysResolver;
-  }
-
-  @Override
-  public Class<?> keyIdResolverDeclarationClass() {
-    return keyIdResolverDeclarationClass;
-  }
-
-  @Override
-  public MetadataType getMetadataType() {
-    return metadataType;
-  }
-
-  @Override
-  public String getParameterName() {
-    return parameterName;
   }
 
   private TypeKeysResolver instantiateResolver() {

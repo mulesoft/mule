@@ -54,11 +54,6 @@ public class JavaDefaultParameterGroupParser extends AbstractJavaParameterGroupM
   }
 
   @Override
-  protected Optional<ExtensionParameter> getGroupParameter() {
-    return empty();
-  }
-
-  @Override
   public Optional<DisplayModel> getDisplayModel() {
     return empty();
   }
