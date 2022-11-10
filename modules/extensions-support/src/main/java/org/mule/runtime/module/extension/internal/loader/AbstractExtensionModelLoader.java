@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
@@ -27,6 +29,7 @@ import org.mule.runtime.module.extension.internal.loader.validator.DeprecationMo
 import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Base implementation for an {@link ExtensionModelLoader}
@@ -51,7 +54,12 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(validators);
 
-    if (IGNORE_DISABLED && !context.getParameter(DISABLE_COMPONENT_IGNORE).isPresent()) {
+    Optional<Object> disableComponentIgnore = context.getParameter(DISABLE_COMPONENT_IGNORE);
+    disableComponentIgnore
+        .ifPresent(value -> checkState(value instanceof Boolean,
+                                       format("Property value for %s expected to be boolean", DISABLE_COMPONENT_IGNORE)));
+
+    if (IGNORE_DISABLED && !disableComponentIgnore.isPresent()) {
       context.addParameter(DISABLE_COMPONENT_IGNORE, true);
     }
     if (ENABLE_POLLING_SOURCE_LIMIT) {
