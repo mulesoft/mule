@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.utils;
 
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
-import org.mule.runtime.api.metadata.resolving.StaticResolver;
 import org.mule.runtime.module.extension.internal.metadata.MuleMetadataTypeResolverAdapter;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
@@ -26,9 +25,5 @@ public class JavaMetadataTypeResolverUtils {
     }
   }
 
-  public static boolean isStaticResolver(Class<?> resolverClass) {
-    return StaticResolver.class.isAssignableFrom(resolverClass)
-        || org.mule.sdk.api.metadata.resolving.StaticResolver.class.isAssignableFrom(resolverClass);
-  }
 
 }
