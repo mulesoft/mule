@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 
 /**
  * Provides a common set of utilities for handling property resolvers for Mule artifacts.
- *
  */
 public class PropertiesResolverUtils {
 
@@ -67,36 +66,41 @@ public class PropertiesResolverUtils {
                                                                                                ResourceProvider externalResourceProvider,
                                                                                                Optional<FeatureFlaggingService> featureFlaggingService) {
 
-    ConfigurationPropertiesHierarchyBuilder builder = new ConfigurationPropertiesHierarchyBuilder();
+    ConfigurationPropertiesHierarchyBuilder partialResolverBuilder = new ConfigurationPropertiesHierarchyBuilder();
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
     // If this FeatureFlag is ever removed (and DeploymentProperties are always set), then remove the
     // referenced line below that adds the deployment properties, in case they weren't added here.
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-      builder.withDeploymentProperties(deploymentProperties);
+      partialResolverBuilder.withDeploymentProperties(deploymentProperties);
     }
 
-    ConfigurationPropertiesResolver partialResolver = builder
+    Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
+
+    ConfigurationPropertiesResolver partialResolver = partialResolverBuilder
         .withSystemProperties()
         .withEnvironmentProperties()
-        .withGlobalPropertiesSupplier(createGlobalPropertiesSupplier(artifactAst))
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier)
         .build();
 
     artifactAst.updatePropertiesResolver(partialResolver);
 
+    ConfigurationPropertiesHierarchyBuilder completeBuilder = new ConfigurationPropertiesHierarchyBuilder()
+        .withDeploymentProperties(deploymentProperties)
+        .withSystemProperties()
+        .withEnvironmentProperties()
+        .withPropertiesFile(externalResourceProvider)
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier);
+
+
     // Some configuration properties providers may depend their parameters on other properties, so we use the
     // partial resolution to create these resolvers, and then complete the entire hierarchy
     getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
-        .forEach(builder::withApplicationProperties);
-    builder.withPropertiesFile(externalResourceProvider);
+        .forEach(completeBuilder::withApplicationProperties);
 
-    parentConfigurationProperties.ifPresent(builder::withDomainPropertiesResolver);
+    parentConfigurationProperties.ifPresent(completeBuilder::withDomainPropertiesResolver);
 
-    // MULE-17659: Adding deployment properties to final resolver, in case the feature was not enabled to add
-    // them for partial resolution.
-    builder.withDeploymentProperties(deploymentProperties);
-
-    return new PropertiesResolverConfigurationProperties(builder.build());
+    return new PropertiesResolverConfigurationProperties(completeBuilder.build());
 
   }
 

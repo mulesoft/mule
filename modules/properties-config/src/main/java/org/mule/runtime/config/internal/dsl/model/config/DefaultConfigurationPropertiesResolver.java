@@ -49,11 +49,19 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   private final Cache<String, Object> resolutionCache = CacheBuilder.<String, String>newBuilder().build();
   private boolean initialized = false;
   private Optional<ConfigurationPropertiesResolver> rootResolver = empty();
+  private final boolean failIfPropertyNotFound;
 
   public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> nextResolver,
                                                 ConfigurationPropertiesProvider configurationPropertiesProvider) {
+    this(nextResolver, configurationPropertiesProvider, true);
+  }
+
+  public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> nextResolver,
+                                                ConfigurationPropertiesProvider configurationPropertiesProvider,
+                                                boolean failIfPropertyNotFound) {
     this.nextResolver = nextResolver;
     this.configurationPropertiesProvider = requireNonNull(configurationPropertiesProvider);
+    this.failIfPropertyNotFound = failIfPropertyNotFound;
   }
 
   private boolean shouldResolvePlaceholder(String value, int prefixIndex) {
@@ -220,7 +228,14 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
 
   @Override
   public String apply(String t) {
-    final Object resolved = resolveValue(t);
-    return resolved == null ? null : resolved.toString();
+    try {
+      final Object resolved = resolveValue(t);
+      return resolved == null ? null : resolved.toString();
+    } catch (PropertyNotFoundException p) {
+      if (failIfPropertyNotFound) {
+        throw p;
+      }
+      return null;
+    }
   }
 }

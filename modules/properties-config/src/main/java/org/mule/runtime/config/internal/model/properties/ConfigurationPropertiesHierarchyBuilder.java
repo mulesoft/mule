@@ -58,6 +58,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
   private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
+  private boolean failuresIfNotPresent = true;
 
   /**
    * @param properties the deployment properties to consider, as a map.
@@ -152,10 +153,22 @@ public class ConfigurationPropertiesHierarchyBuilder {
     return this;
   }
 
+  /**
+   * Set that the {@link ConfigurationPropertiesResolver} to be built won't fail in case of resolving a property doesn't exist.
+   * Instead of throwing a {@link org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException}, it will return
+   * null.
+   * 
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withoutFailuresIfPropertyNotPresent() {
+    this.failuresIfNotPresent = false;
+    return this;
+  }
+
   private void addToHierarchy(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
     Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.peek());
-    hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider));
+    hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider, failuresIfNotPresent));
   }
 
 
