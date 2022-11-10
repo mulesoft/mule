@@ -69,8 +69,6 @@ public class PropertiesResolverUtils {
     ConfigurationPropertiesHierarchyBuilder partialResolverBuilder = new ConfigurationPropertiesHierarchyBuilder();
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
-    // If this FeatureFlag is ever removed (and DeploymentProperties are always set), then remove the
-    // referenced line below that adds the deployment properties, in case they weren't added here.
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
       partialResolverBuilder.withDeploymentProperties(deploymentProperties);
     }

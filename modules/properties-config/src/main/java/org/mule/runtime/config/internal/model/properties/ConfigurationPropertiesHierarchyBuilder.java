@@ -39,7 +39,7 @@ import java.util.function.Supplier;
  * <li>System Properties</li>
  * <li>Environment Properties</li>
  * <li>Application Properties (this includes file properties)</li>
- * <li>5. Global (Default) Properties</li>
+ * <li>Global (Default) Properties</li>
  * </ol>
  * This means that (for example) if we have a property 'hello' both in System Properties level and Application Properties level,
  * then the value to be use is going to be the System Properties one. Also, lower-hierarchy properties can depend their values on
@@ -147,9 +147,6 @@ public class ConfigurationPropertiesHierarchyBuilder {
         return "Domain properties";
       }
     });
-    this.deploymentProperties = empty();
-    this.environmentProperties = empty();
-    this.systemProperties = empty();
     return this;
   }
 
