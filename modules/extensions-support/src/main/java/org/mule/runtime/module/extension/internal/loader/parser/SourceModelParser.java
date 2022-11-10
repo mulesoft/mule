@@ -7,17 +7,19 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
+import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.List;
 import java.util.Optional;
@@ -151,24 +153,6 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 
   /**
-   * @return an {@link Optional} {@link OutputResolverModelParser} that encapsulates the source's output resolver if dynamic
-   *         metadata were defined
-   */
-  Optional<OutputResolverModelParser> getOutputResolverModelParser();
-
-  /**
-   * @return an {@link Optional} {@link AttributesResolverModelParser} that encapsulates the source's attribute resolver if
-   *         dynamic metadata were defined
-   */
-  Optional<AttributesResolverModelParser> getAttributesResolverModelParser();
-
-  /**
-   * @return an {@link Optional} {@link KeyIdResolverModelParser} that encapsulates the source's key id resolver if dynamic
-   *         metadata were defined
-   */
-  Optional<KeyIdResolverModelParser> getKeyIdResolverModelParser();
-
-  /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a
    * uniform way, regardless of the actual syntax used by the extension developer.
    *
@@ -185,8 +169,6 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
      * @return a list with the config's {@link ParameterGroupModelParser}
      */
     List<ParameterGroupModelParser> getParameterGroupModelParsers();
-
-    List<InputResolverModelParser> getInputResolverModelParsers();
 
   }
 }
