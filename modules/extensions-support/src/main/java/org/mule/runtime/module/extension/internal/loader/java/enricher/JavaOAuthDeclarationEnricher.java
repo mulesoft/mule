@@ -124,8 +124,9 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
         final MetadataType voidType = typeLoader.load(void.class);
 
         OperationDeclaration operation = new OperationDeclaration(UNAUTHORIZE_OPERATION_NAME);
-        operation.setDescription("Deletes all the access token information of a given resource owner id so that it's impossible to "
-            + "execute any operation for that user without doing the authorization dance again");
+        operation
+            .setDescription("Deletes all the access token information of a given resource owner id so that it's impossible to "
+                + "execute any operation for that user without doing the authorization dance again");
         operation.setBlocking(true);
         operation.setExecutionType(BLOCKING);
         operation.setOutput(toDeclaration(voidType));
@@ -134,7 +135,8 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
         operation.setSupportsStreaming(false);
         operation.setTransactional(false);
         operation.addModelProperty(
-            new CompletableComponentExecutorModelProperty((model, params) -> new UnauthorizeOperationExecutor()));
+                                   new CompletableComponentExecutorModelProperty((model,
+                                                                                  params) -> new UnauthorizeOperationExecutor()));
 
         if (supportsAuthCode) {
           ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);

@@ -90,6 +90,7 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
   public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
     return extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration())
         .map(p -> new IdempotentDeclarationEnricherWalkDelegate() {
+
           @Override
           public void onSource(SourceDeclaration declaration) {
             enrichContainerModel(declaration, declaration.getName(), "source");
@@ -136,23 +137,23 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
     Map<ParameterDeclaration, List<FieldValues>> dynamicFieldOptions = introspectParameterFields(allParameters);
 
     dynamicOptions.forEach((paramDeclaration, ofValueInformation) -> enrichParameter(ofValueInformation,
-        paramDeclaration,
-        paramDeclaration::setValueProviderModel,
-        1,
-        parameterNames, paramDeclaration.getName(),
-        allParameters));
+                                                                                     paramDeclaration,
+                                                                                     paramDeclaration::setValueProviderModel,
+                                                                                     1,
+                                                                                     parameterNames, paramDeclaration.getName(),
+                                                                                     allParameters));
 
     dynamicFieldOptions.forEach((paramDeclaration, fieldsValues) -> enrichParameterFields(fieldsValues,
-        paramDeclaration,
-        parameterNames,
-        paramDeclaration.getName(),
-        allParameters));
+                                                                                          paramDeclaration,
+                                                                                          parameterNames,
+                                                                                          paramDeclaration.getName(),
+                                                                                          allParameters));
 
     dynamicGroupOptions
         .forEach((paramGroupDeclaration, ofValueInformation) -> getParts(paramGroupDeclaration)
             .forEach((paramDeclaration, order) -> enrichParameter(ofValueInformation, paramDeclaration,
-                paramDeclaration::setValueProviderModel, order, parameterNames,
-                paramGroupDeclaration.getName(), allParameters)));
+                                                                  paramDeclaration::setValueProviderModel, order, parameterNames,
+                                                                  paramGroupDeclaration.getName(), allParameters)));
   }
 
   /**
@@ -177,9 +178,9 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
 
     resolverParameters.forEach(param -> propertyBuilder
         .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired(),
-            bindingMap
-                .getOrDefault(param.getName(),
-                    containerParameterNames.getOrDefault(param.getName(), param.getName()))));
+                                 bindingMap
+                                     .getOrDefault(param.getName(),
+                                                   containerParameterNames.getOrDefault(param.getName(), param.getName()))));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -194,18 +195,18 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
     if (ofValueInformation.isFromLegacyAnnotation()) {
       valueProviderModelConsumer
           .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
-              bindingMap),
-              requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
-              partOrder,
-              name, getValueProviderId(ofValueInformation.getValue())));
+                                                                  bindingMap),
+                                         requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
+                                         partOrder,
+                                         name, getValueProviderId(ofValueInformation.getValue())));
     } else {
       valueProviderModelConsumer
           .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
-              bindingMap),
-              requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
-              partOrder,
-              name, getValueProviderId(ofValueInformation.getValue()),
-              SINCE_MULE_VERSION_MODEL_PROPERTY_SDK_API_VP));
+                                                                  bindingMap),
+                                         requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
+                                         partOrder,
+                                         name, getValueProviderId(ofValueInformation.getValue()),
+                                         SINCE_MULE_VERSION_MODEL_PROPERTY_SDK_API_VP));
     }
 
   }
@@ -235,7 +236,7 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
       resolverParameters.forEach(param -> propertyBuilder
           .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired(), bindingsMap
               .getOrDefault(param.getName(),
-                  parameterNames.getOrDefault(param.getName(), param.getName()))));
+                            parameterNames.getOrDefault(param.getName(), param.getName()))));
 
       Reference<Boolean> requiresConfiguration = new Reference<>(false);
       Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -252,10 +253,10 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
         valueProviderFactoryModelProperties.put(targetSelector, valueProviderFactoryModelProperty);
         fieldValueProviderModels
             .add(new FieldValueProviderModel(getActingParametersModel(resolverParameters, parameterNames, allParameters,
-                bindingsMap),
-                requiresConfiguration.get(), requiresConnection.get(), fieldValues.open(),
-                partOrder,
-                providerName, getValueProviderId(fieldValues.value()), targetSelector));
+                                                                      bindingsMap),
+                                             requiresConfiguration.get(), requiresConnection.get(), fieldValues.open(),
+                                             partOrder,
+                                             providerName, getValueProviderId(fieldValues.value()), targetSelector));
         partOrder++;
       }
       paramDeclaration.setFieldValueProviderModels(fieldValueProviderModels);
@@ -373,13 +374,13 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
         .map(extensionParameter -> {
           if (bindings.containsKey(extensionParameter.getName())) {
             return new ImmutableActingParameterModel(extensionParameter.getName(),
-                extensionParameter.isRequired(),
-                bindings.get(extensionParameter.getName()));
+                                                     extensionParameter.isRequired(),
+                                                     bindings.get(extensionParameter.getName()));
           } else {
             return new ImmutableActingParameterModel(parameterNames
                 .getOrDefault(extensionParameter.getName(), extensionParameter.getName()), extensionParameter.isRequired(),
-                parameterNames.getOrDefault(extensionParameter.getName(),
-                    extensionParameter.getName()));
+                                                     parameterNames.getOrDefault(extensionParameter.getName(),
+                                                                                 extensionParameter.getName()));
           }
         })
         .collect(toList());
@@ -409,7 +410,7 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
         getAnnotation(parameterDeclaration, org.mule.sdk.api.annotation.values.OfValues.class);
 
     return getOfValueInformation(legacyAnnotation.orElse(null), sdkAnnotation.orElse(null), parameterDeclaration.getName(),
-        componentName, componentType, "parameter");
+                                 componentName, componentType, "parameter");
   }
 
   private Optional<OfValueInformation> getOfValueInformation(ParameterGroupDeclaration parameterGroupDeclaration,
@@ -421,7 +422,7 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
         annotatedElement.getAnnotation(org.mule.sdk.api.annotation.values.OfValues.class);
 
     return getOfValueInformation(legacyAnnotation, sdkAnnotation, parameterGroupDeclaration.getName(), componentName,
-        componentType, "parameter group");
+                                 componentType, "parameter group");
   }
 
   private Optional<OfValueInformation> getOfValueInformation(OfValues legacyOfValues,
@@ -432,12 +433,12 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
                                                              String elementType) {
     if (legacyOfValues != null && ofValues != null) {
       throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on %s %s of %s %s",
-          OfValues.class.getName(),
-          org.mule.sdk.api.annotation.values.OfValues.class.getName(),
-          elementType,
-          elementName,
-          componentType,
-          componentName));
+                                                       OfValues.class.getName(),
+                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName(),
+                                                       elementType,
+                                                       elementName,
+                                                       componentType,
+                                                       componentName));
     } else if (legacyOfValues != null) {
       return of(new OfValueInformation(legacyOfValues.value(), legacyOfValues.open(), new Binding[0], true));
     } else if (ofValues != null) {

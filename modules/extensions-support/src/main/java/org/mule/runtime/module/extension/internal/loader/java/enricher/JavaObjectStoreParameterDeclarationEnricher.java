@@ -40,6 +40,7 @@ public class JavaObjectStoreParameterDeclarationEnricher implements WalkingDecla
   @Override
   public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
     return of(new IdempotentDeclarationEnricherWalkDelegate() {
+
       final ExtensionDeclaration extension = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
       boolean hasObjectStoreParams = false;
 

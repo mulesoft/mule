@@ -70,9 +70,9 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
 
       final int schedulingStrategyParameterSequence =
           getInfrastructureType(new TypeWrapper(SchedulingStrategy.class,
-              new DefaultExtensionsTypeLoaderFactory()
-                  .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
-              .map(infrastructureType -> infrastructureType.getSequence()).orElse(0);
+                                                new DefaultExtensionsTypeLoaderFactory()
+                                                    .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
+                                                        .map(infrastructureType -> infrastructureType.getSequence()).orElse(0);
       ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
       boolean thereArePollingSources = false;
@@ -117,7 +117,7 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new InfrastructureParameterModelProperty(schedulingStrategyParameterSequence));
         parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
-            CORE_PREFIX)));
+                                                                    CORE_PREFIX)));
         parameter.setDslConfiguration(ParameterDslConfiguration.builder()
             .allowsInlineDefinition(true)
             .allowsReferences(false)

@@ -75,9 +75,9 @@ public final class JavaMimeTypeParametersDeclarationEnricher implements WalkingD
 
   /**
    * Certain enrichments of this {@link DeclarationEnricher} where added in a newer version of mule than the one when it was
-   * introduced. This {@link ModelProperty} has to be added to these new enrichments so that if
-   * the {@link org.mule.runtime.api.meta.model.ExtensionModel} of an extension need to be recreated for a former muleVersion, the
-   * new enrichments can be filtered.
+   * introduced. This {@link ModelProperty} has to be added to these new enrichments so that if the
+   * {@link org.mule.runtime.api.meta.model.ExtensionModel} of an extension need to be recreated for a former muleVersion, the new
+   * enrichments can be filtered.
    */
   private static SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY = new SinceMuleVersionModelProperty("4.2.0");
 
@@ -109,14 +109,16 @@ public final class JavaMimeTypeParametersDeclarationEnricher implements WalkingD
         declareMimeTypeParameters(declaration, outputType);
       }
 
-      private void declareOutputEncodingParameter(ParameterGroupDeclaration group, boolean shouldAddSinceMuleVersionModelProperty) {
+      private void declareOutputEncodingParameter(ParameterGroupDeclaration group,
+                                                  boolean shouldAddSinceMuleVersionModelProperty) {
         group.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs.",
-            shouldAddSinceMuleVersionModelProperty));
+                                        shouldAddSinceMuleVersionModelProperty));
       }
 
-      private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group, boolean shouldAddSinceMuleVersionModelProperty) {
+      private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group,
+                                                  boolean shouldAddSinceMuleVersionModelProperty) {
         group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs.",
-            shouldAddSinceMuleVersionModelProperty));
+                                        shouldAddSinceMuleVersionModelProperty));
       }
 
       private void declareOutputEncodingParameter(ParameterGroupDeclaration group) {
@@ -233,9 +235,9 @@ public final class JavaMimeTypeParametersDeclarationEnricher implements WalkingD
 
       private boolean shouldOverrideMetadataFormat(ExecutableComponentDeclaration declaration) {
         /**
-         * On top of looking for the CustomDefinedStaticTypeAnnotation to see if there is a Static Resolution involved, you have to
-         * check that the MetadataFormat is not JAVA, since there are other ways of Static Resolved Metadata that do not add this
-         * annotation (none of the set the metadata format as JAVA), for example: @OutputJsonType and @OutputXmlType.
+         * On top of looking for the CustomDefinedStaticTypeAnnotation to see if there is a Static Resolution involved, you have
+         * to check that the MetadataFormat is not JAVA, since there are other ways of Static Resolved Metadata that do not add
+         * this annotation (none of the set the metadata format as JAVA), for example: @OutputJsonType and @OutputXmlType.
          */
         return !declaration.getOutput().getType().getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent() &&
             declaration.getOutput().getType().getMetadataFormat().equals(JAVA);

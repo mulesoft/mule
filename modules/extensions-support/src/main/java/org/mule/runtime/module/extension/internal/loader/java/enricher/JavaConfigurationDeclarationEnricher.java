@@ -48,13 +48,13 @@ public class JavaConfigurationDeclarationEnricher implements WalkingDeclarationE
           @Override
           protected void onOperation(OperationDeclaration declaration) {
             enrich(declaration, ExtensionOperationDescriptorModelProperty.class,
-                (operation, property) -> enrich(operation, property.getOperationElement()));
+                   (operation, property) -> enrich(operation, property.getOperationElement()));
           }
 
           @Override
           public void onSource(SourceDeclaration declaration) {
             enrich(declaration, ExtensionTypeDescriptorModelProperty.class,
-                (source, property) -> enrich(source, (SourceElement) property.getType()));
+                   (source, property) -> enrich(source, (SourceElement) property.getType()));
           }
         });
   }
