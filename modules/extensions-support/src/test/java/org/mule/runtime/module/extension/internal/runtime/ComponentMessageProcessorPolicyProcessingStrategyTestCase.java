@@ -23,22 +23,22 @@ import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolic
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.probe.PollingProber.probe;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 import static java.util.concurrent.Executors.newFixedThreadPool;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -85,15 +85,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.namespace.QName;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Mono;
 
@@ -206,7 +207,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     when(rootContainer.getProcessingStrategy()).thenReturn(processingStrategy);
 
     processor.setComponentLocator(componentLocator);
-    processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
+    processor.setCacheIdGeneratorFactory(of(mock(MetadataCacheIdGeneratorFactory.class)));
 
     final Map<QName, Object> annotations = new HashMap<>();
     final ComponentIdentifier opIdentifier = buildFromStringRepresentation("ns:op");

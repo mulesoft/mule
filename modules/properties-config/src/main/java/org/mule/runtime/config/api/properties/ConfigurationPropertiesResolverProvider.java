@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.api.properties;
 
+import static org.mule.runtime.config.internal.model.properties.PropertiesHierarchyCreationUtils.createConfigurationAttributeResolver;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;

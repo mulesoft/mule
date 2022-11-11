@@ -17,7 +17,6 @@ import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUti
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -25,7 +24,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.core.api.MuleContext;
@@ -38,9 +37,7 @@ import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
-import org.mule.runtime.module.service.api.manager.ServiceManager;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 

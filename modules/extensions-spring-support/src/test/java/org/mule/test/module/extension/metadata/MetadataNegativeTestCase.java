@@ -6,12 +6,6 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static java.lang.Integer.valueOf;
-import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
@@ -29,6 +23,14 @@ import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatch
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+
+import static java.lang.Integer.valueOf;
+import static java.lang.String.format;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assume.assumeThat;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -60,7 +62,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
   private static final String NO_SUCH_COMPONENT_MODEL_EXCEPTION_CLASS_NAME =
       "org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException";
   private static final String INVALID_COMPONENT_EXCEPTION_CLASSNAME =
-      "org.mule.runtime.core.internal.metadata.InvalidComponentIdException";
+      "org.mule.runtime.metadata.internal.InvalidComponentIdException";
 
   public MetadataNegativeTestCase(ResolutionType resolutionType) {
     super(resolutionType);

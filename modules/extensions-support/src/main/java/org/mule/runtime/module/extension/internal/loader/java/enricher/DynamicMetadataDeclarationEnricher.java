@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.getMetadataKeyPart;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.hasKeyId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
+
+import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -30,8 +31,6 @@ import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.collection.Collectors;
-import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -45,6 +44,8 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
+import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
+import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -240,7 +241,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
       final MetadataScopeAdapter metadataScope = new MetadataScopeAdapter() {
 
-        private OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
+        private final OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
 
         @Override
         public boolean hasKeysResolver() {

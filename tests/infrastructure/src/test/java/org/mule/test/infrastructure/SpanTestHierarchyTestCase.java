@@ -6,22 +6,41 @@
  */
 package org.mule.test.infrastructure;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_ESCAPED_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_EVENT_NAME;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_MESSAGE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_STACK_TRACE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_TYPE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
+
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.core.privileged.profiling.CapturedEventData;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
+
+  public static final String LOCATION_KEY = "location";
+  public static final String CORRELATION_ID_KEY = "correlationId";
+  public static final String ARTIFACT_ID_KEY = "artifactId";
+  public static final String THREAD_START_ID_KEY = "threadStartId";
+  public static final String ARTIFACT_TYPE_ID = "artifactType";
 
   private static final String NO_PARENT_SPAN = "0000000000000000";
 
@@ -40,9 +59,15 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   private static final String SCATTER_GATHER_ROUTE_SPAN_ID_1 = "123scattergatherroute1123";
   private static final String SCATTER_GATHER_ROUTE_SPAN_ID_2 = "123scattergatherroute2123";
   private static final String LOGGER_SPAN_ID = "123logger123";
+  private static final String LOGGER_SPAN_ID_2 = "1234logger1234";
+  private static final String LOGGER_SPAN_ID_3 = "12345logger12345";
   private static final String SET_PAYLOAD_SPAN_ID_1 = "123setpayload1123";
   private static final String SET_PAYLOAD_SPAN_ID_2 = "123setpayload2123";
   private static final String SET_VARIABLE_SPAN_ID = "123setvariable123";
+  public static final String TEST_ARTIFACT_ID = "SpanTestHierarchyTestCase#mockCapturedExportedSpan";
+
+  public static final String ERROR_TYPE_1 = "CUSTOM:ERROR";
+  public static final String ERROR_TYPE_2 = "CUSTOM:ERROR_2";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -50,9 +75,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testWhenSimpleStructureSpanTreeMatchesExpectedSpansAssertionShouldNotFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan async = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan logger = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -85,9 +110,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test()
   public void testWhenSimpleStructureSpanTreeDoesNotMatchExpectedSpansAssertionShouldFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan async = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan logger = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -124,13 +149,13 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testWhenSpanTreeWithTwoChildrenWithSameNameMatchesExpectedSpansAssertionShouldNotFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather2 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute2 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan logger = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather1 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather2 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute1 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute2 = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -193,13 +218,13 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testWhenSpanTreeWithTwoChildrenWithSameNameDoesNotMatchExpectedSpansAssertionShouldFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather2 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute2 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan logger = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather1 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather2 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute1 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute2 = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -265,11 +290,11 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testWhenSpanTreeWithTwoSetPayloadsOnDifferentBranchesMatchesExpectedSpansAssertionShouldNotFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload2 = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload1 = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload2 = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -316,11 +341,11 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testWhenSpanTreeWithTwoSetPayloadsOnDifferentBranchesDoesNotMatchExpectedSpansAssertionShouldFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload2 = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload1 = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload2 = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -371,13 +396,13 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testDeclaringOrderWhenCreatingTreeShouldNotChangeTheTree() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
-    CapturedExportedSpan muleFlow = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGather = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute1 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan scatterGatherRoute2 = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setPayload = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan setVariable = mock(CapturedExportedSpan.class);
-    CapturedExportedSpan logger = mock(CapturedExportedSpan.class);
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGather = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute1 = mockCapturedExportedSpan();
+    CapturedExportedSpan scatterGatherRoute2 = mockCapturedExportedSpan();
+    CapturedExportedSpan setPayload = mockCapturedExportedSpan();
+    CapturedExportedSpan setVariable = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -451,5 +476,401 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
 
     spanTestHierarchy.assertSpanTree();
     spanTestHierarchyAlternativeOrder.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenAttributesInTreeMatchActualAttributesAssertionShouldNotFailWithThreeLoggersInSameAndDifferentLocations() {
+    String flowLocation = "flow-test-location";
+    String asyncLocation = "async-test-location";
+    String loggerLocation = "logger-test-location";
+    String loggerSecondLocation = "logger-second-test-location";
+
+    List<String> attributesToAssertExistence = Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY);
+
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+    CapturedExportedSpan secondLogger = mockCapturedExportedSpan();
+    CapturedExportedSpan thirdLogger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    muleFlow.getAttributes().put(LOCATION_KEY, flowLocation);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    async.getAttributes().put(LOCATION_KEY, asyncLocation);
+
+    when(logger.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+    logger.getAttributes().put(LOCATION_KEY, loggerLocation);
+
+    when(thirdLogger.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(thirdLogger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(thirdLogger.getSpanId()).thenReturn(LOGGER_SPAN_ID_3);
+    thirdLogger.getAttributes().put(LOCATION_KEY, loggerLocation);
+
+    when(secondLogger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(secondLogger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(secondLogger.getSpanId()).thenReturn(LOGGER_SPAN_ID_2);
+    secondLogger.getAttributes().put(LOCATION_KEY, loggerSecondLocation);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+    capturedExportedSpans.add(secondLogger);
+    capturedExportedSpans.add(thirdLogger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(flowLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(asyncLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerSecondLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .endChildren()
+        .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenAttributesInTreeDontMatchActualAttributesAssertionShouldFailWithThreeLoggersInSameAndDifferentLocations() {
+    String flowLocation = "flow-test-location";
+    String asyncLocation = "async-test-location";
+    String loggerLocation = "logger-test-location";
+    String loggerSecondLocation = "logger-second-test-location";
+
+    List<String> attributesToAssertExistence = Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY);
+
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+    CapturedExportedSpan secondLogger = mockCapturedExportedSpan();
+    CapturedExportedSpan thirdLogger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    muleFlow.getAttributes().put(LOCATION_KEY, flowLocation);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    async.getAttributes().put(LOCATION_KEY, asyncLocation);
+
+    when(logger.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+    logger.getAttributes().put(LOCATION_KEY, loggerLocation);
+
+    // This logger has the Async scope as parent instead of the expected Mule Flow parent
+    when(thirdLogger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(thirdLogger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(thirdLogger.getSpanId()).thenReturn(LOGGER_SPAN_ID_3);
+    thirdLogger.getAttributes().put(LOCATION_KEY, loggerLocation);
+
+    when(secondLogger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(secondLogger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(secondLogger.getSpanId()).thenReturn(LOGGER_SPAN_ID_2);
+    secondLogger.getAttributes().put(LOCATION_KEY, loggerSecondLocation);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+    capturedExportedSpans.add(secondLogger);
+    capturedExportedSpans.add(thirdLogger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(flowLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(asyncLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerSecondLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .endChildren()
+        .endChildren();
+
+    expectedException.expect(AssertionError.class);
+    expectedException.expectMessage("Expected span: mule:logger was not found");
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenExceptionsInTreeMatchActualExceptionsAssertionShouldNotFail() {
+    Map<String, Object> exceptionAttributes = new HashMap<>();
+    exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
+    exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
+
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
+
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.hasErrorStatus()).thenReturn(true);
+
+    when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .endChildren()
+        .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenExceptionsInTreeDoesNotMatchActualExceptionsAssertionShouldFail() {
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+
+    when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .endChildren()
+        .endChildren();
+
+    expectedException.expect(AssertionError.class);
+    expectedException.expectMessage("Expected exceptions for Span: [Mock for CapturedExportedSpan, hashCode: ");
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenExceptionAttributeInTreeDoesNotMatchActualExceptionAttributeAssertionShouldFail() {
+    Map<String, Object> exceptionAttributes = new HashMap<>();
+    exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, "Wrong Error type");
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
+    exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
+
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
+
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.hasErrorStatus()).thenReturn(true);
+
+    when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .endChildren()
+        .endChildren();
+
+    expectedException.expect(AssertionError.class);
+    expectedException.expectMessage("Expected: \"CUSTOM:ERROR\"\n" +
+        "     but: was \"Wrong Error type");
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenThereIsANotExpectedExceptionAssertionShouldFail() {
+    Map<String, Object> exceptionAttributes = new HashMap<>();
+    exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
+    exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
+
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
+
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+
+    // Exception added to muleFlow which is not expected by the span tree
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(muleFlow.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(muleFlow.hasErrorStatus()).thenReturn(true);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.hasErrorStatus()).thenReturn(true);
+
+    when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .endChildren()
+        .endChildren();
+
+    expectedException.expect(AssertionError.class);
+    expectedException.expectMessage("Unexpected Span exceptions found for Span: [Mock for CapturedExportedSpan, hashCode: ");
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenNoExceptionDataIsExpectedAssertionShouldNotFail() {
+    Map<String, Object> exceptionAttributes = new HashMap<>();
+    exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
+    exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
+
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
+
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.hasErrorStatus()).thenReturn(true);
+
+    when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+    when(logger.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(logger.hasErrorStatus()).thenReturn(true);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .endChildren()
+        .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  private CapturedExportedSpan mockCapturedExportedSpan() {
+    CapturedExportedSpan mockedSpan = mock(CapturedExportedSpan.class);
+    Map<String, String> basicAttributes = new HashMap<>();
+    basicAttributes.put(CORRELATION_ID_KEY, "test-correlation-id");
+    basicAttributes.put(THREAD_START_ID_KEY, "12");
+    basicAttributes.put(ARTIFACT_ID_KEY, TEST_ARTIFACT_ID);
+    basicAttributes.put(ARTIFACT_TYPE_ID, APP.getAsString());
+    when(mockedSpan.getAttributes()).thenReturn(basicAttributes);
+    when(mockedSpan.getServiceName()).thenReturn(TEST_ARTIFACT_ID);
+    return mockedSpan;
   }
 }
