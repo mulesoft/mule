@@ -110,6 +110,7 @@ public class PropertiesResolverUtils {
     ConfigurationPropertiesResolver partialResolver = new ConfigurationPropertiesHierarchyBuilder()
         .withDeploymentProperties(deploymentProperties)
         .withGlobalPropertiesSupplier(globalPropertiesSupplier)
+        .withoutFailuresIfPropertyNotPresent()
         .build();
 
     artifactAst.updatePropertiesResolver(partialResolver);
