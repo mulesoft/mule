@@ -9,11 +9,12 @@ package org.mule.runtime.module.deployment.internal.processor;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.config.internal.context.BaseSpringMuleContextServiceConfigurator.DISABLE_TRANSFORMERS_SUPPORT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.tck.util.MuleContextUtils.addExtensionModelToMock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Optional.of;
-
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -44,13 +45,12 @@ import java.net.URLClassLoader;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import io.qameta.allure.Issue;
 
 public class AstXmlParserArtifactConfigurationProcessorTestCase extends AbstractMuleTestCase {
 
@@ -74,6 +74,7 @@ public class AstXmlParserArtifactConfigurationProcessorTestCase extends Abstract
   @Before
   public void setUp() throws Exception {
     muleContext = mockContextWithServices();
+    addExtensionModelToMock(muleContext, getExtensionModel());
     muleContext.getInjector().inject(this);
     configurationBuilder = new AstXmlParserArtifactConfigurationProcessor();
   }
