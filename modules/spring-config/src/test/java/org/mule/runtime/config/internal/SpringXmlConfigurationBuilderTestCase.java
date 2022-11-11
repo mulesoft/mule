@@ -10,7 +10,9 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAI
 import static org.mule.runtime.config.internal.context.BaseSpringMuleContextServiceConfigurator.DISABLE_TRANSFORMERS_SUPPORT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.tck.util.MuleContextUtils.addExtensionModelToMock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Collections.emptyMap;
@@ -38,7 +40,10 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.lazy.LazyExpressionLanguageAdaptor;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
@@ -53,7 +58,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -90,6 +97,7 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   @Before
   public void setUp() throws Exception {
     muleContext = mockContextWithServices();
+    addExtensionModelToMock(muleContext, getExtensionModel());
     muleContext.getInjector().inject(this);
     configurationBuilderWithUsedInvalidSchema =
         new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), APP, false, false);
