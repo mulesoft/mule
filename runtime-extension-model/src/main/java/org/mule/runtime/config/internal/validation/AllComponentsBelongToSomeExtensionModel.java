@@ -41,6 +41,7 @@ public class AllComponentsBelongToSomeExtensionModel implements Validation {
 
   @Override
   public Level getLevel() {
+    // TODO (W-12050227): Make this an ERROR when possible.
     return WARN;
   }
 
