@@ -38,7 +38,7 @@ import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
 /**
- * Utils for Properties Resolver Creations.
+ * Utils for Properties Resolver Creation.
  * 
  * @since 4.5
  */
@@ -76,10 +76,12 @@ public class PropertiesResolverUtils {
   }
 
   /**
-   * @param artifactAst
-   * @param externalResourceProvider
-   * @param localResolver            A resolver that retrieves properties that are used in
-   * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers
+   * @param artifactAst              the {@link ArtifactAst} to get the {@link ConfigurationPropertiesProvider} from.
+   * @param externalResourceProvider a {@link ResourceProvider} to use to read files when needed for properties resolution.
+   * @param localResolver            A resolver that retrieves properties that are used when resolving parameters of a
+   *                                 {@link ConfigurationPropertiesProvider}.
+   * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers within the
+   *         {@link ArtifactAst}.
    */
   public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
                                                                                                         ResourceProvider externalResourceProvider,
@@ -108,8 +110,8 @@ public class PropertiesResolverUtils {
   }
 
   /**
-   *
-   * @return
+   * @return a {@link Map} with the {@link ConfigurationPropertiesProviderFactory} loaded using the {@link ServiceLoader}
+   * @throws {@link MuleRuntimeException} if there are more than one factory for the same {@link ComponentIdentifier}.
    */
   public static Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> loadProviderFactories() {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
