@@ -131,11 +131,12 @@ public interface ExtensionDiscoveryRequest {
      * @param value the custom parameter value.
      * @throws IllegalArgumentException if {@code key} or {@code value} are {@code null}.
      */
-    public void addParameter(String key, Object value) {
+    public ExtensionDiscoveryRequestBuilder addParameter(String key, Object value) {
       checkArgument(key != null && key.length() > 0, "key cannot be blank");
       checkArgument(value != null, "value cannot be null");
 
       customParameters.put(key, value);
+      return this;
     }
 
     /**
@@ -143,10 +144,11 @@ public interface ExtensionDiscoveryRequest {
      *
      * @param parameters a map with custom parameters.
      */
-    public void addParameters(Map<String, Object> parameters) {
+    public ExtensionDiscoveryRequestBuilder addParameters(Map<String, Object> parameters) {
       checkArgument(parameters != null, "cannot add null parameters");
 
       parameters.forEach(this::addParameter);
+      return this;
     }
 
     public ExtensionDiscoveryRequest build() {
