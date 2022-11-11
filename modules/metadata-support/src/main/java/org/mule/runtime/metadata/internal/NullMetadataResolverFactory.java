@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.metadata;
+package org.mule.runtime.metadata.internal;
 
 import static java.util.Collections.emptyList;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;

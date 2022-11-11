@@ -19,8 +19,9 @@ import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactCont
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
-import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
+import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -32,6 +33,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.internal.bean.lazy.LazyConnectivityTestingService;
 import org.mule.runtime.config.internal.bean.lazy.LazyMetadataService;
 import org.mule.runtime.config.internal.bean.lazy.LazySampleDataService;
@@ -44,13 +46,14 @@ import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
-import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.metadata.internal.MuleMetadataService;
+import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
+import org.mule.runtime.metadata.internal.cache.lazy.DelegateMetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.internal.cache.lazy.DelegateMetadataCacheManager;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 
 import java.io.File;
@@ -66,6 +69,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceConfigurator {
 
   private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
+  private static final String DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY = "_defaultMetadataCacheIdGenerator";
   private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
   private final LazyComponentInitializerAdapter lazyComponentInitializer;
@@ -154,6 +158,12 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                              .<ObjectStoreManager>lookupObject(LAZY_MULE_OBJECT_STORE_MANAGER));
                                          return defaultPersistentMetadataCacheManager;
                                        }));
+
+        registerBeanDefinition(DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY,
+                               getBeanDefinition(ModelBasedMetadataCacheIdGeneratorFactory.class));
+        registerConstantBeanDefinition(METADATA_CACHE_ID_GENERATOR_KEY,
+                                       new DelegateMetadataCacheIdGeneratorFactory(() -> getRegistry()
+                                           .<ModelBasedMetadataCacheIdGeneratorFactory>lookupObject(DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY)));
       }
     }
   }

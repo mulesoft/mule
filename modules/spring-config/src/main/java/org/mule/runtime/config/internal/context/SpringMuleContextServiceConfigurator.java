@@ -63,8 +63,9 @@ import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBo
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
-import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementService.PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY;
+import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
+import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.valueOf;
@@ -78,6 +79,7 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
@@ -109,8 +111,6 @@ import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
@@ -125,6 +125,8 @@ import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.metadata.internal.MuleMetadataService;
+import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
@@ -228,6 +230,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(SAMPLE_DATA_SERVICE_KEY, getBeanDefinition(MuleSampleDataService.class))
       .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
       .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
+      .put(METADATA_CACHE_ID_GENERATOR_KEY, getBeanDefinition(ModelBasedMetadataCacheIdGeneratorFactory.class))
       .build();
 
   private final MuleFunctionsBindingContextProvider coreFunctionsProvider;
