@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.3.0-20221024</version>
+        <version>4.3.0-20221111</version>
     </parent>
     <artifactId>mule-core</artifactId>
     <packaging>jar</packaging>
