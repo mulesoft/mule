@@ -102,6 +102,32 @@ public class PropertiesResolverUtils {
 
   }
 
+  public static PropertiesResolverConfigurationProperties createIsolatedConfigurationAttributeResolver(ArtifactAst artifactAst,
+                                                                                                       Optional<ConfigurationProperties> parentConfigurationProperties,
+                                                                                                       Map<String, String> deploymentProperties,
+                                                                                                       ResourceProvider externalResourceProvider) {
+    Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
+    ConfigurationPropertiesResolver partialResolver = new ConfigurationPropertiesHierarchyBuilder()
+        .withDeploymentProperties(deploymentProperties)
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier)
+        .build();
+
+    artifactAst.updatePropertiesResolver(partialResolver);
+
+    ConfigurationPropertiesHierarchyBuilder completeBuilder = new ConfigurationPropertiesHierarchyBuilder()
+        .withDeploymentProperties(deploymentProperties)
+        .withPropertiesFile(externalResourceProvider)
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier);
+
+    // Some configuration properties providers may depend their parameters on other properties, so we use the
+    // partial resolution to create these resolvers, and then complete the entire hierarchy
+    getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
+        .forEach(completeBuilder::withApplicationProperties);
+
+    parentConfigurationProperties.ifPresent(completeBuilder::withDomainPropertiesResolver);
+    return new PropertiesResolverConfigurationProperties(completeBuilder.build());
+  }
+
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
                                                                                                ResourceProvider externalResourceProvider) {
