@@ -52,14 +52,13 @@ import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesR
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
-import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 import org.mule.runtime.internal.memory.management.ProfiledMemoryManagementService;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -109,7 +108,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
   private final ArtifactClassLoader containerClassLoader;
   private final ServiceManager serviceManager;
-  private final ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final DefaultClassLoaderManager artifactClassLoaderManager;
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
@@ -277,14 +276,16 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
-    extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
+
+    extensionModelLoaderRepository =
+        ExtensionModelLoaderRepository.getExtensionModelLoaderManager(containerClassLoader.getClassLoader());
 
     pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, deployableArtifactDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
                                              domainClassLoaderBuilderFactory,
-                                             extensionModelLoaderManager, licenseValidator,
+                                             extensionModelLoaderRepository, licenseValidator,
                                              runtimeLockFactory,
                                              this.memoryManagementService,
                                              artifactConfigurationProcessor);
@@ -297,7 +298,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,
                                                        domainManager, serviceManager,
-                                                       extensionModelLoaderManager,
+                                                       extensionModelLoaderRepository,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
                                                        licenseValidator,
@@ -389,8 +390,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   /**
    * @return the manager of available extension loaders.
    */
-  public ExtensionModelLoaderManager getExtensionModelLoaderManager() {
-    return extensionModelLoaderManager;
+  public ExtensionModelLoaderRepository getExtensionModelLoaderRepository() {
+    return extensionModelLoaderRepository;
   }
 
   /**

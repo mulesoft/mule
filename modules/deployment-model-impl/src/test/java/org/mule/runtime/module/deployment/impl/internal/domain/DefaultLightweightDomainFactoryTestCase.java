@@ -28,10 +28,10 @@ import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFac
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactoryTestCase;
@@ -72,7 +72,7 @@ public class DefaultLightweightDomainFactoryTestCase extends AbstractMuleTestCas
                                null,
                                mock(ServiceRepository.class),
                                new DomainClassLoaderBuilderFactory(ArtifactClassLoaderResolver.defaultClassLoaderResolver()),
-                               mock(ExtensionModelLoaderManager.class),
+                               mock(ExtensionModelLoaderRepository.class),
                                mock(LicenseValidator.class),
                                getRuntimeLockFactory(),
                                mock(MemoryManagementService.class),

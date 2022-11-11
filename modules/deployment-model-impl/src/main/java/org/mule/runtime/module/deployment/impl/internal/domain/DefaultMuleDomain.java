@@ -40,7 +40,7 @@ import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
@@ -64,7 +64,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   private final DomainDescriptor descriptor;
   private final ServiceRepository serviceRepository;
   private final List<ArtifactPlugin> artifactPlugins;
-  private final ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
@@ -77,7 +77,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
                            ClassLoaderRepository classLoaderRepository,
                            ServiceRepository serviceRepository,
                            List<ArtifactPlugin> artifactPlugins,
-                           ExtensionModelLoaderManager extensionModelLoaderManager,
+                           ExtensionModelLoaderRepository extensionModelLoaderRepository,
                            LockFactory runtimeLockFactory,
                            MemoryManagementService memoryManagementService,
                            ArtifactConfigurationProcessor artifactConfigurationProcessor) {
@@ -86,7 +86,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.descriptor = descriptor;
     this.serviceRepository = serviceRepository;
     this.artifactPlugins = artifactPlugins;
-    this.extensionModelLoaderManager = extensionModelLoaderManager;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
@@ -193,7 +193,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
           .setArtifactInstallationDirectory(getArtifactInstallationDirectory())
           .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
-          .setExtensionModelLoaderRepository(extensionModelLoaderManager)
+          .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)
           .setDisableXmlValidations(disableXmlValidations)

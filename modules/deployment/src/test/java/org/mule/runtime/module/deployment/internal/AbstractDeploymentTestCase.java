@@ -16,6 +16,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
@@ -124,9 +126,9 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -552,7 +554,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected File appsDir;
   protected File domainsDir;
   protected ServiceManager serviceManager;
-  protected ExtensionModelLoaderManager extensionModelLoaderManager;
+  protected ExtensionModelLoaderRepository extensionModelLoaderRepository;
   protected MuleDeploymentService deploymentService;
   protected DeploymentListener applicationDeploymentListener;
   protected DeploymentListener domainDeploymentListener;
@@ -619,7 +621,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
-    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderRepository = muleArtifactResourcesRegistry.getExtensionModelLoaderRepository();
     artifactClassLoaderManager = muleArtifactResourcesRegistry.getArtifactClassLoaderManager();
 
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
@@ -674,8 +676,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       serviceManager.stop();
     }
 
-    if (extensionModelLoaderManager != null) {
-      extensionModelLoaderManager.stop();
+    if (extensionModelLoaderRepository != null) {
+      stopIfNeeded(extensionModelLoaderRepository);
     }
 
     deleteTree(muleHome);
@@ -820,7 +822,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void startDeployment() throws MuleException {
     serviceManager.start();
-    extensionModelLoaderManager.start();
+    startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start();
   }
 
@@ -1205,7 +1207,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                    new MuleClassLoaderLookupPolicy(emptyMap(),
                                                                                                    emptySet())),
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
-                                 artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
+                                 artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderRepository,
                                  getRuntimeLockFactory(),
                                  mock(MemoryManagementService.class),
                                  serializedAstWithFallbackArtifactConfigurationProcessor());

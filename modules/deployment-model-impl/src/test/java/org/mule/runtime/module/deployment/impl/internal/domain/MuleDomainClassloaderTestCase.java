@@ -36,7 +36,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -64,7 +64,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   private final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final List<ArtifactPlugin> artifactPlugins = emptyList();
-  private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final ClassLoader originalThreadClassloader = mock(ClassLoader.class);
   private final ClassLoader domainClassloader = mock(ClassLoader.class);
   private final ArtifactContext artifactContext = mock(ArtifactContext.class);
@@ -80,7 +80,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
 
     domain = new TestMuleDomain(domainDescriptor, artifactClassLoader, domainClassLoaderRepository, serviceRepository,
-                                artifactPlugins, extensionModelLoaderManager,
+                                artifactPlugins, extensionModelLoaderRepository,
                                 getRuntimeLockFactory());
     currentThread().setContextClassLoader(originalThreadClassloader);
     when(domainDescriptor.getDeploymentProperties()).thenReturn(empty());
@@ -133,10 +133,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
 
     public TestMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
-                          List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager,
+                          List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderRepository extensionModelLoaderRepository,
                           LockFactory runtimeLockFactory) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderManager, runtimeLockFactory, mock(MemoryManagementService.class),
+            extensionModelLoaderRepository, runtimeLockFactory, mock(MemoryManagementService.class),
             mock(ArtifactConfigurationProcessor.class));
     }
 

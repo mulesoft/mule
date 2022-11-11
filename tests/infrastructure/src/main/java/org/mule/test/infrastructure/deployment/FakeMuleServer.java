@@ -11,6 +11,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.internal.memory.management.DefaultMemoryManagementService.newDefaultMemoryManagementService;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
@@ -36,7 +38,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
@@ -92,7 +94,7 @@ public class FakeMuleServer {
   private final DefaultMuleCoreExtensionManagerServer coreExtensionManager;
   private final ArtifactClassLoader containerClassLoader;
   private final ServiceManager serviceManager;
-  private final ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
   public FakeMuleServer(String muleHomePath) {
     this(muleHomePath, new LinkedList<>());
@@ -108,7 +110,7 @@ public class FakeMuleServer {
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
-    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderRepository = muleArtifactResourcesRegistry.getExtensionModelLoaderRepository();
 
     this.coreExtensions = intialCoreExtensions;
     for (MuleCoreExtension extension : coreExtensions) {
@@ -155,7 +157,7 @@ public class FakeMuleServer {
   public void stop() throws MuleException {
     deploymentService.stop();
     serviceManager.stop();
-    extensionModelLoaderManager.stop();
+    stopIfNeeded(extensionModelLoaderRepository);
     coreExtensionManager.stop();
     coreExtensionManager.dispose();
   }
@@ -164,7 +166,7 @@ public class FakeMuleServer {
     serviceManager.start();
     coreExtensionManager.initialise();
     coreExtensionManager.start();
-    extensionModelLoaderManager.start();
+    startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start();
   }
 

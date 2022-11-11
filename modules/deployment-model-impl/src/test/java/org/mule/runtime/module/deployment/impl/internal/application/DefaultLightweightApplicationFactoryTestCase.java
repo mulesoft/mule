@@ -34,9 +34,9 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -86,7 +86,7 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
                                     DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
                                     domainManager,
                                     mock(ServiceRepository.class),
-                                    mock(ExtensionModelLoaderManager.class),
+                                    mock(ExtensionModelLoaderRepository.class),
                                     mock(ClassLoaderRepository.class),
                                     mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                     mock(PluginDependenciesResolver.class),
