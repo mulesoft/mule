@@ -12,6 +12,7 @@ import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -40,6 +41,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -283,7 +285,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         List<ConfigurationBuilder> builders = new ArrayList<>();
         builders.add(new ServiceCustomizationsConfigurationBuilder(getStartUpRegistryObjects()));
         addBuilders(builders);
-        builders.add(new MockExtensionManagerConfigurationBuilder());
+        builders.add(new MockExtensionManagerConfigurationBuilder(getExtensionModels()));
         builders.add(getBuilder());
         MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
         DefaultMuleConfiguration muleConfiguration = createMuleConfiguration();
@@ -309,6 +311,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return emptySet();
   }
 
   protected DefaultMuleConfiguration createMuleConfiguration() {
