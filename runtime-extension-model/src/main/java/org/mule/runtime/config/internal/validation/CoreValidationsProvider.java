@@ -42,7 +42,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   @Override
   public List<Validation> get() {
-    List<Validation> validations = new ArrayList<>(asList(new SingletonsAreNotRepeated(),
+    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(),
+                                                          new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
                                                           new NameHasValidCharacters(),
