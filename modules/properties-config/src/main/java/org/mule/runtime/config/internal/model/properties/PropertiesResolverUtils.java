@@ -103,15 +103,14 @@ public class PropertiesResolverUtils {
   }
 
   /**
-   * Creates the {@link PropertiesResolverConfigurationProperties} with the entire correct hierarchy for an isolated
-   * environment. This includes neither System Properties nor Environment Properties.
-   * @param artifactAst the Artifact AST of the application to calculate the properties resolvers.
-   * @param parentConfigurationProperties The Configuration Properties from a parent configuration, such as a Domain.
-   * @param deploymentProperties a {@link Map} of deployment properties
+   * Creates the {@link PropertiesResolverConfigurationProperties} with the entire correct hierarchy for an isolated environment.
+   * This includes neither System Properties nor Environment Properties.
+   * 
+   * @param artifactAst              the Artifact AST of the application to calculate the properties resolvers.
+   * @param deploymentProperties     a {@link Map} of deployment properties
    * @param externalResourceProvider a {@link ResourceProvider} to use to retrieve files to be used for properties' resolution
    */
   public static PropertiesResolverConfigurationProperties createIsolatedConfigurationAttributeResolver(ArtifactAst artifactAst,
-                                                                                                       Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                        Map<String, String> deploymentProperties,
                                                                                                        ResourceProvider externalResourceProvider) {
     Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
@@ -133,7 +132,6 @@ public class PropertiesResolverUtils {
     getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
         .forEach(completeBuilder::withApplicationProperties);
 
-    parentConfigurationProperties.ifPresent(completeBuilder::withDomainPropertiesResolver);
     return new PropertiesResolverConfigurationProperties(completeBuilder.build());
   }
 
