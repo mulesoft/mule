@@ -62,19 +62,16 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
 
   private TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                  DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
-                                 ApplicationDescriptorFactory applicationDescriptorFactory,
                                  DomainRepository domainRepository,
                                  ServiceRepository serviceRepository,
                                  ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                  ClassLoaderRepository classLoaderRepository,
                                  PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
-                                 PluginDependenciesResolver pluginDependenciesResolver,
-                                 ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
-    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, deployableArtifactDescriptorFactory,
+                                 PluginDependenciesResolver pluginDependenciesResolver) {
+    super(applicationClassLoaderBuilderFactory, deployableArtifactDescriptorFactory,
           domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
-          pluginDependenciesResolver, artifactPluginDescriptorLoader,
-          discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
+          pluginDependenciesResolver, discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
           RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),
           serializedAstWithFallbackArtifactConfigurationProcessor());
@@ -83,17 +80,11 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   public static TestApplicationFactory createTestApplicationFactory(DomainManager domainManager,
                                                                     ServiceRepository serviceRepository,
                                                                     ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                                                    ModuleRepository moduleRepository,
-                                                                    DescriptorLoaderRepository descriptorLoaderRepository) {
+                                                                    ModuleRepository moduleRepository) {
     AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> artifactPluginDescriptorFactory =
         artifactDescriptorFactoryProvider()
             .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
                                                    ArtifactDescriptorValidatorBuilder.builder());
-    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
-        new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
-    ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
-                                         ArtifactDescriptorValidatorBuilder.builder());
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
     PluginDependenciesResolver pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
@@ -107,11 +98,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory,
                                       DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
-                                      applicationDescriptorFactory,
                                       domainManager, serviceRepository,
                                       extensionModelLoaderRepository, artifactClassLoaderManager,
-                                      mock(PolicyTemplateClassLoaderBuilderFactory.class), pluginDependenciesResolver,
-                                      artifactPluginDescriptorLoader);
+                                      mock(PolicyTemplateClassLoaderBuilderFactory.class), pluginDependenciesResolver);
   }
 
   @Override

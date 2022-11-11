@@ -89,7 +89,6 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
     return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
                                  DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
-                                 pluginDependenciesResolver,
                                  domainClassLoaderBuilderFactory, new MuleExtensionModelLoaderManager(containerClassLoader));
   }
 
@@ -97,12 +96,10 @@ public class TestDomainFactory extends DefaultDomainFactory {
                             ServiceRepository serviceRepository,
                             DomainDescriptorFactory domainDescriptorFactory,
                             DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
-                            PluginDependenciesResolver pluginDependenciesResolver,
                             DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                             ExtensionModelLoaderManager extensionModelLoaderManager) {
     super(domainDescriptorFactory, deployableArtifactDescriptorFactory, new DefaultDomainManager(),
-          classLoaderRepository, serviceRepository,
-          pluginDependenciesResolver, domainClassLoaderBuilderFactory,
+          classLoaderRepository, serviceRepository, domainClassLoaderBuilderFactory,
           extensionModelLoaderManager, mock(LicenseValidator.class),
           RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),

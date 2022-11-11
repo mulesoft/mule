@@ -10,7 +10,6 @@ import static java.util.Optional.empty;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -35,14 +34,12 @@ public class ArtifactPluginDescriptorFactory
   private final DeployableArtifactDescriptor ownerDescriptor;
   private final List<BundleDependency> bundleDependencies;
   private final Set<BundleDescriptor> sharedProjectDependencies;
-  private final PluginPatchesResolver pluginPatchesResolver;
 
   public ArtifactPluginDescriptorFactory(BundleDependency bundleDependency,
                                          MulePluginModel pluginModel,
                                          DeployableArtifactDescriptor ownerDescriptor,
                                          List<BundleDependency> bundleDependencies,
                                          Set<BundleDescriptor> sharedProjectDependencies,
-                                         PluginPatchesResolver pluginPatchesResolver,
                                          ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(new File(bundleDependency.getBundleUri()), artifactDescriptorValidatorBuilder);
 
@@ -51,7 +48,6 @@ public class ArtifactPluginDescriptorFactory
     this.ownerDescriptor = ownerDescriptor;
     this.bundleDependencies = bundleDependencies;
     this.sharedProjectDependencies = sharedProjectDependencies;
-    this.pluginPatchesResolver = pluginPatchesResolver;
   }
 
   @Override
@@ -77,8 +73,7 @@ public class ArtifactPluginDescriptorFactory
                                                        getArtifactLocation(),
                                                        muleArtifactLoaderDescriptor,
                                                        bundleDependencies,
-                                                       ownerDescriptor,
-                                                       pluginPatchesResolver)
+                                                       ownerDescriptor)
                                                            .createClassLoaderConfiguration();
   }
 
