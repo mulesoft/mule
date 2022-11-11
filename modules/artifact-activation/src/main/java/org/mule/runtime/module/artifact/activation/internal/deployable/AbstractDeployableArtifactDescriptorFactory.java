@@ -23,7 +23,6 @@ import org.mule.runtime.module.artifact.activation.api.ArtifactActivationExcepti
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.plugin.BundlePluginDependenciesResolver;
@@ -62,14 +61,12 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   private final DeployableProjectModel deployableProjectModel;
   private final Optional<Properties> deploymentProperties;
-  private final PluginPatchesResolver pluginPatchesResolver;
   private final PluginModelResolver pluginModelResolver;
   private final PluginDescriptorResolver pluginDescriptorResolver;
   private final BundlePluginDependenciesResolver pluginDependenciesResolver;
 
   public AbstractDeployableArtifactDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                                      Map<String, String> deploymentProperties,
-                                                     PluginPatchesResolver pluginPatchesResolver,
                                                      PluginModelResolver pluginModelResolver,
                                                      PluginDescriptorResolver pluginDescriptorResolver,
                                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
@@ -77,7 +74,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
           artifactDescriptorValidatorBuilder);
     this.deployableProjectModel = deployableProjectModel;
     this.deploymentProperties = asProperties(deploymentProperties);
-    this.pluginPatchesResolver = pluginPatchesResolver;
     this.pluginModelResolver = pluginModelResolver;
     this.pluginDescriptorResolver = pluginDescriptorResolver;
     this.pluginDependenciesResolver = new BundlePluginDependenciesResolver();
@@ -204,7 +200,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                ownerDescriptor,
                                                pluginBundleDependencies,
                                                sharedPluginDependencies,
-                                               pluginPatchesResolver,
                                                ArtifactDescriptorValidatorBuilder.builder())
                                                    .create();
   }

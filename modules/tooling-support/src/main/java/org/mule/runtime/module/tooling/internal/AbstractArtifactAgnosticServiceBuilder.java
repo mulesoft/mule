@@ -6,35 +6,49 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
 
+import static java.nio.file.Files.createDirectories;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.maven.model.Model;
 
 public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServiceBuilder, S>
@@ -127,24 +141,60 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       File applicationFolder = new File(getExecutionFolder(), applicationName);
       Properties deploymentProperties = new Properties();
       deploymentProperties.putAll(forcedDeploymentProperties());
-      ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName, of(deploymentProperties));
-      applicationDescriptor.setArtifactDeclaration(artifactDeclaration);
-      applicationDescriptor.setConfigResources(singleton("empty-app.xml"));
-      applicationDescriptor.setArtifactLocation(applicationFolder);
-      applicationDescriptor.setAppProperties(artifactProperties);
+      Set<String> configs = singleton("empty-app.xml");
+
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);
+
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
-      applicationDescriptor
-          .setClassLoaderConfiguration(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
+      ClassLoaderConfiguration classLoaderConfiguration =
+          new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
               .createMavenClient(GlobalConfigLoader.getMavenConfig())))
                   .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
                                                         createTempBundleDescriptor()),
-                        ArtifactType.APP));
-      return defaultApplicationFactory.createArtifact(applicationDescriptor);
+                        ArtifactType.APP);
+
+      File destinationFolder =
+          applicationFolder.toPath().resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
+      createDirectories(destinationFolder.toPath());
+
+      MuleVersion muleVersion = new MuleVersion("4.4.0");
+      String artifactJson =
+          new MuleApplicationModelJsonSerializer().serialize(serializeModel(applicationName, classLoaderConfiguration,
+                                                                            configs,
+                                                                            muleVersion.toCompleteNumericVersion()));
+      try (FileWriter fileWriter = new FileWriter(new File(destinationFolder, "mule-artifact.json"))) {
+        fileWriter.write(artifactJson);
+      }
+
+      ApplicationDescriptor artifactDescriptor =
+          defaultApplicationFactory.createArtifactDescriptor(applicationFolder, of(deploymentProperties));
+      artifactDescriptor.setMinMuleVersion(muleVersion);
+      artifactDescriptor.setArtifactDeclaration(artifactDeclaration);
+      return defaultApplicationFactory.createArtifact(artifactDescriptor);
     });
   }
+
+  private MuleApplicationModel serializeModel(String appName,
+                                              ClassLoaderConfiguration classLoaderConfiguration,
+                                              Set<String> configs, String muleVersion) {
+    Map<String, Object> attributes = ImmutableMap.of("exportedResources",
+                                                     newArrayList(classLoaderConfiguration.getExportedResources()),
+                                                     "exportedPackages",
+                                                     newArrayList(classLoaderConfiguration.getExportedPackages()));
+    MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = new MuleArtifactLoaderDescriptor("mule", attributes);
+    MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder();
+    builder.setName(appName)
+        .setMinMuleVersion(muleVersion)
+        .setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor("mule", emptyMap()))
+        .withClassLoaderModelDescriptorLoader(muleArtifactLoaderDescriptor)
+        .setConfigs(configs);
+    return builder.build();
+  }
+
+
 
   protected Map<String, String> forcedDeploymentProperties() {
     return emptyMap();
@@ -156,7 +206,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
     model = new Model();
     model.setArtifactId(TMP_APP_ARTIFACT_ID);
     model.setGroupId(TMP_APP_GROUP_ID);
-    model.setVersion(TMP_APP_VERSION);
+    model.setVersion("4.4.0");
     model.setDependencies(new ArrayList<>());
     model.setModelVersion(TMP_APP_MODEL_VERSION);
   }
