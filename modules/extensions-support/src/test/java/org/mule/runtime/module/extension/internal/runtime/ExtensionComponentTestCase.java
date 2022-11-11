@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
+import static java.util.Optional.of;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -13,9 +19,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
-import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -40,12 +43,14 @@ import org.mule.tck.size.SmallTest;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 @Issue("MULE-19815")
@@ -62,7 +67,7 @@ public class ExtensionComponentTestCase extends AbstractMuleContextTestCase {
 
   private ExtensionComponent extensionComponent;
 
-  private AtomicReference<ClassLoader> executedClassloader = new AtomicReference<>();
+  private final AtomicReference<ClassLoader> executedClassloader = new AtomicReference<>();
 
   private MuleArtifactClassLoader artifactClassLoader;
 
@@ -85,7 +90,7 @@ public class ExtensionComponentTestCase extends AbstractMuleContextTestCase {
 
     MetadataCacheIdGeneratorFactory metadataCacheIdGeneratorFactory = mock(MetadataCacheIdGeneratorFactory.class);
     when(metadataCacheIdGeneratorFactory.create(any(), any())).thenReturn(null);
-    extensionComponent.setCacheIdGeneratorFactory(metadataCacheIdGeneratorFactory);
+    extensionComponent.setCacheIdGeneratorFactory(of(metadataCacheIdGeneratorFactory));
     executedClassloader.set(null);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
   }

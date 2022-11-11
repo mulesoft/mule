@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.oauth.internal.util.ClassLoaderUtils.setContextClassLoader;
 
 import static java.lang.Thread.currentThread;
@@ -38,12 +40,14 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
-import org.junit.After;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.junit.After;
+import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 public class ComponentMessageProcessorClassLoadingTestCase extends AbstractMuleContextTestCase {
 
@@ -116,7 +120,7 @@ public class ComponentMessageProcessorClassLoadingTestCase extends AbstractMuleC
 
     processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
     processor.setComponentLocator(componentLocator);
-    processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
+    processor.setCacheIdGeneratorFactory(of(mock(MetadataCacheIdGeneratorFactory.class)));
 
     initialiseIfNeeded(processor, muleContext);
     processor.doStart();

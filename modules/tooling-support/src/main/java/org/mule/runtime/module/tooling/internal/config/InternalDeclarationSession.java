@@ -14,7 +14,7 @@ import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
-import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -42,7 +42,7 @@ import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
+import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataComponentExecutor;

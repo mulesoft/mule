@@ -12,7 +12,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager.PERSISTENT_METADATA_SERVICE_CACHE;
+import static org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager.PERSISTENT_METADATA_SERVICE_CACHE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;

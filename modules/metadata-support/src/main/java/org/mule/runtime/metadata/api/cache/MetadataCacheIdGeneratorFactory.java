@@ -16,6 +16,8 @@ import org.mule.runtime.metadata.api.locator.ComponentLocator;
  */
 public interface MetadataCacheIdGeneratorFactory<T> {
 
+  String METADATA_CACHE_ID_GENERATOR_KEY = "metadata.cache.id.model.generator.factory";
+
   /**
    * Creates a new {@link MetadataCacheIdGenerator} valid for the given context information provided.
    *
