@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
+
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -28,7 +31,7 @@ import java.util.Properties;
  * 
  * @param <D> the type of the {@link DeployableArtifactDescriptor}
  * @param <T> the type of the {@link DeployableArtifact}
- * @since 4.
+ * @since 4.z
  */
 public abstract class AbstractDeployableArtifactFactory<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
     implements ArtifactFactory<D, T> {
@@ -111,8 +114,8 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
    * @param artifactLocation the artifact location.
    * @return the {@link DeployableProjectModel} representing the structure of the artifact.
    */
-  protected DeployableProjectModel createDeployableProjectModel(File artifactLocation) {
-    return new MuleDeployableProjectModelBuilder(artifactLocation).build();
+  protected DeployableProjectModel createDeployableProjectModel(File artifactLocation, boolean isDomain) {
+    return defaultDeployableProjectModelBuilder(artifactLocation, empty(), isDomain).build();
   }
 
 }

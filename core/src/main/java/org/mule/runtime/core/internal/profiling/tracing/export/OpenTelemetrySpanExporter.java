@@ -81,7 +81,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     this.noExportUntil = noExportUntil;
     remoteContext = resolveRemoteContext(eventContext);
     Set<String> parentNoExportUntil = resolveParentNoExportUntil(internalSpan);
-    openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan, parentNoExportUntil, noExportUntil, exportable);
+    openTelemetrySpan = resolveOpenTelemetrySpan(internalSpan, parentNoExportUntil, noExportUntil, exportable, eventContext);
   }
 
   private Set<String> resolveNoExportUntil(Set<String> noExportUntil, Set<String> parentNoExportUntil) {
@@ -192,7 +192,10 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   private synchronized Span resolveOpenTelemetrySpan(InternalSpan internalSpan,
                                                      Set<String> parentNoExportUntil,
                                                      Set<String> noExportUntil,
-                                                     boolean exportable) {
+                                                     boolean exportable,
+                                                     EventContext eventContext) {
+
+    DistributedTraceContext distributedTraceContext = resolveDistributedTraceContext(eventContext);
     // In case it was already resolved, return the same.
     if (openTelemetrySpan != null) {
       return openTelemetrySpan;
@@ -220,8 +223,17 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
     }
 
-    return spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
+    Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
+
+    String spanName = distributedTraceContext.getRootSpanName();
+
+    if (internalSpan.getParent() == null && spanName != null) {
+      span.updateName(spanName);
+      distributedTraceContext.getSpanRootAttributes().forEach((key, value) -> span.setAttribute(key, value));
+    }
+
+    return span;
   }
 
   private boolean exportableAccordingToName(InternalSpan internalSpan, Set<String> parentNoExportUntil) {

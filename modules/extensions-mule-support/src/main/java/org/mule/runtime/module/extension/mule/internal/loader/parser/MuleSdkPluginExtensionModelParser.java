@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAMESPACE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_NAME_PARAMETER_NAME;
@@ -22,16 +20,22 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME;
 
+import static java.util.Locale.getDefault;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -48,10 +52,16 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   private String namespace;
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private LicenseModelProperty licenseModelProperty;
+  private List<ErrorModelParser> errorModelParsers;
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     super(ast, typeLoader, extensionModelHelper);
-    parseStructure(getExtensionComponentAst(ast));
+  }
+
+  @Override
+  protected void init(ArtifactAst ast) {
+    parseStructure(ast);
+    super.init(ast);
   }
 
   @Override
@@ -86,18 +96,12 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
 
   @Override
   protected Stream<ComponentAst> getTopLevelElements(ArtifactAst ast) {
-    return getExtensionComponentAst(ast).directChildrenStream();
+    return ast.topLevelComponentsStream();
   }
 
-  private ComponentAst getExtensionComponentAst(ArtifactAst ast) {
-    // At this point we can assume there is only one top level component which is the extension:extension component
-    // We don't need to check for this because it should be guaranteed by previous validations
-    return ast.topLevelComponents().get(0);
-  }
-
-  private void parseStructure(ComponentAst extensionComponentAst) {
+  private void parseStructure(ArtifactAst ast) {
     ComponentAst descriptionComponentAst =
-        getRequiredSingleChild(extensionComponentAst, MULE_SDK_EXTENSION_DESCRIPTION_COMPONENT_NAME);
+        getRequiredTopLevelComponent(ast, MULE_SDK_EXTENSION_DESCRIPTION_IDENTIFIER);
     name = getParameter(descriptionComponentAst, MULE_SDK_EXTENSION_NAME_PARAMETER_NAME);
     category = Category
         .valueOf(this.<String>getParameter(descriptionComponentAst, MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME).toUpperCase());
@@ -108,6 +112,19 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
 
     // use dummy version since this is just for obtaining the namespace
     this.namespace = getExtensionsNamespace(getXmlDslModel(name, "1.0.0", xmlDslConfiguration));
+
+    parseErrorsDeclaration(ast);
+  }
+
+  private void parseErrorsDeclaration(ArtifactAst ast) {
+    errorModelParsers =
+        new ArrayList<>(new MuleSdkErrorsDeclarationParser(ast, namespace.toUpperCase(getDefault())).parse()
+            .values());
+  }
+
+  @Override
+  public List<ErrorModelParser> getErrorModelParsers() {
+    return errorModelParsers;
   }
 
   private void parseXmlDslConfiguration(ComponentAst descriptionComponentAst) {

@@ -23,7 +23,6 @@ import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescript
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -51,13 +50,12 @@ public class ApplicationDescriptorFactory
 
   public ApplicationDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                       Map<String, String> deploymentProperties,
-                                      PluginPatchesResolver pluginPatchesResolver,
                                       PluginModelResolver pluginModelResolver,
                                       PluginDescriptorResolver pluginDescriptorResolver,
                                       ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
                                       DomainDescriptorResolver domainDescriptorResolver,
                                       DeployableArtifactDescriptorCreator<ApplicationDescriptor> descriptorCreator) {
-    super(deployableProjectModel, deploymentProperties, pluginPatchesResolver, pluginModelResolver, pluginDescriptorResolver,
+    super(deployableProjectModel, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
           artifactDescriptorValidatorBuilder);
     this.domainDescriptorResolver = domainDescriptorResolver;
     this.descriptorCreator = descriptorCreator;

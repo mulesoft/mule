@@ -10,10 +10,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
-import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
 
 import static java.lang.Boolean.valueOf;
@@ -35,6 +37,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -159,7 +162,6 @@ public class DefaultToolingService implements ToolingService {
       } catch (DomainNotFoundException e) {
         throw new IllegalArgumentException(format("Domain '%s' is expected to be deployed", domainName), e);
       }
-
       MuleArtifactLoaderDescriptor classLoaderModelDescriptorLoader =
           applicationArtifactModelBuilder.getClassLoaderModelDescriptorLoader();
       Map<String, Object> extendedAttributes = new HashMap<>(classLoaderModelDescriptorLoader.getAttributes());
@@ -173,14 +175,21 @@ public class DefaultToolingService implements ToolingService {
       applicationArtifactModelBuilder
           .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(classLoaderModelDescriptorLoader.getId(),
                                                                                  extendedAttributes));
+      MuleApplicationModel model = applicationArtifactModelBuilder.build();
+
+      DeployableProjectModel deployableProjectModel =
+          defaultDeployableProjectModelBuilder(toolingApplicationContent, of(model), false).build();
+
       ApplicationDescriptor applicationDescriptor =
-          applicationDescriptorFactory.createArtifact(toolingApplicationContent, mergedDeploymentProperties,
-                                                      applicationArtifactModelBuilder.build());
+          applicationFactory.createArtifactDescriptor(toolingApplicationContent, deployableProjectModel,
+                                                      mergedDeploymentProperties);
+
       applicationDescriptor.setDomainName(domain.getArtifactName());
       return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptor));
     }
-    return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptorFactory.create(toolingApplicationContent,
-                                                                                                 mergedDeploymentProperties)));
+    return new ToolingApplicationWrapper(doCreateApplication(applicationFactory
+        .createArtifactDescriptor(toolingApplicationContent,
+                                  mergedDeploymentProperties)));
   }
 
   /**
@@ -239,7 +248,7 @@ public class DefaultToolingService implements ToolingService {
   private Application doCreateApplication(ApplicationDescriptor applicationDescriptor) throws IOException {
     Application application = applicationFactory.createArtifact(applicationDescriptor);
     application.install();
-    application.lazyInit();
+    application.lazyInitTooling(true);
     application.start();
     return application;
   }
@@ -286,7 +295,7 @@ public class DefaultToolingService implements ToolingService {
     Optional<Properties> mergedDeploymentProperties = of(createDeploymentProperties(deploymentProperties));
     Domain domain = domainFactory.createArtifact(toolingDomainContent, mergedDeploymentProperties);
     domain.install();
-    domain.lazyInit();
+    domain.lazyInitTooling(true);
     domain.start();
     return new ToolingDomainWrapper(domain);
   }
@@ -303,6 +312,7 @@ public class DefaultToolingService implements ToolingService {
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY,
                            String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, "false"))));
     properties.setProperty(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath());
+    properties.setProperty(MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY, "true");
     return properties;
   }
 

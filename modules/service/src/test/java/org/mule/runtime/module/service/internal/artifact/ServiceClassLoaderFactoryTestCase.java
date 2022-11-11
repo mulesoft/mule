@@ -18,6 +18,8 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookup
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.URL;

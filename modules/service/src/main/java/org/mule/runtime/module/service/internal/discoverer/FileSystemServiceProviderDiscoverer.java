@@ -7,11 +7,27 @@
 
 package org.mule.runtime.module.service.internal.discoverer;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.instantiateServiceProvider;
+
 import static java.security.AccessController.doPrivileged;
 import static java.security.AccessController.getContext;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
 import java.io.File;
 import java.security.AccessControlContext;
@@ -19,22 +35,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-
-import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
-import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
-import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
-import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
 /**
  * Discovers services artifacts from the {@link MuleFoldersUtil#SERVICES_FOLDER} folder.
@@ -54,8 +54,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *
    * @param containerClassLoader               container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator}
    *                                           in order to check the state of the descriptor once loaded.
@@ -75,8 +75,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *
    * @param containerClassLoader               container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator}
    *                                           in order to check the state of the descriptor once loaded.
@@ -144,13 +144,13 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
 
       final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(
-                                                                       () -> (ClassLoader) doPrivileged((PrivilegedAction<ClassLoader>) () -> (ClassLoader) serviceClassLoaderFactory
+                                                                       () -> doPrivileged((PrivilegedAction<ClassLoader>) () -> (ClassLoader) serviceClassLoaderFactory
                                                                            .create(getServiceArtifactId(serviceDescriptor),
                                                                                    serviceDescriptor,
                                                                                    apiClassLoader.getClassLoader(),
                                                                                    apiClassLoader
                                                                                        .getClassLoaderLookupPolicy()),
-                                                                                                        ACCESS_CONTROL_CTX));
+                                                                                          ACCESS_CONTROL_CTX));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         ServiceAssembly assembly = LazyServiceAssembly.builder()
@@ -169,23 +169,6 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
   private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {
     return "service/" + serviceDescriptor.getName();
-  }
-
-  private ServiceProvider instantiateServiceProvider(MuleServiceContractModel contractModel) throws ServiceResolutionError {
-    final String className = contractModel.getServiceProviderClassName();
-    Object reflectedObject;
-    try {
-      reflectedObject = ClassUtils.instantiateClass(className);
-    } catch (Exception e) {
-      throw new ServiceResolutionError("Unable to create service from class: " + className, e);
-    }
-
-    if (!(reflectedObject instanceof ServiceProvider)) {
-      throw new ServiceResolutionError(String.format("Provided service class '%s' does not implement '%s'", className,
-                                                     ServiceProvider.class.getName()));
-    }
-
-    return (ServiceProvider) reflectedObject;
   }
 
 }

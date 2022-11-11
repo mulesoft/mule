@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventT
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition.NO_CONDITION;
@@ -49,6 +50,8 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   private Map<String, String> tracingFields = new HashMap<>();
   private Map<String, String> baggageItems = new HashMap<>();
   private InternalSpan currentSpan;
+  private String rootSpanName;
+  private Map<String, String> rootSpanAttributes = new HashMap<>();
 
   public static EventDistributedContextBuilder builder() {
     return new EventDistributedContextBuilder();
@@ -56,7 +59,8 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
 
   public static DistributedTraceContext emptyDistributedTraceContext() {
     return new EventDistributedTraceContext(new HashMap<>(), new HashMap<>(),
-                                            getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING));
+                                            getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING),
+                                            emptyMap());
   }
 
   private EventDistributedTraceContext(TraceContextFieldExtractor tracingFieldExtractor,
@@ -70,10 +74,12 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
 
   private EventDistributedTraceContext(Map<String, String> tracingFields,
                                        Map<String, String> baggageItems,
-                                       boolean propagateTracingExceptions) {
+                                       boolean propagateTracingExceptions,
+                                       Map<String, String> rootSpanAttributes) {
     this.tracingFields = tracingFields;
     this.baggageItems = baggageItems;
     this.propagateTracingExceptions = propagateTracingExceptions;
+    this.rootSpanAttributes.putAll(rootSpanAttributes);
   }
 
   @Override
@@ -99,8 +105,9 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   @Override
   public DistributedTraceContext copy() {
     EventDistributedTraceContext eventDistributedTraceContext =
-        new EventDistributedTraceContext(tracingFields, baggageItems, propagateTracingExceptions);
+        new EventDistributedTraceContext(tracingFields, baggageItems, propagateTracingExceptions, rootSpanAttributes);
     eventDistributedTraceContext.setCurrentSpan(currentSpan, NO_CONDITION);
+    eventDistributedTraceContext.setRootSpanName(rootSpanName);
     return eventDistributedTraceContext;
   }
 
@@ -120,6 +127,25 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
     if (currentSpan != null) {
       currentSpan.addError(error);
     }
+  }
+
+  @Override
+  public void setRootSpanName(String name) {
+    this.rootSpanName = name;
+  }
+
+  public String getRootSpanName() {
+    return rootSpanName;
+  }
+
+  @Override
+  public void setSpanRootAttribute(String key, String value) {
+    rootSpanAttributes.put(key, value);
+  }
+
+  @Override
+  public Map<String, String> getSpanRootAttributes() {
+    return rootSpanAttributes;
   }
 
   private InternalSpan resolveParentAsInternalSpan() {

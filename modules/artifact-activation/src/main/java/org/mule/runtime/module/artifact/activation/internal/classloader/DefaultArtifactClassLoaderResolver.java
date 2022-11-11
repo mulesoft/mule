@@ -52,6 +52,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 
 import java.io.File;
 import java.net.URL;
@@ -112,7 +113,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
       domainClassLoader = getDefaultDomainClassLoader(regionClassLoader, regionClassLoader.getClassLoaderLookupPolicy());
     } else {
       NativeLibraryFinder nativeLibraryFinder =
-          nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderModel().getUrls());
+          nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderConfiguration().getUrls());
       domainClassLoader = getCustomDomainClassLoader(regionClassLoader, descriptor, nativeLibraryFinder);
     }
 
@@ -147,7 +148,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     return new MuleSharedDomainClassLoader(domain, parent.getClassLoader(),
                                            getArtifactClassLoaderLookupPolicy(parent, domain),
-                                           asList(domain.getClassLoaderModel().getUrls()), nativeLibraryFinder);
+                                           asList(domain.getClassLoaderConfiguration().getUrls()), nativeLibraryFinder);
   }
 
   private void validateDomain(DomainDescriptor domainDescriptor) {
@@ -224,12 +225,12 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getArtifactClassLoaderLookupPolicy(parentClassLoader, descriptor);
 
     List<URL> resourcesPath =
-        concat(additionalClassloaderUrls.stream(), stream(descriptor.getClassLoaderModel().getUrls())).collect(toList());
+        concat(additionalClassloaderUrls.stream(), stream(descriptor.getClassLoaderConfiguration().getUrls())).collect(toList());
 
     MuleDeployableArtifactClassLoader appClassLoader =
         new MuleApplicationClassLoader(artifactId, descriptor, regionClassLoader,
                                        nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
-                                                                         descriptor.getClassLoaderModel().getUrls()),
+                                                                         descriptor.getClassLoaderConfiguration().getUrls()),
                                        resourcesPath,
                                        classLoaderLookupPolicy);
 
@@ -254,11 +255,11 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private ClassLoaderLookupPolicy getApplicationParentLookupPolicy(ArtifactClassLoader parentClassLoader) {
     ArtifactDescriptor descriptor = parentClassLoader.getArtifactDescriptor();
-    List<String> packages = new ArrayList<>(descriptor.getClassLoaderModel().getExportedPackages());
+    List<String> packages = new ArrayList<>(descriptor.getClassLoaderConfiguration().getExportedPackages());
 
     if (descriptor instanceof DeployableArtifactDescriptor) {
       for (ArtifactPluginDescriptor artifactPluginDescriptor : ((DeployableArtifactDescriptor) descriptor).getPlugins()) {
-        packages.addAll(artifactPluginDescriptor.getClassLoaderModel().getExportedPackages());
+        packages.addAll(artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
       }
     }
 
@@ -288,7 +289,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     final List<String> packages = new ArrayList<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
-      packages.addAll(artifactPluginDescriptor.getClassLoaderModel().getExportedPackages());
+      packages.addAll(artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
     }
 
     return parent.getClassLoaderLookupPolicy().extend(packages.stream(), PARENT_FIRST);
@@ -298,11 +299,11 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                                     ClassLoaderLookupPolicy classLoaderLookupPolicy) {
     Set<String> artifactExportedPackages = sanitizeExportedPackages(artifactDescriptor,
                                                                     classLoaderLookupPolicy,
-                                                                    artifactDescriptor.getClassLoaderModel()
+                                                                    artifactDescriptor.getClassLoaderConfiguration()
                                                                         .getExportedPackages());
 
     return new DefaultArtifactClassLoaderFilter(artifactExportedPackages,
-                                                artifactDescriptor.getClassLoaderModel().getExportedResources());
+                                                artifactDescriptor.getClassLoaderConfiguration().getExportedResources());
   }
 
   private ArtifactClassLoaderFilter createPluginClassLoaderFilter(DeployableArtifactDescriptor artifactDescriptor,
@@ -310,10 +311,10 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                                   ClassLoaderLookupPolicy classLoaderLookupPolicy) {
     Set<String> sanitizedArtifactExportedPackages =
         sanitizeExportedPackages(artifactDescriptor, classLoaderLookupPolicy,
-                                 pluginDescriptor.getClassLoaderModel().getExportedPackages());
+                                 pluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
 
     Set<String> replacedPackages =
-        artifactDescriptor.getClassLoaderModel().getExportedPackages().stream()
+        artifactDescriptor.getClassLoaderConfiguration().getExportedPackages().stream()
             .filter(p -> sanitizedArtifactExportedPackages.contains(p)).collect(toSet());
     if (!replacedPackages.isEmpty()) {
       sanitizedArtifactExportedPackages.removeAll(replacedPackages);
@@ -321,7 +322,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
           + replacedPackages);
     }
     return new DefaultArtifactClassLoaderFilter(sanitizedArtifactExportedPackages,
-                                                pluginDescriptor.getClassLoaderModel().getExportedResources());
+                                                pluginDescriptor.getClassLoaderConfiguration().getExportedResources());
   }
 
   private Set<String> sanitizeExportedPackages(DeployableArtifactDescriptor artifactDescriptor,
@@ -370,8 +371,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                                           pluginClassLoaderResolver);
 
     MuleArtifactClassLoader pluginClassLoader =
-        new MuleArtifactClassLoader(pluginArtifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
-                                    regionClassLoader, pluginLookupPolicy);
+        new MulePluginClassLoader(pluginArtifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
+                                  regionClassLoader, pluginLookupPolicy);
     return pluginClassLoader;
   }
 
@@ -389,7 +390,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .map(p -> (ArtifactPluginDescriptor) (p.getArtifactDescriptor())).collect(toSet());
     Map<String, LookupStrategy> pluginsLookupPolicies = new HashMap<>();
 
-    descriptor.getClassLoaderModel().getDependencies()
+    descriptor.getClassLoaderConfiguration().getDependencies()
         .stream()
         .filter(dependency -> dependency.getDescriptor().getClassifier()
             .map(MULE_PLUGIN_CLASSIFIER::equals)
@@ -398,7 +399,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .filter(Optional::isPresent)
         .map(Optional::get)
         .forEach(dependencyPluginDescriptor -> {
-          for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getExportedPackages()) {
+          for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderConfiguration().getExportedPackages()) {
             pluginsLookupPolicies.put(exportedPackage, PARENT_FIRST);
           }
 
@@ -420,7 +421,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                 .get();
             LookupStrategy lookupStrategy = new DelegateOnlyLookupStrategy(pluginClassLoader.getClassLoader());
 
-            for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedExportedPackages()) {
+            for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderConfiguration()
+                .getPrivilegedExportedPackages()) {
               pluginsLookupPolicies.put(exportedPackage, lookupStrategy);
             }
           }
@@ -441,7 +443,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     }
 
     List<String> pluginLocalPackages = new ArrayList<>();
-    for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
+    for (String localPackage : descriptor.getClassLoaderConfiguration().getLocalPackages()) {
       // packages exported from another artifact in the region will be ParentFirst,
       // even if they are also exported by the container.
       if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
@@ -471,11 +473,11 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private boolean isPrivilegedPluginDependency(ArtifactPluginDescriptor descriptor,
                                                ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    if (dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedExportedPackages().isEmpty()) {
+    if (dependencyPluginDescriptor.getClassLoaderConfiguration().getPrivilegedExportedPackages().isEmpty()) {
       return false;
     }
 
-    return dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedArtifacts()
+    return dependencyPluginDescriptor.getClassLoaderConfiguration().getPrivilegedArtifacts()
         .stream()
         .filter(a -> a.startsWith(descriptor.getBundleDescriptor().getGroupId()
             + ":" + descriptor.getBundleDescriptor().getArtifactId()))

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -22,8 +22,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
 import java.io.File;
 import java.net.URL;
@@ -168,7 +168,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
 
     boolean error = false;
     for (ArtifactPluginDescriptor plugin : plugins) {
-      for (String packageName : plugin.getClassLoaderModel().getExportedPackages()) {
+      for (String packageName : plugin.getClassLoaderConfiguration().getExportedPackages()) {
         List<String> exportedOn = exportedPackages.get(packageName);
 
         if (exportedOn == null) {
@@ -202,9 +202,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     if (!pluginDescriptors.isEmpty()) {
       List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
       pluginDescriptors.stream()
-          .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
+          .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderConfiguration().getDependencies().isEmpty())
           .filter(pluginDescriptor -> pluginDescriptor.getBundleDescriptor().isPlugin())
-          .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
+          .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderConfiguration().getDependencies()
               .forEach(dependency -> {
                 Optional<ArtifactPluginDescriptor> resolvedPluginApplicationLevelOptional =
                     findPlugin(pluginDescriptorsWithDependences, dependency.getDescriptor());
@@ -223,17 +223,19 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                         .warn(format("Transitive plugin dependency '[%s -> %s]' is greater than the one resolved for the application '%s', it will be ignored.",
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
-                    ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
+                    ClassLoaderConfiguration originalClassLoaderConfiguration = pluginDescriptor.getClassLoaderConfiguration();
                     boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
                     pluginDescriptor
-                        .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
-                            .dependingOn(ImmutableSet.of(
-                                                         new BundleDependency.Builder()
-                                                             .setDescriptor(artifactPluginDescriptorResolved
-                                                                 .getBundleDescriptor())
-                                                             .setScope(dependency.getScope())
-                                                             .build()))
-                            .build());
+                        .setClassLoaderConfiguration(createBuilderWithoutDependency(originalClassLoaderConfiguration, dependency,
+                                                                                    includeLocals)
+                                                                                        .dependingOn(ImmutableSet.of(
+                                                                                                                     new BundleDependency.Builder()
+                                                                                                                         .setDescriptor(artifactPluginDescriptorResolved
+                                                                                                                             .getBundleDescriptor())
+                                                                                                                         .setScope(dependency
+                                                                                                                             .getScope())
+                                                                                                                         .build()))
+                                                                                        .build());
                   } else {
                     if (logger.isDebugEnabled()) {
                       logger.debug(format(
@@ -281,56 +283,57 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                         List<ArtifactPluginDescriptor> resolvedPlugins) {
 
     final Set<String> packagesExportedByDependencies =
-        findDependencyPackageClosure(pluginDescriptor.getClassLoaderModel().getDependencies(), resolvedPlugins);
+        findDependencyPackageClosure(pluginDescriptor.getClassLoaderConfiguration().getDependencies(), resolvedPlugins);
 
-    ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-    final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
+    ClassLoaderConfiguration originalClassLoaderConfiguration = pluginDescriptor.getClassLoaderConfiguration();
+    final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderConfiguration.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
     boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
-    pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
-        .exportingPackages(exportedClassPackages).build());
+    pluginDescriptor
+        .setClassLoaderConfiguration(createBuilderWithoutExportedPackages(originalClassLoaderConfiguration, includeLocals)
+            .exportingPackages(exportedClassPackages).build());
   }
 
-  private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel,
-                                                                       boolean includeLocals) {
-    ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
-        .dependingOn(originalClassLoaderModel.getDependencies())
-        .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
-                                     originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources());
+  private ClassLoaderConfigurationBuilder createBuilderWithoutExportedPackages(ClassLoaderConfiguration originalClassLoaderConfiguration,
+                                                                               boolean includeLocals) {
+    ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder()
+        .dependingOn(originalClassLoaderConfiguration.getDependencies())
+        .exportingPrivilegedPackages(originalClassLoaderConfiguration.getPrivilegedExportedPackages(),
+                                     originalClassLoaderConfiguration.getPrivilegedArtifacts())
+        .exportingResources(originalClassLoaderConfiguration.getExportedResources());
 
     if (includeLocals) {
-      classLoaderModelBuilder.withLocalResources(originalClassLoaderModel.getLocalResources())
-          .withLocalPackages(originalClassLoaderModel.getLocalPackages());
+      classLoaderConfigurationBuilder.withLocalResources(originalClassLoaderConfiguration.getLocalResources())
+          .withLocalPackages(originalClassLoaderConfiguration.getLocalPackages());
     }
 
-    for (URL url : originalClassLoaderModel.getUrls()) {
-      classLoaderModelBuilder.containing(url);
+    for (URL url : originalClassLoaderConfiguration.getUrls()) {
+      classLoaderConfigurationBuilder.containing(url);
     }
-    return classLoaderModelBuilder;
+    return classLoaderConfigurationBuilder;
   }
 
-  private ClassLoaderModelBuilder createBuilderWithoutDependency(ClassLoaderModel originalClassLoaderModel,
-                                                                 BundleDependency dependencyToBeExcluded,
-                                                                 boolean includeLocals) {
-    ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
-        .dependingOn(originalClassLoaderModel.getDependencies().stream()
+  private ClassLoaderConfigurationBuilder createBuilderWithoutDependency(ClassLoaderConfiguration originalClassLoaderConfiguration,
+                                                                         BundleDependency dependencyToBeExcluded,
+                                                                         boolean includeLocals) {
+    ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder()
+        .dependingOn(originalClassLoaderConfiguration.getDependencies().stream()
             .filter(dependency -> !dependency.equals(dependencyToBeExcluded))
             .collect(toSet()))
-        .exportingPackages(originalClassLoaderModel.getExportedPackages())
-        .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
-                                     originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources());
+        .exportingPackages(originalClassLoaderConfiguration.getExportedPackages())
+        .exportingPrivilegedPackages(originalClassLoaderConfiguration.getPrivilegedExportedPackages(),
+                                     originalClassLoaderConfiguration.getPrivilegedArtifacts())
+        .exportingResources(originalClassLoaderConfiguration.getExportedResources());
 
     if (includeLocals) {
-      classLoaderModelBuilder.withLocalResources(originalClassLoaderModel.getLocalResources())
-          .withLocalPackages(originalClassLoaderModel.getLocalPackages());
+      classLoaderConfigurationBuilder.withLocalResources(originalClassLoaderConfiguration.getLocalResources())
+          .withLocalPackages(originalClassLoaderConfiguration.getLocalPackages());
     }
 
-    for (URL url : originalClassLoaderModel.getUrls()) {
-      classLoaderModelBuilder.containing(url);
+    for (URL url : originalClassLoaderConfiguration.getUrls()) {
+      classLoaderConfigurationBuilder.containing(url);
     }
-    return classLoaderModelBuilder;
+    return classLoaderConfigurationBuilder;
   }
 
   private Set<String> findDependencyPackageClosure(Set<BundleDependency> pluginDependencies,
@@ -340,9 +343,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       final Optional<String> classifier = pluginDependency.getDescriptor().getClassifier();
       if (classifier.isPresent() && MULE_PLUGIN_CLASSIFIER.equals(classifier.get())) {
         ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(pluginDependency, resolvedPlugins);
-        exportedPackages.addAll(dependencyDescriptor.getClassLoaderModel().getExportedPackages());
+        exportedPackages.addAll(dependencyDescriptor.getClassLoaderConfiguration().getExportedPackages());
         exportedPackages
-            .addAll(findDependencyPackageClosure(dependencyDescriptor.getClassLoaderModel().getDependencies(), resolvedPlugins));
+            .addAll(findDependencyPackageClosure(dependencyDescriptor.getClassLoaderConfiguration().getDependencies(),
+                                                 resolvedPlugins));
       }
     }
 
@@ -355,7 +359,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     for (ArtifactPluginDescriptor unresolvedPlugin : unresolvedPlugins) {
       builder.append("\nPlugin: ").append(unresolvedPlugin.getName()).append(" missing dependencies:");
       List<BundleDependency> missingDependencies = new ArrayList<>();
-      for (BundleDependency dependency : unresolvedPlugin.getClassLoaderModel().getDependencies()) {
+      for (BundleDependency dependency : unresolvedPlugin.getClassLoaderConfiguration().getDependencies()) {
         Optional<String> classifierOptional = dependency.getDescriptor().getClassifier();
         if (classifierOptional.isPresent() && MULE_PLUGIN_CLASSIFIER.equals(classifierOptional.get())) {
           final ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(dependency, resolvedPlugins);
@@ -382,9 +386,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   private boolean isResolvedPlugin(ArtifactPluginDescriptor descriptor, List<ArtifactPluginDescriptor> resolvedPlugins) {
-    boolean isResolved = descriptor.getClassLoaderModel().getDependencies().isEmpty();
+    boolean isResolved = descriptor.getClassLoaderConfiguration().getDependencies().isEmpty();
 
-    if (!isResolved && hasPluginDependenciesResolved(descriptor.getClassLoaderModel().getDependencies(), resolvedPlugins)) {
+    if (!isResolved
+        && hasPluginDependenciesResolved(descriptor.getClassLoaderConfiguration().getDependencies(), resolvedPlugins)) {
       isResolved = true;
     }
 

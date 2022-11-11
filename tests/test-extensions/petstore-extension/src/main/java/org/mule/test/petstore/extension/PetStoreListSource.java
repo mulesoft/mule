@@ -14,6 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
@@ -37,8 +38,14 @@ public class PetStoreListSource extends Source<List<Result<String, Object>>, Obj
     listResult.add(Result.<String, Object>builder().output("cat").build());
     listResult.add(Result.<String, Object>builder().output("dog").build());
     listResult.add(Result.<String, Object>builder().output("parrot").build());
+    customizeCurrentSpan(context.getDistributedSourceTraceContext());
     sourceCallback.handle(Result.<List<Result<String, Object>>, Object>builder().output(listResult).build(),
                           context);
+  }
+
+  private void customizeCurrentSpan(DistributedTraceContextManager distributedTraceContextManager) {
+    distributedTraceContextManager.setCurrentSpanName("pet-store-list-modified");
+    distributedTraceContextManager.addCurrentSpanAttribute("dog", "Jack, the legendary fake border collie");
   }
 
   @Override

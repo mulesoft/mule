@@ -1129,8 +1129,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnStopApplication(true);
 
     deploymentService.setAppFactory(appFactory);
@@ -1152,8 +1151,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploymentFailureWhenDomainNotFound() throws Exception {
     final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
 
@@ -1172,8 +1170,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
 
@@ -1193,8 +1190,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1322,8 +1318,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1344,8 +1339,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1386,8 +1380,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1429,8 +1422,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();

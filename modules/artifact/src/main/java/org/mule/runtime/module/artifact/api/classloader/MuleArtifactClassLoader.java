@@ -7,31 +7,21 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
-import static java.lang.reflect.Modifier.isAbstract;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
-import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
-import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
-import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
-import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,9 +44,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
-
-  private static final String DB_RESOURCE_RELEASER_CLASS_LOCATION =
-      "/org/mule/module/artifact/classloader/JdbcResourceReleaser.class";
 
   static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
   static final String PATH_SEPARATOR = "/";
@@ -100,14 +87,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final String artifactId;
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
-  private String dbResourceReleaserClassLocation = DB_RESOURCE_RELEASER_CLASS_LOCATION;
-  private final ResourceReleaser classLoaderReferenceReleaser;
-  private volatile boolean shouldReleaseJdbcReferences = false;
-  private volatile boolean shouldReleaseIbmMQResources = false;
-  private volatile boolean shouldReleaseActiveMQReferences = false;
-  private ResourceReleaser jdbcResourceReleaserInstance;
-  private final ResourceReleaser scalaClassValueReleaserInstance;
-  private final ResourceReleaser mvelClassLoaderReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
@@ -128,9 +107,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-    this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
-    this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
-    this.mvelClassLoaderReleaserInstance = new MvelClassLoaderReleaser(this);
   }
 
   @Override
@@ -262,23 +238,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   @Override
-  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-    Class<?> clazz = super.loadClass(name, resolve);
-    if (!shouldReleaseJdbcReferences && Driver.class.isAssignableFrom(clazz) &&
-        !(clazz.equals(Driver.class) || clazz.isInterface() || isAbstract(clazz.getModifiers()))) {
-      shouldReleaseJdbcReferences = true;
-    }
-    if (!shouldReleaseIbmMQResources && name.startsWith("com.ibm.mq")) {
-      shouldReleaseIbmMQResources = true;
-    }
-
-    if (!shouldReleaseActiveMQReferences && name.startsWith("org.apache.activemq")) {
-      shouldReleaseActiveMQReferences = true;
-    }
-    return clazz;
-  }
-
-  @Override
   public Class<?> loadInternalClass(String name) throws ClassNotFoundException {
     return loadClass(name);
   }
@@ -308,45 +267,25 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     });
     descriptorMapping.clear();
 
-    try {
-      clearReferences();
-    } catch (Exception e) {
-      reportPossibleLeak(e, artifactId);
-    }
-
-    try {
-      if (shouldReleaseJdbcReferences) {
-        createResourceReleaserInstance().release();
-      }
-    } catch (Exception e) {
-      reportPossibleLeak(e, artifactId);
-    }
-
-    if (shouldReleaseIbmMQResources) {
-      new IBMMQResourceReleaser(this).release();
-    }
-
-    if (shouldReleaseActiveMQReferences) {
-      new ActiveMQResourceReleaser(this).release();
-    }
+    doDispose();
 
     super.dispose();
     shutdownListeners();
   }
 
-  private void clearReferences() {
-    classLoaderReferenceReleaser.release();
-    scalaClassValueReleaserInstance.release();
-    mvelClassLoaderReleaserInstance.release();
-  }
+  protected void doDispose() {}
 
-  void reportPossibleLeak(Exception e, String artifactId) {
+  protected void reportPossibleLeak(Exception e, String artifactId) {
     final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(message, artifactId, e);
     } else {
       LOGGER.error(message, artifactId);
     }
+  }
+
+  public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
+    // Nothing to do, left for backwards compatibility compilation
   }
 
   private void shutdownListeners() {
@@ -360,43 +299,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     // Clean up references to shutdown listeners in order to avoid class loader leaks
     shutdownListeners.clear();
-  }
-
-  private <T> T createInstance(String classLocation) {
-    try {
-      Class clazz = createClass(classLocation);
-      return (T) clazz.newInstance();
-    } catch (Exception e) {
-      throw new RuntimeException("Can not create instance from resource: " + classLocation, e);
-    }
-  }
-
-  /**
-   * Creates a {@link ResourceReleaser} using this classloader, only used outside in unit tests.
-   */
-  protected ResourceReleaser createResourceReleaserInstance() {
-    if (jdbcResourceReleaserInstance == null) {
-      jdbcResourceReleaserInstance = createInstance(dbResourceReleaserClassLocation);
-    }
-    return jdbcResourceReleaserInstance;
-  }
-
-  public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
-    this.dbResourceReleaserClassLocation = resourceReleaserClassLocation;
-  }
-
-  private Class createClass(String classLocation) {
-    InputStream classStream = null;
-    try {
-      classStream = this.getClass().getResourceAsStream(classLocation);
-      byte[] classBytes = IOUtils.toByteArray(classStream);
-      classStream.close();
-      return this.defineClass(null, classBytes, 0, classBytes.length);
-    } catch (Exception e) {
-      throw new RuntimeException("Can not create class from resource: " + classLocation, e);
-    } finally {
-      closeQuietly(classStream);
-    }
   }
 
   @Override

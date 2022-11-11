@@ -38,6 +38,8 @@ import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
@@ -154,7 +156,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
   private static final String TYPE_ATTRIBUTE = "type";
   private static final String MODULE_NAME = "name";
-  private static final String MODULE_NAMESPACE_NAME = "module";
+  private static final String MODULE_NAMESPACE_NAME = MODULE_DSL_NAMESPACE;
   protected static final String CONFIG_NAME = "config";
 
   private static final Map<String, ParameterRole> parameterRoleTypes = ImmutableMap.<String, ParameterRole>builder()
@@ -232,7 +234,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final ComponentIdentifier OPERATION_ERROR_IDENTIFIER =
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("error").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name(MODULE_NAMESPACE_NAME)
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name(MODULE_ROOT_NODE_NAME)
           .build();
   public static final String XSD_SUFFIX = ".xsd";
   private static final String XML_SUFFIX = ".xml";

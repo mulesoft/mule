@@ -7,22 +7,18 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -33,15 +29,16 @@ import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -72,7 +69,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
       mock(DeployableArtifactDescriptorFactory.class);
-  private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
@@ -81,7 +77,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
                                                                               new DefaultDomainManager(),
                                                                               null,
                                                                               serviceRepository,
-                                                                              pluginDependenciesResolver,
                                                                               domainClassLoaderBuilderFactory,
                                                                               extensionModelLoaderManager,
                                                                               licenseValidator,
@@ -95,15 +90,15 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
   @Before
   public void setUp() throws Exception {
-    mockStatic(MuleDeployableProjectModelBuilder.class);
-    given(isHeavyPackage(any())).willReturn(true);
+    mockStatic(AbstractDeployableProjectModelBuilder.class);
+    when(isHeavyPackage(any())).thenReturn(true);
+    when(defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
     DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
     doNothing().when(deployableProjectModelMock).validate();
     MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
         PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
     when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
     whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
-    when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList(), anyBoolean())).thenReturn(emptyList());
     domainManager = new DefaultDomainManager();
   }
 

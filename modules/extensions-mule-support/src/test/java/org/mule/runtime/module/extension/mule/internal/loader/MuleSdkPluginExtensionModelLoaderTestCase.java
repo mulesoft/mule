@@ -7,15 +7,12 @@
 package org.mule.runtime.module.extension.mule.internal.loader;
 
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.TEST_ARTIFACT_COORDINATES;
+import static org.mule.runtime.module.extension.mule.internal.loader.ExtensionModelTestUtils.loadMuleSdkExtension;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
 
@@ -30,17 +27,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.mule.internal.loader.ast.AbstractMuleSdkAstTestCase;
-import org.mule.runtime.module.extension.mule.internal.operation.FakeExpressionLanguageMetadataService;
 import org.mule.tck.classlaoder.TestClassLoader;
 
 import java.io.File;
@@ -62,13 +54,6 @@ import org.slf4j.Logger;
 public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAstTestCase {
 
   private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelLoaderTestCase.class);
-  private static final ExpressionLanguageMetadataService expressionLanguageMetadataService =
-      new FakeExpressionLanguageMetadataService();
-  private static final ArtifactCoordinates TEST_ARTIFACT_COORDINATES = new BundleDescriptor.Builder()
-      .setArtifactId("TestExtension")
-      .setGroupId("TestGroup")
-      .setVersion("1.2.3")
-      .build();
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
@@ -104,7 +89,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   public void whenResourceIsAppInsteadOfExtensionThenFails() {
     expectedException.expect(MuleRuntimeException.class);
     expectedException
-        .expectMessage("Expected a single top level component matching identifier [extension:extension], but got: [flow]");
+        .expectMessage("Extension from artifact 'artifact' is missing a required top level element. 'extension:description' is expected.");
     getExtensionModelFrom("app-as-mule-extension.xml");
   }
 
@@ -112,7 +97,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   public void whenResourceIsEmptyAppInsteadOfExtensionThenFails() {
     expectedException.expect(MuleRuntimeException.class);
     expectedException
-        .expectMessage("Expected a single top level component matching identifier [extension:extension]");
+        .expectMessage("Extension from artifact 'artifact' is missing a required top level element. 'extension:description' is expected.");
     getExtensionModelFrom("mule-empty-app-config.xml");
   }
 
@@ -127,7 +112,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
     testClassLoader.addResource(nonexistentResourceName, existentResource);
 
     // Trying to load the model from the resource by its non-existent name should only succeed if the right class loader is used.
-    getExtensionModelFrom(nonexistentResourceName, testClassLoader);
+    loadMuleSdkExtension(nonexistentResourceName, testClassLoader, astParserExtensionModels);
 
     // Control test to verify that loading from the non-existent name will actually fail if using the wrong class loader.
     expectedException.expect(MuleRuntimeException.class);
@@ -174,17 +159,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   }
 
   private ExtensionModel getExtensionModelFrom(String extensionFile) {
-    return getExtensionModelFrom(extensionFile, this.getClass().getClassLoader());
-  }
-
-  private ExtensionModel getExtensionModelFrom(String extensionFile, ClassLoader classLoader) {
-    ExtensionModelLoadingRequest loadingRequest = builder(classLoader, getDefault(runtimeExtensionModels))
-        .addParameter(VERSION_PROPERTY_NAME, TEST_ARTIFACT_COORDINATES.getVersion())
-        .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
-        .addParameter(MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME, expressionLanguageMetadataService)
-        .setArtifactCoordinates(TEST_ARTIFACT_COORDINATES)
-        .build();
-    return new MuleSdkPluginExtensionModelLoader().loadExtensionModel(loadingRequest);
+    return loadMuleSdkExtension(extensionFile, this.getClass().getClassLoader(), astParserExtensionModels);
   }
 
   @Override

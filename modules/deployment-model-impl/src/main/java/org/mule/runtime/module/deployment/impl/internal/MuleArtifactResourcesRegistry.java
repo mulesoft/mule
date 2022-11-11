@@ -86,13 +86,13 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
-import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
+import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -276,14 +276,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new ServiceRegistry(), this)));
+                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
     pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, deployableArtifactDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
-                                             pluginDependenciesResolver, domainClassLoaderBuilderFactory,
+                                             domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
                                              runtimeLockFactory,
                                              this.memoryManagementService,
@@ -294,13 +294,12 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
         new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
 
-    applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
+    applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,
                                                        domainManager, serviceManager,
                                                        extensionModelLoaderManager,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
-                                                       artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        runtimeLockFactory,
                                                        this.memoryManagementService,

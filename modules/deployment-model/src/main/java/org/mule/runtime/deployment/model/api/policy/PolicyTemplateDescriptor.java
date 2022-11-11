@@ -11,7 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -55,10 +55,10 @@ public final class PolicyTemplateDescriptor extends ArtifactDescriptor {
   }
 
   @Override
-  public void setClassLoaderModel(ClassLoaderModel classLoaderModel) {
-    checkArgument(classLoaderModel.getExportedPackages().isEmpty(), POLICY_EXPORTED_PACKAGES_ERROR);
-    checkArgument(classLoaderModel.getExportedResources().isEmpty(), POLICY_EXPORTED_RESOURCE_ERROR);
+  public void setClassLoaderConfiguration(ClassLoaderConfiguration classLoaderConfiguration) {
+    checkArgument(classLoaderConfiguration.getExportedPackages().isEmpty(), POLICY_EXPORTED_PACKAGES_ERROR);
+    checkArgument(classLoaderConfiguration.getExportedResources().isEmpty(), POLICY_EXPORTED_RESOURCE_ERROR);
 
-    super.setClassLoaderModel(classLoaderModel);
+    super.setClassLoaderConfiguration(classLoaderConfiguration);
   }
 }

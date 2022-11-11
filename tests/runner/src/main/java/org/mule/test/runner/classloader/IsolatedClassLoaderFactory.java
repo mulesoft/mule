@@ -37,6 +37,7 @@ import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
@@ -49,9 +50,13 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
@@ -95,6 +100,7 @@ public class IsolatedClassLoaderFactory {
 
   private final ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private final PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
+  private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -142,10 +148,10 @@ public class IsolatedClassLoaderFactory {
 
       childClassLoaderLookupPolicy =
           testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
-      final ClassLoaderLookupPolicy appLookupPolicy = childClassLoaderLookupPolicy.extend(pluginsLookupStrategies);
 
-      serviceArtifactClassLoaders = createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
-                                                              artifactsUrlClassification);
+      serviceArtifactClassLoaders =
+          createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
+                                    artifactsUrlClassification);
 
       regionClassLoader = new TestRegionClassLoader(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy);
 
@@ -162,15 +168,15 @@ public class IsolatedClassLoaderFactory {
           pluginLookupPolicy = pluginLookupPolicy.extend(appExportedLookupStrategies);
 
           MuleArtifactClassLoader pluginCL =
-              new MuleArtifactClassLoader(artifactId,
-                                          new ArtifactDescriptor(pluginUrlClassification.getName()),
-                                          pluginUrlClassification.getUrls().toArray(new URL[0]),
-                                          regionClassLoader,
-                                          pluginLookupPolicyGenerator.createLookupPolicy(pluginUrlClassification,
-                                                                                         artifactsUrlClassification
-                                                                                             .getPluginUrlClassifications(),
-                                                                                         pluginLookupPolicy,
-                                                                                         pluginsArtifactClassLoaders));
+              new MulePluginClassLoader(artifactId,
+                                        new ArtifactDescriptor(pluginUrlClassification.getName()),
+                                        pluginUrlClassification.getUrls().toArray(new URL[0]),
+                                        regionClassLoader,
+                                        pluginLookupPolicyGenerator.createLookupPolicy(pluginUrlClassification,
+                                                                                       artifactsUrlClassification
+                                                                                           .getPluginUrlClassifications(),
+                                                                                       pluginLookupPolicy,
+                                                                                       pluginsArtifactClassLoaders));
           pluginsArtifactClassLoaders.add(pluginCL);
 
           ArtifactClassLoaderFilter filter =
@@ -186,6 +192,7 @@ public class IsolatedClassLoaderFactory {
                                testJarInfo.getPackages());
       }
 
+      final ClassLoaderLookupPolicy appLookupPolicy = childClassLoaderLookupPolicy.extend(pluginsLookupStrategies);
       ArtifactClassLoader appClassLoader =
           createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification);
 
@@ -339,11 +346,14 @@ public class IsolatedClassLoaderFactory {
     for (ArtifactUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
       logClassLoaderUrls("SERVICE (" + serviceUrlClassification.getArtifactId() + ")", serviceUrlClassification.getUrls());
 
-      MuleArtifactClassLoader artifactClassLoader =
-          new MuleArtifactClassLoader(serviceUrlClassification.getName(),
-                                      new ArtifactDescriptor(serviceUrlClassification.getName()),
-                                      serviceUrlClassification.getUrls().toArray(new URL[0]), parent,
-                                      childClassLoaderLookupPolicy);
+      ServiceDescriptor descriptor = new ServiceDescriptor(serviceUrlClassification.getName());
+      descriptor.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
+          .containing(serviceUrlClassification.getUrls())
+          .build());
+      ArtifactClassLoader artifactClassLoader = serviceClassLoaderFactory.create(serviceUrlClassification.getName(),
+                                                                                 descriptor,
+                                                                                 parent,
+                                                                                 childClassLoaderLookupPolicy);
       servicesArtifactClassLoaders.add(artifactClassLoader);
     }
     return servicesArtifactClassLoaders;

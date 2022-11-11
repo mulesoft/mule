@@ -26,7 +26,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateE
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
@@ -53,8 +53,8 @@ public class ArtifactPluginDescriptorFactory
   /**
    * Creates a custom factory
    * 
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be
    *                                           used. Non null.
    */
@@ -86,19 +86,21 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
-  protected Map<String, Object> getClassLoaderModelAttributes(Optional<Properties> deploymentPropertiesOptional,
-                                                              MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
-                                                              BundleDescriptor bundleDescriptor) {
+  protected Map<String, Object> getClassLoaderConfigurationAttributes(Optional<Properties> deploymentPropertiesOptional,
+                                                                      MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                                      BundleDescriptor bundleDescriptor) {
     Map<String, Object> attributes =
-        super.getClassLoaderModelAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor, bundleDescriptor);
+        super.getClassLoaderConfigurationAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor,
+                                                    bundleDescriptor);
 
     if (deploymentPropertiesOptional.isPresent()) {
       Properties deploymentProperties = deploymentPropertiesOptional.get();
       if (deploymentProperties instanceof PluginExtendedDeploymentProperties) {
         PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
             (PluginExtendedDeploymentProperties) deploymentProperties;
-        return new PluginExtendedClassLoaderModelAttributes(attributes,
-                                                            pluginExtendedDeploymentProperties.getDeployableArtifactDescriptor());
+        return new PluginExtendedClassLoaderConfigurationAttributes(attributes,
+                                                                    pluginExtendedDeploymentProperties
+                                                                        .getDeployableArtifactDescriptor());
       }
     }
     return attributes;

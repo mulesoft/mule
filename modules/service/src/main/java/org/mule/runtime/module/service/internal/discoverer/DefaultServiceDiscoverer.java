@@ -14,7 +14,7 @@ import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
-import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
+import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
 
   public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
-    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry(), null));
+    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new DefaultServiceRegistry(), null));
   }
 
   /**

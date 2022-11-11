@@ -13,8 +13,10 @@ import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
-import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
+
 import static java.lang.Thread.currentThread;
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
+
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -30,6 +32,8 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -38,14 +42,17 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -63,7 +70,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
 
   String driverVersion;
   private ClassLoaderLookupPolicy testLookupPolicy;
-  MuleArtifactClassLoader artifactClassLoader = null;
+  MulePluginClassLoader artifactClassLoader = null;
   BundleDependency dependency = null;
 
   // Parameterized
@@ -137,9 +144,9 @@ public class IBMMQResourceReleaserTriggerTestCase {
 
     dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
 
-    artifactClassLoader = new MuleArtifactClassLoader("IBMMQResourceReleaserTriggerTestCase", mock(ArtifactDescriptor.class),
-                                                      new URL[] {dependency.getBundleUri().toURL()},
-                                                      currentThread().getContextClassLoader(), testLookupPolicy);
+    artifactClassLoader = new MulePluginClassLoader("IBMMQResourceReleaserTriggerTestCase", mock(ArtifactDescriptor.class),
+                                                    new URL[] {dependency.getBundleUri().toURL()},
+                                                    currentThread().getContextClassLoader(), testLookupPolicy);
 
 
   }
@@ -149,7 +156,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
   public void releaserTriggerTest() throws Exception {
     // Driver not loaded yet. Should not cleanup on dispose.
-    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
+    Field shouldReleaseIbmMQResourcesField = getField(MulePluginClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
     // Force to load a Driver class so the resource releaser is flagged to run on dispose
@@ -169,7 +176,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   @Test
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should clean mbeans")
   public void releaserMBeansPropertyFalseTriggerTest() throws Exception {
-    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
+    Field shouldReleaseIbmMQResourcesField = getField(MulePluginClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
     // Force to load a Driver class so the resource releaser is flagged to run on dispose
@@ -183,7 +190,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed " +
       "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
   public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
-    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
+    Field shouldReleaseIbmMQResourcesField = getField(MulePluginClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
     // Force to load a Driver class so the resource releaser is flagged to run on dispose

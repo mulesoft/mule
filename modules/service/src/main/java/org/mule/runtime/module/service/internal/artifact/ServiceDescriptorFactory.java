@@ -15,8 +15,9 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 
 import java.io.File;
@@ -31,8 +32,8 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
   /**
    * Creates a new factory
    *
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
-   *                                           null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
+   *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
    *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
    *                                           once loaded.
