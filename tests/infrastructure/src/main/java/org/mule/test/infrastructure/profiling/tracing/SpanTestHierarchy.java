@@ -12,13 +12,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.privileged.profiling.CapturedEventData;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,11 +35,7 @@ import org.hamcrest.CoreMatchers;
  */
 public class SpanTestHierarchy {
 
-  public static final String ARTIFACT_TYPE_KEY = "artifactType";
-  public static final String ARTIFACT_ID_KEY = "artifactId";
-  public static final String THREAD_START_ID_KEY = "threadStartId";
   public static final String LOCATION_KEY = "location";
-  public static final String CORRELATION_ID_KEY = "correlationId";
 
   public static final String OTEL_EXCEPTION_TYPE_KEY = "exception.type";
   public static final String OTEL_EXCEPTION_MESSAGE_KEY = "exception.message";
@@ -63,12 +59,7 @@ public class SpanTestHierarchy {
   }
 
   public SpanTestHierarchy withRoot(String rootName) {
-    return withRoot(rootName, new HashMap<>());
-  }
-
-  public SpanTestHierarchy withRoot(String rootName, Map<String, String> attributes) {
     root = new SpanNode(rootName);
-    root.addAttributes(attributes);
     root.parent = new SpanNode(NO_PARENT_SPAN);
     currentNode = root;
     return this;
@@ -80,13 +71,8 @@ public class SpanTestHierarchy {
   }
 
   public SpanTestHierarchy child(String childName) {
-    return child(childName, new HashMap<>());
-  }
-
-  public SpanTestHierarchy child(String childName, Map<String, String> attributes) {
     SpanNode child = new SpanNode(childName);
     child.parent = lastChild;
-    child.addAttributes(attributes);
     lastChild.addChild(child);
     currentNode = child;
     return this;
@@ -97,6 +83,26 @@ public class SpanTestHierarchy {
       lastChild = lastChild.parent;
       currentNode = currentNode.parent.parent;
     }
+    return this;
+  }
+
+  public SpanTestHierarchy addAttributeToAssertValue(String key, String value) {
+    currentNode.addAttributeThatShouldMatch(key, value);
+    return this;
+  }
+
+  public SpanTestHierarchy addAttributesToAssertValue(Map<String, String> attributes) {
+    currentNode.addAttributesThatShouldMatch(attributes);
+    return this;
+  }
+
+  public SpanTestHierarchy addAttributesToAssertExistence(List<String> attributeNames) {
+    currentNode.addAttributeThatShouldExist(attributeNames);
+    return this;
+  }
+
+  public SpanTestHierarchy addAttributesToAssertExistence(String... attributeNames) {
+    currentNode.addAttributeThatShouldExist(Arrays.asList(attributeNames));
     return this;
   }
 
@@ -117,7 +123,6 @@ public class SpanTestHierarchy {
   /**
    * Traverses the expected span hierarchy tree asserting that each node exists in the actual captured spans and that it has the
    * correct parent node
-   *
    */
   public void assertSpanTree() {
     assertSpanTree(root, null);
@@ -159,14 +164,17 @@ public class SpanTestHierarchy {
   }
 
   private void assertAttributes(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
-    expectedNode.getAttributes()
+    expectedNode.getAttributesThatShouldMatch()
         .forEach((key, value) -> assertThat(
                                             "Actual attribute \"" + key + "\" for: " + expectedNode.spanName
                                                 + " is not the expected one",
                                             actualSpan.getAttributes().get(key), equalTo(value)));
-    assertThat(actualSpan.getAttributes().get(CORRELATION_ID_KEY), notNullValue());
-    assertThat(actualSpan.getAttributes().get(THREAD_START_ID_KEY), notNullValue());
-    assertThat(actualSpan.getServiceName(), equalTo(actualSpan.getAttributes().get(ARTIFACT_ID_KEY)));
+    expectedNode.getAttributesThatShouldExist().forEach((attribute) -> assertThat(
+                                                                                  "Actual attribute \"" + attribute + "\" for: "
+                                                                                      + expectedNode.spanName
+                                                                                      + " does not exist",
+                                                                                  actualSpan.getAttributes().get(attribute),
+                                                                                  notNullValue()));
   }
 
   private void assertException(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
@@ -198,7 +206,8 @@ public class SpanTestHierarchy {
     private final String spanName;
     private SpanNode parent;
     private final List<SpanNode> children = new ArrayList<>();
-    private Map<String, String> attributes;
+    private Map<String, String> attributesThatShouldMatch = new HashMap<>();
+    private List<String> attributesThatShouldExist = new ArrayList<>();
     private String exceptionData;
 
     public SpanNode(String spanName) {
@@ -209,8 +218,16 @@ public class SpanTestHierarchy {
       children.add(child);
     }
 
-    public void addAttributes(Map<String, String> attributes) {
-      this.attributes = attributes;
+    public void addAttributeThatShouldMatch(String key, String value) {
+      this.attributesThatShouldMatch.put(key, value);
+    }
+
+    public void addAttributesThatShouldMatch(Map<String, String> attributesThatShouldMatch) {
+      this.attributesThatShouldMatch.putAll(attributesThatShouldMatch);
+    }
+
+    public void addAttributeThatShouldExist(List<String> attributes) {
+      this.attributesThatShouldExist.addAll(attributes);
     }
 
     public void setExceptionData(String exceptionData) {
@@ -218,11 +235,15 @@ public class SpanTestHierarchy {
     }
 
     public String getAttribute(String key) {
-      return attributes.get(key);
+      return attributesThatShouldMatch.get(key);
     }
 
-    public Map<String, String> getAttributes() {
-      return attributes;
+    public Map<String, String> getAttributesThatShouldMatch() {
+      return attributesThatShouldMatch;
+    }
+
+    public List<String> getAttributesThatShouldExist() {
+      return attributesThatShouldExist;
     }
 
     public String getExceptionData() {

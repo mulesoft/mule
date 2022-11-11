@@ -7,16 +7,11 @@
 package org.mule.test.infrastructure;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.ARTIFACT_ID_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.ARTIFACT_TYPE_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.CORRELATION_ID_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.LOCATION_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_ESCAPED_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_EVENT_NAME;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_MESSAGE_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_STACK_TRACE_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_TYPE_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.THREAD_START_ID_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
 
 import static org.junit.rules.ExpectedException.none;
@@ -40,6 +35,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
+
+  public static final String LOCATION_KEY = "location";
+  public static final String CORRELATION_ID_KEY = "correlationId";
+  public static final String ARTIFACT_ID_KEY = "artifactId";
+  public static final String THREAD_START_ID_KEY = "threadStartId";
+  public static final String ARTIFACT_TYPE_ID = "artifactType";
 
   private static final String NO_PARENT_SPAN = "0000000000000000";
 
@@ -484,6 +485,8 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     String loggerLocation = "logger-test-location";
     String loggerSecondLocation = "logger-second-test-location";
 
+    List<String> attributesToAssertExistence = Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY);
+
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
     CapturedExportedSpan async = mockCapturedExportedSpan();
@@ -523,13 +526,23 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(thirdLogger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME, createAttributeMap(flowLocation, TEST_ARTIFACT_ID))
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(flowLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
         .beginChildren()
-        .child(EXPECTED_LOGGER_SPAN_NAME, createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
-        .child(EXPECTED_LOGGER_SPAN_NAME, createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
-        .child(EXPECTED_ASYNC_SPAN_NAME, createAttributeMap(asyncLocation, TEST_ARTIFACT_ID))
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(asyncLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
         .beginChildren()
-        .child(EXPECTED_LOGGER_SPAN_NAME, createAttributeMap(loggerSecondLocation, TEST_ARTIFACT_ID))
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerSecondLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
         .endChildren()
         .endChildren();
 
@@ -542,6 +555,8 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     String asyncLocation = "async-test-location";
     String loggerLocation = "logger-test-location";
     String loggerSecondLocation = "logger-second-test-location";
+
+    List<String> attributesToAssertExistence = Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY);
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
@@ -583,13 +598,23 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(thirdLogger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME, createAttributeMap(flowLocation, TEST_ARTIFACT_ID))
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(flowLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
         .beginChildren()
-        .child(EXPECTED_LOGGER_SPAN_NAME, createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
-        .child(EXPECTED_LOGGER_SPAN_NAME, createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
-        .child(EXPECTED_ASYNC_SPAN_NAME, createAttributeMap(asyncLocation, TEST_ARTIFACT_ID))
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(asyncLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
         .beginChildren()
-        .child(EXPECTED_LOGGER_SPAN_NAME, createAttributeMap(loggerSecondLocation, TEST_ARTIFACT_ID))
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addAttributesToAssertValue(createAttributeMap(loggerSecondLocation, TEST_ARTIFACT_ID))
+        .addAttributesToAssertExistence(attributesToAssertExistence)
         .endChildren()
         .endChildren();
 
@@ -843,7 +868,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     basicAttributes.put(CORRELATION_ID_KEY, "test-correlation-id");
     basicAttributes.put(THREAD_START_ID_KEY, "12");
     basicAttributes.put(ARTIFACT_ID_KEY, TEST_ARTIFACT_ID);
-    basicAttributes.put(ARTIFACT_TYPE_KEY, APP.getAsString());
+    basicAttributes.put(ARTIFACT_TYPE_ID, APP.getAsString());
     when(mockedSpan.getAttributes()).thenReturn(basicAttributes);
     when(mockedSpan.getServiceName()).thenReturn(TEST_ARTIFACT_ID);
     return mockedSpan;

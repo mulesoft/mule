@@ -8,9 +8,6 @@
 package org.mule.test.infrastructure.profiling.tracing;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.ARTIFACT_ID_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.ARTIFACT_TYPE_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.LOCATION_KEY;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,12 +17,16 @@ import java.util.Map;
  */
 public class TracingTestUtils {
 
+  public static final String LOCATION_KEY = "location";
+  public static final String ARTIFACT_ID_KEY = "artifactId";
+  public static final String ARTIFACT_TYPE_ID = "artifactType";
+
   public static Map<String, String> createAttributeMap(String location,
                                                        String artifactId) {
     Map<String, String> attributeMap = new HashMap<>();
     attributeMap.put(ARTIFACT_ID_KEY, artifactId);
     attributeMap.put(LOCATION_KEY, location);
-    attributeMap.put(ARTIFACT_TYPE_KEY, APP.getAsString());
+    attributeMap.put(ARTIFACT_TYPE_ID, APP.getAsString());
     return attributeMap;
   }
 }
