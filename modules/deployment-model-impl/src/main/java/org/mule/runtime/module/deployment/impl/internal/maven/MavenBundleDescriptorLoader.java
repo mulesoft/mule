@@ -26,8 +26,8 @@ import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.dese
 import static java.util.Collections.singletonMap;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;

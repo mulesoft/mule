@@ -84,6 +84,6 @@ public class ArtifactPluginDescriptorFactory
 
   @Override
   protected ArtifactPluginDescriptor doCreateArtifactDescriptor() {
-    return new ArtifactPluginDescriptor(getArtifactModel().getName(), empty());
+    return new ArtifactPluginDescriptor(getArtifactModel().getName());
   }
 }

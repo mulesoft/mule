@@ -25,7 +25,7 @@ import java.util.Properties;
  * @since 4.5
  */
 @NoExtend
-public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
+public class ArtifactPluginDescriptor extends ArtifactDescriptor {
 
   private static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_CLASSIFIER = BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -50,16 +50,6 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
    */
   public ArtifactPluginDescriptor(String name) {
     super(name);
-  }
-
-  /**
-   * Creates a new artifact plugin descriptor
-   *
-   * @param name                 artifact plugin name. Non empty.
-   * @param deploymentProperties deployment properties provided for the plugin
-   */
-  public ArtifactPluginDescriptor(String name, Optional<Properties> deploymentProperties) {
-    super(name, deploymentProperties);
   }
 
   /**

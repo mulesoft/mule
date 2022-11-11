@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.io.Serializable;
@@ -121,7 +122,7 @@ final class LoggerContextConfigurer {
       return true;
     }
 
-    ArtifactDescriptor descriptor = context.getArtifactDescriptor();
+    DeployableArtifactDescriptor descriptor = context.getArtifactDescriptor();
     if (descriptor == null || !descriptor.getDeploymentProperties().isPresent()) {
       return true;
     }
