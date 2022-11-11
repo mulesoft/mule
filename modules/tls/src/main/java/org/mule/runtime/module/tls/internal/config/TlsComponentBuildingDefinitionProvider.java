@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tls.internal.config;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
@@ -17,6 +18,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_EL
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -89,6 +91,7 @@ public class TlsComponentBuildingDefinitionProvider implements ComponentBuilding
         .add(baseDefinition.withIdentifier(TLS_CONTEXT_ELEMENT_IDENTIFIER)
             .withTypeDefinition(fromType(DefaultTlsContextFactory.class))
             .withObjectFactoryType(DefaultTlsContextFactoryObjectFactory.class)
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
             .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
             .withSetterParameterDefinition("enabledProtocols", fromSimpleParameter("enabledProtocols").build())
             .withSetterParameterDefinition("enabledCipherSuites", fromSimpleParameter("enabledCipherSuites").build())
