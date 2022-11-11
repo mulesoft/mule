@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import static java.lang.String.format;
@@ -41,7 +41,7 @@ public class AllComponentsBelongToSomeExtensionModel implements Validation {
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override
