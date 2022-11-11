@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.extension.internal.loader.validator;
 
+import static org.mule.runtime.config.api.properties.PropertiesResolverUtils.loadProviderFactories;
 import static java.lang.String.format;
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.loadProviderFactories;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;

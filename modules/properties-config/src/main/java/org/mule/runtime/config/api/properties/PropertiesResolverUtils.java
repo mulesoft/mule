@@ -4,119 +4,58 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.model.properties;
+package org.mule.runtime.config.api.properties;
 
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-
+import static org.slf4j.LoggerFactory.getLogger;
 import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
+import org.slf4j.Logger;
 
+import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
-import javax.xml.namespace.QName;
-
-import org.slf4j.Logger;
-
 /**
- * Provides a common set of utilities for handling property resolvers for Mule artifacts.
+ * Utils for Properties Resolver Creations.
+ * 
+ * @since 4.5
  */
 public class PropertiesResolverUtils {
 
+  public static final String GLOBAL_PROPERTY = "global-property";
   private static final Logger LOGGER = getLogger(PropertiesResolverUtils.class);
 
-  public static final String GLOBAL_PROPERTY = "global-property";
-
   private PropertiesResolverUtils() {
-    // Nothing to do
+    // do nothing
   }
 
-  public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(ArtifactAst artifactAst,
-                                                                                               Optional<ConfigurationProperties> parentConfigurationProperties,
-                                                                                               Map<String, String> deploymentProperties,
-                                                                                               ResourceProvider externalResourceProvider,
-                                                                                               Optional<FeatureFlaggingService> featureFlaggingService) {
-
-    ConfigurationPropertiesHierarchyBuilder partialResolverBuilder = new ConfigurationPropertiesHierarchyBuilder();
-
-    // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
-    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-      partialResolverBuilder.withDeploymentProperties(deploymentProperties);
-    }
-
-    Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
-
-    ConfigurationPropertiesResolver partialResolver = partialResolverBuilder
-        .withSystemProperties()
-        .withEnvironmentProperties()
-        .withGlobalPropertiesSupplier(globalPropertiesSupplier)
-        .build();
-
-    artifactAst.updatePropertiesResolver(partialResolver);
-
-    ConfigurationPropertiesHierarchyBuilder completeBuilder = new ConfigurationPropertiesHierarchyBuilder()
-        .withDeploymentProperties(deploymentProperties)
-        .withSystemProperties()
-        .withEnvironmentProperties()
-        .withPropertiesFile(externalResourceProvider)
-        .withGlobalPropertiesSupplier(globalPropertiesSupplier);
-
-
-    // Some configuration properties providers may depend their parameters on other properties, so we use the
-    // partial resolution to create these resolvers, and then complete the entire hierarchy
-    getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
-        .forEach(completeBuilder::withApplicationProperties);
-
-    parentConfigurationProperties.ifPresent(completeBuilder::withDomainPropertiesResolver);
-
-    return new PropertiesResolverConfigurationProperties(completeBuilder.build());
-
-  }
-
-  public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(Optional<ConfigurationProperties> parentConfigurationProperties,
-                                                                                               Map<String, String> deploymentProperties,
-                                                                                               ResourceProvider externalResourceProvider) {
-    ConfigurationPropertiesHierarchyBuilder builder = new ConfigurationPropertiesHierarchyBuilder()
-        .withDeploymentProperties(deploymentProperties)
-        .withSystemProperties()
-        .withEnvironmentProperties()
-        .withPropertiesFile(externalResourceProvider);
-
-    parentConfigurationProperties.ifPresent(builder::withDomainPropertiesResolver);
-
-    return new PropertiesResolverConfigurationProperties(builder.build());
-  }
-
-  public static Supplier<Map<String, ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
+  /**
+   * @param artifactAst the Artifact AST to calculate the global properties from
+   * @return a Lazy Evaluator to get the Global/Default Properties of a given {@link ArtifactAst}.
+   */
+  public static Supplier<Map<String, org.mule.runtime.properties.api.ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
     return new LazyValue<>(() -> {
       final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
@@ -136,10 +75,15 @@ public class PropertiesResolverUtils {
     });
   }
 
-  private static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
-                                                                                                         ResourceProvider externalResourceProvider,
-                                                                                                         ConfigurationPropertiesResolver localResolver) {
-
+  /**
+   * @param artifactAst
+   * @param externalResourceProvider
+   * @param localResolver            A resolver that retrieves properties that are used in
+   * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers
+   */
+  public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
+                                                                                                        ResourceProvider externalResourceProvider,
+                                                                                                        ConfigurationPropertiesResolver localResolver) {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = loadProviderFactories();
 
     return artifactAst.topLevelComponentsStream()
@@ -163,6 +107,10 @@ public class PropertiesResolverUtils {
         .collect(toList());
   }
 
+  /**
+   *
+   * @return
+   */
   public static Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> loadProviderFactories() {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
 
@@ -200,5 +148,4 @@ public class PropertiesResolverUtils {
 
     return providerFactoriesMap;
   }
-
 }

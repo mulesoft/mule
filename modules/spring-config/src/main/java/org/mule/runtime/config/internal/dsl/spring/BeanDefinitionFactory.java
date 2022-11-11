@@ -12,6 +12,7 @@ import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATIO
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.api.properties.PropertiesResolverUtils.loadProviderFactories;
 import static org.mule.runtime.config.internal.dsl.XmlConstants.buildRawParamKeyForDocAttribute;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -22,7 +23,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.loadProviderFactories;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
