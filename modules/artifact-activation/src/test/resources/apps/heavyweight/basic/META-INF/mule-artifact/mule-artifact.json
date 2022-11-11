@@ -1,0 +1,23 @@
+{
+  "configs": [
+    "app.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "basic",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "test-script.dwl",
+        "app.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

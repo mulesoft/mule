@@ -15,8 +15,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 
 import static java.lang.Class.forName;
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
 
@@ -29,16 +27,9 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
@@ -50,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
@@ -57,7 +49,6 @@ import org.slf4j.Logger;
 
 /**
  * Provides a common set of utilities for handling property resolvers for Mule artifacts.
- *
  */
 public class PropertiesResolverUtils {
 
@@ -69,217 +60,64 @@ public class PropertiesResolverUtils {
     // Nothing to do
   }
 
-  // TODO MULE-18786 refactor this
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(ArtifactAst artifactAst,
                                                                                                Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
                                                                                                ResourceProvider externalResourceProvider,
                                                                                                Optional<FeatureFlaggingService> featureFlaggingService) {
-    ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
-    if (!deploymentProperties.isEmpty()) {
-      deploymentPropertiesConfigurationProperties =
-          new MapConfigurationPropertiesProvider(deploymentProperties, "Deployment properties");
-    }
 
-    EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
-        new EnvironmentPropertiesConfigurationProvider();
-    DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
-
-    SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider =
-        new SystemPropertiesConfigurationProvider();
-    DefaultConfigurationPropertiesResolver systemPropertiesConfigurationPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
-                                                   systemPropertiesConfigurationProvider);
-
-    DefaultConfigurationPropertiesResolver parentLocalResolver;
-    if (deploymentPropertiesConfigurationProperties != null) {
-      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(systemPropertiesConfigurationPropertiesResolver),
-                                                                       deploymentPropertiesConfigurationProperties);
-    } else {
-      parentLocalResolver = systemPropertiesConfigurationPropertiesResolver;
-    }
-
-    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
-        createProviderFromGlobalProperties(artifactAst);
-
-    DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
-                                                                                                                                               globalPropertiesConfigurationAttributeProvider)),
-                                                                                                 environmentPropertiesConfigurationProvider)),
-                                                   systemPropertiesConfigurationProvider);
+    ConfigurationPropertiesHierarchyBuilder partialResolverBuilder = new ConfigurationPropertiesHierarchyBuilder();
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-      localResolver.setRootResolver(parentLocalResolver);
+      partialResolverBuilder.withDeploymentProperties(deploymentProperties);
     }
 
-    artifactAst.updatePropertiesResolver(localResolver);
-    List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
-        getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, localResolver);
-    FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
-        new FileConfigurationPropertiesProvider(externalResourceProvider, "External files");
+    Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
 
-    Optional<ConfigurationPropertiesResolver> parentConfigurationPropertiesResolver = of(localResolver);
-    if (parentConfigurationProperties.isPresent()) {
-      parentConfigurationPropertiesResolver =
-          of(new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
+    ConfigurationPropertiesResolver partialResolver = partialResolverBuilder
+        .withSystemProperties()
+        .withEnvironmentProperties()
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier)
+        .build();
 
-            @Override
-            public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
-              return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
-                  .map(value -> new DefaultConfigurationProperty(parentConfigurationProperties, configurationAttributeKey,
-                                                                 value));
-            }
+    artifactAst.updatePropertiesResolver(partialResolver);
 
-            @Override
-            public String getDescription() {
-              return "Domain properties";
-            }
-          }));
-    }
+    ConfigurationPropertiesHierarchyBuilder completeBuilder = new ConfigurationPropertiesHierarchyBuilder()
+        .withDeploymentProperties(deploymentProperties)
+        .withSystemProperties()
+        .withEnvironmentProperties()
+        .withPropertiesFile(externalResourceProvider)
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier);
 
-    Optional<CompositeConfigurationPropertiesProvider> configurationAttributesProvider = empty();
-    if (!configConfigurationPropertiesProviders.isEmpty()) {
-      configurationAttributesProvider = of(new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders));
-      parentConfigurationPropertiesResolver =
-          of(new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
-              // deployment properties provider has to go as parent here so we can reference them from configuration properties
-              // files
-              ? of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                              deploymentPropertiesConfigurationProperties))
-              : parentConfigurationPropertiesResolver,
-                                                        configurationAttributesProvider.get()));
-    } else if (deploymentPropertiesConfigurationProperties != null) {
-      parentConfigurationPropertiesResolver =
-          of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                        deploymentPropertiesConfigurationProperties));
-    }
 
-    DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                   globalPropertiesConfigurationAttributeProvider);
+    // Some configuration properties providers may depend their parameters on other properties, so we use the
+    // partial resolution to create these resolvers, and then complete the entire hierarchy
+    getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, partialResolver)
+        .forEach(completeBuilder::withApplicationProperties);
 
-    DefaultConfigurationPropertiesResolver systemPropertiesResolver;
-    if (configurationAttributesProvider.isPresent()) {
-      DefaultConfigurationPropertiesResolver configurationPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
-                                                     configurationAttributesProvider.get());
-      systemPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
-                                                                                                   environmentPropertiesConfigurationProvider)),
-                                                     systemPropertiesConfigurationProvider);
-    } else {
-      systemPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
-                                                                                                   environmentPropertiesConfigurationProvider)),
-                                                     systemPropertiesConfigurationProvider);
-    }
+    parentConfigurationProperties.ifPresent(completeBuilder::withDomainPropertiesResolver);
 
-    DefaultConfigurationPropertiesResolver externalPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
-            // deployment properties provider has to go as parent here so we can reference
-            // them from external files
-            ? of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
-                                                            deploymentPropertiesConfigurationProperties))
-            : of(systemPropertiesResolver),
-                                                   externalPropertiesConfigurationProvider);
-    if (deploymentPropertiesConfigurationProperties == null) {
-      externalPropertiesResolver.setAsRootResolver();
-      return new PropertiesResolverConfigurationProperties(externalPropertiesResolver);
-    } else {
-      // finally the first configuration properties resolver should be deployment properties as they have precedence over the rest
-      DefaultConfigurationPropertiesResolver deploymentPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver), deploymentPropertiesConfigurationProperties);
-      deploymentPropertiesResolver.setAsRootResolver();
-      return new PropertiesResolverConfigurationProperties(deploymentPropertiesResolver);
-    }
+    return new PropertiesResolverConfigurationProperties(completeBuilder.build());
+
   }
 
-  // TODO MULE-18786 refactor this
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
                                                                                                ResourceProvider externalResourceProvider) {
-    ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
-    if (!deploymentProperties.isEmpty()) {
-      deploymentPropertiesConfigurationProperties =
-          new MapConfigurationPropertiesProvider(deploymentProperties, "Deployment properties");
-    }
+    ConfigurationPropertiesHierarchyBuilder builder = new ConfigurationPropertiesHierarchyBuilder()
+        .withDeploymentProperties(deploymentProperties)
+        .withSystemProperties()
+        .withEnvironmentProperties()
+        .withPropertiesFile(externalResourceProvider);
 
-    EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
-        new EnvironmentPropertiesConfigurationProvider();
-    DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
+    parentConfigurationProperties.ifPresent(builder::withDomainPropertiesResolver);
 
-    SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider =
-        new SystemPropertiesConfigurationProvider();
-    DefaultConfigurationPropertiesResolver systemPropertiesConfigurationPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
-                                                   systemPropertiesConfigurationProvider);
-
-    DefaultConfigurationPropertiesResolver parentLocalResolver;
-    if (deploymentPropertiesConfigurationProperties != null) {
-      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(systemPropertiesConfigurationPropertiesResolver),
-                                                                       deploymentPropertiesConfigurationProperties);
-    } else {
-      parentLocalResolver = systemPropertiesConfigurationPropertiesResolver;
-    }
-
-    DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
-                                                                                                 environmentPropertiesConfigurationProvider)),
-                                                   systemPropertiesConfigurationProvider);
-    localResolver.setRootResolver(parentLocalResolver);
-
-    FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
-        new FileConfigurationPropertiesProvider(externalResourceProvider, "External files");
-
-    Optional<ConfigurationPropertiesResolver> parentConfigurationPropertiesResolver = of(localResolver);
-    if (parentConfigurationProperties.isPresent()) {
-      parentConfigurationPropertiesResolver =
-          of(new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
-
-            @Override
-            public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
-              return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
-                  .map(value -> new DefaultConfigurationProperty(parentConfigurationProperties, configurationAttributeKey,
-                                                                 value));
-            }
-
-            @Override
-            public String getDescription() {
-              return "Domain properties";
-            }
-          }));
-    }
-
-    DefaultConfigurationPropertiesResolver systemPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                                                                 environmentPropertiesConfigurationProvider)),
-                                                   systemPropertiesConfigurationProvider);
-
-    DefaultConfigurationPropertiesResolver externalPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
-            // deployment properties provider has to go as parent here so we can reference
-            // them from external files
-            ? of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
-                                                            deploymentPropertiesConfigurationProperties))
-            : of(systemPropertiesResolver),
-                                                   externalPropertiesConfigurationProvider);
-    if (deploymentPropertiesConfigurationProperties == null) {
-      externalPropertiesResolver.setAsRootResolver();
-      return new PropertiesResolverConfigurationProperties(externalPropertiesResolver);
-    } else {
-      // finally the first configuration properties resolver should be deployment properties as they have precedence over the rest
-      DefaultConfigurationPropertiesResolver deploymentPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver), deploymentPropertiesConfigurationProperties);
-      deploymentPropertiesResolver.setAsRootResolver();
-      return new PropertiesResolverConfigurationProperties(deploymentPropertiesResolver);
-    }
+    return new PropertiesResolverConfigurationProperties(builder.build());
   }
 
-  public static ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst artifactAst) {
-    return new GlobalPropertyConfigurationPropertiesProvider(new LazyValue<>(() -> {
+  public static Supplier<Map<String, ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
+    return new LazyValue<>(() -> {
       final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
       artifactAst.topLevelComponentsStream()
@@ -295,7 +133,7 @@ public class PropertiesResolverUtils {
           });
 
       return globalProperties;
-    }));
+    });
   }
 
   private static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,

@@ -8,8 +8,10 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.DOMAIN_CREATION;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -43,13 +45,16 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,8 +66,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
 @Feature(DOMAIN_CREATION)
+@Story(HEAVYWEIGHT)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class})
+@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class,
+    AbstractDeployableProjectModelBuilder.class})
 @PowerMockIgnore({"javax.management.*", "javax.script.*"})
 @PowerMockRunnerDelegate(JUnit4.class)
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
@@ -70,7 +77,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
       mock(DeployableArtifactDescriptorFactory.class);
-  private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
@@ -79,7 +85,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
                                                                               new DefaultDomainManager(),
                                                                               null,
                                                                               serviceRepository,
-                                                                              pluginDependenciesResolver,
                                                                               domainClassLoaderBuilderFactory,
                                                                               extensionModelLoaderManager,
                                                                               licenseValidator,
@@ -91,15 +96,15 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   @Before
   public void setUp() throws Exception {
-    mockStatic(MuleDeployableProjectModelBuilder.class);
-    given(isHeavyPackage(any())).willReturn(true);
+    mockStatic(AbstractDeployableProjectModelBuilder.class);
+    when(isHeavyPackage(any())).thenReturn(true);
+    when(defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
     DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
     doNothing().when(deployableProjectModelMock).validate();
     MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
         PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
     when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
     whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
-    when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList(), anyBoolean())).thenReturn(emptyList());
   }
 
   @Test

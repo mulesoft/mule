@@ -14,8 +14,9 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -29,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -48,8 +50,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                  File artifactLocation,
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
-                                                 DeployableArtifactDescriptor ownerDescriptor,
-                                                 PluginPatchesResolver pluginPatchesResolver) {
+                                                 DeployableArtifactDescriptor ownerDescriptor) {
     super(new ClassLoaderModelAssembler(new ArtifactCoordinates(bundleDependency.getDescriptor().getGroupId(),
                                                                 bundleDependency.getDescriptor().getArtifactId(),
                                                                 bundleDependency.getDescriptor().getVersion(),
@@ -64,7 +65,18 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     this.bundleDependencies = bundleDependencies;
     this.bundleDependency = bundleDependency;
     this.ownerDescriptor = ownerDescriptor;
-    this.pluginPatchesResolver = pluginPatchesResolver;
+    Collection<PluginPatchesResolver> resolverRegistered =
+        new SpiServiceRegistry().lookupProviders(PluginPatchesResolver.class, this.getClass().getClassLoader());
+    if (resolverRegistered.size() > 1) {
+      throw new MuleRuntimeException(
+                                     createStaticMessage("There is more than 1 PluginPatchesResolver implementation registered: "
+                                         + resolverRegistered));
+    }
+    if (resolverRegistered.isEmpty()) {
+      pluginPatchesResolver = new NullPluginPatchesResolver();
+    } else {
+      pluginPatchesResolver = resolverRegistered.iterator().next();
+    }
   }
 
   private static List<String> attributeToList(Set<String> attribute) {
