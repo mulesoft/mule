@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
+import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
+import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
+
 import static java.util.Optional.empty;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,14 +16,21 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
-public class DefaultConfigurationPropertiesResolverTestCase {
+@Feature(CONFIGURATION_PROPERTIES)
+@Story(CONFIGURATION_PROPERTIES_RESOLVER_STORY)
+public class DefaultConfigurationPropertiesResolverTestCase extends AbstractMuleTestCase {
 
   private static final String NOT_FOUND_PROPERTY = "${not-found.prop}";
 
   @Test
+  @Issue("W-11949160")
   public void propertyResolverMustNotFailWithPropertyNotFound() {
     DefaultConfigurationPropertiesResolver resolver =
         new DefaultConfigurationPropertiesResolver(empty(), mock(ConfigurationPropertiesProvider.class), false);
