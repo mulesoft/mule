@@ -16,8 +16,8 @@ import org.mule.runtime.core.internal.parameterization.DefaultComponentParameter
  *
  * @since 4.5
  */
-public class DefaultComponentParameterizationBuilderFactory<T extends ParameterizedModel>
-    extends AbstractComponentParameterizationBuilderFactory<T> {
+public class DefaultComponentParameterizationBuilderFactory
+    extends AbstractComponentParameterizationBuilderFactory {
 
   @Override
   protected <M extends ParameterizedModel> ComponentParameterization.Builder<M> create(M model) {
