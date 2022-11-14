@@ -52,8 +52,6 @@ import org.slf4j.Logger;
  */
 public abstract class OAuthHandler<Dancer> implements Lifecycle {
 
-  public static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
-  private static final boolean DEFAULT_PERSISTENCE_SETTING = true;
   private static final Logger LOGGER = getLogger(OAuthHandler.class);
 
   @Inject
