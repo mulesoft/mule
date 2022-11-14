@@ -36,14 +36,18 @@ public class ExecutionSpan implements InternalSpan {
   private Long endTime;
   private final Map<String, String> attributes = new HashMap<>();
   private final Set<SpanError> errors = new HashSet<>();
+  private final boolean policySpan;
+  private boolean nameUpdated = false;
 
   public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime,
-                       InternalSpan parent) {
+                       InternalSpan parent,
+                       boolean policySpan) {
     this.name = name;
     this.identifier = identifier;
     this.startTime = startTime;
     this.endTime = endTime;
     this.parent = parent;
+    this.policySpan = policySpan;
   }
 
   @Override
@@ -99,6 +103,7 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public void updateName(String name) {
     this.name = name;
+    this.nameUpdated = true;
   }
 
   /**
@@ -133,5 +138,15 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public Optional<String> getAttribute(String key) {
     return ofNullable(attributes.get(key));
+  }
+
+  @Override
+  public boolean isPolicySpan() {
+    return policySpan;
+  }
+
+  @Override
+  public boolean isOriginalNameUpdated() {
+    return nameUpdated;
   }
 }

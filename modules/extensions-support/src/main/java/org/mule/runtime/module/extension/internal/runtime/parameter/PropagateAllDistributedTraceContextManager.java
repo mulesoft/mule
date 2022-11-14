@@ -51,7 +51,7 @@ public class PropagateAllDistributedTraceContextManager implements InternalDistr
   @Override
   public Map<String, String> getRemoteTraceContextMap() {
     if (contextMap == null) {
-      resolveContextMap(resolveDistributedTraceContext(coreEvent, coreEventTracer));;
+      resolveContextMap(resolveDistributedTraceContext(coreEvent, coreEventTracer));
     }
     return contextMap;
   }

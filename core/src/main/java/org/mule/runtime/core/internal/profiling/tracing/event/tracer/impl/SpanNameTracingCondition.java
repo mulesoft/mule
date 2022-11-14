@@ -31,6 +31,10 @@ public class SpanNameTracingCondition implements TracingCondition {
           + spanExpectedName);
     }
 
+    if (span.isOriginalNameUpdated()) {
+      return;
+    }
+
     String spanName = span.getName();
 
     if (!spanExpectedName.equals(spanName)) {

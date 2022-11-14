@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
@@ -101,8 +103,15 @@ public class ExportOnEndSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    runtimeInternalSpan.addAttribute(key, value);
-    spanExporter.visit(new AddAttributeVisitor(key, value));
+    if (!runtimeInternalSpan.isPolicySpan()) {
+      runtimeInternalSpan.addAttribute(key, value);
+      spanExporter.visit(new AddAttributeVisitor(key, value));
+    } else {
+      InternalSpan parent = getAsInternalSpan(getParent());
+      if (parent != null) {
+        parent.addAttribute(key, value);
+      }
+    }
   }
 
   @Override
@@ -126,8 +135,25 @@ public class ExportOnEndSpan implements InternalSpan {
 
   @Override
   public void updateName(String name) {
-    runtimeInternalSpan.updateName(name);
-    spanExporter.onNameUpdated(name);
+    if (!runtimeInternalSpan.isPolicySpan()) {
+      runtimeInternalSpan.updateName(name);
+      spanExporter.onNameUpdated(name);
+    } else {
+      InternalSpan parent = getAsInternalSpan(getParent());
+      if (parent != null) {
+        parent.updateName(name);
+      }
+    }
+  }
+
+  @Override
+  public boolean isPolicySpan() {
+    return runtimeInternalSpan.isPolicySpan();
+  }
+
+  @Override
+  public boolean isOriginalNameUpdated() {
+    return runtimeInternalSpan.isOriginalNameUpdated();
   }
 
   /**
