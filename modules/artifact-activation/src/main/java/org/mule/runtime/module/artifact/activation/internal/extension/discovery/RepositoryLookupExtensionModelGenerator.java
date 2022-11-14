@@ -10,8 +10,6 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -47,6 +45,11 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
   public ExtensionModel obtainExtensionModel(ExtensionDiscoveryRequest discoveryRequest,
                                              ArtifactPluginDescriptor artifactPluginDescriptor,
                                              Set<ExtensionModel> dependencies) {
+    Map<String, Object> additionalAttributes = new HashMap<>(discoveryRequest.getParameters());
+    if (discoveryRequest.isEnrichDescriptions()) {
+      additionalAttributes.put("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT", true);
+    }
+
     return artifactPluginDescriptor.getExtensionModelDescriptorProperty()
         .map(describer -> discoverExtensionThroughJsonDescriber(extensionModelLoaderRepository,
                                                                 describer,
@@ -54,10 +57,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                 () -> classLoaderFactory.get(artifactPluginDescriptor)
                                                                     .getClassLoader(),
                                                                 artifactPluginDescriptor.getName(),
-                                                                discoveryRequest.isEnrichDescriptions()
-                                                                    ? emptyMap()
-                                                                    : singletonMap("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT",
-                                                                                   true),
+                                                                additionalAttributes,
                                                                 artifactPluginDescriptor,
                                                                 discoveryRequest.isOCSEnabled()))
         .orElse(null);
