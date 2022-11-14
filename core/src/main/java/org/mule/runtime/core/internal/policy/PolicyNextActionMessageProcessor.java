@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.lang.ref.Reference;
@@ -69,6 +69,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
+  public static final SpanCustomizationInfo NO_EXPORT_CHILD_NAMED_SPAN_BASED_ON_PARENT_SPAN_CHILD_SPAN_CUSTOMIZATION_INFO =
+      getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo(true);
 
   @Inject
   private MuleContext muleContext;
@@ -115,7 +117,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 : policyEventMapper.onOperationPolicyNext(event))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
-    }), policyNextErrorHandler(), getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
+    }), policyNextErrorHandler(), NO_EXPORT_CHILD_NAMED_SPAN_BASED_ON_PARENT_SPAN_CHILD_SPAN_CUSTOMIZATION_INFO);
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
   }
 

@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportExecuteNextChildSpanCustomizationInfo.getCustomizationInfo;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -90,7 +91,6 @@ import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportExecuteNextChildSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
@@ -189,8 +189,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private CoreEventTracer muleEventTracer;
   private static final SpanCustomizationInfo DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO =
       new NamedSpanBasedOnParentSpanChildSpanCustomizationInfo();
-  private static final SpanCustomizationInfo NO_COMPONENT_PROCESSOR_DEFAULT_CUSTOMIZATION_INFO =
-      new NoExportExecuteNextChildSpanCustomizationInfo();
 
   /**
    * The span customization info for the chain.
@@ -535,10 +533,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
       spanCustomizationInfo =
-          new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo((Component) processor);
+          new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo((Component) processor,
+                                                                            chainSpanCustomizationInfo.isPolicySpan());
     } else {
       // Other type of processors we define taking into account the parent.
-      spanCustomizationInfo = NO_COMPONENT_PROCESSOR_DEFAULT_CUSTOMIZATION_INFO;
+      spanCustomizationInfo = getCustomizationInfo(chainSpanCustomizationInfo.isPolicySpan());
     }
 
     // We start the component verifying that the current span is the span corresponding to

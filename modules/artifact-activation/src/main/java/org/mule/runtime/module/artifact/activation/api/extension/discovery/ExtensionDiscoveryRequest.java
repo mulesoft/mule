@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.util.Collections.emptySet;
 
 import org.mule.api.annotation.NoImplement;
@@ -17,6 +19,9 @@ import org.mule.runtime.module.artifact.activation.internal.extension.discovery.
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -36,6 +41,22 @@ public interface ExtensionDiscoveryRequest {
   }
 
   /**
+   * Obtains the custom parameter registered under {@code key}.
+   *
+   * @param key the key under which the wanted value is registered.
+   * @param <T> generic type of the expected value.
+   * @return an {@link Optional} value.
+   */
+  <T> Optional<T> getParameter(String key);
+
+  /**
+   * Returns all the parameters for this discovery request.
+   *
+   * @return parameters for this discovery request.
+   */
+  Map<String, Object> getParameters();
+
+  /**
    * @return {@link ArtifactPluginDescriptor}s for artifact plugins deployed inside the artifact. Non-null.
    */
   Collection<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
@@ -44,11 +65,6 @@ public interface ExtensionDiscoveryRequest {
    * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions.
    */
   Set<ExtensionModel> getParentArtifactExtensions();
-
-  /**
-   * @return Whether OCS is enabled.
-   */
-  boolean isOCSEnabled();
 
   /**
    * Parallel discovery will try to parallelize only the discovery for extensions that do not depend on the DSL of other
@@ -67,6 +83,11 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isEnrichDescriptions();
 
+  /**
+   * @return whether OCS is enabled.
+   */
+  boolean isOCSEnabled();
+
   @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
@@ -74,7 +95,8 @@ public interface ExtensionDiscoveryRequest {
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
-    private boolean ocsEnabled;
+    private boolean ocsEnabled = false;
+    private final Map<String, Object> customParameters = new HashMap<>();
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -101,9 +123,36 @@ public interface ExtensionDiscoveryRequest {
       return this;
     }
 
+    /**
+     * Adds a custom parameter registered under {@code key}.
+     *
+     * @param key   the key under which the {@code value} is to be registered.
+     * @param value the custom parameter value.
+     * @throws IllegalArgumentException if {@code key} or {@code value} are {@code null}.
+     */
+    public ExtensionDiscoveryRequestBuilder addParameter(String key, Object value) {
+      checkArgument(key != null && key.length() > 0, "key cannot be blank");
+      checkArgument(value != null, "value cannot be null");
+
+      customParameters.put(key, value);
+      return this;
+    }
+
+    /**
+     * Adds the contents of the given map as custom parameters.
+     *
+     * @param parameters a map with custom parameters.
+     */
+    public ExtensionDiscoveryRequestBuilder addParameters(Map<String, Object> parameters) {
+      checkArgument(parameters != null, "cannot add null parameters");
+
+      parameters.forEach(this::addParameter);
+      return this;
+    }
+
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, ocsEnabled);
+                                                  parallelDiscovery, enrichDescriptions, ocsEnabled, customParameters);
     }
   }
 }

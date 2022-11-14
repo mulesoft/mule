@@ -76,4 +76,11 @@ public interface SpanCustomizationInfo {
     return emptySet();
   }
 
+  /**
+   * @return whether this corresponds to a policy span.
+   */
+  // TODO: Technical debt: verify order of spans in the case of policies (W-12041739)
+  default boolean isPolicySpan() {
+    return false;
+  }
 }

@@ -23,6 +23,22 @@ import java.util.Set;
 public class NoChildrenExportableUntilExecuteNextSpanCustomizationInfo extends
     NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo {
 
+  private boolean policySpan = false;
+
+  /**
+   * @param component  the component corresponding to the span to be created.
+   * @param policySpan if this is a policySpan
+   */
+  public NoChildrenExportableUntilExecuteNextSpanCustomizationInfo(
+                                                                   Component component, boolean policySpan) {
+    super(component);
+    this.policySpan = policySpan;
+
+  }
+
+  /**
+   * @param component the component corresponding to the span to be created.
+   */
   public NoChildrenExportableUntilExecuteNextSpanCustomizationInfo(
                                                                    Component component) {
     super(component);
@@ -31,5 +47,10 @@ public class NoChildrenExportableUntilExecuteNextSpanCustomizationInfo extends
   @Override
   public Set<String> noExportUntil() {
     return singleton(EXECUTE_NEXT);
+  }
+
+  @Override
+  public boolean isPolicySpan() {
+    return policySpan;
   }
 }
