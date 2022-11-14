@@ -82,6 +82,11 @@ public interface DistributedTraceContext extends CurrentSpanAware {
   Map<String, String> getSpanRootAttributes();
 
   /**
+   * @param exportOnEndSpan updates the export name and attributes according to distributed trace context.
+   */
+  void updateSpanNameAndAttributes(InternalSpan exportOnEndSpan);
+
+  /**
    * @return a {@link DistributedTraceContext} that has no fields nor baggage set.
    */
   static DistributedTraceContext emptyDistributedEventContext() {
@@ -143,6 +148,11 @@ public interface DistributedTraceContext extends CurrentSpanAware {
       }
 
       @Override
+      public void updateSpanNameAndAttributes(InternalSpan exportOnEndSpan) {
+        // Nothing to do.
+      }
+
+      @Override
       public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) {
         // Nothing to do.
       }
@@ -153,4 +163,6 @@ public interface DistributedTraceContext extends CurrentSpanAware {
       }
     };
   }
+
+
 }

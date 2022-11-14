@@ -23,12 +23,24 @@ import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 public class NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo
     extends AbstractNamedSpanBasedOnComponentIdentifierSpanCustomizationInfo {
 
+  private boolean policySpan = false;
+
   public NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(Component component) {
     super(component);
+  }
+
+  public NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(Component processor, boolean policySpan) {
+    super(processor);
+    this.policySpan = policySpan;
   }
 
   @Override
   public String getName(CoreEvent coreEvent) {
     return getSpanName(component.getIdentifier());
+  }
+
+  @Override
+  public boolean isPolicySpan() {
+    return policySpan;
   }
 }

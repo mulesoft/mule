@@ -71,12 +71,14 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   private final Tracer tracer;
   private final Context remoteContext;
   private final Span openTelemetrySpan;
+  private final InternalSpan internalSpan;
   private Set<String> noExportUntil;
 
   public OpenTelemetrySpanExporter(Tracer tracer, EventContext eventContext,
                                    boolean exportable,
                                    Set<String> noExportUntil,
                                    InternalSpan internalSpan) {
+    this.internalSpan = internalSpan;
     this.tracer = tracer;
     this.noExportUntil = noExportUntil;
     remoteContext = resolveRemoteContext(eventContext);
@@ -226,13 +228,6 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
     Span span = spanBuilder.setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS)
         .startSpan();
 
-    String spanName = distributedTraceContext.getRootSpanName();
-
-    if (internalSpan.getParent() == null && spanName != null) {
-      span.updateName(spanName);
-      distributedTraceContext.getSpanRootAttributes().forEach((key, value) -> span.setAttribute(key, value));
-    }
-
     return span;
   }
 
@@ -241,6 +236,14 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
   }
 
   public Span getOpenTelemetrySpan() {
+    return openTelemetrySpan;
+  }
+
+  private Span resolveExportableOpentelemetrySpan() {
+    if (openTelemetrySpan instanceof NoExportableOpenTelemetrySpan && internalSpan.getParent() != null) {
+      return getAsInternalSpan(internalSpan.getParent()).visit(OPEN_TELEMETRY_PARENT_SPAN_VISITOR);
+    }
+
     return openTelemetrySpan;
   }
 
@@ -295,7 +298,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
 
       @Override
       public Span accept(OpenTelemetrySpanExporter opentelemetrySpanExporter) {
-        return opentelemetrySpanExporter.getOpenTelemetrySpan();
+        return opentelemetrySpanExporter.resolveExportableOpentelemetrySpan();
       }
     }
   }
