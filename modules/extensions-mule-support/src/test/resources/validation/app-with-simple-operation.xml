@@ -5,6 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd">
 
+    <!-- The operation DSL is only allowed if the property mule.experimental.enableMuleSdk is set to true -->
     <operation:def name="simpleOperation" >
         <operation:output>
             <operation:payload-type type="void" />
