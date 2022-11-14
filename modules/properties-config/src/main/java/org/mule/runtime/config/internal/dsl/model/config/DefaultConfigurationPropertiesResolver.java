@@ -236,7 +236,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       if (failIfPropertyNotFound) {
         throw p;
       }
-      return null;
+      return t;
     }
   }
 }
