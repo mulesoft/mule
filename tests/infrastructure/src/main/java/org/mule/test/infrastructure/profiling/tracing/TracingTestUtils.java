@@ -18,8 +18,8 @@ import java.util.Map;
 public class TracingTestUtils {
 
   public static final String LOCATION_KEY = "location";
-  public static final String ARTIFACT_ID_KEY = "artifactId";
-  public static final String ARTIFACT_TYPE_ID = "artifactType";
+  public static final String ARTIFACT_ID_KEY = "artifact.id";
+  public static final String ARTIFACT_TYPE_ID = "artifact.type";
 
   public static Map<String, String> createAttributeMap(String location,
                                                        String artifactId) {
