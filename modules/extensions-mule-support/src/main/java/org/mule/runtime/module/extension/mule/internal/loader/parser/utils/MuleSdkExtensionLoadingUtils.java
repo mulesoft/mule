@@ -63,4 +63,8 @@ public class MuleSdkExtensionLoadingUtils {
   private static RuntimeException createParameterNotFoundException(String parameterName) {
     return new NoSuchElementException(format("Parameter '%s' not found in context", parameterName));
   }
+
+  private MuleSdkExtensionLoadingUtils() {
+    // Private constructor to prevent instantiation.
+  }
 }

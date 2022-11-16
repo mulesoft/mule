@@ -160,7 +160,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   protected abstract Stream<ComponentAst> getTopLevelElements(ArtifactAst ast);
 
   private List<OperationModelParser> computeOperationModelParsers(ArtifactAst ast) {
-    final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
+    final Map<String, MuleSdkOperationModelParser> operationParsersByName =
         getTopLevelElements(ast)
             .filter(c -> c.getComponentType() == OPERATION_DEF)
             .map(c -> createOperationModelParser(c, getNamespace()))
@@ -173,7 +173,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
     return new ArrayList<>(operationParsersByName.values());
   }
 
-  protected MuleSdkOperationModelParserSdk createOperationModelParser(ComponentAst operation, String namespace) {
-    return new MuleSdkOperationModelParserSdk(operation, namespace, typeLoader, extensionModelHelper);
+  protected MuleSdkOperationModelParser createOperationModelParser(ComponentAst operation, String namespace) {
+    return new MuleSdkOperationModelParser(operation, namespace, typeLoader, extensionModelHelper);
   }
 }

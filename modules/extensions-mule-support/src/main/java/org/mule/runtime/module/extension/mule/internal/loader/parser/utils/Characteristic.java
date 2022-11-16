@@ -228,8 +228,8 @@ public class Characteristic<T> {
   public static class IsTransactionalCharacteristic extends AnyMatchFilteringCharacteristic {
 
     public IsTransactionalCharacteristic() {
-      super(IsTransactionalCharacteristic::isTransactional, MuleSdkOperationodelParserUtils::isSkippedScopeForTx,
-            MuleSdkOperationodelParserUtils::isIgnoredComponentForTx);
+      super(IsTransactionalCharacteristic::isTransactional, MuleSdkOperationModelParserUtils::isSkippedScopeForTx,
+            MuleSdkOperationModelParserUtils::isIgnoredComponentForTx);
     }
 
     private static boolean isTransactional(ComponentAstWithHierarchy operationAst) {

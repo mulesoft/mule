@@ -25,7 +25,7 @@ import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Chara
  *
  * @since 4.5
  */
-public class MuleSdkOperationodelParserUtils {
+public class MuleSdkOperationModelParserUtils {
 
   private static boolean isTry(ComponentAst componentAst) {
     return componentAst.getIdentifier().equals(TRY_IDENTIFIER);
@@ -64,4 +64,7 @@ public class MuleSdkOperationodelParserUtils {
         .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
   }
 
+  private MuleSdkOperationModelParserUtils() {
+    // Private constructor to prevent instantiation.
+  }
 }

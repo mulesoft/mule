@@ -19,12 +19,12 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class MuleSdkOptionalParameterModelParserSdk extends MuleSdkParameterModelParserSdk implements ParameterModelParser {
+public class MuleSdkOptionalParameterModelParser extends MuleSdkParameterModelParser implements ParameterModelParser {
 
   private Object defaultValue = null;
 
-  public MuleSdkOptionalParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader,
-                                                ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkOptionalParameterModelParser(ComponentAst parameter, TypeLoader typeLoader,
+                                             ExtensionModelHelper extensionModelHelper) {
     super(parameter, typeLoader, extensionModelHelper);
 
     parseStructure();
