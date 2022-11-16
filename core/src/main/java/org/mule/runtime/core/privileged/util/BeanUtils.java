@@ -89,9 +89,9 @@ public class BeanUtils {
     if (ClassUtils.getMethod(bean.getClass(), SET_PROPERTIES_METHOD, new Class[] {Map.class}) != null) {
       org.apache.commons.beanutils.BeanUtils.setProperty(bean, "properties", props);
     } else {
-      Map master = describe(bean);
+      Map mainProps = describe(bean);
       for (Object o : props.keySet()) {
-        if (!master.containsKey(o)) {
+        if (!mainProps.containsKey(o)) {
           throw new IllegalArgumentException(CoreMessages.propertyDoesNotExistOnObject(o.toString(), bean).getMessage());
         }
 
