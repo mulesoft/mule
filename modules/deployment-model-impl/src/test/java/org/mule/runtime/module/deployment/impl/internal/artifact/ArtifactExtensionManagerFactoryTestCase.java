@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.verify;
+import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.ExtensionModelDiscoveryStory.PARALLEL_EXTENSION_MODEL_LOADING;
@@ -31,19 +32,21 @@ import org.mule.tck.size.SmallTest;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 @Feature(EXTENSION_MODEL_DISCOVERY)
 @Story(PARALLEL_EXTENSION_MODEL_LOADING)
 public class ArtifactExtensionManagerFactoryTestCase extends AbstractMuleTestCase {
 
   private ArtifactExtensionManagerFactory factory;
+
+  @Rule
+  public MockitoRule mockitorule = rule();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModelLoaderRepository extensionModelLoaderRepository;

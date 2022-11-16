@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util.boot;
 
-import static java.lang.System.getProperty;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 
@@ -83,8 +83,7 @@ public final class ExtensionLoaderUtils {
   }
 
   public static boolean isParallelExtensionModelLoadingEnabled() {
-    String property = getProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY);
-    return property != null ? Boolean.valueOf(property) : false;
+    return getBoolean(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY);
   }
 
   private ExtensionLoaderUtils() {}
