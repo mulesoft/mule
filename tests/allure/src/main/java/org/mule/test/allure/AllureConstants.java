@@ -251,6 +251,7 @@ public interface AllureConstants {
     interface ExtensionModelDiscoveryStory {
 
       String EXTENSION_MODEL_LOADER_REPOSITORY = "Extension model loader repository";
+      String PARALLEL_EXTENSION_MODEL_LOADING = "Parallel Extension Model Loading";
     }
   }
 
