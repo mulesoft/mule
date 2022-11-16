@@ -115,6 +115,7 @@ public class OpenTelemetrySpanExporter implements InternalSpanExporter {
       openTelemetrySpan.setStatus(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
       recordSpanExceptions(internalSpan);
     }
+    internalSpan.attributesAsMap().forEach(openTelemetrySpan::setAttribute);
     openTelemetrySpan.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
