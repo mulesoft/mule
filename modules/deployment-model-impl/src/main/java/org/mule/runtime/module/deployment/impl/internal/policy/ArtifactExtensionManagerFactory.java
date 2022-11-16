@@ -7,11 +7,11 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
-
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.isParallelExtensionModelLoadingEnabled;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -98,7 +98,7 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
         .discoverPluginsExtensionModels(
                                         ExtensionDiscoveryRequest.builder()
                                             .setArtifactPlugins(artifactPluginsDescriptors)
-                                            .setParallelDiscovery(true)
+                                            .setParallelDiscovery(isParallelExtensionModelLoadingEnabled())
                                             .setParentArtifactExtensions(parentArtifactExtensions)
                                             .build()));
     extensions.forEach(extensionManager::registerExtension);
