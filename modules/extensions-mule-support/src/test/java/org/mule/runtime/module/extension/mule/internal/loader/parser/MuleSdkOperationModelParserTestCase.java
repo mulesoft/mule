@@ -45,12 +45,12 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Story(OPERATIONS)
-public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase {
+public class MuleSdkOperationModelParserTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = none();
 
-  private MuleSdkOperationModelParserSdk operationModelParser;
+  private MuleSdkOperationModelParser operationModelParser;
   private ComponentAst operationAst;
   private MetadataType someMetadataType;
 
@@ -65,8 +65,8 @@ public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase
     someMetadataType = mock(MetadataType.class);
     when(typeLoader.load("some")).thenReturn(Optional.of(someMetadataType));
 
-    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, APP_LOCAL_EXTENSION_NAMESPACE, typeLoader,
-                                                              new ExtensionModelHelper(emptySet()));
+    operationModelParser = new MuleSdkOperationModelParser(operationAst, APP_LOCAL_EXTENSION_NAMESPACE, typeLoader,
+                                                           new ExtensionModelHelper(emptySet()));
   }
 
   // ------------------------------- //

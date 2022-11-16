@@ -31,7 +31,7 @@ public class MagnetoBrotherhood extends Source<Iterator, Void> {
 
   private Result<Iterator, Void> makeResult() {
     return Result.<Iterator, Void>builder()
-        .output(asList("QuickSilver", "Scarlet Witch", "Toad", "MasterMind", "Mystique", "Blob").iterator())
+        .output(asList("QuickSilver", "Scarlet Witch", "Toad", "Magneto Ally", "Mystique", "Blob").iterator())
         .build();
   }
 

@@ -101,7 +101,7 @@ If you're new to Git, consider reading [Pro Git](http://git-scm.com/book) to abs
 7. From the command line, execute one of the following:
     - For **HTTPS**:  `git clone https://github.com/<yourreponame>/mule`
     - For **SSH**:  `git clone git@github.com:<username>/<repo-name>.git`
-8. Add the upstream repository so that you can pull changes and stay updated with changes to the mule-3.x (i.e. master) branch. From the command line, execute one of the following:
+8. Add the upstream repository so that you can pull changes and stay updated with changes to the mule-3.x (i.e. main) branch. From the command line, execute one of the following:
     - For **HTTPS**: `git remote add upstream https://github.com/mulesoft/mule.git`
     - For **SSH**: `git remote add upstream git@github.com:mulesoft/mule.git`
 
@@ -209,7 +209,7 @@ We finally have everything ready to start writing code. Lets start with the code
 
 #  Developing your contribution
 
-Working directly on the master version of Mule source code would likely result in merge conflicts with the original master. Instead, as a best practice for contributing to source code, work on your project in a feature branch.
+Working directly on the main version of Mule source code would likely result in merge conflicts with the original main. Instead, as a best practice for contributing to source code, work on your project in a feature branch.
 
 ## Creating your feature branch
 
@@ -230,7 +230,7 @@ Note that if this is your first time using Maven, the download make take several
 Now that you're all set with a local development environment and your own branch of Mule source code, you're ready get kicking! The following steps briefly outline the development lifecycle to follow to develop and commit your changes in preparation for submission.
 
 1. If you are using an IDE, make sure you read the previous section about [IDE configuration](#configuring-the-ide).
-2. Review the [Mule Coding Style](STYLE.md) documentation to ensure you adhere to source code standards, thus increasing the likelihood that your changes will be merged with the `mule-4.x` (i.e. master) source code.
+2. Review the [Mule Coding Style](STYLE.md) documentation to ensure you adhere to source code standards, thus increasing the likelihood that your changes will be merged with the `mule-4.x` (i.e. main) source code.
 3. Import the Mule source code project into your IDE (if you are using one), then work on your changes, fixes or improvements. 
 4. Debug and test your  local version, resolving any issues that arise. 
 5. Save your changes locally.
@@ -239,25 +239,25 @@ Now that you're all set with a local development environment and your own branch
 
 ## Updating Your feature Branch
 
-To ensure that your cloned version of Mule source code remains up-to-date with any changes to the mule-4.x (i.e. master) branch, regularly update your branch to rebase off the latest version of the master.  
+To ensure that your cloned version of Mule source code remains up-to-date with any changes to the mule-4.x (i.e. main) branch, regularly update your branch to rebase off the latest version of the main.  
 
-1. Pull the latest changes from the "upstream" master mule-4.x branch using the following commands:
+1. Pull the latest changes from the "upstream" main mule-4.x branch using the following commands:
 
 ```shell
 git fetch upstream
 git fetch upstream --tags 
 ```
-2. Ensure you are working with the master branch using the following command:
+2. Ensure you are working with the main branch using the following command:
 
 ```shell
 git checkout mule-4.x
 ```
-3. Merge the latest changes and updates from the master branch to your feature branch using the following command:
+3. Merge the latest changes and updates from the main branch to your feature branch using the following command:
 
 ```shell
 git merge upstream/mule-4.x
 ```
-4. Push any changes to the master to your forked clone using the following commands:
+4. Push any changes to the main to your forked clone using the following commands:
 
 ```shell
 git push origin mule-4.x
@@ -268,12 +268,12 @@ git push origin --tags
 ```shell
 git checkout dev/yourreponame/bug/yourJIRAissuenumber
 ```
-6. Rebase your branch from the latest version of the master branch using the following command:
+6. Rebase your branch from the latest version of the main branch using the following command:
 
 ```shell
 git rebase mule-4.x
 ```
-7. Resolve any conflicts on your feature branch that may appear as a result of the changes to mule-4.x (i.e. master).
+7. Resolve any conflicts on your feature branch that may appear as a result of the changes to mule-4.x (i.e. main).
 8. Push the newly-rebased branch back to your fork on your git repository using the following command:
 
 ```shell
@@ -287,7 +287,7 @@ Ready to submit your patch for review and merging? Initiate a pull request in gi
 1. Review the [MuleSoft Contributor's Agreement](http://www.mulesoft.org/legal/contributor-agreement.html). Before any contribution is accepted, we need you to run the following notebook [script ](https://api-notebook.anypoint.mulesoft.com/notebooks/#380297ed0e474010ff43). This script will ask you to login to github and accept our Contributor's Agreement. That process creates an issue in our contributors project with your name.
 2. From the repo of your branch, click the Pull Request button.
 3. In the Pull Request Preview dialog, enter a title and optional description of your changes, review the commits that form part of your pull request, then click Send Pull Request (Refer to github's [detailed instructions](https://help.github.com/articles/using-pull-requests) for submitting a pull request).
-4. Mule's core dev team reviews the pull request and may initiate discussion or ask questions about your changes in a Pull Request Discussion. The team can then merge your commits with the master where appropriate. We will validate acceptance of the agreement at this step. 
+4. Mule's core dev team reviews the pull request and may initiate discussion or ask questions about your changes in a Pull Request Discussion. The team can then merge your commits with the main where appropriate. We will validate acceptance of the agreement at this step. 
 5. If you have made changes or corrections to your commit after having submitted the pull request, go back to the Pull Request page and update the Commit Range (via the Commits tab), rather than submitting a new pull request. 
 
 # Summary

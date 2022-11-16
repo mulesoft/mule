@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.api.extension;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -21,6 +22,7 @@ import org.mule.runtime.internal.dsl.NullDslResolvingContext;
  *
  * @since 4.5
  */
+@Experimental
 @NoInstantiate
 public class MuleSdkExtensionExtensionModelProvider {
 

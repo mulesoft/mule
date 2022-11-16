@@ -48,7 +48,7 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Story(PARAMETERS)
-public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractMuleTestCase {
+public class MuleSdkParameterModelParserConfigNamesTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = none();
@@ -96,7 +96,7 @@ public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractM
         .id(ConfigurationProvider.class.getName())
         .with(new ClassInformationAnnotation(ConfigurationProvider.class))
         .build();
-    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.withType("some:some-config").build();
+    MuleSdkParameterModelParser parameterModelParser = baseParameterParserBuilder.withType("some:some-config").build();
     assertThat(parameterModelParser.getType(), is(expectedType));
     assertThat(parameterModelParser.getAllowedStereotypes(mock(StereotypeModelFactory.class)), contains(expectedStereotype));
   }
@@ -112,7 +112,7 @@ public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractM
   @Test
   @Description("Checks that when the parameter type matches a configuration on an extension but also a type in the type loader, the type loader takes precedence. Whether that situation is possible or not, is of no concern to the parser, hence the test")
   public void parameterTypeMatchingExtensionConfigCollidingWithTypeInTypeLoaderPrioritizesTypeLoader() {
-    MuleSdkParameterModelParserSdk parameterModelParser =
+    MuleSdkParameterModelParser parameterModelParser =
         baseParameterParserBuilder.withType("some:some-config-colliding-with-type").build();
     MetadataType expectedType =
         new MetadataTypeEnricher().enrich(someValidMetadataType, singleton(new TypedValueTypeAnnotation()));

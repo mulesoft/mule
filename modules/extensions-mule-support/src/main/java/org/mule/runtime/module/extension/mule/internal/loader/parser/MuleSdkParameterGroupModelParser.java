@@ -49,9 +49,9 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
 
   private List<ParameterModelParser> doParserParameters(ComponentAst parametersComponent, TypeLoader typeLoader) {
     Stream<ParameterModelParser> parameterParsers = getChildren(parametersComponent, "parameter")
-        .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader, extensionModelHelper));
+        .map(p -> new MuleSdkParameterModelParser(p, typeLoader, extensionModelHelper));
     Stream<ParameterModelParser> optionalParameterParsers = getChildren(parametersComponent, "optional-parameter")
-        .map(p -> new MuleSdkOptionalParameterModelParserSdk(p, typeLoader, extensionModelHelper));
+        .map(p -> new MuleSdkOptionalParameterModelParser(p, typeLoader, extensionModelHelper));
 
     return concat(parameterParsers, optionalParameterParsers).collect(toList());
   }

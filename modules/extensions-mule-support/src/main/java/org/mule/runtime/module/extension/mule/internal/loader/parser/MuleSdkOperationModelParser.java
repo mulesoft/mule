@@ -23,7 +23,6 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -75,9 +74,9 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
+class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
 
-  private static final Logger LOGGER = getLogger(MuleSdkOperationModelParserSdk.class);
+  private static final Logger LOGGER = getLogger(MuleSdkOperationModelParser.class);
 
   private static final String BODY_CHILD = "body";
   private static final String DESCRIPTION_PARAMETER = "description";
@@ -104,8 +103,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private String name;
 
-  public MuleSdkOperationModelParserSdk(ComponentAst operation, String namespace, TypeLoader typeLoader,
-                                        ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkOperationModelParser(ComponentAst operation, String namespace, TypeLoader typeLoader,
+                                     ExtensionModelHelper extensionModelHelper) {
     this.operation = operation;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
@@ -320,12 +319,12 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     return getSingleChild(operation, BODY_CHILD).get();
   }
 
-  private Stream<ComponentAstWithHierarchy> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+  private Stream<ComponentAstWithHierarchy> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParser> operationModelParsersByName,
                                                                         Set<String> visitedOperations,
                                                                         ComponentAstWithHierarchy componentAst,
                                                                         Predicate<ComponentAstWithHierarchy> filterCondition,
                                                                         Predicate<ComponentAstWithHierarchy> ignoreCondition) {
-    final MuleSdkOperationModelParserSdk operationParser =
+    final MuleSdkOperationModelParser operationParser =
         operationModelParsersByName.get(componentAst.getComponentAst().getIdentifier().getName());
 
     if (operationParser != null) {
@@ -336,7 +335,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     }
   }
 
-  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParser> operationModelParsersByName) {
     return getOperationsAstRecursiveStream(operationModelParsersByName, componentAst -> false, componentAst -> false);
   }
 
@@ -347,14 +346,14 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
    *                        inner children.
    * @param ignoreCondition when it returns true, that particular component is ignored.
    */
-  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParser> operationModelParsersByName,
                                                                             Predicate<ComponentAstWithHierarchy> filterCondition,
                                                                             Predicate<ComponentAstWithHierarchy> ignoreCondition) {
     final Set<String> visitedOperations = new HashSet<>();
     return getOperationsAstRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition, ignoreCondition);
   }
 
-  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+  private Stream<ComponentAstWithHierarchy> getOperationsAstRecursiveStream(Map<String, MuleSdkOperationModelParser> operationModelParsersByName,
                                                                             Set<String> visitedOperations,
                                                                             Predicate<ComponentAstWithHierarchy> filterCondition,
                                                                             Predicate<ComponentAstWithHierarchy> ignoreCondition) {
@@ -397,13 +396,13 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     }
   }
 
-  public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+  public void computeCharacteristics(Map<String, MuleSdkOperationModelParser> operationModelParsersByName) {
     computeCharacteristicsWithoutFiltering(asList(isBlocking, notificationModels, errorModels), operationModelParsersByName);
     computeCharacteristicsWithFiltering(singletonList(isTransactional), operationModelParsersByName);
   }
 
   private void computeCharacteristicsWithoutFiltering(List<Characteristic<?>> characteristics,
-                                                      Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+                                                      Map<String, MuleSdkOperationModelParser> operationModelParsersByName) {
     // For characteristics that don't involve filtering components we get the stream of operation models only once, as a
     // performance improvement
     getOperationsAstRecursiveStream(operationModelParsersByName).anyMatch(operationAst -> {
@@ -416,7 +415,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private void computeCharacteristicsWithFiltering(List<FilteringCharacteristic<?>> characteristics,
-                                                   Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+                                                   Map<String, MuleSdkOperationModelParser> operationModelParsersByName) {
     for (FilteringCharacteristic<?> characteristic : characteristics) {
       getOperationsAstRecursiveStream(operationModelParsersByName, characteristic::filterComponent,
                                       characteristic::ignoreComponent).anyMatch(operationAst -> {

@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Helper class for building {@link MuleSdkParameterModelParserSdk} instances for testing by mocking {@link ComponentAst}.
+ * Helper class for building {@link MuleSdkParameterModelParser} instances for testing by mocking {@link ComponentAst}.
  */
 class MuleSdkParameterModelParserSdkBuilder {
 
@@ -108,11 +108,11 @@ class MuleSdkParameterModelParserSdkBuilder {
   }
 
   /**
-   * Builds the {@link MuleSdkParameterModelParserSdk} using all the defined characteristics.
+   * Builds the {@link MuleSdkParameterModelParser} using all the defined characteristics.
    *
-   * @return The {@link MuleSdkParameterModelParserSdk}
+   * @return The {@link MuleSdkParameterModelParser}
    */
-  public MuleSdkParameterModelParserSdk build() {
+  public MuleSdkParameterModelParser build() {
     final TypeLoader typeLoader = mockTypeLoader(typeLoaderTypes != null ? typeLoaderTypes : emptyMap());
     final ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(loadExtensionModels());
 
@@ -128,7 +128,7 @@ class MuleSdkParameterModelParserSdkBuilder {
       setMockAstChild(componentAst, "deprecated", deprecatedAst);
     }
 
-    return new MuleSdkParameterModelParserSdk(componentAst, typeLoader, extensionModelHelper);
+    return new MuleSdkParameterModelParser(componentAst, typeLoader, extensionModelHelper);
   }
 
   private Set<ExtensionModel> loadExtensionModels() {
