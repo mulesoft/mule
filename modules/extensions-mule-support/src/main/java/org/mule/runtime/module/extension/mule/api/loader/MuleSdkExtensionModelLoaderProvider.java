@@ -12,6 +12,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkApplicationExtensionModelLoader;
@@ -25,6 +26,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
+@Experimental
 public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
   private final boolean isMuleSdkEnabled = getBoolean(ENABLE_MULE_SDK_PROPERTY);
