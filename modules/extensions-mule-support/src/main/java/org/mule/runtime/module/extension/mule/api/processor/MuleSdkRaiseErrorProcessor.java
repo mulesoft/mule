@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.module.extension.mule.internal.error.ThrowableError.wrap;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkApplicationExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.privileged.util.AttributeEvaluator;
  *
  * @since 4.5
  */
+@Experimental
 public final class MuleSdkRaiseErrorProcessor extends AbstractRaiseErrorProcessor {
 
   private static final DataType ERROR_DATA_TYPE = fromType(Error.class);
