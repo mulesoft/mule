@@ -57,53 +57,53 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
   private static final String TEST_GROUP_ID = "org.mule.tests";
-  private static final String VERSION = "4.5.0";
+  private static final String VERSION = "1.2.3";
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
     List<ResourceExtensionUnitTest> extensions;
     extensions = asList(newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-vegan-extension", VERSION)),
+                                    createArtifactCoordinate("mule-vegan-extension")),
                         newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-petstore-extension", VERSION)),
+                                    createArtifactCoordinate("mule-petstore-extension")),
                         newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-metadata-extension", VERSION)),
+                                    createArtifactCoordinate("mule-metadata-extension")),
                         newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-heisenberg-extension", VERSION)),
+                                    createArtifactCoordinate("mule-heisenberg-extension")),
                         newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-substitution-group-extension", VERSION)),
+                                    createArtifactCoordinate("mule-substitution-group-extension")),
                         newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-tx-extension", VERSION)),
+                                    createArtifactCoordinate("mule-tx-extension")),
                         newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-subtypes-extension", VERSION)),
+                                    createArtifactCoordinate("mule-subtypes-extension")),
                         newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-marvel-extension", VERSION)),
+                                    createArtifactCoordinate("mule-marvel-extension")),
                         newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-rick-and-morty-extension", VERSION)),
+                                    createArtifactCoordinate("mule-rick-and-morty-extension")),
                         newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-typed-value-extension", VERSION)),
+                                    createArtifactCoordinate("mule-typed-value-extension")),
                         newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-test-oauth-extension", VERSION)),
+                                    createArtifactCoordinate("mule-test-oauth-extension")),
                         newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "test-weave-function-extension", VERSION)),
+                                    createArtifactCoordinate("test-weave-function-extension")),
                         newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-values-extension", VERSION)),
+                                    createArtifactCoordinate("mule-values-extension")),
                         newUnitTest(JAVA_LOADER, SampleDataExtension.class, "sample-data.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-sample-data-extension", VERSION)),
+                                    createArtifactCoordinate("mule-sample-data-extension")),
                         newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-implicit-config-extension", VERSION)),
+                                    createArtifactCoordinate("mule-implicit-config-extension")),
                         newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-non-implicit-config-extension", VERSION)),
+                                    createArtifactCoordinate("mule-non-implicit-config-extension")),
                         newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-semantic-terms-extension", VERSION)),
+                                    createArtifactCoordinate("mule-semantic-terms-extension")),
                         newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.json",
-                                    createArtifactCoordinate(TEST_GROUP_ID, "mule-reconnection-test-extension", VERSION)));
+                                    createArtifactCoordinate("mule-reconnection-test-extension")));
 
     return createExtensionModels(extensions);
   }
 
-  private static ArtifactCoordinates createArtifactCoordinate(String groupId, String artifactId, String version) {
-    return new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(version).build();
+  private static ArtifactCoordinates createArtifactCoordinate(String artifactId) {
+    return new BundleDescriptor.Builder().setGroupId(TEST_GROUP_ID).setArtifactId(artifactId).setVersion(VERSION).build();
   }
 
   private final ExtensionModelJsonSerializer generator = new ExtensionModelJsonSerializer(true);

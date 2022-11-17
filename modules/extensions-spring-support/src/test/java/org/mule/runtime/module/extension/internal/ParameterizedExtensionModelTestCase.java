@@ -34,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.function.TriFunction;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -111,12 +112,6 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
     }
 
     return loader.loadExtensionModel(builder.build());
-  }
-
-  @FunctionalInterface
-  interface TriFunction<A, B, C, R> {
-
-    R apply(A a, B b, C c);
   }
 
   public static class ExtensionUnitTest {

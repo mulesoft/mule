@@ -1768,7 +1768,7 @@
   "artifactCoordinates": {
     "artifact id": "test-weave-function-extension",
     "group id": "org.mule.tests",
-    "version": "4.5.0"
+    "version": "1.2.3"
   },
   "notifications": [],
   "errors": [
