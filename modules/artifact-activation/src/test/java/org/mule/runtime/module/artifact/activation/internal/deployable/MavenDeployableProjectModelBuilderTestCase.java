@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +52,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   public ExpectedException expected = none();
 
   @Test
+  @Issue("W-12036240")
   public void createDeployableProjectModelForAnAppWithOnlyAMuleConfig() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/simple-app");
 
