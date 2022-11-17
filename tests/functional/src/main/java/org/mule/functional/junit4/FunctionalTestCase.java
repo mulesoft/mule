@@ -6,16 +6,15 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
-
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
-
-import static org.mockito.Mockito.mock;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
@@ -64,6 +63,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * {@link #disposeContextPerClass}.
    */
   private static ArtifactClassLoader executionClassLoader;
+
+  @Rule
+  public SystemProperty parallelExtensionModelLoading = new SystemProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY, "true");
 
   @Inject
   protected Registry registry;
