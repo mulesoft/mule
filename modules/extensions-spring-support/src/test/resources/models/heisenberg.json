@@ -57591,6 +57591,11 @@
       "kind": "source"
     }
   ],
+  "artifactCoordinates": {
+    "artifact id": "mule-heisenberg-extension",
+    "group id": "org.mule.tests",
+    "version": "4.5.0"
+  },
   "notifications": [
     {
       "notification": "HEISENBERG:NEW_BATCH",

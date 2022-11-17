@@ -9619,6 +9619,11 @@
       "kind": "source"
     }
   ],
+  "artifactCoordinates": {
+    "artifact id": "mule-semantic-terms-extension",
+    "group id": "org.mule.tests",
+    "version": "4.5.0"
+  },
   "notifications": [],
   "errors": [
     {
