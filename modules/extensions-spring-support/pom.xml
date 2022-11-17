@@ -18,7 +18,6 @@
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <jsoup.version>1.15.3</jsoup.version>
-        <commonsLangVersion>3.12.0</commonsLangVersion>
     </properties>
 
     <build>
