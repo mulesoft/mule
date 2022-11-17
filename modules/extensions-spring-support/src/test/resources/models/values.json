@@ -26812,6 +26812,11 @@
       "kind": "source"
     }
   ],
+  "artifactCoordinates": {
+    "artifact id": "mule-values-extension",
+    "group id": "org.mule.tests",
+    "version": "1.2.3"
+  },
   "notifications": [],
   "errors": [
     {
