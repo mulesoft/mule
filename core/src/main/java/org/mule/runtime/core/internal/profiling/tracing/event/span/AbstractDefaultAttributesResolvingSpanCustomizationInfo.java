@@ -25,11 +25,11 @@ import java.util.Optional;
 public abstract class AbstractDefaultAttributesResolvingSpanCustomizationInfo implements SpanCustomizationInfo {
 
   public static final String LOCATION_KEY = "location";
-  public static final String CORRELATION_ID_KEY = "correlationId";
-  public static final String ARTIFACT_ID_KEY = "artifactId";
-  public static final String ARTIFACT_TYPE_ID = "artifactType";
-  public static final String THREAD_START_ID_KEY = "threadStartId";
-  public static final String THREAD_START_NAME_KEY = "threadStartName";
+  public static final String CORRELATION_ID_KEY = "correlation.id";
+  public static final String ARTIFACT_ID_KEY = "artifact.id";
+  public static final String ARTIFACT_TYPE_ID = "artifact.type";
+  public static final String THREAD_START_ID_KEY = "thread.start.id";
+  public static final String THREAD_START_NAME_KEY = "thread.start.name";
 
   @Override
   public Map<String, String> getAttributes(CoreEvent coreEvent, MuleConfiguration muleConfiguration, ArtifactType artifactType) {
