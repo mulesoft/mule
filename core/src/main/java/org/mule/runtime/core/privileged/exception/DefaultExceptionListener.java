@@ -135,7 +135,7 @@ public final class DefaultExceptionListener implements Initialisable {
   }
 
   public void processStatistics() {
-    if (statistics != null && statistics.isEnabled()) {
+    if (statistics != null) {
       statistics.incExecutionError();
     }
   }
@@ -148,7 +148,7 @@ public final class DefaultExceptionListener implements Initialisable {
    * @param t     the fatal exception to log
    */
   protected void logFatal(CoreEvent event, Throwable t) {
-    if (statistics != null && statistics.isEnabled()) {
+    if (statistics != null) {
       statistics.incFatalError();
     }
 

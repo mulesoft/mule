@@ -447,9 +447,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   private Consumer<CoreEvent> beforeProcessors() {
     return event -> {
-      if (getStatistics().isEnabled()) {
-        getStatistics().incReceivedEvents();
-      }
+      getStatistics().incReceivedEvents();
 
       FlowCallStack flowCallStack = event.getFlowCallStack();
       if (flowCallStack instanceof DefaultFlowCallStack) {
