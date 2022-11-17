@@ -31,7 +31,8 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class ExtensionModelJsonGeneratorWithNullArtifactCoordinateTestCase extends FileGenerationParameterizedExtensionModelTestCase {
+public class ExtensionModelJsonGeneratorWithNullArtifactCoordinateTestCase
+    extends FileGenerationParameterizedExtensionModelTestCase {
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
