@@ -56,12 +56,12 @@ public class SpanCustomizationTestCase {
   public static final String MULE_CONFIGURATION_ID = "id";
   public static final String LOCATION_TEST = "testLocation";
   public static final String LOCATION_KEY = "location";
-  public static final String CORRELATION_ID = "correlationId";
-  public static final String CORRELATION_ID_KEY = "correlationId";
-  public static final String THREAD_START_ID = "threadStartId";
-  public static final String THREAD_START_NAME = "threadStartName";
-  public static final String ARTIFACT_TYPE = "artifactType";
-  public static final String ARTIFACT_ID = "artifactId";
+  public static final String CORRELATION_ID = "correlation.id";
+  public static final String CORRELATION_ID_KEY = "correlation.id";
+  public static final String THREAD_START_ID = "thread.start.id";
+  public static final String THREAD_START_NAME = "thread.start.name";
+  public static final String ARTIFACT_TYPE = "artifact.type";
+  public static final String ARTIFACT_ID = "artifact.id";
 
   @Test
   public void namedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo() {
