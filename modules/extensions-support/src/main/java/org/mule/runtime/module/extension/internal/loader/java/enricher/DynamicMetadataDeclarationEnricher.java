@@ -12,6 +12,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -35,10 +37,11 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Query;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
@@ -75,348 +78,339 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
+public class DynamicMetadataDeclarationEnricher implements WalkingDeclarationEnricher {
+
+  private static final NullMetadataResolver NULL_METADATA_RESOLVER = new NullMetadataResolver();
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    new EnricherDelegate().enrich(extensionLoadingContext);
-  }
+  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+    BaseDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+    // TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
+    if (isASTMode(declaration)) {
+      return empty();
+    }
 
-  private static class EnricherDelegate extends AbstractAnnotatedDeclarationEnricher {
+    Optional<ExtensionTypeDescriptorModelProperty> property =
+        declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
 
-    private static final NullMetadataResolver nullMetadataResolver = new NullMetadataResolver();
-    private Type extensionType;
+    if (!property.isPresent()) {
+      return empty();
+    }
 
-    @Override
-    public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-      BaseDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      // TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
-      if (!isASTMode(declaration)) {
-        Optional<ExtensionTypeDescriptorModelProperty> property =
-            declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    return of(new IdempotentDeclarationEnricherWalkDelegate() {
 
-        if (!property.isPresent()) {
-          return;
-        }
+      private Type extensionType = property.get().getType();
 
-        extensionType = property.get().getType();
-
-        new IdempotentDeclarationWalker() {
-
-          @Override
-          public void onSource(SourceDeclaration declaration) {
-            enrichSourceMetadata(declaration);
-          }
-
-          @Override
-          public void onOperation(OperationDeclaration declaration) {
-            enrichOperationMetadata(declaration);
-          }
-
-        }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+      @Override
+      public void onSource(SourceDeclaration declaration) {
+        enrichSourceMetadata(declaration);
       }
-    }
 
-    private void enrichSourceMetadata(SourceDeclaration declaration) {
-      declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-          .ifPresent(prop -> {
-            final Type sourceType = prop.getType();
-            MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, sourceType, declaration);
-            enrichResolversInformation(declaration, metadataScope);
-            enrichSuccesSourceCallbackMetadata(declaration);
-            enrichErrorSourceCallbackMetadata(declaration);
-          });
-    }
+      @Override
+      public void onOperation(OperationDeclaration declaration) {
+        enrichOperationMetadata(declaration);
+      }
 
-    private void enrichErrorSourceCallbackMetadata(SourceDeclaration declaration) {
-      declaration.getSuccessCallback()
-          .ifPresent(sourceCallbackDeclaration -> enrichSourceCallbackMetadata(declaration, sourceCallbackDeclaration));
-    }
-
-    private void enrichSuccesSourceCallbackMetadata(SourceDeclaration declaration) {
-      declaration.getErrorCallback()
-          .ifPresent(sourceCallbackDeclaration -> enrichSourceCallbackMetadata(declaration, sourceCallbackDeclaration));
-    }
-
-    private void enrichSourceCallbackMetadata(SourceDeclaration sourceDeclaration,
-                                              SourceCallbackDeclaration sourceCallbackDeclaration) {
-      MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(sourceCallbackDeclaration);
-      enrichResolversInformation(sourceDeclaration, sourceCallbackDeclaration, metadataScope);
-    }
-
-    private void enrichOperationMetadata(OperationDeclaration declaration) {
-      declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-          .map(ExtensionOperationDescriptorModelProperty::getOperationElement)
-          .ifPresent(operation -> {
-            if (operation.isAnnotatedWith(Query.class)) {
-              enrichWithDsql(declaration, operation);
-            } else {
-              MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, operation, declaration);
+      private void enrichSourceMetadata(SourceDeclaration declaration) {
+        declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+            .ifPresent(prop -> {
+              final Type sourceType = prop.getType();
+              MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, sourceType, declaration);
               enrichResolversInformation(declaration, metadataScope);
-            }
-          });
-    }
-
-    private void enrichResolversInformation(SourceDeclaration sourceDeclaration,
-                                            SourceCallbackDeclaration sourceCallbackDeclaration,
-                                            MetadataScopeAdapter metadataScope) {
-      final String categoryName = getCategoryName(metadataScope);
-      declareResolversInformation(sourceCallbackDeclaration, metadataScope, categoryName,
-                                  sourceDeclaration.isRequiresConnection());
-      declareMetadataResolverFactory(sourceCallbackDeclaration, metadataScope);
-    }
-
-    private void enrichResolversInformation(ExecutableComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
-      final String categoryName = getCategoryName(metadataScope);
-      declareResolversInformation(declaration, metadataScope, categoryName);
-      declareMetadataResolverFactory(declaration, metadataScope, categoryName);
-      enrichMetadataKeyParameters(declaration, metadataScope);
-    }
-
-    private void enrichMetadataKeyParameters(ParameterizedDeclaration<?> declaration,
-                                             MetadataScopeAdapter metadataScope) {
-      declaration.getAllParameters()
-          .forEach(paramDeclaration -> paramDeclaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-              .ifPresent(modelProperty -> parseMetadataKeyAnnotations(modelProperty.getExtensionParameter(),
-                                                                      paramDeclaration,
-                                                                      metadataScope)));
-    }
-
-    private void declareResolversInformation(ExecutableComponentDeclaration<? extends ComponentDeclaration> declaration,
-                                             MetadataScopeAdapter metadataScope, String categoryName) {
-      declareResolversInformation(declaration, metadataScope, categoryName, declaration.isRequiresConnection());
-    }
-
-    private void declareResolversInformation(BaseDeclaration declaration,
-                                             MetadataScopeAdapter metadataScope, String categoryName,
-                                             boolean requiresConnection) {
-      if (metadataScope.isCustomScope()) {
-        Map<String, String> inputResolversByParam = metadataScope.getInputResolvers()
-            .entrySet().stream()
-            .collect(Collectors.toImmutableMap(Map.Entry::getKey,
-                                               e -> e.getValue().get().getResolverName()));
-        String outputResolver = metadataScope.getOutputResolver().getResolverName();
-        String attributesResolver = metadataScope.getAttributesResolver().getResolverName();
-        String keysResolver = metadataScope.getKeysResolver().getResolverName();
-        boolean isPartialKeyResolver = metadataScope.isPartialKeyResolver();
-
-        // TODO MULE-15638 - Once Metadata API 2.0 is implemented we will know better if the resolver requires or not a connection
-        // of config.
-        declaration.addModelProperty(new TypeResolversInformationModelProperty(categoryName,
-                                                                               inputResolversByParam,
-                                                                               outputResolver,
-                                                                               attributesResolver,
-                                                                               keysResolver,
-                                                                               requiresConnection,
-                                                                               requiresConnection,
-                                                                               isPartialKeyResolver));
+              enrichSuccessSourceCallbackMetadata(declaration);
+              enrichErrorSourceCallbackMetadata(declaration);
+            });
       }
-    }
 
-    private void declareMetadataResolverFactory(ComponentDeclaration<? extends ComponentDeclaration> declaration,
-                                                MetadataScopeAdapter metadataScope, String categoryName) {
-      MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-      declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
-      declareMetadataKeyId(declaration, categoryName);
-      declareInputResolvers(declaration, metadataScope);
-      if (declaration instanceof WithOutputDeclaration) {
-        declareOutputResolvers((WithOutputDeclaration) declaration, metadataScope);
+      private void enrichErrorSourceCallbackMetadata(SourceDeclaration declaration) {
+        declaration.getSuccessCallback()
+            .ifPresent(sourceCallbackDeclaration -> enrichSourceCallbackMetadata(declaration, sourceCallbackDeclaration));
       }
-    }
 
-    private void declareMetadataResolverFactory(SourceCallbackDeclaration sourceCallbackDeclaration,
-                                                MetadataScopeAdapter metadataScope) {
-      MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-      sourceCallbackDeclaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
-      declareInputResolvers(sourceCallbackDeclaration, metadataScope);
-    }
-
-    private void enrichWithDsql(OperationDeclaration declaration,
-                                MethodElement method) {
-      Query query = method.getAnnotation(Query.class).get();
-      final MetadataResolverFactory resolverFactory = new QueryMetadataResolverFactory(
-                                                                                       query.nativeOutputResolver(),
-                                                                                       query.entityResolver());
-      declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> resolverFactory));
-
-      final MetadataScopeAdapter metadataScope = new MetadataScopeAdapter() {
-
-        private final OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
-
-        @Override
-        public boolean hasKeysResolver() {
-          return false;
-        }
-
-        @Override
-        public boolean hasInputResolvers() {
-          return false;
-        }
-
-        @Override
-        public boolean hasOutputResolver() {
-          return true;
-        }
-
-        @Override
-        public boolean hasAttributesResolver() {
-          return false;
-        }
-
-        @Override
-        public boolean isPartialKeyResolver() {
-          return false;
-        }
-
-        @Override
-        public TypeKeysResolver getKeysResolver() {
-          return nullMetadataResolver;
-        }
-
-        @Override
-        public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
-          return emptyMap();
-        }
-
-        @Override
-        public OutputTypeResolver getOutputResolver() {
-          return outputResolver;
-        }
-
-        @Override
-        public AttributesTypeResolver getAttributesResolver() {
-          return nullMetadataResolver;
-        }
-      };
-      addQueryModelProperties(declaration, query);
-      declareDynamicType(declaration.getOutput());
-      declareMetadataKeyId(declaration, null);
-      enrichMetadataKeyParameters(declaration, metadataScope);
-      declareResolversInformation(declaration, metadataScope, getCategoryName(metadataScope));
-    }
-
-
-    private void addQueryModelProperties(OperationDeclaration declaration, Query query) {
-      ParameterDeclaration parameterDeclaration = declaration.getAllParameters()
-          .stream()
-          .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).isPresent())
-          .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).get()
-              .getParameter().isAnnotationPresent(MetadataKeyId.class))
-          .findFirst()
-          .orElseThrow(() -> new IllegalParameterModelDefinitionException(
-                                                                          "Query operation must have a parameter annotated with @MetadataKeyId"));
-
-      parameterDeclaration.addModelProperty(new QueryParameterModelProperty(query.translator()));
-      parameterDeclaration.setLayoutModel(builderFrom(parameterDeclaration.getLayoutModel()).asQuery().build());
-    }
-
-    private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope) {
-      Supplier<OutputTypeResolver<?>> outputTypeResolverSupplier = scope::getOutputResolver;
-
-      Supplier<AttributesTypeResolver<?>> attributesTypeResolverSupplier =
-          () -> MuleAttributesTypeResolverAdapter.from(scope.getAttributesResolver());
-
-      Supplier<org.mule.runtime.api.metadata.resolving.TypeKeysResolver> typeKeysResolverSupplier = scope::getKeysResolver;
-
-      return scope.isCustomScope() ? new DefaultMetadataResolverFactory(typeKeysResolverSupplier, scope.getInputResolvers(),
-                                                                        outputTypeResolverSupplier,
-                                                                        attributesTypeResolverSupplier)
-          : new NullMetadataResolverFactory();
-
-    }
-
-    private void declareInputResolvers(ParameterizedDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
-      if (metadataScope.hasInputResolvers()) {
-        Set<String> dynamicParameters = metadataScope.getInputResolvers().keySet();
-        declaration.getAllParameters().stream()
-            .filter(p -> dynamicParameters.contains(p.getName()))
-            .forEach(this::declareDynamicType);
+      private void enrichSuccessSourceCallbackMetadata(SourceDeclaration declaration) {
+        declaration.getErrorCallback()
+            .ifPresent(sourceCallbackDeclaration -> enrichSourceCallbackMetadata(declaration, sourceCallbackDeclaration));
       }
-    }
 
-    private void declareOutputResolvers(WithOutputDeclaration declaration, MetadataScopeAdapter metadataScope) {
-      if (metadataScope.hasOutputResolver()) {
+      private void enrichSourceCallbackMetadata(SourceDeclaration sourceDeclaration,
+                                                SourceCallbackDeclaration sourceCallbackDeclaration) {
+        MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(sourceCallbackDeclaration);
+        enrichResolversInformation(sourceDeclaration, sourceCallbackDeclaration, metadataScope);
+      }
+
+      private void enrichOperationMetadata(OperationDeclaration declaration) {
+        declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+            .map(ExtensionOperationDescriptorModelProperty::getOperationElement)
+            .ifPresent(operation -> {
+              if (operation.isAnnotatedWith(Query.class)) {
+                enrichWithDsql(declaration, operation);
+              } else {
+                MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, operation, declaration);
+                enrichResolversInformation(declaration, metadataScope);
+              }
+            });
+      }
+
+      private void enrichResolversInformation(SourceDeclaration sourceDeclaration,
+                                              SourceCallbackDeclaration sourceCallbackDeclaration,
+                                              MetadataScopeAdapter metadataScope) {
+        final String categoryName = getCategoryName(metadataScope);
+        declareResolversInformation(sourceCallbackDeclaration, metadataScope, categoryName,
+                                    sourceDeclaration.isRequiresConnection());
+        declareMetadataResolverFactory(sourceCallbackDeclaration, metadataScope);
+      }
+
+      private void enrichResolversInformation(ExecutableComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
+        final String categoryName = getCategoryName(metadataScope);
+        declareResolversInformation(declaration, metadataScope, categoryName);
+        declareMetadataResolverFactory(declaration, metadataScope, categoryName);
+        enrichMetadataKeyParameters(declaration, metadataScope);
+      }
+
+      private void enrichMetadataKeyParameters(ParameterizedDeclaration<?> declaration,
+                                               MetadataScopeAdapter metadataScope) {
+        declaration.getAllParameters()
+            .forEach(paramDeclaration -> paramDeclaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+                .ifPresent(modelProperty -> parseMetadataKeyAnnotations(modelProperty.getExtensionParameter(),
+                                                                        paramDeclaration,
+                                                                        metadataScope)));
+      }
+
+      private void declareResolversInformation(ExecutableComponentDeclaration<? extends ComponentDeclaration> declaration,
+                                               MetadataScopeAdapter metadataScope, String categoryName) {
+        declareResolversInformation(declaration, metadataScope, categoryName, declaration.isRequiresConnection());
+      }
+
+      private void declareResolversInformation(BaseDeclaration declaration,
+                                               MetadataScopeAdapter metadataScope, String categoryName,
+                                               boolean requiresConnection) {
+        if (metadataScope.isCustomScope()) {
+          Map<String, String> inputResolversByParam = metadataScope.getInputResolvers()
+              .entrySet().stream()
+              .collect(Collectors.toImmutableMap(Map.Entry::getKey,
+                                                 e -> e.getValue().get().getResolverName()));
+          String outputResolver = metadataScope.getOutputResolver().getResolverName();
+          String attributesResolver = metadataScope.getAttributesResolver().getResolverName();
+          String keysResolver = metadataScope.getKeysResolver().getResolverName();
+          boolean isPartialKeyResolver = metadataScope.isPartialKeyResolver();
+
+          // TODO MULE-15638 - Once Metadata API 2.0 is implemented we will know better if the resolver requires or not a
+          // connection
+          // of config.
+          declaration.addModelProperty(new TypeResolversInformationModelProperty(categoryName,
+                                                                                 inputResolversByParam,
+                                                                                 outputResolver,
+                                                                                 attributesResolver,
+                                                                                 keysResolver,
+                                                                                 requiresConnection,
+                                                                                 requiresConnection,
+                                                                                 isPartialKeyResolver));
+        }
+      }
+
+      private void declareMetadataResolverFactory(ComponentDeclaration<? extends ComponentDeclaration> declaration,
+                                                  MetadataScopeAdapter metadataScope, String categoryName) {
+        MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
+        declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
+        declareMetadataKeyId(declaration, categoryName);
+        declareInputResolvers(declaration, metadataScope);
+        if (declaration instanceof WithOutputDeclaration) {
+          declareOutputResolvers((WithOutputDeclaration) declaration, metadataScope);
+        }
+      }
+
+      private void declareMetadataResolverFactory(SourceCallbackDeclaration sourceCallbackDeclaration,
+                                                  MetadataScopeAdapter metadataScope) {
+        MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
+        sourceCallbackDeclaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
+        declareInputResolvers(sourceCallbackDeclaration, metadataScope);
+      }
+
+      private void enrichWithDsql(OperationDeclaration declaration,
+                                  MethodElement method) {
+        Query query = method.getAnnotation(Query.class).get();
+        final MetadataResolverFactory resolverFactory = new QueryMetadataResolverFactory(
+                                                                                         query.nativeOutputResolver(),
+                                                                                         query.entityResolver());
+        declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> resolverFactory));
+
+        final MetadataScopeAdapter metadataScope = new MetadataScopeAdapter() {
+
+          private OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
+
+          @Override
+          public boolean hasKeysResolver() {
+            return false;
+          }
+
+          @Override
+          public boolean hasInputResolvers() {
+            return false;
+          }
+
+          @Override
+          public boolean hasOutputResolver() {
+            return true;
+          }
+
+          @Override
+          public boolean hasAttributesResolver() {
+            return false;
+          }
+
+          @Override
+          public boolean isPartialKeyResolver() {
+            return false;
+          }
+
+          @Override
+          public TypeKeysResolver getKeysResolver() {
+            return NULL_METADATA_RESOLVER;
+          }
+
+          @Override
+          public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
+            return emptyMap();
+          }
+
+          @Override
+          public OutputTypeResolver getOutputResolver() {
+            return outputResolver;
+          }
+
+          @Override
+          public AttributesTypeResolver getAttributesResolver() {
+            return NULL_METADATA_RESOLVER;
+          }
+        };
+        addQueryModelProperties(declaration, query);
         declareDynamicType(declaration.getOutput());
+        declareMetadataKeyId(declaration, null);
+        enrichMetadataKeyParameters(declaration, metadataScope);
+        declareResolversInformation(declaration, metadataScope, getCategoryName(metadataScope));
       }
 
-      if (metadataScope.hasAttributesResolver()) {
-        declareDynamicType(declaration.getOutputAttributes());
+
+      private void addQueryModelProperties(OperationDeclaration declaration, Query query) {
+        ParameterDeclaration parameterDeclaration = declaration.getAllParameters()
+            .stream()
+            .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).isPresent())
+            .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).get()
+                .getParameter().isAnnotationPresent(MetadataKeyId.class))
+            .findFirst()
+            .orElseThrow(() -> new IllegalParameterModelDefinitionException(
+                                                                            "Query operation must have a parameter annotated with @MetadataKeyId"));
+
+        parameterDeclaration.addModelProperty(new QueryParameterModelProperty(query.translator()));
+        parameterDeclaration.setLayoutModel(builderFrom(parameterDeclaration.getLayoutModel()).asQuery().build());
       }
-    }
 
-    private void declareDynamicType(TypedDeclaration component) {
-      component.setType(component.getType(), true);
-    }
+      private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope) {
+        Supplier<OutputTypeResolver<?>> outputTypeResolverSupplier = scope::getOutputResolver;
 
-    private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component,
-                                      String categoryName) {
-      getMetadataKeyModelProperty(component, categoryName).ifPresent(component::addModelProperty);
-    }
+        Supplier<AttributesTypeResolver<?>> attributesTypeResolverSupplier =
+            () -> MuleAttributesTypeResolverAdapter.from(scope.getAttributesResolver());
 
-    private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(ComponentDeclaration<? extends ComponentDeclaration> component,
-                                                                             String categoryName) {
-      Optional<MetadataKeyIdModelProperty> keyId = findMetadataKeyIdInGroups(component, categoryName);
-      return keyId.isPresent() ? keyId : findMetadataKeyIdInParameters(component, categoryName);
-    }
+        Supplier<org.mule.runtime.api.metadata.resolving.TypeKeysResolver> typeKeysResolverSupplier = scope::getKeysResolver;
 
-    private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInGroups(
-                                                                           ComponentDeclaration<? extends ComponentDeclaration> component,
-                                                                           String categoryName) {
-      return component.getParameterGroups().stream()
-          .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
-          .filter(Objects::nonNull)
-          .filter(group -> hasKeyId(group.getDescriptor().getAnnotatedContainer()))
-          .map(group -> new MetadataKeyIdModelProperty(group.getDescriptor().getMetadataType(),
-                                                       group.getDescriptor().getName(), categoryName))
-          .findFirst();
-    }
+        return scope.isCustomScope() ? new DefaultMetadataResolverFactory(typeKeysResolverSupplier, scope.getInputResolvers(),
+                                                                          outputTypeResolverSupplier,
+                                                                          attributesTypeResolverSupplier)
+            : new NullMetadataResolverFactory();
 
-    private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInParameters(
-                                                                               ComponentDeclaration<? extends ComponentDeclaration> component,
+      }
+
+      private void declareInputResolvers(ParameterizedDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
+        if (metadataScope.hasInputResolvers()) {
+          Set<String> dynamicParameters = metadataScope.getInputResolvers().keySet();
+          declaration.getAllParameters().stream()
+              .filter(p -> dynamicParameters.contains(p.getName()))
+              .forEach(this::declareDynamicType);
+        }
+      }
+
+      private void declareOutputResolvers(WithOutputDeclaration declaration, MetadataScopeAdapter metadataScope) {
+        if (metadataScope.hasOutputResolver()) {
+          declareDynamicType(declaration.getOutput());
+        }
+
+        if (metadataScope.hasAttributesResolver()) {
+          declareDynamicType(declaration.getOutputAttributes());
+        }
+      }
+
+      private void declareDynamicType(TypedDeclaration component) {
+        component.setType(component.getType(), true);
+      }
+
+      private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component,
+                                        String categoryName) {
+        getMetadataKeyModelProperty(component, categoryName).ifPresent(component::addModelProperty);
+      }
+
+      private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(ComponentDeclaration<? extends ComponentDeclaration> component,
                                                                                String categoryName) {
-      return component.getParameterGroups().stream()
-          .flatMap(g -> g.getParameters().stream())
-          .filter(p -> getExtensionParameter(p).map(JavaMetadataKeyIdModelParserUtils::hasKeyId).orElse(false))
-          .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName(), categoryName))
-          .findFirst();
-    }
-
-    private Optional<ExtensionParameter> getExtensionParameter(ParameterDeclaration parameterDeclaration) {
-      return parameterDeclaration
-          .getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-          .map(ExtensionParameterDescriptorModelProperty::getExtensionParameter);
-    }
-
-    /**
-     * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} if the parsedParameter is annotated
-     * either as {@link MetadataKeyId} or {@link MetadataKeyPart}
-     *
-     * @param element         the method annotated parameter parsed
-     * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
-     */
-    private void parseMetadataKeyAnnotations(ExtensionParameter element, BaseDeclaration baseDeclaration,
-                                             MetadataScopeAdapter metadataScope) {
-      if (hasKeyId(element)) {
-        baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1, metadataScope.hasKeysResolver()));
+        Optional<MetadataKeyIdModelProperty> keyId = findMetadataKeyIdInGroups(component, categoryName);
+        return keyId.isPresent() ? keyId : findMetadataKeyIdInParameters(component, categoryName);
       }
 
-      getMetadataKeyPart(element).ifPresent(metadataKeyPart -> baseDeclaration
-          .addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.getFirst(), metadataKeyPart.getSecond())));
-    }
-
-    private String getCategoryName(MetadataScopeAdapter metadataScopeAdapter) {
-      NamedTypeResolver resolver = metadataScopeAdapter.getKeysResolver();
-      if (metadataScopeAdapter.hasKeysResolver()) {
-        return resolver.getCategoryName();
-      } else if (metadataScopeAdapter.hasInputResolvers()) {
-        return metadataScopeAdapter.getInputResolvers().values().iterator().next().get().getCategoryName();
-      } else if (metadataScopeAdapter.hasOutputResolver()) {
-        return metadataScopeAdapter.getOutputResolver().getCategoryName();
-      } else {
-        return null;
+      private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInGroups(
+                                                                             ComponentDeclaration<? extends ComponentDeclaration> component,
+                                                                             String categoryName) {
+        return component.getParameterGroups().stream()
+            .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
+            .filter(Objects::nonNull)
+            .filter(group -> hasKeyId(group.getDescriptor().getAnnotatedContainer()))
+            .map(group -> new MetadataKeyIdModelProperty(group.getDescriptor().getMetadataType(),
+                                                         group.getDescriptor().getName(), categoryName))
+            .findFirst();
       }
-    }
 
+      private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInParameters(
+                                                                                 ComponentDeclaration<? extends ComponentDeclaration> component,
+                                                                                 String categoryName) {
+        return component.getParameterGroups().stream()
+            .flatMap(g -> g.getParameters().stream())
+            .filter(p -> getExtensionParameter(p).map(JavaMetadataKeyIdModelParserUtils::hasKeyId).orElse(false))
+            .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName(), categoryName))
+            .findFirst();
+      }
+
+      private Optional<ExtensionParameter> getExtensionParameter(ParameterDeclaration parameterDeclaration) {
+        return parameterDeclaration
+            .getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+            .map(ExtensionParameterDescriptorModelProperty::getExtensionParameter);
+      }
+
+      /**
+       * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} if the parsedParameter is annotated
+       * either as {@link MetadataKeyId} or {@link MetadataKeyPart}
+       *
+       * @param element         the method annotated parameter parsed
+       * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
+       */
+      private void parseMetadataKeyAnnotations(ExtensionParameter element, BaseDeclaration baseDeclaration,
+                                               MetadataScopeAdapter metadataScope) {
+        if (hasKeyId(element)) {
+          baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1, metadataScope.hasKeysResolver()));
+        }
+
+        getMetadataKeyPart(element).ifPresent(metadataKeyPart -> baseDeclaration
+            .addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.getFirst(), metadataKeyPart.getSecond())));
+      }
+
+      private String getCategoryName(MetadataScopeAdapter metadataScopeAdapter) {
+        NamedTypeResolver resolver = metadataScopeAdapter.getKeysResolver();
+        if (metadataScopeAdapter.hasKeysResolver()) {
+          return resolver.getCategoryName();
+        } else if (metadataScopeAdapter.hasInputResolvers()) {
+          return metadataScopeAdapter.getInputResolvers().values().iterator().next().get().getCategoryName();
+        } else if (metadataScopeAdapter.hasOutputResolver()) {
+          return metadataScopeAdapter.getOutputResolver().getCategoryName();
+        } else {
+          return null;
+        }
+      }
+    });
   }
-
 }
