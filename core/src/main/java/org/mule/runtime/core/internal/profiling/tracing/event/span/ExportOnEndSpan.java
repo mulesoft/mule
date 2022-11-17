@@ -88,7 +88,6 @@ public class ExportOnEndSpan implements InternalSpan {
   @Override
   public void end() {
     runtimeInternalSpan.end();
-//    runtimeInternalSpan.addAttribute(THREAD_END_NAME_KEY, Thread.currentThread().getName());
     spanExporter.export(this);
   }
 
