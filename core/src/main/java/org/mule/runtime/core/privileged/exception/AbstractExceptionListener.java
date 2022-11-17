@@ -193,7 +193,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t     the fatal exception to log
    */
   protected void logFatal(CoreEvent event, Throwable t) {
-    if (statistics != null && statistics.isEnabled()) {
+    if (statistics != null) {
       statistics.incFatalError();
     }
 

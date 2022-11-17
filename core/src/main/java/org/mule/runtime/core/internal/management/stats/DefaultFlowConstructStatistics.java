@@ -59,14 +59,18 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   @Override
   public void incExecutionError() {
-    executionError.addAndGet(1);
-    executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    if (isEnabled()) {
+      executionError.addAndGet(1);
+      executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
   }
 
   @Override
   public void incFatalError() {
-    fatalError.addAndGet(1);
-    fatalErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    if (isEnabled()) {
+      fatalError.addAndGet(1);
+      fatalErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
   }
 
   /**
@@ -152,20 +156,26 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   @Override
   public void incReceivedEvents() {
-    receivedEvents.addAndGet(1);
-    eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
+    if (isEnabled()) {
+      receivedEvents.addAndGet(1);
+      eventsReceivedCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
   }
 
   @Override
   public void incMessagesDispatched() {
-    dispatchedMessages.addAndGet(1);
-    messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
+    if (isEnabled()) {
+      dispatchedMessages.addAndGet(1);
+      messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
   }
 
   @Override
   public void incConnectionErrors() {
-    connectionErrors.addAndGet(1);
-    connectionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    if (isEnabled()) {
+      connectionErrors.addAndGet(1);
+      connectionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
   }
 
   @Override
