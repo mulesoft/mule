@@ -24,7 +24,9 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.rules.ExpectedException.none;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -37,11 +39,30 @@ import java.util.Map;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
 public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public ExpectedException expected = none();
+
+  @Test
+  public void createDeployableProjectModelForAnAppWithOnlyAMuleConfig() throws Exception {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/simple-app");
+
+    assertThat(deployableProjectModel.getDependencies(), hasSize(0));
+  }
+
+  @Test
+  public void createDeployableProjectModelForAnEmptyAppMustFail() throws Exception {
+    expected.expect(MuleRuntimeException.class);
+    expected.expectMessage("src/main/mule cannot be empty");
+    getDeployableProjectModel("apps/empty-app");
+  }
 
   @Test
   public void createBasicDeployableProjectModel() throws Exception {

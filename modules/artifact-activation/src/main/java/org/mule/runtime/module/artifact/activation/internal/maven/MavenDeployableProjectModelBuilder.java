@@ -33,6 +33,7 @@ import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
@@ -60,8 +61,6 @@ import org.apache.maven.model.Model;
 public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableProjectModelBuilder {
 
   private final File projectFolder;
-  private List<String> packages = emptyList();
-  private List<String> resources = emptyList();
   private final List<Path> resourcesPath = new ArrayList<>();
   private boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = false;
 
@@ -130,25 +129,27 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
 
     // Get exported resources and packages
     try {
-      getAvailablePackagesAndResources(pomModel.getBuild());
+      List<String> packages = getAvailablePackages(pomModel.getBuild());
+      List<String> resources = getAvailableResources(pomModel.getBuild());
+
+      return new DeployableProjectModel(packages, resources, resourcesPath,
+                                        buildBundleDescriptor(deployableArtifactCoordinates),
+                                        getModelResolver(deployableArtifactCoordinates, resources, packages),
+                                        projectFolder, deployableBundleDependencies,
+                                        sharedDeployableBundleDescriptors, additionalPluginDependencies);
     } catch (IOException e) {
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
-
-    return new DeployableProjectModel(packages, resources, resourcesPath,
-                                      buildBundleDescriptor(deployableArtifactCoordinates),
-                                      getModelResolver(deployableArtifactCoordinates),
-                                      projectFolder, deployableBundleDependencies,
-                                      sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
-  private Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
+  private Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates,
+                                                         List<String> resources, List<String> packages) {
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
         if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
             && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
-          applicationModel = buildModelWithResourcesAndClasses(applicationModel);
+          applicationModel = buildModelWithResourcesAndClasses(applicationModel, resources, packages);
         }
         return applicationModel;
       };
@@ -159,12 +160,13 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     }
   }
 
-  private MuleApplicationModel buildModelWithResourcesAndClasses(MuleApplicationModel applicationModel) {
+  private MuleApplicationModel buildModelWithResourcesAndClasses(MuleApplicationModel applicationModel,
+                                                                 List<String> resources, List<String> packages) {
     MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder()
         .setName(applicationModel.getName() != null ? applicationModel.getName() : "mule")
         .setMinMuleVersion(applicationModel.getMinMuleVersion())
         .setRequiredProduct(applicationModel.getRequiredProduct())
-        .withClassLoaderModelDescriptorLoader(createDescriptorWithResourcesAndClasses())
+        .withClassLoaderModelDescriptorLoader(createDescriptorWithResourcesAndClasses(resources, packages))
         .withBundleDescriptorLoader(applicationModel.getBundleDescriptorLoader() != null
             ? applicationModel.getBundleDescriptorLoader()
             : new MuleArtifactLoaderDescriptor("mule", emptyMap()))
@@ -176,51 +178,65 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return builder.build();
   }
 
-  private MuleArtifactLoaderDescriptor createDescriptorWithResourcesAndClasses() {
+  private MuleArtifactLoaderDescriptor createDescriptorWithResourcesAndClasses(List<String> resources, List<String> packages) {
     Map<String, Object> attributes = of("exportedResources", resources, "exportedPackages", packages);
     return new MuleArtifactLoaderDescriptor("mule", attributes);
   }
 
-  private void getAvailablePackagesAndResources(Build build) throws IOException {
+  private List<String> getAvailablePackages(Build build) throws IOException {
     String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
     Path javaDirectory = get(projectFolder.getAbsolutePath(), sourceDirectory.concat(DEFAULT_SOURCES_JAVA_DIRECTORY));
     // look for all the sources under the java directory
+    if (!javaDirectory.toFile().exists()) {
+      return emptyList();
+    }
+
     List<Path> allJavaFiles = walk(javaDirectory)
         .filter(Files::isRegularFile)
         .collect(toList());
     Predicate<Path> isJavaFile = path -> getExtension(path.toString()).endsWith(JAVA_EXTENSION);
-    packages = allJavaFiles.stream()
-        .filter(isJavaFile)
-        .map(path -> {
-          Path parent = javaDirectory.relativize(path).getParent();
-          // if parent is null, it implies "default package" in java, which means we need an empty string for the
-          // exportedPackages
-          return parent != null ? parent.toString() : DEFAULT_PACKAGE_EXPORT;
-        })
-        .map(this::escapeSlashes)
+
+    return allJavaFiles.stream().filter(isJavaFile).map(path -> {
+      Path parent = javaDirectory.relativize(path).getParent();
+      // if parent is null, it implies "default package" in java, which means we need an empty string for the
+      // exportedPackages
+      return parent != null ? parent.toString() : DEFAULT_PACKAGE_EXPORT;
+    }).map(this::escapeSlashes)
         .map(s -> s.replace(CLASS_PATH_SEPARATOR, PACKAGE_SEPARATOR))
         .distinct()
         .collect(toList());
+  }
+
+  private List<String> getAvailableResources(Build build) throws IOException {
+    String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
+    List<String> resources = getResourcesInFolder(sourceDirectory.concat(DEFAULT_MULE_DIRECTORY));
+    if (resources.isEmpty()) {
+      throw new MuleRuntimeException(createStaticMessage(sourceDirectory.concat(DEFAULT_MULE_DIRECTORY) + " cannot be empty"));
+    }
 
     if (build.getResources().isEmpty()) {
-      resources = getResourcesInFolder(sourceDirectory.concat(DEFAULT_RESOURCES_DIRECTORY));
+      resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_RESOURCES_DIRECTORY)));
     } else {
-      resources = build.getResources().stream()
-          .flatMap(r -> {
-            try {
-              return getResourcesInFolder(r.getDirectory()).stream();
-            } catch (IOException e) {
-              throw new IllegalStateException("Cannot load files from" + r.getDirectory());
-            }
-          }).collect(toList());
+      build.getResources().forEach(r -> {
+        try {
+          resources.addAll(getResourcesInFolder(r.getDirectory()));
+        } catch (IOException e) {
+          throw new IllegalStateException("Cannot load files from" + r.getDirectory());
+        }
+      });
     }
-    resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_MULE_DIRECTORY)));
-
     // TODO W-11203142 - add test resources
+
+    return resources;
   }
 
   private List<String> getResourcesInFolder(String resourcesDirectoryName) throws IOException {
     Path resourcesDirectory = get(projectFolder.getAbsolutePath(), resourcesDirectoryName);
+
+    if (!resourcesDirectory.toFile().exists()) {
+      return emptyList();
+    }
+
     resourcesPath.add(resourcesDirectory);
     // look for all the sources under the resources directory
     List<Path> allResourcesFiles = walk(resourcesDirectory)
