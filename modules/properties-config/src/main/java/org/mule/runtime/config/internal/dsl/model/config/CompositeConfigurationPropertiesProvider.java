@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -74,5 +76,10 @@ public class CompositeConfigurationPropertiesProvider implements ConfigurationPr
     }
     stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length(), "");
     return stringBuilder.append(")").toString();
+  }
+
+  @Override
+  public String toString() {
+    return getDescription();
   }
 }

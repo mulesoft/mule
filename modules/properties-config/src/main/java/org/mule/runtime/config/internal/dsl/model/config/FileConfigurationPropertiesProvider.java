@@ -54,4 +54,9 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
   public String getDescription() {
     return description;
   }
+
+  @Override
+  public String toString() {
+    return getDescription();
+  }
 }
