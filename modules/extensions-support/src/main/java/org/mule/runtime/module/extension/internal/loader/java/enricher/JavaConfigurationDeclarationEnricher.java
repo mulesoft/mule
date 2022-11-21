@@ -41,7 +41,7 @@ import java.util.function.BiConsumer;
 public class JavaConfigurationDeclarationEnricher implements WalkingDeclarationEnricher {
 
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     return extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration())
         .map(p -> new IdempotentDeclarationEnricherWalkDelegate() {
 

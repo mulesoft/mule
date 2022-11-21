@@ -46,7 +46,7 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Walki
   }
 
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     Predicate<Field> fieldHasAnnotationPredicate = getFieldHasAnnotationPredicate();
     return of(getWalkDelegate(fieldHasAnnotationPredicate));
   }

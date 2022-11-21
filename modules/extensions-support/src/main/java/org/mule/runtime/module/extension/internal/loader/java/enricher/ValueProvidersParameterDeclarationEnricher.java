@@ -87,7 +87,7 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
   private final ClassTypeLoader classTypeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     return extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration())
         .map(p -> new IdempotentDeclarationEnricherWalkDelegate() {
 

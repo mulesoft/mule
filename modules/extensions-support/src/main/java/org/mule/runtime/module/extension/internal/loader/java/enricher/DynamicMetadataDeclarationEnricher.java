@@ -83,7 +83,7 @@ public class DynamicMetadataDeclarationEnricher implements WalkingDeclarationEnr
   private static final NullMetadataResolver NULL_METADATA_RESOLVER = new NullMetadataResolver();
 
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     BaseDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
     // TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
     if (isASTMode(declaration)) {

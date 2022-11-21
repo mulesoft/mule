@@ -65,7 +65,7 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
   private static final String POLLING_SOURCE_LIMIT_MULE_VERSION = "4.4.0";
 
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     return of(new IdempotentDeclarationEnricherWalkDelegate() {
 
       final int schedulingStrategyParameterSequence =

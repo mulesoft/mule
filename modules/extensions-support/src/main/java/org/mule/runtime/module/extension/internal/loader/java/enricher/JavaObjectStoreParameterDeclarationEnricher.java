@@ -38,7 +38,7 @@ import java.util.Optional;
 public class JavaObjectStoreParameterDeclarationEnricher implements WalkingDeclarationEnricher {
 
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     return of(new IdempotentDeclarationEnricherWalkDelegate() {
 
       final ExtensionDeclaration extension = extensionLoadingContext.getExtensionDeclarer().getDeclaration();

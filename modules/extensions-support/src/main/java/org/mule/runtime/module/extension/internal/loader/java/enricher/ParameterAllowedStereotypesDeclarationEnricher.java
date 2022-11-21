@@ -49,7 +49,7 @@ public final class ParameterAllowedStereotypesDeclarationEnricher implements Wal
    * them up.
    */
   @Override
-  public Optional<DeclarationEnricherWalkDelegate> getWalker(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     Map<String, ObjectType> typesByClassName = new HashMap<>();
     extensionLoadingContext.getExtensionDeclarer().getDeclaration().getTypes()
         .forEach(type -> type.getAnnotation(ClassInformationAnnotation.class)
