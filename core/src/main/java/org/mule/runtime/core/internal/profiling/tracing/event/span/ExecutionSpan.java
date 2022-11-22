@@ -83,7 +83,6 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public void end() {
     this.endTime = Clock.getDefault().now();
-    addAttribute(THREAD_END_NAME_KEY, Thread.currentThread().getName());
   }
 
   @Override
