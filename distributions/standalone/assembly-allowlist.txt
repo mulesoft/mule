@@ -450,7 +450,10 @@
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/user/README.txt
 /mule-standalone-${productVersion}/lib/user/xmlunit-1.6.jar
-
+/mule-standalone-${productVersion}/lib/opt/asm-5.0.4.jar
+/mule-standalone-${productVersion}/lib/opt/axiom-common-impl-1.2.14.jar
+/mule-standalone-${productVersion}/lib/opt/cglib-3.2.2.jar
+/mule-standalone-${productVersion}/lib/opt/jruby-core-9.1.16.0.jar
 
 #
 # /lib/logs
