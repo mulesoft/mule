@@ -189,7 +189,7 @@
         <javaXmlBindVersion>2.3.0-MULE-001</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
-        <jbossTsVersion>4.16.6.Final</jbossTsVersion>
+        <jbossTsVersion>4.15.0.Final</jbossTsVersion>
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jdom2Version>2.0.6</jdom2Version>
