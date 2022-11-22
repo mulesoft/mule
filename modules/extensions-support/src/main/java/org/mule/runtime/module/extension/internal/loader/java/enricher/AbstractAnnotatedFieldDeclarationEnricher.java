@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -16,15 +17,17 @@ import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Optional;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -35,7 +38,7 @@ import com.google.common.base.Predicate;
  *
  * @since 4.4
  */
-public abstract class AbstractAnnotatedFieldDeclarationEnricher implements DeclarationEnricher {
+public abstract class AbstractAnnotatedFieldDeclarationEnricher implements WalkingDeclarationEnricher {
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
@@ -43,9 +46,13 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
   }
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     Predicate<Field> fieldHasAnnotationPredicate = getFieldHasAnnotationPredicate();
-    new IdempotentDeclarationWalker() {
+    return of(getWalkDelegate(fieldHasAnnotationPredicate));
+  }
+
+  protected DeclarationEnricherWalkDelegate getWalkDelegate(Predicate<Field> fieldHasAnnotationPredicate) {
+    return new IdempotentDeclarationEnricherWalkDelegate() {
 
       @Override
       public void onConfiguration(ConfigurationDeclaration declaration) {
@@ -61,7 +68,7 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
       protected void onSource(SourceDeclaration declaration) {
         doEnrich(declaration, fieldHasAnnotationPredicate);
       }
-    }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+    };
   }
 
   protected void doEnrich(BaseDeclaration<?> declaration, Predicate<Field> fieldHasAnnotationPredicate) {
@@ -111,5 +118,4 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
   protected abstract String getAnnotationName();
 
   protected abstract Class getImplementingClass();
-
 }
