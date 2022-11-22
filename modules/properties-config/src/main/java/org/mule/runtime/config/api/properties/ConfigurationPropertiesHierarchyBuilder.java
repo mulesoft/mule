@@ -8,8 +8,10 @@ package org.mule.runtime.config.api.properties;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
@@ -57,6 +59,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
   private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
+  private boolean reservedProperties = false;
   private boolean failuresIfNotPresent = true;
 
   /**
@@ -161,12 +164,37 @@ public class ConfigurationPropertiesHierarchyBuilder {
     return this;
   }
 
+  /**
+   * Set that the {@link ConfigurationPropertiesResolver} should not override reserved properties (such as 'app.name'). Check
+   * documentation for all the reserved properties. Usually, this method should always be invoked for a correct behavior. It
+   * should only not be invoked if the min mule version of the application is prior to 4.3.0.
+   * 
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withReservedProperties() {
+    this.reservedProperties = true;
+    return this;
+  }
+
   private void addToHierarchy(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
     Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.peek());
     hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider, failuresIfNotPresent));
   }
 
+
+  private void setRootProvider(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy) {
+    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
+
+    if (reservedProperties || !deploymentProperties.isPresent()) {
+      lastResolver.setAsRootResolver();
+    } else {
+      hierarchy.pop();
+      DefaultConfigurationPropertiesResolver preLastResolver = hierarchy.peek();
+      hierarchy.push(lastResolver);
+      preLastResolver.setAsRootResolver();
+    }
+  }
 
   /**
    * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
@@ -184,8 +212,8 @@ public class ConfigurationPropertiesHierarchyBuilder {
     systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
-    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
-    lastResolver.setAsRootResolver();
-    return lastResolver;
+    setRootProvider(hierarchy);
+
+    return hierarchy.peek();
   }
 }

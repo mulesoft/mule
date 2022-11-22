@@ -42,12 +42,13 @@ public class PropertiesHierarchyCreationUtils {
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-      partialResolverBuilder.withDeploymentProperties(deploymentProperties);
+      partialResolverBuilder.withReservedProperties();
     }
 
     Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
 
     ConfigurationPropertiesResolver partialResolver = partialResolverBuilder
+        .withDeploymentProperties(deploymentProperties)
         .withSystemProperties()
         .withEnvironmentProperties()
         .withGlobalPropertiesSupplier(globalPropertiesSupplier)
@@ -57,6 +58,7 @@ public class PropertiesHierarchyCreationUtils {
 
     ConfigurationPropertiesHierarchyBuilder completeBuilder = new ConfigurationPropertiesHierarchyBuilder()
         .withDeploymentProperties(deploymentProperties)
+        .withReservedProperties()
         .withSystemProperties()
         .withEnvironmentProperties()
         .withPropertiesFile(externalResourceProvider)
