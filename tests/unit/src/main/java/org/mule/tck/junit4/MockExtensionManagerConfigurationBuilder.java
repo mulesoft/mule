@@ -10,6 +10,7 @@ import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -17,6 +18,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Set;
 
@@ -49,6 +52,11 @@ public class MockExtensionManagerConfigurationBuilder implements ConfigurationBu
         ExtensionManager mockExtensionManager = mock(ExtensionManager.class, RETURNS_DEEP_STUBS.get());
         when(mockExtensionManager.getExtensions()).thenReturn(extensionModels);
         muleContext.setExtensionManager(mockExtensionManager);
+        try {
+          ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, mockExtensionManager);
+        } catch (RegistrationException e) {
+          throw new RuntimeException("Failed to register ExtensionManager in the mule registry.");
+        }
       });
     }
   }

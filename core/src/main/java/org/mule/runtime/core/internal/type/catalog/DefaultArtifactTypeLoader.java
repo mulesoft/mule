@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.core.internal.type.catalog;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
+
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -23,6 +27,7 @@ import org.mule.runtime.api.metadata.ArtifactTypeLoader;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -43,8 +48,6 @@ import javax.inject.Inject;
  */
 public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactTypeLoader.class);
-
   private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
 
@@ -56,20 +59,22 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
 
   private Collection<ExtensionModel> extensionModels;
 
-  public DefaultArtifactTypeLoader() {
-
-  }
+  public DefaultArtifactTypeLoader() {}
 
   public DefaultArtifactTypeLoader(Collection<ExtensionModel> extensionModels) {
+    requireNonNull(extensionModels, "ExtensionModels collection cannot be null.");
     this.extensionModels = extensionModels;
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    if (extensionModels == null) {
+    if (extensionModels == null && extensionManager != null) {
       extensionModels = extensionManager.getExtensions();
     }
-    typesByExtension = new ConcurrentHashMap<>();
+    if (extensionModels == null) {
+      extensionModels = emptySet();
+    }
+    typesByExtension = new HashMap<>();
     loadedTypes = new ConcurrentHashMap<>();
     for (ExtensionModel extensionModel : extensionModels) {
       String extensionPrefix = extensionModel.getXmlDslModel().getPrefix();
@@ -110,8 +115,8 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
     if (typesByExtension.containsKey(extensionIdentifier)) {
       Set<MetadataType> typesWithTypeIdentifierAsAlias = new HashSet<>();
       for (MetadataType extensionType : typesByExtension.get(extensionIdentifier)) {
-        Optional<String> extensionTypeTypeTypeId = getTypeId(extensionType);
-        if (extensionTypeTypeTypeId.isPresent() && extensionTypeTypeTypeId.get().equals(typeIdOrAlias)) {
+        Optional<String> extensionTypeTypeId = getTypeId(extensionType);
+        if (extensionTypeTypeId.isPresent() && extensionTypeTypeId.get().equals(typeIdOrAlias)) {
           return extensionType;
         }
         String extensionTypeAlias = getAlias(extensionType);
