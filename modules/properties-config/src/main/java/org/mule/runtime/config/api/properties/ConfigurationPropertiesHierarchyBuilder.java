@@ -183,13 +183,11 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   private void setRootProvider(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy) {
     DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
-
     if (reservedProperties || !deploymentProperties.isPresent()) {
       lastResolver.setAsRootResolver();
     } else {
       hierarchy.pop();
       DefaultConfigurationPropertiesResolver preLastResolver = hierarchy.peek();
-      hierarchy.push(lastResolver);
       preLastResolver.setAsRootResolver();
     }
   }
