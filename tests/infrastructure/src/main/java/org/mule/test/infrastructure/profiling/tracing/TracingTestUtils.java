@@ -34,7 +34,7 @@ public class TracingTestUtils {
     attributeMap.put(ARTIFACT_TYPE_ID, APP.getAsString());
     return attributeMap;
   }
-  
+
   public static List<String> getDefaultAttributesToAssertExistence() {
     return Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY, THREAD_END_NAME_KEY);
   }
