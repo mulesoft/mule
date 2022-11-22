@@ -8,10 +8,8 @@ package org.mule.runtime.config.api.properties;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
