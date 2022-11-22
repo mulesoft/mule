@@ -8,28 +8,29 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 
 import static java.lang.String.format;
+import static java.nio.file.Files.notExists;
 import static java.nio.file.Files.walk;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -44,6 +45,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,28 +62,40 @@ import org.apache.maven.model.Model;
  */
 public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableProjectModelBuilder {
 
-  private final File projectFolder;
+  private static final String DEFAULT_PACKAGE_EXPORT = "";
+  private static final String JAVA_EXTENSION = "java";
+  private static final String PACKAGE_SEPARATOR = ".";
+  private static final String CLASS_PATH_SEPARATOR = "/";
+  private static final String DEFAULT_SOURCES_DIRECTORY = "src/main";
+  private static final String DEFAULT_SOURCES_JAVA_DIRECTORY = "/java";
+  private static final String DEFAULT_RESOURCES_DIRECTORY = "/resources";
+  private static final String DEFAULT_MULE_DIRECTORY = "/mule";
+  private static final String DEFAULT_TEST_RESOURCES_DIRECTORY = "/test/resources";
+
   private final List<Path> resourcesPath = new ArrayList<>();
-  private boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = false;
+  private final boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor;
+  private final boolean includeTestDependencies;
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration,
-                                            boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
-    super(mavenConfiguration);
-    this.projectFolder = projectFolder;
+                                            boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                            boolean includeTestDependencies) {
+    super(mavenConfiguration, projectFolder);
     this.exportAllResourcesAndPackagesIfEmptyLoaderDescriptor = exportAllResourcesAndPackagesIfEmptyLoaderDescriptor;
-  }
-
-  public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration) {
-    super(mavenConfiguration);
-    this.projectFolder = projectFolder;
+    this.includeTestDependencies = includeTestDependencies;
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
-    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor);
+    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, false);
+  }
+
+  public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                            boolean includeTestDependencies) {
+    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+         includeTestDependencies);
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder) {
-    this(projectFolder, getDefaultMavenConfiguration());
+    this(projectFolder, getDefaultMavenConfiguration(), false, false);
   }
 
   protected static MavenConfiguration getDefaultMavenConfiguration() {
@@ -110,23 +124,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   }
 
   @Override
-  public DeployableProjectModel build() {
-    File pom = getPomFromFolder(projectFolder);
-    Model pomModel = getPomModelFromFile(pom);
-
-    deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
-
-    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(pomModel);
-
-    AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
-    List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
-
-    resolveDeployableDependencies(aetherMavenClient, pom, pomModel, activeProfiles);
-
-    resolveDeployablePluginsData(deployableMavenBundleDependencies);
-
-    resolveAdditionalPluginDependencies(aetherMavenClient, pomModel, activeProfiles, pluginsArtifactDependencies);
-
+  protected DeployableProjectModel doBuild(Model pomModel, ArtifactCoordinates deployableArtifactCoordinates) {
     // Get exported resources and packages
     try {
       List<String> packages = getAvailablePackages(pomModel.getBuild());
@@ -134,7 +132,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
 
       return new DeployableProjectModel(packages, resources, resourcesPath,
                                         buildBundleDescriptor(deployableArtifactCoordinates),
-                                        getModelResolver(deployableArtifactCoordinates, resources, packages),
+                                        getDeployableModelResolver(deployableArtifactCoordinates, resources, packages),
                                         projectFolder, deployableBundleDependencies,
                                         sharedDeployableBundleDescriptors, additionalPluginDependencies);
     } catch (IOException e) {
@@ -142,14 +140,13 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     }
   }
 
-  private Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates,
-                                                         List<String> resources, List<String> packages) {
+  private Supplier<MuleDeployableModel> getDeployableModelResolver(ArtifactCoordinates deployableArtifactCoordinates,
+                                                                   List<String> resources, List<String> packages) {
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
-        if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
-            && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
-          applicationModel = buildModelWithResourcesAndClasses(applicationModel, resources, packages);
+        if (shouldEditApplicationModel(applicationModel)) {
+          applicationModel = buildApplicationModel(applicationModel, resources, packages);
         }
         return applicationModel;
       };
@@ -160,17 +157,31 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     }
   }
 
-  private MuleApplicationModel buildModelWithResourcesAndClasses(MuleApplicationModel applicationModel,
-                                                                 List<String> resources, List<String> packages) {
+  private boolean shouldEditApplicationModel(MuleApplicationModel applicationModel) {
+    return (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
+        && applicationModel.getClassLoaderModelLoaderDescriptor() == null) || includeTestDependencies;
+  }
+
+  @Override
+  protected boolean isIncludeTestDependencies() {
+    return includeTestDependencies;
+  }
+
+  private MuleApplicationModel buildApplicationModel(MuleApplicationModel applicationModel, List<String> resources,
+                                                     List<String> packages) {
     MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder()
         .setName(applicationModel.getName() != null ? applicationModel.getName() : "mule")
         .setMinMuleVersion(applicationModel.getMinMuleVersion())
         .setRequiredProduct(applicationModel.getRequiredProduct())
-        .withClassLoaderModelDescriptorLoader(createDescriptorWithResourcesAndClasses(resources, packages))
+        .withClassLoaderModelDescriptorLoader(createClassLoaderModelDescriptorLoader(applicationModel
+            .getClassLoaderModelLoaderDescriptor(), resources, packages))
         .withBundleDescriptorLoader(applicationModel.getBundleDescriptorLoader() != null
             ? applicationModel.getBundleDescriptorLoader()
             : new MuleArtifactLoaderDescriptor("mule", emptyMap()))
         .setDomain(applicationModel.getDomain().orElse(null));
+    if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor && applicationModel.getClassLoaderModelLoaderDescriptor() == null) {
+
+    }
     builder.setConfigs(applicationModel.getConfigs());
     builder.setRedeploymentEnabled(applicationModel.isRedeploymentEnabled());
     builder.setSecureProperties(applicationModel.getSecureProperties());
@@ -178,8 +189,18 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return builder.build();
   }
 
-  private MuleArtifactLoaderDescriptor createDescriptorWithResourcesAndClasses(List<String> resources, List<String> packages) {
-    Map<String, Object> attributes = of("exportedResources", resources, "exportedPackages", packages);
+  private MuleArtifactLoaderDescriptor createClassLoaderModelDescriptorLoader(MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                                              List<String> resources, List<String> packages) {
+    Map<String, Object> attributes = new HashMap<>();
+
+    if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor && classLoaderModelLoaderDescriptor == null) {
+      attributes.put(EXPORTED_RESOURCES, resources);
+      attributes.put(EXPORTED_PACKAGES, packages);
+    }
+    if (includeTestDependencies) {
+      attributes.put(INCLUDE_TEST_DEPENDENCIES, "true");
+    }
+
     return new MuleArtifactLoaderDescriptor("mule", attributes);
   }
 
@@ -214,6 +235,10 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
       throw new MuleRuntimeException(createStaticMessage(sourceDirectory.concat(DEFAULT_MULE_DIRECTORY) + " cannot be empty"));
     }
 
+    if (includeTestDependencies) {
+      resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_TEST_RESOURCES_DIRECTORY)));
+    }
+
     if (build.getResources().isEmpty()) {
       resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_RESOURCES_DIRECTORY)));
     } else {
@@ -225,7 +250,6 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
         }
       });
     }
-    // TODO W-11203142 - add test resources
 
     return resources;
   }
@@ -238,6 +262,11 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     }
 
     resourcesPath.add(resourcesDirectory);
+
+    if (notExists(resourcesDirectory)) {
+      return emptyList();
+    }
+
     // look for all the sources under the resources directory
     List<Path> allResourcesFiles = walk(resourcesDirectory)
         .filter(Files::isRegularFile)
@@ -254,7 +283,8 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return p.replace("\\", CLASS_PATH_SEPARATOR);
   }
 
-  private File getPomFromFolder(File projectFolder) {
+  @Override
+  protected File getPomFromFolder(File projectFolder) {
     String pomFilePath = "pom.xml";
 
     File pomFile = new File(projectFolder, pomFilePath);

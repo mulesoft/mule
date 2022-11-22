@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -223,20 +224,47 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
                         hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("spring-context"))))));
   }
 
+  @Test
+  public void createDeployableProjectModelIncludingTestDependencies() throws Exception {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/include-test-dependencies", false, true);
+
+    assertThat(deployableProjectModel.getDependencies(), hasSize(1));
+    assertThat(deployableProjectModel.getDependencies(),
+               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-jms-connector")))));
+  }
+
+  @Test
+  @Description("Tests that even if the \"includeTestDependencies\" field is present in the class loader model loader " +
+      "descriptor in the mule-artifact.json file, test dependencies are not included unless explicitly stated.")
+  public void createDeployableProjectModelWithoutIncludingTestDependenciesAndIncludeTestDependenciesInMuleArtifactJson()
+      throws Exception {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/include-test-dependencies");
+
+    assertThat(deployableProjectModel.getDependencies(), hasSize(0));
+  }
+
   private DeployableProjectModel getDeployableProjectModel(String deployablePath,
-                                                           boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor)
+                                                           boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                           boolean includeTestDependencies)
       throws URISyntaxException {
     DeployableProjectModel model =
         new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath),
-                                               exportAllResourcesAndPackagesIfEmptyLoaderDescriptor).build();
+                                               exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, includeTestDependencies)
+                                                   .build();
 
     model.validate();
 
     return model;
   }
 
+  private DeployableProjectModel getDeployableProjectModel(String deployablePath,
+                                                           boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor)
+      throws URISyntaxException {
+    return getDeployableProjectModel(deployablePath, exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, false);
+  }
+
   private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    return getDeployableProjectModel(deployablePath, false);
+    return getDeployableProjectModel(deployablePath, false, false);
   }
 
   protected File getDeployableFolder(String appPath) throws URISyntaxException {

@@ -6,20 +6,22 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
-import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.nio.file.Files.find;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -39,7 +41,6 @@ import org.apache.maven.model.Model;
 public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeployableProjectModelBuilder {
 
   private final boolean isDomain;
-  private final File projectFolder;
   private final Optional<MuleDeployableModel> model;
 
 
@@ -48,46 +49,32 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
   }
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain) {
-    super(getMavenConfig());
-    this.projectFolder = projectFolder;
+    super(getMavenConfig(), projectFolder);
     this.model = model;
     this.isDomain = isDomain;
   }
 
   @Override
-  public DeployableProjectModel build() {
-    File pom = getPomFromFolder(projectFolder);
-    Model pomModel = getPomModelFromFile(pom);
+  protected DeployableProjectModel doBuild(Model pomModel, ArtifactCoordinates deployableArtifactCoordinates) {
+    Supplier<MuleDeployableModel> deployableModelResolver = getDeployableModelResolver();
+    MuleDeployableModel deployableModel = deployableModelResolver.get();
 
-    deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
-
-    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(pomModel);
-
-    AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
-    List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
-
-    resolveDeployableDependencies(aetherMavenClient, pom, pomModel, activeProfiles);
-
-    resolveDeployablePluginsData(deployableMavenBundleDependencies);
-
-    resolveAdditionalPluginDependencies(aetherMavenClient, pomModel, activeProfiles, pluginsArtifactDependencies);
-
-    Supplier<MuleDeployableModel> modelResolver = getModelResolver();
-
-    List<String> exportedPackages = (List<String>) modelResolver.get()
-        .getClassLoaderModelLoaderDescriptor().getAttributes().getOrDefault("exportedPackages", emptyList());
-
-    List<String> exportedResources = (List<String>) modelResolver.get().getClassLoaderModelLoaderDescriptor().getAttributes()
-        .getOrDefault("exportedResources", emptyList());
+    List<String> exportedPackages =
+        getAttribute(deployableModel.getClassLoaderModelLoaderDescriptor().getAttributes(),
+                     EXPORTED_PACKAGES);
+    List<String> exportedResources =
+        getAttribute(deployableModel.getClassLoaderModelLoaderDescriptor().getAttributes(),
+                     EXPORTED_RESOURCES);
 
     return new DeployableProjectModel(exportedPackages, exportedResources, emptyList(),
                                       buildBundleDescriptor(deployableArtifactCoordinates, isDomain),
-                                      modelResolver,
+                                      deployableModelResolver,
                                       projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
-  private File getPomFromFolder(File projectFolder) {
+  @Override
+  protected File getPomFromFolder(File projectFolder) {
     File mavenFolder = new File(projectFolder, "META-INF/maven");
     try (Stream<Path> stream = find(mavenFolder.toPath(), 3, (p, m) -> p.getFileName().toString().equals("pom.xml"))) {
       List<Path> pomLists = stream.collect(toList());
@@ -100,7 +87,14 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
     }
   }
 
-  private Supplier<MuleDeployableModel> getModelResolver() {
+  @Override
+  protected boolean isIncludeTestDependencies() {
+    return parseBoolean(getSimpleAttribute(getDeployableModelResolver().get().getClassLoaderModelLoaderDescriptor()
+        .getAttributes(),
+                                           INCLUDE_TEST_DEPENDENCIES, "false"));
+  }
+
+  private Supplier<MuleDeployableModel> getDeployableModelResolver() {
     return () -> model.orElseGet(() -> {
       if (isDomain) {
         return domainModelResolver().resolve(new File(projectFolder, "META-INF/mule-artifact"));
