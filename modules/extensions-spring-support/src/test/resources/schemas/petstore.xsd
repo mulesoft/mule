@@ -375,14 +375,14 @@
         </xs:sequence>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="watermark"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="idempotent"></xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -399,14 +399,14 @@
         </xs:sequence>
         <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="failAtPoll"></xs:attribute>
         <xs:attribute type="mule:substitutableLong" use="optional" default="100" name="adoptionLimit"></xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -422,14 +422,14 @@
         </xs:sequence>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnStart"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnException"></xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
