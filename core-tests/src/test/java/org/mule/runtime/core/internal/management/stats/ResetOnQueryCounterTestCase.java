@@ -85,6 +85,7 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase {
     flow2Stats = new DefaultFlowConstructStatistics(FLOW_FLOW_CONSTRUCT_TYPE, "someFlow2");
 
     allStatistics = new AllStatistics();
+    allStatistics.setEnabled(true);
     allStatistics.add(flow1Stats);
     allStatistics.add(flow2Stats);
   }

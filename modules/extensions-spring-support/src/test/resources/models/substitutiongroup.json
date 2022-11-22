@@ -284,6 +284,11 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "artifactCoordinates": {
+    "artifact id": "mule-substitution-group-extension",
+    "group id": "org.mule.tests",
+    "version": "1.2.3"
+  },
   "notifications": [],
   "errors": [
     {

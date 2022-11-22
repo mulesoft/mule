@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,10 +29,10 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
+import org.slf4j.Logger;
 
 /**
  * Resolves attribute placeholders.
@@ -238,5 +240,10 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       }
       return t;
     }
+  }
+
+  @Override
+  public String toString() {
+    return configurationPropertiesProvider.toString() + nextResolver.map(n -> " -> " + n.toString()).orElse("");
   }
 }

@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,8 +33,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
+import org.apache.commons.lang3.function.TriFunction;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,23 +57,24 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
   }
 
   protected static Collection<Object[]> createExtensionModels(List<? extends ExtensionUnitTest> extensions) {
-    BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
-      ExtensionModel model = loadExtension(extension, loader);
+    TriFunction<Class<?>, ExtensionModelLoader, ArtifactCoordinates, ExtensionModel> createExtensionModel =
+        (extension, loader, artifactCoordinates) -> {
+          ExtensionModel model = loadExtension(extension, loader, artifactCoordinates);
 
-      if (EXTENSION_MODELS.put(model.getName(), model) != null) {
-        throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
-                                                  model.getName(), extension.getName()));
-      }
+          if (EXTENSION_MODELS.put(model.getName(), model) != null) {
+            throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
+                                                      model.getName(), extension.getName()));
+          }
 
-      return model;
-    };
+          return model;
+        };
 
     return extensions.stream()
         .map(e -> e.toTestParams(createExtensionModel))
         .collect(toList());
   }
 
-  protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
+  protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader, ArtifactCoordinates coordinates) {
     Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
                                     VERSION, getProductVersion(),
                                     // TODO MULE-14517: This workaround should be replaced for a better and more complete
@@ -101,21 +106,24 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
       }
     };
 
-    return loader.loadExtensionModel(pluginClassLoader, dslResolvingContext, params);
+    ExtensionModelLoadingRequest.Builder builder = builder(pluginClassLoader, dslResolvingContext).addParameters(params);
+    if (coordinates != null) {
+      builder.setArtifactCoordinates(coordinates);
+    }
+
+    return loader.loadExtensionModel(builder.build());
   }
 
   public static class ExtensionUnitTest {
 
     final ExtensionModelLoader loader;
     final Class<?> extensionClass;
+    final ArtifactCoordinates artifactCoordinates;
 
-    protected ExtensionUnitTest(ExtensionModelLoader loader, Class<?> extensionClass) {
+    protected ExtensionUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, ArtifactCoordinates artifactCoordinates) {
       this.loader = loader;
       this.extensionClass = extensionClass;
-    }
-
-    static ExtensionUnitTest newTestUnit(ExtensionModelLoader loader, Class<?> extensionClass) {
-      return new ExtensionUnitTest(loader, extensionClass);
+      this.artifactCoordinates = artifactCoordinates;
     }
 
     ExtensionModelLoader getLoader() {
@@ -126,8 +134,13 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
       return extensionClass;
     }
 
-    public final Object[] toTestParams(BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel) {
-      final ExtensionModel extensionModel = createExtensionModel.apply(getExtensionClass(), getLoader());
+    ArtifactCoordinates getArtifactCoordinates() {
+      return artifactCoordinates;
+    }
+
+    public final Object[] toTestParams(TriFunction<Class<?>, ExtensionModelLoader, ArtifactCoordinates, ExtensionModel> createExtensionModel) {
+      final ExtensionModel extensionModel =
+          createExtensionModel.apply(getExtensionClass(), getLoader(), getArtifactCoordinates());
       return buildTestParams(extensionModel);
     }
 

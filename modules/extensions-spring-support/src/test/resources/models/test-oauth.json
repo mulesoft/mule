@@ -70127,6 +70127,11 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "artifactCoordinates": {
+    "artifact id": "mule-test-oauth-extension",
+    "group id": "org.mule.tests",
+    "version": "1.2.3"
+  },
   "notifications": [],
   "errors": [
     {

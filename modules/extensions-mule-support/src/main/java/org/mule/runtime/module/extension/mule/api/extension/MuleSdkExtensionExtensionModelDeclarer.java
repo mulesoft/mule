@@ -33,6 +33,7 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_XSD_FILE_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -50,6 +51,7 @@ import java.util.Arrays;
  *
  * @since 4.5
  */
+@Experimental
 public class MuleSdkExtensionExtensionModelDeclarer {
 
   public ExtensionDeclarer declareExtensionModel() {

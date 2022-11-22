@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
@@ -25,13 +26,19 @@ public abstract class FileGenerationParameterizedExtensionModelTestCase extends 
   public static class ResourceExtensionUnitTest extends ExtensionUnitTest {
 
     public static ResourceExtensionUnitTest newUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename) {
-      return new ResourceExtensionUnitTest(loader, extensionClass, filename);
+      return newUnitTest(loader, extensionClass, filename, null);
+    }
+
+    public static ResourceExtensionUnitTest newUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename,
+                                                        ArtifactCoordinates artifactCoordinates) {
+      return new ResourceExtensionUnitTest(loader, extensionClass, filename, artifactCoordinates);
     }
 
     private final String filename;
 
-    protected ResourceExtensionUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename) {
-      super(loader, extensionClass);
+    protected ResourceExtensionUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename,
+                                        ArtifactCoordinates artifactCoordinates) {
+      super(loader, extensionClass, artifactCoordinates);
       this.filename = filename;
     }
 

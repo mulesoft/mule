@@ -51,7 +51,7 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
+public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
   private static final MetadataTypeEnricher METADATA_TYPE_ENRICHER = new MetadataTypeEnricher();
   private static final Set<TypeAnnotation> METADATA_TYPE_ANNOTATIONS = singleton(new TypedValueTypeAnnotation());
@@ -66,8 +66,8 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   private Optional<ParameterDslConfiguration> dslConfiguration = empty();
   private ParameterLayoutParser parameterLayoutParser;
 
-  public MuleSdkParameterModelParserSdk(ComponentAst parameterAst, TypeLoader typeLoader,
-                                        ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkParameterModelParser(ComponentAst parameterAst, TypeLoader typeLoader,
+                                     ExtensionModelHelper extensionModelHelper) {
     this.parameterAst = parameterAst;
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;

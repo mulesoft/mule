@@ -37,7 +37,7 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Story(PARAMETERS)
-public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase {
+public class MuleSdkParameterModelParserTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = none();
@@ -72,7 +72,7 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Test
   public void parameterTypeCanBeSomeValidParameterInTheApplicationTypeLoader() {
-    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.withType("somevalid").build();
+    MuleSdkParameterModelParser parameterModelParser = baseParameterParserBuilder.withType("somevalid").build();
     MetadataType expectedType =
         new MetadataTypeEnricher().enrich(someValidMetadataType, singleton(new TypedValueTypeAnnotation()));
     assertThat(parameterModelParser.getType(), is(expectedType));
@@ -84,13 +84,13 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Test
   public void when_parameterAstHasNotDeprecationParameter_then_parserHasNotDeprecationModel() {
-    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.build();
+    MuleSdkParameterModelParser parameterModelParser = baseParameterParserBuilder.build();
     assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(false));
   }
 
   @Test
   public void when_parameterAstHasDeprecationParameter_then_parserHasDeprecationModelWithCorrespondingValues() {
-    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder
+    MuleSdkParameterModelParser parameterModelParser = baseParameterParserBuilder
         .withDeprecationModel("1.1.0", "Some Message", "2.0.0")
         .build();
 
@@ -104,7 +104,7 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Test
   public void when_toRemoveInParameterIsNotConfigured_then_theDeprecationModelReturnsAnEmptyOptional() {
-    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder
+    MuleSdkParameterModelParser parameterModelParser = baseParameterParserBuilder
         .withDeprecationModel("1.1.0", "Some Message", null)
         .build();
 

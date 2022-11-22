@@ -34,4 +34,8 @@ public class GlobalPropertyConfigurationPropertiesProvider implements Configurat
     return "global-properties configuration attributes";
   }
 
+  @Override
+  public String toString() {
+    return getDescription();
+  }
 }

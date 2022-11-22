@@ -7,13 +7,8 @@
 package org.mule.runtime.core.api.retry.policy;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
+
 import static org.slf4j.LoggerFactory.getLogger;
-
-import java.io.InterruptedIOException;
-import java.util.Map;
-import java.util.concurrent.Executor;
-
-import javax.inject.Inject;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -25,6 +20,13 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.internal.retry.DefaultRetryContext;
+
+import java.io.InterruptedIOException;
+import java.util.Map;
+import java.util.concurrent.Executor;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 /**
