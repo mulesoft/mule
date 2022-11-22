@@ -113,7 +113,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   }
 
   @Override
-  public DeployableProjectModel build() {
+  public final DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
     Model pomModel = getPomModelFromFile(pom);
 
@@ -133,11 +133,29 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     return doBuild(pomModel, deployableArtifactCoordinates);
   }
 
+  /**
+   * Effectively builds the {@link DeployableProjectModel} with specific behaviour from the implementation.
+   *
+   * @param pomModel                      the POM model.
+   * @param deployableArtifactCoordinates artifact coordinates from the deployable.
+   * @return the {@link DeployableProjectModel}.
+   */
   protected abstract DeployableProjectModel doBuild(Model pomModel, ArtifactCoordinates deployableArtifactCoordinates);
 
+  /**
+   * Retrieves the POM file from the deployable project's folder.
+   *
+   * @param projectFolder the deployable project's folder.
+   * @return the deployable project's POM file.
+   */
   protected abstract File getPomFromFolder(File projectFolder);
 
-  protected List<String> getAttribute(Map<String, Object> attributes, String attribute) {
+  /**
+   * @return whether test dependencies are to be considered for this {@link DeployableProjectModel}.
+   */
+  protected abstract boolean isIncludeTestDependencies();
+
+  protected final List<String> getAttribute(Map<String, Object> attributes, String attribute) {
     if (attributes == null) {
       return emptyList();
     }
@@ -148,14 +166,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     return (List<String>) attributeObject;
   }
 
-  protected <T> T getSimpleAttribute(Map<String, Object> attributes, String attribute, T defaultValue) {
+  protected final <T> T getSimpleAttribute(Map<String, Object> attributes, String attribute, T defaultValue) {
     return (T) attributes.getOrDefault(attribute, defaultValue);
-  }
-
-  protected ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
-    ApplicationGAVModel deployableGAVModel =
-        new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
-    return getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
   }
 
   protected BundleDescriptor buildBundleDescriptor(ArtifactCoordinates artifactCoordinates) {
@@ -167,6 +179,12 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .setType(artifactCoordinates.getType())
         .setClassifier(artifactCoordinates.getClassifier())
         .build();
+  }
+
+  private ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
+    ApplicationGAVModel deployableGAVModel =
+        new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
+    return getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
   }
 
   /**
@@ -209,11 +227,9 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
             .collect(toSet());
   }
 
-  protected abstract boolean isIncludeTestDependencies();
-
-  protected void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
-                                                     List<String> activeProfiles,
-                                                     Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
+  private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
+                                                   List<String> activeProfiles,
+                                                   Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     // Parse additional plugin dependencies
     List<org.mule.runtime.module.artifact.activation.internal.plugin.Plugin> initialAdditionalPluginDependencies =
         findArtifactPackagerPlugin(pomModel, activeProfiles)
@@ -228,7 +244,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));
   }
 
-  protected void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
+  private void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
     // Resolve the dependencies of each deployable's dependency
     pluginsArtifactDependencies =
         new DeployablePluginsDependenciesResolver().resolve(deployableMavenBundleDependencies);

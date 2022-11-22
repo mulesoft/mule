@@ -197,7 +197,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
       attributes.put(EXPORTED_RESOURCES, resources);
       attributes.put(EXPORTED_PACKAGES, packages);
     }
-    if (includeTestDependencies) {
+    if (isIncludeTestDependencies()) {
       attributes.put(INCLUDE_TEST_DEPENDENCIES, "true");
     }
 
@@ -235,7 +235,8 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
       throw new MuleRuntimeException(createStaticMessage(sourceDirectory.concat(DEFAULT_MULE_DIRECTORY) + " cannot be empty"));
     }
 
-    if (includeTestDependencies) {
+    // include test resources if test dependencies have to be considered
+    if (isIncludeTestDependencies()) {
       resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_TEST_RESOURCES_DIRECTORY)));
     }
 
