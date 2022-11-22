@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.type.catalog;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
-import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.core.internal.type.catalog.SpecialTypesTypeLoader.VOID;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES_CATALOG;
 
@@ -23,31 +23,34 @@ import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
 @Feature(REUSE)
 @Story(TYPES_CATALOG)
-public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
+public class DefaultArtifactTypeLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String MOCK_EXTENSION_PREFIX = "mock";
   private static final String MOCK_TYPE_ALIAS = "MockType";
   private static final String MOCK_TYPE_ID = "MockTypeId";
   private static final String MOCK_EXTENSION_NAME = "Mock Extension";
 
-  private ApplicationTypeLoader applicationTypeLoader;
+  private static final String MOCK_TYPE_IDENTIFIER = MOCK_EXTENSION_PREFIX + ":" + MOCK_TYPE_ID;
+
+  private static final String MOCK_TYPE_IDENTIFIER_FROM_ALIAS = MOCK_EXTENSION_PREFIX + ":" + MOCK_TYPE_ALIAS;
+
+  private DefaultArtifactTypeLoader defaultArtifactTypeLoader;
 
   @Before
-  public void setUp() {
+  public void setUp() throws InitialisationException {
     ExtensionModel mockExtensionModel = mock(ExtensionModel.class);
 
     XmlDslModel dslModel = XmlDslModel.builder().setPrefix(MOCK_EXTENSION_PREFIX).build();
@@ -61,30 +64,32 @@ public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
         .build();
     when(mockExtensionModel.getTypes()).thenReturn(singleton(mockType));
 
-    ExpressionLanguageMetadataService mockMetadataService = mock(ExpressionLanguageMetadataService.class);
-    when(mockMetadataService.evaluateTypeExpression(eq(MOCK_TYPE_ID), any())).thenReturn(mockType);
-    applicationTypeLoader = new ApplicationTypeLoader(singleton(mockExtensionModel), mockMetadataService);
+    defaultArtifactTypeLoader = new DefaultArtifactTypeLoader(singleton(mockExtensionModel));
+    defaultArtifactTypeLoader.initialise();
   }
 
   @Test
   public void hasPrimitiveTypeString() {
-    assertThat(applicationTypeLoader.load(STRING).isPresent(), is(true));
+    assertThat(defaultArtifactTypeLoader.load(STRING).isPresent(), is(true));
   }
 
   @Test
   public void hasNotIncorrectType() {
-    assertThat(applicationTypeLoader.load("incorrect").isPresent(), is(false));
+    assertThat(defaultArtifactTypeLoader.load("incorrect").isPresent(), is(false));
   }
 
   @Test
   public void hasVoidType() {
-    assertThat(applicationTypeLoader.load(VOID).isPresent(), is(true));
+    assertThat(defaultArtifactTypeLoader.load(VOID).isPresent(), is(true));
   }
 
   @Test
-  @Issue("W-11706194")
-  @Description("The type expressions are resolved by the ExpressionLanguageMetadataService")
-  public void typeResolvedByExpressionLanguageMetadataService() {
-    assertThat(applicationTypeLoader.load(MOCK_TYPE_ID).isPresent(), is(true));
+  public void objectTypeFromExtension() {
+    assertThat(defaultArtifactTypeLoader.load(MOCK_TYPE_IDENTIFIER).isPresent(), is(true));
+  }
+
+  @Test
+  public void objectTypeFromExtensionUsingTypeID() {
+    assertThat(defaultArtifactTypeLoader.load(MOCK_TYPE_IDENTIFIER_FROM_ALIAS).isPresent(), is(true));
   }
 }
