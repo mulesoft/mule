@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.CompletionHandler;
@@ -45,6 +46,7 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   private final CompletionOutputStream outputStream;
   private final Semaphore sending = new Semaphore(1);
 
+  private volatile AtomicBoolean isCompleted = new AtomicBoolean(false);
   private volatile boolean isDone;
 
   public ResponseDeferringCompletionHandler(final FilterChainContext ctx,
@@ -98,9 +100,12 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
 
   private void doComplete()
   {
-    responseStatusCallback.responseSendSuccessfully();
-    ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
-    resume();
+    //If its not completed, then complete it
+    if(isCompleted.compareAndSet(false, true)) {
+      responseStatusCallback.responseSendSuccessfully();
+      ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
+      resume();
+    }
   }
 
   /**
