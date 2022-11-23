@@ -329,6 +329,12 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "artifactCoordinates":
+  {
+    "artifact id":"TestExtension",
+    "group id":"TestGroup",
+    "version":"1.2.3"
+  },
   "notifications": [],
   "errors": [
     {
