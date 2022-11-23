@@ -26,11 +26,8 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import io.qameta.allure.Feature;
-import io.qameta.allure.Flaky;
+import org.junit.Test;
 
 @Feature(DOMAIN_DEPLOYMENT)
 public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDeploymentTestCase {
@@ -234,8 +231,6 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   }
 
   @Test
-  @Flaky
-  @Ignore("MULE-19333")
   public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -247,14 +242,14 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STOPPED);
 
     // Redeploy domain
-    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(emptyDomain100FileBuilder.getId());
 
     // Application was redeployed but it is not started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), CREATED);
 
     // Redeploy domain again
-    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(emptyDomain100FileBuilder.getId());
 
     // Application was redeployed twice but it is not started
     verify(mockDeploymentListener, times(2)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
@@ -271,11 +266,20 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
 
     // Redeploy domain
-    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(emptyDomain100FileBuilder.getId());
 
     // Application was redeployed and started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
+  }
+
+  private void redeployDomain(String domainName) {
+    deploymentService.getLock().lock();
+    try {
+      deploymentService.redeployDomain(domainName);
+    } finally {
+      deploymentService.getLock().unlock();
+    }
   }
 
   private void assertApplicationStatus(String appName, ApplicationStatus expectedStatus) {
