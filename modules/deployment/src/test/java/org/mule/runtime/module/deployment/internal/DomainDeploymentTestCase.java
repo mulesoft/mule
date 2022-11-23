@@ -750,7 +750,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     Properties initialDeploymentProperties = new Properties();
     initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
-    deploy(deploymentService, dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(), initialDeploymentProperties);
+    deploy(deploymentService, dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(),
+           initialDeploymentProperties);
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
