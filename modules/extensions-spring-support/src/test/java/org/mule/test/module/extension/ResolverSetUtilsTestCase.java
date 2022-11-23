@@ -439,8 +439,6 @@ public class ResolverSetUtilsTestCase extends AbstractMuleContextTestCase {
 
     expressionManager = muleContext.getExpressionManager();
     testParameterizedModel = testOAuthExtensionModel.getConfigurationModels().get(0).getConnectionProviders().get(0);
-    MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
-    muleRegistry.registerObject("Extensions Manager Mock", mock(ExtensionManager.class));
     testOperationModels = testOAuthExtensionModel.getConfigurationModels().get(0).getOperationModels();
   }
 

@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -52,11 +53,6 @@ public class MockExtensionManagerConfigurationBuilder implements ConfigurationBu
         ExtensionManager mockExtensionManager = mock(ExtensionManager.class, RETURNS_DEEP_STUBS.get());
         when(mockExtensionManager.getExtensions()).thenReturn(extensionModels);
         muleContext.setExtensionManager(mockExtensionManager);
-        try {
-          ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, mockExtensionManager);
-        } catch (RegistrationException e) {
-          throw new RuntimeException("Failed to register ExtensionManager in the mule registry.");
-        }
       });
     }
   }

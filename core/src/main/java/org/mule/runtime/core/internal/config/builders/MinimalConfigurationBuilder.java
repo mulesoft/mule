@@ -13,6 +13,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
@@ -88,6 +89,7 @@ import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
@@ -148,6 +150,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerStreamingManager(muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
+    registerObject(OBJECT_ARTIFACT_TYPE_LOADER, new DefaultArtifactTypeLoader(), muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
