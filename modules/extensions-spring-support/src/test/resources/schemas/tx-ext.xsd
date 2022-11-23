@@ -56,11 +56,6 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.sdk.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
@@ -69,6 +64,11 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
@@ -87,11 +87,6 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
           <xs:annotation>
             <xs:documentation>The type of transaction to create. Availability will depend on the runtime version.</xs:documentation>
@@ -100,6 +95,11 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
@@ -117,14 +117,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -139,14 +139,14 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -169,14 +169,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -230,14 +230,14 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -260,14 +260,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -292,14 +292,14 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -322,14 +322,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -343,14 +343,14 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="transactional-connection"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -363,14 +363,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -383,14 +383,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -403,14 +403,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -454,11 +454,6 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.sdk.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
@@ -474,6 +469,11 @@
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -484,14 +484,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -504,14 +504,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -534,14 +534,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -555,14 +555,14 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="sdk-transactional-connection"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -575,14 +575,14 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>

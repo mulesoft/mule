@@ -6,28 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithParametersDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link DeclarationEnricher} implementation which introspect Configurations and Connection Provides and looks for parameters
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @since 4.2.0
  */
-public class RequiredForMetadataDeclarationEnricher implements DeclarationEnricher {
+public class RequiredForMetadataDeclarationEnricher implements WalkingDeclarationEnricher {
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
@@ -44,19 +44,19 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
   }
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    new DeclarationWalker() {
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
+    return of(new DeclarationEnricherWalkDelegate() {
 
       @Override
-      protected void onConfiguration(ConfigurationDeclaration declaration) {
+      public void onConfiguration(ConfigurationDeclaration declaration) {
         registerRequiredParametersForMetadata(declaration);
       }
 
       @Override
-      protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
+      public void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
         registerRequiredParametersForMetadata(declaration);
       }
-    }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+    });
   }
 
   private <T extends BaseDeclaration & WithParametersDeclaration> void registerRequiredParametersForMetadata(T declaration) {

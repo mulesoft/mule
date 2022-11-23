@@ -13,10 +13,9 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.annotation.param.RefName;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
 import java.lang.reflect.Field;
@@ -37,9 +36,9 @@ import com.google.common.base.Predicate;
 public final class RefNameDeclarationEnricher extends AbstractAnnotatedFieldDeclarationEnricher {
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    Predicate<Field> fieldHasAnnotationPredicate = getFieldHasAnnotationPredicate();
-    new IdempotentDeclarationWalker() {
+  protected DeclarationEnricherWalkDelegate getWalkDelegate(Predicate<Field> fieldHasAnnotationPredicate) {
+    // feature not supported on sources
+    return new IdempotentDeclarationEnricherWalkDelegate() {
 
       @Override
       public void onConfiguration(ConfigurationDeclaration declaration) {
@@ -50,8 +49,7 @@ public final class RefNameDeclarationEnricher extends AbstractAnnotatedFieldDecl
       protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
         doEnrich(declaration, fieldHasAnnotationPredicate);
       }
-
-    }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+    };
   }
 
   @Override
