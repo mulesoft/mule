@@ -10,6 +10,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeployDomain;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import static org.hamcrest.Matchers.is;
@@ -242,14 +243,14 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STOPPED);
 
     // Redeploy domain
-    redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(deploymentService, emptyDomain100FileBuilder.getId());
 
     // Application was redeployed but it is not started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), CREATED);
 
     // Redeploy domain again
-    redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(deploymentService, emptyDomain100FileBuilder.getId());
 
     // Application was redeployed twice but it is not started
     verify(mockDeploymentListener, times(2)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
@@ -266,20 +267,11 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
 
     // Redeploy domain
-    redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(deploymentService, emptyDomain100FileBuilder.getId());
 
     // Application was redeployed and started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
-  }
-
-  private void redeployDomain(String domainName) {
-    deploymentService.getLock().lock();
-    try {
-      deploymentService.redeployDomain(domainName);
-    } finally {
-      deploymentService.getLock().unlock();
-    }
   }
 
   private void assertApplicationStatus(String appName, ApplicationStatus expectedStatus) {

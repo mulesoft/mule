@@ -25,6 +25,10 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deployDomain;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeployDomain;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeployDomain;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -746,7 +750,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     Properties initialDeploymentProperties = new Properties();
     initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
-    deploymentService.deploy(dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(), initialDeploymentProperties);
+    deploy(deploymentService, dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(), initialDeploymentProperties);
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
@@ -1859,7 +1863,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void synchronizesDomainDeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI());
+    final Action action = () -> deployDomain(deploymentService, dummyDomainFileBuilder.getArtifactFile().toURI());
 
     final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainFileBuilder.getId());
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
@@ -1867,7 +1871,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void synchronizesDomainUndeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.undeployDomain(emptyDomainFileBuilder.getId());
+    final Action action = () -> undeployDomain(deploymentService, emptyDomainFileBuilder.getId());
 
     final Action assertAction =
         () -> verify(domainDeploymentListener, never()).onUndeploymentStart(emptyDomainFileBuilder.getId());
@@ -1879,7 +1883,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final Action action = () -> {
       // Clears notification from first deployment
       reset(domainDeploymentListener);
-      deploymentService.redeployDomain(emptyDomainFileBuilder.getId());
+      redeployDomain(deploymentService, emptyDomainFileBuilder.getId());
     };
 
     final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(emptyDomainFileBuilder.getId());
@@ -2257,15 +2261,15 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Override
   protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    deploymentService.deployDomain(uri, deploymentProperties);
+    deployDomain(deploymentService, uri, deploymentProperties);
   }
 
   @Override
   protected void redeployId(String id, Properties deploymentProperties) throws IOException {
     if (deploymentProperties == null) {
-      deploymentService.redeployDomain(id);
+      redeployDomain(deploymentService, id);
     } else {
-      deploymentService.redeployDomain(id, deploymentProperties);
+      redeployDomain(deploymentService, id, deploymentProperties);
     }
   }
 

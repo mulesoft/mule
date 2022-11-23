@@ -35,6 +35,9 @@ import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentP
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeploy;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ArtifactAstSerialization.AST_JSON_DESERIALIZER;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -965,7 +968,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     reset(applicationDeploymentListener);
 
-    deploymentService.redeploy(emptyAppFileBuilder.getId());
+    redeploy(deploymentService, emptyAppFileBuilder.getId());
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
     deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
@@ -1016,7 +1019,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     }
 
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
     assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
@@ -1034,7 +1037,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     }
 
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
     for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
@@ -1052,7 +1055,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deployApplication(dummyAppDescriptorFileBuilder);
 
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
     assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
@@ -1099,7 +1102,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
       flow.stop();
     }
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilder, STARTED);
     for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
@@ -1512,7 +1515,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesAppDeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    final Action action = () -> deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     final Action assertAction =
         () -> verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
@@ -1522,7 +1525,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void synchronizesAppUndeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.getId());
+    final Action action = () -> undeploy(deploymentService, emptyAppFileBuilder.getId());
 
     final Action assertAction =
         () -> verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.getId());
@@ -1535,7 +1538,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Action action = () -> {
       // Clears notification from first deployment
       reset(applicationDeploymentListener);
-      deploymentService.redeploy(emptyAppFileBuilder.getId());
+      redeploy(deploymentService, emptyAppFileBuilder.getId());
     };
 
     final Action assertAction =
@@ -1669,7 +1672,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     reset(mockDeploymentListener);
 
     // Redeploy by using deploy method
-    deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
@@ -1692,7 +1695,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     // Redeploy by using deploy method
-    deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());

@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 
@@ -507,7 +508,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     reset(mockDeploymentListener);
 
     // Redeploy by using redeploy method
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
@@ -528,7 +529,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     // Redeploy by using redeploy method
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
