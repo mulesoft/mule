@@ -41,18 +41,22 @@ public class PropertiesHierarchyCreationUtils {
     ConfigurationPropertiesHierarchyBuilder partialResolverBuilder = new ConfigurationPropertiesHierarchyBuilder();
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
-    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-      partialResolverBuilder.withReservedProperties();
-    }
+
 
     Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = createGlobalPropertiesSupplier(artifactAst);
 
-    ConfigurationPropertiesResolver partialResolver = partialResolverBuilder
+    partialResolverBuilder
         .withDeploymentProperties(deploymentProperties)
         .withSystemProperties()
         .withEnvironmentProperties()
-        .withGlobalPropertiesSupplier(globalPropertiesSupplier)
-        .build();
+        .withGlobalPropertiesSupplier(globalPropertiesSupplier);
+
+    ConfigurationPropertiesResolver partialResolver = null;
+    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      partialResolver = partialResolverBuilder.build();
+    } else {
+      partialResolver = partialResolverBuilder.buildBrokenHierarchy();
+    }
 
     artifactAst.updatePropertiesResolver(partialResolver);
 

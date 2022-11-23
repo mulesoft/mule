@@ -180,18 +180,6 @@ public class ConfigurationPropertiesHierarchyBuilder {
     hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider, failuresIfNotPresent));
   }
 
-
-  private void setRootProvider(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy) {
-    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
-    if (reservedProperties || !deploymentProperties.isPresent()) {
-      lastResolver.setAsRootResolver();
-    } else {
-      hierarchy.pop();
-      DefaultConfigurationPropertiesResolver preLastResolver = hierarchy.peek();
-      preLastResolver.setAsRootResolver();
-    }
-  }
-
   /**
    * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
    */
@@ -208,7 +196,24 @@ public class ConfigurationPropertiesHierarchyBuilder {
     systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
-    setRootProvider(hierarchy);
+    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
+    lastResolver.setAsRootResolver();
+    return lastResolver;
+  }
+
+  @Deprecated
+  public ConfigurationPropertiesResolver buildBrokenHierarchy() {
+    ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayDeque<>();
+
+    deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(globalPropertiesSupplier));
+    domainResolver.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    if (!appProperties.isEmpty()) {
+      addToHierarchy(hierarchy, new CompositeConfigurationPropertiesProvider(appProperties));
+    }
+    fileProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
     return hierarchy.peek();
   }
