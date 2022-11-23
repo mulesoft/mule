@@ -57,7 +57,6 @@ public class ConfigurationPropertiesHierarchyBuilder {
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
   private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
-  private boolean reservedProperties = false;
   private boolean failuresIfNotPresent = true;
 
   /**
@@ -162,18 +161,6 @@ public class ConfigurationPropertiesHierarchyBuilder {
     return this;
   }
 
-  /**
-   * Set that the {@link ConfigurationPropertiesResolver} should not override reserved properties (such as 'app.name'). Check
-   * documentation for all the reserved properties. Usually, this method should always be invoked for a correct behavior. It
-   * should only not be invoked if the min mule version of the application is prior to 4.3.0.
-   * 
-   * @return this builder.
-   */
-  public ConfigurationPropertiesHierarchyBuilder withReservedProperties() {
-    this.reservedProperties = true;
-    return this;
-  }
-
   private void addToHierarchy(ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy,
                               ConfigurationPropertiesProvider newProvider) {
     Optional<ConfigurationPropertiesResolver> nextResolver = hierarchy.isEmpty() ? empty() : of(hierarchy.peek());
@@ -202,6 +189,11 @@ public class ConfigurationPropertiesHierarchyBuilder {
   }
 
   @Deprecated
+  /**
+   * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
+   *         This hierarchy is a broken hierarchy (with deployment properties at the bottom) and without the circular resolution.
+   *         This is intended to be used only by applications previous to 4.3.0.
+   */
   public ConfigurationPropertiesResolver buildBrokenHierarchy() {
     ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayDeque<>();
 

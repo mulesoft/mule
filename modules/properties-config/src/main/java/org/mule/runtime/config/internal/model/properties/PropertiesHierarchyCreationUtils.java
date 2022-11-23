@@ -51,7 +51,7 @@ public class PropertiesHierarchyCreationUtils {
         .withEnvironmentProperties()
         .withGlobalPropertiesSupplier(globalPropertiesSupplier);
 
-    ConfigurationPropertiesResolver partialResolver = null;
+    ConfigurationPropertiesResolver partialResolver;
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
       partialResolver = partialResolverBuilder.build();
     } else {
@@ -62,7 +62,6 @@ public class PropertiesHierarchyCreationUtils {
 
     ConfigurationPropertiesHierarchyBuilder completeBuilder = new ConfigurationPropertiesHierarchyBuilder()
         .withDeploymentProperties(deploymentProperties)
-        .withReservedProperties()
         .withSystemProperties()
         .withEnvironmentProperties()
         .withPropertiesFile(externalResourceProvider)
