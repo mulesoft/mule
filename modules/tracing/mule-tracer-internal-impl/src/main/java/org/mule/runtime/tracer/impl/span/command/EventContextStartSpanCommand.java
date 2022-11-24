@@ -34,38 +34,28 @@ public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSp
   private final Assertion assertion;
   private final EventSpanFactory eventSpanFactory;
   private final StartSpanInfo startSpaninfo;
-  private final String artifactId;
-  private final ArtifactType artifactType;
 
   /**
    *
-   * @param eventContext     the {@link EventContext}.
-   * @param artifactId       the artifact id.
-   * @param artifactType     the {@link ArtifactType}
+   * @param eventContext     the {@link EventContext}.xs
    * @param eventSpanFactory the {@link EventSpanFactory} to create the span.
    * @param startSpanInfo    the {@link StartSpanInfo} to indicate how the {@link InternalSpan} should be created.
    * @param assertion        the {@link Assertion} to validate when starting the {@link EventContext}.
    * @return
    */
   public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(EventContext eventContext,
-                                                                                 String artifactId,
-                                                                                 ArtifactType artifactType,
                                                                                  EventSpanFactory eventSpanFactory,
                                                                                  StartSpanInfo startSpanInfo,
                                                                                  Assertion assertion) {
-    return new EventContextStartSpanCommand(eventContext, artifactId, artifactType, eventSpanFactory, startSpanInfo, assertion);
+    return new EventContextStartSpanCommand(eventContext, eventSpanFactory, startSpanInfo, assertion);
   }
 
   private EventContextStartSpanCommand(EventContext eventContext,
-                                       String artifactId,
-                                       ArtifactType artifactType,
                                        EventSpanFactory eventSpanFactory,
                                        StartSpanInfo startSpanInfo,
                                        Assertion assertion) {
     this.eventSpanFactory = eventSpanFactory;
     this.eventContext = eventContext;
-    this.artifactId = artifactId;
-    this.artifactType = artifactType;
     this.assertion = assertion;
     this.startSpaninfo = startSpanInfo;
   }
@@ -77,7 +67,7 @@ public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSp
       InternalSpan newSpan = null;
 
       if (spanContext != null) {
-        newSpan = eventSpanFactory.getSpan(spanContext, artifactId, artifactType, startSpaninfo);
+        newSpan = eventSpanFactory.getSpan(spanContext, startSpaninfo);
         spanContext.setSpan(newSpan, assertion);
       }
 

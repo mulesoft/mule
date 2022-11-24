@@ -1,1 +1,1 @@
-org.mule.runtime.tracer.impl.OpenTelemetrySpanExporterFactory
+org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterFactory

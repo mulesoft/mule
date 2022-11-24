@@ -9,6 +9,7 @@ package org.mule.runtime.tracer.impl.span;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
@@ -19,7 +20,6 @@ import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
-import org.mule.runtime.tracer.impl.clock.Clock;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,7 +96,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void end() {
-    this.endTime = Clock.getDefault().now();
+    this.endTime = getDefault().now();
     this.spanExporter.export();
   }
 
@@ -171,22 +171,17 @@ public class ExecutionSpan implements InternalSpan {
    */
   public static class ExecutionSpanBuilder {
 
-    public static final String ARTIFACT_ID_IS_NULL_MESSAGE = "Artifact id is null";
-    private String artifactId;
+    public static final String THERE_IS_NO_SPAN_FACTORY_MESSAGE = "there is no span factory";
+
     private InternalSpan parent;
     private Long startTime;
     private SpanExporterFactory spanExporterFactory;
-    private StartSpanInfo spanCustomizationInfo;
+    private StartSpanInfo startSpanInfo;
 
     private ExecutionSpanBuilder() {}
 
-    public ExecutionSpanBuilder withArtifactId(String artifactId) {
-      this.artifactId = artifactId;
-      return this;
-    }
-
-    public ExecutionSpanBuilder withSpanCustomizationInfo(StartSpanInfo spanCustomizationInfo) {
-      this.spanCustomizationInfo = spanCustomizationInfo;
+    public ExecutionSpanBuilder withStartSpanInfo(StartSpanInfo spanCustomizationInfo) {
+      this.startSpanInfo = spanCustomizationInfo;
       return this;
     }
 
@@ -200,35 +195,23 @@ public class ExecutionSpan implements InternalSpan {
       return this;
     }
 
-    private SpanExporter resolveSpanExporter(SpanExporterFactory spanExporterFactory, ExecutionSpan executionSpan,
-                                             StartSpanInfo exportStartSpanInfo) {
-      return spanExporterFactory.getSpanExporter(executionSpan, exportStartSpanInfo);
-    }
-
     public ExecutionSpan build() {
-      if (artifactId == null) {
-        throw new IllegalArgumentException(ARTIFACT_ID_IS_NULL_MESSAGE);
-      }
-
       if (startTime == null) {
-        startTime = Clock.getDefault().now();
+        startTime = getDefault().now();
       }
 
       if (spanExporterFactory == null) {
-        throw new IllegalArgumentException("there is no span factory");
+        throw new IllegalArgumentException(THERE_IS_NO_SPAN_FACTORY_MESSAGE);
       }
 
-      ExecutionSpan executionSpan = new ExecutionSpan(spanCustomizationInfo,
+      ExecutionSpan executionSpan = new ExecutionSpan(startSpanInfo,
                                                       startTime,
                                                       parent);
 
 
-      executionSpan.spanExporter = resolveSpanExporter(spanExporterFactory,
-                                                       executionSpan,
-                                                       spanCustomizationInfo);
+      executionSpan.spanExporter = spanExporterFactory.getSpanExporter(executionSpan, startSpanInfo);
 
       return executionSpan;
-
     }
 
   }

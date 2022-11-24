@@ -31,8 +31,7 @@ public interface EventSpanFactory {
    *
    * @return the resulting {@link InternalSpan}
    */
-  InternalSpan getSpan(SpanContext spanContext, String artifactId,
-                       ArtifactType artifactType,
+  InternalSpan getSpan(SpanContext spanContext,
                        StartSpanInfo startSpanInfo);
 
   SpanSnifferManager getSpanSnifferManager();

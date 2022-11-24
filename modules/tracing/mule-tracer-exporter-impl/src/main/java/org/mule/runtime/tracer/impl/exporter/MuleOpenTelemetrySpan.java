@@ -5,11 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl;
+package org.mule.runtime.tracer.impl.exporter;
 
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
 import java.util.Collections;
 import java.util.Map;
@@ -19,7 +20,7 @@ public interface MuleOpenTelemetrySpan extends Span {
 
   Context getSpanOpenTelemetryContext();
 
-  void end(InternalSpan internalSpan);
+  void end(InternalSpan internalSpan, StartSpanInfo startSpanInfo, String artifactId, String artifactType);
 
   Map<String, String> getDistributedTraceContextMap();
 
@@ -29,11 +30,11 @@ public interface MuleOpenTelemetrySpan extends Span {
     return Collections.emptySet();
   }
 
-  void setNotIntercepting(boolean propagateUpdateName);
+  void setPolicy(boolean propagateUpdateName);
 
-  void setCustomizableInformationCarrier(boolean propagateSpanFromParent);
+  void setRoot(boolean propagateSpanFromParent);
 
-  boolean isNotIntercepting();
+  boolean isPolicy();
 
-  boolean isSetCustomizableInformationCarrier();
+  boolean isRoot();
 }

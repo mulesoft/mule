@@ -145,8 +145,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import org.mule.runtime.tracer.impl.CoreEventTracer;
-import org.mule.runtime.tracer.impl.OpenTelemetrySpanExporterFactory;
-import org.mule.runtime.tracer.impl.span.factory.ExportOnEndEventSpanFactory;
+import org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterFactory;
+import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -228,7 +228,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
       .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinitionForProfilingService())
-      .put(MULE_CORE_SPAN_FACTORY_KEY, getBeanDefinition(ExportOnEndEventSpanFactory.class))
+      .put(MULE_CORE_SPAN_FACTORY_KEY, getBeanDefinition(ExecutionSpanFactory.class))
       .put(MULE_CORE_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetrySpanExporterFactory.class))
       .put(MULE_CORE_EVENT_TRACER_KEY, getBeanDefinition(CoreEventTracer.class))
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))

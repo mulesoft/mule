@@ -5,18 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl;
+package org.mule.runtime.tracer.impl.exporter;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import javax.inject.Inject;
+
+import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
 
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
@@ -25,18 +26,20 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
   @Override
   public SpanExporter getSpanExporter(InternalSpan internalSpan, StartSpanInfo startSpanInfo) {
-    OpenTelemetrySpanExporter openTelemetrySpanExporter = new OpenTelemetrySpanExporter(internalSpan);
-    openTelemetrySpanExporter.configure(startSpanInfo.getStartExportInfo(), muleContext.getConfiguration().getId(),
-                                        startSpanInfo.isPolicySpan(), startSpanInfo.isRootSpan());
-    return openTelemetrySpanExporter;
+    return builder()
+        .withStartSpanInfo(startSpanInfo)
+        .withArtifactId(muleContext.getConfiguration().getId())
+        .withArtifactType(muleContext.getArtifactType().getAsString())
+        .withInternalSpan(internalSpan)
+        .build();
   }
 
   @Override
   public SpanSnifferManager getSpanExporterManager() {
-    return new OpentelemetrySpanExporterManager();
+    return new OpenTelemetrySpanExporterManager();
   }
 
-  private class OpentelemetrySpanExporterManager implements SpanSnifferManager {
+  private static class OpenTelemetrySpanExporterManager implements SpanSnifferManager {
 
     @Override
     public ExportedSpanSniffer getExportedSpanSniffer() {

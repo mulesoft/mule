@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.capturer;
+package org.mule.runtime.tracer.impl.exporter.capturer;
 
 
 import static java.lang.String.valueOf;
@@ -28,7 +28,7 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.impl.OpenTelemetryResources;
+import org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources;
 
 /**
  * A {@link SpanExporter} that captures Open Telemetry exported spans.

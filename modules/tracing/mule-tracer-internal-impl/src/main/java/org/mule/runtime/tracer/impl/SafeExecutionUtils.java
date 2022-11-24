@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 /**
  * Utils class.
  */

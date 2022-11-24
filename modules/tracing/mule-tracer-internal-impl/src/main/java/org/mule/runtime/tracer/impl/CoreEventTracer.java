@@ -18,7 +18,6 @@ import static org.mule.runtime.tracer.impl.span.command.EventContextStartSpanCom
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
@@ -42,11 +41,7 @@ import javax.inject.Inject;
 public class CoreEventTracer implements EventTracer<CoreEvent> {
 
   @Inject
-  private MuleContext muleContext;
-
-  @Inject
   private EventSpanFactory eventSpanFactory;
-
 
   @Override
   public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo) {
@@ -57,8 +52,6 @@ public class CoreEventTracer implements EventTracer<CoreEvent> {
   public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
                                                    Assertion assertion) {
     return getEventContextStartSpanCommandFrom(coreEvent.getContext(),
-                                               muleContext.getConfiguration().getId(),
-                                               muleContext.getArtifactType(),
                                                eventSpanFactory,
                                                startSpanInfo,
                                                assertion).execute();

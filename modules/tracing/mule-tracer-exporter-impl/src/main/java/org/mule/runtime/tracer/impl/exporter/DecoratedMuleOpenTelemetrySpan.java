@@ -5,7 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl;
+package org.mule.runtime.tracer.impl.exporter;
+
+import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
+import static io.opentelemetry.api.common.Attributes.of;
+import static io.opentelemetry.api.common.AttributeKey.booleanKey;
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.api.trace.StatusCode.ERROR;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -16,6 +25,7 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,13 +33,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static io.opentelemetry.api.common.AttributeKey.booleanKey;
-import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.api.trace.StatusCode.ERROR;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
-
-public class DelegateMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
+/**
+ * An exportable opentelemetry span that adds more info on export.
+ *
+ * @since 4.5.0
+ */
+public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
 
   private static final TextMapSetter<Map<String, String>> SETTER = Map::put;
 
@@ -40,14 +49,15 @@ public class DelegateMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   public static final AttributeKey<Boolean> EXCEPTION_ESCAPED_KEY = booleanKey("exception.escaped");
 
   public static final String EXCEPTIONS_HAS_BEEN_RECORDED = "Exceptions has been recorded.";
+  public static final String ARTIFACT_ID = "artifact.id";
+  public static final String ARTIFACT_TYPE = "artifact.type";
 
   private final Span delegate;
   private Set<String> noExportableUntil = new HashSet<>();
-  private boolean notIntercepting;
-  private boolean customizedInfoCarrier;
+  private boolean policy;
+  private boolean root;
 
-
-  public DelegateMuleOpenTelemetrySpan(Span delegate) {
+  public DecoratedMuleOpenTelemetrySpan(Span delegate) {
     this.delegate = delegate;
   }
 
@@ -57,12 +67,15 @@ public class DelegateMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   @Override
-  public void end(InternalSpan internalSpan) {
+  public void end(InternalSpan internalSpan, StartSpanInfo startSpanInfo, String artifactId, String artifactType) {
     if (internalSpan.hasErrors()) {
       delegate.setStatus(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
       recordSpanExceptions(internalSpan);
     }
+    startSpanInfo.getStartAttributes().forEach(delegate::setAttribute);
     internalSpan.getAttributes().forEach(delegate::setAttribute);
+    delegate.setAttribute(ARTIFACT_ID, artifactId);
+    delegate.setAttribute(ARTIFACT_TYPE, artifactType);
     delegate.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
@@ -85,23 +98,23 @@ public class DelegateMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   @Override
-  public void setNotIntercepting(boolean propagateUpdateName) {
-    this.notIntercepting = propagateUpdateName;
+  public void setPolicy(boolean policy) {
+    this.policy = policy;
   }
 
   @Override
-  public void setCustomizableInformationCarrier(boolean propagateSpanFromParent) {
-    this.customizedInfoCarrier = propagateSpanFromParent;
+  public void setRoot(boolean root) {
+    this.root = root;
   }
 
   @Override
-  public boolean isNotIntercepting() {
-    return notIntercepting;
+  public boolean isPolicy() {
+    return policy;
   }
 
   @Override
-  public boolean isSetCustomizableInformationCarrier() {
-    return customizedInfoCarrier;
+  public boolean isRoot() {
+    return root;
   }
 
   @Override
@@ -165,12 +178,11 @@ public class DelegateMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   private void recordSpanException(SpanError spanError) {
-    Attributes errorAttributes = Attributes.of(
-                                               EXCEPTION_TYPE_KEY, spanError.getError().getErrorType().toString(),
-                                               EXCEPTION_MESSAGE_KEY, spanError.getError().getDescription(),
-                                               EXCEPTION_STACK_TRACE_KEY,
-                                               getInternalSpanError(spanError).getErrorStacktrace().toString(),
-                                               EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
+    Attributes errorAttributes = of(EXCEPTION_TYPE_KEY, spanError.getError().getErrorType().toString(),
+                                    EXCEPTION_MESSAGE_KEY, spanError.getError().getDescription(),
+                                    EXCEPTION_STACK_TRACE_KEY,
+                                    getInternalSpanError(spanError).getErrorStacktrace().toString(),
+                                    EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
     delegate.addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
   }
 
