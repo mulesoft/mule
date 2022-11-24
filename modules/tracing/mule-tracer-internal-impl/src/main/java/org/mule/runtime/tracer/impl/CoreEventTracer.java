@@ -85,7 +85,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent> {
     getEventContextRecordErrorCommand(coreEvent.getContext(),
                                       errorSupplier,
                                       isErrorEscapingCurrentSpan,
-                                      coreEvent.getFlowCallStack());
+                                      coreEvent.getFlowCallStack()).execute();
   }
 
   @Override
@@ -114,3 +114,4 @@ public class CoreEventTracer implements EventTracer<CoreEvent> {
   }
 
 }
+xx
