@@ -13,6 +13,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
@@ -310,6 +311,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void configureSpanExporterFactory(MuleContext muleContext) throws RegistrationException {
     SpanExporterFactory spanExporterFactory = new NoopSpanExporterFactory();
-    registerObject(MULE_CORE_EVENT_TRACER_KEY, spanExporterFactory, muleContext);
+    registerObject(MULE_CORE_EXPORTER_FACTORY_KEY, spanExporterFactory, muleContext);
   }
 }
