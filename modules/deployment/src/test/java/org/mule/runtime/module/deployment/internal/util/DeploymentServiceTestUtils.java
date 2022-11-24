@@ -11,6 +11,7 @@ import org.mule.runtime.module.deployment.api.DeploymentService;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Utility class used to avoid skipping actions in the MuleDeploymentService#executeSynchronized method. We avoid it by acquiring
@@ -26,11 +27,8 @@ public final class DeploymentServiceTestUtils {
    * @param appName name of the application to undeploy
    */
   public static void undeploy(DeploymentService delegate, String appName) {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.undeploy(appName);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -41,11 +39,8 @@ public final class DeploymentServiceTestUtils {
    * @throws IOException
    */
   public static void deploy(DeploymentService delegate, URI appArchiveUri) throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.deploy(appArchiveUri);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -57,11 +52,8 @@ public final class DeploymentServiceTestUtils {
    * @throws IOException
    */
   public static void deploy(DeploymentService delegate, URI appArchiveUri, Properties appProperties) throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.deploy(appArchiveUri, appProperties);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -71,11 +63,8 @@ public final class DeploymentServiceTestUtils {
    * @param artifactName then name of the application to redeploy
    */
   public static void redeploy(DeploymentService delegate, String artifactName) {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.redeploy(artifactName);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -86,11 +75,8 @@ public final class DeploymentServiceTestUtils {
    * @param appProperties map of properties to include
    */
   public static void redeploy(DeploymentService delegate, String artifactName, Properties appProperties) {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.redeploy(artifactName, appProperties);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -101,11 +87,8 @@ public final class DeploymentServiceTestUtils {
    * @param appProperties map of properties to include
    */
   public static void redeploy(DeploymentService delegate, URI archiveUri, Properties appProperties) throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.redeploy(archiveUri, appProperties);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -115,11 +98,8 @@ public final class DeploymentServiceTestUtils {
    * @param archiveUri location of the application file
    */
   public static void redeploy(DeploymentService delegate, URI archiveUri) throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.redeploy(archiveUri);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -129,11 +109,8 @@ public final class DeploymentServiceTestUtils {
    * @param domainName name of the domain to undeploy
    */
   public static void undeployDomain(DeploymentService delegate, String domainName) {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.undeployDomain(domainName);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -144,11 +121,8 @@ public final class DeploymentServiceTestUtils {
    * @throws IOException
    */
   public static void deployDomain(DeploymentService delegate, URI domainArchiveUri) throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.deployDomain(domainArchiveUri);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -161,11 +135,8 @@ public final class DeploymentServiceTestUtils {
    */
   public static void deployDomain(DeploymentService delegate, URI domainArchiveUri, Properties deploymentProperties)
       throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.deployDomain(domainArchiveUri, deploymentProperties);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -176,11 +147,8 @@ public final class DeploymentServiceTestUtils {
    * @param deploymentProperties the properties to override during the deployment process.
    */
   public static void redeployDomain(DeploymentService delegate, String domainName, Properties deploymentProperties) {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.redeployDomain(domainName, deploymentProperties);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -190,11 +158,8 @@ public final class DeploymentServiceTestUtils {
    * @param domainName then name of the domain to redeploy
    */
   public static void redeployDomain(DeploymentService delegate, String domainName) {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.redeployDomain(domainName);
-    } finally {
-      delegate.getLock().unlock();
     }
   }
 
@@ -205,11 +170,27 @@ public final class DeploymentServiceTestUtils {
    * @throws IOException if there is any problem reading the file
    */
   public static void deployDomainBundle(DeploymentService delegate, URI domainArchiveUri) throws IOException {
-    delegate.getLock().lock();
-    try {
+    try (DeploymentServiceLock lock = new DeploymentServiceLock(delegate)) {
       delegate.deployDomainBundle(domainArchiveUri);
-    } finally {
-      delegate.getLock().unlock();
+    }
+  }
+
+  /**
+   * Auxiliary auto-closeable class to be used in a try-with-resources scope. During this object's lifetime, the
+   * DeploymentService's lock will be taken.
+   */
+  private static class DeploymentServiceLock implements AutoCloseable {
+
+    private final ReentrantLock lock;
+
+    DeploymentServiceLock(DeploymentService deploymentService) {
+      this.lock = deploymentService.getLock();
+      this.lock.lock();
+    }
+
+    @Override
+    public void close() {
+      lock.unlock();
     }
   }
 }
