@@ -150,7 +150,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerStreamingManager(muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
-    registerObject(OBJECT_ARTIFACT_TYPE_LOADER, new DefaultArtifactTypeLoader(), muleContext);
+    registerObject(OBJECT_ARTIFACT_TYPE_LOADER, new DefaultArtifactTypeLoader(muleContext.getExtensionManager()), muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {

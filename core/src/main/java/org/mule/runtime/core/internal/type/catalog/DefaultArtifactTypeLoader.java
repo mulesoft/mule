@@ -59,7 +59,10 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
 
   private Collection<ExtensionModel> extensionModels;
 
-  public DefaultArtifactTypeLoader() {}
+  @Inject
+  public DefaultArtifactTypeLoader(ExtensionManager extensionManager) {
+    this.extensionManager = extensionManager;
+  }
 
   public DefaultArtifactTypeLoader(Collection<ExtensionModel> extensionModels) {
     requireNonNull(extensionModels, "ExtensionModels collection cannot be null.");
