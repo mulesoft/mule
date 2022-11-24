@@ -188,12 +188,13 @@ public class ConfigurationPropertiesHierarchyBuilder {
     return lastResolver;
   }
 
-  @Deprecated
   /**
    * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
    *         This hierarchy is a broken/legacy hierarchy (with deployment properties at the bottom) and without the circular
    *         resolution. This is intended to be used only by applications previous to 4.3.0.
+   * @deprecated since 4.5. Use {@link ConfigurationPropertiesHierarchyBuilder#build} instead.
    */
+  @Deprecated
   public ConfigurationPropertiesResolver buildLegacyHierarchy() {
     ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayDeque<>();
 
