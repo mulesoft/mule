@@ -45,6 +45,9 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.co
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeploy;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
@@ -642,7 +645,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   @After
   public void undeployApps() {
     if (deploymentService != null) {
-      deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
+      deploymentService.getApplications().forEach(app -> undeploy(deploymentService, app.getArtifactName()));
     }
     TestApplicationFactory.after();
   }
@@ -1852,14 +1855,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    deploymentService.deploy(uri, deploymentProperties);
+    deploy(deploymentService, uri, deploymentProperties);
   }
 
   protected void redeployId(String id, Properties deploymentProperties) throws IOException {
     if (deploymentProperties == null) {
-      deploymentService.redeploy(id);
+      redeploy(deploymentService, id);
     } else {
-      deploymentService.redeploy(id, deploymentProperties);
+      redeploy(deploymentService, id, deploymentProperties);
     }
   }
 

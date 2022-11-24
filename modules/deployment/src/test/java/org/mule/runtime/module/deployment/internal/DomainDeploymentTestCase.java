@@ -25,6 +25,10 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deployDomain;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeployDomain;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeployDomain;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -746,7 +750,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     Properties initialDeploymentProperties = new Properties();
     initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
-    deploymentService.deploy(dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(), initialDeploymentProperties);
+    deploy(deploymentService, dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(),
+           initialDeploymentProperties);
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
@@ -2257,15 +2262,15 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Override
   protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    deploymentService.deployDomain(uri, deploymentProperties);
+    deployDomain(deploymentService, uri, deploymentProperties);
   }
 
   @Override
   protected void redeployId(String id, Properties deploymentProperties) throws IOException {
     if (deploymentProperties == null) {
-      deploymentService.redeployDomain(id);
+      redeployDomain(deploymentService, id);
     } else {
-      deploymentService.redeployDomain(id, deploymentProperties);
+      redeployDomain(deploymentService, id, deploymentProperties);
     }
   }
 
