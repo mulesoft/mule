@@ -74,7 +74,8 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
   public void initialise() throws InitialisationException {
     if (extensionModels == null && extensionManager != null) {
       extensionModels = extensionManager.getExtensions();
-    } else if (extensionManager == null) {
+    }
+    if (extensionModels == null) {
       throw new InitialisationException(createStaticMessage("Cannot initialize DefaultArtifactTypeLoader with a null Collection of ExtensionModels"),
                                         this);
     }
