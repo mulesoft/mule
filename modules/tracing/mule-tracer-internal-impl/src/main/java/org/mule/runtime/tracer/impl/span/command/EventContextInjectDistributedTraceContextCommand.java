@@ -7,47 +7,49 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
-import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.tracer.api.context.SpanContext;
+import static org.mule.runtime.tracer.impl.context.EventSpanContext.builder;
 
-import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 
 /**
  * A {@link VoidCommand} that injects the span context.
- * 
+ *
  * The carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextInjectSpanContextCommand extends AbstractFailsafeSpanVoidCommand {
+public class EventContextInjectDistributedTraceContextCommand extends AbstractFailsafeSpanVoidCommand {
 
   public static final String ERROR_MESSAGE = "Error injecting the span context";
 
   private final EventContext eventContext;
-  private final String key;
-  private final String value;
+  private final DistributedTraceContextGetter getter;
 
-  public static VoidCommand getEventContextAddSpanAttributeCommandFrom(EventContext eventContext, String key, String value) {
-    return new EventContextInjectSpanContextCommand(eventContext, key, value);
+  public static VoidCommand getEventContextInjectDistributedTraceContextCommand(EventContext eventContext,
+                                                                                DistributedTraceContextGetter getter) {
+    return new EventContextInjectDistributedTraceContextCommand(eventContext, getter);
   }
 
-  private EventContextInjectSpanContextCommand(EventContext eventContext, String key, String value) {
+  private EventContextInjectDistributedTraceContextCommand(EventContext eventContext, DistributedTraceContextGetter getter) {
     this.eventContext = eventContext;
-    this.key = key;
-    this.value = value;
+    this.getter = getter;
   }
 
   protected Runnable getRunnable() {
     return () -> {
-      SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
-
-      if (spanContext != null) {
-        spanContext.getSpan().ifPresent(span -> span.addAttribute(key, value));
+      if (eventContext instanceof SpanContextAware) {
+        ((SpanContextAware) eventContext).setSpanContext(
+                                                         builder()
+                                                             .withGetter(getter)
+                                                             .build());
       }
     };
   }
 
-  @Override protected String getErrorMessage() {
+  @Override
+  protected String getErrorMessage() {
     return ERROR_MESSAGE;
   }
 }

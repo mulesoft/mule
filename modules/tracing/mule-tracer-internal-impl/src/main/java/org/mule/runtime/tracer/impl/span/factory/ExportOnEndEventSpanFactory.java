@@ -28,9 +28,10 @@ public class ExportOnEndEventSpanFactory implements EventSpanFactory {
   private SpanExporterFactory spanExporterFactory;
 
   @Override
-  public InternalSpan getSpan(SpanContext spanContext, CoreEvent coreEvent,
+  public InternalSpan getSpan(SpanContext spanContext,
                               String artifactId,
-                              ArtifactType artifactType, StartSpanInfo startSpanInfo) {
+                              ArtifactType artifactType,
+                              StartSpanInfo startSpanInfo) {
     InternalSpan internalSpan = getExecutionSpanBuilder()
         .withSpanCustomizationInfo(startSpanInfo)
         .withArtifactId(artifactId)

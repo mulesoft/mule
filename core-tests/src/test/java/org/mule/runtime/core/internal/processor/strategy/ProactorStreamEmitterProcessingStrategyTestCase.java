@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -139,12 +140,12 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
         @Override
         public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo) {
-          return Optional.empty();
+          return empty();
         }
 
         @Override
-        public void startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
-
+        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
+          return empty();
         }
 
         @Override

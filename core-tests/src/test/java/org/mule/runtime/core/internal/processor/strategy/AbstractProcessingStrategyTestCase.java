@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
@@ -271,12 +272,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
         @Override
         public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo) {
-          return Optional.empty();
+          return empty();
         }
 
         @Override
-        public void startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
-
+        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
+          return empty();
         }
 
         @Override

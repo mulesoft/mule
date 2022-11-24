@@ -6,9 +6,17 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
+import static org.mule.runtime.tracer.impl.span.command.EventContextAddAttributeCommand.getEventContextAddSpanAttributeCommandFrom;
+import static org.mule.runtime.tracer.impl.span.command.EventContextAddAttributesCommand.getEventContextAddSpanAttributesCommandFrom;
+import static org.mule.runtime.tracer.impl.span.command.EventContextEndSpanCommand.getEventContextEndSpanCommandFrom;
+import static org.mule.runtime.tracer.impl.span.command.EventContextGetDistributedTraceContextMapCommand.getEventContextGetDistributedTraceContextMapCommand;
+import static org.mule.runtime.tracer.impl.span.command.EventContextInjectDistributedTraceContextCommand.getEventContextInjectDistributedTraceContextCommand;
+import static org.mule.runtime.tracer.impl.span.command.EventContextRecordErrorCommand.getEventContextRecordErrorCommand;
+import static org.mule.runtime.tracer.impl.span.command.EventContextSetCurrentSpanNameCommand.getEventContextSetCurrentSpanNameCommand;
+import static org.mule.runtime.tracer.impl.span.command.EventContextStartSpanCommand.getEventContextStartSpanCommandFrom;
+
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -19,26 +27,19 @@ import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
-import org.mule.runtime.tracer.impl.span.method.AddSpanAttributeMethod;
-import org.mule.runtime.tracer.impl.span.method.DefaultTracingMethods;
-import org.mule.runtime.tracer.impl.span.method.EndEventSpanMethod;
-import org.mule.runtime.tracer.impl.span.method.InjectDistributedTraceContextMethod;
-import org.mule.runtime.tracer.impl.span.method.RecordSpanErrorMethod;
-import org.mule.runtime.tracer.impl.span.method.SetCurrentSpanNameMethod;
-import org.mule.runtime.tracer.impl.span.method.StartEventSpanMethod;
-import org.mule.runtime.tracer.impl.span.method.GetTraceContextMapMethod;
 
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import javax.inject.Inject;
 
 /**
  * A default implementation for a {@link CoreEventTracer}.
  *
  * @since 4.5.0
  */
-public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
+public class CoreEventTracer implements EventTracer<CoreEvent> {
 
   @Inject
   private MuleContext muleContext;
@@ -46,63 +47,60 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   @Inject
   private EventSpanFactory eventSpanFactory;
 
-  private StartEventSpanMethod<EventContext> startSpanMethod;
-  private final EndEventSpanMethod<EventContext> endSpanCommand = DefaultTracingMethods.getEndSpanMethod();
-  private final RecordSpanErrorMethod<EventContext> recordSpanErrorMethod = DefaultTracingMethods.getRecordSpanErrorMethod();
-  private final SetCurrentSpanNameMethod<EventContext> setCurrentSpanNameMethod =
-      DefaultTracingMethods.getSetCurrentSpanNameMethod();
-  private final AddSpanAttributeMethod<EventContext> addSpanAttributeMethod = DefaultTracingMethods.getAddSpanAttributesMethod();
-  private final InjectDistributedTraceContextMethod<EventContext> injectDistributedTraceContextMethod =
-      DefaultTracingMethods.getInjectDistributedTraceContextMethod();
-  private final GetTraceContextMapMethod<EventContext> getDistributedTraceContextMapMethod =
-      DefaultTracingMethods.getDistributedTraceContextMapMethod();
 
   @Override
   public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo) {
-    return startSpanMethod.start(coreEvent.getContext(), coreEvent, spanCustomizationInfo);
+    return startComponentSpan(coreEvent, spanCustomizationInfo, SUCCESSFUL_ASSERTION);
   }
 
   @Override
-  public void startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo,
-                                 Assertion assertion) {
-    startSpanMethod.start(coreEvent.getContext(), coreEvent, spanCustomizationInfo, assertion);
+  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
+                                                   Assertion assertion) {
+    return getEventContextStartSpanCommandFrom(coreEvent.getContext(),
+                                               muleContext.getConfiguration().getId(),
+                                               muleContext.getArtifactType(),
+                                               eventSpanFactory,
+                                               startSpanInfo,
+                                               assertion).execute();
   }
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent) {
-    endSpanCommand.end(coreEvent.getContext());
+    endCurrentSpan(coreEvent, SUCCESSFUL_ASSERTION);
   }
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent, Assertion condition) {
-    endSpanCommand.end(coreEvent.getContext(), condition);
+    getEventContextEndSpanCommandFrom(coreEvent.getContext(), SUCCESSFUL_ASSERTION);
   }
 
   @Override
   public void injectDistributedTraceContext(EventContext eventContext,
                                             DistributedTraceContextGetter distributedTraceContextGetter) {
-    injectDistributedTraceContextMethod.inject(eventContext, distributedTraceContextGetter);
+    getEventContextInjectDistributedTraceContextCommand(eventContext, distributedTraceContextGetter).execute();
   }
 
   @Override
   public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
-    recordSpanErrorMethod.recordError(coreEvent.getContext(), errorSupplier, isErrorEscapingCurrentSpan,
+    getEventContextRecordErrorCommand(coreEvent.getContext(),
+                                      errorSupplier,
+                                      isErrorEscapingCurrentSpan,
                                       coreEvent.getFlowCallStack());
   }
 
   @Override
   public void setCurrentSpanName(CoreEvent coreEvent, String name) {
-    setCurrentSpanNameMethod.setCurrentSpanName(coreEvent.getContext(), name);
+    getEventContextSetCurrentSpanNameCommand(coreEvent.getContext(), name).execute();
   }
 
   @Override
   public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
-    addSpanAttributeMethod.addAttribute(coreEvent.getContext(), key, value);
+    getEventContextAddSpanAttributeCommandFrom(coreEvent.getContext(), key, value).execute();
   }
 
   @Override
   public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
-    addSpanAttributeMethod.addAttributes(coreEvent.getContext(), attributes);
+    getEventContextAddSpanAttributesCommandFrom(coreEvent.getContext(), attributes).execute();
   }
 
   @Override
@@ -112,13 +110,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public Map<String, String> getDistributedTraceContextMap(CoreEvent event) {
-    return getDistributedTraceContextMapMethod.getDistributedTraceContextMap(event.getContext());
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    startSpanMethod = DefaultTracingMethods.getStartEventSpanMethod(muleContext.getConfiguration(), muleContext.getArtifactType(),
-                                                                    muleContext.getConfiguration().getId(), eventSpanFactory);
+    return getEventContextGetDistributedTraceContextMapCommand(event.getContext()).execute();
   }
 
 }

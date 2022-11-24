@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.method;
+package org.mule.runtime.tracer.impl.span.command;
 
 import static org.mule.runtime.tracer.impl.DefaultCoreEventTracerUtils.safeExecute;
 import static org.mule.runtime.tracer.impl.DefaultCoreEventTracerUtils.safeExecuteWithDefaultOnThrowable;

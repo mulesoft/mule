@@ -39,6 +39,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 
 /**
  * A Profiling Service that disables all data production. The {@link ProfilingDataProducer} implements operations that do not
@@ -52,13 +53,13 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
     @Override
     public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo) {
-      return Optional.empty();
+      return empty();
     }
 
     @Override
-    public void startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
-                                   Assertion assertion) {
-      // Nothing to do.
+    public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
+                                                     Assertion assertion) {
+      return empty();
     }
 
     @Override

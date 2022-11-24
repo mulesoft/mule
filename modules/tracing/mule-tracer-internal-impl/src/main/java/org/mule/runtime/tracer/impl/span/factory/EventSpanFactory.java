@@ -24,14 +24,16 @@ public interface EventSpanFactory {
   /**
    * Provides a span for related to a component that is hit by an event.
    *
-   * @param distributedTraceContext the {@link SpanContext}.
-   * @param artifactType            the artifact type.
-   * @param spanCustomizationInfo   the {@link StartSpanInfo} for the span.
-   * @return the {@link InternalSpan} for that coreEvent and component.
+   * @param spanContext   the {@link SpanContext}.
+   * @param artifactId    the artifact id.
+   * @param artifactType  the {@link ArtifactType}
+   * @param startSpanInfo the {@link StartSpanInfo}.
+   *
+   * @return the resulting {@link InternalSpan}
    */
-  InternalSpan getSpan(SpanContext distributedTraceContext, CoreEvent coreEvent, String artifactId,
+  InternalSpan getSpan(SpanContext spanContext, String artifactId,
                        ArtifactType artifactType,
-                       StartSpanInfo spanCustomizationInfo);
+                       StartSpanInfo startSpanInfo);
 
   SpanSnifferManager getSpanSnifferManager();
 }

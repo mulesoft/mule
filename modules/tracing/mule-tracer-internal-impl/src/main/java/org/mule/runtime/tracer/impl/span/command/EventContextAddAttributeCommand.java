@@ -5,22 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.method.eventcontext;
-
-import static org.mule.runtime.tracer.impl.span.method.eventcontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
+package org.mule.runtime.tracer.impl.span.command;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
-import org.mule.runtime.tracer.impl.span.method.AbstractFailSafeSpanVoidCommand;
-import org.mule.runtime.tracer.impl.span.method.VoidCommand;
+
+import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 /**
- * A {@link VoidCommand} that ads a span attribute.
- * The carrier is the {@link org.mule.runtime.api.event.EventContext}
+ * A {@link VoidCommand} that ads a span attribute. The carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextAddAttributeCommand extends AbstractFailSafeSpanVoidCommand {
+public class EventContextAddAttributeCommand extends AbstractFailsafeSpanVoidCommand {
 
   public static final String ERROR_MESSAGE = "Error adding a span attribute";
 
@@ -38,7 +35,7 @@ public class EventContextAddAttributeCommand extends AbstractFailSafeSpanVoidCom
     this.value = value;
   }
 
-  @Override protected Runnable getRunnable() {
+  protected Runnable getRunnable() {
     return () -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
@@ -48,7 +45,8 @@ public class EventContextAddAttributeCommand extends AbstractFailSafeSpanVoidCom
     };
   }
 
-  @Override protected String getErrorMessage() {
+  @Override
+  protected String getErrorMessage() {
     return ERROR_MESSAGE;
   }
 }

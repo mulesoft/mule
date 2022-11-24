@@ -5,29 +5,32 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.method;
+package org.mule.runtime.tracer.impl.span.command;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
+import static org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand.getFailsafeSpanOperation;
+
+import static java.lang.Boolean.getBoolean;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.slf4j.Logger;
-
-import static org.mule.runtime.tracer.impl.span.method.FailsafeSpanCommand.getFailsafeSpanOperation;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * An abstract implementation of {@link VoidCommand} related to {@link org.mule.runtime.tracer.api.span.InternalSpan}
  *
  * @since 4.5.0
  */
-public abstract class AbstractFailSafeSpanVoidCommand implements VoidCommand {
+public abstract class AbstractFailsafeSpanVoidCommand implements VoidCommand {
 
-  private static final Logger LOGGER = getLogger(AbstractFailSafeSpanVoidCommand.class);
+  private static final Logger LOGGER = getLogger(AbstractFailsafeSpanVoidCommand.class);
 
   private final FailsafeSpanCommand failSafeSpanCommand =
-    getFailsafeSpanOperation(LOGGER, getErrorMessage(), true);
+      getFailsafeSpanOperation(LOGGER, getErrorMessage(), getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING));
 
   @Override
   public void execute() {
-    failSafeSpanCommand
-      .execute(() -> getRunnable().run());
+    failSafeSpanCommand.execute(getRunnable());
   }
 
   /**

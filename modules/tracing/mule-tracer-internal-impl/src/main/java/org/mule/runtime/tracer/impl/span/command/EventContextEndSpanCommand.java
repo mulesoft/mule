@@ -5,35 +5,45 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.method.eventcontext;
+package org.mule.runtime.tracer.impl.span.command;
+
+import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
-import org.mule.runtime.tracer.impl.span.method.AbstractFailSafeSpanVoidCommand;
-import org.mule.runtime.tracer.impl.span.method.VoidCommand;
-
-import static org.mule.runtime.tracer.impl.span.method.eventcontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 /**
- * A {@link VoidCommand} that ends the current {@link org.mule.runtime.tracer.api.span.InternalSpan}.
- * The carrier is the {@link org.mule.runtime.api.event.EventContext}
+ * A {@link VoidCommand} that ends the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The carrier is the
+ * {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextEndSpanCommand extends AbstractFailSafeSpanVoidCommand {
+public class EventContextEndSpanCommand extends AbstractFailsafeSpanVoidCommand {
 
   public static final String ERROR_MESSAGE = "Error ending a span";
 
   private final EventContext eventContext;
   private final Assertion assertion;
 
+  /**
+   * Return a {@link VoidCommand} that ends the current span in the {@link EventContext}
+   *
+   * @param eventContext the {@link EventContext}.
+   * @param assertion    the {@link Assertion} to validate when ending the {@link EventContext}.
+   *
+   * @return the {@link EventContextEndSpanCommand}.
+   */
+  public static EventContextEndSpanCommand getEventContextEndSpanCommandFrom(EventContext eventContext, Assertion assertion) {
+    return new EventContextEndSpanCommand(eventContext, assertion);
+  }
+
   private EventContextEndSpanCommand(EventContext eventContext, Assertion assertion) {
     this.eventContext = eventContext;
     this.assertion = assertion;
   }
 
-  @Override protected Runnable getRunnable() {
+  protected Runnable getRunnable() {
     return () -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
@@ -43,7 +53,8 @@ public class EventContextEndSpanCommand extends AbstractFailSafeSpanVoidCommand 
     };
   }
 
-  @Override protected String getErrorMessage() {
+  @Override
+  protected String getErrorMessage() {
     return ERROR_MESSAGE;
   }
 }

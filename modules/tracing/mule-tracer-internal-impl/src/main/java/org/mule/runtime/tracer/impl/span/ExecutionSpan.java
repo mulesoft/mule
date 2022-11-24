@@ -169,15 +169,13 @@ public class ExecutionSpan implements InternalSpan {
     spanExporter = spanExporterFactory.getSpanExporter(this, exportStartSpanInfo);
   }
 
-  /**x
-   * A Builder for {@link ExecutionSpan}
+  /**
+   * x A Builder for {@link ExecutionSpan}
    *
    * @since 4.5.0
    */
   public static class ExecutionSpanBuilder {
 
-    public static final String NAME_FOR_SPAN_IS_NULL_MESSAGE = "Name for span is null";
-    public static final String CORRELATION_ID_IS_NULL_VARIABLE = "Correlation id is null";
     public static final String ARTIFACT_ID_IS_NULL_MESSAGE = "Artifact id is null";
     private String artifactId;
     private InternalSpan parent;

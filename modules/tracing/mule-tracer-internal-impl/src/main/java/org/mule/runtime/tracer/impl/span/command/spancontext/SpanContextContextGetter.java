@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.command;
+package org.mule.runtime.tracer.impl.span.command.spancontext;
 
 import org.mule.runtime.tracer.api.context.SpanContext;
 

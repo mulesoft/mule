@@ -5,16 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.method;
+package org.mule.runtime.tracer.impl.span.command;
 
 /**
  * A command interface.
- *
- * @param <R> the returning type.
  *
  * @since 4.5.0
  */
 public interface VoidCommand {
 
+  /**
+   * executes the command.
+   */
   void execute();
 }
