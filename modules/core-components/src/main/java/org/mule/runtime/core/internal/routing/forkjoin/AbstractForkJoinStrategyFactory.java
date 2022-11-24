@@ -273,7 +273,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
               routeVars.put(key, new TypedValue(newList, DataType.builder().collectionType(List.class)
                   .itemType(routeVars.get(key).getDataType().getType()).build()));
             }
-            List valueList = (List) routeVars.get(key).getValue();
+            List valueList = new ArrayList((List) routeVars.get(key).getValue());
             valueList.add(value.getValue());
             if (((CollectionDataType) routeVars.get(key).getDataType()).getItemDataType().isCompatibleWith(value.getDataType())) {
               // If item types are compatible then data type is conserved
