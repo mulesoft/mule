@@ -1515,7 +1515,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesAppDeployFromClient() throws Exception {
-    final Action action = () -> deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     final Action assertAction =
         () -> verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
@@ -1525,7 +1525,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void synchronizesAppUndeployFromClient() throws Exception {
-    final Action action = () -> undeploy(deploymentService, emptyAppFileBuilder.getId());
+    final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.getId());
 
     final Action assertAction =
         () -> verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.getId());
@@ -1538,7 +1538,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Action action = () -> {
       // Clears notification from first deployment
       reset(applicationDeploymentListener);
-      redeploy(deploymentService, emptyAppFileBuilder.getId());
+      deploymentService.redeploy(emptyAppFileBuilder.getId());
     };
 
     final Action assertAction =

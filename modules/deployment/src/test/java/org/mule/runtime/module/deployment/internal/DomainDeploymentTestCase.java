@@ -1864,7 +1864,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void synchronizesDomainDeployFromClient() throws Exception {
-    final Action action = () -> deployDomain(deploymentService, dummyDomainFileBuilder.getArtifactFile().toURI());
+    final Action action = () -> deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI());
 
     final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainFileBuilder.getId());
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
@@ -1872,7 +1872,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void synchronizesDomainUndeployFromClient() throws Exception {
-    final Action action = () -> undeployDomain(deploymentService, emptyDomainFileBuilder.getId());
+    final Action action = () -> deploymentService.undeployDomain(emptyDomainFileBuilder.getId());
 
     final Action assertAction =
         () -> verify(domainDeploymentListener, never()).onUndeploymentStart(emptyDomainFileBuilder.getId());
@@ -1884,7 +1884,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final Action action = () -> {
       // Clears notification from first deployment
       reset(domainDeploymentListener);
-      redeployDomain(deploymentService, emptyDomainFileBuilder.getId());
+      deploymentService.redeployDomain(emptyDomainFileBuilder.getId());
     };
 
     final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(emptyDomainFileBuilder.getId());
