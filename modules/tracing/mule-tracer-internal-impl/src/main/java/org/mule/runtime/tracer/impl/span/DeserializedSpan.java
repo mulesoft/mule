@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.trace;
+package org.mule.runtime.tracer.impl.span;
 
 
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;

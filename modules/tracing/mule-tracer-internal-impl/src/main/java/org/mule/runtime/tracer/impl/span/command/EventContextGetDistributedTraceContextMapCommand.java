@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
-import static org.mule.runtime.tracer.impl.DefaultCoreEventTracerUtils.safeExecuteWithDefaultOnThrowable;
+import static org.mule.runtime.tracer.impl.SafeExecutionUtils.safeExecuteWithDefaultOnThrowable;
 
 import static java.util.Collections.emptyMap;
 

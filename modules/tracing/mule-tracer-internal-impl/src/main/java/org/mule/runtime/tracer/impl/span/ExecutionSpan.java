@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
+
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
@@ -46,11 +47,10 @@ public class ExecutionSpan implements InternalSpan {
   private final Map<String, String> attributes = new HashMap<>();
   private final Set<SpanError> errors = new HashSet<>();
 
-  private ExecutionSpan(StartSpanInfo spanCustomizationInfo, Long startTime, Long endTime,
+  private ExecutionSpan(StartSpanInfo spanCustomizationInfo, Long startTime,
                         InternalSpan parent) {
     this.spanCustomizationInfo = spanCustomizationInfo;
     this.startTime = startTime;
-    this.endTime = endTime;
     this.parent = parent;
   }
 
@@ -164,11 +164,6 @@ public class ExecutionSpan implements InternalSpan {
     spanExporter.updateChildSpanExporter(internalSpan.getSpanExporter());
   }
 
-  private void resolveSpanExporter(SpanExporterFactory spanExporterFactory,
-                                   StartSpanInfo exportStartSpanInfo) {
-    spanExporter = spanExporterFactory.getSpanExporter(this, exportStartSpanInfo);
-  }
-
   /**
    * x A Builder for {@link ExecutionSpan}
    *
@@ -180,7 +175,6 @@ public class ExecutionSpan implements InternalSpan {
     private String artifactId;
     private InternalSpan parent;
     private Long startTime;
-    private Long endTime;
     private SpanExporterFactory spanExporterFactory;
     private StartSpanInfo spanCustomizationInfo;
 
@@ -201,19 +195,14 @@ public class ExecutionSpan implements InternalSpan {
       return this;
     }
 
-    public ExecutionSpanBuilder withStartTime(Long startTime) {
-      this.startTime = startTime;
-      return this;
-    }
-
-    public ExecutionSpanBuilder withEndTime(Long endTime) {
-      this.endTime = endTime;
-      return this;
-    }
-
     public ExecutionSpanBuilder withSpanExporterFactory(SpanExporterFactory spanExporterFactory) {
       this.spanExporterFactory = spanExporterFactory;
       return this;
+    }
+
+    private SpanExporter resolveSpanExporter(SpanExporterFactory spanExporterFactory, ExecutionSpan executionSpan,
+                                     StartSpanInfo exportStartSpanInfo) {
+      return spanExporterFactory.getSpanExporter(executionSpan, exportStartSpanInfo);
     }
 
     public ExecutionSpan build() {
@@ -231,10 +220,12 @@ public class ExecutionSpan implements InternalSpan {
 
       ExecutionSpan executionSpan = new ExecutionSpan(spanCustomizationInfo,
                                                       startTime,
-                                                      endTime,
                                                       parent);
 
-      executionSpan.resolveSpanExporter(spanExporterFactory, spanCustomizationInfo);
+
+      executionSpan.spanExporter = resolveSpanExporter(spanExporterFactory,
+                                                       executionSpan,
+                                                       spanCustomizationInfo);
 
       return executionSpan;
 

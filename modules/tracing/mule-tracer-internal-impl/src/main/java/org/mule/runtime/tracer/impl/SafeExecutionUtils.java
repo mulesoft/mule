@@ -16,9 +16,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Utils class.
  */
-public class DefaultCoreEventTracerUtils {
+public class SafeExecutionUtils {
 
-  private DefaultCoreEventTracerUtils() {}
+  private SafeExecutionUtils() {}
 
   /**
    * Returns the value obtained from the {@param resultSupplier} or returns the {@param onFailReturnValue} if a {@link Throwable}

@@ -276,7 +276,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         }
 
         @Override
-        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
+        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo,
+                                                         Assertion assertion) {
           return empty();
         }
 

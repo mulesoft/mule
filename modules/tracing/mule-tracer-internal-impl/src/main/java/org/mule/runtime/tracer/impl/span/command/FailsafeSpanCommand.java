@@ -7,8 +7,8 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
-import static org.mule.runtime.tracer.impl.DefaultCoreEventTracerUtils.safeExecute;
-import static org.mule.runtime.tracer.impl.DefaultCoreEventTracerUtils.safeExecuteWithDefaultOnThrowable;
+import static org.mule.runtime.tracer.impl.SafeExecutionUtils.safeExecute;
+import static org.mule.runtime.tracer.impl.SafeExecutionUtils.safeExecuteWithDefaultOnThrowable;
 
 import static java.util.Optional.empty;
 
