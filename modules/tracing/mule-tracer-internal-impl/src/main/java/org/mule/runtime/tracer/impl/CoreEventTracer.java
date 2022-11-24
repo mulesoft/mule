@@ -114,4 +114,3 @@ public class CoreEventTracer implements EventTracer<CoreEvent> {
   }
 
 }
-xx
