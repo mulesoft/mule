@@ -55,7 +55,7 @@ public class PropertiesHierarchyCreationUtils {
     if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
       partialResolver = partialResolverBuilder.build();
     } else {
-      partialResolver = partialResolverBuilder.buildBrokenHierarchy();
+      partialResolver = partialResolverBuilder.buildLegacyHierarchy();
     }
 
     artifactAst.updatePropertiesResolver(partialResolver);
