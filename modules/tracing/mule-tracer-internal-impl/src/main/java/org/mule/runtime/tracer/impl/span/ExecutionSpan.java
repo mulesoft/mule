@@ -201,7 +201,7 @@ public class ExecutionSpan implements InternalSpan {
     }
 
     private SpanExporter resolveSpanExporter(SpanExporterFactory spanExporterFactory, ExecutionSpan executionSpan,
-                                     StartSpanInfo exportStartSpanInfo) {
+                                             StartSpanInfo exportStartSpanInfo) {
       return spanExporterFactory.getSpanExporter(executionSpan, exportStartSpanInfo);
     }
 
