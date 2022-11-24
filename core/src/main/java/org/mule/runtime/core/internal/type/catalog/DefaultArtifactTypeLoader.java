@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.type.catalog;
 
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 
 import static java.lang.String.format;
@@ -73,9 +74,9 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
   public void initialise() throws InitialisationException {
     if (extensionModels == null && extensionManager != null) {
       extensionModels = extensionManager.getExtensions();
-    }
-    if (extensionModels == null) {
-      extensionModels = emptySet();
+    } else if (extensionManager == null) {
+      throw new InitialisationException(createStaticMessage("Cannot initialize DefaultArtifactTypeLoader with a null Collection of ExtensionModels"),
+                                        this);
     }
     typesByExtension = new HashMap<>();
     loadedTypes = new ConcurrentHashMap<>();
