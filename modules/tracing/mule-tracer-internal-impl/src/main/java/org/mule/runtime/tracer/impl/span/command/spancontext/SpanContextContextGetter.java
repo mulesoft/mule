@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.span.method.distributedtracecontext;
+package org.mule.runtime.tracer.impl.span.command;
 
 import org.mule.runtime.tracer.api.context.SpanContext;
 
@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
  *
  * @param <T> carrier
  */
-public interface DistributedTraceContextGetter<T> {
+public interface SpanContextContextGetter<T> {
 
   /**
    * @param carrier the carrier that has the {@link SpanContext}.
@@ -24,5 +24,5 @@ public interface DistributedTraceContextGetter<T> {
    * @return the {@link SpanContext}.
    */
   @Nullable
-  SpanContext getDistributedTraceContext(T carrier);
+  SpanContext get(T carrier);
 }

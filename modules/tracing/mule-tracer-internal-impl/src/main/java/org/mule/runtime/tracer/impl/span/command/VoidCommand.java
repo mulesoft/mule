@@ -7,13 +7,14 @@
 
 package org.mule.runtime.tracer.impl.span.method;
 
-import org.mule.runtime.core.api.event.CoreEvent;
+/**
+ * A command interface.
+ *
+ * @param <R> the returning type.
+ *
+ * @since 4.5.0
+ */
+public interface VoidCommand {
 
-import java.util.Map;
-
-public interface AddSpanAttributeMethod<T> {
-
-  void addAttribute(T context, String key, String value);
-
-  void addAttributes(T coreEvent, Map<String, String> attributes);
+  void execute();
 }

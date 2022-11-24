@@ -20,32 +20,32 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 
 /**
- * An operation to perform in a fail safe mode.
+ * An operation to perform in a fail-safe mode.
  *
  * @since 4.5.0
  */
-public class FailsafeDistributedTraceContextOperation {
+public class FailsafeSpanCommand {
 
   private final boolean propagateExceptions;
   private final Logger customLogger;
   private final String errorMessage;
 
-  private FailsafeDistributedTraceContextOperation(Logger customLogger,
-                                                   String errorMessage,
-                                                   boolean propagateExceptions) {
+  private FailsafeSpanCommand(Logger customLogger,
+                              String errorMessage,
+                              boolean propagateExceptions) {
     this.customLogger = customLogger;
     this.errorMessage = errorMessage;
     this.propagateExceptions = propagateExceptions;
   }
 
-  public static FailsafeDistributedTraceContextOperation getFailsafeDistributedTraceContextOperation(Logger customLogger,
-                                                                                                     String errorMessage,
-                                                                                                     boolean propagateExceptions) {
-    return new FailsafeDistributedTraceContextOperation(customLogger, errorMessage, propagateExceptions);
+  public static FailsafeSpanCommand getFailsafeSpanOperation(Logger customLogger,
+                                                             String errorMessage,
+                                                             boolean propagateExceptions) {
+    return new FailsafeSpanCommand(customLogger, errorMessage, propagateExceptions);
   }
 
   public Optional<InternalSpan> execute(Supplier<Optional<InternalSpan>> internalSpanSupplier) {
-    return safeExecuteWithDefaultOnThrowable(internalSpanSupplier::get,
+    return safeExecuteWithDefaultOnThrowable(internalSpanSupplier,
                                              empty(),
                                              errorMessage,
                                              propagateExceptions,
@@ -53,7 +53,7 @@ public class FailsafeDistributedTraceContextOperation {
   }
 
   public void execute(Runnable runnable) {
-    safeExecute(runnable::run, errorMessage, propagateExceptions, customLogger);
+    safeExecute(runnable, errorMessage, propagateExceptions, customLogger);
   }
 
 }
