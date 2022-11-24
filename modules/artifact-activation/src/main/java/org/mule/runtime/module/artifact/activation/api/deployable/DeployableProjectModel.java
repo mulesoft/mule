@@ -132,7 +132,7 @@ public final class DeployableProjectModel {
     for (BundleDependency dependency : dependencies) {
       BundleDescriptor descriptor = dependency.getDescriptor();
       String pluginKey =
-          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getClassifier().orElse("empty");
+          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getClassifier().orElse("");
       repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
       repeatedDependencies.get(pluginKey).add(descriptor);
     }
