@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_AST;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
@@ -119,6 +120,7 @@ import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
@@ -214,6 +216,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .put(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class))
+      .put(OBJECT_ARTIFACT_TYPE_LOADER, getBeanDefinition(DefaultArtifactTypeLoader.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(ExtendedTransformationService.class))
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
