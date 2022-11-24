@@ -580,7 +580,9 @@ public class FlowProcessMediator implements Initialisable {
       return eventMessage;
     }).build();
 
-    coreEventTracer.setCurrentSpanName(coreEvent, adapter.getRootSpanName());
+    if (adapter.getRootSpanName() != null) {
+      coreEventTracer.setCurrentSpanName(coreEvent, adapter.getRootSpanName());
+    }
     coreEventTracer.addCurrentSpanAttributes(coreEvent, adapter.getSpanRootAttributes());
     return coreEvent;
   }

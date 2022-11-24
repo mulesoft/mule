@@ -91,7 +91,7 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public void updateChildSpanExporter(InternalSpan internalSpan) {
-    if (!name.equals(ROOT_SPAN)) {
+    if (!ROOT_SPAN.equals(name)) {
       internalSpan.updateRootName(name);
       attributes.forEach(internalSpan::setRootAttribute);
     }

@@ -21,4 +21,5 @@ public class NoExportTillExecuteNextComponentCoreCustomizationInfoProvider exten
   public StartSpanInfo get(CoreEvent coreEvent) {
     return new NoExportableTillCustomizationInfo(component, coreEvent);
   }
+
 }

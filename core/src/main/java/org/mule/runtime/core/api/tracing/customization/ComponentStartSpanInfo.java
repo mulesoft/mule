@@ -85,4 +85,24 @@ public class ComponentStartSpanInfo implements StartSpanInfo {
       }
     };
   }
+
+  @Override
+  public boolean isPolicySpan() {
+    if (component.getIdentifier() != null && component.getIdentifier().getName() != null
+        && component.getIdentifier().getName().equals("execute-next")) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean isRootSpan() {
+    if (component.getIdentifier() != null && component.getIdentifier().getName() != null
+        && component.getIdentifier().getName().equals("flow")) {
+      return true;
+    } ;
+
+    return false;
+  }
 }

@@ -22,4 +22,9 @@ public class NoExportableTillCustomizationInfo extends ComponentStartSpanInfo {
   public StartExportInfo getStartExportInfo() {
     return new NoExportableTillStartExportInfo("execute-next", true);
   }
+
+  @Override
+  public boolean isPolicySpan() {
+    return true;
+  }
 }
