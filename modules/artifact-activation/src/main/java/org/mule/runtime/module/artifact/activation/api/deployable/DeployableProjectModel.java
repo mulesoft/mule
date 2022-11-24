@@ -131,7 +131,8 @@ public final class DeployableProjectModel {
 
     for (BundleDependency dependency : dependencies) {
       BundleDescriptor descriptor = dependency.getDescriptor();
-      String pluginKey = descriptor.getGroupId() + ":" + descriptor.getArtifactId();
+      String pluginKey =
+          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getClassifier().orElse("empty");
       repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
       repeatedDependencies.get(pluginKey).add(descriptor);
     }
@@ -152,7 +153,7 @@ public final class DeployableProjectModel {
   }
 
   /**
-   * These are the resources in the modeled project. These resources are located in one of the folders of {@link resourcesPath}
+   * These are the resources in the modeled project. These resources are located in one of the folders of {@code resourcesPath}.
    * <p>
    * This does not take into account the resources of this project's dependencies.
    *
