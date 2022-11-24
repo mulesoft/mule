@@ -12,6 +12,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContex
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
@@ -28,6 +29,7 @@ import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_OPERATION_CONFIG_REF;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
@@ -144,6 +146,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private final String targetValue;
   private final List<EnrichedErrorMapping> errorMappings;
   private CompiledExpression targetValueExpression;
+  private final boolean isDynamicConfigRefEnabled = getBoolean(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY);
 
   public ModuleOperationMessageProcessor(Map<String, Object> parameters,
                                          List<EnrichedErrorMapping> errorMappings,
@@ -427,10 +430,15 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * @return An optional {@link ConfigurationProvider} {@link ValueResolver} only present if the config-ref is an expression.
    */
   private Optional<ValueResolver<ConfigurationProvider>> getConfigurationProviderResolver(Map<String, Object> parameters) {
+    if (!isDynamicConfigRefEnabled) {
+      return empty();
+    }
+
     String configRefParameter = (String) parameters.get(MODULE_OPERATION_CONFIG_REF);
     if (isExpression(configRefParameter)) {
       return of(new ConfigurationProviderValueResolver(configRefParameter));
     }
+
     return empty();
   }
 
