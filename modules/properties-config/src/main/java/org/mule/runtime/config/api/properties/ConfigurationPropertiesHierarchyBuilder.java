@@ -167,7 +167,6 @@ public class ConfigurationPropertiesHierarchyBuilder {
     hierarchy.push(new DefaultConfigurationPropertiesResolver(nextResolver, newProvider, failuresIfNotPresent));
   }
 
-
   /**
    * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
    */
@@ -187,5 +186,28 @@ public class ConfigurationPropertiesHierarchyBuilder {
     DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
     lastResolver.setAsRootResolver();
     return lastResolver;
+  }
+
+  /**
+   * @return the built {@link ConfigurationPropertiesResolver} that includes the complete hierarchy with the defined resolvers.
+   *         This hierarchy is a broken/legacy hierarchy (with deployment properties at the bottom) and without the circular
+   *         resolution. This is intended to be used only by applications previous to 4.3.0.
+   * @deprecated since 4.5. Use {@link ConfigurationPropertiesHierarchyBuilder#build} instead.
+   */
+  @Deprecated
+  public ConfigurationPropertiesResolver buildLegacyHierarchy() {
+    ArrayDeque<DefaultConfigurationPropertiesResolver> hierarchy = new ArrayDeque<>();
+
+    deploymentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    addToHierarchy(hierarchy, new GlobalPropertyConfigurationPropertiesProvider(globalPropertiesSupplier));
+    domainResolver.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    if (!appProperties.isEmpty()) {
+      addToHierarchy(hierarchy, new CompositeConfigurationPropertiesProvider(appProperties));
+    }
+    fileProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+    systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
+
+    return hierarchy.peek();
   }
 }
