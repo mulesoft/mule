@@ -13,9 +13,11 @@ import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 import org.mule.test.petstore.extension.PetStoreClient;
 
 import io.qameta.allure.Feature;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(XML_SDK)
+@Ignore("W-12121045: Ignore until we can set MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION to false")
 public class ModuleWithConfigurationAndWithImplicitConfigurationTestCase
     extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 

@@ -125,7 +125,7 @@ public class MacroExpansionModuleModel {
    * If true avoid the creation of an implicit configuration
    */
   private final boolean disable_xml_sdk_implicit_configuration_creation =
-      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false"));
+      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "true"));
 
   private final ArtifactAst applicationModel;
   private final ExtensionModel extensionModel;
