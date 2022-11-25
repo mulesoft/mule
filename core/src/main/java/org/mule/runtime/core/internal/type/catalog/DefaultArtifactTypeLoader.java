@@ -16,6 +16,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -49,6 +50,8 @@ import javax.inject.Inject;
  */
 public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisable {
 
+  private static final Logger LOGGER = getLogger(DefaultArtifactTypeLoader.class);
+
   private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
 
@@ -76,8 +79,8 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
       extensionModels = extensionManager.getExtensions();
     }
     if (extensionModels == null) {
-      throw new InitialisationException(createStaticMessage("Cannot initialize DefaultArtifactTypeLoader with a null Collection of ExtensionModels"),
-                                        this);
+      extensionModels = emptySet();
+      LOGGER.warn("DefaultArtifactTypeLoader has been initialized with a null Collection of ExtensionModels");
     }
     typesByExtension = new HashMap<>();
     loadedTypes = new ConcurrentHashMap<>();
