@@ -128,6 +128,12 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                      new LazySampleDataService(lazyComponentInitializer, () -> getRegistry()
                                          .<SampleDataService>lookupObject(NON_LAZY_SAMPLE_DATA_SERVICE)));
       registerBeanDefinition(NON_LAZY_SAMPLE_DATA_SERVICE, getBeanDefinition(MuleSampleDataService.class));
+
+      registerBeanDefinition(DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY,
+                             getBeanDefinition(ModelBasedMetadataCacheIdGeneratorFactory.class));
+      registerConstantBeanDefinition(METADATA_CACHE_ID_GENERATOR_KEY,
+                                     new DelegateMetadataCacheIdGeneratorFactory(() -> getRegistry()
+                                         .<ModelBasedMetadataCacheIdGeneratorFactory>lookupObject(DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY)));
     }
 
     registerConstantBeanDefinition(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, lazyComponentInitializer);
@@ -158,12 +164,6 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                              .<ObjectStoreManager>lookupObject(LAZY_MULE_OBJECT_STORE_MANAGER));
                                          return defaultPersistentMetadataCacheManager;
                                        }));
-
-        registerBeanDefinition(DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY,
-                               getBeanDefinition(ModelBasedMetadataCacheIdGeneratorFactory.class));
-        registerConstantBeanDefinition(METADATA_CACHE_ID_GENERATOR_KEY,
-                                       new DelegateMetadataCacheIdGeneratorFactory(() -> getRegistry()
-                                           .<ModelBasedMetadataCacheIdGeneratorFactory>lookupObject(DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY)));
       }
     }
   }
