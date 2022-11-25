@@ -100,8 +100,8 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
 
   private Optional<MetadataType> doLoad(String typeIdentifier) {
     return ofNullable(primitivesTypeLoader.load(typeIdentifier)
-        .orElse(specialTypesLoader.load(typeIdentifier)
-            .orElse(lookupType(typeIdentifier))));
+        .orElseGet(() -> specialTypesLoader.load(typeIdentifier)
+            .orElseGet(() -> lookupType(typeIdentifier))));
   }
 
   private MetadataType lookupType(String typeIdentifier) {
