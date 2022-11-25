@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -20,9 +18,15 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
@@ -44,6 +48,8 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 /**
@@ -61,6 +67,9 @@ public class IdempotentMessageValidator extends AbstractComponent
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
 
   protected MuleContext muleContext;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   protected volatile ObjectStore<String> store;
   protected ObjectStore<String> privateStore;
@@ -158,7 +167,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     this.store = store;
   }
 
-  private boolean accept(CoreEvent event) {
+  private boolean accept(CoreEvent event) throws ObjectStoreException {
     BindingContext bindingContext = event.asBindingContext();
     try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
       String id = getIdForEvent(session);
@@ -169,12 +178,21 @@ public class IdempotentMessageValidator extends AbstractComponent
           store.store(id, value);
           return true;
         } catch (ObjectAlreadyExistsException ex) {
+          if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+            throw ex;
+          }
           return false;
         } catch (ObjectStoreNotAvailableException e) {
           LOGGER.error("ObjectStore not available: " + e.getMessage());
+          if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+            throw e;
+          }
           return false;
         } catch (ObjectStoreException e) {
           LOGGER.warn("ObjectStore exception: " + e.getMessage());
+          if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+            throw e;
+          }
           return false;
         }
       } else {
@@ -184,6 +202,9 @@ public class IdempotentMessageValidator extends AbstractComponent
       throw e;
     } catch (Exception e) {
       LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
+      if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+        throw e;
+      }
       return false;
     }
   }

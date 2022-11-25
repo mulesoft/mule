@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.IdempotentMessageValidator.IDEMPOTENT_MESSAGE_VALIDATOR;
 
@@ -76,7 +77,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     Message okMessage = InternalMessage.builder().value("OK").build();
     CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
 
-    idempotent.initialise();
+    initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, sameInstance(event));
@@ -102,7 +103,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Set MEL expression to hash value
     idempotent.setIdExpression(melExpression);
 
-    idempotent.initialise();
+    initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, is(notNullValue()));
@@ -130,7 +131,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Set DW expression to hash value
     idempotent.setIdExpression(dwExpression);
 
-    idempotent.initialise();
+    initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, is(notNullValue()));
@@ -167,7 +168,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
                                                getFeatureFlaggingService());
     TypedValue<?> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
-    idempotent.initialise();
+    initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, is(notNullValue()));
@@ -206,7 +207,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
                                                getFeatureFlaggingService());
     TypedValue<Object> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
-    idempotent.initialise();
+    initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, is(notNullValue()));
@@ -226,6 +227,20 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.setPrivateObjectStore(new InMemoryObjectStore<>());
     expected.expect(InitialisationException.class);
     idempotent.initialise();
+  }
+
+  @Test
+  public void rethrowsException() throws Exception {
+    final BaseEventContext contextA = mock(BaseEventContext.class);
+    // this will force a NullPointerException while checking if store contains the id
+    when(contextA.getCorrelationId()).thenReturn(null);
+
+    Message okMessage = InternalMessage.builder().value("OK").build();
+    CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
+
+    initialiseIfNeeded(idempotent, true, muleContext);
+    expected.expect(NullPointerException.class);
+    idempotent.process(event);
   }
 
   @Test
