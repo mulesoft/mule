@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
@@ -25,19 +24,21 @@ import java.net.URISyntaxException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
 public class LightweightDeployableProjectModelBuilderTestCase {
 
+  @ClassRule
+  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+
   @Rule
-  public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
-                                                                discoverProvider(LightweightDeployableProjectModelBuilderTestCase.class
-                                                                    .getClassLoader()).getLocalRepositorySuppliers()
-                                                                        .environmentMavenRepositorySupplier().get()
-                                                                        .getAbsolutePath());
+  public SystemProperty repositoryLocation =
+      new SystemProperty("muleRuntimeConfig.maven.repositoryLocation", temporaryFolder.getRoot().getAbsolutePath());
 
   @Test
   public void createDeployableProjectModelWithSystemScopePlugin() throws Exception {
