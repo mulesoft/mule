@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory.getExtensionElement;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory.getExtensionElement;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateFactory;
@@ -59,9 +61,9 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.Privile
 import org.mule.runtime.module.extension.internal.loader.java.validation.SourceCallbacksModelValidator;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.JavaConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.JavaConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
 import java.util.Collection;
@@ -102,6 +104,7 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                          new JavaScopeModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
+                                                                                               new BooleanParameterDeclarationEnricher(),
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
                                                                                                new RuntimeVersionDeclarationEnricher(),

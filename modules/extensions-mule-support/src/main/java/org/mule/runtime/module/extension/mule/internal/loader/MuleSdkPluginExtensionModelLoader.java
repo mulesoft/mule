@@ -18,6 +18,9 @@ import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactA
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.getRequiredLoadingParameter;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,8 +29,10 @@ import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
 import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
@@ -36,6 +41,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkPluginExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginExtensionModelLoadingMediator;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,6 +57,9 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
   private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelParserFactory.class);
   private static final String MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME = "_muleSdkArtifactExtensionModel";
 
+  private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
+                                                                                               new BooleanParameterDeclarationEnricher()));
+
   @Override
   public String getId() {
     return MULE_SDK_EXTENSION_LOADER_ID;
@@ -64,6 +73,8 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
   @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     super.configureContextBeforeDeclaration(context);
+
+    context.addCustomDeclarationEnrichers(customDeclarationEnrichers);
 
     // Parses the AST if not already available in the loading context.
     Optional<ArtifactAst> ast = context.getParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME);
