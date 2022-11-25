@@ -23,6 +23,11 @@ import java.util.function.Supplier;
 
 import static java.util.Optional.empty;
 
+/**
+ * A noop {@link NoopCoreEventTracer}
+ *
+ * @since 4.5.0
+ */
 public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
 
   public static EventTracer<CoreEvent> getNoopCoreEventTracer() {

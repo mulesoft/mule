@@ -7,10 +7,17 @@
 
 package org.mule.runtime.core.api.tracing.customization;
 
+import static org.mule.runtime.tracer.api.span.info.StartExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 
+/**
+ * A {@link ComponentStartSpanInfo} that indicates that the span shouldn't be exportable.
+ *
+ * @since 4.5.0
+ */
 public class NoExportableComponentSpanCustomizationInfo extends ComponentStartSpanInfo {
 
   public NoExportableComponentSpanCustomizationInfo(Component component, CoreEvent coreEvent) {
@@ -19,6 +26,6 @@ public class NoExportableComponentSpanCustomizationInfo extends ComponentStartSp
 
   @Override
   public StartExportInfo getStartExportInfo() {
-    return StartExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+    return NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
 }

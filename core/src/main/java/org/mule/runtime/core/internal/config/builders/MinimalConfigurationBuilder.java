@@ -44,6 +44,7 @@ import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaul
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
@@ -305,7 +306,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void configureCoreTracer(MuleContext muleContext) throws RegistrationException {
-    EventTracer<CoreEvent> tracer = new NoopCoreEventTracer();
+    EventTracer<CoreEvent> tracer = getNoopCoreEventTracer();
     registerObject(MULE_CORE_EVENT_TRACER_KEY, tracer, muleContext);
   }
 

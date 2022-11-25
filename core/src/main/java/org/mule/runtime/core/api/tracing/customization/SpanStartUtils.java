@@ -10,7 +10,7 @@ package org.mule.runtime.core.api.tracing.customization;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 
-public class SpanCustomizationUtils {
+public class SpanStartUtils {
 
   private static final String CORE_EVENT_SPAN_NAME_SEPARATOR = ":";
   public static final String UNKNOWN = "unknown";

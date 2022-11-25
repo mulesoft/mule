@@ -92,7 +92,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreStartSpanInfoProvider;
 import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
   private final CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider =
-      new ComponentCoreSpanCustomizationInfoProvider(TemplateOnErrorHandler.this);
+      new ComponentCoreStartSpanInfoProvider(TemplateOnErrorHandler.this);
 
   private boolean fromGlobalErrorHandler = false;
 

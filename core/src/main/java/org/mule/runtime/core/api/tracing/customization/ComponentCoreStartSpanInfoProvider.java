@@ -11,11 +11,16 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
-public class ComponentCoreSpanCustomizationInfoProvider implements CoreSpanCustomizationInfoProvider {
+/**
+ * A {@link CoreSpanCustomizationInfoProvider} for {@link StartSpanInfo} based on the component.
+ *
+ * @since 4.5.0
+ */
+public class ComponentCoreStartSpanInfoProvider implements CoreSpanCustomizationInfoProvider {
 
   protected final Component component;
 
-  public ComponentCoreSpanCustomizationInfoProvider(Component component) {
+  public ComponentCoreStartSpanInfoProvider(Component component) {
     this.component = component;
   }
 

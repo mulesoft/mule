@@ -107,7 +107,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreStartSpanInfoProvider;
 import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
@@ -192,7 +192,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    * The span customization info for the chain.
    */
   private CoreSpanCustomizationInfoProvider chainCoreSpanCustomizationInfoProvider =
-      new ComponentCoreSpanCustomizationInfoProvider(this);
+      new ComponentCoreStartSpanInfoProvider(this);
 
   // This is used to verify if a span has to be ended in case of error handling.
   // In case an exception is raised before the chain begins to execute, there is no current span set for the chain.
@@ -534,7 +534,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
       startSpanInfo =
-          new ComponentCoreSpanCustomizationInfoProvider((Component) processor).get(event);
+          new ComponentCoreStartSpanInfoProvider((Component) processor).get(event);
     } else {
       // Other processors are not exported
       startSpanInfo = new NoExportableNoExportableFixedNameCoreSpanCustomizationInfoProvider("unknown").get(event);

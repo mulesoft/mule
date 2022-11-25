@@ -10,8 +10,16 @@ package org.mule.runtime.core.api.tracing.customization;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
+/**
+ * A provider for {@link StartSpanInfo} based on {@link CoreEvent}
+ */
 public interface CoreSpanCustomizationInfoProvider {
 
+  /**
+   * @param core a {@link CoreEvent}
+   *
+   * @return the {@link StartSpanInfo}
+   */
   StartSpanInfo get(CoreEvent core);
 
 }

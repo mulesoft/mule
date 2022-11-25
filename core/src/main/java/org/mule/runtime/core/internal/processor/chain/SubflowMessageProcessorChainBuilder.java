@@ -25,9 +25,9 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreStartSpanInfoProvider;
 import org.mule.runtime.core.api.tracing.customization.ComponentStartSpanInfo;
-import org.mule.runtime.core.api.tracing.customization.SpanCustomizationUtils;
+import org.mule.runtime.core.api.tracing.customization.SpanStartUtils;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -110,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setCoreSpanCustomizationInfoProvider(new SubFlowSpanCustomizationInfoProvider(this));
+      this.setCoreSpanCustomizationInfoProvider(new SubFlowStartSpanInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -131,9 +131,9 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 
-    private class SubFlowSpanCustomizationInfoProvider extends ComponentCoreSpanCustomizationInfoProvider {
+    private class SubFlowStartSpanInfoProvider extends ComponentCoreStartSpanInfoProvider {
 
-      SubFlowSpanCustomizationInfoProvider(Component component) {
+      SubFlowStartSpanInfoProvider(Component component) {
         super(component);
       }
 
@@ -150,7 +150,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
 
         @Override
         public String getName() {
-          return SpanCustomizationUtils.getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
+          return SpanStartUtils.getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
         }
 
         @Override

@@ -19,6 +19,6 @@ public class NoExportableNoExportableFixedNameCoreSpanCustomizationInfoProvider
 
   @Override
   public StartSpanInfo get(CoreEvent coreEvent) {
-    return new NoFixedComponentSpanCustomizationInfo(name);
+    return new NoFixedNameSpanCustomizationInfo(name);
   }
 }

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.profiling;
 
-import org.mule.runtime.api.event.Event;
+import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
+
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -17,29 +17,16 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
-import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
-import org.mule.runtime.tracer.api.span.validation.Assertion;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 
 /**
  * A Profiling Service that disables all data production. The {@link ProfilingDataProducer} implements operations that do not
@@ -49,77 +36,7 @@ import static java.util.Optional.empty;
  */
 public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
-  private final EventTracer<CoreEvent> eventTracer = new EventTracer<CoreEvent>() {
-
-    @Override
-    public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo) {
-      return empty();
-    }
-
-    @Override
-    public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
-                                                     Assertion assertion) {
-      return empty();
-    }
-
-    @Override
-    public void endCurrentSpan(CoreEvent coreEvent) {
-
-    }
-
-    @Override
-    public void endCurrentSpan(CoreEvent coreEvent, Assertion condition) {
-
-    }
-
-    @Override
-    public void injectDistributedTraceContext(EventContext eventContext,
-                                              DistributedTraceContextGetter distributedTraceContextGetter) {
-
-    }
-
-    @Override
-    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
-
-    }
-
-    @Override
-    public void setCurrentSpanName(CoreEvent coreEvent, String name) {
-
-    }
-
-    @Override
-    public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
-
-    }
-
-    @Override
-    public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
-
-    }
-
-    @Override
-    public SpanSnifferManager getSpanExporterManager() {
-      return new SpanSnifferManager() {
-
-        @Override
-        public ExportedSpanSniffer getExportedSpanSniffer() {
-          return new ExportedSpanSniffer() {
-
-            @Override
-            public Collection<CapturedExportedSpan> getExportedSpans() {
-              return emptySet();
-            }
-
-            @Override
-            public void dispose() {
-              // Nothing to dispose.
-            }
-          };
-        }
-      };
-    };
-  };
+  private final EventTracer<CoreEvent> eventTracer = getNoopCoreEventTracer();
 
   private final TracingService noOpTracingService = new TracingService() {
 

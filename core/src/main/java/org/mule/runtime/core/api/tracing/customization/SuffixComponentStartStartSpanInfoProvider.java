@@ -11,11 +11,17 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
-public class RouteComponentSpanCustominzationInfoProvider extends ComponentCoreSpanCustomizationInfoProvider {
+/**
+ * A {@link ComponentCoreStartSpanInfoProvider} that provides {@link StartSpanInfo}
+ * for adding a suffix to the name.
+ *
+ * @since 4.5.0
+ */
+public class SuffixComponentStartStartSpanInfoProvider extends ComponentCoreStartSpanInfoProvider {
 
   private final String routeName;
 
-  public RouteComponentSpanCustominzationInfoProvider(Component component, String routeName) {
+  public SuffixComponentStartStartSpanInfoProvider(Component component, String routeName) {
     super(component);
     this.routeName = routeName;
   }

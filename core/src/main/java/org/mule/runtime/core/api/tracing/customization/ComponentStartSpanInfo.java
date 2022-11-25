@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * A {@link StartSpanInfo} based on the component.
+ *
+ * @since 4.5.0
+ */
 public class ComponentStartSpanInfo implements StartSpanInfo {
 
 
@@ -55,7 +60,7 @@ public class ComponentStartSpanInfo implements StartSpanInfo {
   }
 
   protected String getLocationAsString(CoreEvent coreEvent) {
-    return SpanCustomizationUtils.getLocationAsString(component.getLocation());
+    return SpanStartUtils.getLocationAsString(component.getLocation());
   }
 
 
@@ -72,7 +77,7 @@ public class ComponentStartSpanInfo implements StartSpanInfo {
 
   @Override
   public String getName() {
-    return SpanCustomizationUtils.getSpanName(component.getIdentifier()) + suffix;
+    return SpanStartUtils.getSpanName(component.getIdentifier()) + suffix;
   }
 
   @Override

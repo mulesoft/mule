@@ -11,10 +11,16 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 
-public class NoExportableTillCustomizationInfo extends ComponentStartSpanInfo {
+/**
+ * A {@link ComponentStartSpanInfo} that indicates that a hierarchy of spans shouldn't be
+ * exported till some component.
+ *
+ * @since 4.5.0
+ */
+public class NoExportableTillStartInfo extends ComponentStartSpanInfo {
 
-  public NoExportableTillCustomizationInfo(Component component,
-                                           CoreEvent coreEvent) {
+  public NoExportableTillStartInfo(Component component,
+                                   CoreEvent coreEvent) {
     super(component, coreEvent);
   }
 

@@ -20,6 +20,6 @@ public class FixedNameCoreSpanCustomizationInfoProvider implements CoreSpanCusto
 
   @Override
   public StartSpanInfo get(CoreEvent core) {
-    return new FixedComponentStartSpanInfo(name);
+    return new FixedNameStartSpanInfo(name);
   }
 }

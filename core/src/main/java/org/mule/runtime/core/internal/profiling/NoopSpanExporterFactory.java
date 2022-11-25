@@ -15,6 +15,11 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 
+/**
+ * A noop {@link SpanExporterFactory}.
+ *
+ * @since 4.5.0
+ */
 public class NoopSpanExporterFactory implements SpanExporterFactory {
 
   @Override

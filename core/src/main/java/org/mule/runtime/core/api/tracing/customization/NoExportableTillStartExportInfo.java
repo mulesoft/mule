@@ -13,6 +13,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+/**
+ * A {@link StartExportInfo} that indicates that the span shouldn't be exported.
+ *
+ * @since 4.5.0
+ */
 public class NoExportableTillStartExportInfo implements StartExportInfo {
 
   private Set<String> resetSpans = new HashSet<>();

@@ -8,24 +8,15 @@
 package org.mule.runtime.core.api.tracing.customization;
 
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
-public class FixedComponentStartSpanInfo implements StartSpanInfo {
+public class NoFixedNameSpanCustomizationInfo extends FixedNameStartSpanInfo {
 
-  private final String name;
-
-  public FixedComponentStartSpanInfo(String name) {
-    this.name = name;
+  public NoFixedNameSpanCustomizationInfo(String name) {
+    super(name);
   }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
 
   @Override
   public StartExportInfo getStartExportInfo() {
-    return StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+    return StartExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
 }
