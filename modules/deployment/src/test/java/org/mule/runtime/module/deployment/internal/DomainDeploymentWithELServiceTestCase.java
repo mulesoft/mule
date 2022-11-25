@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
@@ -27,6 +28,7 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.weave.v2.el.WeaveServiceProvider;
 
 import java.io.File;
@@ -35,6 +37,7 @@ import java.net.URL;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import org.junit.After;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -43,6 +46,9 @@ import org.junit.Test;
  */
 @Feature(DOMAIN_DEPLOYMENT)
 public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTestCase {
+
+  @ClassRule
+  public static SystemProperty enableDynamicConfigRef = new SystemProperty(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY, "true");
 
   private final DomainFileBuilder domainWithConfigsFileBuilder =
       new DomainFileBuilder("domain-with-configs")

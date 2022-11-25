@@ -14,11 +14,13 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.test.allure.AllureConstants.Sdk.Parameters.EXPRESSIONS_ON_CONFIG_REF;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
@@ -27,11 +29,15 @@ import java.util.List;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 @Feature(SDK)
 @Story(EXPRESSIONS_ON_CONFIG_REF)
 public class PetStoreExpressionConfigRefTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @ClassRule
+  public static SystemProperty enableDynamicConfigRef = new SystemProperty(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY, "true");
 
   @Override
   protected String getConfigFile() {
@@ -90,5 +96,10 @@ public class PetStoreExpressionConfigRefTestCase extends AbstractExtensionFuncti
     String expectedMessage = "cannot get configuration from a blank provider name";
     flowRunner("getPetsWithExpressionResolvingToEmptyString")
         .runExpectingException(allOf(instanceOf(IllegalArgumentException.class), hasMessage(expectedMessage)));
+  }
+
+  @Override
+  protected boolean mustRegenerateExtensionModels() {
+    return true;
   }
 }
