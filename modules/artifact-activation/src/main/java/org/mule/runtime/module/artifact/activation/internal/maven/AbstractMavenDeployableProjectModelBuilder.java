@@ -30,8 +30,8 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.*;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -76,7 +76,6 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
   private static final String VERSION = "version";
-  private static final String POM = "pom";
 
   protected final MavenConfiguration mavenConfiguration;
   protected final File projectFolder;
