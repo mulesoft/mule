@@ -13,6 +13,7 @@ import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.O
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_STACK_TRACE_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_TYPE_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
+import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.getDefaultAttributesToAssertExistence;
 
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
@@ -24,7 +25,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +67,6 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   public static final String TEST_ARTIFACT_ID = "SpanTestHierarchyTestCase#mockCapturedExportedSpan";
 
   public static final String ERROR_TYPE_1 = "CUSTOM:ERROR";
-  public static final String ERROR_TYPE_2 = "CUSTOM:ERROR_2";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -485,7 +484,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     String loggerLocation = "logger-test-location";
     String loggerSecondLocation = "logger-second-test-location";
 
-    List<String> attributesToAssertExistence = Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY);
+    List<String> attributesToAssertExistence = getDefaultAttributesToAssertExistence();
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
@@ -556,7 +555,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     String loggerLocation = "logger-test-location";
     String loggerSecondLocation = "logger-second-test-location";
 
-    List<String> attributesToAssertExistence = Arrays.asList(CORRELATION_ID_KEY, THREAD_START_ID_KEY);
+    List<String> attributesToAssertExistence = getDefaultAttributesToAssertExistence();
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
