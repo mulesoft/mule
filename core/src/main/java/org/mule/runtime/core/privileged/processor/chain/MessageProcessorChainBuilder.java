@@ -10,7 +10,7 @@ package org.mule.runtime.core.privileged.processor.chain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
+import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
 
 /**
  * Builds {@link MessageProcessorChain} instances.
@@ -59,7 +59,7 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
    *
    * @since 4.5.0
    */
-  default void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo) {
+  default void setCoreSpanCustomizationInfoProvider(CoreSpanCustomizationInfoProvider spanCustomizationInfo) {
     // Nothing to do by default.
   }
 }

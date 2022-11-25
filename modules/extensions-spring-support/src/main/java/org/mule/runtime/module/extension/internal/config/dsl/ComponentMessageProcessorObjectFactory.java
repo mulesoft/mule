@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
@@ -22,6 +21,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.tracing.customization.NoExportableNoExportableFixedNameCoreSpanCustomizationInfoProvider;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -68,7 +68,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
     final MessageProcessorChain nestedChain;
 
     if (nestedProcessors != null) {
-      nestedChain = newChain(empty(), nestedProcessors, getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo());
+      nestedChain = newChain(empty(), nestedProcessors,
+                             new NoExportableNoExportableFixedNameCoreSpanCustomizationInfoProvider("message:processor"));
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()

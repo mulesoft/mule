@@ -79,9 +79,11 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
@@ -113,6 +115,12 @@ import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -126,6 +134,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -253,6 +263,63 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
       return () -> singleton(profilingDataConsumer);
+    }
+
+    @Override
+    public EventTracer<CoreEvent> getCoreEventTracer() {
+      return new EventTracer<CoreEvent>() {
+
+        @Override
+        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo) {
+          return Optional.empty();
+        }
+
+        @Override
+        public void startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
+
+        }
+
+        @Override
+        public void endCurrentSpan(CoreEvent event) {
+
+        }
+
+        @Override
+        public void endCurrentSpan(CoreEvent event, Assertion condition) {
+
+        }
+
+        @Override
+        public void injectDistributedTraceContext(EventContext eventContext,
+                                                  DistributedTraceContextGetter distributedTraceContextGetter) {
+
+        }
+
+        @Override
+        public void recordErrorAtCurrentSpan(CoreEvent event, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
+
+        }
+
+        @Override
+        public void setCurrentSpanName(CoreEvent event, String name) {
+
+        }
+
+        @Override
+        public void addCurrentSpanAttribute(CoreEvent event, String key, String value) {
+
+        }
+
+        @Override
+        public void addCurrentSpanAttributes(CoreEvent event, Map<String, String> attributes) {
+
+        }
+
+        @Override
+        public SpanSnifferManager getSpanExporterManager() {
+          return null;
+        }
+      };
     }
   };
 

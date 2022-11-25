@@ -58,9 +58,11 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingService;
@@ -78,6 +80,12 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -85,12 +93,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -119,6 +129,63 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         @Override
         public Set<ProfilingDataConsumer<?>> discover() {
           return singleton(profilingDataConsumer);
+        }
+      };
+    }
+
+    @Override
+    public EventTracer<CoreEvent> getCoreEventTracer() {
+      return new EventTracer<CoreEvent>() {
+
+        @Override
+        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo) {
+          return Optional.empty();
+        }
+
+        @Override
+        public void startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo, Assertion assertion) {
+
+        }
+
+        @Override
+        public void endCurrentSpan(CoreEvent event) {
+
+        }
+
+        @Override
+        public void endCurrentSpan(CoreEvent event, Assertion condition) {
+
+        }
+
+        @Override
+        public void injectDistributedTraceContext(EventContext eventContext,
+                                                  DistributedTraceContextGetter distributedTraceContextGetter) {
+
+        }
+
+        @Override
+        public void recordErrorAtCurrentSpan(CoreEvent event, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
+
+        }
+
+        @Override
+        public void setCurrentSpanName(CoreEvent event, String name) {
+
+        }
+
+        @Override
+        public void addCurrentSpanAttribute(CoreEvent event, String key, String value) {
+
+        }
+
+        @Override
+        public void addCurrentSpanAttributes(CoreEvent event, Map<String, String> attributes) {
+
+        }
+
+        @Override
+        public SpanSnifferManager getSpanExporterManager() {
+          return null;
         }
       };
     }

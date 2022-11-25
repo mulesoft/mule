@@ -24,14 +24,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentStartSpanInfo;
+import org.mule.runtime.core.api.tracing.customization.SpanCustomizationUtils;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
-import org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractDefaultAttributesResolvingSpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 
 import java.util.HashMap;
@@ -41,6 +40,8 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
+import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 import org.reactivestreams.Publisher;
 
 /**
@@ -109,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setSpanCustomizationInfo(new SubFlowSpanCustomization(subFlowName));
+      this.setCoreSpanCustomizationInfoProvider(new SubFlowSpanCustomizationInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -130,33 +131,33 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 
-  }
+    private class SubFlowSpanCustomizationInfoProvider extends ComponentCoreSpanCustomizationInfoProvider {
 
-  private static class SubFlowSpanCustomization extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
+      SubFlowSpanCustomizationInfoProvider(Component component) {
+        super(component);
+      }
 
-    private final String name;
-    private final String subFlowLocationPart;
+      @Override
+      public StartSpanInfo get(CoreEvent coreEvent) {
+        return new SubflowCustomizationInfo(component, coreEvent);
+      }
 
-    public SubFlowSpanCustomization(String name) {
-      this.name = name;
-      this.subFlowLocationPart = DefaultComponentLocation.LOCATION_PART_SEPARATOR + name;
-    }
+      private class SubflowCustomizationInfo extends ComponentStartSpanInfo {
 
-    @Override
-    public String getLocationAsString(CoreEvent coreEvent) {
-      String parentLocation = CoreEventSpanUtils.getCurrentSpan(coreEvent.getContext()).flatMap(internalSpan -> internalSpan
-          .getAttribute(AbstractDefaultAttributesResolvingSpanCustomizationInfo.LOCATION_KEY)).orElse("");
-      return parentLocation.isEmpty() ? name : parentLocation + subFlowLocationPart;
-    }
+        public SubflowCustomizationInfo(Component component, CoreEvent coreEvent) {
+          super(component, coreEvent);
+        }
 
-    @Override
-    public String getName(CoreEvent coreEvent) {
-      return CoreEventSpanUtils.getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
-    }
+        @Override
+        public String getName() {
+          return SpanCustomizationUtils.getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
+        }
 
-    @Override
-    public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
-      return null;
+        @Override
+        public StartExportInfo getStartExportInfo() {
+          return StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+        }
+      }
     }
   }
 }

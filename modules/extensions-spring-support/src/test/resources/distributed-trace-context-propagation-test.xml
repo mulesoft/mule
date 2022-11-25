@@ -12,7 +12,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <object name="collector" class="org.mule.test.module.extension.DistributedTraceContextPropagationTestCase$EventCollectorProcessor"/>
+    <object name="collector" class="org.mule.test.module.extension.SpanContextPropagationTestCase$EventCollectorProcessor"/>
 
     <flow name="traceContextPropagation" initialState="stopped">
         <petstore:pet-source-list birds="Primate" outputMimeType="pet/plain"/>

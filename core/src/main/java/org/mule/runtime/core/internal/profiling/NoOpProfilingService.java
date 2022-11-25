@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.core.internal.profiling;
 
-import static java.util.Optional.empty;
-
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
@@ -18,23 +17,28 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
-
-import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
+import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.validation.Assertion;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import static java.util.Collections.emptySet;
 
 /**
  * A Profiling Service that disables all data production. The {@link ProfilingDataProducer} implements operations that do not
@@ -44,7 +48,77 @@ import reactor.core.publisher.Mono;
  */
 public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
-  private final CoreEventTracer eventTracer = new NoOpCoreEventTracer();
+  private final EventTracer<CoreEvent> eventTracer = new EventTracer<CoreEvent>() {
+
+    @Override
+    public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo) {
+      return Optional.empty();
+    }
+
+    @Override
+    public void startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
+                                   Assertion assertion) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void endCurrentSpan(CoreEvent coreEvent) {
+
+    }
+
+    @Override
+    public void endCurrentSpan(CoreEvent coreEvent, Assertion condition) {
+
+    }
+
+    @Override
+    public void injectDistributedTraceContext(EventContext eventContext,
+                                              DistributedTraceContextGetter distributedTraceContextGetter) {
+
+    }
+
+    @Override
+    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
+
+    }
+
+    @Override
+    public void setCurrentSpanName(CoreEvent coreEvent, String name) {
+
+    }
+
+    @Override
+    public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
+
+    }
+
+    @Override
+    public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+
+    }
+
+    @Override
+    public SpanSnifferManager getSpanExporterManager() {
+      return new SpanSnifferManager() {
+
+        @Override
+        public ExportedSpanSniffer getExportedSpanSniffer() {
+          return new ExportedSpanSniffer() {
+
+            @Override
+            public Collection<CapturedExportedSpan> getExportedSpans() {
+              return emptySet();
+            }
+
+            @Override
+            public void dispose() {
+              // Nothing to dispose.
+            }
+          };
+        }
+      };
+    };
+  };
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -107,6 +181,12 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
   }
 
   @Override
+  public void injectDistributedTraceContext(EventContext eventContext,
+                                            DistributedTraceContextGetter distributedTraceContextGetter) {
+
+  }
+
+  @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
     throw new UnsupportedOperationException();
   }
@@ -141,64 +221,8 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
   }
 
   @Override
-  public CoreEventTracer getCoreEventTracer() {
+  public EventTracer<CoreEvent> getCoreEventTracer() {
     return eventTracer;
   }
 
-  private static class NoOpCoreEventTracer implements CoreEventTracer {
-
-    @Override
-    public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent,
-                                                     SpanCustomizationInfo spanCustomizationInfo) {
-      return empty();
-    }
-
-    @Override
-    public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, SpanCustomizationInfo spanCustomizationInfo,
-                                                     TracingCondition tracingCondition) {
-      return empty();
-    }
-
-    @Override
-    public void endCurrentSpan(CoreEvent coreEvent) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void endCurrentSpan(CoreEvent coreEvent, TracingCondition condition) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, boolean isErrorEscapingCurrentSpan) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void recordErrorAtCurrentSpan(CoreEvent coreEvent, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void setCurrentSpanName(CoreEvent coreEvent, String name) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
-      // Nothing to do.
-    }
-
-    @Override
-    public void injectDistributedTraceContext(EventContext eventContext,
-                                              DistributedTraceContextGetter distributedTraceContextGetter) {
-      // Nothing to do.
-    }
-
-  }
 }

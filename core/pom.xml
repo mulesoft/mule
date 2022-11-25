@@ -14,7 +14,6 @@
     <description>Mule server and core classes</description>
 
     <properties>
-        <opentelemetryVersion>1.10.1</opentelemetryVersion>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
@@ -67,38 +66,24 @@
         </pluginManagement>
     </build>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-bom</artifactId>
-                <version>${opentelemetryVersion}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <!--
         group/artifact id only, version and exclusions are specified
         via dependency management
     -->
     <dependencies>
         <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-exporter-otlp</artifactId>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-api</artifactId>
+            <artifactId>mule-tracer-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-exporter-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.sdk</groupId>

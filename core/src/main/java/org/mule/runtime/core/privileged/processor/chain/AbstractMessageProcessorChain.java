@@ -23,7 +23,6 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportExecuteNextChildSpanCustomizationInfo.getCustomizationInfo;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -35,7 +34,7 @@ import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentM
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.NotNullSpanTracingCondition.getNotNullSpanTracingCondition;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 
 import static java.lang.String.format;
@@ -72,12 +71,13 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
+import org.mule.runtime.core.api.tracing.customization.NoExportableNoExportableFixedNameCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
@@ -89,11 +89,6 @@ import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptor
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.SpanNameTracingCondition;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
@@ -112,6 +107,11 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -186,14 +186,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
 
   private Scheduler switchOnErrorScheduler;
-  private CoreEventTracer muleEventTracer;
-  private static final SpanCustomizationInfo DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO =
-      new NamedSpanBasedOnParentSpanChildSpanCustomizationInfo();
+  private EventTracer<CoreEvent> muleEventTracer;
 
   /**
    * The span customization info for the chain.
    */
-  private SpanCustomizationInfo chainSpanCustomizationInfo = DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO;
+  private CoreSpanCustomizationInfoProvider chainCoreSpanCustomizationInfoProvider =
+      new ComponentCoreSpanCustomizationInfoProvider(this);
 
   // This is used to verify if a span has to be ended in case of error handling.
   // In case an exception is raised before the chain begins to execute, there is no current span set for the chain.
@@ -234,7 +233,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                         // We end the current span verifying that it's a MessageProcessorChain Span.
                         muleEventTracer
                             .endCurrentSpan(handled,
-                                            new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(handled)));
+                                            new SpanNameAssertion(chainCoreSpanCustomizationInfoProvider.get(handled)
+                                                .getName()));
                       }
                       errorSwitchSinkSinkRef.next(right(handled));
                     },
@@ -249,8 +249,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                         // We end the current Span verifying that it's a MessageProcessorChain span.
                         muleEventTracer
                             .endCurrentSpan(coreEvent,
-                                            new SpanNameTracingCondition(chainSpanCustomizationInfo
-                                                .getName(coreEvent)));
+                                            new SpanNameAssertion(chainCoreSpanCustomizationInfoProvider.get(coreEvent)
+                                                .getName()));
                       }
                       errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
                     }));
@@ -301,7 +301,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         muleEventTracer.endCurrentSpan(coreEvent, getNotNullSpanTracingCondition());
         // Record the error and end current (MessageProcessor chain) Span. We verify that is the chain span.
         muleEventTracer.endCurrentSpan(coreEvent,
-                                       new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(coreEvent)));
+                                       new SpanNameAssertion(chainCoreSpanCustomizationInfoProvider.get(coreEvent)
+                                           .getName()));
         muleEventTracer.recordErrorAtCurrentSpan(coreEvent, true);
 
         context.error(throwable);
@@ -349,7 +350,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     Flux<CoreEvent> stream = from(publisher);
     // We create a span for the execution of the chain. As reactor only receives an event per next. No need to synchronize.
     // We don't have a way to verify nothing about the parent span. So no tracing condition is added.
-    stream = stream.doOnNext(event -> muleEventTracer.startComponentSpan(event, chainSpanCustomizationInfo)
+    stream = stream.doOnNext(event -> muleEventTracer.startComponentSpan(event, chainCoreSpanCustomizationInfoProvider.get(event))
         .ifPresent(span -> chainSpanCreated = true));
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
@@ -365,7 +366,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
     // We end the MessageProcessorChain span verifying that it is the one expected by its name.
     stream = stream.doOnNext(event -> muleEventTracer
-        .endCurrentSpan(event, new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(event))));
+        .endCurrentSpan(event, new SpanNameAssertion(chainCoreSpanCustomizationInfoProvider.get(event).getName())));
 
     stream = stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
@@ -526,25 +527,24 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private void startSpanForProcessor(Processor processor, CoreEvent event) {
-    TracingCondition tracingCondition = new SpanNameTracingCondition(chainSpanCustomizationInfo.getName(event));
+    Assertion assertion = new SpanNameAssertion(chainCoreSpanCustomizationInfoProvider.get(event).getName());
 
-    SpanCustomizationInfo spanCustomizationInfo = null;
+    StartSpanInfo startSpanInfo = null;
 
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
-      spanCustomizationInfo =
-          new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo((Component) processor,
-                                                                            chainSpanCustomizationInfo.isPolicySpan());
+      startSpanInfo =
+          new ComponentCoreSpanCustomizationInfoProvider((Component) processor).get(event);
     } else {
-      // Other type of processors we define taking into account the parent.
-      spanCustomizationInfo = getCustomizationInfo(chainSpanCustomizationInfo.isPolicySpan());
+      // Other processors are not exported
+      startSpanInfo = new NoExportableNoExportableFixedNameCoreSpanCustomizationInfoProvider("unknown").get(event);
     }
 
     // We start the component verifying that the current span is the span corresponding to
     // the chain.
     muleEventTracer.startComponentSpan(event,
-                                       spanCustomizationInfo,
-                                       tracingCondition);
+                                       startSpanInfo,
+                                       assertion);
   }
 
   private void triggerOperationExecuted(CoreEvent event, ComponentLocation componentLocation) {
@@ -783,9 +783,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   /**
-   * @param spanCustomizationInfo sets the {@link SpanCustomizationInfo} for the chain.
+   * @param chainCoreSpanCustomizationInfoProvider sets the {@link StartSpanInfo} for the chain.
    */
-  public void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo) {
-    this.chainSpanCustomizationInfo = spanCustomizationInfo;
+  public void setCoreSpanCustomizationInfoProvider(CoreSpanCustomizationInfoProvider chainCoreSpanCustomizationInfoProvider) {
+    this.chainCoreSpanCustomizationInfoProvider = chainCoreSpanCustomizationInfoProvider;
   }
 }

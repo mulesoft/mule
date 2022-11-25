@@ -11,7 +11,6 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.NoExportNamedSpanBasedOnParentSpanChildSpanCustomizationInfo.getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
@@ -38,9 +37,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.tracing.customization.NoExportableComponentCoreSpanCustomizationInfoProvider;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.lang.ref.Reference;
@@ -50,6 +49,8 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
 import org.reactivestreams.Publisher;
 
 /**
@@ -69,8 +70,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
-  public static final SpanCustomizationInfo NO_EXPORT_CHILD_NAMED_SPAN_BASED_ON_PARENT_SPAN_CHILD_SPAN_CUSTOMIZATION_INFO =
-      getNoExportChildNamedSpanBasedOnParentSpanChildSpanCustomizationInfo(true);
+  public final CoreSpanCustomizationInfoProvider NO_EXPORT_CHILD_NAMED_SPAN_BASED_ON_PARENT_SPAN_CHILD_SPAN_CUSTOMIZATION_INFO =
+      new NoExportableComponentCoreSpanCustomizationInfoProvider(this);
 
   @Inject
   private MuleContext muleContext;

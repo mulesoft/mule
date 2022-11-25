@@ -31,11 +31,10 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentCoreCustomizationInfoProvider;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
-
-import org.mule.runtime.core.internal.profiling.tracing.event.NoChildrenExportableUntilExecuteNextSpanCustomizationInfo;
 
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -84,7 +83,7 @@ public class PolicyChain extends AbstractComponent
   public final void initialise() throws InitialisationException {
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
-                                          new NoChildrenExportableUntilExecuteNextSpanCustomizationInfo(this, true));
+                                          new NoExportTillExecuteNextComponentCoreCustomizationInfoProvider(this));
 
     initialiseIfNeeded(processorChain, muleContext);
 
