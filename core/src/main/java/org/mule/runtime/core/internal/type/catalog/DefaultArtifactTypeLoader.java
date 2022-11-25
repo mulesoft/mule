@@ -99,23 +99,17 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
   }
 
   private Optional<MetadataType> doLoad(String typeIdentifier) {
-    Optional<MetadataType> primitive = primitivesTypeLoader.load(typeIdentifier);
-    if (primitive.isPresent()) {
-      return primitive;
-    }
-
-    Optional<MetadataType> special = specialTypesLoader.load(typeIdentifier);
-    if (special.isPresent()) {
-      return special;
-    }
-
-    return ofNullable(lookupType(typeIdentifier));
+    return ofNullable(primitivesTypeLoader.load(typeIdentifier)
+        .orElse(specialTypesLoader.load(typeIdentifier)
+            .orElse(lookupType(typeIdentifier))));
   }
 
   private MetadataType lookupType(String typeIdentifier) {
     if (!typeIdentifier.contains(":")) {
       return null;
     }
+    // The first appearance of the separator and the String.substring methods are used instead of String.split because the type id
+    // or alias might include the separator inside it.
     int separatorIndex = typeIdentifier.indexOf(":");
     String extensionIdentifier = typeIdentifier.substring(0, separatorIndex);
     String typeIdOrAlias = typeIdentifier.substring(separatorIndex + 1);
