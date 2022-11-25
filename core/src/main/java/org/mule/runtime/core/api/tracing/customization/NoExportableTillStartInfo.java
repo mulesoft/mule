@@ -12,8 +12,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 
 /**
- * A {@link ComponentStartSpanInfo} that indicates that a hierarchy of spans shouldn't be
- * exported till some component.
+ * A {@link ComponentStartSpanInfo} that indicates that a hierarchy of spans shouldn't be exported till some component.
  *
  * @since 4.5.0
  */

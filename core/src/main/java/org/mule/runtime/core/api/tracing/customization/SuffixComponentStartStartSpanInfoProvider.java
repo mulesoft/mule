@@ -12,8 +12,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
 /**
- * A {@link ComponentCoreStartSpanInfoProvider} that provides {@link StartSpanInfo}
- * for adding a suffix to the name.
+ * A {@link ComponentCoreStartSpanInfoProvider} that provides {@link StartSpanInfo} for adding a suffix to the name.
  *
  * @since 4.5.0
  */
