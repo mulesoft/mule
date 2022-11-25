@@ -38,13 +38,9 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.google.common.io.Files.createTempDir;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
-import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
