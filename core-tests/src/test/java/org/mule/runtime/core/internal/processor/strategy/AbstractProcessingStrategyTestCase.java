@@ -37,6 +37,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
+import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
@@ -114,14 +115,8 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
-import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -131,12 +126,8 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -268,60 +259,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public EventTracer<CoreEvent> getCoreEventTracer() {
-      return new EventTracer<CoreEvent>() {
-
-        @Override
-        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo) {
-          return empty();
-        }
-
-        @Override
-        public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo,
-                                                         Assertion assertion) {
-          return empty();
-        }
-
-        @Override
-        public void endCurrentSpan(CoreEvent event) {
-
-        }
-
-        @Override
-        public void endCurrentSpan(CoreEvent event, Assertion condition) {
-
-        }
-
-        @Override
-        public void injectDistributedTraceContext(EventContext eventContext,
-                                                  DistributedTraceContextGetter distributedTraceContextGetter) {
-
-        }
-
-        @Override
-        public void recordErrorAtCurrentSpan(CoreEvent event, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan) {
-
-        }
-
-        @Override
-        public void setCurrentSpanName(CoreEvent event, String name) {
-
-        }
-
-        @Override
-        public void addCurrentSpanAttribute(CoreEvent event, String key, String value) {
-
-        }
-
-        @Override
-        public void addCurrentSpanAttributes(CoreEvent event, Map<String, String> attributes) {
-
-        }
-
-        @Override
-        public SpanSnifferManager getSpanExporterManager() {
-          return null;
-        }
-      };
+      return getNoopCoreEventTracer();
     }
   };
 

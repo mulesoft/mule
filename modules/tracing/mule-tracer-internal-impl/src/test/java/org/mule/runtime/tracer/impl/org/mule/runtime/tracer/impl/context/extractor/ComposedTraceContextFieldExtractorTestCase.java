@@ -63,7 +63,6 @@ public class ComposedTraceContextFieldExtractorTestCase {
     assertThat(extractedValuesMap, aMapWithSize(2));
     assertThat(extractedValuesMap, hasEntry(equalTo(TEST_TRACE_FIELD_KEY_1), equalTo(TEST_TRACE_FIELD_VALUE_1)));
     assertThat(extractedValuesMap, hasEntry(equalTo(TEST_TRACE_FIELD_KEY_2), equalTo(TEST_TRACE_FIELD_VALUE_2)));
-
   }
 
   /**

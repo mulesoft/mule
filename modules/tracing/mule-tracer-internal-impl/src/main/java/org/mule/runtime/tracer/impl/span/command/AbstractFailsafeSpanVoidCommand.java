@@ -8,7 +8,7 @@
 package org.mule.runtime.tracer.impl.span.command;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
-import static org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand.getFailsafeSpanOperation;
+import static org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand.getFailsafeSpanCommand;
 
 import static java.lang.Boolean.getBoolean;
 
@@ -26,7 +26,7 @@ public abstract class AbstractFailsafeSpanVoidCommand implements VoidCommand {
   private static final Logger LOGGER = getLogger(AbstractFailsafeSpanVoidCommand.class);
 
   private final FailsafeSpanCommand failSafeSpanCommand =
-      getFailsafeSpanOperation(LOGGER, getErrorMessage(), getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING));
+      getFailsafeSpanCommand(LOGGER, getErrorMessage(), getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING));
 
   @Override
   public void execute() {

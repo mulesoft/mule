@@ -55,10 +55,10 @@ public class EventContextGetDistributedTraceContextMapCommand implements Command
 
   private Map<String, String> doGetDistributedTraceContextMap(EventContext eventContext) {
     if (eventContext instanceof SpanContextAware) {
-      SpanContext distributedTraceContext =
+      SpanContext spanContext =
           ((SpanContextAware) eventContext).getSpanContext();
 
-      return distributedTraceContext.getSpan().map(InternalSpan::serializeAsMap).orElse(emptyMap());
+      return spanContext.getSpan().map(InternalSpan::serializeAsMap).orElse(emptyMap());
 
     } else {
       return emptyMap();

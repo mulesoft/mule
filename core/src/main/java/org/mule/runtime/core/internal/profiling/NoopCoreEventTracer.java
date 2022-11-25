@@ -25,6 +25,12 @@ import static java.util.Optional.empty;
 
 public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
 
+  public static EventTracer<CoreEvent> getNoopCoreEventTracer() {
+    return new NoopCoreEventTracer();
+  }
+
+  private NoopCoreEventTracer() {}
+
   @Override
   public Optional<InternalSpan> startComponentSpan(CoreEvent event, StartSpanInfo spanCustomizationInfo) {
     return empty();

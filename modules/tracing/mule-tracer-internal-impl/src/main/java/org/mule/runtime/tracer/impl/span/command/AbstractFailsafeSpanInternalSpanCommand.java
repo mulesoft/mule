@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand.getFailsafeSpanOperation;
+import static org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand.getFailsafeSpanCommand;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -26,7 +26,7 @@ public abstract class AbstractFailsafeSpanInternalSpanCommand implements Command
   private static final Logger LOGGER = getLogger(AbstractFailsafeSpanVoidCommand.class);
 
   private final FailsafeSpanCommand failSafeSpanCommand =
-      getFailsafeSpanOperation(LOGGER, getErrorMessage(), true);
+      getFailsafeSpanCommand(LOGGER, getErrorMessage(), true);
 
   @Override
   public Optional<InternalSpan> execute() {

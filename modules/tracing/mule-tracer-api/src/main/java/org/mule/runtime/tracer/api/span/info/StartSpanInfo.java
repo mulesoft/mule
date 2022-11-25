@@ -33,12 +33,20 @@ public interface StartSpanInfo {
   }
 
   /**
-   * @return indicates that the {@link InternalSpan} belongs to a policy.
+   * @return indicates that the {@link InternalSpan} belongs to a policy. TODO: Technical debt: verify order of spans in the case
+   *         of policies (W-12041739)
    */
   default boolean isPolicySpan() {
     return false;
   }
 
+  /**
+   * indicates if it is the first entry point of a mule pan. For example if there is a policy and some attributes are propagated
+   * from a connector, this will be added to the flow span and not to the policy spans.
+   *
+   * @return indicates if it is the first entry point of a mule pan.
+   *
+   */
   default boolean isRootSpan() {
     return false;
   }

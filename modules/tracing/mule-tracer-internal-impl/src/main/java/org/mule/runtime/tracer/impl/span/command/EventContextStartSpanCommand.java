@@ -18,6 +18,7 @@ import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 /**
@@ -71,7 +72,7 @@ public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSp
         spanContext.setSpan(newSpan, assertion);
       }
 
-      return Optional.ofNullable(newSpan);
+      return ofNullable(newSpan);
     };
   }
 

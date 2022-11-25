@@ -91,7 +91,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       OpenTelemetrySpanExporter childOpenTelemetrySpanExporter = (OpenTelemetrySpanExporter) childSpanExporter;
 
       // If it is a policy span, propagate the rootSpan.
-      if (childOpenTelemetrySpanExporter.getOpenTelemetrySpan().isPolicy()) {
+      if (childOpenTelemetrySpanExporter.getOpenTelemetrySpan().onlyPropagateNamesAndAttributes()) {
         childOpenTelemetrySpanExporter.setRootSpan(rootSpan);
       }
 
@@ -160,6 +160,19 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     }
 
     public OpenTelemetrySpanExporter build() {
+
+      if (startSpanInfo == null) {
+        throw new IllegalArgumentException("Start span info is null");
+      }
+
+      if (artifactId == null) {
+        throw new IllegalArgumentException("Artifact id is null");
+      }
+
+      if (artifactType == null) {
+        throw new IllegalArgumentException("Artifact type is null");
+      }
+
       OpenTelemetrySpanExporter openTelemetrySpanExporter =
           new OpenTelemetrySpanExporter(internalSpan, startSpanInfo, artifactId, artifactType);
       openTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan, startSpanInfo, artifactId);

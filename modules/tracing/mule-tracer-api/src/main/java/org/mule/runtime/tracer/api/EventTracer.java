@@ -46,25 +46,25 @@ public interface EventTracer<T extends Event> {
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link Event}.
    *
-   * @param event                 the {@link Event} that has hit the {@link Component}
-   * @param spanCustomizationInfo the {@link StartSpanInfo} used for customizing the span.
+   * @param event    the {@link Event} that has hit the {@link Component}
+   * @param spanInfo the {@link StartSpanInfo} used for customizing the span.
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
   Optional<InternalSpan> startComponentSpan(T event,
-                                            StartSpanInfo spanCustomizationInfo);
+                                            StartSpanInfo spanInfo);
 
 
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link Event}.
    *
-   * @param event                 the {@link Event} that has hit the {@link Component}
-   * @param spanCustomizationInfo the {@link StartSpanInfo} used for customizing the span.
-   * @param assertion             indicates a condition that has to be verified for starting the span.
+   * @param event     the {@link Event} that has hit the {@link Component}
+   * @param spanInfo  the {@link StartSpanInfo} used for customizing the span.
+   * @param assertion indicates a condition that has to be verified for starting the span.
    *
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
   Optional<InternalSpan> startComponentSpan(T event,
-                                            StartSpanInfo spanCustomizationInfo,
+                                            StartSpanInfo spanInfo,
                                             Assertion assertion);
 
   /**

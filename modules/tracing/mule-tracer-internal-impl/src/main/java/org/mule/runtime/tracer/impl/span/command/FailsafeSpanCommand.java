@@ -30,6 +30,12 @@ public class FailsafeSpanCommand {
   private final Logger customLogger;
   private final String errorMessage;
 
+  public static FailsafeSpanCommand getFailsafeSpanCommand(Logger customLogger,
+                                                           String errorMessage,
+                                                           boolean propagateExceptions) {
+    return new FailsafeSpanCommand(customLogger, errorMessage, propagateExceptions);
+  }
+
   private FailsafeSpanCommand(Logger customLogger,
                               String errorMessage,
                               boolean propagateExceptions) {
@@ -38,11 +44,6 @@ public class FailsafeSpanCommand {
     this.propagateExceptions = propagateExceptions;
   }
 
-  public static FailsafeSpanCommand getFailsafeSpanOperation(Logger customLogger,
-                                                             String errorMessage,
-                                                             boolean propagateExceptions) {
-    return new FailsafeSpanCommand(customLogger, errorMessage, propagateExceptions);
-  }
 
   public Optional<InternalSpan> execute(Supplier<Optional<InternalSpan>> internalSpanSupplier) {
     return safeExecuteWithDefaultOnThrowable(internalSpanSupplier,

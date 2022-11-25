@@ -77,7 +77,7 @@ public class NoopMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   @Override
-  public boolean isPolicy() {
+  public boolean onlyPropagateNamesAndAttributes() {
     return true;
   }
 

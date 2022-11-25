@@ -10,6 +10,7 @@ package org.mule.runtime.tracer.impl.context;
 import static java.util.Optional.ofNullable;
 
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
+import static org.mule.runtime.tracer.impl.span.DeserializedSpan.getDeserializedRootSpan;
 
 import java.util.Optional;
 
@@ -35,8 +36,8 @@ public class EventSpanContext implements SpanContext {
   private final boolean propagateTracingExceptions;
   private InternalSpan currentSpan;
 
-  public static EventDistributedContextBuilder builder() {
-    return new EventDistributedContextBuilder();
+  public static EventSpanContextBuilder builder() {
+    return new EventSpanContextBuilder();
   }
 
   private EventSpanContext(InternalSpan currentSpan,
@@ -82,26 +83,26 @@ public class EventSpanContext implements SpanContext {
    *
    * @since 4.5.0
    */
-  public static final class EventDistributedContextBuilder {
+  public static final class EventSpanContextBuilder {
 
     private DistributedTraceContextGetter distributedTraceContextMapGetter;
     private boolean propagateTracingExceptions;
 
-    private EventDistributedContextBuilder() {}
+    private EventSpanContextBuilder() {}
 
-    public EventDistributedContextBuilder withGetter(DistributedTraceContextGetter distributedTraceContextMapGetter) {
+    public EventSpanContextBuilder withGetter(DistributedTraceContextGetter distributedTraceContextMapGetter) {
       this.distributedTraceContextMapGetter = distributedTraceContextMapGetter;
       return this;
     }
 
 
-    public EventDistributedContextBuilder withPropagateTracingExceptions(boolean propagateTracingExceptions) {
+    public EventSpanContextBuilder withPropagateTracingExceptions(boolean propagateTracingExceptions) {
       this.propagateTracingExceptions = propagateTracingExceptions;
       return this;
     }
 
-    public SpanContext build() {
-      return new EventSpanContext(DeserializedSpan.getDeserializedRootSpan(distributedTraceContextMapGetter),
+    public EventSpanContext build() {
+      return new EventSpanContext(getDeserializedRootSpan(distributedTraceContextMapGetter),
                                   propagateTracingExceptions);
     }
 

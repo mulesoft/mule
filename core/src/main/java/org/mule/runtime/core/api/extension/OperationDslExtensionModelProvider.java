@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getOperationDslExtensionModel;
 

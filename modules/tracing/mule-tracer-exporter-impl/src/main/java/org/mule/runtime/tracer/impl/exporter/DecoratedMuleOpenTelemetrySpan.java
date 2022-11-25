@@ -108,7 +108,7 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   @Override
-  public boolean isPolicy() {
+  public boolean onlyPropagateNamesAndAttributes() {
     return policy;
   }
 
