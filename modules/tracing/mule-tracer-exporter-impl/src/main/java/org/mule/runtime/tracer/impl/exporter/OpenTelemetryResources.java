@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -116,8 +115,7 @@ public class OpenTelemetryResources {
 
   private static SpanExporter createExporter(String endpoint) {
     if (!isEmpty(endpoint)) {
-      ManagedChannelBuilder managedChannelBuilder = ManagedChannelBuilder.forAddress().useTransportSecurity().
-      return OtlpH
+      return OtlpGrpcSpanExporter.builder().setEndpoint(endpoint).build();
     } else {
       return OtlpGrpcSpanExporter.builder().build();
     }
