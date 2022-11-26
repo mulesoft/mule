@@ -27,7 +27,7 @@ import java.util.Optional;
 public class EventContextEndSpanCommand extends AbstractFailsafeSpanVoidCommand {
 
   public static final String ERROR_MESSAGE = "Error ending a span";
-  public static final String THREAD_END_SPAN = "thread.end.span";
+  public static final String THREAD_END_SPAN = "thread.end.name";
 
   private final EventContext eventContext;
   private final Assertion assertion;
