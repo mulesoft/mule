@@ -27,6 +27,7 @@ import java.util.Optional;
 public class EventContextEndSpanCommand extends AbstractFailsafeSpanVoidCommand {
 
   public static final String ERROR_MESSAGE = "Error ending a span";
+  public static final String THREAD_END_SPAN = "thread.end.span";
 
   private final EventContext eventContext;
   private final Assertion assertion;
@@ -55,7 +56,7 @@ public class EventContextEndSpanCommand extends AbstractFailsafeSpanVoidCommand 
       if (spanContext != null) {
         Optional<InternalSpan> span = spanContext.getSpan();
         if (span.isPresent()) {
-          span.get().addAttribute("thread.end.span", currentThread().getName());
+          span.get().addAttribute(THREAD_END_SPAN, currentThread().getName());
         }
         spanContext.endSpan(assertion);
       }
