@@ -9,8 +9,6 @@ package org.mule.runtime.tracer.impl.span.command;
 
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
-import static java.lang.Thread.currentThread;
-
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -55,9 +53,6 @@ public class EventContextEndSpanCommand extends AbstractFailsafeSpanVoidCommand 
 
       if (spanContext != null) {
         Optional<InternalSpan> span = spanContext.getSpan();
-        if (span.isPresent()) {
-          span.get().addAttribute(THREAD_END_SPAN, currentThread().getName());
-        }
         spanContext.endSpan(assertion);
       }
     };

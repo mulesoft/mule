@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 
 import static java.util.Optional.ofNullable;
@@ -34,6 +35,7 @@ import java.util.Set;
  */
 public class ExecutionSpan implements InternalSpan {
 
+  public static final String THREAD_END_NAME = "thread.end.name";
   private final StartSpanInfo spanCustomizationInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
 
@@ -96,6 +98,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void end() {
+    this.attributes.put(THREAD_END_NAME, currentThread().getName());
     this.endTime = getDefault().now();
     this.spanExporter.export();
   }
