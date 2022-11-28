@@ -89,7 +89,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   protected File deployableArtifactRepositoryFolder;
   private final Optional<MavenReactorResolver> mavenReactorResolver;
-  private final Map<ArtifactCoordinates, File> poms;
+  private final Map<ArtifactCoordinates, Model> pomModels;
 
   protected static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
@@ -121,11 +121,11 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
   protected AbstractMavenDeployableProjectModelBuilder(MavenConfiguration mavenConfiguration, File projectFolder,
                                                        Optional<MavenReactorResolver> mavenReactorResolver,
-                                                       Map<ArtifactCoordinates, File> poms) {
+                                                       Map<ArtifactCoordinates, Model> pomModels) {
     this.mavenConfiguration = mavenConfiguration;
     this.projectFolder = projectFolder;
     this.mavenReactorResolver = mavenReactorResolver;
-    this.poms = poms;
+    this.pomModels = pomModels;
   }
 
   @Override
@@ -274,7 +274,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         new AdditionalPluginDependenciesResolver(aetherMavenClient,
                                                  initialAdditionalPluginDependencies,
                                                  new File("temp"),
-                                                 poms);
+                                                 pomModels);
 
     additionalPluginDependencies = toPluginDependencies(additionalPluginDependenciesResolver
         .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));

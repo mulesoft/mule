@@ -66,16 +66,16 @@ public class AdditionalPluginDependenciesResolver {
   private final AetherMavenClient aetherMavenClient;
   private final List<Plugin> pluginsWithAdditionalDependencies;
   private final File temporaryFolder;
-  private final Map<ArtifactCoordinates, File> poms;
+  private final Map<ArtifactCoordinates, Model> pomModels;
 
   public AdditionalPluginDependenciesResolver(AetherMavenClient muleMavenPluginClient,
                                               List<Plugin> additionalPluginDependencies,
                                               File temporaryFolder,
-                                              Map<ArtifactCoordinates, File> poms) {
+                                              Map<ArtifactCoordinates, Model> pomModels) {
     this.aetherMavenClient = muleMavenPluginClient;
     this.pluginsWithAdditionalDependencies = new ArrayList<>(additionalPluginDependencies);
     this.temporaryFolder = temporaryFolder;
-    this.poms = poms;
+    this.pomModels = pomModels;
   }
 
   public Map<BundleDependency, List<BundleDependency>> resolveDependencies(List<BundleDependency> applicationDependencies,
@@ -171,8 +171,9 @@ public class AdditionalPluginDependenciesResolver {
         ArtifactCoordinates artifactCoordinates =
             new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
 
-        File file = poms.getOrDefault(artifactCoordinates, toFile(mulePlugin.getBundleUri().toURL()));
-        Model pomModel = aetherMavenClient.getEffectiveModel(file, of(temporaryFolder));
+        Model pomModel = pomModels.getOrDefault(artifactCoordinates,
+                                                aetherMavenClient.getEffectiveModel(toFile(mulePlugin.getBundleUri().toURL()),
+                                                                                    of(temporaryFolder)));
 
         Build build = pomModel.getBuild();
         if (build != null) {

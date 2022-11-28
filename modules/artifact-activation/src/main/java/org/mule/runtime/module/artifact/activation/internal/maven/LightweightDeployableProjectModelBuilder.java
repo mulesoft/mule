@@ -56,8 +56,8 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain,
                                                   Optional<MavenReactorResolver> mavenReactorResolver,
-                                                  Map<ArtifactCoordinates, File> poms) {
-    super(getMavenConfig(), projectFolder, mavenReactorResolver, poms);
+                                                  Map<ArtifactCoordinates, Model> pomModel) {
+    super(getMavenConfig(), projectFolder, mavenReactorResolver, pomModel);
     this.model = model;
     this.isDomain = isDomain;
   }
