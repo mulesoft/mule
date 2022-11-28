@@ -63,7 +63,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.CoreEventStartSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,11 +101,11 @@ public class MessageProcessors {
   }
 
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
-                                               CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider) {
+                                               CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider) {
     if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
-      return buildNewChainWithListOfProcessors(processingStrategy, processors, coreSpanCustomizationInfoProvider);
+      return buildNewChainWithListOfProcessors(processingStrategy, processors, coreEventStartSpanInfoProvider);
     }
   }
 
@@ -133,32 +133,32 @@ public class MessageProcessors {
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
                                                                         String name,
-                                                                        CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider) {
+                                                                        CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
     defaultMessageProcessorChainBuilder.setName(name);
-    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(coreSpanCustomizationInfoProvider);
+    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(coreEventStartSpanInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
-                                                                        CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider) {
+                                                                        CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
-    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(coreSpanCustomizationInfoProvider);
+    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(coreEventStartSpanInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
-                                                                        CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider) {
+                                                                        CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
-    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(coreSpanCustomizationInfoProvider);
+    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(coreEventStartSpanInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 

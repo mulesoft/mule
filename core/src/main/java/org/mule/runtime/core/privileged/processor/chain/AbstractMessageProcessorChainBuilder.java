@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.CoreEventStartSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected FlowExceptionHandler messagingExceptionHandler;
   protected ComponentLocation location;
   protected MuleContext muleContext;
-  protected CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider;
+  protected CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider;
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
   protected Processor initializeMessageProcessor(Object processor) {
@@ -65,7 +65,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   }
 
   @Override
-  public void setCoreSpanCustomizationInfoProvider(CoreSpanCustomizationInfoProvider coreSpanCustomizationInfoProvider) {
-    this.coreSpanCustomizationInfoProvider = coreSpanCustomizationInfoProvider;
+  public void setCoreSpanCustomizationInfoProvider(CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider) {
+    this.coreEventStartSpanInfoProvider = coreEventStartSpanInfoProvider;
   }
 }

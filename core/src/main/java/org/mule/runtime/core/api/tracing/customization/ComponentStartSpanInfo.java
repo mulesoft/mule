@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A {@link StartSpanInfo} based on the component.
+ * A {@link StartSpanInfo} based on a component.
  *
  * @since 4.5.0
  */

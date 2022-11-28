@@ -53,7 +53,7 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.tracing.customization.NoExportableComponentCoreStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.NoExportableComponentCoreEventStartSpanInfoProvider;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -144,7 +144,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
-    delegateBuilder.setCoreSpanCustomizationInfoProvider(new NoExportableComponentCoreStartSpanInfoProvider(this));
+    delegateBuilder.setCoreSpanCustomizationInfoProvider(new NoExportableComponentCoreEventStartSpanInfoProvider(this));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

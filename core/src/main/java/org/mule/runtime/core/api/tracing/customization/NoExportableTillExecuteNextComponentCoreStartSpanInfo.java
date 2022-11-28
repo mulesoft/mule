@@ -12,20 +12,22 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 
 /**
- * A {@link ComponentStartSpanInfo} that indicates that a hierarchy of spans shouldn't be exported till some component.
+ * A {@link ComponentStartSpanInfo} that indicates that a hierarchy of spans shouldn't be exported till execute-next component.
  *
  * @since 4.5.0
  */
-public class NoExportableTillStartInfo extends ComponentStartSpanInfo {
+public class NoExportableTillExecuteNextComponentCoreStartSpanInfo extends ComponentStartSpanInfo {
 
-  public NoExportableTillStartInfo(Component component,
-                                   CoreEvent coreEvent) {
+  public static final String EXECUTE_NEXT = "execute-next";
+
+  public NoExportableTillExecuteNextComponentCoreStartSpanInfo(Component component,
+                                                               CoreEvent coreEvent) {
     super(component, coreEvent);
   }
 
   @Override
   public StartExportInfo getStartExportInfo() {
-    return new NoExportableTillStartExportInfo("execute-next", true);
+    return new NoExportableTillStartExportInfo(EXECUTE_NEXT, true);
   }
 
   @Override

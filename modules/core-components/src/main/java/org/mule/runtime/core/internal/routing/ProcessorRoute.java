@@ -23,8 +23,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.CoreSpanCustomizationInfoProvider;
-import org.mule.runtime.core.api.tracing.customization.FixedNameCoreSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.CoreEventStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.FixedNameCoreStartEventStartSpanInfoProvider;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.MessagingExceptionHandlerAware;
 
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
@@ -41,7 +41,7 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
   private final Processor processor;
-  private CoreSpanCustomizationInfoProvider spanCustomizationInfo = new FixedNameCoreSpanCustomizationInfoProvider("route");
+  private CoreEventStartSpanInfoProvider spanCustomizationInfo = new FixedNameCoreStartEventStartSpanInfoProvider("route");
 
   // just let the error be propagated to the outer chain...
   private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
@@ -73,7 +73,7 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
 
-  public void setCoreSpanCustominzationInfoProvider(CoreSpanCustomizationInfoProvider spanCustomizationInfo) {
+  public void setCoreSpanCustominzationInfoProvider(CoreEventStartSpanInfoProvider spanCustomizationInfo) {
     this.spanCustomizationInfo = spanCustomizationInfo;
   }
 

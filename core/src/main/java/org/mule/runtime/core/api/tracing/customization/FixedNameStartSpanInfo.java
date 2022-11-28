@@ -11,7 +11,7 @@ import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
 /**
- * A {@link StartSpanInfo} with a fix name.
+ * A {@link StartSpanInfo} with a fixed name.
  *
  * @since 4.5.0
  */

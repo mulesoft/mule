@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentCoreStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentCoreEventStartSpanInfoProvider;
 import org.mule.runtime.core.api.tracing.customization.ComponentStartSpanInfo;
 import org.mule.runtime.core.api.tracing.customization.SpanStartUtils;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -110,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setCoreSpanCustomizationInfoProvider(new SubFlowStartSpanInfoProvider(this));
+      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentCoreEventStartSpanInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -131,20 +131,20 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 
-    private class SubFlowStartSpanInfoProvider extends ComponentCoreStartSpanInfoProvider {
+    private class SubFllowComponentCoreEventStartSpanInfoProvider extends ComponentCoreEventStartSpanInfoProvider {
 
-      SubFlowStartSpanInfoProvider(Component component) {
+      SubFllowComponentCoreEventStartSpanInfoProvider(Component component) {
         super(component);
       }
 
       @Override
       public StartSpanInfo get(CoreEvent coreEvent) {
-        return new SubflowCustomizationInfo(component, coreEvent);
+        return new SubFlowComponentStartSpanInfo(component, coreEvent);
       }
 
-      private class SubflowCustomizationInfo extends ComponentStartSpanInfo {
+      private class SubFlowComponentStartSpanInfo extends ComponentStartSpanInfo {
 
-        public SubflowCustomizationInfo(Component component, CoreEvent coreEvent) {
+        public SubFlowComponentStartSpanInfo(Component component, CoreEvent coreEvent) {
           super(component, coreEvent);
         }
 
