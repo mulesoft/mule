@@ -1127,7 +1127,7 @@ class MuleExtensionModelDeclarer {
   private void declareExtraAppConfigs(ConstructDeclarer configuration) {
     configuration.withOptionalComponent("extraAppConfig")
         .withAllowedStereotypes(EXTRA_APP_CONFIG)
-        .describedAs("COSO...");
+        .describedAs("A placeholder for configuration elements.");
   }
 
   private void declareExpressionLanguage(NestedComponentDeclarer expressionLanguageDeclarer) {
