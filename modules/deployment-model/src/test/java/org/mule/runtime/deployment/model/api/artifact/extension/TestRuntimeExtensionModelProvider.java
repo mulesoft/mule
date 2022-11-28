@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 
 // TODO W-10928152: remove this class when migrating to use the new extension model loading API.
@@ -19,6 +20,8 @@ public class TestRuntimeExtensionModelProvider implements RuntimeExtensionModelP
   public ExtensionModel createExtensionModel() {
     ExtensionModel extModel = mock(ExtensionModel.class);
     when(extModel.getName()).thenReturn("testRuntime");
+    XmlDslModel xmlDslModel = XmlDslModel.builder().setPrefix("test-runtime").build();
+    when(extModel.getXmlDslModel()).thenReturn(xmlDslModel);
     return extModel;
   }
 
