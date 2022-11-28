@@ -119,7 +119,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
       if (eventBasedInitialSpanInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
+        messageProcessorChain.setEventBasedInitialSpanInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     } else {
@@ -130,7 +130,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            messagingExceptionHandler,
                                            location);
       if (eventBasedInitialSpanInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
+        messageProcessorChain.setEventBasedInitialSpanInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     }
@@ -141,7 +141,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
       if (eventBasedInitialSpanInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
+        messageProcessorChain.setEventBasedInitialSpanInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     } else {
@@ -152,7 +152,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            NullExceptionHandler.getInstance(),
                                            location);
       if (eventBasedInitialSpanInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
+        messageProcessorChain.setEventBasedInitialSpanInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     }
@@ -166,7 +166,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                               processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
                                               location);
     if (eventBasedInitialSpanInfoProvider != null) {
-      messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
+      messageProcessorChain.setEventBasedInitialSpanInfoProvider(eventBasedInitialSpanInfoProvider);
     }
     return messageProcessorChain;
   }

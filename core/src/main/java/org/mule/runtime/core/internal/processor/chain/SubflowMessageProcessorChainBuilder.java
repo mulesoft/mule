@@ -110,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentEventBasedInitialSpanInfoProvider(this));
+      this.setEventBasedInitialSpanInfoProvider(new SubFllowComponentEventBasedInitialSpanInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {

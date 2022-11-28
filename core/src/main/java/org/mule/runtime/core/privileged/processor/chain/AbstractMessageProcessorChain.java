@@ -787,7 +787,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   /**
    * @param chainEventBasedStartStartInfoProvider sets the {@link InitialSpanInfo} for the chain.
    */
-  public void setCoreSpanCustomizationInfoProvider(
+  public void setEventBasedInitialSpanInfoProvider(
                                                    EventBasedInitialSpanInfoProvider chainEventBasedStartStartInfoProvider) {
     this.chainEventBasedStartStartInfoProvider = chainEventBasedStartStartInfoProvider;
   }
