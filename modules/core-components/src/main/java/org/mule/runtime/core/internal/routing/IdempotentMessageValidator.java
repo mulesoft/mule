@@ -205,7 +205,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     }
   }
 
-  private boolean acceptWithFF(CoreEvent event) throws MuleException {
+  private boolean acceptWithRethrowExceptionsInIdempotentMessageValidator(CoreEvent event) throws MuleException {
     BindingContext bindingContext = event.asBindingContext();
     try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
       String id = getIdForEvent(session);
@@ -234,7 +234,7 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   @Override
   public final CoreEvent process(CoreEvent event) throws MuleException {
-    if (rethrowEnabled && acceptWithFF(event) || !rethrowEnabled && accept(event)) {
+    if (rethrowEnabled ? acceptWithRethrowExceptionsInIdempotentMessageValidator(event) : accept(event)) {
       return event;
     } else {
       throw new DuplicateMessageException();
