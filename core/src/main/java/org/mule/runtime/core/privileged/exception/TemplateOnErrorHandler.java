@@ -35,7 +35,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
@@ -94,6 +93,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -301,7 +301,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private void processStatistics() {
-    if (statistics != null && statistics.isEnabled()) {
+    if (statistics != null) {
       statistics.incExecutionError();
     }
   }
