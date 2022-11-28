@@ -24,7 +24,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
+import org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware;
 import org.reactivestreams.Publisher;
 
 /**
@@ -62,9 +62,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   public void setRoutes(List<MessageProcessorChain> routes) {
     this.routes = routes;
     for (MessageProcessorChain route : routes) {
-      if (route instanceof SpanCustomizationInfoAware) {
-        ((SpanCustomizationInfoAware) route)
-            .setCoreSpanCustomizationInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
+      if (route instanceof EventBasedInitialSpanInfoProviderAware) {
+        ((EventBasedInitialSpanInfoProviderAware) route)
+            .setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
       }
     }
   }

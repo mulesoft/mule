@@ -54,12 +54,12 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
   MessageProcessorChain build();
 
   /**
-   * @param spanCustomizationInfo the span customization info for the creation of the
-   *                              {@link org.mule.runtime.api.profiling.tracing.Span} associated to the chain.
+   * @param eventBasedInitialSpanInfoProvider the span customization info for the creation of the
+   *                                          {@link org.mule.runtime.api.profiling.tracing.Span} associated to the chain.
    *
    * @since 4.5.0
    */
-  default void setCoreSpanCustomizationInfoProvider(EventBasedInitialSpanInfoProvider spanCustomizationInfo) {
+  default void setEventBasedInitialSpanInfoProvider(EventBasedInitialSpanInfoProvider eventBasedInitialSpanInfoProvider) {
     // Nothing to do by default.
   }
 }

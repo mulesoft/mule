@@ -76,7 +76,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     routes.add(new ProcessorRoute(defaultProcessor));
 
     for (ProcessorRoute route : routes) {
-      route.setCoreSpanCustominzationInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
+      route.setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
       initialiseIfNeeded(route, muleContext);
     }
   }

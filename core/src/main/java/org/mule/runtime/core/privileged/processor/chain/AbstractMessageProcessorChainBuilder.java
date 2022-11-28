@@ -36,7 +36,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected FlowExceptionHandler messagingExceptionHandler;
   protected ComponentLocation location;
   protected MuleContext muleContext;
-  protected EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider;
+  protected EventBasedInitialSpanInfoProvider eventBasedInitialSpanInfoProvider;
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
   protected Processor initializeMessageProcessor(Object processor) {
@@ -65,8 +65,8 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   }
 
   @Override
-  public void setCoreSpanCustomizationInfoProvider(
-                                                   EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
-    this.eventBasedStartStartInfoProvider = eventBasedStartStartInfoProvider;
+  public void setEventBasedInitialSpanInfoProvider(
+                                                   EventBasedInitialSpanInfoProvider eventBasedInitialSpanInfoProvider) {
+    this.eventBasedInitialSpanInfoProvider = eventBasedInitialSpanInfoProvider;
   }
 }

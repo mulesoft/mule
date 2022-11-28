@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfo
  *
  * @since 4.5.0
  */
-public interface SpanCustomizationInfoAware {
+public interface EventBasedInitialSpanInfoProviderAware {
 
-  void setCoreSpanCustomizationInfoProvider(
+  void setEventBasedInitialSpanInfoProvider(
                                             EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider);
 }

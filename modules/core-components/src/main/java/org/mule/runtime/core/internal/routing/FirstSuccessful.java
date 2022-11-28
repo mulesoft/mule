@@ -42,8 +42,8 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
     Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setCoreSpanCustominzationInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this,
-                                                                                                       "attempt:" + routeNumber));
+      route.setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this,
+                                                                                                      "attempt:" + routeNumber));
       initialiseIfNeeded(route, muleContext);
       routeNumber++;
     }

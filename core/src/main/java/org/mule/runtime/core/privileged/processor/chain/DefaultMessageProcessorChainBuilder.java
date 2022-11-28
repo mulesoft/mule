@@ -38,7 +38,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
+import org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 @NoExtend
 public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcessorChainBuilder
-    implements SpanCustomizationInfoAware {
+    implements EventBasedInitialSpanInfoProviderAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMessageProcessorChainBuilder.class);
 
@@ -118,8 +118,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
-      if (eventBasedStartStartInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+      if (eventBasedInitialSpanInfoProvider != null) {
+        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     } else {
@@ -129,8 +129,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            new ArrayList<>(tempList),
                                            messagingExceptionHandler,
                                            location);
-      if (eventBasedStartStartInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+      if (eventBasedInitialSpanInfoProvider != null) {
+        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     }
@@ -140,8 +140,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                                              Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
-      if (eventBasedStartStartInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+      if (eventBasedInitialSpanInfoProvider != null) {
+        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     } else {
@@ -151,8 +151,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            new ArrayList<>(tempList),
                                            NullExceptionHandler.getInstance(),
                                            location);
-      if (eventBasedStartStartInfoProvider != null) {
-        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+      if (eventBasedInitialSpanInfoProvider != null) {
+        messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
       }
       return messageProcessorChain;
     }
@@ -165,8 +165,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                               ofNullable(processingStrategy), head,
                                               processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
                                               location);
-    if (eventBasedStartStartInfoProvider != null) {
-      messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+    if (eventBasedInitialSpanInfoProvider != null) {
+      messageProcessorChain.setCoreSpanCustomizationInfoProvider(eventBasedInitialSpanInfoProvider);
     }
     return messageProcessorChain;
   }
@@ -308,7 +308,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   }
 
   private static final class LazyProcessorChainBuilder extends AbstractMessageProcessorChain
-      implements MessagingExceptionHandlerAware, SpanCustomizationInfoAware {
+      implements MessagingExceptionHandlerAware, EventBasedInitialSpanInfoProviderAware {
 
     private final AbstractMessageProcessorChainBuilder chainBuilder;
     private final Supplier<ProcessingStrategy> processingStrategySupplier;
@@ -329,7 +329,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     public void initialise() throws InitialisationException {
       chainBuilder.setProcessingStrategy(processingStrategySupplier.get());
       chainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
-      chainBuilder.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+      chainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
       delegate = chainBuilder.build();
       delegate.setAnnotations(getAnnotations());
       initialiseIfNeeded(delegate, muleContext);
@@ -367,7 +367,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     }
 
     @Override
-    public void setCoreSpanCustomizationInfoProvider(
+    public void setEventBasedInitialSpanInfoProvider(
                                                      EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
       this.eventBasedStartStartInfoProvider = eventBasedStartStartInfoProvider;
 

@@ -192,7 +192,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
-    builder.setCoreSpanCustomizationInfoProvider(new ComponentEventBasedInitialSpanInfoProvider(this));
+    builder.setEventBasedInitialSpanInfoProvider(new ComponentEventBasedInitialSpanInfoProvider(this));
     return builder.build();
   }
 

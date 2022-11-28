@@ -131,6 +131,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
   private static final String UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE =
       "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException";
+  public static final String UNKNOWN = "unknown";
 
   private static Class<ClassLoader> appClClass;
 
@@ -538,7 +539,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           new ComponentEventBasedInitialSpanInfoProvider((Component) processor).get(event);
     } else {
       // Other processors are not exported
-      initialSpanInfo = new NoExportFixedNameEventBasedInitialSpanInfoProvider("unknown").get(event);
+      initialSpanInfo = new NoExportFixedNameEventBasedInitialSpanInfoProvider(UNKNOWN).get(event);
     }
 
     // We start the component verifying that the current span is the span corresponding to

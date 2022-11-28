@@ -144,7 +144,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
-    delegateBuilder.setCoreSpanCustomizationInfoProvider(new NoExportComponentEventBasedInitialSpanInfoProvider(this));
+    delegateBuilder.setEventBasedInitialSpanInfoProvider(new NoExportComponentEventBasedInitialSpanInfoProvider(this));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

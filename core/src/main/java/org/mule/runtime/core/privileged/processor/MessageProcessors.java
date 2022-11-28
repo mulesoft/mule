@@ -138,7 +138,7 @@ public class MessageProcessors {
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
     defaultMessageProcessorChainBuilder.setName(name);
-    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+    defaultMessageProcessorChainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
@@ -147,7 +147,7 @@ public class MessageProcessors {
                                                                         EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
-    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+    defaultMessageProcessorChainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
@@ -158,7 +158,7 @@ public class MessageProcessors {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
-    defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
+    defaultMessageProcessorChainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 

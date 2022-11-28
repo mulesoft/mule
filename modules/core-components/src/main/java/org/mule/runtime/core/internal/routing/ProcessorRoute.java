@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfo
 import org.mule.runtime.core.api.tracing.customization.FixedNameEventBasedInitialSpanInfoProvider;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.MessagingExceptionHandlerAware;
 
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
+import org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,8 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
   private final Processor processor;
-  private EventBasedInitialSpanInfoProvider spanCustomizationInfo = new FixedNameEventBasedInitialSpanInfoProvider("route");
+  private EventBasedInitialSpanInfoProvider eventBasedInitialSpanInfoProvider =
+      new FixedNameEventBasedInitialSpanInfoProvider("route");
 
   // just let the error be propagated to the outer chain...
   private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
@@ -73,8 +74,8 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
 
-  public void setCoreSpanCustominzationInfoProvider(EventBasedInitialSpanInfoProvider spanCustomizationInfo) {
-    this.spanCustomizationInfo = spanCustomizationInfo;
+  public void setEventBasedInitialSpanInfoProvider(EventBasedInitialSpanInfoProvider eventBasedInitialSpanInfoProvider) {
+    this.eventBasedInitialSpanInfoProvider = eventBasedInitialSpanInfoProvider;
   }
 
   @Override
@@ -82,8 +83,9 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
     if (processor instanceof MessagingExceptionHandlerAware) {
       ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
     }
-    if (processor instanceof SpanCustomizationInfoAware) {
-      ((SpanCustomizationInfoAware) processor).setCoreSpanCustomizationInfoProvider(spanCustomizationInfo);
+    if (processor instanceof EventBasedInitialSpanInfoProviderAware) {
+      ((EventBasedInitialSpanInfoProviderAware) processor)
+          .setEventBasedInitialSpanInfoProvider(eventBasedInitialSpanInfoProvider);
     }
     initialiseIfNeeded(processor, muleContext);
   }

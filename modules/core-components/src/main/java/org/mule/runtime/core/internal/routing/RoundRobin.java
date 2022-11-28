@@ -58,7 +58,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setCoreSpanCustominzationInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
+      route.setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
       initialiseIfNeeded(route, muleContext);
     }
   }
