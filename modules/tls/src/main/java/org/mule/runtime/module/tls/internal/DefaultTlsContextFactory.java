@@ -35,7 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -57,8 +56,10 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
 
   private String name;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
+  /**
+   * When set to true, {@link #isTrustStoreConfigured()} will return false if the trust store is configured to be insecure.
+   */
+  private final boolean treatInsecureTrustStoreAsNotConfigured;
 
   private final TlsConfiguration tlsConfiguration;
 
@@ -67,9 +68,18 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
   private String[] enabledProtocols;
   private String[] enabledCipherSuites;
 
+  public DefaultTlsContextFactory(Map<QName, Object> annotations, FeatureFlaggingService featureFlaggingService) {
+    this(annotations, featureFlaggingService.isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION));
+  }
+
   public DefaultTlsContextFactory(Map<QName, Object> annotations) {
+    this(annotations, false);
+  }
+
+  private DefaultTlsContextFactory(Map<QName, Object> annotations, boolean treatInsecureTrustStoreAsNotConfigured) {
     tlsConfiguration = new TlsConfiguration(null);
     tlsConfiguration.setAnnotations(annotations);
+    this.treatInsecureTrustStoreAsNotConfigured = treatInsecureTrustStoreAsNotConfigured;
   }
 
   @Override
@@ -286,7 +296,7 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
     if (tlsConfiguration.getTrustStore() == null) {
       return false;
     }
-    return !trustStoreInsecure || !featureFlaggingService.isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION);
+    return !trustStoreInsecure || !treatInsecureTrustStoreAsNotConfigured;
   }
 
   @Override

@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.tls.internal.config;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+
+import javax.inject.Inject;
 
 /**
  * {@link ObjectFactory} for TLS context factory
@@ -21,7 +23,7 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
  */
 public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFactory<DefaultTlsContextFactory> {
 
-  private final MuleContext muleContext;
+  private final FeatureFlaggingService featureFlaggingService;
 
   private String name;
   private TlsContextKeyStoreConfiguration keyStore;
@@ -30,8 +32,9 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
   private String enabledProtocols;
   private String enabledCipherSuites;
 
-  public DefaultTlsContextFactoryObjectFactory(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  @Inject
+  public DefaultTlsContextFactoryObjectFactory(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
   }
 
   public void setName(String name) {
@@ -60,7 +63,7 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
 
   @Override
   public DefaultTlsContextFactory doGetObject() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(getAnnotations());
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(getAnnotations(), featureFlaggingService);
 
     tlsContextFactory.setName(name);
     tlsContextFactory.setEnabledProtocols(enabledProtocols);
@@ -98,8 +101,6 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
     if (revocationCheck != null) {
       tlsContextFactory.setRevocationCheck(revocationCheck);
     }
-
-    muleContext.getInjector().inject(tlsContextFactory);
 
     return tlsContextFactory;
   }
