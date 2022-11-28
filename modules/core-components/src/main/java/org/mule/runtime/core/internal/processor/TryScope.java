@@ -51,7 +51,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionBasedStartSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.NoExportComponentEventBasedStartSpanInfoProvider;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -227,7 +227,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
-                                                         new NoExportComponentExecutionBasedStartSpanCustomizationInfoProvider(this));
+                                                         new NoExportComponentEventBasedStartSpanInfoProvider(this));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

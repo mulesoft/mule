@@ -18,9 +18,9 @@ import org.mule.runtime.tracer.api.span.info.StartExportInfo;
  *
  * @since 4.5.0
  */
-public class NoExportComponentSpanCustomizationInfoExecution extends ComponentExecutionStartSpanInfo {
+public class NoExportComponentExecutionStartSpanInfo extends ComponentExecutionStartSpanInfo {
 
-  public NoExportComponentSpanCustomizationInfoExecution(Component component, CoreEvent coreEvent) {
+  public NoExportComponentExecutionStartSpanInfo(Component component, CoreEvent coreEvent) {
     super(component, coreEvent);
   }
 

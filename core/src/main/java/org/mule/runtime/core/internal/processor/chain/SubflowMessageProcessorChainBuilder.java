@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionBasedStartSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedStartSpanInfoProvider;
 import org.mule.runtime.core.api.tracing.customization.ComponentExecutionStartSpanInfo;
 import org.mule.runtime.core.api.tracing.customization.SpanStartUtils;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -110,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentExecutionBasedStartSpanCustomizationInfoProvider(this));
+      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentEventBasedStartSpanInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -131,10 +131,10 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 
-    private class SubFllowComponentExecutionBasedStartSpanCustomizationInfoProvider
-        extends ComponentExecutionBasedStartSpanCustomizationInfoProvider {
+    private class SubFllowComponentEventBasedStartSpanInfoProvider
+        extends ComponentEventBasedStartSpanInfoProvider {
 
-      SubFllowComponentExecutionBasedStartSpanCustomizationInfoProvider(Component component) {
+      SubFllowComponentEventBasedStartSpanInfoProvider(Component component) {
         super(component);
       }
 

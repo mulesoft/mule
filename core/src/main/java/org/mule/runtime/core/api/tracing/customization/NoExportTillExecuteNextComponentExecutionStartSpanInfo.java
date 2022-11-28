@@ -17,12 +17,12 @@ import org.mule.runtime.tracer.api.span.info.StartExportInfo;
  *
  * @since 4.5.0
  */
-public class NoExportTillExecuteNextComponentCoreExecutionStartSpanInfo extends ComponentExecutionStartSpanInfo {
+public class NoExportTillExecuteNextComponentExecutionStartSpanInfo extends ComponentExecutionStartSpanInfo {
 
   public static final String EXECUTE_NEXT = "execute-next";
 
-  public NoExportTillExecuteNextComponentCoreExecutionStartSpanInfo(Component component,
-                                                                    CoreEvent coreEvent) {
+  public NoExportTillExecuteNextComponentExecutionStartSpanInfo(Component component,
+                                                                CoreEvent coreEvent) {
     super(component, coreEvent);
   }
 

@@ -12,20 +12,22 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
 /**
- * A {@link EventBasedStartSpanCustomizationInfoProvider} for {@link StartSpanInfo} based on a {@link Component}.
+ * A {@link ComponentEventBasedStartSpanInfoProvider} that provides {@link StartSpanInfo} for adding a suffix to the name.
  *
  * @since 4.5.0
  */
-public class ComponentExecutionBasedStartSpanCustomizationInfoProvider implements EventBasedStartSpanCustomizationInfoProvider {
+public class SuffixComponentEventBasedStartSpanInfoProvider
+    extends ComponentEventBasedStartSpanInfoProvider {
 
-  protected final Component component;
+  private final String routeName;
 
-  public ComponentExecutionBasedStartSpanCustomizationInfoProvider(Component component) {
-    this.component = component;
+  public SuffixComponentEventBasedStartSpanInfoProvider(Component component, String routeName) {
+    super(component);
+    this.routeName = routeName;
   }
 
   @Override
   public StartSpanInfo get(CoreEvent coreEvent) {
-    return new ComponentExecutionStartSpanInfo(component, coreEvent);
+    return new ComponentExecutionStartSpanInfo(component, coreEvent, ":" + routeName);
   }
 }
