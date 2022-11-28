@@ -18,6 +18,7 @@ import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.maven.client.api.model.BundleDependency;
+import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils;
@@ -65,13 +66,16 @@ public class AdditionalPluginDependenciesResolver {
   private final AetherMavenClient aetherMavenClient;
   private final List<Plugin> pluginsWithAdditionalDependencies;
   private final File temporaryFolder;
+  private final Map<ArtifactCoordinates, File> poms;
 
   public AdditionalPluginDependenciesResolver(AetherMavenClient muleMavenPluginClient,
                                               List<Plugin> additionalPluginDependencies,
-                                              File temporaryFolder) {
+                                              File temporaryFolder,
+                                              Map<ArtifactCoordinates, File> poms) {
     this.aetherMavenClient = muleMavenPluginClient;
     this.pluginsWithAdditionalDependencies = new ArrayList<>(additionalPluginDependencies);
     this.temporaryFolder = temporaryFolder;
+    this.poms = poms;
   }
 
   public Map<BundleDependency, List<BundleDependency>> resolveDependencies(List<BundleDependency> applicationDependencies,
@@ -161,8 +165,14 @@ public class AdditionalPluginDependenciesResolver {
 
     mulePlugins.forEach(mulePlugin -> {
       try {
-        Model pomModel =
-            aetherMavenClient.getEffectiveModel(toFile(mulePlugin.getBundleUri().toURL()), of(temporaryFolder));
+
+        BundleDescriptor descriptor = mulePlugin.getDescriptor();
+
+        ArtifactCoordinates artifactCoordinates =
+            new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+
+        File file = poms.getOrDefault(artifactCoordinates, toFile(mulePlugin.getBundleUri().toURL()));
+        Model pomModel = aetherMavenClient.getEffectiveModel(file, of(temporaryFolder));
 
         Build build = pomModel.getBuild();
         if (build != null) {
