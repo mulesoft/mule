@@ -11,6 +11,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
@@ -23,6 +26,8 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
@@ -233,17 +238,20 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
   @Test
   @Issue("W-11529823")
   public void rethrowsException() throws Exception {
-    final BaseEventContext contextA = mock(BaseEventContext.class);
-    // this will force a NullPointerException while checking if store contains the id
-    when(contextA.getCorrelationId()).thenReturn(null);
+    final BaseEventContext context = mock(BaseEventContext.class);
+    when(context.getCorrelationId()).thenReturn("1");
+
+    ObjectStore<String> objectStore = mock(ObjectStore.class);
+    doThrow(ObjectStoreException.class).when(objectStore).store(anyString(), any());
+    idempotent.setObjectStore(objectStore);
 
     Message okMessage = InternalMessage.builder().value("OK").build();
-    CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
+    CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
 
     initialiseIfNeeded(idempotent, true, muleContext);
     // set rethrow as if FF is enabled
     idempotent.setRethrowEnabled(true);
-    expected.expect(NullPointerException.class);
+    expected.expect(ObjectStoreException.class);
     idempotent.process(event);
   }
 
@@ -251,8 +259,11 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
   @Issue("W-11529823")
   public void throwsDuplicateMessageException() throws Exception {
     final BaseEventContext contextA = mock(BaseEventContext.class);
-    // this will force a NullPointerException while checking if store contains the id
-    when(contextA.getCorrelationId()).thenReturn(null);
+    when(contextA.getCorrelationId()).thenReturn("1");
+
+    ObjectStore<String> objectStore = mock(ObjectStore.class);
+    doThrow(ObjectStoreException.class).when(objectStore).store(anyString(), any());
+    idempotent.setObjectStore(objectStore);
 
     Message okMessage = InternalMessage.builder().value("OK").build();
     CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();

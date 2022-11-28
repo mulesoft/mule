@@ -175,7 +175,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     this.store = store;
   }
 
-  private boolean accept(CoreEvent event) throws MuleException {
+  private boolean accept(CoreEvent event) {
     BindingContext bindingContext = event.asBindingContext();
     try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
       String id = getIdForEvent(session);
@@ -189,10 +189,10 @@ public class IdempotentMessageValidator extends AbstractComponent
           return false;
         } catch (ObjectStoreNotAvailableException e) {
           LOGGER.error("ObjectStore not available: " + e.getMessage());
-          return rethrowIfFeatureFlagEnabled(e);
+          return false;
         } catch (ObjectStoreException e) {
           LOGGER.warn("ObjectStore exception: " + e.getMessage());
-          return rethrowIfFeatureFlagEnabled(e);
+          return false;
         }
       } else {
         return false;
@@ -201,10 +201,27 @@ public class IdempotentMessageValidator extends AbstractComponent
       throw e;
     } catch (Exception e) {
       LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
-      if (rethrowEnabled) {
-        throw e;
-      }
       return false;
+    }
+  }
+
+  private boolean acceptWithFF(CoreEvent event) throws MuleException {
+    BindingContext bindingContext = event.asBindingContext();
+    try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
+      String id = getIdForEvent(session);
+      String value = getValueForEvent(session);
+
+      if (event != null && isNewMessage(event, id)) {
+        store.store(id, value);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (ObjectAlreadyExistsException ex) {
+      return false;
+    } catch (Exception e) {
+      LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
+      throw e;
     }
   }
 
@@ -217,7 +234,7 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   @Override
   public final CoreEvent process(CoreEvent event) throws MuleException {
-    if (accept(event)) {
+    if (rethrowEnabled && acceptWithFF(event) || !rethrowEnabled && accept(event)) {
       return event;
     } else {
       throw new DuplicateMessageException();
