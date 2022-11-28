@@ -7,6 +7,18 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import static java.lang.Boolean.parseBoolean;
+
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.context.propagation.ContextPropagators.create;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
+import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.exporter.capturer.CapturingSpanExporterWrapper;
+
+import java.util.Collection;
+
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -24,16 +36,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-import org.mule.runtime.tracer.impl.exporter.capturer.CapturingSpanExporterWrapper;
-
-import java.util.Collection;
-
-import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.context.propagation.ContextPropagators.create;
-import static java.lang.Boolean.parseBoolean;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class OpenTelemetryResources {
 

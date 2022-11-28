@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentCoreEventStartSpanInfoProvider;
-import org.mule.runtime.core.api.tracing.customization.ComponentStartSpanInfo;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionBasedStartSpanCustomizationInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionStartSpanInfo;
 import org.mule.runtime.core.api.tracing.customization.SpanStartUtils;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -110,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentCoreEventStartSpanInfoProvider(this));
+      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentExecutionBasedStartSpanCustomizationInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -131,20 +131,21 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 
-    private class SubFllowComponentCoreEventStartSpanInfoProvider extends ComponentCoreEventStartSpanInfoProvider {
+    private class SubFllowComponentExecutionBasedStartSpanCustomizationInfoProvider
+        extends ComponentExecutionBasedStartSpanCustomizationInfoProvider {
 
-      SubFllowComponentCoreEventStartSpanInfoProvider(Component component) {
+      SubFllowComponentExecutionBasedStartSpanCustomizationInfoProvider(Component component) {
         super(component);
       }
 
       @Override
       public StartSpanInfo get(CoreEvent coreEvent) {
-        return new SubFlowComponentStartSpanInfo(component, coreEvent);
+        return new SubFlowComponentExecutionStartSpanInfo(component, coreEvent);
       }
 
-      private class SubFlowComponentStartSpanInfo extends ComponentStartSpanInfo {
+      private class SubFlowComponentExecutionStartSpanInfo extends ComponentExecutionStartSpanInfo {
 
-        public SubFlowComponentStartSpanInfo(Component component, CoreEvent coreEvent) {
+        public SubFlowComponentExecutionStartSpanInfo(Component component, CoreEvent coreEvent) {
           super(component, coreEvent);
         }
 

@@ -18,17 +18,17 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class NoExportableTillSpanWithNameStartExportInfo implements StartExportInfo {
+public class NoExportTillSpanWithNameStartExportInfo implements StartExportInfo {
 
   private Set<String> resetSpans = new HashSet<>();
   private boolean exportable;
 
-  public NoExportableTillSpanWithNameStartExportInfo(String resetSpan, boolean exportable) {
+  public NoExportTillSpanWithNameStartExportInfo(String resetSpan, boolean exportable) {
     this.resetSpans.add(resetSpan);
     this.exportable = exportable;
   }
 
-  public NoExportableTillSpanWithNameStartExportInfo(Set<String> resetSpans, boolean exportable) {
+  public NoExportTillSpanWithNameStartExportInfo(Set<String> resetSpans, boolean exportable) {
     this.resetSpans.addAll(resetSpans);
     this.exportable = exportable;
   }

@@ -12,29 +12,30 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
 /**
- * A {@link ComponentCoreEventStartSpanInfoProvider} provider for {@link StartSpanInfo} with fixed name.
+ * A {@link ComponentExecutionBasedStartSpanCustomizationInfoProvider} provider for {@link StartSpanInfo} with fixed name.
  *
  * @since 4.5.0
  */
-public class FixedNameComponentCoreEventStartSpanInfoProvider extends ComponentCoreEventStartSpanInfoProvider {
+public class FixedNameComponentExecutionStartSpanInfoProvider
+    extends ComponentExecutionBasedStartSpanCustomizationInfoProvider {
 
   private final String name;
 
-  public FixedNameComponentCoreEventStartSpanInfoProvider(Component component, String name) {
+  public FixedNameComponentExecutionStartSpanInfoProvider(Component component, String name) {
     super(component);
     this.name = name;
   }
 
   @Override
   public StartSpanInfo get(CoreEvent coreEvent) {
-    return new FixedComponentCoreStartSpanInfoProvider(component, coreEvent, name);
+    return new FixedComponentCoreExecutionStartSpanInfoProvider(component, coreEvent, name);
   }
 
-  private class FixedComponentCoreStartSpanInfoProvider extends ComponentStartSpanInfo {
+  private class FixedComponentCoreExecutionStartSpanInfoProvider extends ComponentExecutionStartSpanInfo {
 
     private final String name;
 
-    public FixedComponentCoreStartSpanInfoProvider(Component component, CoreEvent coreEvent, String name) {
+    public FixedComponentCoreExecutionStartSpanInfoProvider(Component component, CoreEvent coreEvent, String name) {
       super(component, coreEvent);
       this.name = name;
     }

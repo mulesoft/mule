@@ -7,14 +7,15 @@
 
 package org.mule.runtime.core.privileged.profiling.tracing;
 
-import org.mule.runtime.core.api.tracing.customization.CoreEventStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.EventBasedStartSpanCustomizationInfoProvider;
 
 /**
- * Interface which allows classes to set {@link CoreEventStartSpanInfoProvider}
+ * Interface which allows classes to set {@link EventBasedStartSpanCustomizationInfoProvider}
  *
  * @since 4.5.0
  */
 public interface SpanCustomizationInfoAware {
 
-  void setCoreSpanCustomizationInfoProvider(CoreEventStartSpanInfoProvider coreEventStartSpanInfoProvider);
+  void setCoreSpanCustomizationInfoProvider(
+                                            EventBasedStartSpanCustomizationInfoProvider eventBasedStartSpanCustomizationInfoProvider);
 }

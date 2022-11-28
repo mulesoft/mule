@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
@@ -16,8 +18,6 @@ import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import javax.inject.Inject;
-
-import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
 
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 

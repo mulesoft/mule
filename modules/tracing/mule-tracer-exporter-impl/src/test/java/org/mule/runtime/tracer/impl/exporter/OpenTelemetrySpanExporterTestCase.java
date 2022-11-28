@@ -14,7 +14,6 @@ import static java.lang.System.nanoTime;
 import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.hasItems;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -26,15 +25,15 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)

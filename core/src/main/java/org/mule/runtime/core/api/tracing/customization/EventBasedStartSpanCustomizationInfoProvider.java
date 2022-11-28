@@ -15,7 +15,7 @@ import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
  *
  * @since 4.5.0
  */
-public interface CoreEventStartSpanInfoProvider {
+public interface EventBasedStartSpanCustomizationInfoProvider {
 
   /**
    * @param core a {@link CoreEvent}

@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentCoreEventStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.SuffixComponentExecutionBasedStartSpanCustomizationInfoProvider;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -64,7 +64,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
     for (MessageProcessorChain route : routes) {
       if (route instanceof SpanCustomizationInfoAware) {
         ((SpanCustomizationInfoAware) route)
-            .setCoreSpanCustomizationInfoProvider(new SuffixComponentCoreEventStartSpanInfoProvider(this, "route"));
+            .setCoreSpanCustomizationInfoProvider(new SuffixComponentExecutionBasedStartSpanCustomizationInfoProvider(this, "route"));
       }
     }
   }

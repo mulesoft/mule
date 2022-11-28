@@ -22,7 +22,7 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class ComponentStartSpanInfo implements StartSpanInfo {
+public class ComponentExecutionStartSpanInfo implements StartSpanInfo {
 
 
   public static final String LOCATION_KEY = "location";
@@ -34,16 +34,16 @@ public class ComponentStartSpanInfo implements StartSpanInfo {
   protected final Component component;
   private String suffix = "";
 
-  public ComponentStartSpanInfo(Component component,
-                                CoreEvent coreEvent,
-                                String suffix) {
+  public ComponentExecutionStartSpanInfo(Component component,
+                                         CoreEvent coreEvent,
+                                         String suffix) {
     this.component = component;
     this.coreEvent = coreEvent;
     this.suffix = suffix;
   }
 
-  public ComponentStartSpanInfo(Component component,
-                                CoreEvent coreEvent) {
+  public ComponentExecutionStartSpanInfo(Component component,
+                                         CoreEvent coreEvent) {
     this.component = component;
     this.coreEvent = coreEvent;
   }

@@ -7,9 +7,9 @@
 
 package org.mule.runtime.tracer.impl.exporter.config;
 
-import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-
 import static java.lang.System.getProperty;
+
+import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 public class SystemPropertiesSpanExporterConfiguration implements SpanExporterConfiguration {
 

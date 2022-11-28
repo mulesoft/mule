@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentCoreEventStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.SuffixComponentExecutionBasedStartSpanCustomizationInfoProvider;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.privileged.processor.Scope;
@@ -105,7 +105,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     nestedChain =
         buildNewChainWithListOfProcessors(processingStrategy, messageProcessors,
-                                          new SuffixComponentCoreEventStartSpanInfoProvider(this, "iteration"));
+                                          new SuffixComponentExecutionBasedStartSpanCustomizationInfoProvider(this, "iteration"));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
   }

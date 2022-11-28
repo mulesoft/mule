@@ -105,7 +105,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       if (!openTelemetrySpan.getNoExportUntil().isEmpty()
           && !openTelemetrySpan.getNoExportUntil().contains(getWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
         childOpenTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan,
-                                                                                   new NoExportableStartSpanInfo(childOpenTelemetrySpanExporter
+                                                                                   new NoExportStartSpanInfo(childOpenTelemetrySpanExporter
                                                                                        .getOpenTelemetrySpan()
                                                                                        .getNoExportUntil()),
                                                                                    NO_EXPORTABLE_SERVICE);
