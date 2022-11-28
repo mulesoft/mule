@@ -42,7 +42,7 @@ public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent event, InitialSpanInfo spanCustomizationInfo, Assertion assertion) {
+  public Optional<InternalSpan> startComponentSpan(CoreEvent event, InitialSpanInfo initialSpanInfo, Assertion assertion) {
     return empty();
   }
 
