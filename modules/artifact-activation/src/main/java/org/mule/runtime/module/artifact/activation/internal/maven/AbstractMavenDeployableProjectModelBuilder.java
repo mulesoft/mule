@@ -197,7 +197,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .build();
   }
 
-  protected ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
+  private ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
     ApplicationGAVModel deployableGAVModel =
         new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
     return getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
