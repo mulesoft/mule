@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
+import static org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader.TYPE_PROPERTY_NAME;
+
+import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader.TYPE_PROPERTY_NAME;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -24,14 +28,18 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -40,7 +48,7 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
   private static final String EXTENSION_NAME = "crafted extension";
 
   private ExtensionModelLoader loader = new CraftedExtensionModelLoader();
-  private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+  private final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -48,7 +56,7 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
   @Mock
   private DslResolvingContext dslResolvingContext;
 
-  private Map<String, Object> attributes = new HashMap<>();
+  private final Map<String, Object> attributes = new HashMap<>();
 
   @Before
   public void before() throws Exception {
@@ -90,6 +98,24 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
     attributes.put(TYPE_PROPERTY_NAME, String.class.getName());
     expectedException.expect(IllegalArgumentException.class);
     load();
+  }
+
+  @Test
+  @Issue("W-12003688")
+  public void dontSetDefaultValueToBooleanParams() throws Exception {
+    AtomicReference<ExtensionLoadingContext> contextRef = new AtomicReference<>();
+
+    loader = new CraftedExtensionModelLoader() {
+
+      @Override
+      protected ExtensionModel doCreate(ExtensionLoadingContext context) {
+        contextRef.set(context);
+        return super.doCreate(context);
+      }
+    };
+
+    load();
+    assertThat(contextRef.get().getParameter(DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS), is(of(true)));
   }
 
   public static class TestExtensionLoadingDelegate implements ExtensionLoadingDelegate {
