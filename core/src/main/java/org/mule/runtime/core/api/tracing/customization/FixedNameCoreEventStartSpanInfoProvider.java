@@ -15,11 +15,11 @@ import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
  *
  * @since 4.5.0
  */
-public class FixedNameCoreEventStartEventStartSpanInfoProvider implements CoreEventStartSpanInfoProvider {
+public class FixedNameCoreEventStartSpanInfoProvider implements CoreEventStartSpanInfoProvider {
 
   protected final String name;
 
-  public FixedNameCoreEventStartEventStartSpanInfoProvider(String name) {
+  public FixedNameCoreEventStartSpanInfoProvider(String name) {
     this.name = name;
   }
 
