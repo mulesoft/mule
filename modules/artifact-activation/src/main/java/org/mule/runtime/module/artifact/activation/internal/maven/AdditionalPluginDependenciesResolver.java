@@ -28,6 +28,7 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.ObjectUtils;
@@ -66,12 +68,12 @@ public class AdditionalPluginDependenciesResolver {
   private final AetherMavenClient aetherMavenClient;
   private final List<Plugin> pluginsWithAdditionalDependencies;
   private final File temporaryFolder;
-  private final Map<ArtifactCoordinates, Model> pomModels;
+  private final Map<ArtifactCoordinates, Supplier<Model>> pomModels;
 
   public AdditionalPluginDependenciesResolver(AetherMavenClient muleMavenPluginClient,
                                               List<Plugin> additionalPluginDependencies,
                                               File temporaryFolder,
-                                              Map<ArtifactCoordinates, Model> pomModels) {
+                                              Map<ArtifactCoordinates, Supplier<Model>> pomModels) {
     this.aetherMavenClient = muleMavenPluginClient;
     this.pluginsWithAdditionalDependencies = new ArrayList<>(additionalPluginDependencies);
     this.temporaryFolder = temporaryFolder;
@@ -167,15 +169,15 @@ public class AdditionalPluginDependenciesResolver {
       try {
 
         BundleDescriptor descriptor = mulePlugin.getDescriptor();
-
         ArtifactCoordinates artifactCoordinates =
             new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+        URL mulePluginUrl = mulePlugin.getBundleUri().toURL();
 
-        Model pomModel = pomModels.getOrDefault(artifactCoordinates,
-                                                aetherMavenClient.getEffectiveModel(toFile(mulePlugin.getBundleUri().toURL()),
-                                                                                    of(temporaryFolder)));
+        Supplier<Model> pomModel =
+            pomModels.getOrDefault(artifactCoordinates, () -> aetherMavenClient.getEffectiveModel(toFile(mulePluginUrl),
+                                                                                                  of(temporaryFolder)));
 
-        Build build = pomModel.getBuild();
+        Build build = pomModel.get().getBuild();
         if (build != null) {
           org.apache.maven.model.Plugin packagerPlugin =
               build.getPluginsAsMap().get(MULE_EXTENSIONS_PLUGIN_GROUP_ID + ":" + MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID);
