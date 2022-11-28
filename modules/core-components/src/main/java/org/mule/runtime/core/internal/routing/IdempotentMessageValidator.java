@@ -80,10 +80,15 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   private CompiledExpression compiledIdExpression;
   private CompiledExpression compiledValueExpression;
+  private boolean rethrowEnabled;
 
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  public void setRethrowEnabled(boolean rethrowEnabled) {
+    this.rethrowEnabled = rethrowEnabled;
   }
 
   @Override
@@ -94,6 +99,9 @@ public class IdempotentMessageValidator extends AbstractComponent
                  this.getClass().getName(), UUID.randomUUID());
     }
     setupObjectStore();
+    if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+      setRethrowEnabled(true);
+    }
     compiledIdExpression = compile(idExpression, muleContext.getExpressionManager());
     compiledValueExpression = compile(valueExpression, muleContext.getExpressionManager());
   }
@@ -167,7 +175,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     this.store = store;
   }
 
-  private boolean accept(CoreEvent event) throws ObjectStoreException {
+  private boolean accept(CoreEvent event) throws MuleException {
     BindingContext bindingContext = event.asBindingContext();
     try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
       String id = getIdForEvent(session);
@@ -178,22 +186,13 @@ public class IdempotentMessageValidator extends AbstractComponent
           store.store(id, value);
           return true;
         } catch (ObjectAlreadyExistsException ex) {
-          if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
-            throw ex;
-          }
           return false;
         } catch (ObjectStoreNotAvailableException e) {
           LOGGER.error("ObjectStore not available: " + e.getMessage());
-          if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
-            throw e;
-          }
-          return false;
+          return rethrowIfFeatureFlagEnabled(e);
         } catch (ObjectStoreException e) {
           LOGGER.warn("ObjectStore exception: " + e.getMessage());
-          if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
-            throw e;
-          }
-          return false;
+          return rethrowIfFeatureFlagEnabled(e);
         }
       } else {
         return false;
@@ -202,11 +201,18 @@ public class IdempotentMessageValidator extends AbstractComponent
       throw e;
     } catch (Exception e) {
       LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
-      if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+      if (rethrowEnabled) {
         throw e;
       }
       return false;
     }
+  }
+
+  private boolean rethrowIfFeatureFlagEnabled(MuleException e) throws MuleException {
+    if (rethrowEnabled) {
+      throw e;
+    }
+    return false;
   }
 
   @Override
@@ -218,7 +224,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     }
   }
 
-  protected boolean isNewMessage(CoreEvent event, String id) {
+  protected boolean isNewMessage(CoreEvent event, String id) throws MuleException {
     try {
       if (store == null) {
         synchronized (this) {
@@ -230,7 +236,7 @@ public class IdempotentMessageValidator extends AbstractComponent
       LOGGER.error("Exception attempting to determine idempotency of incoming message for " + getLocation().getRootContainerName()
           + " from the connector "
           + event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), e);
-      return false;
+      return rethrowIfFeatureFlagEnabled(e);
     }
   }
 

@@ -34,6 +34,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -230,6 +231,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  @Issue("W-11529823")
   public void rethrowsException() throws Exception {
     final BaseEventContext contextA = mock(BaseEventContext.class);
     // this will force a NullPointerException while checking if store contains the id
@@ -239,14 +241,33 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
 
     initialiseIfNeeded(idempotent, true, muleContext);
+    // set rethrow as if FF is enabled
+    idempotent.setRethrowEnabled(true);
     expected.expect(NullPointerException.class);
+    idempotent.process(event);
+  }
+
+  @Test
+  @Issue("W-11529823")
+  public void throwsDuplicateMessageException() throws Exception {
+    final BaseEventContext contextA = mock(BaseEventContext.class);
+    // this will force a NullPointerException while checking if store contains the id
+    when(contextA.getCorrelationId()).thenReturn(null);
+
+    Message okMessage = InternalMessage.builder().value("OK").build();
+    CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
+
+    initialiseIfNeeded(idempotent, true, muleContext);
+    // set rethrow as if FF is disabled
+    idempotent.setRethrowEnabled(false);
+    expected.expect(DuplicateMessageException.class);
     idempotent.process(event);
   }
 
   @Test
   public void implicitObjectStoreIsCreatedWhenNonDefined() throws Exception {
     idempotent.setObjectStore(null);
-    idempotent.initialise();
+    initialiseIfNeeded(idempotent, true, muleContext);
     assertThat(idempotent.getObjectStore(), is(notNullValue()));
   }
 
