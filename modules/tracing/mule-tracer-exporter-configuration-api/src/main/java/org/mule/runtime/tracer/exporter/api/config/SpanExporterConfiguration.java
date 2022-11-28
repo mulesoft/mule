@@ -7,10 +7,8 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
-
 /**
- * A configuration for the export of {@link InternalSpan}'s
+ * A configuration for the export of spans.
  *
  * @since 4.5.0
  */
@@ -23,4 +21,13 @@ public interface SpanExporterConfiguration {
    */
   String getValue(String key);
 
+  default String getValue(String key, String defaultValue) {
+    String value = getValue(key);
+
+    if (value == null) {
+      value = defaultValue;
+    }
+
+    return value;
+  }
 }

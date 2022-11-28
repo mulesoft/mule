@@ -12,11 +12,24 @@ import static java.lang.Boolean.parseBoolean;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.capturer.CapturingSpanExporterWrapper;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 import io.opentelemetry.api.OpenTelemetry;
@@ -36,13 +49,11 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterType;
 
 public class OpenTelemetryResources {
 
   private static final ContextPropagators PROPAGATOR = create(W3CTraceContextPropagator.getInstance());
-
-  private static final String OPENTELEMETRY_EXPORT_ENABLED_SYSPROP = "mule.openetelemetry.export.enabled";
-  private static final String MULE_OPENTELEMETRY_ENDPOINT_SYSPROP = "mule.opentelemetry.endpoint";
 
   // This is only defined in the semconv artifact which is in alpha state and is only needed for this.
   // In order not to add another dependency we add it here.
@@ -80,7 +91,7 @@ public class OpenTelemetryResources {
     Resource resource = Resource.getDefault()
         .merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, serviceName)));
 
-    if (parseBoolean(spanExporterConfiguration.getValue(OPENTELEMETRY_EXPORT_ENABLED_SYSPROP))) {
+    if (parseBoolean(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
       sdkTracerProviderBuilder = sdkTracerProviderBuilder.addSpanProcessor(resolveExporterProcessor(spanExporterConfiguration));
     } else {
       sdkTracerProviderBuilder =
@@ -111,16 +122,54 @@ public class OpenTelemetryResources {
 
   private static SpanProcessor resolveExporterProcessor(
                                                         SpanExporterConfiguration spanExporterConfiguration) {
-    return BatchSpanProcessor.builder(createExporter(spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP)))
+    if (Integer.parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE)) == 0) {
+      return SimpleSpanProcessor.create(createExporter(spanExporterConfiguration));
+    }
+
+    return BatchSpanProcessor.builder(createExporter(spanExporterConfiguration))
         .build();
   }
 
-  private static SpanExporter createExporter(String endpoint) {
+  private static SpanExporter createExporter(SpanExporterConfiguration spanExporterConfiguration) {
+    if (spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE).equals(OpenTelemetryExporterType.GRPC.toString())) {
+      return createGrpcExporter(spanExporterConfiguration);
+    }
+    String endpoint = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT);
     if (!isEmpty(endpoint)) {
       return OtlpGrpcSpanExporter.builder().setEndpoint(endpoint).build();
     } else {
       return OtlpGrpcSpanExporter.builder().build();
     }
+  }
+
+  private static SpanExporter createGrpcExporter(SpanExporterConfiguration spanExporterConfiguration) {
+    String endpoint = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT);
+    if (!isEmpty(endpoint)) {
+      OtlpGrpcSpanExporterBuilder builder = OtlpGrpcSpanExporter.builder().setEndpoint(endpoint);
+      if (spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "false").equals(Boolean.TRUE.toString())) {
+        configureTls(builder, spanExporterConfiguration);
+      }
+      return builder.build();
+    }
+
+    return OtlpGrpcSpanExporter.builder().build();
+  }
+
+  private static void configureTls(OtlpGrpcSpanExporterBuilder builder, SpanExporterConfiguration spanExporterConfiguration) {
+    String keyFilePath = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
+    String certFilePath = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION);
+    String caFilePath = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION);
+    try {
+      byte[] keyFileBytes = Files.readAllBytes(Paths.get(keyFilePath));
+      byte[] certFileBytes = Files.readAllBytes(Paths.get(certFilePath));
+      byte[] caFileBytes = Files.readAllBytes(Paths.get(caFilePath));
+
+      builder.setClientTls(keyFileBytes, certFileBytes);
+      builder.setTrustedCertificates(caFileBytes);
+    } catch (IOException e) {
+
+    }
+
   }
 
 }
