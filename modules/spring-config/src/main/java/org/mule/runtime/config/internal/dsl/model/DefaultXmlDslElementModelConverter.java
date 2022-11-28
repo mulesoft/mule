@@ -24,7 +24,7 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocat
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.CLUSTER_EE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
@@ -150,7 +150,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private boolean isEETransform(Element parentNode) {
-    return parentNode.getNamespaceURI().equals(CLUSTER_EE_NAMESPACE)
+    return parentNode.getNamespaceURI().equals(EE_NAMESPACE)
         && parentNode.getNodeName().equals(EE_PREFIX + ":" + TRANSFORM_IDENTIFIER);
   }
 
@@ -334,8 +334,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Element createEE(ComponentConfiguration config) {
-    String namespaceURI = CLUSTER_EE_NAMESPACE;
-    String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, CLUSTER_EE_NAMESPACE);
+    String namespaceURI = EE_NAMESPACE;
+    String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, EE_NAMESPACE);
 
     addNamespaceDeclarationIfNeeded(EE_PREFIX, namespaceURI, eeSchemaLocation);
 
@@ -346,8 +346,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Element createTransformTextElement(ComponentConfiguration config) {
-    String namespaceURI = CLUSTER_EE_NAMESPACE;
-    String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, CLUSTER_EE_NAMESPACE);
+    String namespaceURI = EE_NAMESPACE;
+    String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, EE_NAMESPACE);
 
     addNamespaceDeclarationIfNeeded(EE_PREFIX, namespaceURI, eeSchemaLocation);
 
