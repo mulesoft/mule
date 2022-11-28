@@ -36,7 +36,7 @@ import java.util.Set;
 public class ExecutionSpan implements InternalSpan {
 
   public static final String THREAD_END_NAME = "thread.end.name";
-  private final InitialSpanInfo spanCustomizationInfo;
+  private final InitialSpanInfo initialSpanInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
 
   public static ExecutionSpanBuilder getExecutionSpanBuilder() {
@@ -49,9 +49,9 @@ public class ExecutionSpan implements InternalSpan {
   private final Map<String, String> attributes = new HashMap<>();
   private final Set<SpanError> errors = new HashSet<>();
 
-  private ExecutionSpan(InitialSpanInfo spanCustomizationInfo, Long startTime,
+  private ExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
                         InternalSpan parent) {
-    this.spanCustomizationInfo = spanCustomizationInfo;
+    this.initialSpanInfo = initialSpanInfo;
     this.startTime = startTime;
     this.parent = parent;
   }
@@ -68,7 +68,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public String getName() {
-    return spanCustomizationInfo.getName();
+    return initialSpanInfo.getName();
   }
 
   @Override
