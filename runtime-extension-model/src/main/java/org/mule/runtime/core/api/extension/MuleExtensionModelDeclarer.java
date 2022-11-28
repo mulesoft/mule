@@ -69,6 +69,7 @@ import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEF
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.EXTRA_APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
@@ -1032,6 +1033,7 @@ class MuleExtensionModelDeclarer {
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
     declareExpressionLanguage(configuration.withOptionalComponent("expression-language"));
+    declareExtraAppConfigs(configuration);
 
     final ParameterGroupDeclarer params = configuration.onDefaultParameterGroup();
     params
@@ -1120,6 +1122,12 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(REQUIRED)
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
+  }
+
+  private void declareExtraAppConfigs(ConstructDeclarer configuration) {
+    configuration.withOptionalComponent("extraAppConfig")
+        .withAllowedStereotypes(EXTRA_APP_CONFIG)
+        .describedAs("COSO...");
   }
 
   private void declareExpressionLanguage(NestedComponentDeclarer expressionLanguageDeclarer) {
