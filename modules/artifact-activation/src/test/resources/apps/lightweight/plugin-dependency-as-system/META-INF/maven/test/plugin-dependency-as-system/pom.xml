@@ -21,7 +21,7 @@
             <version>${dependencyVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>system</scope>
-            <systemPath>${muleRuntimeConfig.maven.repositoryLocation}/${dependencyGroupId}/${dependencyArtifactId}/${dependencyVersion}/${dependencyArtifactId}-${dependencyVersion}-mule-plugin.jar</systemPath>
+            <systemPath>${localPluginDirectory}/${dependencyGroupId}/${dependencyArtifactId}/${dependencyVersion}/${dependencyArtifactId}-${dependencyVersion}-mule-plugin.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

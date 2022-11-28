@@ -26,7 +26,9 @@ import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
 import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
+import static java.lang.Math.random;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -38,13 +40,17 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
@@ -54,6 +60,7 @@ import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -240,14 +247,74 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     return deployableMavenBundleDependencies.stream().map(bundleDependency -> {
       if (MULE_PLUGIN_CLASSIFIER.equals(bundleDependency.getDescriptor().getClassifier().orElse(null))
           && SYSTEM.equals(bundleDependency.getScope())) {
-        return aetherMavenClient.resolveArtifactDependencies(singletonList(bundleDependency.getDescriptor()),
-                                                             of(deployableArtifactRepositoryFolder),
-                                                             empty())
-            .get(0);
+        try (MuleSystemPluginMavenReactorResolver reactor =
+            new MuleSystemPluginMavenReactorResolver(new File(bundleDependency.getBundleUri()), aetherMavenClient)) {
+          return aetherMavenClient.resolveArtifactDependencies(singletonList(bundleDependency.getDescriptor()),
+                                                               of(deployableArtifactRepositoryFolder),
+                                                               of(reactor))
+              .get(0);
+        }
       }
 
       return bundleDependency;
     }).collect(toList());
+  }
+
+  private static class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
+
+    private static final String POM = "pom";
+
+    private final File temporaryFolder;
+
+    private final Model effectiveModel;
+
+    private final File pomFile;
+    private final File artifactFile;
+
+    public MuleSystemPluginMavenReactorResolver(File artifactFile, MavenClient mavenClient) {
+      try {
+        temporaryFolder = createTempDirectory("tmpDirPrefix" + random()).toFile();
+      } catch (IOException e) {
+        throw new MuleRuntimeException(e);
+      }
+
+      this.effectiveModel = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
+
+      this.pomFile = effectiveModel.getPomFile();
+      this.artifactFile = artifactFile;
+    }
+
+    @Override
+    public File findArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+      if (checkArtifact(bundleDescriptor)) {
+        if (bundleDescriptor.getType().equals(POM)) {
+          return pomFile;
+        } else {
+          return artifactFile;
+        }
+      }
+      return null;
+    }
+
+    @Override
+    public List<String> findVersions(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+      if (checkArtifact(bundleDescriptor)) {
+        return singletonList(this.effectiveModel.getVersion());
+      }
+      return emptyList();
+    }
+
+    private boolean checkArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+      return this.effectiveModel.getGroupId().equals(bundleDescriptor.getGroupId())
+          && this.effectiveModel.getArtifactId().equals(bundleDescriptor.getArtifactId())
+          && this.effectiveModel.getVersion().equals(bundleDescriptor.getVersion());
+    }
+
+    @Override
+    public void close() {
+      deleteQuietly(temporaryFolder);
+    }
+
   }
 
   private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
