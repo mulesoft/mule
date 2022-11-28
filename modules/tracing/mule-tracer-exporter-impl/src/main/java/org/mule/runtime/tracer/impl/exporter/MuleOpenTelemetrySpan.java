@@ -8,7 +8,7 @@
 package org.mule.runtime.tracer.impl.exporter;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.Collections;
 import java.util.Map;
@@ -29,12 +29,12 @@ public interface MuleOpenTelemetrySpan extends Span {
   /**
    * Ends the span
    *
-   * @param internalSpan  the internal span.
-   * @param startSpanInfo the start span info.
-   * @param artifactId    the artifact id.
-   * @param artifactType  the artifact type.
+   * @param internalSpan    the internal span.
+   * @param initialSpanInfo the start span info.
+   * @param artifactId      the artifact id.
+   * @param artifactType    the artifact type.
    */
-  void end(InternalSpan internalSpan, StartSpanInfo startSpanInfo, String artifactId, String artifactType);
+  void end(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo, String artifactId, String artifactType);
 
   Map<String, String> getDistributedTraceContextMap();
 

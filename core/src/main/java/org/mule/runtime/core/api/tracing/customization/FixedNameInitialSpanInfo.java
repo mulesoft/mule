@@ -10,18 +10,18 @@ package org.mule.runtime.core.api.tracing.customization;
 import static org.mule.runtime.tracer.api.span.info.StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
- * A {@link StartSpanInfo} with a fixed name.
+ * A {@link InitialSpanInfo} with a fixed name.
  *
  * @since 4.5.0
  */
-public class FixedNameStartSpanInfo implements StartSpanInfo {
+public class FixedNameInitialSpanInfo implements InitialSpanInfo {
 
   private final String name;
 
-  public FixedNameStartSpanInfo(String name) {
+  public FixedNameInitialSpanInfo(String name) {
     this.name = name;
   }
 

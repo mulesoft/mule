@@ -10,7 +10,7 @@ package org.mule.runtime.core.internal.profiling;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
@@ -23,7 +23,7 @@ import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORT
 public class NoopSpanExporterFactory implements SpanExporterFactory {
 
   @Override
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, StartSpanInfo startExportInfo) {
+  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo startExportInfo) {
     return NOOP_EXPORTER;
   }
 

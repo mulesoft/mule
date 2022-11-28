@@ -16,7 +16,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.config.SystemPropertiesSpanExporterConfiguration;
 
@@ -41,17 +41,17 @@ public class MuleOpenTelemetrySpanProvider {
   private MuleOpenTelemetrySpanProvider() {}
 
   public static MuleOpenTelemetrySpan getNewOpenTelemetrySpan(InternalSpan internalSpan,
-                                                              StartSpanInfo startSpanInfo,
+                                                              InitialSpanInfo initialSpanInfo,
                                                               String serviceNAme) {
 
-    StartExportInfo startExportInfo = startSpanInfo.getStartExportInfo();
+    StartExportInfo startExportInfo = initialSpanInfo.getStartExportInfo();
 
     if (!startExportInfo.isExportable()) {
       return getNonExportableSpan(internalSpan);
     }
 
-    return getExportableSpan(internalSpan, startExportInfo, serviceNAme, startSpanInfo.isPolicySpan(),
-                             startSpanInfo.isRootSpan());
+    return getExportableSpan(internalSpan, startExportInfo, serviceNAme, initialSpanInfo.isPolicySpan(),
+                             initialSpanInfo.isRootSpan());
   }
 
   private static MuleOpenTelemetrySpan getExportableSpan(InternalSpan internalSpan,

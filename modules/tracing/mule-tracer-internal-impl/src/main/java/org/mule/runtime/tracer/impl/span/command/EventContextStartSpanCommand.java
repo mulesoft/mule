@@ -8,10 +8,9 @@
 package org.mule.runtime.tracer.impl.span.command;
 
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
 
@@ -34,31 +33,31 @@ public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSp
   private final EventContext eventContext;
   private final Assertion assertion;
   private final EventSpanFactory eventSpanFactory;
-  private final StartSpanInfo startSpaninfo;
+  private final InitialSpanInfo initialSpaninfo;
 
   /**
    *
    * @param eventContext     the {@link EventContext}.xs
    * @param eventSpanFactory the {@link EventSpanFactory} to create the span.
-   * @param startSpanInfo    the {@link StartSpanInfo} to indicate how the {@link InternalSpan} should be created.
+   * @param initialSpanInfo  the {@link InitialSpanInfo} to indicate how the {@link InternalSpan} should be created.
    * @param assertion        the {@link Assertion} to validate when starting the {@link EventContext}.
    * @return
    */
   public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(EventContext eventContext,
                                                                                  EventSpanFactory eventSpanFactory,
-                                                                                 StartSpanInfo startSpanInfo,
+                                                                                 InitialSpanInfo initialSpanInfo,
                                                                                  Assertion assertion) {
-    return new EventContextStartSpanCommand(eventContext, eventSpanFactory, startSpanInfo, assertion);
+    return new EventContextStartSpanCommand(eventContext, eventSpanFactory, initialSpanInfo, assertion);
   }
 
   private EventContextStartSpanCommand(EventContext eventContext,
                                        EventSpanFactory eventSpanFactory,
-                                       StartSpanInfo startSpanInfo,
+                                       InitialSpanInfo initialSpanInfo,
                                        Assertion assertion) {
     this.eventSpanFactory = eventSpanFactory;
     this.eventContext = eventContext;
     this.assertion = assertion;
-    this.startSpaninfo = startSpanInfo;
+    this.initialSpaninfo = initialSpanInfo;
   }
 
   protected Supplier<Optional<InternalSpan>> getSupplier() {
@@ -68,7 +67,7 @@ public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSp
       InternalSpan newSpan = null;
 
       if (spanContext != null) {
-        newSpan = eventSpanFactory.getSpan(spanContext, startSpaninfo);
+        newSpan = eventSpanFactory.getSpan(spanContext, initialSpaninfo);
         spanContext.setSpan(newSpan, assertion);
       }
 

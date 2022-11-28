@@ -14,7 +14,7 @@ import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import javax.inject.Inject;
@@ -25,9 +25,9 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
   MuleContext muleContext;
 
   @Override
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, StartSpanInfo startSpanInfo) {
+  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo) {
     return builder()
-        .withStartSpanInfo(startSpanInfo)
+        .withStartSpanInfo(initialSpanInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
         .withInternalSpan(internalSpan)

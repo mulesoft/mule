@@ -23,7 +23,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
 
@@ -41,12 +41,12 @@ public class EventContextStartSpanCommandTestCase {
   public void whenNotSpanContextAwareReturnEmpty() {
     EventContext eventContext = mock(EventContext.class);
     EventSpanFactory eventContextFactory = mock(EventSpanFactory.class);
-    StartSpanInfo startSpanInfo = mock(StartSpanInfo.class);
+    InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
     Assertion assertion = mock(Assertion.class);
 
     EventContextStartSpanCommand startCommand = getEventContextStartSpanCommandFrom(eventContext,
                                                                                     eventContextFactory,
-                                                                                    startSpanInfo,
+                                                                                    initialSpanInfo,
                                                                                     assertion);
 
     Optional<InternalSpan> internalSpan = startCommand.execute();
@@ -63,15 +63,15 @@ public class EventContextStartSpanCommandTestCase {
 
     EventSpanFactory eventContextFactory = mock(EventSpanFactory.class);
 
-    StartSpanInfo startSpanInfo = mock(StartSpanInfo.class);
+    InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
     Assertion assertion = mock(Assertion.class);
 
     InternalSpan expectedSpan = mock(InternalSpan.class);
-    when(eventContextFactory.getSpan(spanContext, startSpanInfo)).thenReturn(expectedSpan);
+    when(eventContextFactory.getSpan(spanContext, initialSpanInfo)).thenReturn(expectedSpan);
 
     EventContextStartSpanCommand startCommand = getEventContextStartSpanCommandFrom((EventContext) eventContext,
                                                                                     eventContextFactory,
-                                                                                    startSpanInfo,
+                                                                                    initialSpanInfo,
                                                                                     assertion);
 
     Optional<InternalSpan> internalSpan = startCommand.execute();

@@ -71,7 +71,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
-import org.mule.runtime.core.api.tracing.customization.NoExportFixedNameEventBasedStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.NoExportFixedNameEventBasedInitialSpanInfoProvider;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -107,10 +107,10 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedStartSpanInfoProvider;
-import org.mule.runtime.core.api.tracing.customization.EventBasedStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
@@ -191,8 +191,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   /**
    * The span customization info for the chain.
    */
-  private EventBasedStartSpanInfoProvider chainEventBasedStartStartInfoProvider =
-      new ComponentEventBasedStartSpanInfoProvider(this);
+  private EventBasedInitialSpanInfoProvider chainEventBasedStartStartInfoProvider =
+      new ComponentEventBasedInitialSpanInfoProvider(this);
 
   // This is used to verify if a span has to be ended in case of error handling.
   // In case an exception is raised before the chain begins to execute, there is no current span set for the chain.
@@ -530,21 +530,21 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private void startSpanForProcessor(Processor processor, CoreEvent event) {
     Assertion assertion = new SpanNameAssertion(chainEventBasedStartStartInfoProvider.get(event).getName());
 
-    StartSpanInfo startSpanInfo = null;
+    InitialSpanInfo initialSpanInfo = null;
 
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
-      startSpanInfo =
-          new ComponentEventBasedStartSpanInfoProvider((Component) processor).get(event);
+      initialSpanInfo =
+          new ComponentEventBasedInitialSpanInfoProvider((Component) processor).get(event);
     } else {
       // Other processors are not exported
-      startSpanInfo = new NoExportFixedNameEventBasedStartSpanInfoProvider("unknown").get(event);
+      initialSpanInfo = new NoExportFixedNameEventBasedInitialSpanInfoProvider("unknown").get(event);
     }
 
     // We start the component verifying that the current span is the span corresponding to
     // the chain.
     muleEventTracer.startComponentSpan(event,
-                                       startSpanInfo,
+                                       initialSpanInfo,
                                        assertion);
   }
 
@@ -784,10 +784,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   /**
-   * @param chainEventBasedStartStartInfoProvider sets the {@link StartSpanInfo} for the chain.
+   * @param chainEventBasedStartStartInfoProvider sets the {@link InitialSpanInfo} for the chain.
    */
   public void setCoreSpanCustomizationInfoProvider(
-                                                   EventBasedStartSpanInfoProvider chainEventBasedStartStartInfoProvider) {
+                                                   EventBasedInitialSpanInfoProvider chainEventBasedStartStartInfoProvider) {
     this.chainEventBasedStartStartInfoProvider = chainEventBasedStartStartInfoProvider;
   }
 }

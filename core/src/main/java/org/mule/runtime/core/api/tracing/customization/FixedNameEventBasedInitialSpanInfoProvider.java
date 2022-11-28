@@ -8,23 +8,23 @@
 package org.mule.runtime.core.api.tracing.customization;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
- * A {@link EventBasedStartSpanInfoProvider} that provides {@link FixedNameStartSpanInfo}
+ * A {@link EventBasedInitialSpanInfoProvider} that provides {@link FixedNameInitialSpanInfo}
  *
  * @since 4.5.0
  */
-public class FixedNameEventBasedStartSpanInfoProvider implements EventBasedStartSpanInfoProvider {
+public class FixedNameEventBasedInitialSpanInfoProvider implements EventBasedInitialSpanInfoProvider {
 
   protected final String name;
 
-  public FixedNameEventBasedStartSpanInfoProvider(String name) {
+  public FixedNameEventBasedInitialSpanInfoProvider(String name) {
     this.name = name;
   }
 
   @Override
-  public StartSpanInfo get(CoreEvent core) {
-    return new FixedNameStartSpanInfo(name);
+  public InitialSpanInfo get(CoreEvent core) {
+    return new FixedNameInitialSpanInfo(name);
   }
 }

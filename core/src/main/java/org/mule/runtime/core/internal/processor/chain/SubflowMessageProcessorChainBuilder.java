@@ -25,9 +25,9 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedStartSpanInfoProvider;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionStartSpanInfo;
-import org.mule.runtime.core.api.tracing.customization.SpanStartUtils;
+import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
+import org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -41,7 +41,7 @@ import java.util.Optional;
 import javax.xml.namespace.QName;
 
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 
 /**
@@ -110,7 +110,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentEventBasedStartSpanInfoProvider(this));
+      this.setCoreSpanCustomizationInfoProvider(new SubFllowComponentEventBasedInitialSpanInfoProvider(this));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -131,27 +131,27 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           .doOnNext(this::popSubFlowFlowStackElement);
     }
 
-    private class SubFllowComponentEventBasedStartSpanInfoProvider
-        extends ComponentEventBasedStartSpanInfoProvider {
+    private class SubFllowComponentEventBasedInitialSpanInfoProvider
+        extends ComponentEventBasedInitialSpanInfoProvider {
 
-      SubFllowComponentEventBasedStartSpanInfoProvider(Component component) {
+      SubFllowComponentEventBasedInitialSpanInfoProvider(Component component) {
         super(component);
       }
 
       @Override
-      public StartSpanInfo get(CoreEvent coreEvent) {
-        return new SubFlowComponentExecutionStartSpanInfo(component, coreEvent);
+      public InitialSpanInfo get(CoreEvent coreEvent) {
+        return new SubFlowComponentExecutionInitialSpanInfo(component, coreEvent);
       }
 
-      private class SubFlowComponentExecutionStartSpanInfo extends ComponentExecutionStartSpanInfo {
+      private class SubFlowComponentExecutionInitialSpanInfo extends ComponentExecutionInitialSpanInfo {
 
-        public SubFlowComponentExecutionStartSpanInfo(Component component, CoreEvent coreEvent) {
+        public SubFlowComponentExecutionInitialSpanInfo(Component component, CoreEvent coreEvent) {
           super(component, coreEvent);
         }
 
         @Override
         public String getName() {
-          return SpanStartUtils.getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
+          return SpanInitialInfoUtils.getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
         }
 
         @Override

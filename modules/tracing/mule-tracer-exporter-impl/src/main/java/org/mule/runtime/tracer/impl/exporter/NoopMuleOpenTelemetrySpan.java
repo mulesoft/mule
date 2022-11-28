@@ -19,7 +19,7 @@ import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Context;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
  * An OpenTelemetry Span that does not export but propagates the root span.
@@ -47,7 +47,7 @@ public class NoopMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   @Override
-  public void end(InternalSpan internalSpan, StartSpanInfo startSpanInfo, String artifactId, String artifactType) {
+  public void end(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo, String artifactId, String artifactType) {
     // Noop
   }
 

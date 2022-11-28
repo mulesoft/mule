@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @since 4.5.0
  */
-public interface StartSpanInfo {
+public interface InitialSpanInfo {
 
   /**
    * @return the initial name for the span.
@@ -28,7 +28,7 @@ public interface StartSpanInfo {
   /**
    * @return initial attributes for the span.
    */
-  default Map<String, String> getStartAttributes() {
+  default Map<String, String> getInitialAttributes() {
     return emptyMap();
   }
 

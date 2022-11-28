@@ -92,8 +92,8 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedStartSpanInfoProvider;
-import org.mule.runtime.core.api.tracing.customization.EventBasedStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -111,8 +111,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   public static Boolean reuseGlobalErrorHandler;
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
-  private final EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider =
-      new ComponentEventBasedStartSpanInfoProvider(TemplateOnErrorHandler.this);
+  private final EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider =
+      new ComponentEventBasedInitialSpanInfoProvider(TemplateOnErrorHandler.this);
 
   private boolean fromGlobalErrorHandler = false;
 

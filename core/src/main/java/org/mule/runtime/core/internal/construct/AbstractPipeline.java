@@ -96,7 +96,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
@@ -192,7 +192,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
-    builder.setCoreSpanCustomizationInfoProvider(new ComponentEventBasedStartSpanInfoProvider(this));
+    builder.setCoreSpanCustomizationInfoProvider(new ComponentEventBasedInitialSpanInfoProvider(this));
     return builder.build();
   }
 

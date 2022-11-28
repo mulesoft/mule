@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.mule.runtime.core.api.tracing.customization.EventBasedStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfoAware;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -314,7 +314,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     private final Supplier<ProcessingStrategy> processingStrategySupplier;
     private FlowExceptionHandler messagingExceptionHandler;
     private MessageProcessorChain delegate;
-    private EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider;
+    private EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider;
 
     private LazyProcessorChainBuilder(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                       List<Processor> processors,
@@ -368,7 +368,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
     @Override
     public void setCoreSpanCustomizationInfoProvider(
-                                                     EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider) {
+                                                     EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
       this.eventBasedStartStartInfoProvider = eventBasedStartStartInfoProvider;
 
     }

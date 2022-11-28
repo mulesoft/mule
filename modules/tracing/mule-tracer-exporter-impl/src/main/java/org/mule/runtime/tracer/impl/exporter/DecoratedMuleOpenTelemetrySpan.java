@@ -25,7 +25,7 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,12 +67,12 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   }
 
   @Override
-  public void end(InternalSpan internalSpan, StartSpanInfo startSpanInfo, String artifactId, String artifactType) {
+  public void end(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo, String artifactId, String artifactType) {
     if (internalSpan.hasErrors()) {
       delegate.setStatus(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
       recordSpanExceptions(internalSpan);
     }
-    startSpanInfo.getStartAttributes().forEach(delegate::setAttribute);
+    initialSpanInfo.getInitialAttributes().forEach(delegate::setAttribute);
     internalSpan.getAttributes().forEach(delegate::setAttribute);
     delegate.setAttribute(ARTIFACT_ID, artifactId);
     delegate.setAttribute(ARTIFACT_TYPE, artifactType);

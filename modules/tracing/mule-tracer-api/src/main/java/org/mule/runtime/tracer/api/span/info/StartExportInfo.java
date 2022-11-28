@@ -16,7 +16,7 @@ import static java.util.Collections.emptySet;
 /**
  * The export information when starting a {@link org.mule.runtime.tracer.api.span.InternalSpan}.
  *
- * @see org.mule.runtime.tracer.api.EventTracer#startComponentSpan(Event, StartSpanInfo)
+ * @see org.mule.runtime.tracer.api.EventTracer#startComponentSpan(Event, InitialSpanInfo)
  *
  * @since 4.5.0
  */

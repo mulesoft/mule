@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.HashSet;
 import java.util.List;
@@ -77,10 +77,10 @@ public class OpenTelemetrySpanExporterTestCase {
     when(spanDuration.getStart()).thenReturn(nanoTime());
     when(internalSpan.getDuration()).thenReturn(spanDuration);
 
-    StartSpanInfo startSpanInfo = mock(StartSpanInfo.class);
-    when(startSpanInfo.isPolicySpan()).thenReturn(isPolicy);
-    when(startSpanInfo.isRootSpan()).thenReturn(isRoot);
-    when(startSpanInfo.getStartExportInfo()).thenReturn(new StartExportInfo() {
+    InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
+    when(initialSpanInfo.isPolicySpan()).thenReturn(isPolicy);
+    when(initialSpanInfo.isRootSpan()).thenReturn(isRoot);
+    when(initialSpanInfo.getStartExportInfo()).thenReturn(new StartExportInfo() {
 
       @Override
       public boolean isExportable() {
@@ -99,7 +99,7 @@ public class OpenTelemetrySpanExporterTestCase {
     OpenTelemetrySpanExporter openTelemetrySpanExporter = OpenTelemetrySpanExporter
         .builder()
         .withInternalSpan(internalSpan)
-        .withStartSpanInfo(startSpanInfo)
+        .withStartSpanInfo(initialSpanInfo)
         .withArtifactId(ARTIFACT_ID)
         .withArtifactType(ARTIFACT_TYPE)
         .build();

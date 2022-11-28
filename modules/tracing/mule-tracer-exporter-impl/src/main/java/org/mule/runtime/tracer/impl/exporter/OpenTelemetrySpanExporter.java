@@ -9,7 +9,7 @@ package org.mule.runtime.tracer.impl.exporter;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   public static final String NO_EXPORTABLE_SERVICE = "no-exportable-service";
 
   private final InternalSpan internalSpan;
-  private final StartSpanInfo startSpanInfo;
+  private final InitialSpanInfo initialSpanInfo;
   private final String artifactId;
   private final String artifactType;
 
@@ -35,18 +35,18 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   private final Map<String, String> rootAttributes = new HashMap<>();
 
   private OpenTelemetrySpanExporter(InternalSpan internalSpan,
-                                    StartSpanInfo startSpanInfo,
+                                    InitialSpanInfo initialSpanInfo,
                                     String artifactId,
                                     String artifactType) {
     this.internalSpan = internalSpan;
-    this.startSpanInfo = startSpanInfo;
+    this.initialSpanInfo = initialSpanInfo;
     this.artifactId = artifactId;
     this.artifactType = artifactType;
   }
 
   @Override
   public void export() {
-    openTelemetrySpan.end(internalSpan, startSpanInfo, artifactId, artifactType);
+    openTelemetrySpan.end(internalSpan, initialSpanInfo, artifactId, artifactType);
   }
 
   @Override
@@ -105,7 +105,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       if (!openTelemetrySpan.getNoExportUntil().isEmpty()
           && !openTelemetrySpan.getNoExportUntil().contains(getWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
         childOpenTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan,
-                                                                                   new NoExportStartSpanInfo(childOpenTelemetrySpanExporter
+                                                                                   new NoExportInitialSpanInfo(childOpenTelemetrySpanExporter
                                                                                        .getOpenTelemetrySpan()
                                                                                        .getNoExportUntil()),
                                                                                    NO_EXPORTABLE_SERVICE);
@@ -134,13 +134,13 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
 
   public static class OpenTelemetrySpanExportBuilder {
 
-    private StartSpanInfo startSpanInfo;
+    private InitialSpanInfo initialSpanInfo;
     private InternalSpan internalSpan;
     private String artifactId;
     private String artifactType;
 
-    public OpenTelemetrySpanExportBuilder withStartSpanInfo(StartSpanInfo startSpanInfo) {
-      this.startSpanInfo = startSpanInfo;
+    public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
+      this.initialSpanInfo = initialSpanInfo;
       return this;
     }
 
@@ -161,7 +161,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
 
     public OpenTelemetrySpanExporter build() {
 
-      if (startSpanInfo == null) {
+      if (initialSpanInfo == null) {
         throw new IllegalArgumentException("Start span info is null");
       }
 
@@ -174,8 +174,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       }
 
       OpenTelemetrySpanExporter openTelemetrySpanExporter =
-          new OpenTelemetrySpanExporter(internalSpan, startSpanInfo, artifactId, artifactType);
-      openTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan, startSpanInfo, artifactId);
+          new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType);
+      openTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan, initialSpanInfo, artifactId);
       return openTelemetrySpanExporter;
     }
   }

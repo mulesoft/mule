@@ -63,7 +63,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.mule.runtime.core.api.tracing.customization.EventBasedStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +101,7 @@ public class MessageProcessors {
   }
 
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
-                                               EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider) {
+                                               EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
@@ -133,7 +133,7 @@ public class MessageProcessors {
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
                                                                         String name,
-                                                                        EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider) {
+                                                                        EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
@@ -144,7 +144,7 @@ public class MessageProcessors {
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
-                                                                        EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider) {
+                                                                        EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setCoreSpanCustomizationInfoProvider(eventBasedStartStartInfoProvider);
@@ -154,7 +154,7 @@ public class MessageProcessors {
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
-                                                                        EventBasedStartSpanInfoProvider eventBasedStartStartInfoProvider) {
+                                                                        EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);

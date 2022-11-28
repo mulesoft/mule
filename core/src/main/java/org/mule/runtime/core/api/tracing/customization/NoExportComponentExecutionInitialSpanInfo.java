@@ -9,17 +9,19 @@ package org.mule.runtime.core.api.tracing.customization;
 
 import static org.mule.runtime.tracer.api.span.info.StartExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 
 /**
- * A {@link FixedNameStartSpanInfo} that indicates that the span to be created is not exportable.
+ * A {@link ComponentExecutionInitialSpanInfo} that indicates that the span shouldn't be exportable.
  *
  * @since 4.5.0
  */
-public class NoExportFixedNameStartSpanInfo extends FixedNameStartSpanInfo {
+public class NoExportComponentExecutionInitialSpanInfo extends ComponentExecutionInitialSpanInfo {
 
-  public NoExportFixedNameStartSpanInfo(String name) {
-    super(name);
+  public NoExportComponentExecutionInitialSpanInfo(Component component, CoreEvent coreEvent) {
+    super(component, coreEvent);
   }
 
   @Override

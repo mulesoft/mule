@@ -11,18 +11,18 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * A {@link StartSpanInfo} based on a component.
+ * A {@link InitialSpanInfo} based on a component.
  *
  * @since 4.5.0
  */
-public class ComponentExecutionStartSpanInfo implements StartSpanInfo {
+public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
 
   public static final String LOCATION_KEY = "location";
@@ -34,22 +34,22 @@ public class ComponentExecutionStartSpanInfo implements StartSpanInfo {
   protected final Component component;
   private String suffix = "";
 
-  public ComponentExecutionStartSpanInfo(Component component,
-                                         CoreEvent coreEvent,
-                                         String suffix) {
+  public ComponentExecutionInitialSpanInfo(Component component,
+                                           CoreEvent coreEvent,
+                                           String suffix) {
     this.component = component;
     this.coreEvent = coreEvent;
     this.suffix = suffix;
   }
 
-  public ComponentExecutionStartSpanInfo(Component component,
-                                         CoreEvent coreEvent) {
+  public ComponentExecutionInitialSpanInfo(Component component,
+                                           CoreEvent coreEvent) {
     this.component = component;
     this.coreEvent = coreEvent;
   }
 
   @Override
-  public Map<String, String> getStartAttributes() {
+  public Map<String, String> getInitialAttributes() {
     Map<String, String> attributes = new HashMap<>();
     attributes.put(LOCATION_KEY, getLocationAsString(coreEvent));
     attributes.put(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
@@ -60,7 +60,7 @@ public class ComponentExecutionStartSpanInfo implements StartSpanInfo {
   }
 
   protected String getLocationAsString(CoreEvent coreEvent) {
-    return SpanStartUtils.getLocationAsString(component.getLocation());
+    return SpanInitialInfoUtils.getLocationAsString(component.getLocation());
   }
 
 
@@ -77,7 +77,7 @@ public class ComponentExecutionStartSpanInfo implements StartSpanInfo {
 
   @Override
   public String getName() {
-    return SpanStartUtils.getSpanName(component.getIdentifier()) + suffix;
+    return SpanInitialInfoUtils.getSpanName(component.getIdentifier()) + suffix;
   }
 
   @Override

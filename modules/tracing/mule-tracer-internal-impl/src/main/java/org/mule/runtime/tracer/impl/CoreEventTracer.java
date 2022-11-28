@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
@@ -44,16 +44,16 @@ public class CoreEventTracer implements EventTracer<CoreEvent> {
   private EventSpanFactory eventSpanFactory;
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo spanCustomizationInfo) {
+  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo spanCustomizationInfo) {
     return startComponentSpan(coreEvent, spanCustomizationInfo, SUCCESSFUL_ASSERTION);
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, StartSpanInfo startSpanInfo,
+  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo initialSpanInfo,
                                                    Assertion assertion) {
     return getEventContextStartSpanCommandFrom(coreEvent.getContext(),
                                                eventSpanFactory,
-                                               startSpanInfo,
+                                               initialSpanInfo,
                                                assertion).execute();
   }
 

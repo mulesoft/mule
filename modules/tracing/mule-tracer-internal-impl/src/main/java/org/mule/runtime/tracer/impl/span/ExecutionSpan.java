@@ -18,7 +18,7 @@ import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
-import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
@@ -36,7 +36,7 @@ import java.util.Set;
 public class ExecutionSpan implements InternalSpan {
 
   public static final String THREAD_END_NAME = "thread.end.name";
-  private final StartSpanInfo spanCustomizationInfo;
+  private final InitialSpanInfo spanCustomizationInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
 
   public static ExecutionSpanBuilder getExecutionSpanBuilder() {
@@ -49,7 +49,7 @@ public class ExecutionSpan implements InternalSpan {
   private final Map<String, String> attributes = new HashMap<>();
   private final Set<SpanError> errors = new HashSet<>();
 
-  private ExecutionSpan(StartSpanInfo spanCustomizationInfo, Long startTime,
+  private ExecutionSpan(InitialSpanInfo spanCustomizationInfo, Long startTime,
                         InternalSpan parent) {
     this.spanCustomizationInfo = spanCustomizationInfo;
     this.startTime = startTime;
@@ -179,12 +179,12 @@ public class ExecutionSpan implements InternalSpan {
     private InternalSpan parent;
     private Long startTime;
     private SpanExporterFactory spanExporterFactory;
-    private StartSpanInfo startSpanInfo;
+    private InitialSpanInfo initialSpanInfo;
 
     private ExecutionSpanBuilder() {}
 
-    public ExecutionSpanBuilder withStartSpanInfo(StartSpanInfo spanCustomizationInfo) {
-      this.startSpanInfo = spanCustomizationInfo;
+    public ExecutionSpanBuilder withStartSpanInfo(InitialSpanInfo spanCustomizationInfo) {
+      this.initialSpanInfo = spanCustomizationInfo;
       return this;
     }
 
@@ -207,12 +207,12 @@ public class ExecutionSpan implements InternalSpan {
         throw new IllegalArgumentException(THERE_IS_NO_SPAN_FACTORY_MESSAGE);
       }
 
-      ExecutionSpan executionSpan = new ExecutionSpan(startSpanInfo,
+      ExecutionSpan executionSpan = new ExecutionSpan(initialSpanInfo,
                                                       startTime,
                                                       parent);
 
 
-      executionSpan.spanExporter = spanExporterFactory.getSpanExporter(executionSpan, startSpanInfo);
+      executionSpan.spanExporter = spanExporterFactory.getSpanExporter(executionSpan, initialSpanInfo);
 
       return executionSpan;
     }
