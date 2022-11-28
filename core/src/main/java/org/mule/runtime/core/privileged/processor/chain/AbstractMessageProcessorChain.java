@@ -71,7 +71,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
-import org.mule.runtime.core.api.tracing.customization.NoExportableFixedNameStartEventStartSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.NoExportableFixedNameEventStartEventStartSpanInfoProvider;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -537,7 +537,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           new ComponentCoreEventStartSpanInfoProvider((Component) processor).get(event);
     } else {
       // Other processors are not exported
-      startSpanInfo = new NoExportableFixedNameStartEventStartSpanInfoProvider("unknown").get(event);
+      startSpanInfo = new NoExportableFixedNameEventStartEventStartSpanInfoProvider("unknown").get(event);
     }
 
     // We start the component verifying that the current span is the span corresponding to
