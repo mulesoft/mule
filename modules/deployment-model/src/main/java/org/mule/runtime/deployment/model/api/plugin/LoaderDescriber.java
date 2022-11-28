@@ -11,7 +11,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 
 /**
  * Generic descriptor that will be used to describe parameterization to construct {@link ExtensionModel}, {@link ClassLoader} and
- * any other descriptor that may arise in a future of {@link ArtifactPluginDescriptor}.
+ * any other descriptor that may arise in a future of
+ * {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor}.
  * <p/>
  * Each {@link LoaderDescriber} will have an ID that will be used to discover any loader that's responsible of working with the
  * current set of attributes. It's up to each loader to validate the types, size and all that matters around the attributes.
