@@ -12,13 +12,9 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static java.util.Collections.unmodifiableMap;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.internal.trace.DistributedTraceContext;
-import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextManager;
-import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextVisitor;
+import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,21 +22,15 @@ import java.util.Map;
  *
  * @since 4.5.0
  */
-public class PropagateAllDistributedTraceContextManager implements InternalDistributedTraceContextManager {
+public class PropagateAllDistributedTraceContextManager implements DistributedTraceContextManager {
 
   private Map<String, String> contextMap;
   private final CoreEvent coreEvent;
-  private final CoreEventTracer coreEventTracer;
+  private final EventTracer<CoreEvent> coreEventTracer;
 
-  public PropagateAllDistributedTraceContextManager(CoreEvent coreEvent, CoreEventTracer coreEventTracer) {
+  public PropagateAllDistributedTraceContextManager(CoreEvent coreEvent, EventTracer<CoreEvent> coreEventTracer) {
     this.coreEventTracer = coreEventTracer;
     this.coreEvent = coreEvent;
-  }
-
-  private void resolveContextMap(DistributedTraceContext distributedTraceContext) {
-    Map<String, String> contextMapToBuild = new HashMap<>(distributedTraceContext.tracingFieldsAsMap());
-    contextMapToBuild.putAll(distributedTraceContext.baggageItemsAsMap());
-    contextMap = unmodifiableMap(contextMapToBuild);
   }
 
   @Override
@@ -50,10 +40,7 @@ public class PropagateAllDistributedTraceContextManager implements InternalDistr
 
   @Override
   public Map<String, String> getRemoteTraceContextMap() {
-    if (contextMap == null) {
-      resolveContextMap(resolveDistributedTraceContext(coreEvent, coreEventTracer));
-    }
-    return contextMap;
+    return unmodifiableMap(resolveDistributedTraceContext(coreEvent, coreEventTracer));
   }
 
   @Override
@@ -64,16 +51,10 @@ public class PropagateAllDistributedTraceContextManager implements InternalDistr
   @Override
   public void addCurrentSpanAttribute(String key, String value) {
     coreEventTracer.addCurrentSpanAttribute(coreEvent, key, value);
-
   }
 
   @Override
   public void addCurrentSpanAttributes(Map<String, String> attributes) {
     coreEventTracer.addCurrentSpanAttributes(coreEvent, attributes);
-  }
-
-  @Override
-  public <T> T visit(InternalDistributedTraceContextVisitor<T> visitor) {
-    return visitor.accept(this);
   }
 }

@@ -12,6 +12,8 @@ import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
@@ -42,6 +44,7 @@ import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaul
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
@@ -63,6 +66,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
@@ -81,6 +85,8 @@ import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
+import org.mule.runtime.core.internal.profiling.NoopCoreEventTracer;
+import org.mule.runtime.core.internal.profiling.NoopSpanExporterFactory;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
@@ -98,6 +104,9 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
+import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -156,6 +165,10 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
       registerObject(MULE_PROFILING_SERVICE_KEY, new NoOpProfilingService(), muleContext);
     }
+
+    configureCoreTracer(muleContext);
+
+    configureSpanExporterFactory(muleContext);
 
     registerObject(ComponentInitialStateManager.SERVICE_ID, new ComponentInitialStateManager() {
 
@@ -290,5 +303,15 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     QueueManager queueManager = new TransactionalQueueManager();
     registerObject(OBJECT_QUEUE_MANAGER, queueManager, muleContext);
     registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
+  }
+
+  protected void configureCoreTracer(MuleContext muleContext) throws RegistrationException {
+    EventTracer<CoreEvent> tracer = getNoopCoreEventTracer();
+    registerObject(MULE_CORE_EVENT_TRACER_KEY, tracer, muleContext);
+  }
+
+  protected void configureSpanExporterFactory(MuleContext muleContext) throws RegistrationException {
+    SpanExporterFactory spanExporterFactory = new NoopSpanExporterFactory();
+    registerObject(MULE_CORE_EXPORTER_FACTORY_KEY, spanExporterFactory, muleContext);
   }
 }

@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager;
+import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 /**
@@ -20,9 +21,9 @@ import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
  */
 public class DistributedTraceContextManagerResolver implements ArgumentResolver<DistributedTraceContextManager> {
 
-  private final CoreEventTracer coreEventTracer;
+  private final EventTracer<CoreEvent> coreEventTracer;
 
-  public DistributedTraceContextManagerResolver(CoreEventTracer coreEventTracer) {
+  public DistributedTraceContextManagerResolver(EventTracer<CoreEvent> coreEventTracer) {
     this.coreEventTracer = coreEventTracer;
   }
 

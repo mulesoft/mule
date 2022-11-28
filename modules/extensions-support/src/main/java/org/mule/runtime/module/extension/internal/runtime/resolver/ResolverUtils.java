@@ -29,17 +29,12 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanError;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.TracingCondition;
-import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager;
+import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -233,85 +228,12 @@ public class ResolverUtils {
 
 
   public static DistributedTraceContextManager resolveDistributedTraceContextManager(CoreEvent coreEvent,
-                                                                                     CoreEventTracer coreEventTracer) {
+                                                                                     EventTracer<CoreEvent> coreEventTracer) {
     return new PropagateAllDistributedTraceContextManager(coreEvent, coreEventTracer);
   }
 
-  public static DistributedTraceContext resolveDistributedTraceContext(CoreEvent event, CoreEventTracer coreEventTracer) {
-    Map<String, String> map = coreEventTracer.getDistributedTraceContextMap(event);
-
-    return new DistributedTraceContext() {
-
-      @Override
-      public Optional<String> getTraceFieldValue(String key) {
-        return Optional.ofNullable(map.get(key));
-      }
-
-      @Override
-      public Map<String, String> tracingFieldsAsMap() {
-        return map;
-      }
-
-      @Override
-      public Optional<String> getBaggageItem(String key) {
-        return empty();
-      }
-
-      @Override
-      public Map<String, String> baggageItemsAsMap() {
-        return new HashMap<>();
-      }
-
-      @Override
-      public DistributedTraceContext copy() {
-        return this;
-      }
-
-      @Override
-      public void endCurrentContextSpan(TracingCondition tracingCondition) {
-        // Nothing to do.
-      }
-
-      @Override
-      public void recordErrorAtCurrentSpan(InternalSpanError error) {
-        // Nothing to do.
-      }
-
-      @Override
-      public void setRootSpanName(String name) {
-        // Nothing to do.
-      }
-
-      @Override
-      public String getRootSpanName() {
-        return null;
-      }
-
-      @Override
-      public void setSpanRootAttribute(String key, String value) {
-
-      }
-
-      @Override
-      public Map<String, String> getSpanRootAttributes() {
-        return null;
-      }
-
-      @Override
-      public void updateSpanNameAndAttributes(InternalSpan exportOnEndSpan) {
-        // Nothing to do.
-      }
-
-      @Override
-      public void setCurrentSpan(InternalSpan span, TracingCondition tracingCondition) {
-        // Nothing to do.
-      }
-
-      @Override
-      public Optional<InternalSpan> getCurrentSpan() {
-        return empty();
-      }
-    };
+  public static Map<String, String> resolveDistributedTraceContext(CoreEvent event, EventTracer<CoreEvent> coreEventTracer) {
+    return coreEventTracer.getDistributedTraceContextMap(event);
   }
 
   private static Cursor resolveCursorProviderAsUnclosable(CursorProvider<?> cursorProvider) {
