@@ -10,7 +10,7 @@ package org.mule.runtime.core.api.tracing.customization;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.HashMap;
@@ -81,8 +81,8 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   }
 
   @Override
-  public StartExportInfo getStartExportInfo() {
-    return new StartExportInfo() {
+  public InitialExportInfo getInitialExportInfo() {
+    return new InitialExportInfo() {
 
       @Override
       public boolean isExportable() {

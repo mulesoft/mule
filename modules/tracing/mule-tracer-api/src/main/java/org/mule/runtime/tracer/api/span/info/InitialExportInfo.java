@@ -20,9 +20,9 @@ import static java.util.Collections.emptySet;
  *
  * @since 4.5.0
  */
-public interface StartExportInfo {
+public interface InitialExportInfo {
 
-  StartExportInfo DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO = new StartExportInfo() {
+  InitialExportInfo DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO = new InitialExportInfo() {
 
     @Override
     public boolean isExportable() {
@@ -30,7 +30,7 @@ public interface StartExportInfo {
     }
   };
 
-  StartExportInfo NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO = new StartExportInfo() {
+  InitialExportInfo NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO = new InitialExportInfo() {
 
     @Override
     public boolean isExportable() {

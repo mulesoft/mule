@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.HashSet;
@@ -80,7 +80,7 @@ public class OpenTelemetrySpanExporterTestCase {
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
     when(initialSpanInfo.isPolicySpan()).thenReturn(isPolicy);
     when(initialSpanInfo.isRootSpan()).thenReturn(isRoot);
-    when(initialSpanInfo.getStartExportInfo()).thenReturn(new StartExportInfo() {
+    when(initialSpanInfo.getInitialExportInfo()).thenReturn(new InitialExportInfo() {
 
       @Override
       public boolean isExportable() {

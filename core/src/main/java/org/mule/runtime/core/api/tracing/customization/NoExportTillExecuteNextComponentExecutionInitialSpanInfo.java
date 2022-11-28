@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.tracing.customization;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 
 /**
  * A {@link ComponentExecutionInitialSpanInfo} that indicates that a hierarchy of spans shouldn't be exported till execute-next
@@ -27,8 +27,8 @@ public class NoExportTillExecuteNextComponentExecutionInitialSpanInfo extends Co
   }
 
   @Override
-  public StartExportInfo getStartExportInfo() {
-    return new NoExportTillSpanWithNameStartExportInfo(EXECUTE_NEXT, true);
+  public InitialExportInfo getInitialExportInfo() {
+    return new NoExportTillSpanWithNameInitialExportInfo(EXECUTE_NEXT, true);
   }
 
   @Override

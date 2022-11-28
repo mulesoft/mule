@@ -23,7 +23,7 @@ import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORT
 public class NoopSpanExporterFactory implements SpanExporterFactory {
 
   @Override
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo startExportInfo) {
+  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
     return NOOP_EXPORTER;
   }
 

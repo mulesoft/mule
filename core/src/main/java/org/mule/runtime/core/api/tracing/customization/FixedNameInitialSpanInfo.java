@@ -7,9 +7,9 @@
 
 package org.mule.runtime.core.api.tracing.customization;
 
-import static org.mule.runtime.tracer.api.span.info.StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
@@ -32,7 +32,7 @@ public class FixedNameInitialSpanInfo implements InitialSpanInfo {
 
 
   @Override
-  public StartExportInfo getStartExportInfo() {
+  public InitialExportInfo getInitialExportInfo() {
     return DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
 }

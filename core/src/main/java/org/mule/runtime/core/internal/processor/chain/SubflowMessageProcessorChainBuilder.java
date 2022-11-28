@@ -40,7 +40,7 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 
@@ -155,8 +155,8 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
         }
 
         @Override
-        public StartExportInfo getStartExportInfo() {
-          return StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+        public InitialExportInfo getInitialExportInfo() {
+          return InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
         }
       }
     }

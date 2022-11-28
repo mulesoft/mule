@@ -7,18 +7,18 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import org.mule.runtime.core.api.tracing.customization.NoExportTillSpanWithNameStartExportInfo;
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.core.api.tracing.customization.NoExportTillSpanWithNameInitialExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.Set;
 
 public class NoExportInitialSpanInfo implements InitialSpanInfo {
 
-  private final NoExportTillSpanWithNameStartExportInfo startExportInfo;
+  private final NoExportTillSpanWithNameInitialExportInfo initialExportInfo;
 
   public NoExportInitialSpanInfo(Set<String> noExportUntil) {
-    this.startExportInfo = new NoExportTillSpanWithNameStartExportInfo(noExportUntil, false);;
+    this.initialExportInfo = new NoExportTillSpanWithNameInitialExportInfo(noExportUntil, false);;
   }
 
   @Override
@@ -28,7 +28,7 @@ public class NoExportInitialSpanInfo implements InitialSpanInfo {
 
 
   @Override
-  public StartExportInfo getStartExportInfo() {
-    return startExportInfo;
+  public InitialExportInfo getInitialExportInfo() {
+    return initialExportInfo;
   }
 }

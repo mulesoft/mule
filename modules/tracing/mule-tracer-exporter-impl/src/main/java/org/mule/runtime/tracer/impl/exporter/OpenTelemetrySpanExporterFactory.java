@@ -25,9 +25,9 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
   MuleContext muleContext;
 
   @Override
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo) {
+  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
     return builder()
-        .withStartSpanInfo(initialSpanInfo)
+        .withStartSpanInfo(initialExportInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
         .withInternalSpan(internalSpan)

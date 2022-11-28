@@ -54,5 +54,5 @@ public interface InitialSpanInfo {
   /**
    * @return initial information concerning the export of the span.
    */
-  StartExportInfo getStartExportInfo();
+  InitialExportInfo getInitialExportInfo();
 }

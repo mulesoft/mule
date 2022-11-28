@@ -13,7 +13,7 @@ import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.getTr
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-import org.mule.runtime.tracer.api.span.info.StartExportInfo;
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -44,18 +44,18 @@ public class MuleOpenTelemetrySpanProvider {
                                                               InitialSpanInfo initialSpanInfo,
                                                               String serviceNAme) {
 
-    StartExportInfo startExportInfo = initialSpanInfo.getStartExportInfo();
+    InitialExportInfo initialExportInfo = initialSpanInfo.getInitialExportInfo();
 
-    if (!startExportInfo.isExportable()) {
+    if (!initialExportInfo.isExportable()) {
       return getNonExportableSpan(internalSpan);
     }
 
-    return getExportableSpan(internalSpan, startExportInfo, serviceNAme, initialSpanInfo.isPolicySpan(),
+    return getExportableSpan(internalSpan, initialExportInfo, serviceNAme, initialSpanInfo.isPolicySpan(),
                              initialSpanInfo.isRootSpan());
   }
 
   private static MuleOpenTelemetrySpan getExportableSpan(InternalSpan internalSpan,
-                                                         StartExportInfo exportSpanCustomizationInfo,
+                                                         InitialExportInfo initialExportInfo,
                                                          String serviceName,
                                                          boolean isPolicy,
                                                          boolean isRoot) {
@@ -77,7 +77,7 @@ public class MuleOpenTelemetrySpanProvider {
     }
 
     DecoratedMuleOpenTelemetrySpan decoratedMuleOpenTelemetrySpan = new DecoratedMuleOpenTelemetrySpan(spanBuilder.startSpan());
-    decoratedMuleOpenTelemetrySpan.setNoExportUntil(exportSpanCustomizationInfo.noExportUntil());
+    decoratedMuleOpenTelemetrySpan.setNoExportUntil(initialExportInfo.noExportUntil());
     decoratedMuleOpenTelemetrySpan
         .setRoot(isRoot);
     decoratedMuleOpenTelemetrySpan.setPolicy(isPolicy);
