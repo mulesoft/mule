@@ -14,6 +14,7 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -33,6 +34,7 @@ import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
@@ -53,6 +55,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.processor.ContextPropagationChecker;
 
 import java.io.StringBufferInputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,6 +245,28 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     expectedException.expect(instanceOf(MuleRuntimeException.class));
     router.process(CoreEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
+  }
+
+  @Test
+  @Issue("W-11932094")
+  @Description("An unmodifiable list of a Scatter Gather route must be able to be merged with the variables of the other routes.")
+  public void mergeVariables2() throws Exception {
+    List<String> unmodifiableList = Collections.singletonList("value1");
+    MessageProcessorChain route1 = newChain(empty(), event -> eventWithVariable(event, unmodifiableList));
+    MessageProcessorChain route2 = newChain(empty(), event -> eventWithVariable(event, "value2"));
+
+    muleContext.getInjector().inject(router);
+    router.setRoutes(asList(route1, route2));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    CoreEvent process = router.process(CoreEvent.builder(testEvent()).message(Message.of(TEST_PAYLOAD)).build());
+    List<String> list = (List) process.getVariables().get("key").getValue();
+    assertThat(list, containsInAnyOrder("value1", "value2"));
+  }
+
+  private CoreEvent eventWithVariable(CoreEvent event, Object object) {
+    return CoreEvent.builder(event).addVariable("key", object).build();
   }
 
   @Test
