@@ -85,8 +85,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
   protected Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
   protected Set<BundleDescriptor> sharedDeployableBundleDescriptors;
-  protected Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies =
-      emptyMap();
+  protected Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   protected File deployableArtifactRepositoryFolder;
   private final Optional<MavenReactorResolver> mavenReactorResolver;
@@ -281,7 +280,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));
   }
 
-  protected void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
+  private void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
     // Resolve the dependencies of each deployable's dependency
     pluginsArtifactDependencies =
         new DeployablePluginsDependenciesResolver().resolve(deployableMavenBundleDependencies);
