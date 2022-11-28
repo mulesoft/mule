@@ -14,21 +14,22 @@ import java.util.Set;
 
 
 /**
- * A {@link StartExportInfo} that indicates that the span shouldn't be exported.
+ * A {@link StartExportInfo} that indicates that the span shouldn't be exported until
+ * a span with certain names is found.
  *
  * @since 4.5.0
  */
-public class NoExportableTillStartExportInfo implements StartExportInfo {
+public class NoExportableTillSpanWithNameStartExportInfo implements StartExportInfo {
 
   private Set<String> resetSpans = new HashSet<>();
   private boolean exportable;
 
-  public NoExportableTillStartExportInfo(String resetSpan, boolean exportable) {
+  public NoExportableTillSpanWithNameStartExportInfo(String resetSpan, boolean exportable) {
     this.resetSpans.add(resetSpan);
     this.exportable = exportable;
   }
 
-  public NoExportableTillStartExportInfo(Set<String> resetSpans, boolean exportable) {
+  public NoExportableTillSpanWithNameStartExportInfo(Set<String> resetSpans, boolean exportable) {
     this.resetSpans.addAll(resetSpans);
     this.exportable = exportable;
   }

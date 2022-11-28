@@ -27,7 +27,7 @@ public class NoExportableTillExecuteNextComponentCoreStartSpanInfo extends Compo
 
   @Override
   public StartExportInfo getStartExportInfo() {
-    return new NoExportableTillStartExportInfo(EXECUTE_NEXT, true);
+    return new NoExportableTillSpanWithNameStartExportInfo(EXECUTE_NEXT, true);
   }
 
   @Override

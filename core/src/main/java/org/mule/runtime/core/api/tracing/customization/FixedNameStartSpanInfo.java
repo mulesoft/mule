@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.api.tracing.customization;
 
+import static org.mule.runtime.tracer.api.span.info.StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+
 import org.mule.runtime.tracer.api.span.info.StartExportInfo;
 import org.mule.runtime.tracer.api.span.info.StartSpanInfo;
 
@@ -31,6 +33,6 @@ public class FixedNameStartSpanInfo implements StartSpanInfo {
 
   @Override
   public StartExportInfo getStartExportInfo() {
-    return StartExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+    return DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
 }
