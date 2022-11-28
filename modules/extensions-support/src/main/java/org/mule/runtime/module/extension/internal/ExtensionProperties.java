@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+import static org.mule.runtime.extension.api.loader.ExtensionLoadingContext.EXTENSION_LOADER_PROPERTY_PREFIX;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
@@ -110,8 +110,7 @@ public class ExtensionProperties {
    *
    * @since 1.4.0
    */
-  public static final String DISABLE_COMPONENT_IGNORE =
-      ExtensionLoadingContext.EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_COMPONENT_IGNORE";
+  public static final String DISABLE_COMPONENT_IGNORE = EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_COMPONENT_IGNORE";
 
   /**
    * When present, adds to polling sources the parameter to configure the item limit per poll feature.
@@ -119,7 +118,7 @@ public class ExtensionProperties {
    * @since 1.4.0
    */
   public static final String ENABLE_POLLING_SOURCE_LIMIT_PARAMETER =
-      ExtensionLoadingContext.EXTENSION_LOADER_PROPERTY_PREFIX + "ENABLE_POLLING_SOURCE_LIMIT";
+      EXTENSION_LOADER_PROPERTY_PREFIX + "ENABLE_POLLING_SOURCE_LIMIT";
 
   /**
    * When present, the execution of any {@link DeclarationEnricher} that adds descriptions to a {@link ExtensionDeclaration} is
@@ -128,7 +127,7 @@ public class ExtensionProperties {
    * @since 4.5
    */
   public static final String DISABLE_DESCRIPTIONS_ENRICHMENT =
-      ExtensionLoadingContext.EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_DESCRIPTIONS_ENRICHMENT";
+      EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_DESCRIPTIONS_ENRICHMENT";
 
   private ExtensionProperties() {}
 }
