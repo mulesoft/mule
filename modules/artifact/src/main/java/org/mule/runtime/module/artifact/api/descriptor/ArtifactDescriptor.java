@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -18,8 +17,6 @@ import org.mule.runtime.api.meta.MuleVersion;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.Properties;
 
 @NoExtend
 public class ArtifactDescriptor {
