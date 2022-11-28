@@ -12,13 +12,13 @@ import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.getPr
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.getTracer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigurationDiscoverer.discoverSpanExporterConfiguration;
 
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-import org.mule.runtime.tracer.impl.exporter.config.SystemPropertiesSpanExporterConfiguration;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -34,7 +34,7 @@ import io.opentelemetry.context.propagation.TextMapGetter;
  */
 public class MuleOpenTelemetrySpanProvider {
 
-  private static final SpanExporterConfiguration CONFIGURATION = new SystemPropertiesSpanExporterConfiguration();
+  private static final SpanExporterConfiguration CONFIGURATION = discoverSpanExporterConfiguration();
 
   private static final TextMapGetter<Map<String, String>> OPEN_TELEMETRY_SPAN_GETTER = new MuleOpenTelemetryRemoteContextGetter();
 
