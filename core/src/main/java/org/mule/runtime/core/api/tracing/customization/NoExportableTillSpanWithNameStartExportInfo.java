@@ -14,8 +14,7 @@ import java.util.Set;
 
 
 /**
- * A {@link StartExportInfo} that indicates that the span shouldn't be exported until
- * a span with certain names is found.
+ * A {@link StartExportInfo} that indicates that the span shouldn't be exported until a span with certain names is found.
  *
  * @since 4.5.0
  */
