@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDep
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 import io.qameta.allure.Feature;
@@ -38,11 +39,17 @@ public class LightweightDeployableProjectModelBuilderTestCase {
 
   @Rule
   public SystemProperty repositoryLocation =
-      new SystemProperty("muleRuntimeConfig.maven.repositoryLocation", temporaryFolder.getRoot().getAbsolutePath());
+      new SystemProperty("muleRuntimeConfig.maven.repositoryLocation", temporaryFolder.newFolder().getAbsolutePath());
+  @Rule
+  public SystemProperty localPluginDirectory =
+      new SystemProperty("localPluginDirectory", temporaryFolder.newFolder().getAbsolutePath());
+
+  public LightweightDeployableProjectModelBuilderTestCase() throws IOException {}
 
   @Test
   public void createDeployableProjectModelWithSystemScopePlugin() throws Exception {
-    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
+    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-dependency"),
+                    new File(localPluginDirectory.getValue()));
     installArtifact(getResourceFolder("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
 
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/lightweight/plugin-dependency-as-system");
