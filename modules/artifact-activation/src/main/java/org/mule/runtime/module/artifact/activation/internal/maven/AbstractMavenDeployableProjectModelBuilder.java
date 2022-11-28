@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.BundleScope.SYSTEM;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -18,6 +19,7 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
@@ -27,7 +29,9 @@ import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_A
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -189,7 +193,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
   /**
    * Resolves the dependencies of the deployable in the various forms needed to obtain the {@link DeployableProjectModel}.
-   * 
+   *
    * @param aetherMavenClient             the configured {@link AetherMavenClient}.
    * @param pom                           POM file.
    * @param pomModel                      parsed POM model.
@@ -203,6 +207,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     // Resolve the Maven bundle dependencies
     deployableMavenBundleDependencies =
         deployableDependencyResolver.resolveDeployableDependencies(pom, isIncludeTestDependencies(), empty());
+
+    // MTF/MUnit declares the mule-plugin being tested as system scope, therefore its transitive dependencies
+    // will not be included in the dependency graph of the deployable artifact and need to be resolved separately
+    deployableMavenBundleDependencies = resolveSystemScopeDependencies(aetherMavenClient, deployableMavenBundleDependencies);
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
     List<Artifact> deployableArtifactDependencies =
@@ -225,6 +233,21 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
                     && bd.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId())))
             .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
             .collect(toSet());
+  }
+
+  private List<BundleDependency> resolveSystemScopeDependencies(AetherMavenClient aetherMavenClient,
+                                                                List<BundleDependency> deployableMavenBundleDependencies) {
+    return deployableMavenBundleDependencies.stream().map(bundleDependency -> {
+      if (MULE_PLUGIN_CLASSIFIER.equals(bundleDependency.getDescriptor().getClassifier().orElse(null))
+          && SYSTEM.equals(bundleDependency.getScope())) {
+        return aetherMavenClient.resolveArtifactDependencies(singletonList(bundleDependency.getDescriptor()),
+                                                             of(deployableArtifactRepositoryFolder),
+                                                             empty())
+            .get(0);
+      }
+
+      return bundleDependency;
+    }).collect(toList());
   }
 
   private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
