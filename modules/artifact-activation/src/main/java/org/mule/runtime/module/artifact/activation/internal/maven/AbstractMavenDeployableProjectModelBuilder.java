@@ -244,7 +244,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   /**
    * Get the {@link MavenReactorResolver} configured.
    *
-   * @return the {@link MavenReactorResolver}.
+   * @return an {@link Optional} {@link MavenReactorResolver}.
    */
   protected Optional<MavenReactorResolver> getMavenReactorResolver() {
     return empty();
