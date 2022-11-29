@@ -27,8 +27,8 @@ import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashSet;

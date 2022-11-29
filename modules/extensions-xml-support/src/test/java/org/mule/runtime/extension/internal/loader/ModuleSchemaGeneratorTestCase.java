@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
@@ -43,9 +44,9 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
 
-  private DefaultExtensionSchemaGenerator extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
+  private final DefaultExtensionSchemaGenerator extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
 
-  @Parameterized.Parameters(name = "{index}: Validating xsd for {2}")
+  @Parameterized.Parameters(name = "{index}: Validating xsd for {1}")
   public static Collection<Object[]> data() {
     final List<String> extensions = asList(
                                            "module-namespace-custom",

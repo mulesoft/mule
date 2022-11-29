@@ -19,8 +19,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.privileged.profiling.CapturedEventData;
-import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy;
 

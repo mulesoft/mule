@@ -33,12 +33,12 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -89,7 +89,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(deserialized);
 
     // Assert that the the distributed trace context is not null.
-    assertNotNull(((DistributedTraceContextAware) deserialized.getContext()).getDistributedTraceContext());
+    assertNotNull(((SpanContextAware) deserialized.getContext()).getSpanContext());
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());

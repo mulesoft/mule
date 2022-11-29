@@ -54,7 +54,6 @@ import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -64,6 +63,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,11 +101,11 @@ public class MessageProcessors {
   }
 
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
-                                               SpanCustomizationInfo spanCustomizationInfo) {
+                                               EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
-      return buildNewChainWithListOfProcessors(processingStrategy, processors, spanCustomizationInfo);
+      return buildNewChainWithListOfProcessors(processingStrategy, processors, eventBasedStartStartInfoProvider);
     }
   }
 
@@ -133,32 +133,32 @@ public class MessageProcessors {
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
                                                                         String name,
-                                                                        SpanCustomizationInfo spanCustomizationInfo) {
+                                                                        EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
     defaultMessageProcessorChainBuilder.setName(name);
-    defaultMessageProcessorChainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
+    defaultMessageProcessorChainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
-                                                                        SpanCustomizationInfo spanCustomizationInfo) {
+                                                                        EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
-    defaultMessageProcessorChainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
+    defaultMessageProcessorChainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
-                                                                        SpanCustomizationInfo spanCustomizationInfo) {
+                                                                        EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
-    defaultMessageProcessorChainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
+    defaultMessageProcessorChainBuilder.setEventBasedInitialSpanInfoProvider(eventBasedStartStartInfoProvider);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 

@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.source.trace;
 
 import static java.util.Collections.emptyMap;
 
-import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextManager;
-import org.mule.runtime.module.extension.internal.runtime.tracing.InternalDistributedTraceContextVisitor;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.util.HashMap;
@@ -21,7 +19,7 @@ import java.util.Map;
  *
  * @since 4.5.0
  */
-public class SourceDistributedSourceTraceContext implements InternalDistributedTraceContextManager {
+public class SourceDistributedSourceTraceContext implements DistributedTraceContextManager {
 
   private Map<String, String> remoteTraceContextMap = emptyMap();
   private String name;
@@ -58,10 +56,5 @@ public class SourceDistributedSourceTraceContext implements InternalDistributedT
 
   public String getSpanName() {
     return name;
-  }
-
-  @Override
-  public <T> T visit(InternalDistributedTraceContextVisitor<T> visitor) {
-    return visitor.accept(this);
   }
 }
