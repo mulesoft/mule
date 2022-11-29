@@ -347,9 +347,9 @@ public class HeisenbergOperations implements Disposable {
                                       org.mule.sdk.api.runtime.process.CompletionCallback<String, Void> callback)
       throws MuleException {
 
-    extensionsClient.<String, Void>executeAsync(extensionName,
-                                                operationName,
-                                                getClientParameterizer(configName, operationParameters))
+    extensionsClient.<String, Void>execute(extensionName,
+                                           operationName,
+                                           getClientParameterizer(configName, operationParameters))
         .whenComplete((result, e) -> {
           if (e != null) {
             callback.error(e);

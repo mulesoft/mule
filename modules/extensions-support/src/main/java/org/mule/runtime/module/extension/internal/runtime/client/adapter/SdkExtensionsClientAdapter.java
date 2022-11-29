@@ -28,11 +28,11 @@ public class SdkExtensionsClientAdapter implements ExtensionsClient {
   }
 
   @Override
-  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension,
-                                                             String operation,
-                                                             Consumer<OperationParameterizer> parameters) {
+  public <T, A> CompletableFuture<Result<T, A>> execute(String extension,
+                                                        String operation,
+                                                        Consumer<OperationParameterizer> parameters) {
     CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
-    delegate.executeAsync(extension, operation, realParams -> parameters.accept(new SdkOperationParameterizerAdapter(realParams)))
+    delegate.execute(extension, operation, realParams -> parameters.accept(new SdkOperationParameterizerAdapter(realParams)))
         .whenComplete((v, e) -> {
           if (e != null) {
             future.completeExceptionally(e);
