@@ -82,10 +82,11 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
-import static com.google.common.collect.ImmutableSet.of;
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+
+import static com.google.common.collect.ImmutableSet.of;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -1032,7 +1033,7 @@ class MuleExtensionModelDeclarer {
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
     declareExpressionLanguage(configuration.withOptionalComponent("expression-language"));
-    declareExtraAppConfigs(configuration);
+    declareConfigurationElementsPlaceholder(configuration);
 
     final ParameterGroupDeclarer params = configuration.onDefaultParameterGroup();
     params
@@ -1123,8 +1124,9 @@ class MuleExtensionModelDeclarer {
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
   }
 
-  private void declareExtraAppConfigs(ConstructDeclarer configuration) {
-    configuration.withOptionalComponent("extraAppConfig")
+  // See the "abstract-configuration-element" in the mule-core-common.xsd file. It represents the same placeholder.
+  private void declareConfigurationElementsPlaceholder(ConstructDeclarer configuration) {
+    configuration.withOptionalComponent("abstractConfigurationElement")
         .withAllowedStereotypes(CONFIGURATION_ELEMENT)
         .describedAs("A placeholder for configuration elements.");
   }
