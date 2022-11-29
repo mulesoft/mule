@@ -19,11 +19,9 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static java.lang.Boolean.parseBoolean;
 import static java.nio.file.Files.find;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -34,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -45,6 +42,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
 
   private final boolean isDomain;
   private final Optional<MuleDeployableModel> model;
+
 
   public LightweightDeployableProjectModelBuilder(File projectFolder, boolean isDomain) {
     this(projectFolder, empty(), isDomain);
