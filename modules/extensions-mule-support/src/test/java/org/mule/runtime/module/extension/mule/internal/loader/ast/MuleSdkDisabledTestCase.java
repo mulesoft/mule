@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.mule.internal.loader.ast;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
@@ -66,7 +65,8 @@ public class MuleSdkDisabledTestCase extends AbstractMuleSdkAstTestCase {
                         "The component 'operation:payload-type' doesn't belong to any extension model",
                         "The component 'operation:body' doesn't belong to any extension model");
 
-    assertAllValidationsLevel(validationResult, ERROR);
+    // TODO (W-12050227): Change to ERROR when possible.
+    assertAllValidationsLevel(validationResult, WARN);
   }
 
   @Test
