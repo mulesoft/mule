@@ -6,9 +6,6 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static java.lang.String.format;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -19,6 +16,10 @@ import static org.mule.sdk.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
+
+import static java.lang.String.format;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -61,6 +62,7 @@ import org.mule.sdk.api.annotation.deprecated.Deprecated;
 import org.mule.sdk.api.annotation.error.Throws;
 import org.mule.sdk.api.annotation.param.display.Example;
 import org.mule.sdk.api.annotation.param.display.Summary;
+import org.mule.sdk.api.client.OperationParameterizer;
 import org.mule.sdk.api.future.SecretSdkFutureFeature;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
@@ -96,6 +98,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -338,14 +341,31 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String sdkExecuteForeingOrders(String extensionName, String operationName, @Optional String configName,
-                                        org.mule.sdk.api.client.ExtensionsClient extensionsClient,
-                                        Map<String, Object> operationParameters)
+  public void sdkExecuteForeingOrders(String extensionName, String operationName, @Optional String configName,
+                                      org.mule.sdk.api.client.ExtensionsClient extensionsClient,
+                                      Map<String, Object> operationParameters,
+                                      org.mule.sdk.api.runtime.process.CompletionCallback<String, Void> callback)
       throws MuleException {
-    Object output =
-        extensionsClient.execute(extensionName, operationName, createSdkOperationParameters(configName, operationParameters))
-            .getOutput();
-    return output instanceof TypedValue ? (String) ((TypedValue) output).getValue() : (String) output;
+
+    extensionsClient.<String, Void>execute(extensionName,
+                                           operationName,
+                                           getClientParameterizer(configName, operationParameters))
+        .whenComplete((result, e) -> {
+          if (e != null) {
+            callback.error(e);
+          } else {
+            Object output = result.getOutput();
+            if (output instanceof TypedValue) {
+              TypedValue<String> typedValue = (TypedValue<String>) output;
+              result = org.mule.sdk.api.runtime.operation.Result.<String, Void>builder()
+                  .output(typedValue.getValue())
+                  .mediaType(typedValue.getDataType().getMediaType())
+                  .build();
+            }
+
+            callback.success(result);
+          }
+        });
   }
 
   private OperationParameters createOperationParameters(String configName, Map<String, Object> operationParameters) {
@@ -357,15 +377,16 @@ public class HeisenbergOperations implements Disposable {
     return builder.build();
   }
 
-  private org.mule.sdk.api.client.OperationParameters createSdkOperationParameters(String configName,
-                                                                                   Map<String, Object> operationParameters) {
-    org.mule.sdk.api.client.DefaultOperationParametersBuilder builder =
-        org.mule.sdk.api.client.DefaultOperationParameters.builder();
-    if (configName != null) {
-      builder.configName(configName);
-    }
-    operationParameters.forEach((key, value) -> builder.addParameter(key, value));
-    return builder.build();
+  private Consumer<OperationParameterizer> getClientParameterizer(String configName,
+                                                                  Map<String, Object> operationParameters) {
+    return params -> {
+      if (configName != null) {
+        params.withConfigRef(configName);
+      }
+
+      operationParameters.forEach((key, value) -> params.withParameter(key, value));
+
+    };
   }
 
   @MediaType(ANY)
