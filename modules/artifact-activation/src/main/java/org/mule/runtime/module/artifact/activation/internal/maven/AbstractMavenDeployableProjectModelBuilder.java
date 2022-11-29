@@ -242,7 +242,9 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   }
 
   /**
-   * Get the {@link MavenReactorResolver} configured.
+   * Get the {@link MavenReactorResolver} configured. If it is configured the {@link DeployableDependencyResolver} will look up
+   * the dependencies also in this repository. If {@link Optional#empty()} it will look up in the repositories configured in the
+   * system.
    *
    * @return an {@link Optional} {@link MavenReactorResolver}.
    */
