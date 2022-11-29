@@ -241,6 +241,11 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
             .collect(toSet());
   }
 
+  /**
+   * Get the {@link MavenReactorResolver} configured.
+   *
+   * @return the {@link MavenReactorResolver}.
+   */
   protected Optional<MavenReactorResolver> getMavenReactorResolver() {
     return empty();
   }
