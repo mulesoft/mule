@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -41,6 +44,8 @@ public class CraftedExtensionModelLoader extends ExtensionModelLoader {
 
   @Override
   protected void declareExtension(ExtensionLoadingContext context) {
+    context.addParameter(DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS, true);
+
     Class<?> delegateType = getDelegateType(context, context.getExtensionClassLoader());
 
     if (!ExtensionLoadingDelegate.class.isAssignableFrom(delegateType)) {

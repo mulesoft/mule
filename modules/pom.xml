@@ -51,6 +51,7 @@
         <module>tls</module>
         <module>soap-api</module>
         <module>extensions-soap-support</module>
+        <module>tracing</module>
         <module>tooling-support</module>
     </modules>
 

@@ -112,6 +112,7 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
    * Creates a {@link DeployableProjectModel} representing the structure of the artifact in {@code artifactLocation}.
    *
    * @param artifactLocation the artifact location.
+   * @param isDomain         whether the artifact is a domain.
    * @return the {@link DeployableProjectModel} representing the structure of the artifact.
    */
   protected DeployableProjectModel createDeployableProjectModel(File artifactLocation, boolean isDomain) {

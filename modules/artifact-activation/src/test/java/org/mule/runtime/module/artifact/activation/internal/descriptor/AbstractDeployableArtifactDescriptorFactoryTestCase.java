@@ -36,19 +36,35 @@ public class AbstractDeployableArtifactDescriptorFactoryTestCase extends Abstrac
   }
 
   protected ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
-    return createApplicationDescriptor(appPath, null);
+    return createApplicationDescriptor(appPath, false, null);
+  }
+
+  protected ApplicationDescriptor createApplicationDescriptor(String appPath, boolean includeTestDependencies)
+      throws URISyntaxException {
+    return createApplicationDescriptor(appPath, includeTestDependencies, null);
   }
 
   protected ApplicationDescriptor createApplicationDescriptor(String appPath, DomainDescriptorResolver domainDescriptorResolver)
       throws URISyntaxException {
-    DeployableProjectModel model = getDeployableProjectModel(appPath);
+    return createApplicationDescriptor(appPath, false, domainDescriptorResolver);
+  }
+
+  protected ApplicationDescriptor createApplicationDescriptor(String appPath, boolean includeTestDependencies,
+                                                              DomainDescriptorResolver domainDescriptorResolver)
+      throws URISyntaxException {
+    DeployableProjectModel model = getDeployableProjectModel(appPath, includeTestDependencies);
 
     return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
                                                                            domainDescriptorResolver);
   }
 
   protected DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    return new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath)).build();
+    return getDeployableProjectModel(deployablePath, false);
+  }
+
+  protected DeployableProjectModel getDeployableProjectModel(String deployablePath, boolean includeTestDependencies)
+      throws URISyntaxException {
+    return new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath), false, includeTestDependencies).build();
   }
 
   protected File getDeployableFolder(String appPath) throws URISyntaxException {

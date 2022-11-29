@@ -8,11 +8,14 @@ package org.mule.runtime.core.privileged.profiling;
 
 import static java.util.Collections.emptySet;
 
-import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
+import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 
 import java.util.Collection;
 
@@ -30,19 +33,22 @@ public interface PrivilegedProfilingService extends ProfilingService {
    */
   <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer);
 
+  void injectDistributedTraceContext(EventContext eventContext,
+                                     DistributedTraceContextGetter distributedTraceContextGetter);
+
   /**
-   * @return gets an {@link SpanExportManager}.
+   * @return gets an {@link SpanSnifferManager}.
    *
    *         This is used for capturing spans in privileged modules but should not be exposed as API.
    *
    * @since 4.5.0
    */
-  default SpanExportManager getSpanExportManager() {
-    return new SpanExportManager() {
+  default SpanSnifferManager getSpanExportManager() {
+    return new SpanSnifferManager() {
 
       @Override
-      public ExportedSpanCapturer getExportedSpanCapturer() {
-        return new ExportedSpanCapturer() {
+      public ExportedSpanSniffer getExportedSpanSniffer() {
+        return new ExportedSpanSniffer() {
 
           @Override
           public Collection<CapturedExportedSpan> getExportedSpans() {
@@ -57,25 +63,4 @@ public interface PrivilegedProfilingService extends ProfilingService {
       }
     };
   }
-
-  /**
-   * Starts a component span. This is used as a privileged api only for testing.
-   *
-   * @param coreEvent the {@link CoreEvent} that has hit the {@link Component}
-   * @param component the {@link Component} that was hit by the {@link CoreEvent}
-   *
-   * @since 4.5.0
-   */
-     // TODO: W-11486418 - Improve FlowRunner Creation of Spans
-  default void startComponentSpan(CoreEvent coreEvent, Component component) {}
-
-  /**
-   * End a component span. This is used as a privileged api only for testing.
-   *
-   * @param coreEvent the {@link CoreEvent}.
-   *
-   * @since 4.5.0
-   */
-     // TODO: W-11486418 - Improve FlowRunner Creation of Spans
-  default void endComponentSpan(CoreEvent coreEvent) {}
 }

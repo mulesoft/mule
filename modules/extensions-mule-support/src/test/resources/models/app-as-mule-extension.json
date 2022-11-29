@@ -4266,6 +4266,12 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "artifactCoordinates":
+    {
+      "artifact id":"mule-test",
+      "group id":"org.mule.tests",
+      "version":"1.0.0"
+    },
   "notifications": [],
   "errors": [
     {

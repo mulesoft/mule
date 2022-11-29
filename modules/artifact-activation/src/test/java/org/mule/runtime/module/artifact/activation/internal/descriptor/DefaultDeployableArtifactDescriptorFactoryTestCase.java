@@ -55,6 +55,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
                containsInAnyOrder("test-script.dwl", "app.xml"));
 
     assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(3));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().isIncludeTestDependencies(), is(false));
   }
 
   @Test
@@ -249,6 +250,25 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
         .collect(toList()), hasItems(hasProperty("name", equalTo("HTTP")), hasProperty("name", equalTo("Sockets"))));
+  }
+
+  @Test
+  public void applicationDescriptorWithIncludeTestDependencies() throws Exception {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/include-test-dependencies", true);
+
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().isIncludeTestDependencies(), is(true));
+
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(1));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(),
+               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-jms-connector")))));
+  }
+
+  @Test
+  public void applicationDescriptorWithoutIncludeTestDependencies() throws Exception {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/do-not-include-test-dependencies");
+
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().isIncludeTestDependencies(), is(false));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
   }
 
 }

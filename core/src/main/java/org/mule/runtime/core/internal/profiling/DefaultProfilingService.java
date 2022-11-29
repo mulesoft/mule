@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.empty;
@@ -26,14 +24,10 @@ import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer;
-import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
 
@@ -46,6 +40,9 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -58,14 +55,13 @@ import reactor.core.publisher.Mono;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  private static InternalSpanExportManager<EventContext> SPAN_EXPORT_MANAGER = getDefaultSpanExporterManager();
-
   private final boolean propagateTracingExceptions;
 
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
 
-  private DefaultCoreEventTracer eventTracer;
+  @Inject
+  private EventTracer<CoreEvent> eventTracer;
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
@@ -100,15 +96,6 @@ public class DefaultProfilingService extends AbstractProfilingService {
   public void initialise() throws InitialisationException {
     initialiseProfilingDataProducerIfNeeded();
     super.initialise();
-  }
-
-  private void getEventTracer() {
-    this.eventTracer = getCoreEventTracerBuilder()
-        .withSpanExporterManager(SPAN_EXPORT_MANAGER)
-        .withMuleConfiguration(muleContext.getConfiguration())
-        .withPropagateTracingExceptions(propagateTracingExceptions)
-        .withArtifactType(muleContext.getArtifactType())
-        .build();
   }
 
   @Override
@@ -194,10 +181,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public CoreEventTracer getCoreEventTracer() {
-    if (eventTracer == null) {
-      getEventTracer();
-    }
+  public EventTracer<CoreEvent> getCoreEventTracer() {
     return eventTracer;
   }
 
@@ -212,12 +196,13 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public SpanExportManager getSpanExportManager() {
-    return SPAN_EXPORT_MANAGER;
+  public void injectDistributedTraceContext(EventContext eventContext,
+                                            DistributedTraceContextGetter distributedTraceContextGetter) {
+    eventTracer.injectDistributedTraceContext(eventContext, distributedTraceContextGetter);
   }
 
   @Override
-  public void endComponentSpan(CoreEvent event) {
-    eventTracer.endCurrentSpan(event);
+  public SpanSnifferManager getSpanExportManager() {
+    return eventTracer.getSpanExporterManager();
   }
 }

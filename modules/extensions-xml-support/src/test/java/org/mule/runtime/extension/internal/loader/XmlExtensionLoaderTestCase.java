@@ -6,16 +6,6 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
@@ -23,15 +13,29 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECTION_CONFIG;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.of;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -53,6 +57,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
@@ -70,19 +75,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.collect.ImmutableSet;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import com.google.common.collect.ImmutableSet;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
+
+  private XmlExtensionModelLoader loader;
 
   private final boolean validateXml;
 
@@ -97,6 +106,11 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
    */
   public XmlExtensionLoaderTestCase(boolean validateXml) {
     this.validateXml = validateXml;
+  }
+
+  @Before
+  public void setUp() {
+    loader = new XmlExtensionModelLoader();
   }
 
   @Test
@@ -585,6 +599,24 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(connectionProviderModel.get().supportsConnectivityTesting(), is(true));
   }
 
+  @Test
+  @Issue("W-12003688")
+  public void dontSetDefaultValueToBooleanParams() throws Exception {
+    AtomicReference<ExtensionLoadingContext> contextRef = new AtomicReference<>();
+
+    loader = new XmlExtensionModelLoader() {
+
+      @Override
+      protected ExtensionModel doCreate(ExtensionLoadingContext context) {
+        contextRef.set(context);
+        return super.doCreate(context);
+      }
+    };
+
+    getExtensionModelFrom("modules/module-test-connection.xml");
+    assertThat(contextRef.get().getParameter(DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS), is(of(true)));
+  }
+
   /**
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
    * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
@@ -611,9 +643,9 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     if (!expectedResources.isEmpty()) {
       parameters.put(XmlExtensionModelLoader.RESOURCES_PATHS, expectedResources);
     }
-    final ExtensionModel extensionModel = new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
-                                                                                           getDefault(getDependencyExtensions()),
-                                                                                           parameters);
+    final ExtensionModel extensionModel = loader.loadExtensionModel(getClass().getClassLoader(),
+                                                                    getDefault(getDependencyExtensions()),
+                                                                    parameters);
     assertNoReconnectionIsAdded(extensionModel);
     return extensionModel;
   }

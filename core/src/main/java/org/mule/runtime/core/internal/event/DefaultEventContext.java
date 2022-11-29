@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext.emptyDistributedTraceContext;
-import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import static java.lang.System.identityHashCode;
@@ -17,11 +15,10 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.tracer.api.context.SpanContext.emptyDistributedTraceContext;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
-import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -45,6 +42,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.mule.runtime.tracer.api.context.SpanContextAware;
+import org.mule.runtime.tracer.api.context.SpanContext;
 import org.slf4j.Logger;
 
 /**
@@ -57,7 +56,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private static final Logger LOGGER = getLogger(DefaultEventContext.class);
 
   private static final long serialVersionUID = -3664490832964509653L;
-  private transient DistributedTraceContext distributedTraceContext;
+  private transient SpanContext distributedTraceContext;
 
   /**
    * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
@@ -324,7 +323,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  public DistributedTraceContext getDistributedTraceContext() {
+  public SpanContext getSpanContext() {
     if (distributedTraceContext == null) {
       distributedTraceContext = emptyDistributedTraceContext();
     }
@@ -332,7 +331,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     return distributedTraceContext;
   }
 
-  public void setDistributedTraceContext(DistributedTraceContext distributedTraceContext) {
+  public void setSpanContext(SpanContext distributedTraceContext) {
     this.distributedTraceContext = distributedTraceContext;
   }
 
@@ -344,7 +343,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final ComponentLocation componentLocation;
     private final String id;
     private final String correlationId;
-    private transient DistributedTraceContext distributedTraceContext;
+    private transient SpanContext spanContext;
     private final String rootId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -359,13 +358,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
           : Integer.toString(identityHashCode(this));
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
-      if (parent instanceof DistributedTraceContextAware) {
-        distributedTraceContext = getParentDistributedTraceContext((DistributedTraceContextAware) parent).copy();
+      if (parent instanceof SpanContextAware) {
+        spanContext = getParentDistributedTraceContext((SpanContextAware) parent).copy();
       }
     }
 
-    private DistributedTraceContext getParentDistributedTraceContext(DistributedTraceContextAware parent) {
-      return parent.getDistributedTraceContext();
+    private SpanContext getParentDistributedTraceContext(SpanContextAware parent) {
+      return parent.getSpanContext();
     }
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -389,17 +388,17 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public DistributedTraceContext getDistributedTraceContext() {
-      if (distributedTraceContext == null) {
-        distributedTraceContext = emptyDistributedEventContext();
+    public SpanContext getSpanContext() {
+      if (spanContext == null) {
+        spanContext = emptyDistributedTraceContext();
       }
 
-      return distributedTraceContext;
+      return spanContext;
     }
 
     @Override
-    public void setDistributedTraceContext(DistributedTraceContext distributedTraceContext) {
-      this.distributedTraceContext = distributedTraceContext;
+    public void setSpanContext(SpanContext spanContext) {
+      this.spanContext = spanContext;
     }
 
     @Override
