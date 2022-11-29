@@ -40,6 +40,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   public static final String CORRELATION_ID_KEY = "correlation.id";
   public static final String ARTIFACT_ID_KEY = "artifact.id";
   public static final String THREAD_START_ID_KEY = "thread.start.id";
+  public static final String THREAD_END_NAME_KEY = "thread.end.name";
   public static final String ARTIFACT_TYPE_ID = "artifact.type";
 
   private static final String NO_PARENT_SPAN = "0000000000000000";
@@ -866,6 +867,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     Map<String, String> basicAttributes = new HashMap<>();
     basicAttributes.put(CORRELATION_ID_KEY, "test-correlation-id");
     basicAttributes.put(THREAD_START_ID_KEY, "12");
+    basicAttributes.put(THREAD_END_NAME_KEY, "endThread");
     basicAttributes.put(ARTIFACT_ID_KEY, TEST_ARTIFACT_ID);
     basicAttributes.put(ARTIFACT_TYPE_ID, APP.getAsString());
     when(mockedSpan.getAttributes()).thenReturn(basicAttributes);

@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.adapter;
 
-import static org.mule.runtime.core.internal.util.message.SdkResultAdapter.from;
-
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
 import org.mule.sdk.api.client.ExtensionsClient;
-import org.mule.sdk.api.client.OperationParameters;
+import org.mule.sdk.api.client.OperationParameterizer;
 import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Adapts a legacy {@link org.mule.runtime.extension.api.client.ExtensionsClient} into a {@link ExtensionsClient}
@@ -30,13 +28,19 @@ public class SdkExtensionsClientAdapter implements ExtensionsClient {
   }
 
   @Override
-  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
-    return delegate.executeAsync(extension, operation, new LegacyOperationParametersAdapter(parameters))
-        .thenApply(SdkResultAdapter::from);
-  }
+  public <T, A> CompletableFuture<Result<T, A>> execute(String extension,
+                                                        String operation,
+                                                        Consumer<OperationParameterizer> parameters) {
+    CompletableFuture<Result<T, A>> future = new CompletableFuture<>();
+    delegate.execute(extension, operation, realParams -> parameters.accept(new SdkOperationParameterizerAdapter(realParams)))
+        .whenComplete((v, e) -> {
+          if (e != null) {
+            future.completeExceptionally(e);
+          } else {
+            future.complete(SdkResultAdapter.from(v));
+          }
+        });
 
-  @Override
-  public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters parameters) throws MuleException {
-    return from(delegate.execute(extension, operation, new LegacyOperationParametersAdapter(parameters)));
+    return future;
   }
 }
