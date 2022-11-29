@@ -82,7 +82,7 @@ public class AdditionalPluginDependenciesResolver {
 
   public Map<BundleDependency, List<BundleDependency>> resolveDependencies(List<BundleDependency> applicationDependencies,
                                                                            Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
-    addPluginDependenciesAdditionalLibraries(applicationDependencies);
+    // addPluginDependenciesAdditionalLibraries(applicationDependencies);
     Map<BundleDependency, List<BundleDependency>> pluginsWithAdditionalDeps = new LinkedHashMap<>();
     for (Plugin pluginWithAdditionalDependencies : pluginsWithAdditionalDependencies) {
       BundleDependency pluginBundleDependency =
