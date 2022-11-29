@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -106,26 +108,36 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
       Properties bootstrapProperties = bootstrapService.getProperties();
 
       for (Map.Entry entry : bootstrapProperties.entrySet()) {
+        logger.debug("Processing registryBootstrap entry: {}={}...", entry.getKey(), entry.getValue());
+
         final String propertyKey = (String) entry.getKey();
         final String propertyValue = (String) entry.getValue();
 
         if (!propertyKeyfilter.test(propertyKey)) {
+          logger.debug("Skipped registryBootstrap entry: {}", entry.getKey());
           continue;
         }
 
         if (propertyKey.contains(OBJECT_KEY)) {
+          logger.debug("Unnamed registryBootstrap entry: {}", entry.getKey());
           String newKey = propertyKey.substring(0, propertyKey.lastIndexOf(".")) + objectCounter++;
           unnamedObjects.add(createObjectBootstrapProperty(bootstrapService, newKey, propertyValue));
         } else if (TRANSFORMER_PREDICATE.test(propertyKey)) {
+          logger.debug("Transformer registryBootstrap entry: {}", entry.getKey());
           transformers.add(createTransformerBootstrapProperty(bootstrapService, propertyValue));
         } else if (propertyKey.contains(SINGLE_TX)) {
           if (!propertyKey.contains(TRANSACTION_RESOURCE_SUFFIX)) {
+            logger.debug("SingleTx Resource registryBootstrap entry: {}", entry.getKey());
             singleTransactionFactories.add(createTransactionFactoryBootstrapProperty(bootstrapService, bootstrapProperties,
                                                                                      propertyKey, propertyValue));
+          } else {
+            logger.debug("SingleTx registryBootstrap entry: {}", entry.getKey());
           }
         } else if (BINDING_PROVIDER_PREDICATE.test(propertyKey)) {
+          logger.debug("Binding Provider registryBootstrap entry: {}", entry.getKey());
           bindingProviders.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
         } else {
+          logger.debug("Named registryBootstrap entry: {}", entry.getKey());
           namedObjects.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
         }
       }
