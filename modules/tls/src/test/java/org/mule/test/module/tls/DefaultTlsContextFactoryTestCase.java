@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
@@ -108,14 +107,6 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
     expectedException.expect(IOException.class);
     expectedException.expectMessage(containsString("Resource non-existent-trust-store could not be found"));
     tlsContextFactory.setTrustStorePath("non-existent-trust-store");
-  }
-
-  @Test
-  public void insecureTrustStoreShouldNotBeConfigured() throws IOException {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
-    tlsContextFactory.setTrustStorePath("trustStore");
-    tlsContextFactory.setTrustStoreInsecure(true);
-    assertFalse(tlsContextFactory.isTrustStoreConfigured());
   }
 
   @Test
