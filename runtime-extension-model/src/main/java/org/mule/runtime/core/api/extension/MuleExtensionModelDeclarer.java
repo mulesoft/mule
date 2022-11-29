@@ -69,7 +69,7 @@ import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEF
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.EXTRA_APP_CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
@@ -1126,7 +1126,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareExtraAppConfigs(ConstructDeclarer configuration) {
     configuration.withOptionalComponent("extraAppConfig")
-        .withAllowedStereotypes(EXTRA_APP_CONFIG)
+        .withAllowedStereotypes(CONFIGURATION_ELEMENT)
         .describedAs("A placeholder for configuration elements.");
   }
 
