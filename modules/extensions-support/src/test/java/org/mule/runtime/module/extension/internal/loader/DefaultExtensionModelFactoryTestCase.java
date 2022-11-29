@@ -6,19 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -43,6 +30,23 @@ import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import static org.mule.test.vegan.extension.VeganExtension.KIWI;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -75,8 +79,8 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -101,14 +105,15 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import org.hamcrest.Matcher;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
@@ -143,7 +148,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void blockingExecutionTypes() {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
-                                                             "blockingNonBlocking", "callGusFringNonBlocking", "tapPhones");
+                                                             "blockingNonBlocking", "callGusFringNonBlocking", "tapPhones",
+                                                             "sdkExecuteForeingOrders");
 
     Reference<Boolean> cpuIntensive = new Reference<>(false);
     Reference<Boolean> blocking = new Reference<>(false);
@@ -153,7 +159,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
       protected void onOperation(OperationModel operation) {
         String operationName = operation.getName();
 
-        assertThat(operation.isBlocking(), is(!nonBlockingOperations.contains(operationName)));
+        Matcher<Iterable<? super String>> nonBlockingMatcher = hasItem(operationName);
+        assertThat(nonBlockingOperations, operation.isBlocking() ? not(nonBlockingMatcher) : nonBlockingMatcher);
 
         if (operationName.equals("approve")) {
           assertThat(operation.getExecutionType(), is(CPU_INTENSIVE));

@@ -105,9 +105,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private LoadingCache<OperationKey, OperationClient> clientCache;
 
   @Override
-  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extensionName,
-                                                             String operationName,
-                                                             Consumer<OperationParameterizer> parameters) {
+  public <T, A> CompletableFuture<Result<T, A>> execute(String extensionName,
+                                                        String operationName,
+                                                        Consumer<OperationParameterizer> parameters) {
 
     DefaultOperationParameterizer parameterizer = new DefaultOperationParameterizer();
     parameters.accept(parameterizer);
@@ -192,15 +192,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final ExtensionModel extensionModel = findExtension(extensionName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
-    return executeAsync(
-                        extensionName,
-                        operationName,
-                        parameterizer -> {
-                          setContextEvent(parameterizer, parameters);
-                          parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                          resolveLegacyParameters(parameterizer, parameters);
-                          configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                        });
+    return execute(
+                   extensionName,
+                   operationName,
+                   parameterizer -> {
+                     setContextEvent(parameterizer, parameters);
+                     parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+                     resolveLegacyParameters(parameterizer, parameters);
+                     configureLegacyRepeatableStreaming(parameterizer, operationModel);
+                   });
   }
 
   protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
