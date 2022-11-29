@@ -7,8 +7,9 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
@@ -24,6 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Configures a {@link BootstrapServiceDiscoverer} on an artifact's {@link MuleContext}
  * <p/>
@@ -32,6 +36,8 @@ import java.util.Properties;
  * services will then used to configure the context.
  */
 public class ArtifactBootstrapServiceDiscovererConfigurationBuilder extends AbstractConfigurationBuilder {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactBootstrapServiceDiscovererConfigurationBuilder.class);
 
   private final List<ArtifactPlugin> artifactPlugins;
 
@@ -58,6 +64,8 @@ public class ArtifactBootstrapServiceDiscovererConfigurationBuilder extends Abst
 
       while (resources.hasMoreElements()) {
         final URL localResource = resources.nextElement();
+        LOGGER.debug("Creating PropertiesBootstrapService from properties file: {}", localResource.toString());
+
         final Properties properties = PropertiesUtils.loadProperties(localResource);
         final BootstrapService pluginBootstrapService =
             new PropertiesBootstrapService(artifactPlugin.getArtifactClassLoader().getClassLoader(), properties);
