@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.beans.PropertyChangeListener;
@@ -90,7 +86,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
 
   private DeployableArtifactDescriptor getArtifactDescriptor(ArtifactClassLoader ownerClassLoader) {
     if (!(ownerClassLoader.getArtifactDescriptor() instanceof DeployableArtifactDescriptor)) {
-      throw new MuleRuntimeException(createStaticMessage("Artifact should be a deployable, i.e. an application or domain"));
+      throw new IllegalArgumentException("Artifact should be a deployable, i.e. an application or domain");
     }
 
     return ownerClassLoader.getArtifactDescriptor();
