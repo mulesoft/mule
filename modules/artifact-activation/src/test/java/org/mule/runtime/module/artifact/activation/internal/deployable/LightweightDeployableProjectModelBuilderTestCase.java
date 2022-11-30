@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -40,6 +41,7 @@ import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
+@Issue("W-12069164")
 public class LightweightDeployableProjectModelBuilderTestCase {
 
   @ClassRule
