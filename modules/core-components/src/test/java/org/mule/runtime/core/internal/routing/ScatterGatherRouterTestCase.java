@@ -77,9 +77,9 @@ import org.junit.runners.Parameterized;
 @Story(SCATTER_GATHER)
 public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
-  public static final String KEY = "key";
-  public static final String VALUE_1 = "value1";
-  public static final String VALUE_2 = "value2";
+  private static final String KEY = "key";
+  private static final String VALUE_1 = "value1";
+  private static final String VALUE_2 = "value2";
 
   @Rule
   public SystemProperty detailedCompositeRoutingExceptionLog;
@@ -257,8 +257,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Description("An unmodifiable list in the first Scatter Gather's route must be able to be merged with the variables of the other routes.")
   public void mergeVariablesWhenTheFirstRouteHasAnUnmodifiableList() throws Exception {
     List<String> unmodifiableList = Collections.singletonList(VALUE_1);
-    MessageProcessorChain route1 = newChain(empty(), event -> addVariable(event, unmodifiableList));
-    MessageProcessorChain route2 = newChain(empty(), event -> addVariable(event, VALUE_2));
+    MessageProcessorChain route1 = newChain(empty(), event -> addVariable(event, KEY, unmodifiableList));
+    MessageProcessorChain route2 = newChain(empty(), event -> addVariable(event, KEY, VALUE_2));
 
     muleContext.getInjector().inject(router);
     router.setRoutes(asList(route1, route2));
@@ -275,8 +275,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Description("An unmodifiable list in the second Scatter Gather's route must be able to be merged with the variables of the other routes.")
   public void mergeVariablesWhenTheSecondRouteHasAnUnmodifiableList() throws Exception {
     List<String> unmodifiableList = Collections.singletonList(VALUE_2);
-    MessageProcessorChain route1 = newChain(empty(), event -> addVariable(event, VALUE_1));
-    MessageProcessorChain route2 = newChain(empty(), event -> addVariable(event, unmodifiableList));
+    MessageProcessorChain route1 = newChain(empty(), event -> addVariable(event, KEY, VALUE_1));
+    MessageProcessorChain route2 = newChain(empty(), event -> addVariable(event, KEY, unmodifiableList));
 
     muleContext.getInjector().inject(router);
     router.setRoutes(asList(route1, route2));
@@ -288,8 +288,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     assertThat(list, contains(VALUE_1, unmodifiableList));
   }
 
-  private CoreEvent addVariable(CoreEvent event, Object value) {
-    return CoreEvent.builder(event).addVariable(KEY, value).build();
+  private CoreEvent addVariable(CoreEvent event, String key, Object value) {
+    return CoreEvent.builder(event).addVariable(key, value).build();
   }
 
   @Test
