@@ -31,6 +31,7 @@ import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.PE
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -173,7 +174,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
   @Test
   public void noAppendersForMutedApplication() throws Exception {
     when(context.isArtifactClassloader()).thenReturn(true);
-    ArtifactDescriptor descriptor = mock(ArtifactDescriptor.class);
+    DeployableArtifactDescriptor descriptor = mock(DeployableArtifactDescriptor.class);
 
     Properties properties = new Properties();
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "true");

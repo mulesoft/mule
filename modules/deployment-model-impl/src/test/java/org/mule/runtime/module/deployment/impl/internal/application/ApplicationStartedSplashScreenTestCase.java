@@ -16,7 +16,7 @@ import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnor
 import static org.mule.test.allure.AllureConstants.SplashScreenFeature.SPLASH_SCREEN;
 
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
