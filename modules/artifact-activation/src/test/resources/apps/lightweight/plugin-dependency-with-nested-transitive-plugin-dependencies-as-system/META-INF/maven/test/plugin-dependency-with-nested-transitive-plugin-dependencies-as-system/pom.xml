@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>test</groupId>
+    <artifactId>plugin-dependency-with-nested-transitive-plugin-dependencies-as-system</artifactId>
+    <version>1.0.0</version>
+
+    <properties>
+        <repeatedDependencyGroupId>test</repeatedDependencyGroupId>
+        <repeatedDependencyArtifactId>plugin-with-transitive-plugin-dependency</repeatedDependencyArtifactId>
+        <repeatedDependencyVersion>1.0.0</repeatedDependencyVersion>
+
+        <systemDependencyGroupId>test</systemDependencyGroupId>
+        <systemDependencyArtifactId>plugin-with-nested-transitive-plugin-dependencies</systemDependencyArtifactId>
+        <systemDependencyVersion>1.0.0</systemDependencyVersion>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${repeatedDependencyGroupId}</groupId>
+            <artifactId>${repeatedDependencyArtifactId}</artifactId>
+            <version>${repeatedDependencyVersion}</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${systemDependencyGroupId}</groupId>
+            <artifactId>${systemDependencyArtifactId}</artifactId>
+            <version>${systemDependencyVersion}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>system</scope>
+            <systemPath>${localPluginDirectory}/${systemDependencyGroupId}/${systemDependencyArtifactId}/${systemDependencyVersion}/${systemDependencyArtifactId}-${systemDependencyVersion}-mule-plugin.jar</systemPath>
+        </dependency>
+    </dependencies>
+</project>
