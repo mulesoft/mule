@@ -14,7 +14,7 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -249,8 +249,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Issue("W-11932094")
-  @Description("An unmodifiable list of a Scatter Gather route must be able to be merged with the variables of the other routes.")
-  public void mergeVariables2() throws Exception {
+  @Description("An unmodifiable list in the first Scatter Gather's route must be able to be merged with the variables of the other routes.")
+  public void mergeVariablesWhenTheFirstRouteHasAnUnmodifiableList() throws Exception {
     List<String> unmodifiableList = Collections.singletonList("value1");
     MessageProcessorChain route1 = newChain(empty(), event -> eventWithVariable(event, unmodifiableList));
     MessageProcessorChain route2 = newChain(empty(), event -> eventWithVariable(event, "value2"));
@@ -262,7 +262,25 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     CoreEvent process = router.process(CoreEvent.builder(testEvent()).message(Message.of(TEST_PAYLOAD)).build());
     List<String> list = (List) process.getVariables().get("key").getValue();
-    assertThat(list, containsInAnyOrder("value1", "value2"));
+    assertThat(list, contains("value1", "value2"));
+  }
+
+  @Test
+  @Issue("W-11932094")
+  @Description("An unmodifiable list in the second Scatter Gather's route must be able to be merged with the variables of the other routes.")
+  public void mergeVariablesWhenTheSecondRouteHasAnUnmodifiableList() throws Exception {
+    List<String> unmodifiableList = Collections.singletonList("value2");
+    MessageProcessorChain route1 = newChain(empty(), event -> eventWithVariable(event, "value1"));
+    MessageProcessorChain route2 = newChain(empty(), event -> eventWithVariable(event, unmodifiableList));
+
+    muleContext.getInjector().inject(router);
+    router.setRoutes(asList(route1, route2));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    CoreEvent process = router.process(CoreEvent.builder(testEvent()).message(Message.of(TEST_PAYLOAD)).build());
+    List<String> list = (List) process.getVariables().get("key").getValue();
+    assertThat(list, contains("value1", unmodifiableList));
   }
 
   private CoreEvent eventWithVariable(CoreEvent event, Object object) {
