@@ -42,7 +42,7 @@ public class MuleOpenTelemetrySpanProvider {
 
   public static MuleOpenTelemetrySpan getNewOpenTelemetrySpan(InternalSpan internalSpan,
                                                               InitialSpanInfo initialSpanInfo,
-                                                              String serviceNAme) {
+                                                              String serviceName) {
 
     InitialExportInfo initialExportInfo = initialSpanInfo.getInitialExportInfo();
 
@@ -50,7 +50,7 @@ public class MuleOpenTelemetrySpanProvider {
       return getNonExportableSpan(internalSpan);
     }
 
-    return getExportableSpan(internalSpan, initialExportInfo, serviceNAme, initialSpanInfo.isPolicySpan(),
+    return getExportableSpan(internalSpan, initialExportInfo, serviceName, initialSpanInfo.isPolicySpan(),
                              initialSpanInfo.isRootSpan());
   }
 

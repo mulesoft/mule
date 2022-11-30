@@ -8,6 +8,7 @@
 package org.mule.runtime.tracer.impl.exporter;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.getTracer;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE;
@@ -28,6 +29,12 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 import static org.testcontainers.utility.MountableFile.forHostPath;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.ServiceRequestContext;
+import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
+import com.linecorp.armeria.testing.junit4.server.ServerRule;
+import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -38,8 +45,11 @@ import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.opentelemetry.api.trace.Tracer;
@@ -77,8 +87,34 @@ public class OpenTelemetryResourcesTestCase {
   @ClassRule
   public static SelfSignedCertificateRule clientTls = new SelfSignedCertificateRule();
 
+  @ClassRule
+  public static final ServerRule server = new ServerRule() {
+
+    @Override protected void configure(ServerBuilder sb) throws Exception {
+      private final List<ExportTraceServiceRequest> traceRequests = new ArrayList<>();
+
+      sb.service(
+        "/opentelemetry.proto.collector.trace.v1.TraceService/Export",
+        new AbstractUnaryGrpcService() {
+          @Override
+          protected CompletionStage<byte[]> handleMessage(
+            ServiceRequestContext ctx, byte[] message) {
+            try {
+              traceRequests.add(ExportTraceServiceRequest.parseFrom(message));
+            } catch (InvalidProtocolBufferException e) {
+              throw new UncheckedIOException(e);
+            }
+            return completedFuture(ExportTraceServiceResponse.getDefaultInstance().toByteArray());
+          }
+        });
+
+      sb.http(0);
+    }
+  };
+
   @Before
   public void before() {
+
     // Configuring the collector test-container
     collector =
         new GenericContainer<>(COLLECTOR_IMAGE)

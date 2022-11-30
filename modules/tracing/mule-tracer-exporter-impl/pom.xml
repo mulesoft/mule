@@ -113,6 +113,18 @@
             <version>1.20.3</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.linecorp.armeria</groupId>
+            <artifactId>armeria-grpc</artifactId>
+            <version>1.20.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.proto</groupId>
+            <artifactId>opentelemetry-proto</artifactId>
+            <version>0.17.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
