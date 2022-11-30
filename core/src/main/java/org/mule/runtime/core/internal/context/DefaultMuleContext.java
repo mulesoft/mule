@@ -17,6 +17,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPIN
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
@@ -321,6 +322,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configurePrintDetailedCompositeExceptionLog();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
       configureSuppressErrors();
+      configureRethrowExceptionsInIdempotentMessageValidator();
     }
   }
 
@@ -1379,6 +1381,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SUPPRESS_ERRORS,
                                                 featureContext -> true);
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureRethrowExceptionsInIdempotentMessageValidator() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR,
+                                                minMuleVersion("4.5.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
