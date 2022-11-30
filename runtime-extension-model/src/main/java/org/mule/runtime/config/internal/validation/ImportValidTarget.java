@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.ast.api.ImportedResource.COULD_NOT_RESOLVE_IMPORTED_RESOURCE;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -67,7 +68,13 @@ public class ImportValidTarget implements ArtifactValidation {
     return artifact.getImportedResources()
         .stream()
         .filter(imp -> imp.getResolutionFailure().isPresent())
-        .map(imp -> create(new ImportComponentAst(imp.getMetadata()), this, imp.getResolutionFailure().get()))
+        .map(imp -> {
+          String message = imp.getResolutionFailure().get();
+          return create(new ImportComponentAst(imp.getMetadata()),
+                        this,
+                        message,
+                        message.startsWith(COULD_NOT_RESOLVE_IMPORTED_RESOURCE));
+        })
         .collect(toList());
   }
 
