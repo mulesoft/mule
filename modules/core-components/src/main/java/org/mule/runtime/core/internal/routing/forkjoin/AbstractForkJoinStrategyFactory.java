@@ -258,35 +258,52 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       if (!mergeVariables) {
         return;
       }
-      Map<String, TypedValue> routeVars = new HashMap<>();
-      list.forEach(event -> event.getVariables().forEach((key, value) -> {
-        // Only merge variables that have been added or mutated in routes
-        if (!value.equals(original.getVariables().get(key))) {
+      Map<String, TypedValue<?>> routeVars = new HashMap<>();
+      list.forEach(event -> event.getVariables().forEach((key, typedValue) -> {
+        // Only merge variables that have been added or mutated in routes.
+        if (!typedValue.equals(original.getVariables().get(key))) {
           if (!routeVars.containsKey(key)) {
-            // A new variable that hasn't already been set by another route is added as a simple entry.
-            routeVars.put(key, value);
+            addNewVariable(routeVars, key, typedValue);
           } else {
-            // If a variable already exists from before route, or was set in a previous route, then it's added to a list of 1.
-            if (!(routeVars.get(key).getValue() instanceof List)) {
-              List newList = new ArrayList();
-              newList.add(routeVars.get(key).getValue());
-              routeVars.put(key, new TypedValue(newList, DataType.builder().collectionType(List.class)
-                  .itemType(routeVars.get(key).getDataType().getType()).build()));
-            }
-            List valueList = (List) routeVars.get(key).getValue();
-            valueList.add(value.getValue());
-            if (((CollectionDataType) routeVars.get(key).getDataType()).getItemDataType().isCompatibleWith(value.getDataType())) {
-              // If item types are compatible then data type is conserved
-              routeVars.put(key, new TypedValue(valueList, routeVars.get(key).getDataType()));
-            } else {
-              // Else Object item type is used.
-              routeVars.put(key, new TypedValue(valueList, DataType.builder().collectionType(List.class).build()));
-            }
+            addExistingVariable(routeVars, key, typedValue);
           }
         }
       }));
       routeVars.forEach((s, typedValue) -> result.addVariable(s, typedValue));
     };
+  }
+
+  private static void addNewVariable(Map<String, TypedValue<?>> routeVars, String key, TypedValue<?> typedValue) {
+    if (typedValue.getValue() instanceof List) {
+      // If the new variable is an instance of a List it creates a modifiable list with all the contained values to avoid adding
+      // unmodifiable lists.
+      List<?> newList = new ArrayList<>((List<?>) typedValue.getValue());
+      routeVars.put(key, new TypedValue<>(newList, DataType.builder().collectionType(List.class)
+          .itemType(((CollectionDataType) typedValue.getDataType()).getItemDataType().getType()).build()));
+    } else {
+      // A new variable that hasn't already been set by another route is added as a simple entry.
+      routeVars.put(key, typedValue);
+    }
+  }
+
+  private static void addExistingVariable(Map<String, TypedValue<?>> routeVars, String key, TypedValue<?> typedValue) {
+    // If a variable already exists from before route, or was set in a previous route, then it's added to a list of 1.
+    if (!(routeVars.get(key).getValue() instanceof List)) {
+      List newList = new ArrayList<>();
+      newList.add(routeVars.get(key).getValue());
+      routeVars.put(key, new TypedValue<>(newList, DataType.builder().collectionType(List.class)
+          .itemType(routeVars.get(key).getDataType().getType()).build()));
+    }
+    List valueList = (List<?>) routeVars.get(key).getValue();
+    valueList.add(typedValue.getValue());
+
+    if (((CollectionDataType) routeVars.get(key).getDataType()).getItemDataType().isCompatibleWith(typedValue.getDataType())) {
+      // If item types are compatible then data type is conserved.
+      routeVars.put(key, new TypedValue<>(valueList, routeVars.get(key).getDataType()));
+    } else {
+      // Else Object item type is used.
+      routeVars.put(key, new TypedValue<>(valueList, DataType.builder().collectionType(List.class).build()));
+    }
   }
 
 }
