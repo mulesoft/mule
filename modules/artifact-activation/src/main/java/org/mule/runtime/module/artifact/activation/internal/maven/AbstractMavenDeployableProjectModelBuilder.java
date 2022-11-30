@@ -254,20 +254,56 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
   private List<BundleDependency> resolveSystemScopeDependencies(AetherMavenClient aetherMavenClient,
                                                                 List<BundleDependency> deployableMavenBundleDependencies) {
-    return deployableMavenBundleDependencies.stream().map(bundleDependency -> {
+    List<BundleDependency> systemScopeDependenciesTransitiveDependencies = new ArrayList<>();
+
+    List<BundleDependency> result = deployableMavenBundleDependencies.stream().map(bundleDependency -> {
       if (MULE_PLUGIN_CLASSIFIER.equals(bundleDependency.getDescriptor().getClassifier().orElse(null))
           && SYSTEM.equals(bundleDependency.getScope())) {
         try (MuleSystemPluginMavenReactorResolver reactor =
             new MuleSystemPluginMavenReactorResolver(new File(bundleDependency.getBundleUri()), aetherMavenClient)) {
-          return aetherMavenClient.resolveArtifactDependencies(singletonList(bundleDependency.getDescriptor()),
-                                                               of(deployableArtifactRepositoryFolder),
-                                                               of(reactor))
+          BundleDependency systemScopeDependency = aetherMavenClient
+              .resolveArtifactDependencies(singletonList(bundleDependency.getDescriptor()),
+                                           of(deployableArtifactRepositoryFolder),
+                                           of(reactor))
               .get(0);
+
+          systemScopeDependenciesTransitiveDependencies.addAll(collectTransitivePluginDependencies(systemScopeDependency));
+
+          return systemScopeDependency;
         }
       }
 
       return bundleDependency;
     }).collect(toList());
+
+    result.addAll(systemScopeDependenciesTransitiveDependencies);
+
+    return getUniqueDependencies(result);
+  }
+
+  private List<BundleDependency> getUniqueDependencies(List<BundleDependency> dependencies) {
+    Map<String, BundleDependency> uniqueDependencies = new HashMap<>();
+
+    for (BundleDependency dependency : dependencies) {
+      org.mule.maven.client.api.model.BundleDescriptor descriptor = dependency.getDescriptor();
+      String pluginKey =
+          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getClassifier().orElse("");
+      uniqueDependencies.putIfAbsent(pluginKey, dependency);
+    }
+
+    return new ArrayList<>(uniqueDependencies.values());
+  }
+
+  private List<BundleDependency> collectTransitivePluginDependencies(BundleDependency rootDependency) {
+    List<BundleDependency> allTransitivePluginDependencies = new ArrayList<>();
+    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
+      if (transitiveDependency.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false)) {
+        allTransitivePluginDependencies.add(transitiveDependency);
+        allTransitivePluginDependencies.addAll(collectTransitivePluginDependencies(transitiveDependency));
+      }
+    }
+
+    return allTransitivePluginDependencies;
   }
 
   private static class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
