@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class CoreValidationsProvider implements ValidationsProvider {
 
@@ -40,9 +41,13 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Inject
   private ExpressionLanguage expressionLanguage;
 
+  @Inject
+  @Named("_compatibilityPluginInstalled")
+  private Optional<Object> compatibilityPluginInstalled;
+
   @Override
   public List<Validation> get() {
-    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(),
+    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(isCompatibilityInstalled()),
                                                           new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
@@ -88,6 +93,10 @@ public class CoreValidationsProvider implements ValidationsProvider {
     }
 
     return validations;
+  }
+
+  private boolean isCompatibilityInstalled() {
+    return compatibilityPluginInstalled != null && compatibilityPluginInstalled.isPresent();
   }
 
   public static Level getExpressionSyntacticValidationErrorLevel(Optional<FeatureFlaggingService> featureFlaggingService) {
