@@ -260,13 +260,11 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       }
       Map<String, TypedValue<?>> routeVars = new HashMap<>();
       list.forEach(event -> event.getVariables().forEach((key, typedValue) -> {
-        // Only merge variables that have been added or mutated in routes
+        // Only merge variables that have been added or mutated in routes.
         if (!typedValue.equals(original.getVariables().get(key))) {
           if (!routeVars.containsKey(key)) {
-            // A new variable that hasn't already been set by another route is added as a simple entry.
             addNewVariable(routeVars, key, typedValue);
           } else {
-            // If a variable already exists from before route, or was set in a previous route, then it's added to a list of 1.
             addExistingVariable(routeVars, key, typedValue);
           }
         }
@@ -283,11 +281,13 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       routeVars.put(key, new TypedValue<>(newList, DataType.builder().collectionType(List.class)
           .itemType(((CollectionDataType) typedValue.getDataType()).getItemDataType().getType()).build()));
     } else {
+      // A new variable that hasn't already been set by another route is added as a simple entry.
       routeVars.put(key, typedValue);
     }
   }
 
   private static void addExistingVariable(Map<String, TypedValue<?>> routeVars, String key, TypedValue<?> typedValue) {
+    // If a variable already exists from before route, or was set in a previous route, then it's added to a list of 1.
     if (!(routeVars.get(key).getValue() instanceof List)) {
       List newList = new ArrayList<>();
       newList.add(routeVars.get(key).getValue());
@@ -298,7 +298,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     valueList.add(typedValue.getValue());
 
     if (((CollectionDataType) routeVars.get(key).getDataType()).getItemDataType().isCompatibleWith(typedValue.getDataType())) {
-      // If item types are compatible then data type is conserved
+      // If item types are compatible then data type is conserved.
       routeVars.put(key, new TypedValue<>(valueList, routeVars.get(key).getDataType()));
     } else {
       // Else Object item type is used.
