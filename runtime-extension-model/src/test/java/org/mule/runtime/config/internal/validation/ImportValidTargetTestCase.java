@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.config.internal.validation;
 
+import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
-import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ImportedResource;
@@ -28,6 +30,7 @@ import java.util.Optional;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(MULE_DSL)
@@ -63,5 +66,22 @@ public class ImportValidTargetTestCase {
     assertThat(result, is(not(empty())));
     assertThat(result.get().getValidation(), sameInstance(validation));
     assertThat(result.get().getMessage(), is(failureMessage));
+    assertThat(result.get().causedByDynamicArtifact(), is(false));
+  }
+
+  @Test
+  @Issue("W-12143338")
+  public void importWithPropertyResolutionFailure() {
+    ArtifactAst artifact = mock(ArtifactAst.class);
+
+    ImportedResource imported = mock(ImportedResource.class);
+    String failureMessage = ImportedResource.COULD_NOT_RESOLVE_IMPORTED_RESOURCE + "'prop'";
+    when(imported.getResolutionFailure()).thenReturn(of(failureMessage));
+    when(artifact.getImportedResources()).thenReturn(singleton(imported));
+
+    ArtifactValidation validation = getArtifactValidation();
+    Optional<ValidationResultItem> result = validation.validate(artifact);
+    assertThat(result, is(not(empty())));
+    assertThat(result.get().causedByDynamicArtifact(), is(true));
   }
 }
