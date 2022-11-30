@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_RESOURCE_PROPERTY_NAME;
+import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
-import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_RESOURCE_PROPERTY_NAME;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -82,6 +84,8 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
   @Override
   protected void declareExtension(ExtensionLoadingContext context) {
+    context.addParameter(DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS, true);
+
     final String modulePath = context.<String>getParameter(RESOURCE_XML)
         .orElseThrow(() -> new IllegalArgumentException(format("The attribute '%s' is missing", RESOURCE_XML)));
     final boolean validateXml = context.<Boolean>getParameter(VALIDATE_XML).orElse(false);

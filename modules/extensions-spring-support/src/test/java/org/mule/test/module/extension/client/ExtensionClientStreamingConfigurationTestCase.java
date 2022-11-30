@@ -89,7 +89,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
     ArgumentCaptor<InMemoryCursorIteratorConfig> captor = forClass(InMemoryCursorIteratorConfig.class);
 
-    client.executeAsync(HEISENBERG_EXT_NAME, ITERABLE_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
+    client.execute(HEISENBERG_EXT_NAME, ITERABLE_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
         .withInMemoryRepeatableIterables(initialBufferSize, initialBufferSizeIncrement, maxBufferSize))
         .get();
 
@@ -107,8 +107,8 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
     ArgumentCaptor<FileStoreCursorIteratorConfig> captor = forClass(FileStoreCursorIteratorConfig.class);
 
     client
-        .executeAsync(HEISENBERG_EXT_NAME, ITERABLE_OPERATION,
-                      params -> params.withConfigRef(HEISENBERG_CONFIG).withFileStoreRepeatableIterables(maxBufferSize))
+        .execute(HEISENBERG_EXT_NAME, ITERABLE_OPERATION,
+                 params -> params.withConfigRef(HEISENBERG_CONFIG).withFileStoreRepeatableIterables(maxBufferSize))
         .get();
 
     verify(streamingManager.forObjects()).getFileStoreCursorIteratorProviderFactory(captor.capture());
@@ -124,7 +124,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
     ArgumentCaptor<InMemoryCursorStreamConfig> captor = forClass(InMemoryCursorStreamConfig.class);
 
-    client.executeAsync(HEISENBERG_EXT_NAME, STREAMING_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
+    client.execute(HEISENBERG_EXT_NAME, STREAMING_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
         .withInMemoryRepeatableStreaming(initialBufferSize, initialBufferSizeIncrement, maxBufferSize))
         .get();
 
@@ -142,7 +142,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
     ArgumentCaptor<FileStoreCursorStreamConfig> captor = forClass(FileStoreCursorStreamConfig.class);
 
-    client.executeAsync(HEISENBERG_EXT_NAME, STREAMING_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
+    client.execute(HEISENBERG_EXT_NAME, STREAMING_OPERATION, params -> params.withConfigRef(HEISENBERG_CONFIG)
         .withFileStoreRepeatableStreaming(maxInMemorySize))
         .get();
 
