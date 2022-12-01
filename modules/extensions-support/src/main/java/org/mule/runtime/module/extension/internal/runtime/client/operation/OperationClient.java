@@ -48,7 +48,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
