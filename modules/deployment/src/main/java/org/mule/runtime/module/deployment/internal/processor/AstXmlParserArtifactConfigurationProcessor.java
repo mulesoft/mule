@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.internal.processor;
 
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
@@ -23,9 +22,9 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -114,8 +113,9 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
                                            ArtifactType artifactType,
                                            ArtifactAst parentArtifactAst,
                                            boolean disableXmlValidations) {
-    ConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+    ConfigurationPropertiesResolver propertyResolver = new ConfigurationPropertiesHierarchyBuilder()
+            .withApplicationProperties(new StaticConfigurationPropertiesProvider(artifactProperties))
+            .build();
 
     FeatureFlaggingService featureFlaggingService = getFeatureFlaggingService(muleContext);
     Builder builder = AstXmlParser.builder()
