@@ -114,8 +114,8 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
                                            ArtifactAst parentArtifactAst,
                                            boolean disableXmlValidations) {
     ConfigurationPropertiesResolver propertyResolver = new ConfigurationPropertiesHierarchyBuilder()
-            .withApplicationProperties(new StaticConfigurationPropertiesProvider(artifactProperties))
-            .build();
+        .withApplicationProperties(new StaticConfigurationPropertiesProvider(artifactProperties))
+        .build();
 
     FeatureFlaggingService featureFlaggingService = getFeatureFlaggingService(muleContext);
     Builder builder = AstXmlParser.builder()
