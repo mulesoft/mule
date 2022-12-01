@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static java.util.Collections.unmodifiableMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -68,7 +70,7 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     validator.setMuleContext(muleContext);
     validator.setStorePrefix("foo");
     validator.setObjectStore(objectStore);
-    validator.initialise();
+    initialiseIfNeeded(validator, muleContext);
 
     Thread t1 = new Thread(new TestForRaceConditionRunnable(), "thread1");
     Thread t2 = new Thread(new TestForRaceConditionRunnable(), "thread2");
