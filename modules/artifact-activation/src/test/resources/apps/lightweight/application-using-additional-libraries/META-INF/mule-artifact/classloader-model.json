@@ -1,0 +1,39 @@
+{
+  "additionalPluginDependencies": [
+    {
+      "groupId": "org.mule.connectors",
+      "artifactId": "mule-db-connector",
+      "additionalDependencies": [
+        {
+          "artifactCoordinates": {
+            "groupId": "org.apache.derby",
+            "artifactId": "derby",
+            "version": "10.11.1.1",
+            "type": "jar"
+          },
+          "uri": "repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar"
+        }
+      ]
+    }
+  ],
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.test",
+    "artifactId": "application-using-additional-libraries",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-db-connector",
+        "version": "1.1.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-db-connector/1.1.0/mule-db-connector-1.1.0-mule-plugin.jar"
+    }
+  ]
+}

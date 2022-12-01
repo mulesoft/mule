@@ -30,6 +30,7 @@ import static java.lang.Math.random;
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -373,10 +374,22 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     AdditionalPluginDependenciesResolver additionalPluginDependenciesResolver =
         new AdditionalPluginDependenciesResolver(aetherMavenClient,
-                                                 initialAdditionalPluginDependencies);
+                                                 initialAdditionalPluginDependencies,
+                                                 new File("temp"),
+                                                 getPomModels());
 
     additionalPluginDependencies = toPluginDependencies(additionalPluginDependenciesResolver
         .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));
+  }
+
+
+  /**
+   * Get a {@link Map} point to the {@link Model} of each artifact present in the map.
+   *
+   * @return a {@link Map} with {@link ArtifactCoordinates} as key and a {@link Supplier} of {@link Model} as value.
+   */
+  protected Map<ArtifactCoordinates, Supplier<Model>> getPomModels() {
+    return emptyMap();
   }
 
   private void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
