@@ -52,8 +52,7 @@ public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTes
 
   @Test
   public void fileDoesNotExist() {
-    expectedException
-        .expectMessage(is("Couldn't find configuration property value for key ${file::non-existing-file} from properties provider External provider"));
+    expectedException.expectMessage(is("Couldn't find configuration property value for key ${file::non-existing-file}"));
     resolver.resolveValue("${file::non-existing-file}");
   }
 }
