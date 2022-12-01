@@ -166,6 +166,7 @@ public class AdditionalPluginDependenciesResolver {
   protected Collection<Plugin> resolveAdditionalDependenciesFromMulePlugins(List<BundleDependency> mulePlugins) {
     Map<String, Plugin> additionalDependenciesFromMulePlugins = new HashMap<>();
 
+    // See LightweightDeployableProjectModelBuilderTestCase#createDeployableProjectModelWithAdditionalDependenciesInAPlugin
     mulePlugins.forEach(mulePlugin -> {
       try {
 

@@ -382,6 +382,12 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));
   }
 
+
+  /**
+   * Get a {@link Map} point to the {@link Model} of each artifact present in the map.
+   *
+   * @return a {@link Map} with {@link ArtifactCoordinates} as key and a {@link Supplier} of {@link Model} as value.
+   */
   protected Map<ArtifactCoordinates, Supplier<Model>> getPomModels() {
     return emptyMap();
   }

@@ -10,16 +10,13 @@ import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
 import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -33,7 +30,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import io.qameta.allure.Feature;
@@ -43,9 +39,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(CLASSLOADING_ISOLATION)
-@Story(ARTIFACT_DESCRIPTORS)
-@Issue("W-12069164")
+@Feature(DEPLOYMENT_TYPE)
+@Story(LIGHTWEIGHT)
 public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
 
 
@@ -63,6 +58,7 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   }
 
   @Test
+  @Issue("W-12142901")
   public void createDeployableProjectModelWithAdditionalDependenciesInAPlugin() throws Exception {
     installArtifact(getResourceFolder("apps/lightweight/application-using-additional-libraries"),
                     getMavenConfig().getLocalMavenRepositoryLocation());
