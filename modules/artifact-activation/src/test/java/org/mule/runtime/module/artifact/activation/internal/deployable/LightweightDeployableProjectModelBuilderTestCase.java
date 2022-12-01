@@ -16,6 +16,7 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -25,12 +26,14 @@ import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import io.qameta.allure.Feature;
@@ -73,10 +76,14 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel("apps/lightweight/db-plugin-with-additional-dep", pluginFileMavenReactor);
 
-    assertThat(deployableProjectModel.getDependencies(),
-               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("plugin-with-transitive-dependency")))));
-    assertThat(deployableProjectModel.getDependencies().get(0).getTransitiveDependenciesList(),
-               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("library")))));
+    assertThat(deployableProjectModel.getAdditionalPluginDependencies().size(), is(1));
+    List<BundleDependency> additionalBundleDependencies =
+        deployableProjectModel.getAdditionalPluginDependencies().values().stream().findFirst().get();
+    assertThat(additionalBundleDependencies.size(), is(1));
+    org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor descriptor =
+        additionalBundleDependencies.get(0).getDescriptor();
+    assertThat(descriptor.getGroupId(), is("org.apache.derby"));
+    assertThat(descriptor.getArtifactId(), is("derby"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)

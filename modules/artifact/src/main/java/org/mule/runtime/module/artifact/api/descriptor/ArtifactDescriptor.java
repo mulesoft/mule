@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -18,8 +17,6 @@ import org.mule.runtime.api.meta.MuleVersion;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.Properties;
 
 @NoExtend
 public class ArtifactDescriptor {
@@ -38,7 +35,6 @@ public class ArtifactDescriptor {
   private BundleDescriptor bundleDescriptor;
   private MuleVersion minMuleVersion;
   private Product requiredProduct;
-  private Optional<Properties> deploymentProperties = empty();
 
   /**
    * Creates a new descriptor for a named artifact
@@ -48,18 +44,6 @@ public class ArtifactDescriptor {
   public ArtifactDescriptor(String name) {
     checkArgument(!isEmpty(name), "Artifact name cannot be empty");
     this.name = name;
-  }
-
-  /**
-   * Creates a new descriptor for a named artifact
-   *
-   * @param name                 artifact name. Non empty.
-   * @param deploymentProperties properties provided for the deployment process.
-   */
-  public ArtifactDescriptor(String name, Optional<Properties> deploymentProperties) {
-    checkArgument(!isEmpty(name), "Artifact name cannot be empty");
-    this.name = name;
-    this.deploymentProperties = deploymentProperties;
   }
 
   public String getName() {
@@ -122,9 +106,5 @@ public class ArtifactDescriptor {
   @Override
   public String toString() {
     return format("%s[%s]", getClass().getSimpleName(), getName());
-  }
-
-  public Optional<Properties> getDeploymentProperties() {
-    return deploymentProperties;
   }
 }

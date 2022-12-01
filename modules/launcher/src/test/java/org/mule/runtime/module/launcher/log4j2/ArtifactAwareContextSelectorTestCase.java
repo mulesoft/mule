@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,7 +33,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -85,16 +84,15 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   private RegionClassLoader regionClassLoader;
 
   @Mock
-  private ArtifactDescriptor artifactDescriptor;
+  private DeployableArtifactDescriptor deployableArtifactDescriptor;
 
   @Before
   public void before() throws Exception {
     selector = new ArtifactAwareContextSelector();
 
-    when(artifactDescriptor.getDeploymentProperties()).thenReturn(empty());
     when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
     when(regionClassLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
-    when(regionClassLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);
+    when(regionClassLoader.getArtifactDescriptor()).thenReturn(deployableArtifactDescriptor);
   }
 
   @After
@@ -109,7 +107,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
     regionClassLoader = mock(RegionClassLoader.class, RETURNS_DEEP_STUBS);
     when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
-    when(regionClassLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);
+    when(regionClassLoader.getArtifactDescriptor()).thenReturn(deployableArtifactDescriptor);
     assertThat(context, not(sameInstance(selector.getContext(EMPTY, regionClassLoader, true))));
   }
 
@@ -199,7 +197,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   @Test
   public void returnsParentContextForPolicyClassloader() throws MalformedURLException {
     ClassLoader childClassLoader = new URLClassLoader(new URL[0], regionClassLoader);
-    PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_TEMPLATE_NAME, empty());
+    PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_TEMPLATE_NAME);
     RegionClassLoader policyRegionClassLoader = spy(getPolicyRegionClassLoader(policyTemplateDescriptor));
     MuleArtifactClassLoader policyClassLoader = getPolicyArtifactClassLoader(policyTemplateDescriptor, policyRegionClassLoader);
 

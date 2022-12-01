@@ -27,7 +27,7 @@ public class AllComponentsBelongToSomeExtensionModelTestCase extends AbstractCor
 
   @Override
   protected Validation getValidation() {
-    return new AllComponentsBelongToSomeExtensionModel();
+    return new AllComponentsBelongToSomeExtensionModel(false);
   }
 
   @Test

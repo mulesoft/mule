@@ -10,7 +10,7 @@ import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.beans.PropertyChangeListener;
 import java.net.URI;
@@ -50,7 +50,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   private final String artifactName;
   private final int ownerClassLoaderHash;
 
-  private ArtifactDescriptor artifactDescriptor;
+  private DeployableArtifactDescriptor artifactDescriptor;
 
   MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone, boolean logSeparationEnabled) {
     this(name, null, null, contextSelector, standalone, logSeparationEnabled);
@@ -84,7 +84,11 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     }
   }
 
-  private ArtifactDescriptor getArtifactDescriptor(ArtifactClassLoader ownerClassLoader) {
+  private DeployableArtifactDescriptor getArtifactDescriptor(ArtifactClassLoader ownerClassLoader) {
+    if (!(ownerClassLoader.getArtifactDescriptor() instanceof DeployableArtifactDescriptor)) {
+      throw new IllegalArgumentException("Artifact should be a deployable, i.e. an application or domain");
+    }
+
     return ownerClassLoader.getArtifactDescriptor();
   }
 
@@ -155,7 +159,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     return applicationClassloader;
   }
 
-  protected ArtifactDescriptor getArtifactDescriptor() {
+  protected DeployableArtifactDescriptor getArtifactDescriptor() {
     return artifactDescriptor;
   }
 
