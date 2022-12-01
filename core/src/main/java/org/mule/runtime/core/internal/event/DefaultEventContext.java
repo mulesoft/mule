@@ -354,7 +354,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
       if (parent instanceof SpanContextAware) {
-        spanContext = getParentDistributedTraceContext((SpanContextAware) parent).copy();
+        SpanContext parentSpanContext = getParentDistributedTraceContext((SpanContextAware) parent);
+        if (parentSpanContext != null) {
+          spanContext = parentSpanContext.copy();
+        }
       }
     }
 
