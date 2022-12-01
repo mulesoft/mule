@@ -6,20 +6,18 @@
  */
 package org.mule.runtime.config.dsl.model.internal.config;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -32,7 +30,7 @@ import org.junit.rules.ExpectedException;
 @Story(CONFIGURATION_PROPERTIES_RESOLVER_STORY)
 public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTestCase {
 
-  private DefaultConfigurationPropertiesResolver resolver;
+  private ConfigurationPropertiesResolver resolver;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -40,8 +38,7 @@ public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTes
   @Before
   public void createResolver() {
     ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
-    resolver = new DefaultConfigurationPropertiesResolver(Optional
-        .empty(), new FileConfigurationPropertiesProvider(externalResourceProvider, "External provider"));
+    resolver = new ConfigurationPropertiesHierarchyBuilder().withPropertiesFile(externalResourceProvider).build();
   }
 
   @Test
@@ -52,8 +49,7 @@ public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTes
 
   @Test
   public void fileDoesNotExist() {
-    expectedException
-        .expectMessage(is("Couldn't find configuration property value for key ${file::non-existing-file} from properties provider External provider"));
+    expectedException.expectMessage(is("Couldn't find configuration property value for key ${file::non-existing-file}"));
     resolver.resolveValue("${file::non-existing-file}");
   }
 }

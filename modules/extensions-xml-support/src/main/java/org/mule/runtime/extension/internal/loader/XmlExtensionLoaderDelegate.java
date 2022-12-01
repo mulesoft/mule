@@ -79,15 +79,10 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -101,11 +96,9 @@ import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentMo
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelProperty;
 import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.BufferedInputStream;
@@ -416,29 +409,17 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
-    // <mule:global-property ... /> properties reader
-    final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(new XmlExtensionConfigurationPropertiesResolver()),
-                                                   createProviderFromGlobalProperties(ast));
-    final ConfigurationPropertiesResolver envVariablesResolver =
-        new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
-                                                   new EnvironmentPropertiesConfigurationProvider());
-
-    // system properties, such as "file.separator" properties reader
-    final ConfigurationPropertiesResolver systemPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(envVariablesResolver),
-                                                   new SystemPropertiesConfigurationProvider());
-    // "file::" properties reader
-    final String description = format("External files for smart connector '%s'", modulePath);
-    final FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
-        new FileConfigurationPropertiesProvider(new ClassLoaderResourceProvider(currentThread().getContextClassLoader()),
-                                                description);
-    return new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
-                                                      externalPropertiesConfigurationProvider);
+    return new ConfigurationPropertiesHierarchyBuilder()
+        .withGlobalPropertiesSupplier(createProviderFromGlobalProperties(ast))
+        .withEnvironmentProperties()
+        .withSystemProperties()
+        .withPropertiesFile(new ClassLoaderResourceProvider(currentThread().getContextClassLoader()))
+        .withoutFailuresIfPropertyNotPresent()
+        .build();
   }
 
-  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst ast) {
-    return new GlobalPropertyConfigurationPropertiesProvider(new LazyValue<>(() -> {
+  private LazyValue<Map<String, ConfigurationProperty>> createProviderFromGlobalProperties(ArtifactAst ast) {
+    return new LazyValue<>(() -> {
       final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
       // Root element is the mule:module
@@ -456,7 +437,7 @@ public final class XmlExtensionLoaderDelegate {
           });
 
       return globalProperties;
-    }));
+    });
   }
 
   private static Optional<String> getStringParameter(ComponentAst componentAst, String parameterName) {
@@ -1158,21 +1139,4 @@ public final class XmlExtensionLoaderDelegate {
     });
   }
 
-  /**
-   * Utility class to read the XML module entirely so that if there's any usage of configurations properties, such as
-   * "${someProperty}", the {@link ForbiddenConfigurationPropertiesValidator} can show the errors consistently, Without this dull
-   * implementation, the XML parser fails while reading ANY parametrization throwing a {@link PropertyNotFoundException} eagerly.
-   */
-  private class XmlExtensionConfigurationPropertiesResolver implements ConfigurationPropertiesResolver {
-
-    @Override
-    public Object resolveValue(String value) {
-      return value;
-    }
-
-    @Override
-    public Object resolvePlaceholderKeyValue(String placeholderKey) {
-      return placeholderKey;
-    }
-  }
 }

@@ -13,8 +13,8 @@ import java.util.Optional;
 
 /**
  * Allows to retrieve the {@link MetadataCacheId} for Configs. It's used since the
- * {@link org.mule.runtime.extension.api.component.ComponentParameterization} has no information of the configs, including its
- * child elements.
+ * {@link org.mule.runtime.api.parameterization.ComponentParameterization} has no information of the configs, including its child
+ * elements.
  *
  * @since 4.5
  */

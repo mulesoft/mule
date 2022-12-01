@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.metadata.api.cache.ComponentParameterizationMetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.api.cache.ConfigurationMetadataCacheIdGenerator;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.metadata.internal.types.AttributesMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.ComponentParameterizationInputMetadataResolutionTypeInformation;
