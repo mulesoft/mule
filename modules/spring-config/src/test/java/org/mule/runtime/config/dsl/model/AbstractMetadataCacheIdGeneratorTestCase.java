@@ -28,7 +28,7 @@ import org.mule.runtime.metadata.internal.cache.ComponentAstBasedMetadataCacheId
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.ComponentParameterizationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.DslElementBasedMetadataCacheIdGenerator;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.metadata.internal.cache.AstConfigurationMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;

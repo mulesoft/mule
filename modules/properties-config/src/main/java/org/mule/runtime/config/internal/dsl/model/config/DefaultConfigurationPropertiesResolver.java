@@ -120,10 +120,11 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
         return replaceAllPlaceholders(value);
       });
     } catch (Exception e) {
+      LOGGER.debug("Could not resolve property at {}", configurationPropertiesProvider.getDescription());
       if (e.getCause() instanceof RuntimeException) {
         throw (RuntimeException) e.getCause();
       } else {
-        throw new MuleRuntimeException(createStaticMessage("Failure processing configuration attribute " + value, e));
+        throw new MuleRuntimeException(createStaticMessage("Failure processing configuration property " + value, e));
       }
     }
   }
@@ -164,11 +165,15 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       }
     } else if (nextResolver.isPresent()) {
       try {
+        LOGGER.debug("Could not resolve property at {}, solving with next resolver",
+                     configurationPropertiesProvider.getDescription());
         return nextResolver.get().resolvePlaceholderKeyValue(placeholderKey);
       } catch (PropertyNotFoundException e) {
         throw new PropertyNotFoundException(e, new Pair<>(configurationPropertiesProvider.getDescription(), placeholderKey));
       }
     }
+    LOGGER.debug("Could not resolve property at {}, and there is no next resolver",
+                 configurationPropertiesProvider.getDescription());
     throw new PropertyNotFoundException(new Pair<>(configurationPropertiesProvider.getDescription(), placeholderKey));
   }
 

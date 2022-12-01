@@ -35,15 +35,6 @@ public class ServiceDescriptor extends ArtifactDescriptor {
   }
 
   /**
-   * Creates a new service descriptor
-   *
-   * @param name service name. Non empty.
-   */
-  public ServiceDescriptor(String name, Optional<Properties> properties) {
-    super(name, properties);
-  }
-
-  /**
    * @return the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
    */
   public List<MuleServiceContractModel> getContractModels() {

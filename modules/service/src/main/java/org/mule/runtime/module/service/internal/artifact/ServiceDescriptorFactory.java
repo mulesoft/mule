@@ -65,7 +65,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
 
   @Override
   protected ServiceDescriptor createArtifactDescriptor(File artifactLocation, String name, Optional<Properties> properties) {
-    return new ServiceDescriptor(name, properties);
+    return new ServiceDescriptor(name);
   }
 
   @Override

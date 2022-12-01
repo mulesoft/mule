@@ -40,13 +40,13 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
@@ -347,8 +347,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private AstXmlParser createMuleXmlParser(Set<ExtensionModel> extensions,
                                            Map<String, String> artifactProperties, boolean disableXmlValidations,
                                            FeatureFlaggingService featureFlaggingService) {
-    ConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+    ConfigurationPropertiesResolver propertyResolver = new ConfigurationPropertiesHierarchyBuilder()
+        .withApplicationProperties(new StaticConfigurationPropertiesProvider(artifactProperties)).build();
 
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
