@@ -6,81 +6,72 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
 import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
-import static java.lang.Math.random;
-import static java.nio.file.Files.createTempDirectory;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
+import org.mule.maven.client.api.MavenReactorResolver;
+import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.ClassRule;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
 @Issue("W-12069164")
-public class LightweightDeployableProjectModelBuilderTestCase {
+public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
 
-  @ClassRule
-  public static SystemProperty repositoryLocation;
 
-  @ClassRule
-  public static SystemProperty localPluginDirectory;
+  @Rule
+  public SystemProperty repositoryLocation =
+      new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
+                         discoverProvider(LightweightDeployableProjectModelBuilderTestCase.class
+                             .getClassLoader()).getLocalRepositorySuppliers()
+                                 .environmentMavenRepositorySupplier().get()
+                                 .getAbsolutePath());
 
-  static {
-    try {
-      repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
-                                              createTempDirectory("localRepository" + random()).toFile().getAbsolutePath());
-      localPluginDirectory =
-          new SystemProperty("localPluginDirectory",
-                             createTempDirectory("localPluginDirectory" + random()).toFile().getAbsolutePath());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @After
-  public void after() throws IOException {
-    cleanDirectory(new File(repositoryLocation.getValue()));
-    cleanDirectory(new File(localPluginDirectory.getValue()));
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    deleteQuietly(new File(repositoryLocation.getValue()));
-    deleteQuietly(new File(localPluginDirectory.getValue()));
+  @Before
+  public void before() {
+    reset();
   }
 
   @Test
-  public void createDeployableProjectModelWithSystemScopePlugin() throws Exception {
-    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-dependency"),
-                    new File(localPluginDirectory.getValue()));
-    installArtifact(getResourceFolder("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
+  public void createDeployableProjectModelWithAdditionalDependenciesInAPlugin() throws Exception {
+    installArtifact(getResourceFolder("apps/lightweight/application-using-additional-libraries"),
+                    getMavenConfig().getLocalMavenRepositoryLocation());
+    File artifact =
+        new File(getMavenConfig().getLocalMavenRepositoryLocation(),
+                 "org/mule/test/application-using-additional-libraries/1.0.0/");
 
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/lightweight/plugin-dependency-as-system");
+    PluginFileMavenReactor pluginFileMavenReactor =
+        new PluginFileMavenReactor(artifact, "org.mule.test", "application-using-additional-libraries", "1.0.0");
+
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/lightweight/db-plugin-with-additional-dep", pluginFileMavenReactor);
 
     assertThat(deployableProjectModel.getDependencies(),
                contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("plugin-with-transitive-dependency")))));
@@ -88,87 +79,76 @@ public class LightweightDeployableProjectModelBuilderTestCase {
                contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("library")))));
   }
 
-  @Test
-  public void createDeployableProjectModelWithSystemScopePluginWithTransitivePluginDependency() throws Exception {
-    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-plugin-dependency"),
-                    new File(localPluginDirectory.getValue()));
-    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-dependency"),
-                    new File(repositoryLocation.getValue()));
-    installArtifact(getResourceFolder("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-
-    DeployableProjectModel deployableProjectModel =
-        getDeployableProjectModel("apps/lightweight/plugin-dependency-with-transitive-plugin-dependency-as-system");
-
-    assertThat(deployableProjectModel.getDependencies(),
-               containsInAnyOrder(hasProperty("descriptor",
-                                              hasProperty("artifactId", equalTo("plugin-with-transitive-plugin-dependency"))),
-                                  hasProperty("descriptor",
-                                              hasProperty("artifactId", equalTo("plugin-with-transitive-dependency")))));
-
-    BundleDependency pluginWithTransitivePluginDependency = deployableProjectModel.getDependencies().stream()
-        .filter(d -> d.getDescriptor().getArtifactId().equals("plugin-with-transitive-plugin-dependency")).findFirst().get();
-    assertThat(pluginWithTransitivePluginDependency.getTransitiveDependenciesList(),
-               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("plugin-with-transitive-dependency")))));
-
-    BundleDependency pluginWithTransitiveDependency = deployableProjectModel.getDependencies().stream()
-        .filter(d -> d.getDescriptor().getArtifactId().equals("plugin-with-transitive-dependency")).findFirst().get();
-    assertThat(pluginWithTransitiveDependency.getTransitiveDependenciesList(),
-               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("library")))));
-  }
-
-  @Test
-  @Description("Tests that transitive dependencies from a plugin with system scope that are plugins, are set as dependencies " +
-      "in the DeployableProjectModel, and also if any of them is already considered as such, they're not duplicated.")
-  public void createDeployableProjectModelWithSystemScopePluginWithNestedTransitivePluginDependenciesAlreadyPresentInDeployablePom()
-      throws Exception {
-    installArtifact(getResourceFolder("dependencies/plugin-with-nested-transitive-plugin-dependencies"),
-                    new File(localPluginDirectory.getValue()));
-    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-plugin-dependency"),
-                    new File(repositoryLocation.getValue()));
-    installArtifact(getResourceFolder("dependencies/plugin-with-transitive-dependency"),
-                    new File(repositoryLocation.getValue()));
-    installArtifact(getResourceFolder("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-
-    DeployableProjectModel deployableProjectModel =
-        getDeployableProjectModel("apps/lightweight/plugin-dependency-with-nested-transitive-plugin-dependencies-as-system");
-
-    assertThat(deployableProjectModel.getDependencies(),
-               containsInAnyOrder(hasProperty("descriptor",
-                                              hasProperty("artifactId",
-                                                          equalTo("plugin-with-nested-transitive-plugin-dependencies"))),
-                                  hasProperty("descriptor",
-                                              hasProperty("artifactId", equalTo("plugin-with-transitive-plugin-dependency"))),
-                                  hasProperty("descriptor",
-                                              hasProperty("artifactId", equalTo("plugin-with-transitive-dependency")))));
-
-    BundleDependency pluginWithNestedTransitivePluginDependencies = deployableProjectModel.getDependencies().stream()
-        .filter(d -> d.getDescriptor().getArtifactId().equals("plugin-with-nested-transitive-plugin-dependencies")).findFirst()
-        .get();
-    assertThat(pluginWithNestedTransitivePluginDependencies.getTransitiveDependenciesList(),
-               contains(hasProperty("descriptor",
-                                    hasProperty("artifactId", equalTo("plugin-with-transitive-plugin-dependency")))));
-
-    BundleDependency pluginWithTransitivePluginDependency = deployableProjectModel.getDependencies().stream()
-        .filter(d -> d.getDescriptor().getArtifactId().equals("plugin-with-transitive-plugin-dependency")).findFirst().get();
-    assertThat(pluginWithTransitivePluginDependency.getTransitiveDependenciesList(),
-               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("plugin-with-transitive-dependency")))));
-
-    BundleDependency pluginWithTransitiveDependency = deployableProjectModel.getDependencies().stream()
-        .filter(d -> d.getDescriptor().getArtifactId().equals("plugin-with-transitive-dependency")).findFirst().get();
-    assertThat(pluginWithTransitiveDependency.getTransitiveDependenciesList(),
-               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("library")))));
-  }
-
-  private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    DeployableProjectModel model = new LightweightDeployableProjectModelBuilder(getResourceFolder(deployablePath), false).build();
+  private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
+      throws URISyntaxException {
+    DeployableProjectModel model = new TestLightweightDeployableProjectModelBuilder(getResourceFolder(deployablePath),
+                                                                                    false, mavenReactorResolver).build();
 
     model.validate();
 
     return model;
   }
 
+  class TestLightweightDeployableProjectModelBuilder extends LightweightDeployableProjectModelBuilder {
+
+    private final MavenReactorResolver mavenReactorResolver;
+
+    public TestLightweightDeployableProjectModelBuilder(File projectFolder, boolean isDomain,
+                                                        MavenReactorResolver mavenReactorResolver) {
+      super(projectFolder, isDomain);
+      this.mavenReactorResolver = mavenReactorResolver;
+    }
+
+    @Override
+    protected Optional<MavenReactorResolver> getMavenReactorResolver() {
+      return Optional.of(mavenReactorResolver);
+    }
+  }
+
   protected File getResourceFolder(String appPath) throws URISyntaxException {
     return new File(getClass().getClassLoader().getResource(appPath).toURI());
+  }
+
+  class PluginFileMavenReactor implements MavenReactorResolver {
+
+    private final File project;
+    private final String groupId;
+    private final String artifactId;
+    private final String version;
+
+
+    public PluginFileMavenReactor(File project, String groupId, String artifactId, String version) {
+      this.project = project;
+      this.groupId = groupId;
+      this.artifactId = artifactId;
+      this.version = version;
+    }
+
+    @Override
+    public File findArtifact(BundleDescriptor bundleDescriptor) {
+      if (checkArtifact(bundleDescriptor)) {
+        if (bundleDescriptor.getType().equals("pom")) {
+          return new File(project, artifactId + "-" + version + ".pom");
+        } else {
+          return new File(project, artifactId + "-" + version + "-mule-application.jar");
+        }
+      }
+      return null;
+    }
+
+    private boolean checkArtifact(BundleDescriptor bundleDescriptor) {
+      return bundleDescriptor.getGroupId().equals(groupId)
+          && bundleDescriptor.getArtifactId().equals(artifactId)
+          && bundleDescriptor.getVersion().equals(version);
+    }
+
+    @Override
+    public List<String> findVersions(BundleDescriptor bundleDescriptor) {
+      if (checkArtifact(bundleDescriptor)) {
+        return singletonList(version);
+      }
+      return emptyList();
+    }
   }
 
 }
