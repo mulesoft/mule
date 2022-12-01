@@ -57,6 +57,10 @@ public class MuleOperationExtensionModelDeclarer {
   public static final String EXCLUSIVE_OPTIONALS = "exclusive-optionals";
   public static final String TYPE = "type";
 
+  private static final String ALLOW_INLINE_SCRIPT_DESCRIPTION = "Whether the parameter should be able to be defined with" +
+      " an inline script. It could be used for parameters that will contain data for the operation, differencing them" +
+      " from configuration parameters.";
+
   private static final String TYPE_EXAMPLE = "string or number or http:request-config";
 
   private static final MetadataType EXPRESSION_SUPPORT_TYPE = BASE_TYPE_BUILDER.stringType()
@@ -343,6 +347,13 @@ public class MuleOperationExtensionModelDeclarer {
         .ofType(EXPRESSION_SUPPORT_TYPE)
         .defaultingTo(SUPPORTED.name())
         .withDisplayModel(display("Expression Support", "The support level this parameter offers regarding expressions"))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterGroupDeclarer.withOptionalParameter("allowInlineScript")
+        .describedAs(ALLOW_INLINE_SCRIPT_DESCRIPTION)
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo("false")
+        .withDisplayModel(display("Allow Inline Script", ALLOW_INLINE_SCRIPT_DESCRIPTION))
         .withExpressionSupport(NOT_SUPPORTED);
 
     parameterGroupDeclarer.withOptionalParameter("configOverride")
