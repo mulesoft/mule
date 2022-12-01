@@ -6,15 +6,17 @@
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+
+import static org.mockito.Mockito.mock;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -69,9 +70,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   @Inject
   protected Registry registry;
-
-  @Inject
-  protected PrivilegedProfilingService privilegedProfilingService;
 
   private volatile boolean tearingDown = false;
   private final Set<FlowRunner> runners = new HashSet<>();

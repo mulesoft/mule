@@ -30,8 +30,6 @@ import java.util.Set;
  */
 public interface InternalSpan extends Span {
 
-  public static final String THREAD_END_NAME_KEY = "thread.end.name";
-
   /**
    * Ends the span.
    */

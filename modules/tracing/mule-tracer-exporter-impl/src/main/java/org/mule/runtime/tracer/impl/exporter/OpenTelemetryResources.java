@@ -7,12 +7,17 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import static java.lang.Boolean.parseBoolean;
-
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
+import static java.lang.System.getProperty;
+
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporterBuilder;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.capturer.CapturingSpanExporterWrapper;
@@ -43,6 +48,11 @@ public class OpenTelemetryResources {
 
   private static final String OPENTELEMETRY_EXPORT_ENABLED_SYSPROP = "mule.openetelemetry.export.enabled";
   private static final String MULE_OPENTELEMETRY_ENDPOINT_SYSPROP = "mule.opentelemetry.endpoint";
+  private static final String MULE_OPENTELEMETRY_PROTOCOL_SYSPROP = "mule.opentelemetry.export.protocol";
+  private static final String MULE_OPENTELEMETRY_EXPORT_BATCH_SIZE_SYSPROP = "mule.opentelemetry.export.batch.size";
+  private static final String MULE_OPENTELEMETRY_EXPORT_BATCH_QUEUE_SIZE_SYSPROP = "mule.opentelemetry.export.queue.size";
+
+  private static final String HTTP_PROTOCOL_NAME = "HTTP";
 
   // This is only defined in the semconv artifact which is in alpha state and is only needed for this.
   // In order not to add another dependency we add it here.
@@ -55,7 +65,9 @@ public class OpenTelemetryResources {
 
   private static final String INSTRUMENTATION_VERSION = "1.0.0";
 
-  private final static CapturingSpanExporterWrapper capturingSpanExporterWrapper =
+  private OpenTelemetryResources() {}
+
+  private static final CapturingSpanExporterWrapper capturingSpanExporterWrapper =
       new CapturingSpanExporterWrapper(new SpanExporter() {
 
         @Override
@@ -109,18 +121,37 @@ public class OpenTelemetryResources {
     return PROPAGATOR;
   }
 
-  private static SpanProcessor resolveExporterProcessor(
-                                                        SpanExporterConfiguration spanExporterConfiguration) {
-    return BatchSpanProcessor.builder(createExporter(spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP)))
+  private static SpanProcessor resolveExporterProcessor(SpanExporterConfiguration spanExporterConfiguration) {
+    createSpanExporter(spanExporterConfiguration);
+    return BatchSpanProcessor.builder(createSpanExporter(spanExporterConfiguration))
+        .setMaxQueueSize(parseInt(getProperty(MULE_OPENTELEMETRY_EXPORT_BATCH_QUEUE_SIZE_SYSPROP, "2048")))
+        .setMaxExportBatchSize(parseInt(getProperty(MULE_OPENTELEMETRY_EXPORT_BATCH_SIZE_SYSPROP, "512")))
         .build();
   }
 
-  private static SpanExporter createExporter(String endpoint) {
-    if (!isEmpty(endpoint)) {
-      return OtlpGrpcSpanExporter.builder().setEndpoint(endpoint).build();
+  private static SpanExporter createSpanExporter(SpanExporterConfiguration spanExporterConfiguration) {
+    String endpoint = spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP);
+    if (HTTP_PROTOCOL_NAME.equalsIgnoreCase(spanExporterConfiguration.getValue(MULE_OPENTELEMETRY_PROTOCOL_SYSPROP))) {
+      return createHttpExporter(endpoint);
     } else {
-      return OtlpGrpcSpanExporter.builder().build();
+      return createGrpcExporter(endpoint);
     }
+  }
+
+  private static SpanExporter createHttpExporter(String endpoint) {
+    OtlpHttpSpanExporterBuilder exporterBuilder = OtlpHttpSpanExporter.builder();
+    if (!isEmpty(endpoint)) {
+      exporterBuilder.setEndpoint(endpoint);
+    }
+    return exporterBuilder.build();
+  }
+
+  private static SpanExporter createGrpcExporter(String endpoint) {
+    OtlpGrpcSpanExporterBuilder exporterBuilder = OtlpGrpcSpanExporter.builder();
+    if (!isEmpty(endpoint)) {
+      exporterBuilder.setEndpoint(endpoint);
+    }
+    return exporterBuilder.build();
   }
 
 }
