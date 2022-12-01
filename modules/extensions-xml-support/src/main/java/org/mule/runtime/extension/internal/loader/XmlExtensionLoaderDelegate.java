@@ -414,6 +414,7 @@ public final class XmlExtensionLoaderDelegate {
         .withEnvironmentProperties()
         .withSystemProperties()
         .withPropertiesFile(new ClassLoaderResourceProvider(currentThread().getContextClassLoader()))
+        .withoutFailuresIfPropertyNotPresent()
         .build();
   }
 
