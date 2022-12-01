@@ -19,11 +19,35 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="hasTwoParametersWithInlineScript">
+        <operation:parameters>
+            <operation:parameter name="content1" type="string" allowInlineScript="true" />
+            <operation:parameter name="content2" type="string" allowInlineScript="true" />
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="#[params.content1 ++ params.content2]"/>
+        </operation:body>
+    </operation:def>
+
     <flow name="returnTestPayloadFlow">
         <this:allows-inline-script>
             <this:content><![CDATA[#[
                 'Test payload'
             ]]]></this:content>
         </this:allows-inline-script>
+    </flow>
+
+    <flow name="returnTestPayloadUsingTwoParamsFlow">
+        <this:has-two-parameters-with-inline-script>
+            <this:content1><![CDATA[#[
+                'Test '
+            ]]]></this:content1>
+            <this:content2><![CDATA[#[
+                'payload'
+            ]]]></this:content2>
+        </this:has-two-parameters-with-inline-script>
     </flow>
 </mule>

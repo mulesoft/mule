@@ -35,4 +35,10 @@ public class MuleOperationAllowInlineScriptsTestCase extends MuleArtifactFunctio
     CoreEvent result = flowRunner("returnTestPayloadFlow").run();
     assertThat(result, hasMessage(hasPayload(is("Test payload"))));
   }
+
+  @Test
+  public void twoParametersAllowingInlineScripts() throws Exception {
+    CoreEvent result = flowRunner("returnTestPayloadUsingTwoParamsFlow").run();
+    assertThat(result, hasMessage(hasPayload(is("Test payload"))));
+  }
 }
