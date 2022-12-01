@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.metadata.api.cache;
 
-import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 
 import java.util.Optional;
 
