@@ -95,10 +95,9 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -133,10 +132,10 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   public AstXmlArtifactDeclarationLoader(DslResolvingContext context) {
     this.context = context;
 
-    DefaultConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(empty(),
-                                                                                                 new SystemPropertiesConfigurationProvider())),
-                                                   new EnvironmentPropertiesConfigurationProvider());
+    ConfigurationPropertiesResolver propertyResolver = new ConfigurationPropertiesHierarchyBuilder()
+        .withEnvironmentProperties()
+        .withSystemProperties()
+        .build();
 
     parser = AstXmlParser.builder().withSchemaValidationsDisabled()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
