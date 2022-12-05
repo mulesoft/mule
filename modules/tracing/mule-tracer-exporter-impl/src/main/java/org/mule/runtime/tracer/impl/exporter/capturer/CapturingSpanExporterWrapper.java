@@ -136,6 +136,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
                                                  OpenTelemetryEventDataWrapper::new)
             .collect(Collectors.toList());
       }
+      
+      @Override
+      public String getSpanKindName(){
+        return spanData.getKind().name();
+      }
 
       @Override
       public String getServiceName() {
