@@ -10,18 +10,21 @@ package org.mule.runtime.tracer.impl.exporter.optel.resources;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
-import java.io.IOException;
-
+/**
+ * An exporter opentelemetry api configurator configurator.
+ *
+ * @since 4.5.0
+ */
 public interface SpanExporterConfigurator {
 
   /**
-   * Configs the exporter according to the @param spanExporterConfiguration
+   * Configs the exporter according to the @param spanExporterConfiguration and returns the {@link SpanExporter}
    *
    * @param spanExporterConfiguration the configuration.
    *
    * @return the {@link SpanExporter}
    *
-   * @throws SpanExporterConfiguratorException a possible exception.
+   * @throws SpanExporterConfiguratorException the exception raised..
    */
   SpanExporter configExporter(SpanExporterConfiguration spanExporterConfiguration) throws SpanExporterConfiguratorException;
 }

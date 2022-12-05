@@ -30,13 +30,9 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE = "mule.open.telemetry.exporter.compression.type";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BALANCER_NAME = "mule.open.telemetry.exporter.balancer.name";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_HEADERS = "mule.open.telemetry.exporter.headers";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_HEADER = "mule.open.telemetry.exporter.header";
-
-  public static final String MULE_OPEN_TELEMETRY_READ_BUFFER_SIZE = "mule.open.telemetry.read.buffer.size";
-
-  public static final String MULE_OPEN_TELEMETRY_WRITE_BUFFER_SIZE = "mule.open.telemetry.write.buffer.size";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT = "mule.open.telemetry.exporter.timeout";
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT = "mule.open.telemetry.exporter.endpoint";
 

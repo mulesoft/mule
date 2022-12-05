@@ -11,18 +11,27 @@ import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExpo
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_HEADERS;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.Long.parseLong;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfigurator;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
@@ -57,7 +66,36 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
     if (spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "false").equals(TRUE.toString())) {
       configureTls(builder, spanExporterConfiguration);
     }
+
+    // Headers
+    String headers = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS);
+    if (headers != null) {
+      configureHeaders(builder, headers);
+    }
+
+    // Timeout
+    String timeout = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT);
+    if (timeout != null) {
+      configureTimeout(builder, timeout);
+    }
+
     return builder.build();
+  }
+
+  private void configureTimeout(OtlpHttpSpanExporterBuilder builder, String timeout) {
+    builder.setTimeout(parseLong(timeout), MILLISECONDS);
+  }
+
+  private void configureHeaders(OtlpHttpSpanExporterBuilder builder, String headers) throws SpanExporterConfiguratorException {
+    try {
+      Map<String, String> retMap = new Gson().fromJson(
+                                                       headers, new TypeToken<HashMap<String, Object>>() {}.getType());
+
+      retMap.forEach(builder::addHeader);
+
+    } catch (Exception e) {
+      throw new SpanExporterConfiguratorException(e);
+    }
   }
 
   private void configureTls(OtlpHttpSpanExporterBuilder builder, SpanExporterConfiguration spanExporterConfiguration)
