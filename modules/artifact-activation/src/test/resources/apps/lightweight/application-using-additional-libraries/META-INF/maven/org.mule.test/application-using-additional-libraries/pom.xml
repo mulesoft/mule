@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mule.test</groupId>
+    <artifactId>application-using-additional-libraries</artifactId>
+    <packaging>mule-application</packaging>
+    <version>1.0.0</version>
+
+    <name>Mule Runtime Tooling Client :: Reusable application with additional dependencies</name>
+    <description>A Mule application for reusability using additional libraries and DB connector</description>
+
+    <build>
+        <plugins>
+            <!-- Only used to declare the shared libraries-->
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <classifier>mule-plugin</classifier>
+                    <additionalPluginDependencies>
+                        <plugin>
+                            <groupId>org.mule.connectors</groupId>
+                            <artifactId>mule-db-connector</artifactId>
+                            <additionalDependencies>
+                                <dependency>
+                                    <groupId>org.apache.derby</groupId>
+                                    <artifactId>derby</artifactId>
+                                    <version>10.11.1.1</version>
+                                </dependency>
+                            </additionalDependencies>
+                        </plugin>
+                    </additionalPluginDependencies>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-db-connector</artifactId>
+            <version>1.13.1</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,17 @@
+{
+  "name": "Db-Additional-Dep",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
+  "configs": ["testing.xml"],
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

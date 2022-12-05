@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.mule.test</groupId>
+    <artifactId>db-plugin-with-additional-dep</artifactId>
+    <version>1.0.0</version>
+    <packaging>mule-application</packaging>
+
+    <build>
+        <plugins>
+            <!-- Only used to declare the shared libraries-->
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-maven-plugin</artifactId>
+                <version>1.0.0</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.test</groupId>
+            <artifactId>application-using-additional-libraries</artifactId>
+            <version>1.0.0</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
+
+</project>
