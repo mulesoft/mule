@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -20,6 +18,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -36,6 +39,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -43,6 +47,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import java.util.UUID;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -62,6 +68,9 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   protected MuleContext muleContext;
 
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
   protected volatile ObjectStore<String> store;
   protected ObjectStore<String> privateStore;
   protected String storePrefix;
@@ -71,10 +80,15 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   private CompiledExpression compiledIdExpression;
   private CompiledExpression compiledValueExpression;
+  private boolean rethrowEnabled;
 
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  public void setRethrowEnabled(boolean rethrowEnabled) {
+    this.rethrowEnabled = rethrowEnabled;
   }
 
   @Override
@@ -85,6 +99,9 @@ public class IdempotentMessageValidator extends AbstractComponent
                  this.getClass().getName(), UUID.randomUUID());
     }
     setupObjectStore();
+    if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
+      setRethrowEnabled(true);
+    }
     compiledIdExpression = compile(idExpression, muleContext.getExpressionManager());
     compiledValueExpression = compile(valueExpression, muleContext.getExpressionManager());
   }
@@ -188,16 +205,43 @@ public class IdempotentMessageValidator extends AbstractComponent
     }
   }
 
+  private boolean acceptWithRethrowExceptionsInIdempotentMessageValidator(CoreEvent event) throws MuleException {
+    BindingContext bindingContext = event.asBindingContext();
+    try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
+      String id = getIdForEvent(session);
+      String value = getValueForEvent(session);
+
+      if (event != null && isNewMessage(event, id)) {
+        store.store(id, value);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (ObjectAlreadyExistsException ex) {
+      return false;
+    } catch (Exception e) {
+      LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
+      throw e;
+    }
+  }
+
+  private boolean rethrowIfFeatureFlagEnabled(MuleException e) throws MuleException {
+    if (rethrowEnabled) {
+      throw e;
+    }
+    return false;
+  }
+
   @Override
   public final CoreEvent process(CoreEvent event) throws MuleException {
-    if (accept(event)) {
+    if (rethrowEnabled ? acceptWithRethrowExceptionsInIdempotentMessageValidator(event) : accept(event)) {
       return event;
     } else {
       throw new DuplicateMessageException();
     }
   }
 
-  protected boolean isNewMessage(CoreEvent event, String id) {
+  protected boolean isNewMessage(CoreEvent event, String id) throws MuleException {
     try {
       if (store == null) {
         synchronized (this) {
@@ -209,7 +253,7 @@ public class IdempotentMessageValidator extends AbstractComponent
       LOGGER.error("Exception attempting to determine idempotency of incoming message for " + getLocation().getRootContainerName()
           + " from the connector "
           + event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), e);
-      return false;
+      return rethrowIfFeatureFlagEnabled(e);
     }
   }
 

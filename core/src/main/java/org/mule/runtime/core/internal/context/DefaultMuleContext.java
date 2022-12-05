@@ -13,6 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -304,6 +305,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureParallelForeachFlattenMessage();
       configureEnableByteBuddyObjectCreation();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
+      configureRethrowExceptionsInIdempotentMessageValidator();
     }
   }
 
@@ -1312,6 +1314,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureHonourErrorMappingsWhenPolicyAppliedOnOperation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureRethrowExceptionsInIdempotentMessageValidator() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
