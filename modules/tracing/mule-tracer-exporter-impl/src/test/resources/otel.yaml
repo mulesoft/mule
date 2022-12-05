@@ -24,9 +24,14 @@ receivers:
 exporters:
   logging:
     logLevel: $LOGGING_EXPORTER_LOG_lEVEL
+  otlp:
+    endpoint: $OTLP_EXPORTER_ENDPOINT
+    tls:
+      insecure: true
+    compression: none
 service:
   extensions: [health_check]
   pipelines:
     traces:
       receivers: [otlp, otlp/mtls]
-      exporters: [logging]
+      exporters: [logging, otlp]

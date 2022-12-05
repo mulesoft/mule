@@ -11,6 +11,11 @@ import static java.lang.System.getProperty;
 
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
+/**
+ * A {@link SpanExporterConfiguration} that is based on system properties.
+ *
+ * @since 4.5.0
+ */
 public class SystemPropertiesSpanExporterConfiguration implements SpanExporterConfiguration {
 
   @Override

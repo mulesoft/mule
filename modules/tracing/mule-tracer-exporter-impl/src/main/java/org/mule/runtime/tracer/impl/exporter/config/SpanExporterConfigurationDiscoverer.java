@@ -11,24 +11,30 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 /**
- * Discoverer for {@link SpanExporterConfiguration}'s.
+ * Discoverer for {@link SpanExporterConfiguration}'s through spi.
  *
  * @since 4.5.0
  */
 public class SpanExporterConfigurationDiscoverer {
 
+  private SpanExporterConfigurationDiscoverer() {}
+
   public static final SystemPropertiesSpanExporterConfiguration SYSTEM_PROPERTIES_SPAN_EXPORTER_CONFIGURATION =
       new SystemPropertiesSpanExporterConfiguration();
 
   public static SpanExporterConfiguration discoverSpanExporterConfiguration() {
-    SpanExporterConfiguration discoveredSpanExporterConfiguration = new SpiServiceRegistry()
-        .lookupProvider(SpanExporterConfiguration.class,
-                        SpanExporterConfiguration.class.getClassLoader());
+    try {
+      SpanExporterConfiguration discoveredSpanExporterConfiguration = new SpiServiceRegistry()
+          .lookupProvider(SpanExporterConfiguration.class,
+                          SpanExporterConfiguration.class.getClassLoader());
 
-    if (discoveredSpanExporterConfiguration == null) {
+      if (discoveredSpanExporterConfiguration == null) {
+        return SYSTEM_PROPERTIES_SPAN_EXPORTER_CONFIGURATION;
+      }
+    } catch (IllegalStateException e) {
       return SYSTEM_PROPERTIES_SPAN_EXPORTER_CONFIGURATION;
     }
 
-    return discoveredSpanExporterConfiguration;
+    return SYSTEM_PROPERTIES_SPAN_EXPORTER_CONFIGURATION;
   }
 }
