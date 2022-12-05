@@ -88,9 +88,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
 
-    // Assert that the the distributed trace context is not null.
-    assertNotNull(((SpanContextAware) deserialized.getContext()).getSpanContext());
-
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());
   }
