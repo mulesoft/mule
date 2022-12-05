@@ -83,7 +83,7 @@ public class FileSpanExporterConfigurationTestCase {
 
     @Override
     protected String getConfFolder() {
-      return "";
+      return ".";
     }
 
     @Override
