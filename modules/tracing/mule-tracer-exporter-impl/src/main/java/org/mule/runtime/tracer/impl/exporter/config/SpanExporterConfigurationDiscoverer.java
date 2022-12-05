@@ -38,6 +38,8 @@ public class SpanExporterConfigurationDiscoverer {
         LOGGER.warn("No configuration for optel export was found. Using system properties");
         return SYSTEM_PROPERTIES_SPAN_EXPORTER_CONFIGURATION;
       }
+
+      return discoveredSpanExporterConfiguration;
     } catch (IllegalStateException e) {
       LOGGER.warn("An exception was raised while trying to find the exporter configuration", e);
     }

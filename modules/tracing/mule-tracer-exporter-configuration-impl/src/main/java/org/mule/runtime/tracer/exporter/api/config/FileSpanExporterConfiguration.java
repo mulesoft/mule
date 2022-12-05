@@ -20,6 +20,7 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.util.Properties;
 
 /**
@@ -29,7 +30,8 @@ import java.util.Properties;
  */
 public class FileSpanExporterConfiguration implements SpanExporterConfiguration {
 
-  private static final String PROPERTIES_FILE_NAME = "tracer-exporter-config.conf";
+  private static final String PROPERTIES_FILE_NAME = "tracer-exporter.conf";
+
   private final ConfigurationPropertiesResolver propertyResolver;
   private final Properties properties;
 
@@ -53,7 +55,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
 
   private Properties getSpanExporterConfiguration() {
     try {
-      InputStream is = getResourceAsStream(getConfFolder() + getPropertiesFileName(), FileSpanExporterConfiguration.class);
+      InputStream is = getResourceAsStream(getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName(),
+                                           FileSpanExporterConfiguration.class);
       return loadProperties(is);
     } catch (IOException e) {
       return new Properties();
