@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
 import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
@@ -36,6 +37,7 @@ import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -60,6 +62,11 @@ public class LightweightDeployableProjectModelBuilderWithSystemDependenciesTestC
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Before
+  public void before() {
+    reset();
   }
 
   @After
