@@ -60,7 +60,8 @@ public class TypeWrapperTestCase {
   @Test
   public void getAnnotationsForMethodWrapper() {
     java.util.Optional<MethodElement> method = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader())).getEnclosingMethods().filter(m -> m.getName().contains("childMethod")).findAny();
+        .createTypeLoader(Thread.currentThread().getContextClassLoader())).getEnclosingMethods()
+            .filter(m -> m.getName().contains("childMethod")).findAny();
     assertThat(method.isPresent(), is(true));
     assertThat(method.get().getAnnotations().count(), is(1L));
     assertThat(method.get().getAnnotations()
@@ -71,7 +72,8 @@ public class TypeWrapperTestCase {
   @Test
   public void getAnnotationsForParameterWrapper() {
     java.util.Optional<MethodElement> method = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader())).getEnclosingMethods().filter(m -> m.getName().contains("childMethod")).findAny();
+        .createTypeLoader(Thread.currentThread().getContextClassLoader())).getEnclosingMethods()
+            .filter(m -> m.getName().contains("childMethod")).findAny();
     assertThat(method.isPresent(), is(true));
     assertThat(method.get().getParameters().size(), is(1));
     assertThat(method.get().getParameters().get(0).getAnnotations().count(), is(1L));
@@ -105,7 +107,10 @@ public class TypeWrapperTestCase {
     Type type = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     assertThat(type.getImplementingInterfaces().count(), is(1L));
-    assertThat(type.getImplementingInterfaces().anyMatch(i -> i.getTypeName().contains("org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapperTestCase$TestInterface")), is(true));
+    assertThat(type.getImplementingInterfaces()
+        .anyMatch(i -> i.getTypeName()
+            .contains("org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapperTestCase$TestInterface")),
+               is(true));
   }
 
   @Alias("Some Class Alias")

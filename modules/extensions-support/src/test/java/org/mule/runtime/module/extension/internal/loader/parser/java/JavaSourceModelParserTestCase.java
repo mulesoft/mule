@@ -34,10 +34,8 @@ import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
-import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
@@ -58,6 +56,7 @@ import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.connectivity.ReconnectionCallback;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.parameter.Literal;
+import org.mule.sdk.api.runtime.source.BackPressureContext;
 import org.mule.sdk.api.runtime.source.SourceCompletionCallback;
 import org.mule.sdk.api.runtime.source.SourceResult;
 import org.mule.sdk.api.store.ObjectStoreManager;
@@ -315,7 +314,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceOnBackPressure.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
   @Test

@@ -159,13 +159,13 @@ public class JavaExtensionModelParserTestCase {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
     ExtensionTypeWrapper<ExtensionWithSuperExtension> extensionTypeWrapper =
-            new ExtensionTypeWrapper<>(ExtensionWithSuperExtension.class, typeLoader);
+        new ExtensionTypeWrapper<>(ExtensionWithSuperExtension.class, typeLoader);
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
     JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
 
     Optional<MuleVersion> minMuleVersion = javaExtensionModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
   @Test
@@ -262,6 +262,7 @@ public class JavaExtensionModelParserTestCase {
   }
 
   @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionWithSuperExtension")
-  private static class ExtensionWithSuperExtension extends ParameterizedExtension {}
+  private static class ExtensionWithSuperExtension extends ParameterizedExtension {
+  }
 
 }

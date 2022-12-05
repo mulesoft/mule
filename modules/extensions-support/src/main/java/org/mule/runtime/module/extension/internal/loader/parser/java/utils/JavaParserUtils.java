@@ -69,7 +69,8 @@ public final class JavaParserUtils {
    * @return the minimum mule version of the given extension
    */
   public static MuleVersion calculateExtensionMinMuleVersion(Type extension) {
-    MuleVersion calculatedMMV = extension.getSuperType().map(JavaParserUtils::calculateExtensionMinMuleVersion).orElse(FIRST_MULE_VERSION);
+    MuleVersion calculatedMMV =
+        extension.getSuperType().map(JavaParserUtils::calculateExtensionMinMuleVersion).orElse(FIRST_MULE_VERSION);
     if (extension.isAnnotatedWith(Extension.class)) {
       calculatedMMV = max(calculatedMMV, SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION);
     }
@@ -78,7 +79,8 @@ public final class JavaParserUtils {
       for (FieldElement field : extension.getFields()) {
         calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
       }
-      calculatedMMV = max(calculatedMMV, extension.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION)).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+      calculatedMMV = max(calculatedMMV, extension.getEnclosingMethods()
+          .map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION)).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     }
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(extension);
     MuleVersion finalCalculatedMMV = calculatedMMV;
@@ -111,7 +113,8 @@ public final class JavaParserUtils {
     for (FieldElement field : config.getFields()) {
       calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
     }
-    calculatedMMV = max(calculatedMMV, config.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION)).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    calculatedMMV = max(calculatedMMV, config.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION))
+        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(config);
     MuleVersion finalCalculatedMMV = calculatedMMV;
     return classLevelMMV.map(mmv -> {
@@ -174,7 +177,8 @@ public final class JavaParserUtils {
       }
       return FIRST_MULE_VERSION;
     }).orElse(FIRST_MULE_VERSION);
-    calculatedMMV = max(calculatedMMV, connectionProvider.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    calculatedMMV = max(calculatedMMV, connectionProvider.getImplementingInterfaces()
+        .map(JavaParserUtils::calculateInterfacesMinMuleVersion).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     calculatedMMV = max(calculatedMMV, connectionProvider.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : connectionProvider.getFields()) {
@@ -219,13 +223,15 @@ public final class JavaParserUtils {
           max(calculatedMMV,
               calculateSourceGenericsMinMuleVersion(source.getSuperTypeGenerics(org.mule.sdk.api.runtime.source.Source.class)));
     }
-    calculatedMMV = max(calculatedMMV, source.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    calculatedMMV = max(calculatedMMV, source.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion)
+        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     calculatedMMV = max(calculatedMMV, source.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : source.getFields()) {
       calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
     }
-    calculatedMMV = max(calculatedMMV, source.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION)).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    calculatedMMV = max(calculatedMMV, source.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION))
+        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(source);
     MuleVersion finalCalculatedMMV = calculatedMMV;
     return classLevelMMV.map(mmv -> {
@@ -291,7 +297,8 @@ public final class JavaParserUtils {
     if (belongsToSdkPackages(type.getTypeName())) {
       return calculatedMMV;
     }
-    calculatedMMV = max(calculatedMMV, type.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    calculatedMMV = max(calculatedMMV, type.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion)
+        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     return calculatedMMV;
   }
 
