@@ -30,6 +30,7 @@ import static java.lang.Math.random;
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -135,7 +136,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
 
-    resolveDeployableDependencies(aetherMavenClient, pom, pomModel, activeProfiles, deployableArtifactCoordinates);
+    resolveDeployableDependencies(aetherMavenClient, pom, pomModel, activeProfiles);
 
     resolveDeployablePluginsData(deployableMavenBundleDependencies);
 
@@ -201,19 +202,18 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   /**
    * Resolves the dependencies of the deployable in the various forms needed to obtain the {@link DeployableProjectModel}.
    *
-   * @param aetherMavenClient             the configured {@link AetherMavenClient}.
-   * @param pom                           POM file.
-   * @param pomModel                      parsed POM model.
-   * @param activeProfiles                active Maven profiles.
-   * @param deployableArtifactCoordinates artifact coordinates of the deployable.
+   * @param aetherMavenClient the configured {@link AetherMavenClient}.
+   * @param pom               POM file.
+   * @param pomModel          parsed POM model.
+   * @param activeProfiles    active Maven profiles.
    */
   private void resolveDeployableDependencies(AetherMavenClient aetherMavenClient, File pom, Model pomModel,
-                                             List<String> activeProfiles, ArtifactCoordinates deployableArtifactCoordinates) {
+                                             List<String> activeProfiles) {
     DeployableDependencyResolver deployableDependencyResolver = new DeployableDependencyResolver(aetherMavenClient);
 
     // Resolve the Maven bundle dependencies
     deployableMavenBundleDependencies =
-        deployableDependencyResolver.resolveDeployableDependencies(pom, isIncludeTestDependencies(), empty());
+        deployableDependencyResolver.resolveDeployableDependencies(pom, isIncludeTestDependencies(), getMavenReactorResolver());
 
     // MTF/MUnit declares the mule-plugin being tested as system scope, therefore its transitive dependencies
     // will not be included in the dependency graph of the deployable artifact and need to be resolved separately
@@ -240,6 +240,17 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
                     && bd.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId())))
             .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
             .collect(toSet());
+  }
+
+  /**
+   * Get the {@link MavenReactorResolver} configured. If it is configured the {@link DeployableDependencyResolver} will look up
+   * the dependencies also in this repository. If {@link Optional#empty()} it will look up in the repositories configured in the
+   * system.
+   *
+   * @return an {@link Optional} {@link MavenReactorResolver}.
+   */
+  protected Optional<MavenReactorResolver> getMavenReactorResolver() {
+    return empty();
   }
 
   private List<BundleDependency> resolveSystemScopeDependencies(AetherMavenClient aetherMavenClient,
@@ -364,10 +375,23 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     AdditionalPluginDependenciesResolver additionalPluginDependenciesResolver =
         new AdditionalPluginDependenciesResolver(aetherMavenClient,
                                                  initialAdditionalPluginDependencies,
-                                                 new File("temp"));
+                                                 new File("temp"),
+                                                 getPomModels());
 
     additionalPluginDependencies = toPluginDependencies(additionalPluginDependenciesResolver
         .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));
+  }
+
+
+  /**
+   * Get a {@link Map} pointing to the {@link Model} of each artifact present in the map. It's used as cache to get the
+   * {@link Model}s of already loaded dependencies. We use this cache in {@link AdditionalPluginDependenciesResolver} to get the
+   * {@link Model} of a dependency when a pom file is not available but the model can be generated from other available info.
+   *
+   * @return a {@link Map} with {@link ArtifactCoordinates} as key and a {@link Supplier} of {@link Model} as value.
+   */
+  protected Map<ArtifactCoordinates, Supplier<Model>> getPomModels() {
+    return emptyMap();
   }
 
   private void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
