@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
@@ -31,8 +30,9 @@ import java.util.function.Predicate;
  */
 public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation {
 
-  public ErrorHandlerOnErrorTypeExists(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+  public ErrorHandlerOnErrorTypeExists(Optional<FeatureFlaggingService> featureFlaggingService,
+                                       boolean waiveUnresolvedPropertiesOnParams) {
+    super(featureFlaggingService, waiveUnresolvedPropertiesOnParams);
   }
 
   @Override
@@ -50,13 +50,12 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
     return currentElemement(comp -> (comp.getIdentifier().equals(ON_ERROR_IDENTIFIER)
         || comp.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)
         || comp.getIdentifier().equals(ON_ERROR_CONTINUE_IDENTIFIER))
-        && comp.getParameter(DEFAULT_GROUP_NAME, "type") != null
-        && comp.getParameter(DEFAULT_GROUP_NAME, "type").getResolvedRawValue() != null);
+        && isErrorTypePresent(comp));
   }
 
   @Override
-  public Optional<ValidationResultItem> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
-    final ComponentParameterAst errorTypeParam = onErrorModel.getParameter(DEFAULT_GROUP_NAME, "type");
+  public Optional<ValidationResultItem> validate(ComponentAst onErrorComponent, ArtifactAst artifact) {
+    final ComponentParameterAst errorTypeParam = getErrorTypeParam(onErrorComponent);
     for (String type : errorTypeParam.getResolvedRawValue().split(",")) {
       final ComponentIdentifier parsedErrorType = parseErrorType(type.trim());
 
@@ -67,7 +66,7 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
 
       final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(parsedErrorType);
       if (!errorType.isPresent()) {
-        return of(create(onErrorModel, errorTypeParam, this, format("Could not find error '%s'", type.trim())));
+        return of(create(onErrorComponent, errorTypeParam, this, format("Could not find error '%s'", type.trim())));
       }
     }
 

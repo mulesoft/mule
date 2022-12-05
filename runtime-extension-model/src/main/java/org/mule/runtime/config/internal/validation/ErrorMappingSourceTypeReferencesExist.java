@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesValidation {
 
   public ErrorMappingSourceTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+    super(featureFlaggingService, false);
   }
 
   @Override

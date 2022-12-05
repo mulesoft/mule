@@ -35,7 +35,7 @@ public class FlowRefPointsToExistingFlowTestCase extends AbstractCoreValidationT
 
   @Override
   protected Validation getValidation() {
-    return new FlowRefPointsToExistingFlow();
+    return new FlowRefPointsToExistingFlow(false);
   }
 
   @Test

@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
@@ -21,6 +22,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -30,6 +33,7 @@ import org.mule.runtime.api.util.IdentifierParsingUtils;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
@@ -61,9 +65,12 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
+  private final boolean waiveUnresolvedPropertiesOnParams;
 
-  public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService) {
+  public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService,
+                                      boolean waiveUnresolvedPropertiesOnParams) {
     this.featureFlaggingService = featureFlaggingService;
+    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
   }
 
   @Override
@@ -71,6 +78,30 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_ERROR_TYPES_VALIDATION)).orElse(true)
         ? ERROR
         : WARN;
+  }
+
+  protected boolean isErrorTypePresent(ComponentAst component) {
+    String errorTypeString;
+    try {
+      errorTypeString = getErrorTypeParam(component).getResolvedRawValue();
+    } catch (PropertyNotFoundException pnfe) {
+      if (waiveUnresolvedPropertiesOnParams) {
+        return false;
+      } else {
+        throw pnfe;
+      }
+    }
+    return !isEmpty(errorTypeString);
+  }
+
+  protected boolean isErrorTypePresentAndPropertyDependant(ComponentAst component) {
+    String errorTypeString = getErrorTypeParam(component).getRawValue();
+    return !isEmpty(errorTypeString)
+        && !errorTypeString.contains("${");
+  }
+
+  protected ComponentParameterAst getErrorTypeParam(ComponentAst component) {
+    return component.getParameter(DEFAULT_GROUP_NAME, "type");
   }
 
   protected static boolean errorMappingPresent(ComponentAst operationComponent) {

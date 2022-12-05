@@ -27,9 +27,12 @@ import java.util.function.Predicate;
 public class ConfigReferenceParametersStereotypesValidations extends AbstractReferenceParametersStereotypesValidations {
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
+  private final boolean waiveUnresolvedPropertiesOnParams;
 
-  public ConfigReferenceParametersStereotypesValidations(Optional<FeatureFlaggingService> featureFlaggingService) {
+  public ConfigReferenceParametersStereotypesValidations(Optional<FeatureFlaggingService> featureFlaggingService,
+                                                         boolean waiveUnresolvedPropertiesOnParams) {
     this.featureFlaggingService = featureFlaggingService;
+    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
   }
 
   public static final ComponentIdentifier CACHE_IDENTIFIER =
@@ -90,7 +93,14 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
   }
 
   @Override
-  protected Predicate<? super ComponentAstDependency> filter(ArtifactAst artifact) {
+  protected boolean filterComponent(ComponentAstDependency missingDependency) {
+    return super.filterComponent(missingDependency)
+        && !(waiveUnresolvedPropertiesOnParams
+            || missingDependency.getName().contains("${"));
+  }
+
+  @Override
+  protected Predicate<? super ComponentAstDependency> filterArtifact(ArtifactAst artifact) {
     Predicate<ComponentAstDependency> configPredicate = missing ->
     // Keep backwards compatibility with custom defined cachingStrategies
     !missing.getComponent().getIdentifier().equals(CACHE_IDENTIFIER)

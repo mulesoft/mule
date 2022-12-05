@@ -35,6 +35,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   private ClassLoader artifactRegionClassLoader;
 
+  private boolean waiveUnresolvedPropertiesOnParams;
+
   @Inject
   private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
@@ -53,8 +55,10 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new NamedTopLevelElementsHaveName(),
                                                           new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
-                                                          // make this general for all references via stereotypes
-                                                          new FlowRefPointsToExistingFlow(),
+                                                          // make these general for all references via stereotypes
+                                                          new FlowRefPointsToNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new FlowRefPointsToExistingFlow(waiveUnresolvedPropertiesOnParams),
+
                                                           new SourceErrorMappingAnyNotRepeated(),
                                                           new SourceErrorMappingAnyLast(),
                                                           new SourceErrorMappingTypeNotRepeated(),
@@ -62,11 +66,24 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
-                                                          new RaiseErrorTypeReferencesExist(featureFlaggingService),
+                                                          new RaiseErrorTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new RaiseErrorTypeReferencesExist(featureFlaggingService,
+                                                                                            waiveUnresolvedPropertiesOnParams),
                                                           new ErrorMappingTargetTypeReferencesExist(featureFlaggingService),
                                                           new ErrorMappingSourceTypeReferencesExist(featureFlaggingService),
                                                           new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService),
-                                                          new ErrorHandlerOnErrorTypeExists(featureFlaggingService),
+                                                          // new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
+                                                          // waiveUnresolvedPropertiesOnParams),
+                                                          // new
+                                                          // ErrorMappingSourceTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          // new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
+                                                          // waiveUnresolvedPropertiesOnParams),
+                                                          // new
+                                                          // ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
+                                                          // waiveUnresolvedPropertiesOnParams?),
+                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
+                                                                                            waiveUnresolvedPropertiesOnParams),
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
@@ -78,7 +95,9 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new RoundRobinRoutes(),
                                                           new FirstSuccessfulRoutes(),
                                                           new ScatterGatherRoutes(),
-                                                          new ParseTemplateResourceExist(artifactRegionClassLoader),
+                                                          new ParseTemplateResourceNotPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new ParseTemplateResourceExist(artifactRegionClassLoader,
+                                                                                         waiveUnresolvedPropertiesOnParams),
                                                           new SourcePositiveMaxItemsPerPoll(),
                                                           new OperationRaiseErrorDoesntSpecifyNamespace(),
                                                           new OperationDoesNotHaveCoreRaiseError(),
@@ -116,12 +135,18 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService),
+                  new ConfigReferenceParametersNonPropertyValueValidations(waiveUnresolvedPropertiesOnParams),
+                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, waiveUnresolvedPropertiesOnParams),
                   new ReferenceParametersStereotypesValidations());
   }
 
   @Override
   public void setArtifactRegionClassLoader(ClassLoader artifactRegionClassLoader) {
     this.artifactRegionClassLoader = artifactRegionClassLoader;
+  }
+
+  @Override
+  public void setWaiveUnresolvedPropertiesOnParams(boolean waiveUnresolvedPropertiesOnParams) {
+    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
   }
 }

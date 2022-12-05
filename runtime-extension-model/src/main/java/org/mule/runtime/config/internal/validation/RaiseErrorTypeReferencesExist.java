@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -29,15 +28,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Referenced error types do exist in the context of the artifact
  */
 public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation {
 
-  public RaiseErrorTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+  public RaiseErrorTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService,
+                                       boolean waiveUnresolvedPropertiesOnParams) {
+    super(featureFlaggingService, waiveUnresolvedPropertiesOnParams);
   }
 
   @Override
@@ -59,12 +57,12 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
         // there is already another validation for the presence of this param
-        .and(component -> !StringUtils.isEmpty(component.getParameter(DEFAULT_GROUP_NAME, "type").getResolvedRawValue())));
+        .and(this::isErrorTypePresent));
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ComponentParameterAst errorTypeParam = component.getParameter(DEFAULT_GROUP_NAME, "type");
+    final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
     final String errorTypeString = errorTypeParam.getResolvedRawValue();
 
     final Set<String> errorNamespaces = artifact.dependencies().stream()
@@ -86,3 +84,4 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
   }
 
 }
+

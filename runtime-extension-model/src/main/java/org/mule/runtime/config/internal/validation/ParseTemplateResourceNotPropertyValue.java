@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class ParseTemplateResourceExist implements Validation {
+public class ParseTemplateResourceNotPropertyValue implements Validation {
 
   private static final String PARSE_TEMPLATE_ELEMENT_NAME = "parse-template";
 
@@ -41,27 +41,25 @@ public class ParseTemplateResourceExist implements Validation {
       .name(PARSE_TEMPLATE_ELEMENT_NAME)
       .build();
 
-  private final ClassLoader artifactRegionClassLoader;
-  private final boolean waiveUnresolvedPropertiesOnParams;
+  private final boolean enabled;
 
-  public ParseTemplateResourceExist(ClassLoader artifactRegionClassLoader, boolean waiveUnresolvedPropertiesOnParams) {
-    this.artifactRegionClassLoader = artifactRegionClassLoader;
-    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
+  public ParseTemplateResourceNotPropertyValue(boolean enabled) {
+    this.enabled = enabled;
   }
 
   @Override
   public String getName() {
-    return "'parse-template' resources exist";
+    return "'parse-template' resources are fixed";
   }
 
   @Override
   public String getDescription() {
-    return "Template file referenced in 'parse-template' exists and is accessible.";
+    return "Template file referenced in 'parse-template' is fixed.";
   }
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override
@@ -71,7 +69,7 @@ public class ParseTemplateResourceExist implements Validation {
           try {
             return component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM).getValue().getRight() != null;
           } catch (PropertyNotFoundException pnfe) {
-            if (waiveUnresolvedPropertiesOnParams) {
+            if (enabled) {
               return false;
             } else {
               throw pnfe;
@@ -83,13 +81,15 @@ public class ParseTemplateResourceExist implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     ComponentParameterAst locationParam = component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM);
-    String location = (String) locationParam.getValue().getRight();
+    String locationAttributeRawValue = locationParam.getRawValue();
 
-    if (artifactRegionClassLoader.getResource(location) == null) {
-      return of(create(component, locationParam, this, "Template location: '" + location + "' not found"));
+    if (locationAttributeRawValue.contains("${")) {
+      return of(create(component, locationParam, this,
+                       "'" + PARSE_TEMPLATE_ELEMENT_NAME + "' is pointing to '" + locationAttributeRawValue
+                           + "' which is resolved with a property and may cause the artifact to have a different structure on different environments."));
+    } else {
+      return empty();
     }
-
-    return empty();
   }
 
 }

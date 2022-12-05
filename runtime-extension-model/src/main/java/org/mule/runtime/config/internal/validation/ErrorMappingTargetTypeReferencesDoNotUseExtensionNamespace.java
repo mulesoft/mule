@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 public class ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace extends AbstractErrorTypesValidation {
 
   public ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+    super(featureFlaggingService, false);
   }
 
   @Override

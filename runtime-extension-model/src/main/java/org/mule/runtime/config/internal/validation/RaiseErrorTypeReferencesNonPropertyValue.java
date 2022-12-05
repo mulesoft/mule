@@ -8,13 +8,12 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -24,47 +23,56 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
- * Referenced error types cannot be empty or null
+ * Referenced error types do exist in the context of the artifact
  */
-public class RaiseErrorTypeReferencesPresent extends AbstractErrorTypesValidation {
+public class RaiseErrorTypeReferencesNonPropertyValue extends AbstractErrorTypesValidation {
 
-  public RaiseErrorTypeReferencesPresent(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService, false);
+  private final boolean enabled;
+
+  public RaiseErrorTypeReferencesNonPropertyValue(boolean enabled) {
+    super(null, false);
+    this.enabled = enabled;
   }
 
   @Override
   public String getName() {
-    return "Error Type references present";
+    return "Error Type references fixed";
   }
 
   @Override
   public String getDescription() {
-    return "Referenced error types cannot be empty or null.";
+    return "Referenced error types are fixed.";
   }
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER));
+    if (enabled) {
+      return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
+          .and(this::isErrorTypePresentAndPropertyDependant));
+    } else {
+      return c -> false;
+    }
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
-    final String errorTypeString = errorTypeParam.getResolvedRawValue();
+    final String errorTypeRawValue = errorTypeParam.getRawValue();
 
-    if (StringUtils.isEmpty(errorTypeString)) {
-      return of(create(component, errorTypeParam, this, "type cannot be an empty string or null "));
+    if (errorTypeRawValue.contains("${")) {
+      return of(create(component, errorTypeParam, this,
+                       "'" + RAISE_ERROR_IDENTIFIER + "' has 'type' '" + errorTypeRawValue
+                           + "' which is resolved with a property and may cause the artifact to have different behavior on different environments."));
     } else {
       return empty();
     }
   }
 
 }
+
