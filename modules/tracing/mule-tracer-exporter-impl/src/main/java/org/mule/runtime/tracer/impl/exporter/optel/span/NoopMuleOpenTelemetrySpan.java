@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter;
+package org.mule.runtime.tracer.impl.exporter.optel.span;
 
 import java.util.Collections;
 import java.util.Map;

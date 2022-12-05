@@ -34,6 +34,7 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)

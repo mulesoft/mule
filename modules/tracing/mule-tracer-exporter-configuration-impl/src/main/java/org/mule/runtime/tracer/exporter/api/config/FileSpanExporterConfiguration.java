@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * A {@link SpanExporterConfiguration} based on a file in the conf folder.
+ *
+ * @since 4.5.0
+ */
 public class FileSpanExporterConfiguration implements SpanExporterConfiguration {
 
   private static final String PROPERTIES_FILE_NAME = "tracer-exporter-config.conf";

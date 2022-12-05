@@ -16,6 +16,7 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
+import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources;
 
 import javax.inject.Inject;
 
