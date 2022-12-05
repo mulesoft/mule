@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 import static org.springframework.core.ResolvableType.forMethodParameter;
@@ -15,11 +16,13 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.InfrastructureType;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.VariableElement;
 
@@ -71,6 +74,11 @@ public final class ParameterWrapper implements ParameterElement {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, parameter, typeLoader))
         : empty();
+  }
+
+  @Override
+  public Stream<Type> getAnnotations() {
+    return stream(parameter.getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), typeLoader));
   }
 
   /**

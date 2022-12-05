@@ -15,6 +15,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.TypeElement;
 
@@ -169,4 +170,16 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
    * @since 4.2
    */
   Optional<MethodElement> getMethod(String name, Class<?>... parameterTypes);
+
+  /**
+   * @return All the {@link MethodElement}s present in the class
+   * @since 4.5
+   */
+  Stream<MethodElement> getEnclosingMethods();
+
+  /**
+   * @return All the Interfaces this class implements as {@link Type}s
+   * @since 4.5
+   */
+  Stream<Type> getImplementingInterfaces();
 }

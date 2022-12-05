@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
@@ -96,4 +96,9 @@ public interface ConfigurationModelParser extends StereotypeModelParser, Additio
   Optional<DeprecationModel> getDeprecationModel();
 
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
+
+  /**
+   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   */
+  Optional<MuleVersion> getMinMuleVersion();
 }

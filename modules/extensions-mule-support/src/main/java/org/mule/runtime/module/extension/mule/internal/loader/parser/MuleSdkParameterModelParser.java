@@ -25,6 +25,7 @@ import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -247,6 +248,11 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return empty();
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return of(new MuleVersion("4.5"));
   }
 
   @Override

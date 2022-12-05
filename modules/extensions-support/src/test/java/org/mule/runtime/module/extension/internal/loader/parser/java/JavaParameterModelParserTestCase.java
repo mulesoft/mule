@@ -9,10 +9,12 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
@@ -40,7 +42,7 @@ public class JavaParameterModelParserTestCase {
   @Test
   public void oAuthParameter() throws Exception {
     Optional<OAuthParameterModelProperty> oAuthParameterModelProperty =
-        getOAuthParameterModelPropertyFromParameterName("outhParameter");
+        getOAuthParameterModelPropertyFromParameterName("oAuthParameter");
     assertThat(oAuthParameterModelProperty.isPresent(), is(true));
     assertThat(oAuthParameterModelProperty.get().getPlacement(), is(PARAMETER_PLACEMENT));
     assertThat(oAuthParameterModelProperty.get().getRequestAlias(), is(ALIAS));
@@ -49,10 +51,32 @@ public class JavaParameterModelParserTestCase {
   @Test
   public void sdkOAuthParameter() throws Exception {
     Optional<OAuthParameterModelProperty> oAuthParameterModelProperty =
-        getOAuthParameterModelPropertyFromParameterName("sdkOuthParameter");
+        getOAuthParameterModelPropertyFromParameterName("sdkOAuthParameter");
     assertThat(oAuthParameterModelProperty.isPresent(), is(true));
     assertThat(oAuthParameterModelProperty.get().getPlacement(), is(PARAMETER_PLACEMENT));
     assertThat(oAuthParameterModelProperty.get().getRequestAlias(), is(ALIAS));
+  }
+
+  @Test
+  public void minMuleVersionParameter() throws Exception {
+    ExtensionParameter extensionParameter = new FieldWrapper(TestConnectionProvider.class
+        .getField("parameter"), new DefaultExtensionsTypeLoaderFactory()
+            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    JavaParameterModelParser javaParameterModelParser =
+        new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+    Optional<MuleVersion> minMuleVersion = javaParameterModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(false));
+  }
+
+  @Test
+  public void minMuleVersionSdkParameter() throws Exception {
+    ExtensionParameter extensionParameter = new FieldWrapper(TestConnectionProvider.class
+        .getField("sdkOAuthParameter"), new DefaultExtensionsTypeLoaderFactory()
+            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    JavaParameterModelParser javaParameterModelParser =
+        new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+    Optional<MuleVersion> minMuleVersion = javaParameterModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(false));
   }
 
   private Optional<OAuthParameterModelProperty> getOAuthParameterModelPropertyFromParameterName(String parameterName)
@@ -72,11 +96,11 @@ public class JavaParameterModelParserTestCase {
 
     @OAuthParameter(requestAlias = ALIAS,
         placement = HttpParameterPlacement.HEADERS)
-    public String outhParameter;
+    public String oAuthParameter;
 
     @org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter(requestAlias = ALIAS,
         placement = org.mule.sdk.api.runtime.parameter.HttpParameterPlacement.HEADERS)
-    public String sdkOuthParameter;
+    public String sdkOAuthParameter;
 
     @Override
     public Object connect() throws ConnectionException {

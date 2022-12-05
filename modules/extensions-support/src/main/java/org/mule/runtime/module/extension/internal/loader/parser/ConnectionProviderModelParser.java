@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
@@ -95,4 +96,9 @@ public interface ConnectionProviderModelParser extends SemanticTermsParser, Ster
   Optional<DisplayModel> getDisplayModel();
 
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
+
+  /**
+   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   */
+  Optional<MuleVersion> getMinMuleVersion();
 }

@@ -43,6 +43,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -329,6 +330,11 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(parameter);
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return empty();
   }
 
   private void collectAdditionalModelProperties() {
