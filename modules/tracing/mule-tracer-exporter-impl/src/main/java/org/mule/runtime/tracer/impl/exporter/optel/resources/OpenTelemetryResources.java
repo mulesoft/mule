@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
-import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
@@ -19,6 +18,7 @@ import static java.lang.Integer.parseInt;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
+import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 import static io.opentelemetry.sdk.trace.export.SimpleSpanProcessor.create;
 
