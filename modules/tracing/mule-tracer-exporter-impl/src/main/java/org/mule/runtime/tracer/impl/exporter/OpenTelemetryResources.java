@@ -46,11 +46,11 @@ public class OpenTelemetryResources {
 
   private static final ContextPropagators PROPAGATOR = create(W3CTraceContextPropagator.getInstance());
 
-  private static final String OPENTELEMETRY_EXPORT_ENABLED_SYSPROP = "mule.openetelemetry.export.enabled";
-  private static final String MULE_OPENTELEMETRY_ENDPOINT_SYSPROP = "mule.opentelemetry.endpoint";
-  private static final String MULE_OPENTELEMETRY_PROTOCOL_SYSPROP = "mule.opentelemetry.export.protocol";
-  private static final String MULE_OPENTELEMETRY_EXPORT_BATCH_SIZE_SYSPROP = "mule.opentelemetry.export.batch.size";
-  private static final String MULE_OPENTELEMETRY_EXPORT_BATCH_QUEUE_SIZE_SYSPROP = "mule.opentelemetry.export.queue.size";
+  public static final String OPENTELEMETRY_EXPORT_ENABLED_SYSPROP = "mule.openetelemetry.export.enabled";
+  public static final String MULE_OPENTELEMETRY_ENDPOINT_SYSPROP = "mule.opentelemetry.endpoint";
+  public static final String MULE_OPENTELEMETRY_PROTOCOL_SYSPROP = "mule.opentelemetry.export.protocol";
+  public static final String MULE_OPENTELEMETRY_EXPORT_BATCH_SIZE_SYSPROP = "mule.opentelemetry.export.batch.size";
+  public static final String MULE_OPENTELEMETRY_EXPORT_BATCH_QUEUE_SIZE_SYSPROP = "mule.opentelemetry.export.queue.size";
 
   private static final String HTTP_PROTOCOL_NAME = "HTTP";
 
