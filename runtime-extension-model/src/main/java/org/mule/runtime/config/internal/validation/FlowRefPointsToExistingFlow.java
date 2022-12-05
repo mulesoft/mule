@@ -23,7 +23,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
@@ -66,15 +65,14 @@ public class FlowRefPointsToExistingFlow implements Validation {
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
         .and(currentElemement(component -> {
-          try {
-            return component.getParameter(DEFAULT_GROUP_NAME, "name").getValue().isRight();
-          } catch (PropertyNotFoundException pnfe) {
-            if (waiveUnresolvedPropertiesOnParams) {
+          ComponentParameterAst flowRefNameParameter = component.getParameter(DEFAULT_GROUP_NAME, "name");
+          if (waiveUnresolvedPropertiesOnParams) {
+            if (flowRefNameParameter.getRawValue().contains("${")) {
               return false;
-            } else {
-              throw pnfe;
             }
           }
+
+          return flowRefNameParameter.getValue().isRight();
         }));
   }
 

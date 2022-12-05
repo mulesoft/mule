@@ -34,8 +34,9 @@ import java.util.function.Predicate;
  */
 public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesValidation {
 
-  public ErrorMappingTargetTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService, false);
+  public ErrorMappingTargetTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService,
+                                               boolean waiveUnresolvedPropertiesOnParams) {
+    super(featureFlaggingService, waiveUnresolvedPropertiesOnParams);
   }
 
   @Override
@@ -55,7 +56,8 @@ public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesVal
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(AbstractErrorTypesValidation::errorMappingPresent);
+    return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent)
+        .and(this::errorMappingTargetNotPropertyDependant));
   }
 
   @Override

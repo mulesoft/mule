@@ -58,7 +58,9 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           // make these general for all references via stereotypes
                                                           new FlowRefPointsToNonPropertyValue(waiveUnresolvedPropertiesOnParams),
                                                           new FlowRefPointsToExistingFlow(waiveUnresolvedPropertiesOnParams),
+                                                          // --
 
+                                                          // Error types + error handling
                                                           new SourceErrorMappingAnyNotRepeated(),
                                                           new SourceErrorMappingAnyLast(),
                                                           new SourceErrorMappingTypeNotRepeated(),
@@ -69,21 +71,19 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new RaiseErrorTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
                                                           new RaiseErrorTypeReferencesExist(featureFlaggingService,
                                                                                             waiveUnresolvedPropertiesOnParams),
-                                                          new ErrorMappingTargetTypeReferencesExist(featureFlaggingService),
-                                                          new ErrorMappingSourceTypeReferencesExist(featureFlaggingService),
-                                                          new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService),
-                                                          // new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
-                                                          // waiveUnresolvedPropertiesOnParams),
-                                                          // new
-                                                          // ErrorMappingSourceTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
-                                                          // new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
-                                                          // waiveUnresolvedPropertiesOnParams),
-                                                          // new
-                                                          // ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
-                                                          // waiveUnresolvedPropertiesOnParams?),
+                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
+                                                                                                    waiveUnresolvedPropertiesOnParams),
+                                                          new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
+                                                                                                                         waiveUnresolvedPropertiesOnParams),
+                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
+                                                                                                    waiveUnresolvedPropertiesOnParams),
                                                           new ErrorHandlerOnErrorTypeNonPropertyValue(waiveUnresolvedPropertiesOnParams),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
                                                                                             waiveUnresolvedPropertiesOnParams),
+                                                          // --
+
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),

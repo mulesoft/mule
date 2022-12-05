@@ -33,8 +33,9 @@ import java.util.function.Predicate;
  */
 public class ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace extends AbstractErrorTypesValidation {
 
-  public ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService, false);
+  public ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(Optional<FeatureFlaggingService> featureFlaggingService,
+                                                                    boolean waiveUnresolvedPropertiesOnParams) {
+    super(featureFlaggingService, waiveUnresolvedPropertiesOnParams);
   }
 
   @Override
@@ -49,7 +50,8 @@ public class ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace extends 
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(AbstractErrorTypesValidation::errorMappingPresent);
+    return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent)
+        .and(this::errorMappingTargetNotPropertyDependant));
   }
 
   @Override

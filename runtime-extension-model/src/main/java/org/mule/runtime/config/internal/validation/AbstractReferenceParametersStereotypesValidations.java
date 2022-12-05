@@ -32,11 +32,7 @@ public abstract class AbstractReferenceParametersStereotypesValidations implemen
         .filter(filterArtifact(artifact))
         .filter(missing -> filterComponent(missing))
         .map(missing -> create(missing.getComponent(), missing.getParameter(), this,
-                               format("Referenced component '%s' must be one of stereotypes %s.",
-                                      missing.getName(),
-                                      missing.getAllowedStereotypes().stream()
-                                          .map(st -> st.getNamespace() + ":" + st.getType())
-                                          .collect(joining(", ", "[", "]")))))
+                               validationMessage(missing)))
         .collect(toList());
   }
 
@@ -51,5 +47,13 @@ public abstract class AbstractReferenceParametersStereotypesValidations implemen
   }
 
   protected abstract Predicate<? super ComponentAstDependency> filterArtifact(ArtifactAst artifact);
+
+  protected String validationMessage(ComponentAstDependency missing) {
+    return format("Referenced component '%s' must be one of stereotypes %s.",
+                  missing.getName(),
+                  missing.getAllowedStereotypes().stream()
+                      .map(st -> st.getNamespace() + ":" + st.getType())
+                      .collect(joining(", ", "[", "]")));
+  }
 
 }
