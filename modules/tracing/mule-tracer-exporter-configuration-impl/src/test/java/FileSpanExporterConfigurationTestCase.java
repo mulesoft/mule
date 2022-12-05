@@ -5,23 +5,24 @@
  * LICENSE.txt file.
  */
 
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
+
 import static java.lang.System.setProperty;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
+
+import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
+import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
-import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
-
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
