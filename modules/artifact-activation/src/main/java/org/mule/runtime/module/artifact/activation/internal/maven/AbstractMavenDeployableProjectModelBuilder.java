@@ -384,7 +384,9 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
 
   /**
-   * Get a {@link Map} point to the {@link Model} of each artifact present in the map.
+   * Get a {@link Map} pointing to the {@link Model} of each artifact present in the map. It's used as cache to get the
+   * {@link Model}s of already loaded dependencies. We use this cache in {@link AdditionalPluginDependenciesResolver} to get the
+   * {@link Model} of a dependency when a pom file is not available but the model can be generated from other available info.
    *
    * @return a {@link Map} with {@link ArtifactCoordinates} as key and a {@link Supplier} of {@link Model} as value.
    */
