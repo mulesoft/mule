@@ -21,14 +21,16 @@ import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExpo
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterType.GRPC;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterType.HTTP;
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.testcontainers.Testcontainers.exposeHostPorts;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 import static org.testcontainers.utility.MountableFile.forHostPath;
@@ -37,20 +39,6 @@ import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.linecorp.armeria.server.ServerBuilder;
-import com.linecorp.armeria.server.ServiceRequestContext;
-import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
-import com.linecorp.armeria.testing.junit4.server.ServerRule;
-import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
-import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse;
-import org.junit.After;
-
-
-import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,13 +46,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.ServiceRequestContext;
+import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
+import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
+import com.linecorp.armeria.testing.junit4.server.ServerRule;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
+import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.jetbrains.annotations.NotNull;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
+@Feature(PROFILING)
+@Story(DEFAULT_CORE_EVENT_TRACER)
 public class OpenTelemetryResourcesTestCase {
 
   public static final String TEST_SERVICE_NAME = "test-service-name";
@@ -223,7 +227,6 @@ public class OpenTelemetryResourcesTestCase {
     }));
   }
 
-
   /**
    * A {@link SpanExporterConfiguration} for testing.
    */
@@ -241,7 +244,6 @@ public class OpenTelemetryResourcesTestCase {
     }
   }
 
-
   private static class GrpcServerRule extends ServerRule {
 
     private final List<ExportTraceServiceRequest> traceRequests = new ArrayList<>();
@@ -253,8 +255,9 @@ public class OpenTelemetryResourcesTestCase {
                  new AbstractUnaryGrpcService() {
 
                    @Override
-                   protected CompletionStage<byte[]> handleMessage(
-                                                                   ServiceRequestContext ctx, byte[] message) {
+                   protected @NotNull CompletionStage<byte[]> handleMessage(
+                                                                            @NotNull ServiceRequestContext ctx,
+                                                                            byte @NotNull [] message) {
                      try {
                        traceRequests.add(ExportTraceServiceRequest.parseFrom(message));
                      } catch (InvalidProtocolBufferException e) {
