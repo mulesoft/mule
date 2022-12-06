@@ -37,7 +37,7 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
   private static final String SINCE_PARAMETER = "since";
   private static final String FUNCTION_PARAMETER = "function";
   private static final Version DEPRECATE_PREVIOUS_TO = new Version("2.5.0");
-  private static final Set<String> DEPRECATION_DOMAINS = ImmutableSet.of("dw", "mule");
+  private static final Set<String> DEPRECATION_DOMAINS = ImmutableSet.of("dw", "Mule");
 
   public OperationDoesNotHaveDeprecatedExpression(ExpressionLanguage el) {
     this.expressionLanguage = el;
@@ -71,7 +71,7 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
         expressionLanguage.collectScopePhaseValidationMessages(actualExpression, "", TypeBindings.builder().build());
 
     return result.getWarnings().stream().anyMatch(warning -> warning.getKind().equals(DEPRECATED) && isDeprecatedVersion(warning)
-        && isDeprecableProduct(warning));
+        && isDeprecableProduct(warning)) || !result.getErrors().isEmpty();
   }
 
   /**
@@ -104,7 +104,11 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
       String[] parts = v.split("\\.");
       mayor = parseInt(parts[0]);
       minor = parseInt(parts[1]);
-      patch = parseInt(parts[2]);
+      if (parts.length > 2) {
+        patch = parseInt(parts[2]);
+      } else {
+        patch = 0;
+      }
     }
 
     public boolean isPriorTo(Version other) {
