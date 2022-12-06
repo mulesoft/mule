@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter.config;
+package org.mule.runtime.tracer.exporter.api.config;
 
 /**
  * Properties for Span Configuration Exporter.
