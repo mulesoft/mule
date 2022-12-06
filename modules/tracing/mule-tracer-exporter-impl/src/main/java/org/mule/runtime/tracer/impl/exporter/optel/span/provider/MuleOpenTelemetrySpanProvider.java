@@ -12,6 +12,7 @@ import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetr
 import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getTracer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigurationDiscoverer.discoverSpanExporterConfiguration;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -20,6 +21,11 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.exporter.DecoratedMuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
+import org.mule.runtime.tracer.impl.exporter.optel.span.MuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -27,11 +33,6 @@ import java.util.Map;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import org.mule.runtime.tracer.impl.exporter.DecoratedMuleOpenTelemetrySpan;
-import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
-import org.mule.runtime.tracer.impl.exporter.optel.span.MuleOpenTelemetrySpan;
-import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
-import org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter;
 import org.slf4j.Logger;
 
 /**

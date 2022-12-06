@@ -7,8 +7,9 @@
 
 package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
-import io.opentelemetry.sdk.trace.export.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+
+import io.opentelemetry.sdk.trace.export.SpanExporter;
 
 /**
  * An exporter opentelemetry api configurator configurator.
