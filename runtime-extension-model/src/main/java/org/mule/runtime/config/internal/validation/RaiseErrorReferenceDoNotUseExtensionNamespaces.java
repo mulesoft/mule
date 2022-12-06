@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
@@ -27,15 +26,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Referenced error types do not use extension namespaces
  */
 public class RaiseErrorReferenceDoNotUseExtensionNamespaces extends AbstractErrorTypesValidation {
 
   public RaiseErrorReferenceDoNotUseExtensionNamespaces(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+    super(featureFlaggingService, false);
   }
 
   @Override
@@ -52,7 +49,7 @@ public class RaiseErrorReferenceDoNotUseExtensionNamespaces extends AbstractErro
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
         // there is already another validation for the presence of this param
-        .and(component -> !StringUtils.isEmpty(getErrorTypeParam(component).getResolvedRawValue())));
+        .and(this::isErrorTypePresent));
   }
 
   @Override
@@ -71,7 +68,4 @@ public class RaiseErrorReferenceDoNotUseExtensionNamespaces extends AbstractErro
     return empty();
   }
 
-  private static ComponentParameterAst getErrorTypeParam(ComponentAst component) {
-    return component.getParameter(DEFAULT_GROUP_NAME, "type");
-  }
 }

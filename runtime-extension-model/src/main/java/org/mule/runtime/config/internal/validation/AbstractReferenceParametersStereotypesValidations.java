@@ -29,16 +29,31 @@ public abstract class AbstractReferenceParametersStereotypesValidations implemen
     ArtifactAstDependencyGraph dependencyGraph = ArtifactAstDependencyGraphFactory.generateFor(artifact);
     return dependencyGraph.getMissingDependencies()
         .stream()
-        .filter(filter(artifact))
+        .filter(filterArtifact(artifact))
+        .filter(missing -> filterComponent(missing))
         .map(missing -> create(missing.getComponent(), missing.getParameter(), this,
-                               format("Referenced component '%s' must be one of stereotypes %s.",
-                                      missing.getName(),
-                                      missing.getAllowedStereotypes().stream()
-                                          .map(st -> st.getNamespace() + ":" + st.getType())
-                                          .collect(joining(", ", "[", "]")))))
+                               validationMessage(missing)))
         .collect(toList());
   }
 
-  protected abstract Predicate<? super ComponentAstDependency> filter(ArtifactAst artifact);
+  /**
+   * Determine whether this dependency must be analyzed or not.
+   * 
+   * @param missingDependency the dependency to analyze
+   * @return {@code true} if this dependency must be analyzed, {@code false} if not.
+   */
+  protected boolean filterComponent(ComponentAstDependency missingDependency) {
+    return true;
+  }
+
+  protected abstract Predicate<? super ComponentAstDependency> filterArtifact(ArtifactAst artifact);
+
+  protected String validationMessage(ComponentAstDependency missing) {
+    return format("Referenced component '%s' must be one of stereotypes %s.",
+                  missing.getName(),
+                  missing.getAllowedStereotypes().stream()
+                      .map(st -> st.getNamespace() + ":" + st.getType())
+                      .collect(joining(", ", "[", "]")));
+  }
 
 }

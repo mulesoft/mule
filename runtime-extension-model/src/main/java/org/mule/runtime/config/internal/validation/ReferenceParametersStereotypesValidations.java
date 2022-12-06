@@ -35,7 +35,7 @@ public class ReferenceParametersStereotypesValidations extends AbstractReference
   }
 
   @Override
-  protected Predicate<? super ComponentAstDependency> filter(ArtifactAst artifact) {
+  protected Predicate<? super ComponentAstDependency> filterArtifact(ArtifactAst artifact) {
     return missing ->
     // flow-ref is already validated by FlowRefPointsToExistingFlow
     !missing.getComponent().getIdentifier().equals(FLOW_REF_IDENTIFIER)

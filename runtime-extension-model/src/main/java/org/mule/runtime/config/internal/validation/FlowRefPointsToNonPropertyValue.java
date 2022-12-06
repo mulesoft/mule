@@ -9,16 +9,16 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -34,67 +34,56 @@ import java.util.function.Predicate;
 /**
  * 'flow-ref's point to existing flows.
  */
-public class FlowRefPointsToExistingFlow implements Validation {
+public class FlowRefPointsToNonPropertyValue implements Validation {
 
   private static final String FLOW_REF_ELEMENT = "flow-ref";
 
   public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
 
-  private final boolean ignoreParamsWithProperties;
+  private final boolean enabled;
 
-  public FlowRefPointsToExistingFlow(boolean ignoreParamsWithProperties) {
-    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
+  public FlowRefPointsToNonPropertyValue(boolean enabled) {
+    this.enabled = enabled;
   }
 
   @Override
   public String getName() {
-    return "'flow-ref's point to existing flows";
+    return "'flow-ref's point to fixed flows";
   }
 
   @Override
   public String getDescription() {
-    return "'flow-ref's point to existing flows.";
+    return "'flow-ref's point to fixed flows.";
   }
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    return WARN;
   }
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
-        .and(currentElemement(component -> {
-          ComponentParameterAst flowRefNameParameter = component.getParameter(DEFAULT_GROUP_NAME, "name");
-          if (ignoreParamsWithProperties && hasPropertyPlaceholder(flowRefNameParameter.getRawValue())) {
-            return false;
-          }
-
-          return flowRefNameParameter.getValue().isRight();
-        }));
+    if (enabled) {
+      return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
+          .and(currentElemement(component -> !isEmpty(component.getParameter(DEFAULT_GROUP_NAME, "name").getRawValue())));
+    } else {
+      return c -> false;
+    }
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final ComponentParameterAst param = component.getParameter(DEFAULT_GROUP_NAME, "name");
-    return param.getValue()
-        .reduce(l -> empty(),
-                nameAttribute -> {
-                  if (isExpression((String) nameAttribute)) {
-                    // According to the extension model, flow-ref cannot be dynamic,
-                    // But this check is needed to avoid breaking on legacy cases that use dynamic flow-refs.
-                    return empty();
-                  }
 
-                  if (artifact.topLevelComponentsStream()
-                      .noneMatch(equalsComponentId((String) nameAttribute))) {
-                    return of(create(component, param, this,
-                                     "'flow-ref' is pointing to '" + nameAttribute + "' which does not exist"));
-                  } else {
-                    return empty();
-                  }
-                });
+    String nameAttributeRawValue = param.getRawValue();
+    if (hasPropertyPlaceholder(nameAttributeRawValue)) {
+      return of(create(component, param, this,
+                       "'flow-ref' is pointing to '" + nameAttributeRawValue
+                           + "' which is resolved with a property and may cause the artifact to have a different structure on different environments."));
+    } else {
+      return empty();
+    }
   }
 
 }
