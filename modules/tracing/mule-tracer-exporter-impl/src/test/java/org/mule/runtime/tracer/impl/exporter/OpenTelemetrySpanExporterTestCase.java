@@ -24,6 +24,7 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,6 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
