@@ -12,11 +12,11 @@ import org.mule.runtime.tracer.impl.exporter.optel.resources.grpc.GrpcSpanExport
 import org.mule.runtime.tracer.impl.exporter.optel.resources.http.HttpSpanExporterConfigurator;
 
 /**
- * The type of export of the spans.
+ * The transport of export of the spans.
  *
  * @since 4.5.0
  */
-public enum OpenTelemetryExporterType {
+public enum OpenTelemetryExporterTransport {
 
   GRPC(new GrpcSpanExporterConfigurator()),
 
@@ -24,7 +24,7 @@ public enum OpenTelemetryExporterType {
 
   private final SpanExporterConfigurator spanExporterConfigurator;
 
-  OpenTelemetryExporterType(SpanExporterConfigurator spanExporterConfigurator) {
+  OpenTelemetryExporterTransport(SpanExporterConfigurator spanExporterConfigurator) {
     this.spanExporterConfigurator = spanExporterConfigurator;
   }
 

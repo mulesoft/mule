@@ -19,10 +19,10 @@ import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExpo
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
-import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterType.GRPC;
-import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterType.HTTP;
+import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.GRPC;
+import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.HTTP;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 
@@ -68,8 +68,8 @@ import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
 @Feature(PROFILING)
-@Story(DEFAULT_CORE_EVENT_TRACER)
-public class OpenTelemetryResourcesTestCase {
+@Story(OPEN_TELEMETRY_EXPORTER)
+public class OpenTelemetryExporterConfigTestCase {
 
   public static final String TEST_SERVICE_NAME = "test-service-name";
 
