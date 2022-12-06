@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.Integer.parseInt;
 import static org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind.DEPRECATED;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.getUnfixedExpression;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
-import com.google.common.collect.ImmutableSet;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationItem;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +36,7 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
 
   private static final String SINCE_PARAMETER = "since";
   private static final String FUNCTION_PARAMETER = "function";
-  private static final Version DEPRECATE_PREVIOUS_TO = new Version("2.5.0");
+  private static final MuleVersion DEPRECATE_UP_TO = new MuleVersion("2.5.0");
   private static final Set<String> DEPRECATION_DOMAINS = ImmutableSet.of("dw", "Mule");
 
   public OperationDoesNotHaveDeprecatedExpression(ExpressionLanguage el) {
@@ -59,7 +59,8 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
   }
 
   private boolean isDeprecatedVersion(ScopePhaseValidationItem warning) {
-    return new Version(warning.getParams().get(SINCE_PARAMETER)).isPriorOrEqualTo(DEPRECATE_PREVIOUS_TO);
+    MuleVersion since = new MuleVersion(warning.getParams().get(SINCE_PARAMETER));
+    return since.sameAs(DEPRECATE_UP_TO) || since.priorTo(DEPRECATE_UP_TO);
   }
 
   private boolean isInvalidExpression(String expression) {
@@ -93,45 +94,6 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
                        "Using an invalid function within an operation. All functions deprecated up to DataWeave 2.5 cannot be used inside a Mule Operation"));
     } else {
       return empty();
-    }
-  }
-
-  private static class Version {
-
-    private int mayor, minor, patch;
-
-    public Version(String v) {
-      String[] parts = v.split("\\.");
-      mayor = parseInt(parts[0]);
-      minor = parseInt(parts[1]);
-      if (parts.length > 2) {
-        patch = parseInt(parts[2]);
-      } else {
-        patch = 0;
-      }
-    }
-
-    public boolean isPriorTo(Version other) {
-      if (other.mayor != this.mayor) {
-        return other.mayor > this.mayor;
-      }
-      if (other.minor != this.minor) {
-        return other.minor > this.minor;
-      }
-      return other.patch > this.patch;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (!(o instanceof Version)) {
-        return false;
-      }
-      Version other = (Version) o;
-      return other.mayor == this.mayor && other.minor == this.minor && other.patch == this.patch;
-    }
-
-    public boolean isPriorOrEqualTo(Version other) {
-      return isPriorTo(other) || equals(other);
     }
   }
 }
