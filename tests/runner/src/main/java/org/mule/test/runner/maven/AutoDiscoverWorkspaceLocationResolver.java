@@ -15,7 +15,6 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.Paths.get;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
