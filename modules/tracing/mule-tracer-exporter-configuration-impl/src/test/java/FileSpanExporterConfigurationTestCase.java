@@ -92,7 +92,6 @@ public class FileSpanExporterConfigurationTestCase {
     }
   }
 
-
   /**
    * {@link FileSpanExporterConfiguration} used for testing properties file not found.
    */
