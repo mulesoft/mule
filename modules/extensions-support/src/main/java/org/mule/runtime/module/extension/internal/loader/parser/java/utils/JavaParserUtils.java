@@ -87,7 +87,7 @@ public final class JavaParserUtils {
     return classLevelMMV.map(mmv -> {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
-            .warn("Calculated Min Mule Version is {} which is greater than the one set at the extension class level {}. Overriding it.",
+            .debug("Calculated Min Mule Version is {} which is greater than the one set at the extension class level {}. Overriding it.",
                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
@@ -120,7 +120,7 @@ public final class JavaParserUtils {
     return classLevelMMV.map(mmv -> {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
-            .warn("Calculated Min Mule Version is {} which is greater than the one set at the configuration class level {}. Overriding it.",
+            .debug("Calculated Min Mule Version is {} which is greater than the one set at the configuration class level {}. Overriding it.",
                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
@@ -189,7 +189,7 @@ public final class JavaParserUtils {
     return classLevelMMV.map(mmv -> {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
-            .warn("Calculated Min Mule Version is {} which is greater than the one set at the connection provider class level {}. Overriding it.",
+            .debug("Calculated Min Mule Version is {} which is greater than the one set at the connection provider class level {}. Overriding it.",
                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
@@ -237,7 +237,7 @@ public final class JavaParserUtils {
     return classLevelMMV.map(mmv -> {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
-            .warn("Calculated Min Mule Version is {} which is greater than the one set at the source class level {}. Overriding it.",
+            .debug("Calculated Min Mule Version is {} which is greater than the one set at the source class level {}. Overriding it.",
                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
@@ -283,7 +283,7 @@ public final class JavaParserUtils {
     return operationLevelMMV.map(mmv -> {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
-            .warn("Calculated Min Mule Version is {} which is greater than the one set at the operation level {}. Overriding it.",
+            .debug("Calculated Min Mule Version is {} which is greater than the one set at the operation level {}. Overriding it.",
                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
