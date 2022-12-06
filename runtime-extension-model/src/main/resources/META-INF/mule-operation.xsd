@@ -67,8 +67,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether the parameter should be able to be defined with an inline script. It could be used
-                            for parameters that will contain data for the operation, differencing them from configuration
-                            parameters.
+                            for parameters that will contain data for the operation, unlike configuration parameters.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

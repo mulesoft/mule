@@ -58,8 +58,8 @@ public class MuleOperationExtensionModelDeclarer {
   public static final String TYPE = "type";
 
   private static final String ALLOW_INLINE_SCRIPT_DESCRIPTION = "Whether the parameter should be able to be defined with" +
-      " an inline script. It could be used for parameters that will contain data for the operation, differencing them" +
-      " from configuration parameters.";
+      " an inline script. It could be used for parameters that will contain data for the operation, unlike configuration" +
+      " parameters.";
 
   private static final String TYPE_EXAMPLE = "string or number or http:request-config";
 
