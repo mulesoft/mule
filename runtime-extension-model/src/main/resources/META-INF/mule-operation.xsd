@@ -63,6 +63,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="allowInlineScript" default="false" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the parameter should be able to be defined with an inline script. It could be used
+                            for parameters that will contain data for the operation, unlike configuration parameters.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="configOverride" type="xsd:boolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
