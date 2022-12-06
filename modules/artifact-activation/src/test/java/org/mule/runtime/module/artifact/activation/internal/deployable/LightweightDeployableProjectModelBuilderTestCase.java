@@ -52,6 +52,14 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
                                  .environmentMavenRepositorySupplier().get()
                                  .getAbsolutePath());
 
+  @Rule
+  public SystemProperty settingsLocation =
+      new SystemProperty("muleRuntimeConfig.maven.userSettingsLocation",
+                         discoverProvider(LightweightDeployableProjectModelBuilderTestCase.class
+                             .getClassLoader()).getSettingsSupplierFactory()
+                                 .environmentUserSettingsSupplier().get()
+                                 .getAbsolutePath());
+
   @Before
   public void before() {
     reset();
