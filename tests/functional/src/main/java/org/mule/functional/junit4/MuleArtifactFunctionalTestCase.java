@@ -57,8 +57,7 @@ import org.junit.Rule;
         "*:*:jar:tests:*",
         "*:*:test-jar:*:*"
     },
-    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional",
-        "org.testcontainers:testcontainers"})
+    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"})
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
   @Inject
