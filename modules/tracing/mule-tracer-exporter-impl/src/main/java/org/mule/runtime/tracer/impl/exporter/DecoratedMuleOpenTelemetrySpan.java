@@ -70,10 +70,10 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   private Set<String> noExportableUntil = new HashSet<>();
   private boolean policy;
   private boolean root;
-  
+
   private static Field getSpanKindField() {
     try {
-      Field spanKindField =  Class.forName(RECORD_EVENTS_READABLE_SPAN_CLASS).getDeclaredField(SPAN_KIND_FIELD_NAME);
+      Field spanKindField = Class.forName(RECORD_EVENTS_READABLE_SPAN_CLASS).getDeclaredField(SPAN_KIND_FIELD_NAME);
       spanKindField.setAccessible(true);
       return spanKindField;
     } catch (NoSuchFieldException | ClassNotFoundException e) {
@@ -107,7 +107,7 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
 
   private void updateSpanStatus(InternalSpan internalSpan) {
     String spanStatus = internalSpan.getAttributes().remove(STATUS);
-    if (spanStatus != null){
+    if (spanStatus != null) {
       delegate.setStatus(StatusCode.valueOf(spanStatus));
     }
   }
@@ -115,12 +115,14 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   private void updateSpanKind(InternalSpan internalSpan) {
     String spanKind = internalSpan.getAttributes().remove(SPAN_KIND);
     if (spanKind != null && SPAN_KIND_FIELD != null && delegate.getClass().getName().equals(RECORD_EVENTS_READABLE_SPAN_CLASS)) {
-        try {
-          SPAN_KIND_FIELD.set(delegate, SpanKind.valueOf(spanKind));
-        } catch (IllegalAccessException e) {
-          throw new MuleRuntimeException(createStaticMessage(format("Span Kind of span: %s could not be changed to: %s", internalSpan.getName(), spanKind)), e);
-        }
+      try {
+        SPAN_KIND_FIELD.set(delegate, SpanKind.valueOf(spanKind));
+      } catch (IllegalAccessException e) {
+        throw new MuleRuntimeException(createStaticMessage(format("Span Kind of span: %s could not be changed to: %s",
+                                                                  internalSpan.getName(), spanKind)),
+                                       e);
       }
+    }
   }
 
   @Override
@@ -223,10 +225,10 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
 
   private void recordSpanException(SpanError spanError) {
     Attributes errorAttributes = of(EXCEPTION_TYPE_KEY, spanError.getError().getErrorType().toString(),
-        EXCEPTION_MESSAGE_KEY, spanError.getError().getDescription(),
-        EXCEPTION_STACK_TRACE_KEY,
-        getInternalSpanError(spanError).getErrorStacktrace().toString(),
-        EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
+                                    EXCEPTION_MESSAGE_KEY, spanError.getError().getDescription(),
+                                    EXCEPTION_STACK_TRACE_KEY,
+                                    getInternalSpanError(spanError).getErrorStacktrace().toString(),
+                                    EXCEPTION_ESCAPED_KEY, spanError.isEscapingSpan());
     delegate.addEvent(EXCEPTION_EVENT_NAME, errorAttributes);
   }
 

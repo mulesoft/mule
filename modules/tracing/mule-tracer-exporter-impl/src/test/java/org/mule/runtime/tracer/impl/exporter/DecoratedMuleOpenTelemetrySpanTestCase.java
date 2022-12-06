@@ -38,7 +38,7 @@ import org.junit.Test;
 public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void ifAttributeIsPresentSpanKindMustBeUpdated(){
+  public void ifAttributeIsPresentSpanKindMustBeUpdated() {
     String spanKind = "CLIENT";
 
     InternalSpan internalSpan = mock(InternalSpan.class);
@@ -52,22 +52,23 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
 
     OtlpGrpcSpanExporter otlpGrpcSpanExporter = OtlpGrpcSpanExporter.builder().build();
-    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
+    SdkTracerProviderBuilder sdkTracerProviderBuilder =
+        SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
     Resource resource = getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, "testServiceName")));
     SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.setResource(resource).build();
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProvider)
         .build();
     Span openTelemetrySpan = openTelemetry.getTracer("testInstrumentationName").spanBuilder("testSpan").startSpan();
-    
+
     DecoratedMuleOpenTelemetrySpan decoratedMuleOpenTelemetrySpan = new DecoratedMuleOpenTelemetrySpan(openTelemetrySpan);
     decoratedMuleOpenTelemetrySpan.end(internalSpan, initialSpanInfo, "testArtifactId", "testArtifactType");
-    
+
     assertThat(((ReadableSpan) openTelemetrySpan).getKind(), equalTo(SpanKind.valueOf(spanKind)));
   }
 
   @Test
-  public void ifAttributeIsNotPresentSpanKindMustNotBeUpdated(){
+  public void ifAttributeIsNotPresentSpanKindMustNotBeUpdated() {
     String spanKind = "INTERNAL";
 
     InternalSpan internalSpan = mock(InternalSpan.class);
@@ -78,14 +79,15 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
 
     OtlpGrpcSpanExporter otlpGrpcSpanExporter = OtlpGrpcSpanExporter.builder().build();
-    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
+    SdkTracerProviderBuilder sdkTracerProviderBuilder =
+        SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
     Resource resource = getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, "testServiceName")));
     SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.setResource(resource).build();
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProvider)
         .build();
     Span openTelemetrySpan = openTelemetry.getTracer("testInstrumentationName").spanBuilder("testSpan").startSpan();
-    
+
     DecoratedMuleOpenTelemetrySpan decoratedMuleOpenTelemetrySpan = new DecoratedMuleOpenTelemetrySpan(openTelemetrySpan);
     decoratedMuleOpenTelemetrySpan.end(internalSpan, initialSpanInfo, "testArtifactId", "testArtifactType");
 
@@ -93,7 +95,7 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void ifAttributeIsPresentSpanStatusMustBeUpdated(){
+  public void ifAttributeIsPresentSpanStatusMustBeUpdated() {
     String spanStatus = "OK";
 
     InternalSpan internalSpan = mock(InternalSpan.class);
@@ -107,7 +109,8 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
 
     OtlpGrpcSpanExporter otlpGrpcSpanExporter = OtlpGrpcSpanExporter.builder().build();
-    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
+    SdkTracerProviderBuilder sdkTracerProviderBuilder =
+        SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
     Resource resource = getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, "testServiceName")));
     SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.setResource(resource).build();
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
@@ -122,7 +125,7 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void ifAttributeIsNotPresentSpanStatusMustNotBeUpdated(){
+  public void ifAttributeIsNotPresentSpanStatusMustNotBeUpdated() {
     InternalSpan internalSpan = mock(InternalSpan.class);
     SpanDuration spanDuration = mock(SpanDuration.class);
     when(spanDuration.getStart()).thenReturn(nanoTime());
@@ -131,7 +134,8 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
 
     OtlpGrpcSpanExporter otlpGrpcSpanExporter = OtlpGrpcSpanExporter.builder().build();
-    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
+    SdkTracerProviderBuilder sdkTracerProviderBuilder =
+        SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(otlpGrpcSpanExporter));
     Resource resource = getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, "testServiceName")));
     SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.setResource(resource).build();
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
