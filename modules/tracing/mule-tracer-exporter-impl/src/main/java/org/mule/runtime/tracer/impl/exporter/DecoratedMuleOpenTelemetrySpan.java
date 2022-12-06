@@ -59,8 +59,9 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   public static final String EXCEPTIONS_HAS_BEEN_RECORDED = "Exceptions has been recorded.";
   public static final String ARTIFACT_ID = "artifact.id";
   public static final String ARTIFACT_TYPE = "artifact.type";
-  
+
   public static final String SPAN_KIND = "span.kind.override";
+  public static final String STATUS = "status.override";
   public static final String RECORD_EVENTS_READABLE_SPAN_CLASS = "io.opentelemetry.sdk.trace.RecordEventsReadableSpan";
   public static final String SPAN_KIND_FIELD_NAME = "kind";
   public static final Field SPAN_KIND_FIELD = getSpanKindField();
@@ -97,10 +98,18 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
     }
     initialSpanInfo.getInitialAttributes().forEach(delegate::setAttribute);
     updateSpanKind(internalSpan);
+    updateSpanStatus(internalSpan);
     internalSpan.getAttributes().forEach(delegate::setAttribute);
     delegate.setAttribute(ARTIFACT_ID, artifactId);
     delegate.setAttribute(ARTIFACT_TYPE, artifactType);
     delegate.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
+  }
+
+  private void updateSpanStatus(InternalSpan internalSpan) {
+    String spanStatus = internalSpan.getAttributes().remove(STATUS);
+    if (spanStatus != null){
+      delegate.setStatus(StatusCode.valueOf(spanStatus));
+    }
   }
 
   private void updateSpanKind(InternalSpan internalSpan) {
