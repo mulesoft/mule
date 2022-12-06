@@ -35,7 +35,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   private ClassLoader artifactRegionClassLoader;
 
-  private boolean waiveUnresolvedPropertiesOnParams;
+  private boolean ignoreParamsWithProperties;
 
   @Inject
   private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -56,8 +56,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
                                                           // make these general for all references via stereotypes
-                                                          new FlowRefPointsToNonPropertyValue(waiveUnresolvedPropertiesOnParams),
-                                                          new FlowRefPointsToExistingFlow(waiveUnresolvedPropertiesOnParams),
+                                                          new FlowRefPointsToNonPropertyValue(ignoreParamsWithProperties),
+                                                          new FlowRefPointsToExistingFlow(ignoreParamsWithProperties),
                                                           // --
 
                                                           // Error types + error handling
@@ -68,20 +68,20 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
-                                                          new RaiseErrorTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new RaiseErrorTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
                                                           new RaiseErrorTypeReferencesExist(featureFlaggingService,
-                                                                                            waiveUnresolvedPropertiesOnParams),
-                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                                                            ignoreParamsWithProperties),
+                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
                                                           new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
-                                                                                                    waiveUnresolvedPropertiesOnParams),
+                                                                                                    ignoreParamsWithProperties),
                                                           new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
-                                                                                                                         waiveUnresolvedPropertiesOnParams),
-                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                                                                                         ignoreParamsWithProperties),
+                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
                                                           new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
-                                                                                                    waiveUnresolvedPropertiesOnParams),
-                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                                                                    ignoreParamsWithProperties),
+                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(ignoreParamsWithProperties),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
-                                                                                            waiveUnresolvedPropertiesOnParams),
+                                                                                            ignoreParamsWithProperties),
                                                           // --
 
                                                           new RequiredParametersPresent(),
@@ -95,9 +95,9 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new RoundRobinRoutes(),
                                                           new FirstSuccessfulRoutes(),
                                                           new ScatterGatherRoutes(),
-                                                          new ParseTemplateResourceNotPropertyValue(waiveUnresolvedPropertiesOnParams),
+                                                          new ParseTemplateResourceNotPropertyValue(ignoreParamsWithProperties),
                                                           new ParseTemplateResourceExist(artifactRegionClassLoader,
-                                                                                         waiveUnresolvedPropertiesOnParams),
+                                                                                         ignoreParamsWithProperties),
                                                           new SourcePositiveMaxItemsPerPoll(),
                                                           new OperationRaiseErrorDoesntSpecifyNamespace(),
                                                           new OperationDoesNotHaveCoreRaiseError(),
@@ -135,8 +135,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersNonPropertyValueValidations(waiveUnresolvedPropertiesOnParams),
-                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, waiveUnresolvedPropertiesOnParams),
+                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties),
+                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties),
                   new ReferenceParametersStereotypesValidations());
   }
 
@@ -146,7 +146,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
   }
 
   @Override
-  public void setWaiveUnresolvedPropertiesOnParams(boolean waiveUnresolvedPropertiesOnParams) {
-    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
+  public void setIgnoreParamsWithProperties(boolean ignoreParamsWithProperties) {
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 }

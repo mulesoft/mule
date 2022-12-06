@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
@@ -28,6 +29,7 @@ public abstract class AbstractErrorValidation implements Validation {
   protected static final String ON_ERROR = "on-error";
   protected static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   protected static final String ON_ERROR_CONTINUE = "on-error-continue";
+  protected static final String RAISE_ERROR = "raise-error";
 
   protected static final ComponentIdentifier ON_ERROR_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR).build();
@@ -35,11 +37,13 @@ public abstract class AbstractErrorValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
   protected static final ComponentIdentifier ON_ERROR_CONTINUE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
+  protected static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
 
   protected boolean isErrorTypePresentAndPropertyDependant(ComponentAst component) {
     String errorTypeString = getErrorTypeParam(component).getRawValue();
     return !isEmpty(errorTypeString)
-        && errorTypeString.contains("${");
+        && hasPropertyPlaceholder(errorTypeString);
   }
 
   protected ComponentParameterAst getErrorTypeParam(ComponentAst component) {
@@ -57,25 +61,25 @@ public abstract class AbstractErrorValidation implements Validation {
   protected boolean errorMappingSourceNotPropertyDependant(ComponentAst operationComponent) {
     return ((List<ErrorMapping>) getErrorMappingsParameter(operationComponent).getValue().getRight())
         .stream()
-        .noneMatch(errorMapping -> errorMapping.getSource().contains("${"));
+        .noneMatch(errorMapping -> hasPropertyPlaceholder(errorMapping.getSource()));
   }
 
   protected boolean errorMappingTargetNotPropertyDependant(ComponentAst operationComponent) {
     return ((List<ErrorMapping>) getErrorMappingsParameter(operationComponent).getValue().getRight())
         .stream()
-        .noneMatch(errorMapping -> errorMapping.getTarget().contains("${"));
+        .noneMatch(errorMapping -> hasPropertyPlaceholder(errorMapping.getTarget()));
   }
 
   protected boolean errorMappingSourcePropertyDependant(ComponentAst operationComponent) {
     return ((List<ErrorMapping>) getErrorMappingsParameter(operationComponent).getValue().getRight())
         .stream()
-        .anyMatch(errorMapping -> errorMapping.getSource().contains("${"));
+        .anyMatch(errorMapping -> hasPropertyPlaceholder(errorMapping.getSource()));
   }
 
   protected boolean errorMappingTargetPropertyDependant(ComponentAst operationComponent) {
     return ((List<ErrorMapping>) getErrorMappingsParameter(operationComponent).getValue().getRight())
         .stream()
-        .anyMatch(errorMapping -> errorMapping.getTarget().contains("${"));
+        .anyMatch(errorMapping -> hasPropertyPlaceholder(errorMapping.getTarget()));
   }
 
   protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {

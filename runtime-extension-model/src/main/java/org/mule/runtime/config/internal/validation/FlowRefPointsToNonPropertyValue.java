@@ -10,6 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -76,7 +77,7 @@ public class FlowRefPointsToNonPropertyValue implements Validation {
     final ComponentParameterAst param = component.getParameter(DEFAULT_GROUP_NAME, "name");
 
     String nameAttributeRawValue = param.getRawValue();
-    if (nameAttributeRawValue.contains("${")) {
+    if (hasPropertyPlaceholder(nameAttributeRawValue)) {
       return of(create(component, param, this,
                        "'flow-ref' is pointing to '" + nameAttributeRawValue
                            + "' which is resolved with a property and may cause the artifact to have a different structure on different environments."));

@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
@@ -64,7 +65,7 @@ public class ErrorMappingSourceTypeReferencesNonPropertyValue extends AbstractEr
     for (ErrorMapping errorMapping : getErrorMappings(component)) {
       final String errorTypeRawValue = errorMapping.getSource();
 
-      if (errorTypeRawValue.contains("${")) {
+      if (hasPropertyPlaceholder(errorTypeRawValue)) {
         return of(create(component,
                          component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME),
                          this,

@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
@@ -65,7 +66,7 @@ public class ErrorHandlerOnErrorTypeNonPropertyValue extends AbstractErrorValida
     final ComponentParameterAst errorTypeParam = getErrorTypeParam(onErrorComponent);
     final String errorTypeRawValue = errorTypeParam.getRawValue();
 
-    if (errorTypeRawValue.contains("${")) {
+    if (hasPropertyPlaceholder(errorTypeRawValue)) {
       return of(create(onErrorComponent, errorTypeParam, this,
                        "'" + onErrorComponent.getIdentifier().getName() + "' has 'type' '" + errorTypeRawValue
                            + "' which is resolved with a property and may cause the artifact to have different behavior on different environments."));

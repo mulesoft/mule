@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
@@ -26,12 +27,11 @@ import java.util.function.Predicate;
 /**
  * Referenced error types do exist in the context of the artifact
  */
-public class RaiseErrorTypeReferencesNonPropertyValue extends AbstractErrorTypesValidation {
+public class RaiseErrorTypeReferencesNonPropertyValue extends AbstractErrorValidation {
 
   private final boolean enabled;
 
   public RaiseErrorTypeReferencesNonPropertyValue(boolean enabled) {
-    super(null, false);
     this.enabled = enabled;
   }
 
@@ -65,7 +65,7 @@ public class RaiseErrorTypeReferencesNonPropertyValue extends AbstractErrorTypes
     final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
     final String errorTypeRawValue = errorTypeParam.getRawValue();
 
-    if (errorTypeRawValue.contains("${")) {
+    if (hasPropertyPlaceholder(errorTypeRawValue)) {
       return of(create(component, errorTypeParam, this,
                        "'" + RAISE_ERROR_IDENTIFIER + "' has 'type' '" + errorTypeRawValue
                            + "' which is resolved with a property and may cause the artifact to have different behavior on different environments."));

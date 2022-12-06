@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -42,18 +41,14 @@ import java.util.Set;
 public abstract class AbstractErrorTypesValidation extends AbstractErrorValidation {
 
   private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(getDefault());
-  protected static final String RAISE_ERROR = "raise-error";
-
-  protected static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
-  private final boolean waiveUnresolvedPropertiesOnParams;
+  private final boolean ignoreParamsWithProperties;
 
   public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService,
-                                      boolean waiveUnresolvedPropertiesOnParams) {
+                                      boolean ignoreParamsWithProperties) {
     this.featureFlaggingService = featureFlaggingService;
-    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   @Override
@@ -68,7 +63,7 @@ public abstract class AbstractErrorTypesValidation extends AbstractErrorValidati
       return false;
     }
 
-    if (waiveUnresolvedPropertiesOnParams) {
+    if (ignoreParamsWithProperties) {
       if (getErrorTypeParam(component).getRawValue().contains("${")) {
         return false;
       }
@@ -115,7 +110,7 @@ public abstract class AbstractErrorTypesValidation extends AbstractErrorValidati
         .collect(toSet());
   }
 
-  public boolean isWaiveUnresolvedPropertiesOnParams() {
-    return waiveUnresolvedPropertiesOnParams;
+  public boolean isIgnoreParamsWithProperties() {
+    return ignoreParamsWithProperties;
   }
 }

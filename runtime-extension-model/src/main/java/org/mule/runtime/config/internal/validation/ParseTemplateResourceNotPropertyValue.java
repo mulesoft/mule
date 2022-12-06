@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -83,7 +84,7 @@ public class ParseTemplateResourceNotPropertyValue implements Validation {
     ComponentParameterAst locationParam = component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM);
     String locationAttributeRawValue = locationParam.getRawValue();
 
-    if (locationAttributeRawValue.contains("${")) {
+    if (hasPropertyPlaceholder(locationAttributeRawValue)) {
       return of(create(component, locationParam, this,
                        "'" + PARSE_TEMPLATE_ELEMENT_NAME + "' is pointing to '" + locationAttributeRawValue
                            + "' which is resolved with a property and may cause the artifact to have a different structure on different environments."));

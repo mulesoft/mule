@@ -31,8 +31,8 @@ import java.util.function.Predicate;
 public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation {
 
   public ErrorHandlerOnErrorTypeExists(Optional<FeatureFlaggingService> featureFlaggingService,
-                                       boolean waiveUnresolvedPropertiesOnParams) {
-    super(featureFlaggingService, waiveUnresolvedPropertiesOnParams);
+                                       boolean ignoreParamsWithProperties) {
+    super(featureFlaggingService, ignoreParamsWithProperties);
   }
 
   @Override

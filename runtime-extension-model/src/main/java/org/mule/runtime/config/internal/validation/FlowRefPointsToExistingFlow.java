@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
@@ -40,10 +41,10 @@ public class FlowRefPointsToExistingFlow implements Validation {
   public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
 
-  private final boolean waiveUnresolvedPropertiesOnParams;
+  private final boolean ignoreParamsWithProperties;
 
-  public FlowRefPointsToExistingFlow(boolean waiveUnresolvedPropertiesOnParams) {
-    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
+  public FlowRefPointsToExistingFlow(boolean ignoreParamsWithProperties) {
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   @Override
@@ -66,10 +67,8 @@ public class FlowRefPointsToExistingFlow implements Validation {
     return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
         .and(currentElemement(component -> {
           ComponentParameterAst flowRefNameParameter = component.getParameter(DEFAULT_GROUP_NAME, "name");
-          if (waiveUnresolvedPropertiesOnParams) {
-            if (flowRefNameParameter.getRawValue().contains("${")) {
-              return false;
-            }
+          if (ignoreParamsWithProperties && hasPropertyPlaceholder(flowRefNameParameter.getRawValue())) {
+            return false;
           }
 
           return flowRefNameParameter.getValue().isRight();

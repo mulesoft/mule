@@ -11,6 +11,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.ArtifactType.DOMAIN;
 import static org.mule.runtime.ast.api.ArtifactType.POLICY;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.APP_CONFIG;
@@ -27,12 +28,12 @@ import java.util.function.Predicate;
 public class ConfigReferenceParametersStereotypesValidations extends AbstractReferenceParametersStereotypesValidations {
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
-  private final boolean waiveUnresolvedPropertiesOnParams;
+  private final boolean ignoreParamsWithProperties;
 
   public ConfigReferenceParametersStereotypesValidations(Optional<FeatureFlaggingService> featureFlaggingService,
-                                                         boolean waiveUnresolvedPropertiesOnParams) {
+                                                         boolean ignoreParamsWithProperties) {
     this.featureFlaggingService = featureFlaggingService;
-    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   public static final ComponentIdentifier CACHE_IDENTIFIER =
@@ -95,8 +96,8 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
   @Override
   protected boolean filterComponent(ComponentAstDependency missingDependency) {
     return super.filterComponent(missingDependency)
-        && !(waiveUnresolvedPropertiesOnParams
-            || missingDependency.getName().contains("${"));
+        && !(ignoreParamsWithProperties
+            || hasPropertyPlaceholder(missingDependency.getName()));
   }
 
   @Override

@@ -34,8 +34,8 @@ import java.util.function.Predicate;
 public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation {
 
   public RaiseErrorTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService,
-                                       boolean waiveUnresolvedPropertiesOnParams) {
-    super(featureFlaggingService, waiveUnresolvedPropertiesOnParams);
+                                       boolean ignoreParamsWithProperties) {
+    super(featureFlaggingService, ignoreParamsWithProperties);
   }
 
   @Override

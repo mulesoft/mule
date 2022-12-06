@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -21,7 +22,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
@@ -42,11 +42,11 @@ public class ParseTemplateResourceExist implements Validation {
       .build();
 
   private final ClassLoader artifactRegionClassLoader;
-  private final boolean waiveUnresolvedPropertiesOnParams;
+  private final boolean ignoreParamsWithProperties;
 
-  public ParseTemplateResourceExist(ClassLoader artifactRegionClassLoader, boolean waiveUnresolvedPropertiesOnParams) {
+  public ParseTemplateResourceExist(ClassLoader artifactRegionClassLoader, boolean ignoreParamsWithProperties) {
     this.artifactRegionClassLoader = artifactRegionClassLoader;
-    this.waiveUnresolvedPropertiesOnParams = waiveUnresolvedPropertiesOnParams;
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   @Override
@@ -68,15 +68,12 @@ public class ParseTemplateResourceExist implements Validation {
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(PARSE_TEMPLATE_IDENTIFIER))
         .and(currentElemement(component -> {
-          try {
-            return component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM).getValue().getRight() != null;
-          } catch (PropertyNotFoundException pnfe) {
-            if (waiveUnresolvedPropertiesOnParams) {
-              return false;
-            } else {
-              throw pnfe;
-            }
+          ComponentParameterAst locationParam = component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM);
+          if (ignoreParamsWithProperties && hasPropertyPlaceholder(locationParam.getRawValue())) {
+            return false;
           }
+
+          return locationParam.getValue().getRight() != null;
         }));
   }
 
