@@ -10,7 +10,7 @@ package org.mule.runtime.tracer.impl.exporter;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_HEADERS;
 import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getTracer;
-import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE;
@@ -141,7 +141,7 @@ public class OpenTelemetryResourcesTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
                    "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT));
-    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE, "0");
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "0");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE, "gzip");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
@@ -163,7 +163,7 @@ public class OpenTelemetryResourcesTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
                    "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_MTLS_PORT));
-    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE, "0");
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "0");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "true");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION, clientTls.privateKeyFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION, clientTls.certificateFile().toPath().toString());
@@ -188,7 +188,7 @@ public class OpenTelemetryResourcesTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
                    "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_PORT) + "/v1/traces");
-    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE, "0");
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "0");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
              "{\"Authorization\": \"Api-Token dt0c01.KMYZTCZBHF7PK22J4CYKTW6R.A6TR7R3UG6BBPDU2EEVJQBL2WUD2DCDFYLYRA72VUDSBPAXXGYJX6Q3QDLJOLUDO\"}");
@@ -209,7 +209,7 @@ public class OpenTelemetryResourcesTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
                    "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_MTLS_PORT)
                        + "/v1/traces");
-    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE, "0");
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "0");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "true");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,

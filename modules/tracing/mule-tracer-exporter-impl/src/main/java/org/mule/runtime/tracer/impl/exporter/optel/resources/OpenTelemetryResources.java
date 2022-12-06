@@ -7,7 +7,8 @@
 
 package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
-import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE;
+import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterType.valueOf;
@@ -107,11 +108,19 @@ public class OpenTelemetryResources {
   private static SpanProcessor resolveExporterProcessor(
                                                         SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
-    if (parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE)) == 0) {
-      return create(createExporter(spanExporterConfiguration));
+
+    int batchSize = parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512"));
+
+    if (batchSize < 512) {
+      throw new SpanExporterConfiguratorException("The batch max size cannot be lower than 512");
     }
 
-    return builder(createExporter(spanExporterConfiguration)).build();
+    int batchMaxQueueSize =
+        parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE, "2048"));
+
+    return builder(createExporter(spanExporterConfiguration))
+        .setMaxQueueSize(batchMaxQueueSize)
+        .setMaxExportBatchSize(batchSize).build();
   }
 
   private static SpanExporter createExporter(SpanExporterConfiguration spanExporterConfiguration)

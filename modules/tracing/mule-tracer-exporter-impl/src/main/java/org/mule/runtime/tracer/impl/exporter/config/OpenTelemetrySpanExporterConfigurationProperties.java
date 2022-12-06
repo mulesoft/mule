@@ -36,5 +36,7 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT = "mule.open.telemetry.exporter.endpoint";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SIZE = "mule.open.telemetry.exporter.batch.size";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE = "mule.open.telemetry.exporter.batch.max.size";
+
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE = "mule.open.telemetry.exporter.batch.queue.size";
 }
