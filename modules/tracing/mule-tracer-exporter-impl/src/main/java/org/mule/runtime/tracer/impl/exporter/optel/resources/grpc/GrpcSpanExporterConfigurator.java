@@ -7,9 +7,6 @@
 
 package org.mule.runtime.tracer.impl.exporter.optel.resources.grpc;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Long.parseLong;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE;
@@ -19,24 +16,24 @@ import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExpo
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.impl.exporter.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED;
 
-import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Long.parseLong;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfigurator;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
 import io.opentelemetry.sdk.trace.export.SpanExporter;

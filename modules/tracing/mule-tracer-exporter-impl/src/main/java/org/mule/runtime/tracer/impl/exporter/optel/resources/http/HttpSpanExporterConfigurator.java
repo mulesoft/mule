@@ -22,21 +22,21 @@ import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfigurator;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporterBuilder;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link SpanExporterConfigurator} for http export.
