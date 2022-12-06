@@ -12,7 +12,7 @@ import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 
 /**
- * An exporter opentelemetry api configurator configurator.
+ * An exporter opentelemetry api configurator.
  *
  * @since 4.5.0
  */

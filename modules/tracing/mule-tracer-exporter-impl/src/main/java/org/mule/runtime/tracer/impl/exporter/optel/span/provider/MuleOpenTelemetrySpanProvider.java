@@ -64,7 +64,7 @@ public class MuleOpenTelemetrySpanProvider {
       return getExportableSpan(internalSpan, initialExportInfo, serviceName, initialSpanInfo.isPolicySpan(),
                                initialSpanInfo.isRootSpan());
     } catch (SpanExporterConfiguratorException e) {
-      LOGGER.warn("Exception on generating exporter for openeltemetry traces", e);
+      LOGGER.warn("Exception on generating exporter for open telemetry traces", e);
 
     }
 
