@@ -25,12 +25,11 @@ import java.util.function.Predicate;
 /**
  * Referenced error types do exist in the context of the artifact
  */
-public class ErrorHandlerOnErrorTypeNonPropertyValue extends AbstractErrorTypesValidation {
+public class ErrorHandlerOnErrorTypeNonPropertyValue extends AbstractErrorValidation {
 
   private final boolean enabled;
 
   public ErrorHandlerOnErrorTypeNonPropertyValue(boolean enabled) {
-    super(null, false);
     this.enabled = enabled;
   }
 

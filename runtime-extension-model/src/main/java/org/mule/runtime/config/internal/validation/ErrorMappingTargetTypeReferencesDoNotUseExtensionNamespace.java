@@ -51,7 +51,9 @@ public class ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace extends 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent)
-        .and(this::errorMappingTargetNotPropertyDependant));
+        .and(comp -> isWaiveUnresolvedPropertiesOnParams()
+            ? errorMappingTargetNotPropertyDependant(comp)
+            : true));
   }
 
   @Override

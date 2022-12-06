@@ -27,12 +27,11 @@ import java.util.function.Predicate;
 /**
  * Referenced error types do exist in the context of the artifact
  */
-public class ErrorMappingSourceTypeReferencesNonPropertyValue extends AbstractErrorTypesValidation {
+public class ErrorMappingSourceTypeReferencesNonPropertyValue extends AbstractErrorValidation {
 
   private final boolean enabled;
 
   public ErrorMappingSourceTypeReferencesNonPropertyValue(boolean enabled) {
-    super(null, false);
     this.enabled = enabled;
   }
 
@@ -54,8 +53,7 @@ public class ErrorMappingSourceTypeReferencesNonPropertyValue extends AbstractEr
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     if (enabled) {
-      return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent)
-          .and(this::errorMappingSourceNotPropertyDependant));
+      return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent));
     } else {
       return c -> false;
     }

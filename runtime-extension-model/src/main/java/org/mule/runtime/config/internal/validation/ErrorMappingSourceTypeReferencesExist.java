@@ -56,7 +56,9 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent)
-        .and(this::errorMappingSourceNotPropertyDependant));
+        .and(comp -> isWaiveUnresolvedPropertiesOnParams()
+            ? errorMappingSourceNotPropertyDependant(comp)
+            : true));
   }
 
   @Override
