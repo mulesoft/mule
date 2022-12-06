@@ -10,6 +10,7 @@ package org.mule.runtime.tracer.exporter.api.config;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
+import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -59,7 +60,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
                                            FileSpanExporterConfiguration.class);
       return loadProperties(is);
     } catch (IOException e) {
-      return new Properties();
+      return getProperties();
     }
   }
 
