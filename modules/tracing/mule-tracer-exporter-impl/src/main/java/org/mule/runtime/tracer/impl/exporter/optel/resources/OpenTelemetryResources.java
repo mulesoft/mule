@@ -16,13 +16,16 @@ import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExp
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 import static io.opentelemetry.sdk.trace.export.SimpleSpanProcessor.create;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.capturer.CapturingSpanExporterWrapper;
@@ -69,7 +72,17 @@ public class OpenTelemetryResources {
   private static final CapturingSpanExporterWrapper capturingSpanExporterWrapper =
       new CapturingSpanExporterWrapper(new DummySpanExporter());
 
+  private static final Cache<String, Tracer> tracerCache =
+      newBuilder()
+          .expireAfterAccess(5, MINUTES)
+          .build();
+
   public static Tracer getTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
+      throws SpanExporterConfiguratorException {
+    return tracerCache.get(serviceName, name -> doGetTracer(spanExporterConfiguration, name));
+  }
+
+  private static Tracer doGetTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
       throws SpanExporterConfiguratorException {
     SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder();
 
