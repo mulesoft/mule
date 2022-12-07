@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShu
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
@@ -36,7 +37,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
@@ -124,7 +125,7 @@ public class MuleContainer {
   }
 
   private final ServiceManager serviceManager;
-  private final ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private boolean embeddedMode = false;
 
   /**
@@ -142,7 +143,7 @@ public class MuleContainer {
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
 
-    this.extensionModelLoaderManager = artifactResourcesRegistry.getExtensionModelLoaderManager();
+    this.extensionModelLoaderRepository = artifactResourcesRegistry.getExtensionModelLoaderRepository();
 
     this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
                                                        artifactResourcesRegistry.getApplicationFactory(),
@@ -165,10 +166,11 @@ public class MuleContainer {
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
                        MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
-                       ExtensionModelLoaderManager extensionModelLoaderManager, TroubleshootingService troubleshootingService)
+                       ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                       TroubleshootingService troubleshootingService)
       throws InitialisationException {
     this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-         extensionModelLoaderManager, troubleshootingService);
+         extensionModelLoaderRepository, troubleshootingService);
   }
 
   /**
@@ -176,7 +178,7 @@ public class MuleContainer {
    */
   public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService,
                        ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
-                       ServiceManager serviceManager, ExtensionModelLoaderManager extensionModelLoaderManager,
+                       ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
                        TroubleshootingService troubleshootingService)
       throws IllegalArgumentException, InitialisationException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
@@ -186,7 +188,7 @@ public class MuleContainer {
     this.coreExtensionManager = coreExtensionManager;
     this.repositoryService = repositoryService;
     this.serviceManager = serviceManager;
-    this.extensionModelLoaderManager = extensionModelLoaderManager;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.toolingService = toolingService;
     this.troubleshootingService = troubleshootingService;
   }
@@ -275,7 +277,7 @@ public class MuleContainer {
       coreExtensionManager.start();
       toolingService.initialise();
 
-      extensionModelLoaderManager.start();
+      startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
     } catch (Throwable e) {
       shutdown(e);
@@ -359,8 +361,8 @@ public class MuleContainer {
       muleLockFactory.dispose();
     }
 
-    if (extensionModelLoaderManager != null) {
-      extensionModelLoaderManager.stop();
+    if (extensionModelLoaderRepository != null) {
+      stopIfNeeded(extensionModelLoaderRepository);
     }
 
     coreExtensionManager.stop();

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
@@ -74,7 +74,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private final ServiceManager serviceManager = mock(ServiceManager.class);
 
-  private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
 
   private final TroubleshootingService troubleshootingService = mock(TroubleshootingService.class);
 
@@ -90,7 +90,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private MuleContainer createMuleContainer() throws InitialisationException {
     return new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                             extensionModelLoaderManager, troubleshootingService) {
+                             extensionModelLoaderRepository, troubleshootingService) {
 
       @Override
       Map<String, Object> getCommandLineOptions(String[] args) {

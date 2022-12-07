@@ -27,10 +27,10 @@ import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -38,7 +38,6 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
-import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -56,7 +55,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   private final ClassLoaderRepository classLoaderRepository;
   private final ServiceRepository serviceRepository;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
-  private final ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
   /**
    * Creates a new domain factory
@@ -68,7 +67,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
    * @param classLoaderRepository               contains all the class loaders in the container. Non null.
    * @param serviceRepository                   repository of available services. Non null.
    * @param domainClassLoaderBuilderFactory     creates builders to build the classloaders for each domain. Non null.
-   * @param extensionModelLoaderManager         manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param extensionModelLoaderRepository      manager capable of resolve {@link ExtensionModel extension models}. Non null.
    * @param artifactConfigurationProcessor      the processor to use for building the application model. Non null.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
@@ -77,7 +76,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               ClassLoaderRepository classLoaderRepository,
                               ServiceRepository serviceRepository,
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
-                              ExtensionModelLoaderManager extensionModelLoaderManager,
+                              ExtensionModelLoaderRepository extensionModelLoaderRepository,
                               LicenseValidator licenseValidator,
                               LockFactory runtimeLockFactory,
                               MemoryManagementService memoryManagementService,
@@ -90,7 +89,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     checkArgument(domainManager != null, "Domain manager cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");
     checkArgument(domainClassLoaderBuilderFactory != null, "domainClassLoaderBuilderFactory cannot be null");
-    checkArgument(extensionModelLoaderManager != null, "extensionModelLoaderManager cannot be null");
+    checkArgument(extensionModelLoaderRepository != null, "extensionModelLoaderRepository cannot be null");
     checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
@@ -98,7 +97,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     this.domainManager = domainManager;
     this.serviceRepository = serviceRepository;
     this.domainClassLoaderBuilderFactory = domainClassLoaderBuilderFactory;
-    this.extensionModelLoaderManager = extensionModelLoaderManager;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
   }
 
   private DomainDescriptor findDomain(String domainName, File domainLocation, Optional<Properties> deploymentProperties) {
@@ -187,7 +186,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeLockFactory(),
+                              extensionModelLoaderRepository, getRuntimeLockFactory(),
                               new ArtifactMemoryManagementService(getMemoryManagementService()),
                               getArtifactConfigurationProcessor());
 

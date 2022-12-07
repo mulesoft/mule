@@ -13,6 +13,8 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
@@ -1132,7 +1134,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
     appFactory.setFailOnStopApplication(true);
 
     deploymentService.setAppFactory(appFactory);
@@ -1154,7 +1156,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploymentFailureWhenDomainNotFound() throws Exception {
     final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(emptyDomainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
 
@@ -1173,7 +1175,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
 
@@ -1193,7 +1195,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1321,7 +1323,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1342,7 +1344,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1383,7 +1385,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1425,7 +1427,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderRepository, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1827,7 +1829,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   private void restartServer(ArtifactConfigurationProcessor artifactConfigurationProcessor) throws MuleException {
     serviceManager.stop();
-    extensionModelLoaderManager.stop();
+    stopIfNeeded(extensionModelLoaderRepository);
     deploymentService.stop();
 
     reset(applicationDeploymentListener);
@@ -1841,8 +1843,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     serviceManager.start();
 
-    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
-    extensionModelLoaderManager.start();
+    extensionModelLoaderRepository = muleArtifactResourcesRegistry.getExtensionModelLoaderRepository();
+    startIfNeeded(extensionModelLoaderRepository);
 
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
