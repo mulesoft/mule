@@ -103,16 +103,11 @@ public class MacroExpansionModulesModel {
       // The macro expansion of xml sdk components causes inner flow components to be generated as a child of another component;
       // so when generating the minimal app during lazy init, those flow components are not registered as top level components
       // causing certain validations to fail. This code extracts those flow and sub-flow components and adds them as top level.
-      List<ComponentAst> componentsToAdd2 =
-          applicationModel.recursiveStream()
-              .filter(c -> c.getIdentifier().equals(FLOW_IDENTIFIER) || c.getIdentifier().equals(SUB_FLOW_IDENTIFIER))
-              .filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(toList());
-      List<ComponentAst> componentsToAdd = applicationModel.recursiveStream()
-          .filter(comp -> FLOW.equals(comp.getComponentType()) || SCOPE.equals(comp.getComponentType()))
+      List<ComponentAst> componentsToAdd = applicationModel.recursiveStream().filter(c -> isFlow(c) || isSubFlow(c))
           .filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(toList());
       applicationModel = copyRecursively(applicationModel, comp -> {
         List<ComponentAst> childrenToKeep = comp.directChildrenStream()
-            .filter(child -> componentsToAdd.stream().noneMatch(c -> c.equals(child)))
+            .filter(child -> componentsToAdd.stream().noneMatch(c -> c.getIdentifier().equals(child.getIdentifier())))
             .collect(toList());
         return new BaseComponentAstDecorator(comp) {
 
@@ -127,7 +122,6 @@ public class MacroExpansionModulesModel {
           }
         };
       }, () -> componentsToAdd, c -> false);
-      System.out.println(componentsToAdd2);
 
       if (LOGGER.isDebugEnabled()) {
         // only log the macro expanded app if there are smart connectors in it
@@ -230,4 +224,11 @@ public class MacroExpansionModulesModel {
         .getNamespacesDependencies();
   }
 
+  private boolean isFlow(ComponentAst component) {
+    return FLOW_IDENTIFIER.equals(component.getIdentifier()) && FLOW.equals(component.getComponentType());
+  }
+
+  private boolean isSubFlow(ComponentAst component) {
+    return SUB_FLOW_IDENTIFIER.equals(component.getIdentifier()) && SCOPE.equals(component.getComponentType());
+  }
 }
