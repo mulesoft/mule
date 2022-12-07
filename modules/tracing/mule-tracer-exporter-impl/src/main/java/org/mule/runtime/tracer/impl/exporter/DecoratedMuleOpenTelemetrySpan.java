@@ -62,7 +62,7 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
 
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
-  public static final String RECORD_EVENTS_READABLE_SPAN_CLASS = "io.opentelemetry.sdk.trace.RecordEventsReadableSpan";
+  public static final String SDK_SPAN_CLASS = "io.opentelemetry.sdk.trace.SdkSpan";
   public static final String SPAN_KIND_FIELD_NAME = "kind";
   public static final Field SPAN_KIND_FIELD = getSpanKindField();
 
@@ -74,7 +74,7 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   // TODO W-12176342: Discuss Span Kind update implementation
   private static Field getSpanKindField() {
     try {
-      Field spanKindField = Class.forName(RECORD_EVENTS_READABLE_SPAN_CLASS).getDeclaredField(SPAN_KIND_FIELD_NAME);
+      Field spanKindField = Class.forName(SDK_SPAN_CLASS).getDeclaredField(SPAN_KIND_FIELD_NAME);
       spanKindField.setAccessible(true);
       return spanKindField;
     } catch (NoSuchFieldException | ClassNotFoundException e) {
@@ -115,7 +115,7 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
 
   private void updateSpanKind(InternalSpan internalSpan) {
     String spanKind = internalSpan.getAttributes().remove(SPAN_KIND);
-    if (spanKind != null && SPAN_KIND_FIELD != null && delegate.getClass().getName().equals(RECORD_EVENTS_READABLE_SPAN_CLASS)) {
+    if (spanKind != null && SPAN_KIND_FIELD != null && delegate.getClass().getName().equals(SDK_SPAN_CLASS)) {
       try {
         SPAN_KIND_FIELD.set(delegate, SpanKind.valueOf(spanKind));
       } catch (IllegalAccessException e) {
