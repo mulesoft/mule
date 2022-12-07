@@ -32,6 +32,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.XmlSdkImplicitConfig.IMPLICIT_CONFIG_NAME_SUFFIX;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,6 +88,8 @@ import java.util.stream.Stream;
  * @since 4.0
  */
 public class MacroExpansionModuleModel {
+
+  private static final Logger LOGGER = getLogger(MacroExpansionModuleModel.class);
 
   /**
    * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
@@ -120,12 +124,15 @@ public class MacroExpansionModuleModel {
    * <operation/>'s <body/> accordingly.
    */
   private static final String DEFAULT_CONFIG_GLOBAL_ELEMENT_SUFFIX = "%s-default-config-global-element-suffix";
+  private static final String IMPLICIT_CONFIG_WARNING =
+      "An implicit config is being used for extension %s, this is not fully supported for this extension." +
+          " All operation usages of this extension should have a reference to an explicit configuration.";
 
   /**
    * If true avoid the creation of an implicit configuration
    */
   private final boolean disable_xml_sdk_implicit_configuration_creation =
-      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false"));
+      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "true"));
 
   private final ArtifactAst applicationModel;
   private final ExtensionModel extensionModel;
@@ -157,8 +164,13 @@ public class MacroExpansionModuleModel {
     final ArtifactAst expandedArtifactAst;
 
     if (shouldAddImplicitConfiguration()) {
-      expandedArtifactAst = copyRecursively(applicationModel, identity(),
-                                            () -> singletonList(new XmlSdkImplicitConfig(extensionModel)), comp -> false);
+      LOGGER.warn(format(IMPLICIT_CONFIG_WARNING, extensionModel.getName()));
+      if (!disable_xml_sdk_implicit_configuration_creation) {
+        expandedArtifactAst = copyRecursively(applicationModel, identity(),
+                                              () -> singletonList(new XmlSdkImplicitConfig(extensionModel)), comp -> false);
+      } else {
+        expandedArtifactAst = applicationModel;
+      }
     } else {
       expandedArtifactAst = applicationModel;
     }
@@ -188,8 +200,7 @@ public class MacroExpansionModuleModel {
   }
 
   private boolean shouldAddImplicitConfiguration() {
-    return existOperationThatUsesImplicitConfiguration() && hasXmlSdkPropertiesWithDefaultValues() &&
-        !disable_xml_sdk_implicit_configuration_creation;
+    return existOperationThatUsesImplicitConfiguration() && hasXmlSdkPropertiesWithDefaultValues();
   }
 
   private boolean existOperationThatUsesImplicitConfiguration() {
@@ -444,7 +455,7 @@ public class MacroExpansionModuleModel {
 
     final Optional<String> configRef =
         !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-            && shouldAddImplicitConfiguration()
+            && (shouldAddImplicitConfiguration() && !disable_xml_sdk_implicit_configuration_creation)
                 ? of(format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName()))
                 : configRefName;
 
