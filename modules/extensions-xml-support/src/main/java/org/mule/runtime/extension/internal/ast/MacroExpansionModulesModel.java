@@ -12,9 +12,13 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.repeat;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -27,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.jgrapht.Graph;
@@ -53,6 +56,10 @@ public class MacroExpansionModulesModel {
   private static final Logger LOGGER = LoggerFactory.getLogger(MacroExpansionModulesModel.class);
   private static final String FILE_MACRO_EXPANSION_DELIMITER = repeat('*', 80) + lineSeparator();
   private static final String FILE_MACRO_EXPANSION_SECTION_DELIMITER = repeat('-', 80) + lineSeparator();
+  private static final String FLOW_ELEMENT = "flow";
+  private static final String SUB_FLOW_ELEMENT = "sub-flow";
+  private static final ComponentIdentifier FLOW_IDENTIFIER = builder().namespace(CORE_PREFIX).name(FLOW_ELEMENT).build();
+  private static final ComponentIdentifier SUB_FLOW_IDENTIFIER = builder().namespace(CORE_PREFIX).name(SUB_FLOW_ELEMENT).build();
 
   private ArtifactAst applicationModel;
   private final List<ExtensionModel> sortedExtensions;
@@ -95,12 +102,17 @@ public class MacroExpansionModulesModel {
     if (hasMacroExpansionExtension) {
       // The macro expansion of xml sdk components causes inner flow components to be generated as a child of another component;
       // so when generating the minimal app during lazy init, those flow components are not registered as top level components
-      // causing certain validations to fail. This code extracts those flow components and adds them as top level.
-      List<ComponentAst> componentsToAdd = applicationModel.recursiveStream().filter(comp -> FLOW.equals(comp.getComponentType()))
+      // causing certain validations to fail. This code extracts those flow and sub-flow components and adds them as top level.
+      List<ComponentAst> componentsToAdd2 =
+          applicationModel.recursiveStream()
+              .filter(c -> c.getIdentifier().equals(FLOW_IDENTIFIER) || c.getIdentifier().equals(SUB_FLOW_IDENTIFIER))
+              .filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(toList());
+      List<ComponentAst> componentsToAdd = applicationModel.recursiveStream()
+          .filter(comp -> FLOW.equals(comp.getComponentType()) || SCOPE.equals(comp.getComponentType()))
           .filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(toList());
       applicationModel = copyRecursively(applicationModel, comp -> {
         List<ComponentAst> childrenToKeep = comp.directChildrenStream()
-            .filter(child -> !FLOW.equals(child.getComponentType()))
+            .filter(child -> componentsToAdd.stream().noneMatch(c -> c.equals(child)))
             .collect(toList());
         return new BaseComponentAstDecorator(comp) {
 
@@ -115,6 +127,7 @@ public class MacroExpansionModulesModel {
           }
         };
       }, () -> componentsToAdd, c -> false);
+      System.out.println(componentsToAdd2);
 
       if (LOGGER.isDebugEnabled()) {
         // only log the macro expanded app if there are smart connectors in it
