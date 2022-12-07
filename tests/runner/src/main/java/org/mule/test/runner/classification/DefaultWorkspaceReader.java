@@ -122,7 +122,8 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
 
   @Override
   public File findArtifact(Artifact artifact) {
-    File workspaceArtifactPath = workspaceLocationResolver.resolvePath(artifact.getArtifactId());
+    File workspaceArtifactPath =
+        workspaceLocationResolver.resolvePath(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
     if (workspaceArtifactPath == null) {
       logger.debug("Couldn't resolve '{}' from workspace, it would be resolved against local repository or downloaded", artifact);
       // Cannot be resolved in workspace so delegate its resolution to the Maven local repository

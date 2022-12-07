@@ -27,4 +27,18 @@ public interface WorkspaceLocationResolver {
    */
   File resolvePath(String artifactId);
 
+  /**
+   * Resolves the {@link File} to file system for the given {@link Artifact}.
+   *
+   * @param groupId    of the artifact, cannot be {@code null}.
+   * @param artifactId of the artifact, cannot be {@code null}.
+   * @param version    of the artifact, cannot be {@code null}.
+   * @return {@link File} for the given artifact or null if it is not present in workspace.
+   * @since 4.4.0
+   */
+  default File resolvePath(String groupId, String artifactId, String version) {
+    // Default implementation for backwards compatibility.
+    return resolvePath(artifactId);
+  }
+
 }
