@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
 import static java.util.Optional.empty;
@@ -164,11 +165,13 @@ public class AdditionalPluginDependenciesResolver {
     Map<String, Plugin> additionalDependenciesFromMulePlugins = new HashMap<>();
 
     // See LightweightDeployableProjectModelBuilderTestCase#createDeployableProjectModelWithAdditionalDependenciesInAPlugin
-    mulePlugins.forEach(mulePlugin -> {
-
-      BundleDescriptor descriptor = mulePlugin.getDescriptor();
-      ArtifactCoordinates artifactCoordinates =
-          new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+    mulePlugins.stream().filter(mulePlugin -> {
+      ArtifactCoordinates artifactCoordinates = getArtifactCoordinates(mulePlugin);
+      return pomModels.getOrDefault(artifactCoordinates,
+                                    () -> aetherMavenClient.getRawPomModel(new File(mulePlugin.getBundleUri())))
+          .get().getPackaging().equals(MULE_APPLICATION_CLASSIFIER);
+    }).forEach(mulePlugin -> {
+      ArtifactCoordinates artifactCoordinates = getArtifactCoordinates(mulePlugin);
 
       Supplier<Model> pomModel =
           pomModels.getOrDefault(artifactCoordinates,
@@ -268,6 +271,11 @@ public class AdditionalPluginDependenciesResolver {
       // If not using semver lets just compare the strings.
       return dependencyA.compareTo(dependencyB) > 0;
     }
+  }
+
+  private ArtifactCoordinates getArtifactCoordinates(BundleDependency mulePlugin) {
+    BundleDescriptor descriptor = mulePlugin.getDescriptor();
+    return new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
   }
 
   private Predicate<Plugin> isNotRedefinedAtApplicationLevel() {
