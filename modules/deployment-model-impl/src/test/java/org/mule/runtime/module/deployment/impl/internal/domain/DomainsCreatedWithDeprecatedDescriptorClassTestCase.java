@@ -22,11 +22,10 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProce
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.license.api.LicenseValidator;
@@ -52,7 +51,7 @@ public class DomainsCreatedWithDeprecatedDescriptorClassTestCase extends Abstrac
                                null,
                                mock(ServiceRepository.class),
                                new DomainClassLoaderBuilderFactory(ArtifactClassLoaderResolver.defaultClassLoaderResolver()),
-                               mock(ExtensionModelLoaderManager.class),
+                               mock(ExtensionModelLoaderRepository.class),
                                mock(LicenseValidator.class),
                                getRuntimeLockFactory(),
                                mock(MemoryManagementService.class),
