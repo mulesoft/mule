@@ -81,6 +81,7 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
       configureTimeout(builder, timeout);
     }
 
+    // Backoff strategy
     enableBackoffStrategy(builder, spanExporterConfiguration);
 
     return builder.build();

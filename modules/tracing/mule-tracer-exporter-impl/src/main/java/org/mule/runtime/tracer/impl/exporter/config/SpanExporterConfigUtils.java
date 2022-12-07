@@ -22,8 +22,27 @@ public class SpanExporterConfigUtils {
 
   private SpanExporterConfigUtils() {}
 
+  /**
+   * <p>
+   * Enables the experimental backoff strategy for the Open Telemetry exporters.
+   * </p>
+   * <p>
+   * A default parametrization will be used if no configuration is provided:
+   * </p>
+   * <lu>
+   * <li>Initial backoff: 1 Second</li>
+   * <li>Maximum backoff: 5 Seconds</li>
+   * <li>Maximum retry attempts: 5</li>
+   * <li>Backoff multiplier: 1.5</li> </lu>
+   *
+   * @param exporterBuilder           The exporter builder.
+   * @param spanExporterConfiguration The span exporter configuration that will be used to override the default backoff
+   *                                  parameters.
+   */
   public static void enableBackoffStrategy(Object exporterBuilder, SpanExporterConfiguration spanExporterConfiguration) {
     try {
+      // Since it's an experimental feature, we must enable it using reflection.
+      // See https://github.com/open-telemetry/opentelemetry-java/pull/3791
       Field delegateField = exporterBuilder.getClass().getDeclaredField("delegate");
       delegateField.setAccessible(true);
       Method setRetryPolicyMethod =
@@ -35,6 +54,9 @@ public class SpanExporterConfigUtils {
     }
   }
 
+  /**
+   * Builder that encapsulates the configuration of the Open Telemetry {@link RetryPolicy}.
+   */
   private static class RetryPolicyBuilder {
 
     private static final String DEFAULT_BACKOFF_MULTIPLIER = "1.5";
@@ -51,12 +73,14 @@ public class SpanExporterConfigUtils {
     public RetryPolicy build() {
       return RetryPolicy.builder()
           .setBackoffMultiplier(parseDouble(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER,
-                  DEFAULT_BACKOFF_MULTIPLIER)))
+                                                                               DEFAULT_BACKOFF_MULTIPLIER)))
           .setInitialBackoff(ofSeconds(parseLong(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF,
-                  DEFAULT_INITIAL_BACKOFF))))
-          .setMaxBackoff(ofSeconds(parseLong(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF))))
+                                                                                    DEFAULT_INITIAL_BACKOFF))))
+          .setMaxBackoff(ofSeconds(parseLong(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF,
+                                                                                DEFAULT_MAXIMUM_BACKOFF))))
           .setMaxAttempts(Integer
-              .parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS, DEFAULT_MAX_ATTEMPTS)))
+              .parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS,
+                                                           DEFAULT_MAX_ATTEMPTS)))
           .build();
     }
   }
