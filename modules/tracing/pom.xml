@@ -28,6 +28,8 @@
         <module>mule-tracer-internal-impl</module>
         <module>mule-tracer-exporter-api</module>
         <module>mule-tracer-exporter-impl</module>
+        <module>mule-tracer-exporter-configuration-api</module>
+        <module>mule-tracer-exporter-configuration-impl</module>
     </modules>
 
     <build>

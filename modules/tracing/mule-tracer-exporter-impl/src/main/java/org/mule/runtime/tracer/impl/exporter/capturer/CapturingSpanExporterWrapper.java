@@ -28,7 +28,7 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources;
+import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources;
 
 /**
  * A {@link SpanExporter} that captures Open Telemetry exported spans.

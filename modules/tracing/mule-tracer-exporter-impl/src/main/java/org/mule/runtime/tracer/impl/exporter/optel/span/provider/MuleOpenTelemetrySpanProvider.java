@@ -5,20 +5,27 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter;
+package org.mule.runtime.tracer.impl.exporter.optel.span.provider;
 
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
-import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.getPropagator;
-import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.getTracer;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getPropagator;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getTracer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
+import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigurationDiscoverer.discoverSpanExporterConfiguration;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-import org.mule.runtime.tracer.impl.exporter.config.SystemPropertiesSpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.exporter.DecoratedMuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
+import org.mule.runtime.tracer.impl.exporter.optel.span.MuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -26,6 +33,7 @@ import java.util.Map;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapGetter;
+import org.slf4j.Logger;
 
 /**
  * A Provider for {@link MuleOpenTelemetrySpan}.
@@ -34,15 +42,17 @@ import io.opentelemetry.context.propagation.TextMapGetter;
  */
 public class MuleOpenTelemetrySpanProvider {
 
-  private static final SpanExporterConfiguration CONFIGURATION = new SystemPropertiesSpanExporterConfiguration();
+  private static final SpanExporterConfiguration CONFIGURATION = discoverSpanExporterConfiguration();
 
   private static final TextMapGetter<Map<String, String>> OPEN_TELEMETRY_SPAN_GETTER = new MuleOpenTelemetryRemoteContextGetter();
+
+  private static final Logger LOGGER = getLogger(MuleOpenTelemetrySpanProvider.class);
 
   private MuleOpenTelemetrySpanProvider() {}
 
   public static MuleOpenTelemetrySpan getNewOpenTelemetrySpan(InternalSpan internalSpan,
                                                               InitialSpanInfo initialSpanInfo,
-                                                              String serviceNAme) {
+                                                              String serviceName) {
 
     InitialExportInfo initialExportInfo = initialSpanInfo.getInitialExportInfo();
 
@@ -50,15 +60,23 @@ public class MuleOpenTelemetrySpanProvider {
       return getNonExportableSpan(internalSpan);
     }
 
-    return getExportableSpan(internalSpan, initialExportInfo, serviceNAme, initialSpanInfo.isPolicySpan(),
-                             initialSpanInfo.isRootSpan());
+    try {
+      return getExportableSpan(internalSpan, initialExportInfo, serviceName, initialSpanInfo.isPolicySpan(),
+                               initialSpanInfo.isRootSpan());
+    } catch (SpanExporterConfiguratorException e) {
+      LOGGER.warn("Exception on generating exporter for open telemetry traces", e);
+
+    }
+
+    return getNonExportableSpan(internalSpan);
   }
 
   private static MuleOpenTelemetrySpan getExportableSpan(InternalSpan internalSpan,
                                                          InitialExportInfo initialExportInfo,
                                                          String serviceName,
                                                          boolean isPolicy,
-                                                         boolean isRoot) {
+                                                         boolean isRoot)
+      throws SpanExporterConfiguratorException {
     SpanBuilder spanBuilder = getTracer(CONFIGURATION, serviceName).spanBuilder(internalSpan.getName())
         .setStartTimestamp(internalSpan.getDuration().getStart(), NANOSECONDS);
 

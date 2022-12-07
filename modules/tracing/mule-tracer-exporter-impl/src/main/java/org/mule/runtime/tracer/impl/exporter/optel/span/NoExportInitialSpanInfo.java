@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter;
+package org.mule.runtime.tracer.impl.exporter.optel.span;
 
 import org.mule.runtime.core.api.tracing.customization.NoExportTillSpanWithNameInitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;

@@ -5,21 +5,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter.config;
-
-import static java.lang.System.getProperty;
+package org.mule.runtime.tracer.impl.exporter;
 
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
-/**
- * A {@link SpanExporterConfiguration} that is based on system properties.
- *
- * @since 4.5.0
- */
-public class SystemPropertiesSpanExporterConfiguration implements SpanExporterConfiguration {
+import java.util.Map;
+
+class TestSpanExporterConfiguration implements SpanExporterConfiguration {
+
+  private final Map<String, String> properties;
+
+  public TestSpanExporterConfiguration(Map<String, String> properties) {
+    this.properties = properties;
+  }
 
   @Override
   public String getValue(String key) {
-    return getProperty(key);
+    return properties.get(key);
   }
 }

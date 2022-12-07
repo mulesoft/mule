@@ -1,0 +1,37 @@
+extensions:
+  health_check: {}
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  otlp/mtls:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:5317
+        tls:
+          client_ca_file: $MTLS_CLIENT_CERTIFICATE
+          cert_file: $MTLS_SERVER_CERTIFICATE
+          key_file: $MTLS_SERVER_KEY
+      http:
+        endpoint: 0.0.0.0:5318
+        tls:
+          client_ca_file: $MTLS_CLIENT_CERTIFICATE
+          cert_file: $MTLS_SERVER_CERTIFICATE
+          key_file: $MTLS_SERVER_KEY
+exporters:
+  logging:
+    logLevel: $LOGGING_EXPORTER_LOG_lEVEL
+  otlp:
+    endpoint: $OTLP_EXPORTER_ENDPOINT
+    tls:
+      insecure: true
+    compression: none
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp, otlp/mtls]
+      exporters: [logging, otlp]
