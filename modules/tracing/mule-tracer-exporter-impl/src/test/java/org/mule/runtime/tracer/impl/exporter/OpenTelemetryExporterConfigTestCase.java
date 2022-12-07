@@ -24,7 +24,6 @@ import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExp
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -150,8 +149,10 @@ public class OpenTelemetryExporterConfigTestCase {
 
 
     tracer.spanBuilder(getUUID()).startSpan().end();
-    new PollingProber(DEFAULT_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(server.getTraceRequests().get(0).getResourceSpansCount(), is(1));
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
+        return false;
+      }
       return true;
     }));
   }
@@ -163,7 +164,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
                    "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_MTLS_PORT));
-    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "0");
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "true");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION, clientTls.privateKeyFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION, clientTls.certificateFile().toPath().toString());
@@ -176,7 +177,9 @@ public class OpenTelemetryExporterConfigTestCase {
 
     tracer.spanBuilder(getUUID()).startSpan().end();
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(server.getTraceRequests().get(0).getResourceSpansCount(), is(1));
+      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
+        return false;
+      }
       return true;
     }));
   }
@@ -195,8 +198,10 @@ public class OpenTelemetryExporterConfigTestCase {
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
     tracer.spanBuilder(getUUID()).startSpan().end();
-    new PollingProber(DEFAULT_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(server.getTraceRequests().get(0).getResourceSpansCount(), is(1));
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
+        return false;
+      }
       return true;
     }));
   }
@@ -222,7 +227,9 @@ public class OpenTelemetryExporterConfigTestCase {
 
     tracer.spanBuilder(getUUID()).startSpan().end();
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(server.getTraceRequests().get(0).getResourceSpansCount(), is(1));
+      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
+        return false;
+      }
       return true;
     }));
   }
