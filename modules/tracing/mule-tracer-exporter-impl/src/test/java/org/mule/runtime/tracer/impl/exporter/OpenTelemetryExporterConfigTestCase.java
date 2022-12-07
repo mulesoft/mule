@@ -144,7 +144,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE, "gzip");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
-             "{\"Authorization\": \"Api-Token dt0c01.KMYZTCZBHF7PK22J4CYKTW6R.A6TR7R3UG6BBPDU2EEVJQBL2WUD2DCDFYLYRA72VUDSBPAXXGYJX6Q3QDLJOLUDO\"}");
+             "{\"Header\": \"Header Value\"}");
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
 
@@ -172,7 +172,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE, "gzip");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
-             "{\"Authorization\": \"Api-Token dt0c01.KMYZTCZBHF7PK22J4CYKTW6R.A6TR7R3UG6BBPDU2EEVJQBL2WUD2DCDFYLYRA72VUDSBPAXXGYJX6Q3QDLJOLUDO\"}");
+             "{\"Header\": \"Header Value\"}");
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
     tracer.spanBuilder(getUUID()).startSpan().end();
@@ -194,7 +194,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
-             "{\"Authorization\": \"Api-Token dt0c01.KMYZTCZBHF7PK22J4CYKTW6R.A6TR7R3UG6BBPDU2EEVJQBL2WUD2DCDFYLYRA72VUDSBPAXXGYJX6Q3QDLJOLUDO\"}");
+             "{\"Header\": \"Header Value\"}");
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
     tracer.spanBuilder(getUUID()).startSpan().end();
@@ -218,7 +218,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "true");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
-             "{\"Authorization\": \"Api-Token dt0c01.KMYZTCZBHF7PK22J4CYKTW6R.A6TR7R3UG6BBPDU2EEVJQBL2WUD2DCDFYLYRA72VUDSBPAXXGYJX6Q3QDLJOLUDO\"}");
+             "{\"Header\": \"Header Value\"}");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION, clientTls.privateKeyFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION, clientTls.certificateFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION, serverTls.certificateFile().toPath().toString());
