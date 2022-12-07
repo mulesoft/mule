@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.tracer.impl.exporter;
 
-import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryResources.SERVICE_NAME_KEY;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.SERVICE_NAME_KEY;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 
 import static java.lang.System.nanoTime;
