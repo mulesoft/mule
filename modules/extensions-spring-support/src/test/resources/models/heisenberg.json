@@ -2095,7 +2095,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -2612,7 +2612,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -2915,7 +2915,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -3696,7 +3696,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -4477,7 +4477,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -5229,7 +5229,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6014,7 +6014,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6340,7 +6340,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6827,7 +6827,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -7156,7 +7156,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -7735,7 +7735,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -8479,7 +8479,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -8856,7 +8856,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -9347,7 +9347,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -10207,7 +10207,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -10925,7 +10925,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -11627,7 +11627,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -12144,7 +12144,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -12581,7 +12581,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -12968,7 +12968,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -13376,7 +13376,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -14034,7 +14034,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -14811,7 +14811,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -15546,7 +15546,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -16275,7 +16275,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -16844,7 +16844,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "SUPPORTED",
+                  "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -20560,60 +20560,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 14
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "CONFIG",
-                      "namespace": "HEISENBERG",
-                      "parent": {
-                        "type": "MODULE_CONFIG",
-                        "namespace": "MULE"
-                      }
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "config-ref",
-                  "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-AsyncListenPayments-backPressureStrategy",
@@ -20655,7 +20601,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15,
+                    "order": 14,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -20686,13 +20632,67 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -21029,7 +21029,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17,
+                    "order": 16,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -22931,60 +22931,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 14
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "CONFIG",
-                      "namespace": "HEISENBERG",
-                      "parent": {
-                        "type": "MODULE_CONFIG",
-                        "namespace": "MULE"
-                      }
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "config-ref",
-                  "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-ListenPayments-backPressureStrategy",
@@ -23026,7 +22972,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15,
+                    "order": 14,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -23057,13 +23003,67 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -23400,7 +23400,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17,
+                    "order": 16,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -24522,60 +24522,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 5
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "CONFIG",
-                      "namespace": "HEISENBERG",
-                      "parent": {
-                        "type": "MODULE_CONFIG",
-                        "namespace": "MULE"
-                      }
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "config-ref",
-                  "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-ListenPaymentsAllOptional-backPressureStrategy",
@@ -24617,7 +24563,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 6,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -24648,13 +24594,67 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 7,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -24991,7 +24991,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8,
+                    "order": 7,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -26926,60 +26926,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 15
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "CONFIG",
-                      "namespace": "HEISENBERG",
-                      "parent": {
-                        "type": "MODULE_CONFIG",
-                        "namespace": "MULE"
-                      }
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "config-ref",
-                  "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-ReconnectableListenPayments-backPressureStrategy",
@@ -27021,7 +26967,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -27052,13 +26998,67 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17,
+                    "order": 16,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -27395,7 +27395,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18,
+                    "order": 17,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -29330,60 +29330,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 15
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "CONFIG",
-                      "namespace": "HEISENBERG",
-                      "parent": {
-                        "type": "MODULE_CONFIG",
-                        "namespace": "MULE"
-                      }
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "config-ref",
-                  "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-SdkReconnectableListenPayments-backPressureStrategy",
@@ -29425,7 +29371,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -29456,13 +29402,67 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17,
+                    "order": 16,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -29799,7 +29799,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18,
+                    "order": 17,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -31701,60 +31701,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 14
-                  },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "CONFIG",
-                      "namespace": "HEISENBERG",
-                      "parent": {
-                        "type": "MODULE_CONFIG",
-                        "namespace": "MULE"
-                      }
-                    }
-                  ],
-                  "semanticTerms": [],
-                  "name": "config-ref",
-                  "description": "The name of the configuration to be used to execute this component",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "Heisenberg-listen-payments-cluster-backPressureStrategy",
@@ -31796,7 +31742,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 15,
+                    "order": 14,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -31827,13 +31773,67 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 15,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -32170,7 +32170,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17,
+                    "order": 16,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],

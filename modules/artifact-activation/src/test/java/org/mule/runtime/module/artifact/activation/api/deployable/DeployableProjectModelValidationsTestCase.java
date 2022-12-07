@@ -209,7 +209,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
 
     expected.expect(ArtifactActivationException.class);
     expected
-        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
+        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a:mule-plugin' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
     new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
@@ -237,6 +237,38 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
             .setArtifactId("test-plugin-a")
             .setVersion("0.1.1")
             .setClassifier(MULE_PLUGIN_CLASSIFIER)
+            .build())
+        .build());
+
+    new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
+                               appDescriptor,
+                               () -> null,
+                               new File("."),
+                               dependencies,
+                               emptySet(),
+                               emptyMap()).validate();
+
+  }
+
+  @Test
+  @Issue("W-12118812")
+  public void nonConflictingPluginsWithSameGroupIdAndArtifactIdButDifferentClassifier() {
+    List<BundleDependency> dependencies = new ArrayList<>();
+
+    dependencies.add(new BundleDependency.Builder()
+        .setDescriptor(new BundleDescriptor.Builder()
+            .setGroupId("org.mule.sample")
+            .setArtifactId("test-plugin-a")
+            .setVersion("0.0.1")
+            .setClassifier(MULE_PLUGIN_CLASSIFIER)
+            .build())
+        .build());
+    dependencies.add(new BundleDependency.Builder()
+        .setDescriptor(new BundleDescriptor.Builder()
+            .setGroupId("org.mule.sample")
+            .setArtifactId("test-plugin-a")
+            .setVersion("0.1.0")
+            .setClassifier(null)
             .build())
         .build());
 

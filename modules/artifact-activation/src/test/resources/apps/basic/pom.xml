@@ -46,6 +46,13 @@
             <version>1.13.1</version>
             <classifier>mule-plugin</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-jms-connector</artifactId>
+            <version>1.8.4</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>

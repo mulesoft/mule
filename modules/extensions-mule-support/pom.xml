@@ -285,6 +285,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <mule.experimental.enableMuleSdk>true</mule.experimental.enableMuleSdk>
+                        <mule.experimental.enableDynamicConfigRef>true</mule.experimental.enableDynamicConfigRef>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

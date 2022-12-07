@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 
@@ -104,6 +105,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 
@@ -863,6 +865,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Inject
+  @Named(METADATA_CACHE_ID_GENERATOR_KEY)
   public void setCacheIdGeneratorFactory(Optional<MetadataCacheIdGeneratorFactory<ComponentAst>> cacheIdGeneratorFactory) {
     this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
   }

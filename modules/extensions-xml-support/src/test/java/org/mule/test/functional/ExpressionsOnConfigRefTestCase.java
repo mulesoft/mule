@@ -12,21 +12,27 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.test.allure.AllureConstants.Sdk.Parameters.EXPRESSIONS_ON_CONFIG_REF;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 @Feature(SDK)
 @Story(EXPRESSIONS_ON_CONFIG_REF)
 public class ExpressionsOnConfigRefTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
+
+  @ClassRule
+  public static SystemProperty enableDynamicConfigRef = new SystemProperty(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY, "true");
 
   public static class SomeTestProcessor implements Processor {
 

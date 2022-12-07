@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+import static org.mule.runtime.extension.api.loader.ExtensionLoadingContext.EXTENSION_LOADER_PROPERTY_PREFIX;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -22,8 +23,6 @@ import org.mule.sdk.api.runtime.source.SourceCallbackContext;
  * @since 4.0
  */
 public class ExtensionProperties {
-
-  private static final String EXTENSION_LOADER_PROPERTY_PREFIX = "EXTENSION_LOADER_";
 
   /**
    * The key of an execution context variable on which the connection to be used was set

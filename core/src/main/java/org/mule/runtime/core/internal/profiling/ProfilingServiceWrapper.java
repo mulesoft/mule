@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -28,14 +28,15 @@ import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.privileged.profiling.SpanExportManager;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -84,6 +85,15 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
+  public void injectDistributedTraceContext(EventContext eventContext,
+                                            DistributedTraceContextGetter distributedTraceContextGetter) {
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).injectDistributedTraceContext(eventContext,
+                                                                                         distributedTraceContextGetter);
+    }
+  }
+
+  @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
     return getProfilingService().getThreadSnapshotCollector();
   }
@@ -101,7 +111,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public SpanExportManager getSpanExportManager() {
+  public SpanSnifferManager getSpanExportManager() {
     if (profilingService instanceof PrivilegedProfilingService) {
       return ((PrivilegedProfilingService) getProfilingService()).getSpanExportManager();
     }
@@ -150,7 +160,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public CoreEventTracer getCoreEventTracer() {
+  public EventTracer<CoreEvent> getCoreEventTracer() {
     return getProfilingService().getCoreEventTracer();
   }
 
@@ -173,13 +183,6 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
     if (profilingService instanceof Initialisable) {
       ((Initialisable) profilingService).initialise();
-    }
-  }
-
-  @Override
-  public void endComponentSpan(CoreEvent event) {
-    if (profilingService instanceof PrivilegedProfilingService) {
-      ((PrivilegedProfilingService) getProfilingService()).endComponentSpan(event);
     }
   }
 

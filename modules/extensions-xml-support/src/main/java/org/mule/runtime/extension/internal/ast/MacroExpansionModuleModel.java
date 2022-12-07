@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.extension.internal.ast;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -22,6 +23,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
@@ -128,6 +130,8 @@ public class MacroExpansionModuleModel {
 
   private final ArtifactAst applicationModel;
   private final ExtensionModel extensionModel;
+
+  private final boolean isDynamicConfigRefEnabled = getBoolean(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY);
 
   /**
    * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
@@ -543,10 +547,7 @@ public class MacroExpansionModuleModel {
   private Map<String, String> extractProperties(ArtifactAst expandedArtifactAst, Optional<String> configRefName) {
     Map<String, String> valuesMap = new HashMap<>();
     configRefName
-        // if the config-ref is an expression we can't macro-expand the properties, they'll need to be resolved in runtime
-        .filter(configParameter -> !isExpression(configParameter) &&
-            defaultGlobalElementName().map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter))
-                .orElse(true))
+        .filter(configParameter -> shouldExtractPropertiesFrom(configParameter))
         .ifPresent(configParameter -> {
           ComponentAst configRefComponentModel = getComponentAst(expandedArtifactAst, configParameter);
           // as configParameter != null, a ConfigurationModel must exist
@@ -557,6 +558,16 @@ public class MacroExpansionModuleModel {
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
+  }
+
+  private boolean shouldExtractPropertiesFrom(String configParameter) {
+    if (isDynamicConfigRefEnabled && isExpression(configParameter)) {
+      // if the config-ref is an expression we can't macro-expand the properties, they'll need to be resolved in runtime
+      return false;
+    }
+
+    return defaultGlobalElementName().map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter))
+        .orElse(true);
   }
 
   private ComponentAst getComponentAst(ArtifactAst applicationModel, String configParameter) {

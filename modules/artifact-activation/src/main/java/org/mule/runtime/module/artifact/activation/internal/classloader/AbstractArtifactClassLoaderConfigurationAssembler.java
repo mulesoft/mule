@@ -10,11 +10,13 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
@@ -71,7 +73,9 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
                                                                   PRIVILEGED_EXPORTED_PACKAGES)),
                                        new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
-                                                                  PRIVILEGED_ARTIFACTS_IDS)));
+                                                                  PRIVILEGED_ARTIFACTS_IDS)))
+          .includeTestDependencies(parseBoolean(getSimpleAttribute(muleArtifactLoaderDescriptor.getAttributes(),
+                                                                   INCLUDE_TEST_DEPENDENCIES, "false")));
     }
 
     List<BundleDependency> bundleDependencies = getBundleDependencies();
@@ -94,10 +98,14 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
       return emptyList();
     }
 
-    final Object attributeObject = attributes.getOrDefault(attribute, new ArrayList<String>());
+    final Object attributeObject = attributes.getOrDefault(attribute, emptyList());
     checkArgument(attributeObject instanceof List, format("The '%s' attribute must be of '%s', found '%s'", attribute,
                                                           List.class.getName(), attributeObject.getClass().getName()));
     return (List<String>) attributeObject;
+  }
+
+  private <T> T getSimpleAttribute(Map<String, Object> attributes, String attribute, T defaultValue) {
+    return attributes != null ? (T) attributes.getOrDefault(attribute, defaultValue) : defaultValue;
   }
 
   protected abstract ClassLoaderConfigurationBuilder getClassLoaderConfigurationBuilder();

@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ import reactor.core.publisher.MonoSink;
  *
  * @since 4.0
  */
-abstract class AbstractEventContext implements DistributedTraceContextAware, BaseEventContext {
+abstract class AbstractEventContext implements SpanContextAware, BaseEventContext {
 
   private static final byte STATE_READY = 0;
   private static final byte STATE_RESPONSE = 1;

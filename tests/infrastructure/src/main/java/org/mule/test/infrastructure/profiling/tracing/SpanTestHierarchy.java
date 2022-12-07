@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.privileged.profiling.CapturedEventData;
-import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
 import java.util.ArrayList;
 import java.util.Arrays;

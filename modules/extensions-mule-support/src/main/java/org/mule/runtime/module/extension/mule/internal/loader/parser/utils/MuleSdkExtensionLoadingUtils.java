@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
 
 import static java.lang.String.format;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
+import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
@@ -46,7 +49,13 @@ public class MuleSdkExtensionLoadingUtils {
   public static TypeLoader createTypeLoader(ExtensionLoadingContext context) {
     ExpressionLanguageMetadataService expressionLanguageMetadataService =
         getRequiredLoadingParameter(context, MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME);
-    return new ApplicationTypeLoader(context.getDslResolvingContext().getExtensions(), expressionLanguageMetadataService);
+    DefaultArtifactTypeLoader typeLoader = new DefaultArtifactTypeLoader(context.getDslResolvingContext().getExtensions());
+    try {
+      typeLoader.initialise();
+    } catch (InitialisationException initialisationException) {
+      throw new MuleRuntimeException(createStaticMessage("Failed to initialise type loader."), initialisationException);
+    }
+    return typeLoader;
   }
 
   /**

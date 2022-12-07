@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ParameterU
 import static org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils.getConnectionFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractImplementingTypeProperty;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -38,18 +39,18 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.values.ValuePart;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
+import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
 import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldsValueProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
@@ -78,7 +79,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclarationEnricher {
 
   private static final SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY_SDK_API_VP =
       new SinceMuleVersionModelProperty("4.4.0");
@@ -86,34 +87,30 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   private final ClassTypeLoader classTypeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
   @Override
-  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    Optional<ImplementingTypeModelProperty> implementingType =
-        extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+  public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
+    return extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration())
+        .map(p -> new IdempotentDeclarationEnricherWalkDelegate() {
 
-    if (implementingType.isPresent()) {
-      new IdempotentDeclarationWalker() {
+          @Override
+          public void onSource(SourceDeclaration declaration) {
+            enrichContainerModel(declaration, declaration.getName(), "source");
+          }
 
-        @Override
-        public void onSource(SourceDeclaration declaration) {
-          enrichContainerModel(declaration, declaration.getName(), "source");
-        }
+          @Override
+          public void onOperation(OperationDeclaration declaration) {
+            enrichContainerModel(declaration, declaration.getName(), "operation");
+          }
 
-        @Override
-        public void onOperation(OperationDeclaration declaration) {
-          enrichContainerModel(declaration, declaration.getName(), "operation");
-        }
+          @Override
+          public void onConfiguration(ConfigurationDeclaration declaration) {
+            enrichContainerModel(declaration, declaration.getName(), "configuration");
+          }
 
-        @Override
-        protected void onConfiguration(ConfigurationDeclaration declaration) {
-          enrichContainerModel(declaration, declaration.getName(), "configuration");
-        }
-
-        @Override
-        protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-          enrichContainerModel(declaration, declaration.getName(), "connection provider");
-        }
-      }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
-    }
+          @Override
+          protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
+            enrichContainerModel(declaration, declaration.getName(), "connection provider");
+          }
+        });
   }
 
   /**
