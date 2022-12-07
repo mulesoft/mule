@@ -10,11 +10,13 @@ package org.mule.runtime.tracer.impl.exporter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.impl.exporter.optel.span.MuleOpenTelemetrySpan;
+import org.mule.runtime.tracer.impl.exporter.optel.span.NoExportInitialSpanInfo;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mule.runtime.tracer.impl.exporter.MuleOpenTelemetrySpanProvider.getNewOpenTelemetrySpan;
+import static org.mule.runtime.tracer.impl.exporter.optel.span.provider.MuleOpenTelemetrySpanProvider.getNewOpenTelemetrySpan;
 
 public class OpenTelemetrySpanExporter implements SpanExporter {
 

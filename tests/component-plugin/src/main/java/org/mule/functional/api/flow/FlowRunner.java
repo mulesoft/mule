@@ -6,14 +6,11 @@
  */
 package org.mule.functional.api.flow;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter.emptyTraceContextMapGetter;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,12 +30,10 @@ import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.processor.FlowAssert;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -66,8 +61,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   private final CompletableFuture<Void> externalCompletionCallback = new CompletableFuture<>();
 
   private boolean wasFlowOriginallyStopped = false;
-
-  private Optional<PrivilegedProfilingService> privilegedProfilingService = empty();
 
   /**
    * Initializes this flow runner.
@@ -125,11 +118,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public FlowRunner withScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;
-    return this;
-  }
-
-  public FlowRunner withProfilingService(PrivilegedProfilingService profilingService) {
-    this.privilegedProfilingService = ofNullable(profilingService);
     return this;
   }
 
@@ -413,13 +401,5 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     } else {
       return super.getFlowConstruct();
     }
-  }
-
-  @Override
-  protected CoreEvent getOrBuildEvent() {
-    CoreEvent coreEvent = super.getOrBuildEvent();
-    privilegedProfilingService
-        .ifPresent(ps -> ps.injectDistributedTraceContext(coreEvent.getContext(), emptyTraceContextMapGetter()));
-    return coreEvent;
   }
 }

@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.streaming.object.FileStoreCursorIteratorConfig;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 
 import java.util.HashMap;
 import java.util.Map;

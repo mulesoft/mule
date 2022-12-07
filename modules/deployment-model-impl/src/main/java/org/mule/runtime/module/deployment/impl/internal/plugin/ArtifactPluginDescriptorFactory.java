@@ -142,8 +142,7 @@ public class ArtifactPluginDescriptorFactory
   @Override
   protected ArtifactPluginDescriptor createArtifactDescriptor(File artifactLocation, String name,
                                                               Optional<Properties> deploymentProperties) {
-    // Keep compatibility with usages of the factory that expect the descriptor from previous version.
-    return new ArtifactPluginDescriptor(name, deploymentProperties);
+    return new ArtifactPluginDescriptor(name);
   }
 
   private static String pluginDescriptorNotFound(File pluginFile, String mulePluginJsonPathInsideJarFile) {

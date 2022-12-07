@@ -846,6 +846,7 @@ public interface AllureConstants {
       String FLOW_STACK = "Flow Stack";
       String CONTEXT_FACTORY = "Log Context Factory";
       String PROCESSING_TYPE = "Processing Type";
+      String LOG_FORMAT = "Logging Format";
 
     }
 
@@ -1059,6 +1060,8 @@ public interface AllureConstants {
       String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
 
       String DEFAULT_CORE_EVENT_TRACER = "Default Core Event Tracer";
+
+      String OPEN_TELEMETRY_EXPORTER = "Open Telemetry Exporter";
     }
   }
 

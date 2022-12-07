@@ -8,6 +8,8 @@ package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -40,9 +42,11 @@ public class ParseTemplateResourceExist implements Validation {
       .build();
 
   private final ClassLoader artifactRegionClassLoader;
+  private final boolean ignoreParamsWithProperties;
 
-  public ParseTemplateResourceExist(ClassLoader artifactRegionClassLoader) {
+  public ParseTemplateResourceExist(ClassLoader artifactRegionClassLoader, boolean ignoreParamsWithProperties) {
     this.artifactRegionClassLoader = artifactRegionClassLoader;
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   @Override
@@ -62,8 +66,15 @@ public class ParseTemplateResourceExist implements Validation {
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(comp -> comp.getIdentifier().equals(PARSE_TEMPLATE_IDENTIFIER)
-        && comp.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM).getValue().getRight() != null);
+    return currentElemement(equalsIdentifier(PARSE_TEMPLATE_IDENTIFIER))
+        .and(currentElemement(component -> {
+          ComponentParameterAst locationParam = component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM);
+          if (ignoreParamsWithProperties && hasPropertyPlaceholder(locationParam.getRawValue())) {
+            return false;
+          }
+
+          return locationParam.getValue().getRight() != null;
+        }));
   }
 
   @Override

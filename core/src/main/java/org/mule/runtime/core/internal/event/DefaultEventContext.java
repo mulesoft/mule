@@ -15,7 +15,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.tracer.api.context.SpanContext.emptyDistributedTraceContext;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -324,10 +323,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   @Override
   public SpanContext getSpanContext() {
-    if (distributedTraceContext == null) {
-      distributedTraceContext = emptyDistributedTraceContext();
-    }
-
     return distributedTraceContext;
   }
 
@@ -359,7 +354,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
       if (parent instanceof SpanContextAware) {
-        spanContext = getParentDistributedTraceContext((SpanContextAware) parent).copy();
+        SpanContext parentSpanContext = getParentDistributedTraceContext((SpanContextAware) parent);
+        if (parentSpanContext != null) {
+          spanContext = parentSpanContext.copy();
+        }
       }
     }
 
@@ -389,10 +387,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public SpanContext getSpanContext() {
-      if (spanContext == null) {
-        spanContext = emptyDistributedTraceContext();
-      }
-
       return spanContext;
     }
 

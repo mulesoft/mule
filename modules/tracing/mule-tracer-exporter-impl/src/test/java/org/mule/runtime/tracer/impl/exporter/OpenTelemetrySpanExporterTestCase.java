@@ -24,6 +24,7 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.impl.exporter.optel.span.NoopMuleOpenTelemetrySpan;
 
 import java.util.HashSet;
 import java.util.List;

@@ -33,8 +33,9 @@ import java.util.function.Predicate;
  */
 public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesValidation {
 
-  public ErrorMappingSourceTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+  public ErrorMappingSourceTypeReferencesExist(Optional<FeatureFlaggingService> featureFlaggingService,
+                                               boolean ignoreParamsWithProperties) {
+    super(featureFlaggingService, ignoreParamsWithProperties);
   }
 
   @Override
@@ -54,7 +55,10 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(AbstractErrorTypesValidation::errorMappingPresent);
+    return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent)
+        .and(comp -> isIgnoreParamsWithProperties()
+            ? errorMappingSourceNotPropertyDependant(comp)
+            : true));
   }
 
   @Override

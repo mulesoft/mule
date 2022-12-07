@@ -17,7 +17,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.component.ComponentParameterization;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;

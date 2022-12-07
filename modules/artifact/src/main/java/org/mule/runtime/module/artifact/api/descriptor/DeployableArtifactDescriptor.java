@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
@@ -36,20 +37,28 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private Set<String> configResources;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>();
   private File logConfigFile;
+  private Optional<Properties> deploymentProperties = empty();
 
   /**
    * Creates a new deployable artifact descriptor
    *
-   * @param name artifact name. Non empty.
+   * @param name artifact name. Non-empty.
    */
   public DeployableArtifactDescriptor(String name) {
     super(name);
     configResources = getDefaultConfigResources();
   }
 
-  public DeployableArtifactDescriptor(String name, Optional<Properties> properties) {
-    super(name, properties);
+  /**
+   * Creates a new deployable artifact descriptor
+   *
+   * @param name                 artifact name. Non-empty.
+   * @param deploymentProperties properties provided for the deployment process.
+   */
+  public DeployableArtifactDescriptor(String name, Optional<Properties> deploymentProperties) {
+    super(name);
     configResources = getDefaultConfigResources();
+    this.deploymentProperties = deploymentProperties;
   }
 
   public boolean isRedeploymentEnabled() {
@@ -133,6 +142,10 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public File getLogConfigFile() {
     return logConfigFile;
+  }
+
+  public Optional<Properties> getDeploymentProperties() {
+    return deploymentProperties;
   }
 
 }

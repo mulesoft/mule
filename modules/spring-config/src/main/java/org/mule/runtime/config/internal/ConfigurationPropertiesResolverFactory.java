@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.util.Optional.empty;
-
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 
@@ -24,8 +23,9 @@ import java.util.Map;
 public class ConfigurationPropertiesResolverFactory {
 
   public static ParsingPropertyResolver createConfigurationPropertiesResolver(Map<String, String> artifactProperties) {
-    DefaultConfigurationPropertiesResolver resolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
+    ConfigurationPropertiesResolver resolver = new ConfigurationPropertiesHierarchyBuilder()
+        .withApplicationProperties(new StaticConfigurationPropertiesProvider(artifactProperties))
+        .build();
 
     return propertyKey -> (String) resolver.resolveValue(propertyKey);
   }

@@ -12,7 +12,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;

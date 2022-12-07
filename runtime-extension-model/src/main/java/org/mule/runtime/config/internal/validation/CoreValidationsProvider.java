@@ -29,10 +29,13 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class CoreValidationsProvider implements ValidationsProvider {
 
   private ClassLoader artifactRegionClassLoader;
+
+  private boolean ignoreParamsWithProperties;
 
   @Inject
   private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -40,16 +43,24 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Inject
   private ExpressionLanguage expressionLanguage;
 
+  @Inject
+  @Named("_compatibilityPluginInstalled")
+  private Optional<Object> compatibilityPluginInstalled;
+
   @Override
   public List<Validation> get() {
-    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(),
+    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(isCompatibilityInstalled()),
                                                           new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
                                                           new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
-                                                          // make this general for all references via stereotypes
-                                                          new FlowRefPointsToExistingFlow(),
+                                                          // make these general for all references via stereotypes
+                                                          new FlowRefPointsToNonPropertyValue(ignoreParamsWithProperties),
+                                                          new FlowRefPointsToExistingFlow(ignoreParamsWithProperties),
+                                                          // --
+
+                                                          // Error types + error handling
                                                           new SourceErrorMappingAnyNotRepeated(),
                                                           new SourceErrorMappingAnyLast(),
                                                           new SourceErrorMappingTypeNotRepeated(),
@@ -57,11 +68,22 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
-                                                          new RaiseErrorTypeReferencesExist(featureFlaggingService),
-                                                          new ErrorMappingTargetTypeReferencesExist(featureFlaggingService),
-                                                          new ErrorMappingSourceTypeReferencesExist(featureFlaggingService),
-                                                          new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService),
-                                                          new ErrorHandlerOnErrorTypeExists(featureFlaggingService),
+                                                          new RaiseErrorTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new RaiseErrorTypeReferencesExist(featureFlaggingService,
+                                                                                            ignoreParamsWithProperties),
+                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
+                                                                                                    ignoreParamsWithProperties),
+                                                          new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
+                                                                                                                         ignoreParamsWithProperties),
+                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
+                                                                                                    ignoreParamsWithProperties),
+                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
+                                                                                            ignoreParamsWithProperties),
+                                                          // --
+
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
@@ -73,12 +95,13 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new RoundRobinRoutes(),
                                                           new FirstSuccessfulRoutes(),
                                                           new ScatterGatherRoutes(),
-                                                          new ParseTemplateResourceExist(artifactRegionClassLoader),
+                                                          new ParseTemplateResourceNotPropertyValue(ignoreParamsWithProperties),
+                                                          new ParseTemplateResourceExist(artifactRegionClassLoader,
+                                                                                         ignoreParamsWithProperties),
                                                           new SourcePositiveMaxItemsPerPoll(),
                                                           new OperationRaiseErrorDoesntSpecifyNamespace(),
                                                           new OperationDoesNotHaveCoreRaiseError(),
-                                                          new OperationDoesNotHaveFlowRef(),
-                                                          new InsecureTLSValidation()));
+                                                          new OperationDoesNotHaveFlowRef()));
 
     // Do not fail if the expressionLanguage was not provided, skip these validations.
     if (expressionLanguage != null) {
@@ -89,6 +112,10 @@ public class CoreValidationsProvider implements ValidationsProvider {
     }
 
     return validations;
+  }
+
+  private boolean isCompatibilityInstalled() {
+    return compatibilityPluginInstalled != null && compatibilityPluginInstalled.isPresent();
   }
 
   public static Level getExpressionSyntacticValidationErrorLevel(Optional<FeatureFlaggingService> featureFlaggingService) {
@@ -108,12 +135,18 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService),
+                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties),
+                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties),
                   new ReferenceParametersStereotypesValidations());
   }
 
   @Override
   public void setArtifactRegionClassLoader(ClassLoader artifactRegionClassLoader) {
     this.artifactRegionClassLoader = artifactRegionClassLoader;
+  }
+
+  @Override
+  public void setIgnoreParamsWithProperties(boolean ignoreParamsWithProperties) {
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 }

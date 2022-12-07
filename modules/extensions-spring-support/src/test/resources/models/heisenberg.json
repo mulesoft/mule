@@ -51154,7 +51154,7 @@
       "kind": "operation"
     },
     {
-      "blocking": true,
+      "blocking": false,
       "executionType": "CPU_LITE",
       "output": {
         "type": {

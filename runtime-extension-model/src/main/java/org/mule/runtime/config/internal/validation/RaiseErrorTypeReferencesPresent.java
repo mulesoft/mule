@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -33,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 public class RaiseErrorTypeReferencesPresent extends AbstractErrorTypesValidation {
 
   public RaiseErrorTypeReferencesPresent(Optional<FeatureFlaggingService> featureFlaggingService) {
-    super(featureFlaggingService);
+    super(featureFlaggingService, false);
   }
 
   @Override
@@ -58,7 +57,7 @@ public class RaiseErrorTypeReferencesPresent extends AbstractErrorTypesValidatio
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    final ComponentParameterAst errorTypeParam = component.getParameter(DEFAULT_GROUP_NAME, "type");
+    final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
     final String errorTypeString = errorTypeParam.getResolvedRawValue();
 
     if (StringUtils.isEmpty(errorTypeString)) {

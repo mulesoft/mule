@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -23,7 +24,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public final class PolicyTemplateDescriptor extends ArtifactDescriptor {
+public final class PolicyTemplateDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_POLICY_CONFIGURATION_RESOURCE = "policy.xml";
   public static final String META_INF = "META-INF";

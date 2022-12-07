@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.lang.String.format;
@@ -21,49 +19,36 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.IdentifierParsingUtils;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
-import org.mule.runtime.extension.api.error.ErrorMapping;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 /**
  * Ensures consistent access to the {@link ErrorTypeRepository} from validations.
  */
-public abstract class AbstractErrorTypesValidation implements Validation {
+public abstract class AbstractErrorTypesValidation extends AbstractErrorValidation {
 
   private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(getDefault());
-  protected static final String RAISE_ERROR = "raise-error";
-
-  protected static final String ON_ERROR = "on-error";
-  protected static final String ON_ERROR_PROPAGATE = "on-error-propagate";
-  protected static final String ON_ERROR_CONTINUE = "on-error-continue";
-
-  protected static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
-
-  protected static final ComponentIdentifier ON_ERROR_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ON_ERROR).build();
-  protected static final ComponentIdentifier ON_ERROR_PROPAGATE_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
-  protected static final ComponentIdentifier ON_ERROR_CONTINUE_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
+  private final boolean ignoreParamsWithProperties;
 
-  public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService) {
+  public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService,
+                                      boolean ignoreParamsWithProperties) {
     this.featureFlaggingService = featureFlaggingService;
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   @Override
@@ -73,17 +58,18 @@ public abstract class AbstractErrorTypesValidation implements Validation {
         : WARN;
   }
 
-  protected static boolean errorMappingPresent(ComponentAst operationComponent) {
-    if (!operationComponent.getModel(ParameterizedModel.class).isPresent()) {
+  protected boolean isErrorTypePresent(ComponentAst component) {
+    if (getErrorTypeParam(component) == null) {
       return false;
     }
-    final ComponentParameterAst errorMappingsAst =
-        operationComponent.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME);
-    return errorMappingsAst != null && errorMappingsAst.getValue().getValue().isPresent();
-  }
 
-  protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {
-    return (List<ErrorMapping>) component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
+    if (ignoreParamsWithProperties) {
+      if (getErrorTypeParam(component).getRawValue().contains("${")) {
+        return false;
+      }
+    }
+
+    return !isEmpty(getErrorTypeParam(component).getResolvedRawValue());
   }
 
   protected static Optional<ValidationResultItem> validateErrorTypeId(ComponentAst component, ComponentParameterAst parameter,
@@ -122,5 +108,9 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     return artifact.dependencies().stream()
         .map(dependency -> dependency.getXmlDslModel().getPrefix().toUpperCase(getDefault()))
         .collect(toSet());
+  }
+
+  public boolean isIgnoreParamsWithProperties() {
+    return ignoreParamsWithProperties;
   }
 }

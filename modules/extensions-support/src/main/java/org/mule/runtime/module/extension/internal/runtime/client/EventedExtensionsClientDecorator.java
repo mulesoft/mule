@@ -46,10 +46,10 @@ public class EventedExtensionsClientDecorator implements ExtensionsClient {
   }
 
   @Override
-  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension,
-                                                             String operation,
-                                                             Consumer<OperationParameterizer> parameters) {
-    return extensionsClient.executeAsync(extension, operation, parameterizer -> {
+  public <T, A> CompletableFuture<Result<T, A>> execute(String extension,
+                                                        String operation,
+                                                        Consumer<OperationParameterizer> parameters) {
+    return extensionsClient.execute(extension, operation, parameterizer -> {
       parameters.accept(parameterizer);
       if (parameterizer instanceof InternalOperationParameterizer) {
         if (!((InternalOperationParameterizer) parameterizer).getContextEvent().isPresent()) {
