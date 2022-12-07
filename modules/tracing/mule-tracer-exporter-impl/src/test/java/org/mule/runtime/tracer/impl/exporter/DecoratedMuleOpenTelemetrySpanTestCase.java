@@ -45,7 +45,7 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
 
   @Test
   public void ifAttributeIsPresentSpanKindMustBeUpdated() {
-    String spanKind = "CLIENT";
+    String spanKind = SpanKind.CLIENT.toString();
 
     InternalSpan internalSpan = mock(InternalSpan.class);
     SpanDuration spanDuration = mock(SpanDuration.class);
@@ -75,7 +75,7 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
 
   @Test
   public void ifAttributeIsNotPresentSpanKindMustNotBeUpdated() {
-    String spanKind = "INTERNAL";
+    String spanKind = SpanKind.INTERNAL.toString();
 
     InternalSpan internalSpan = mock(InternalSpan.class);
     SpanDuration spanDuration = mock(SpanDuration.class);

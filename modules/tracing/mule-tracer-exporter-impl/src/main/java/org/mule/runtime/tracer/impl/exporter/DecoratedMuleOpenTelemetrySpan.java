@@ -71,6 +71,7 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
   private boolean policy;
   private boolean root;
 
+  // TODO W-12176342: Discuss Span Kind update implementation
   private static Field getSpanKindField() {
     try {
       Field spanKindField = Class.forName(RECORD_EVENTS_READABLE_SPAN_CLASS).getDeclaredField(SPAN_KIND_FIELD_NAME);
