@@ -6,13 +6,21 @@
  */
 package org.mule.test.functional;
 
+import org.junit.Rule;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.petstore.extension.PetStoreClient;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
+
 public class ModuleWithImplicitConfigurationTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
+
+  @Rule
+  public SystemProperty disableXmlSdkImplicitConfiguration =
+      new SystemProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false");
 
   @Override
   protected String getModulePath() {

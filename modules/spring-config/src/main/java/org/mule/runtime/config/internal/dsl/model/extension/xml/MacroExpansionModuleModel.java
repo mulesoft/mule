@@ -39,6 +39,8 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +64,11 @@ import javax.xml.namespace.QName;
  * @since 4.0
  */
 public class MacroExpansionModuleModel {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MacroExpansionModuleModel.class);
+  private static final String IMPLICIT_CONFIG_WARNING =
+      "An implicit config is being used for extension %s, this is not fully supported for this extension." +
+          " All operation usages of this extension should have a reference to an explicit configuration.";
 
   /**
    * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
@@ -110,7 +117,7 @@ public class MacroExpansionModuleModel {
    * If true avoid the creation of an implicit configuration
    */
   private final boolean disable_xml_sdk_implicit_configuration_creation =
-      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false"));
+      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "true"));
 
   private final ApplicationModel applicationModel;
   private final ExtensionModel extensionModel;
@@ -228,20 +235,23 @@ public class MacroExpansionModuleModel {
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
     if (shouldAddImplicitConfiguration()) {
-      ComponentModel configModel = new ComponentModel.Builder()
-          .setIdentifier(ComponentIdentifier.builder()
-              .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
-              .namespace(extensionModel.getXmlDslModel().getPrefix())
-              .name(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).build())
-          .addParameter("name", IMPLICIT_CONFIG_NAME, false)
-          .build();
-      configModel.setComponentLocation(fromSingleComponent(MODULE_CONFIG_GLOBAL_ELEMENT_NAME));
-      configModel.setConfigurationModel(extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get());
+      LOGGER.warn(format(IMPLICIT_CONFIG_WARNING, extensionModel.getName()));
+      if (!disable_xml_sdk_implicit_configuration_creation) {
+        ComponentModel configModel = new ComponentModel.Builder()
+            .setIdentifier(ComponentIdentifier.builder()
+                .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
+                .namespace(extensionModel.getXmlDslModel().getPrefix())
+                .name(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).build())
+            .addParameter("name", IMPLICIT_CONFIG_NAME, false)
+            .build();
+        configModel.setComponentLocation(fromSingleComponent(MODULE_CONFIG_GLOBAL_ELEMENT_NAME));
+        configModel.setConfigurationModel(extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get());
 
-      configModel.setRoot(true);
-      configModel.setParent(applicationModel.getRootComponentModel());
+        configModel.setRoot(true);
+        configModel.setParent(applicationModel.getRootComponentModel());
 
-      applicationModel.getRootComponentModel().getInnerComponents().add(configModel);
+        applicationModel.getRootComponentModel().getInnerComponents().add(configModel);
+      }
     }
 
     // scenario where it will macro expand as many times as needed all the references of the smart connector configurations
@@ -273,8 +283,7 @@ public class MacroExpansionModuleModel {
 
   private boolean shouldAddImplicitConfiguration() {
     return existOperationThatUsesImplicitConfiguration() &&
-        extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent() &&
-        !disable_xml_sdk_implicit_configuration_creation;
+        extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent();
   }
 
   private boolean existOperationThatUsesImplicitConfiguration() {
@@ -359,7 +368,9 @@ public class MacroExpansionModuleModel {
     processorChainBuilder.setIdentifier(operationRefModel.getIdentifier());
 
     final Optional<String> configRef =
-        !configRefName.isPresent() && shouldAddImplicitConfiguration() ? of(IMPLICIT_CONFIG_NAME) : configRefName;
+        !configRefName.isPresent() && shouldAddImplicitConfiguration() && !disable_xml_sdk_implicit_configuration_creation
+            ? of(IMPLICIT_CONFIG_NAME)
+            : configRefName;
 
     Map<String, String> propertiesMap = extractProperties(configRef);
     Map<String, String> parametersMap = ((ComponentAst) operationRefModel).getParameters().stream()

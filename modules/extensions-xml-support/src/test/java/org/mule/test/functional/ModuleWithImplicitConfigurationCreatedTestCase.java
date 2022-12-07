@@ -7,10 +7,18 @@
 package org.mule.test.functional;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ModuleWithImplicitConfigurationCreatedTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
+
+  @Rule
+  public SystemProperty disableXmlSdkImplicitConfiguration =
+      new SystemProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "false");
 
   @Override
   protected String getModulePath() {
