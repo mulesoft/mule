@@ -36,7 +36,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.hamcrest.CoreMatchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -106,22 +105,6 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
         "<operation:def name=\"someOp\"><operation:body>" +
         "<set-payload value=\"10\"/>" +
         "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
-    assertThat(msg, is(CoreMatchers.not(empty())));
-    assertThat(msg.get().getMessage(), containsString("Using an invalid function within an operation"));
-  }
-
-
-  @Test
-  @Ignore
-  public void withLookupWithoutMulePrefix() {
-    when(expressionLanguage.collectScopePhaseValidationMessages(contains("lookup("), anyString(), any()))
-        .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0", "lookup"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : lookup('someFlow') }]\"/>" +
         "</operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
