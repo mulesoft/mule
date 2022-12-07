@@ -138,6 +138,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       }
 
       @Override
+      public String getSpanKindName() {
+        return spanData.getKind().name();
+      }
+
+      @Override
       public String getServiceName() {
         return spanData.getResource().getAttribute(OpenTelemetryResources.SERVICE_NAME_KEY);
       }

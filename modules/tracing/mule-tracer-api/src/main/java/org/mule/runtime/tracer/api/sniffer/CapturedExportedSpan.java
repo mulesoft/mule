@@ -45,6 +45,11 @@ public interface CapturedExportedSpan {
    */
   String getServiceName();
 
+  /**
+   * @return the span kind name
+   */
+  String getSpanKindName();
+
   List<CapturedEventData> getEvents();
 
   /**
