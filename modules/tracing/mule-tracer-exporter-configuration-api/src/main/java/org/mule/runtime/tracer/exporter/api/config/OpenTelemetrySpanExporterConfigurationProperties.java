@@ -14,29 +14,45 @@ package org.mule.runtime.tracer.exporter.api.config;
  */
 public class OpenTelemetrySpanExporterConfigurationProperties {
 
+  private static final String MULE_OPEN_TELEMETRY_EXPORTER = "mule.open.telemetry.exporter";
+
   private OpenTelemetrySpanExporterConfigurationProperties() {}
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENABLED = "mule.open.telemetry.exporter.enabled";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENABLED = MULE_OPEN_TELEMETRY_EXPORTER + ".enabled";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TYPE = "mule.open.telemetry.exporter.type";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TYPE = MULE_OPEN_TELEMETRY_EXPORTER + ".type";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED = "mule.open.telemetry.exporter.tls.enabled";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED = MULE_OPEN_TELEMETRY_EXPORTER + ".tls.enabled";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION = "mule.open.telemetry.exporter.cert.file.location";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION =
+      MULE_OPEN_TELEMETRY_EXPORTER + ".cert.file.location";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION = "mule.open.telemetry.exporter.key.file.location";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION = MULE_OPEN_TELEMETRY_EXPORTER + ".key.file.location";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION = "mule.open.telemetry.exporter.ca.file.location";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION = MULE_OPEN_TELEMETRY_EXPORTER + ".ca.file.location";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE = "mule.open.telemetry.exporter.compression.type";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE = MULE_OPEN_TELEMETRY_EXPORTER + ".compression.type";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_HEADERS = "mule.open.telemetry.exporter.headers";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_HEADERS = MULE_OPEN_TELEMETRY_EXPORTER + ".headers";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT = "mule.open.telemetry.exporter.timeout";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT = MULE_OPEN_TELEMETRY_EXPORTER + ".timeout";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT = "mule.open.telemetry.exporter.endpoint";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT = MULE_OPEN_TELEMETRY_EXPORTER + ".endpoint";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE = "mule.open.telemetry.exporter.batch.max.size";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE = MULE_OPEN_TELEMETRY_EXPORTER + ".batch.max.size";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE = "mule.open.telemetry.exporter.batch.queue.size";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE =
+      MULE_OPEN_TELEMETRY_EXPORTER + ".batch.queue.size";
+
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS =
+      MULE_OPEN_TELEMETRY_EXPORTER + "backoff.max.attempts";
+
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF =
+      MULE_OPEN_TELEMETRY_EXPORTER + ".backoff.initial";
+
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF = MULE_OPEN_TELEMETRY_EXPORTER + "backoff.max";
+
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER =
+      MULE_OPEN_TELEMETRY_EXPORTER + "backoff.multiplier";
+
 }

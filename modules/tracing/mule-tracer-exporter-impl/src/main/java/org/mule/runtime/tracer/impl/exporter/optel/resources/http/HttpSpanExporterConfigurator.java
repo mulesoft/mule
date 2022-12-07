@@ -21,8 +21,10 @@ import static java.lang.Long.parseLong;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigUtils.enableBackoffStrategy;
 
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigUtils;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfigurator;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
 
@@ -78,6 +80,8 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
     if (timeout != null) {
       configureTimeout(builder, timeout);
     }
+
+    enableBackoffStrategy(builder, spanExporterConfiguration);
 
     return builder.build();
   }
