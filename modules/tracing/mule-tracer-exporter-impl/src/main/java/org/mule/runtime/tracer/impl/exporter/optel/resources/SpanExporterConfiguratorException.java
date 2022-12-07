@@ -14,7 +14,7 @@ import java.io.IOException;
  *
  * @since 4.5.0
  */
-public class SpanExporterConfiguratorException extends Exception {
+public class SpanExporterConfiguratorException extends RuntimeException {
 
   public SpanExporterConfiguratorException(Exception e) {
     super(e);

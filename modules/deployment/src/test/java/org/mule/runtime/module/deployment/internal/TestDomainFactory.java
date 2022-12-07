@@ -23,10 +23,9 @@ import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepository
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
-import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -89,7 +88,9 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
     return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
                                  DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
-                                 domainClassLoaderBuilderFactory, new MuleExtensionModelLoaderManager(containerClassLoader));
+                                 domainClassLoaderBuilderFactory,
+                                 ExtensionModelLoaderRepository
+                                     .getExtensionModelLoaderManager(containerClassLoader.getClassLoader()));
   }
 
   private TestDomainFactory(ClassLoaderRepository classLoaderRepository,
@@ -97,10 +98,10 @@ public class TestDomainFactory extends DefaultDomainFactory {
                             DomainDescriptorFactory domainDescriptorFactory,
                             DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
                             DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
-                            ExtensionModelLoaderManager extensionModelLoaderManager) {
+                            ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     super(domainDescriptorFactory, deployableArtifactDescriptorFactory, new DefaultDomainManager(),
           classLoaderRepository, serviceRepository, domainClassLoaderBuilderFactory,
-          extensionModelLoaderManager, mock(LicenseValidator.class),
+          extensionModelLoaderRepository, mock(LicenseValidator.class),
           RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),
           serializedAstWithFallbackArtifactConfigurationProcessor());

@@ -9,6 +9,7 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -50,6 +51,8 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
   private List<URL> urls;
   private File targetClasses;
 
+  private DefaultWorkspaceReader reader;
+
   @Before
   public void before() throws Exception {
     artifact = new DefaultArtifact(ORG_FOO_GROUP_ID, BAR, JAR, VERSION);
@@ -59,6 +62,11 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
       assertThat(bar.mkdir(), is(true));
     }
     setUpTargetClassesFolder();
+
+    WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
+    when(workspaceLocationResolver.resolvePath(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()))
+        .thenReturn(bar);
+    reader = new DefaultWorkspaceReader(urls, workspaceLocationResolver);
   }
 
   private void setUpTargetClassesFolder() throws Exception {
@@ -70,10 +78,6 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolveAlsoReleaseVersions() throws Exception {
-    WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
-    when(workspaceLocationResolver.resolvePath(artifact.getArtifactId())).thenReturn(bar);
-    DefaultWorkspaceReader reader = new DefaultWorkspaceReader(urls, workspaceLocationResolver);
-
     File result = reader.findArtifact(artifact);
     assertThat(result, equalTo(targetClasses));
   }
@@ -97,6 +101,20 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
                                                   artifact.getExtension(), artifact.getVersion()),
                               bar, urls);
     assertThat(result, equalTo(targetTestClasses));
+  }
+
+  @Test
+  public void whenArtifactVersionDoesNotMatchThenItReturnsNull() {
+    Artifact searchArtifact =
+        new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(), "1.0-SNAPSHOT");
+    assertThat(reader.findArtifact(searchArtifact), is(nullValue()));
+  }
+
+  @Test
+  public void whenArtifactGroupDoesNotMatchThenItReturnsNull() {
+    Artifact searchArtifact =
+        new DefaultArtifact("other.group", artifact.getArtifactId(), artifact.getExtension(), artifact.getVersion());
+    assertThat(reader.findArtifact(searchArtifact), is(nullValue()));
   }
 
 }

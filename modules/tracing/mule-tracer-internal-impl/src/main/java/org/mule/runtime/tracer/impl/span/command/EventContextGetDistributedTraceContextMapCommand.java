@@ -58,10 +58,10 @@ public class EventContextGetDistributedTraceContextMapCommand implements Command
       SpanContext spanContext =
           ((SpanContextAware) eventContext).getSpanContext();
 
-      return spanContext.getSpan().map(InternalSpan::serializeAsMap).orElse(emptyMap());
-
-    } else {
-      return emptyMap();
+      if (spanContext != null) {
+        return spanContext.getSpan().map(InternalSpan::serializeAsMap).orElse(emptyMap());
+      }
     }
+    return emptyMap();
   }
 }

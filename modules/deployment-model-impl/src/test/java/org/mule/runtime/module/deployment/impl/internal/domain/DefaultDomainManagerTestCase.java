@@ -29,16 +29,15 @@ import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultPluginPatchesResolver;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -70,7 +69,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   private final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
       mock(DeployableArtifactDescriptorFactory.class);
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
-  private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
   private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(mock(DomainDescriptorFactory.class),
                                                                               deployableArtifactDescriptorFactory,
@@ -78,7 +77,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
                                                                               null,
                                                                               serviceRepository,
                                                                               domainClassLoaderBuilderFactory,
-                                                                              extensionModelLoaderManager,
+                                                                              extensionModelLoaderRepository,
                                                                               licenseValidator,
                                                                               getRuntimeLockFactory(),
                                                                               mock(MemoryManagementService.class),
