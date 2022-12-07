@@ -8,6 +8,8 @@
 package org.mule.test.runner.maven;
 
 import static com.google.common.collect.Lists.newArrayList;
+
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
@@ -18,10 +20,11 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
+
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
@@ -32,8 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +67,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private Map<String, File> filePathByArtifactId = new HashMap<>();
+  private final Map<String, File> filePathByGAV = new HashMap<>();
 
   /**
    * Creates an instance of this class.
@@ -98,7 +100,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
 
     List<String> messages = newArrayList("Workspace:");
     messages.add(" ");
-    messages.addAll(filePathByArtifactId.entrySet().stream().map(entry -> entry.getKey() + " -> (" + (entry.getValue()) + ")")
+    messages.addAll(filePathByGAV.entrySet().stream().map(entry -> entry.getKey() + " -> (" + (entry.getValue()) + ")")
         .collect(toList()));
     logger.debug(getBoilerPlate(newArrayList(messages), '*', 150));
   }
@@ -150,7 +152,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
         .filter(path -> containsMavenProject(path.getParent().getParent().toFile()))
         .map(path -> path.getParent().getParent().toFile()).collect(toList());
     logger.debug("Filtered from class path Maven projects: {}", mavenProjects);
-    mavenProjects.stream().forEach(file -> resolvedArtifact(readMavenPomFile(getPomFile(file)).getArtifactId(), file.toPath()));
+    mavenProjects.stream().forEach(file -> resolvedArtifact(createFromPomFile(getPomFile(file)), file.toPath()));
   }
 
   /**
@@ -158,23 +160,19 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    */
   @Override
   public File resolvePath(String artifactId) {
-    return filePathByArtifactId.get(artifactId);
+    throw new UnsupportedOperationException("Operation no longer supported, use resolvePath(groupId, artifactId, version)");
   }
 
   /**
-   * Reads the Maven pom file to get build the {@link Model}.
-   *
-   * @param pomFile to be read
-   * @return {@link Model} represeting the Maven project
+   * {@inheritDoc}
    */
-  private Model readMavenPomFile(File pomFile) {
-    MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+  @Override
+  public File resolvePath(String groupId, String artifactId, String version) {
+    return filePathByGAV.get(getKey(groupId, artifactId, version));
+  }
 
-    try (FileReader reader = new FileReader(pomFile)) {
-      return mavenReader.read(reader);
-    } catch (Exception e) {
-      throw new RuntimeException("Error while reading Maven model from " + pomFile, e);
-    }
+  private String getKey(String groupId, String artifactId, String version) {
+    return format("%s:%s:%s", groupId, artifactId, version);
   }
 
   /**
@@ -206,12 +204,13 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
   /**
    * Adds the resolved artifact with its path.
    *
-   * @param artifactId the Maven artifactId found in workspace
-   * @param path       the {@link Path} location to the artifactId
+   * @param artifact the Maven artifact found in workspace
+   * @param path     the {@link Path} location to the artifact
    */
-  private void resolvedArtifact(String artifactId, Path path) {
-    logger.trace("Resolved artifactId from workspace at {}={}", artifactId, path);
-    filePathByArtifactId.put(artifactId, path.toFile());
+  private void resolvedArtifact(Artifact artifact, Path path) {
+    logger.trace("Resolved artifactId from workspace at {}={}", artifact.getArtifactId(), path);
+    filePathByGAV.put(getKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()),
+                      path.toFile());
   }
 
   /**
@@ -219,7 +218,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    */
   private class MavenDiscovererFileVisitor implements FileVisitor<Path> {
 
-    private List<Path> classPath;
+    private final List<Path> classPath;
 
     public MavenDiscovererFileVisitor(List<URL> urlClassPath) {
       this.classPath =
@@ -234,11 +233,11 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
       if (isPomFile(file.toFile())) {
-        Model model = readMavenPomFile(file.toFile());
+        Artifact artifact = createFromPomFile(file.toFile());
         Path location = file.getParent();
         logger.debug("Checking if location {} is already present in class path", location);
         if (this.classPath.contains(location)) {
-          resolvedArtifact(model.getArtifactId(), location);
+          resolvedArtifact(artifact, location);
         }
       }
       return CONTINUE;
