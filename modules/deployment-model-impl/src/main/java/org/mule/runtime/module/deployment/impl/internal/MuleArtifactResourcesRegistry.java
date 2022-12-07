@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATIO
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository.getExtensionModelLoaderManager;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
@@ -277,8 +278,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
 
-    extensionModelLoaderRepository =
-        ExtensionModelLoaderRepository.getExtensionModelLoaderManager(containerClassLoader.getClassLoader());
+    extensionModelLoaderRepository = getExtensionModelLoaderManager(containerClassLoader.getClassLoader());
 
     pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
