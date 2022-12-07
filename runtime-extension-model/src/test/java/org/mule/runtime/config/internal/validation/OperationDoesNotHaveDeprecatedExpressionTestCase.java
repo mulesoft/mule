@@ -98,27 +98,9 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
   }
 
   @Test
-  public void withErrors() {
-    when(expressionLanguage.collectScopePhaseValidationMessages(contains("keySet("), anyString(), any()))
-        .thenReturn(new TestScopePhaseValidationMessages(emptyList(),
-                                                         singletonList(new TestScopePhaseValidationItem("2.3.0",
-                                                                                                        "dw::core::Objects::keySet"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
-        +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
-    assertThat(msg, is(CoreMatchers.not(empty())));
-    assertThat(msg.get().getMessage(), containsString("Using an invalid function within an operation"));
-  }
-
-  @Test
   public void withLookup() {
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
-        .thenReturn(new TestScopePhaseValidationMessages(emptyList(),
-                                                         singletonList(new TestScopePhaseValidationItem("2.5.0",
+        .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "<operation:def name=\"someOp\"><operation:body>" +
@@ -135,8 +117,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
   @Ignore
   public void withLookupWithoutMulePrefix() {
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("lookup("), anyString(), any()))
-        .thenReturn(new TestScopePhaseValidationMessages(emptyList(),
-                                                         singletonList(new TestScopePhaseValidationItem("2.5.0", "lookup"))));
+        .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0", "lookup"))));
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "<operation:def name=\"someOp\"><operation:body>" +
         "<set-payload value=\"10\"/>" +
@@ -150,8 +131,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
   @Test
   public void withoutExpression() {
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
-        .thenReturn(new TestScopePhaseValidationMessages(emptyList(),
-                                                         singletonList(new TestScopePhaseValidationItem("2.5.0",
+        .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "<operation:def name=\"someOp\"><operation:body>" +
@@ -184,8 +164,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
     when(expressionLanguage.collectScopePhaseValidationMessages(anyString(), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages());
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
-        .thenReturn(new TestScopePhaseValidationMessages(emptyList(),
-                                                         singletonList(new TestScopePhaseValidationItem("2.5.0",
+        .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "<operation:def name=\"someOp\"><operation:body>" +
@@ -217,25 +196,19 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
 
   private class TestScopePhaseValidationMessages implements ScopePhaseValidationMessages {
 
-    private final List<ScopePhaseValidationItem> errors;
     private final List<ScopePhaseValidationItem> warnings;
 
     public TestScopePhaseValidationMessages() {
-      this(emptyList(), emptyList());
+      this(emptyList());
     }
 
     public TestScopePhaseValidationMessages(List<ScopePhaseValidationItem> warnings) {
-      this(warnings, emptyList());
-    }
-
-    public TestScopePhaseValidationMessages(List<ScopePhaseValidationItem> warnings, List<ScopePhaseValidationItem> errors) {
-      this.errors = errors;
       this.warnings = warnings;
     }
 
     @Override
     public List<ScopePhaseValidationItem> getErrors() {
-      return errors;
+      return emptyList();
     }
 
     @Override

@@ -72,7 +72,7 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
         expressionLanguage.collectScopePhaseValidationMessages(actualExpression, "", TypeBindings.builder().build());
 
     return result.getWarnings().stream().anyMatch(warning -> warning.getKind().equals(DEPRECATED) && isDeprecatedVersion(warning)
-        && isDeprecableProduct(warning)) || !result.getErrors().isEmpty();
+        && isDeprecableProduct(warning));
   }
 
   /**
