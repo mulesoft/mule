@@ -24,6 +24,7 @@
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <opentelemetryVersion>1.20.1</opentelemetryVersion>
+        <ioGrpcVersion>1.51.0</ioGrpcVersion>
     </properties>
 
     <dependencyManagement>
@@ -39,6 +40,13 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>1.17.6</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${ioGrpcVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -71,6 +79,10 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
