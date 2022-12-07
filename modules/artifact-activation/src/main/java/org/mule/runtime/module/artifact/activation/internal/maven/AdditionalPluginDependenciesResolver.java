@@ -165,102 +165,101 @@ public class AdditionalPluginDependenciesResolver {
     Map<String, Plugin> additionalDependenciesFromMulePlugins = new HashMap<>();
 
     // See LightweightDeployableProjectModelBuilderTestCase#createDeployableProjectModelWithAdditionalDependenciesInAPlugin
-    mulePlugins.stream().filter(mulePlugin -> {
-      ArtifactCoordinates artifactCoordinates = getArtifactCoordinates(mulePlugin);
-      return pomModels.getOrDefault(artifactCoordinates,
-                                    () -> aetherMavenClient.getRawPomModel(new File(mulePlugin.getBundleUri())))
-          .get().getPackaging().equals(MULE_APPLICATION_CLASSIFIER);
-    }).forEach(mulePlugin -> {
-      ArtifactCoordinates artifactCoordinates = getArtifactCoordinates(mulePlugin);
+    mulePlugins.stream()
+        .filter(mulePlugin -> pomModels.getOrDefault(getArtifactCoordinates(mulePlugin),
+                                                     () -> aetherMavenClient
+                                                         .getRawPomModel(new File(mulePlugin.getBundleUri())))
+            .get().getPackaging().equals(MULE_APPLICATION_CLASSIFIER))
+        .forEach(mulePlugin -> {
 
-      Supplier<Model> pomModel =
-          pomModels.getOrDefault(artifactCoordinates,
-                                 () -> aetherMavenClient.getEffectiveModel(new File(mulePlugin.getBundleUri()),
-                                                                           of(temporaryFolder)));
+          Supplier<Model> pomModel =
+              pomModels.getOrDefault(getArtifactCoordinates(mulePlugin),
+                                     () -> aetherMavenClient.getEffectiveModel(new File(mulePlugin.getBundleUri()),
+                                                                               of(temporaryFolder)));
 
-      Build build = pomModel.get().getBuild();
-      if (build != null) {
-        org.apache.maven.model.Plugin packagerPlugin =
-            build.getPluginsAsMap().get(MULE_EXTENSIONS_PLUGIN_GROUP_ID + ":" + MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID);
-        if (packagerPlugin == null) {
-          packagerPlugin =
-              build.getPluginsAsMap().get(MULE_MAVEN_PLUGIN_GROUP_ID + ":" + MULE_MAVEN_PLUGIN_ARTIFACT_ID);
-        }
-        if (packagerPlugin != null) {
-          Object configurationObject =
-              packagerPlugin.getConfiguration();
-          if (configurationObject != null) {
-            Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configurationObject)
-                .getChild(ADDITIONAL_PLUGIN_DEPENDENCIES_ELEMENT);
-            if (additionalPluginDependenciesDom != null) {
-              Xpp3Dom[] additionalPluginDependencies =
-                  additionalPluginDependenciesDom.getChildren(PLUGIN_ELEMENT);
-              if (additionalPluginDependencies != null) {
-                Arrays.stream(additionalPluginDependencies)
-                    .forEach(additonalPluginDependencyDom -> {
-                      String pluginGroupId = getChildParameterValue(additonalPluginDependencyDom, GROUP_ID_ELEMENT, true);
-                      String pluginArtifactId =
-                          getChildParameterValue(additonalPluginDependencyDom, ARTIFACT_ID_ELEMENT, true);
-                      Plugin alreadyDefinedPluginAdditionalDependencies =
-                          additionalDependenciesFromMulePlugins.get(pluginGroupId + ":" + pluginArtifactId);
-                      List<Dependency> additionalDependencyDependencies = Arrays
-                          .stream(additonalPluginDependencyDom.getChild(ADDITIONAL_DEPENDENCIES_ELEMENT)
-                              .getChildren(DEPENDENCY_ELEMENT))
-                          .map(dependencyDom -> {
-                            Dependency dependency = new Dependency();
-                            dependency.setGroupId(getChildParameterValue(dependencyDom, GROUP_ID_ELEMENT, true));
-                            dependency
-                                .setArtifactId(getChildParameterValue(dependencyDom, ARTIFACT_ID_ELEMENT, true));
-                            dependency.setVersion(getChildParameterValue(dependencyDom, VERSION_ELEMENT, true));
-                            String type = getChildParameterValue(dependencyDom, "type", false);
-                            dependency.setType(type == null ? DEFAULT_ARTIFACT_TYPE : type);
-                            dependency.setClassifier(getChildParameterValue(dependencyDom, "classifier", false));
-                            dependency.setSystemPath(getChildParameterValue(dependencyDom, "systemPath", false));
-                            return dependency;
-                          })
-                          .collect(toList());
-                      if (alreadyDefinedPluginAdditionalDependencies != null) {
-                        LinkedList<Dependency> effectiveDependencies =
-                            new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
-                        additionalDependencyDependencies.forEach(additionalDependenciesDependency -> {
-                          boolean addDependency = true;
-                          for (int i = 0; i < effectiveDependencies.size(); i++) {
-                            Dependency effectiveDependency = effectiveDependencies.get(i);
-                            if (effectiveDependency.getGroupId().equals(additionalDependenciesDependency.getGroupId()) &&
-                                effectiveDependency.getArtifactId().equals(additionalDependenciesDependency.getArtifactId())
-                                &&
-                                effectiveDependency.getType().equals(additionalDependenciesDependency.getType()) &&
-                                ObjectUtils.compare(effectiveDependency.getClassifier(),
-                                                    additionalDependenciesDependency.getClassifier()) == 0) {
-                              if (isNewerVersion(additionalDependenciesDependency.getVersion(),
-                                                 effectiveDependency.getVersion())) {
-                                effectiveDependencies.remove(i);
-                              } else {
-                                addDependency = false;
+          Build build = pomModel.get().getBuild();
+          if (build != null) {
+            org.apache.maven.model.Plugin packagerPlugin =
+                build.getPluginsAsMap().get(MULE_EXTENSIONS_PLUGIN_GROUP_ID + ":" + MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID);
+            if (packagerPlugin == null) {
+              packagerPlugin =
+                  build.getPluginsAsMap().get(MULE_MAVEN_PLUGIN_GROUP_ID + ":" + MULE_MAVEN_PLUGIN_ARTIFACT_ID);
+            }
+            if (packagerPlugin != null) {
+              Object configurationObject =
+                  packagerPlugin.getConfiguration();
+              if (configurationObject != null) {
+                Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configurationObject)
+                    .getChild(ADDITIONAL_PLUGIN_DEPENDENCIES_ELEMENT);
+                if (additionalPluginDependenciesDom != null) {
+                  Xpp3Dom[] additionalPluginDependencies =
+                      additionalPluginDependenciesDom.getChildren(PLUGIN_ELEMENT);
+                  if (additionalPluginDependencies != null) {
+                    Arrays.stream(additionalPluginDependencies)
+                        .forEach(additonalPluginDependencyDom -> {
+                          String pluginGroupId = getChildParameterValue(additonalPluginDependencyDom, GROUP_ID_ELEMENT, true);
+                          String pluginArtifactId =
+                              getChildParameterValue(additonalPluginDependencyDom, ARTIFACT_ID_ELEMENT, true);
+                          Plugin alreadyDefinedPluginAdditionalDependencies =
+                              additionalDependenciesFromMulePlugins.get(pluginGroupId + ":" + pluginArtifactId);
+                          List<Dependency> additionalDependencyDependencies = Arrays
+                              .stream(additonalPluginDependencyDom.getChild(ADDITIONAL_DEPENDENCIES_ELEMENT)
+                                  .getChildren(DEPENDENCY_ELEMENT))
+                              .map(dependencyDom -> {
+                                Dependency dependency = new Dependency();
+                                dependency.setGroupId(getChildParameterValue(dependencyDom, GROUP_ID_ELEMENT, true));
+                                dependency
+                                    .setArtifactId(getChildParameterValue(dependencyDom, ARTIFACT_ID_ELEMENT, true));
+                                dependency.setVersion(getChildParameterValue(dependencyDom, VERSION_ELEMENT, true));
+                                String type = getChildParameterValue(dependencyDom, "type", false);
+                                dependency.setType(type == null ? DEFAULT_ARTIFACT_TYPE : type);
+                                dependency.setClassifier(getChildParameterValue(dependencyDom, "classifier", false));
+                                dependency.setSystemPath(getChildParameterValue(dependencyDom, "systemPath", false));
+                                return dependency;
+                              })
+                              .collect(toList());
+                          if (alreadyDefinedPluginAdditionalDependencies != null) {
+                            LinkedList<Dependency> effectiveDependencies =
+                                new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
+                            additionalDependencyDependencies.forEach(additionalDependenciesDependency -> {
+                              boolean addDependency = true;
+                              for (int i = 0; i < effectiveDependencies.size(); i++) {
+                                Dependency effectiveDependency = effectiveDependencies.get(i);
+                                if (effectiveDependency.getGroupId().equals(additionalDependenciesDependency.getGroupId()) &&
+                                    effectiveDependency.getArtifactId().equals(additionalDependenciesDependency.getArtifactId())
+                                    &&
+                                    effectiveDependency.getType().equals(additionalDependenciesDependency.getType()) &&
+                                    ObjectUtils.compare(effectiveDependency.getClassifier(),
+                                                        additionalDependenciesDependency.getClassifier()) == 0) {
+                                  if (isNewerVersion(additionalDependenciesDependency.getVersion(),
+                                                     effectiveDependency.getVersion())) {
+                                    effectiveDependencies.remove(i);
+                                  } else {
+                                    addDependency = false;
+                                  }
+                                  break;
+                                }
                               }
-                              break;
-                            }
-                          }
-                          if (addDependency) {
-                            effectiveDependencies.add(additionalDependenciesDependency);
+                              if (addDependency) {
+                                effectiveDependencies.add(additionalDependenciesDependency);
+                              }
+                            });
+                            alreadyDefinedPluginAdditionalDependencies.setAdditionalDependencies(effectiveDependencies);
+                          } else {
+                            Plugin plugin = new Plugin();
+                            plugin.setGroupId(pluginGroupId);
+                            plugin.setArtifactId(pluginArtifactId);
+                            plugin.setAdditionalDependencies(additionalDependencyDependencies);
+                            additionalDependenciesFromMulePlugins.put(plugin.getGroupId() + ":" + plugin.getArtifactId(),
+                                                                      plugin);
                           }
                         });
-                        alreadyDefinedPluginAdditionalDependencies.setAdditionalDependencies(effectiveDependencies);
-                      } else {
-                        Plugin plugin = new Plugin();
-                        plugin.setGroupId(pluginGroupId);
-                        plugin.setArtifactId(pluginArtifactId);
-                        plugin.setAdditionalDependencies(additionalDependencyDependencies);
-                        additionalDependenciesFromMulePlugins.put(plugin.getGroupId() + ":" + plugin.getArtifactId(),
-                                                                  plugin);
-                      }
-                    });
+                  }
+                }
               }
             }
           }
-        }
-      }
-    });
+        });
     return additionalDependenciesFromMulePlugins.values();
   }
 
