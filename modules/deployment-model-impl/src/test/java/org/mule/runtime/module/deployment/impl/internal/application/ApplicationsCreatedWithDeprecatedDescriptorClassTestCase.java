@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -29,16 +28,13 @@ import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuild
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -62,7 +58,7 @@ public class ApplicationsCreatedWithDeprecatedDescriptorClassTestCase extends Ab
                                     DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
                                     domainManager,
                                     mock(ServiceRepository.class),
-                                    mock(ExtensionModelLoaderManager.class),
+                                    mock(ExtensionModelLoaderRepository.class),
                                     mock(ClassLoaderRepository.class),
                                     mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                     mock(PluginDependenciesResolver.class),
