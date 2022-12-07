@@ -11,7 +11,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 
-public class OperationDoesNotHaveFlowRef extends OperationDoesNotHaveForbiddenComponent {
+public class OperationDoesNotHaveFlowRef extends MuleSdkOperationDoesNotHaveForbiddenComponents {
 
   private static final String FLOW_REF_ELEMENT = "flow-ref";
   private static final ComponentIdentifier FLOW_REF_IDENTIFIER =

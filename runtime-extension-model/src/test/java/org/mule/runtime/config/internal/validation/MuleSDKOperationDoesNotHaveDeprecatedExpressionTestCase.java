@@ -46,7 +46,7 @@ import java.util.Optional;
 
 @Features({@Feature(MULE_DSL), @Feature(REUSE)})
 @Stories({@Story(DSL_VALIDATION_STORY), @Story(OPERATIONS)})
-public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCoreValidationTestCase {
+public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCoreValidationTestCase {
 
   private static final String XML_NAMESPACE_DEF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
       "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
@@ -61,7 +61,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
 
   @Override
   protected Validation getValidation() {
-    return new OperationDoesNotHaveDeprecatedExpression(expressionLanguage);
+    return new MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions(expressionLanguage);
   }
 
   @Test
@@ -93,7 +93,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
         "</operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
-    assertThat(msg.get().getMessage(), containsString("Using an invalid function within an operation"));
+    assertThat(msg.get().getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
         "</operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
-    assertThat(msg.get().getMessage(), containsString("Using an invalid function within an operation"));
+    assertThat(msg.get().getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
   }
 
   @Test
@@ -159,7 +159,7 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
         "</operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
-    assertThat(msg.get().getMessage(), containsString("Using an invalid function within an operation"));
+    assertThat(msg.get().getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
   }
 
   @Test
@@ -173,6 +173,20 @@ public class OperationDoesNotHaveDeprecatedExpressionTestCase extends AbstractCo
         "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
         +
         "</operation:body></operation:def>" +
+        XML_CLOSE).stream().findFirst();
+    assertThat(msg, is(empty()));
+  }
+
+  @Test
+  public void withoutOperation() {
+    when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
+        .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
+                                                                                                        "Mule::lookup"))));
+    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
+        "<flow name=\"someFlow\">" +
+        "<set-payload value=\"10\"/>" +
+        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
+        "</flow>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }

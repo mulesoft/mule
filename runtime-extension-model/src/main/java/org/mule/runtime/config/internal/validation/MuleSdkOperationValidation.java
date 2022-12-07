@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 
-public abstract class OperationValidation implements Validation {
+public abstract class MuleSdkOperationValidation implements Validation {
 
   protected static final ComponentIdentifier OPERATION_IDENTIFIER = builder().namespace("operation").name("def").build();
 

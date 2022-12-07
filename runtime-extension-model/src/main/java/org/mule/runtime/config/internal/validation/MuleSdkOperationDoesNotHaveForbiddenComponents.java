@@ -19,7 +19,7 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
-public abstract class OperationDoesNotHaveForbiddenComponent extends OperationValidation {
+public abstract class MuleSdkOperationDoesNotHaveForbiddenComponents extends MuleSdkOperationValidation {
 
   protected abstract ComponentIdentifier forbiddenComponentIdentifier();
 
@@ -30,14 +30,14 @@ public abstract class OperationDoesNotHaveForbiddenComponent extends OperationVa
 
   @Override
   public String getDescription() {
-    return format("Operations cannot have a '%s' component within", forbiddenComponentIdentifier());
+    return format("Mule SDK Operations cannot have a '%s' component within", forbiddenComponentIdentifier());
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     if (component.recursiveStream().anyMatch(c -> c.getIdentifier().equals(forbiddenComponentIdentifier()))) {
       return of(create(component, this,
-                       format("Usages of the component '%s' are not allowed inside a Mule Operation Definition (%s)",
+                       format("Usages of the component '%s' are not allowed inside a Mule SDK Operation Definition (%s)",
                               forbiddenComponentIdentifier(), OPERATION_IDENTIFIER)));
     } else {
       return empty();

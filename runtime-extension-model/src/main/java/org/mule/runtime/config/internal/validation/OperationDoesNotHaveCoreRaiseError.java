@@ -11,7 +11,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 
-public class OperationDoesNotHaveCoreRaiseError extends OperationDoesNotHaveForbiddenComponent {
+public class OperationDoesNotHaveCoreRaiseError extends MuleSdkOperationDoesNotHaveForbiddenComponents {
 
   private static final String CORE_RAISE_ERROR_ELEMENT = "raise-error";
   private static final ComponentIdentifier CORE_RAISE_ERROR_IDENTIFIER =

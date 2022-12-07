@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class OperationDoesNotHaveDeprecatedExpression extends OperationValidation {
+public class MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions extends MuleSdkOperationValidation {
 
   private final ExpressionLanguage expressionLanguage;
 
@@ -39,18 +39,18 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
   private static final MuleVersion DEPRECATE_UP_TO = new MuleVersion("2.5.0");
   private static final Set<String> DEPRECATION_DOMAINS = ImmutableSet.of("dw", "Mule");
 
-  public OperationDoesNotHaveDeprecatedExpression(ExpressionLanguage el) {
+  public MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions(ExpressionLanguage el) {
     this.expressionLanguage = el;
   }
 
   @Override
   public String getName() {
-    return "Operation doesn't have deprecated expressions";
+    return "Mule SDK Operation doesn't have deprecated expressions";
   }
 
   @Override
   public String getDescription() {
-    return "The operation does not have a function as deprecated prior to DW 2.5 within itself";
+    return "The Mule SDK operation does not have a function as deprecated prior to DW 2.5 within itself";
   }
 
   private boolean isDeprecableProduct(ScopePhaseValidationItem warning) {
@@ -91,7 +91,7 @@ public class OperationDoesNotHaveDeprecatedExpression extends OperationValidatio
     if (component.recursiveStream().anyMatch(componentAst -> componentAst.getModel(ParameterizedModel.class)
         .map(model -> getAllExpressions(model, componentAst).anyMatch(this::isInvalidExpression)).orElse(false))) {
       return of(create(component, this,
-                       "Using an invalid function within an operation. All functions deprecated up to DataWeave 2.5 cannot be used inside a Mule Operation"));
+                       "Using an invalid function within a Mule SDK operation. All functions deprecated up to DataWeave 2.5 cannot be used inside a Mule Operation"));
     } else {
       return empty();
     }

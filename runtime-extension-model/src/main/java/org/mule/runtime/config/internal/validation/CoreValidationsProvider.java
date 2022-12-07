@@ -90,7 +90,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                                  () -> getExpressionSyntacticValidationErrorLevel(featureFlaggingService),
                                                                  Severity.ERROR));
       validations.add(new ExpressionParametersSyntacticallyValid(expressionLanguage, () -> WARN, WARNING));
-      validations.add(new OperationDoesNotHaveDeprecatedExpression(expressionLanguage));
+      validations.add(new MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions(expressionLanguage));
     }
 
     return validations;
