@@ -88,7 +88,7 @@ public final class JavaParserUtils {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
             .debug("Calculated Min Mule Version is {} which is greater than the one set at the extension class level {}. Overriding it.",
-                  finalCalculatedMMV, mmv);
+                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
         return mmv;
@@ -121,7 +121,7 @@ public final class JavaParserUtils {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
             .debug("Calculated Min Mule Version is {} which is greater than the one set at the configuration class level {}. Overriding it.",
-                  finalCalculatedMMV, mmv);
+                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
         return mmv;
@@ -190,7 +190,7 @@ public final class JavaParserUtils {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
             .debug("Calculated Min Mule Version is {} which is greater than the one set at the connection provider class level {}. Overriding it.",
-                  finalCalculatedMMV, mmv);
+                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
         return mmv;
@@ -238,7 +238,7 @@ public final class JavaParserUtils {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
             .debug("Calculated Min Mule Version is {} which is greater than the one set at the source class level {}. Overriding it.",
-                  finalCalculatedMMV, mmv);
+                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
         return mmv;
@@ -284,7 +284,7 @@ public final class JavaParserUtils {
       if (mmv.priorTo(finalCalculatedMMV)) {
         LOGGER
             .debug("Calculated Min Mule Version is {} which is greater than the one set at the operation level {}. Overriding it.",
-                  finalCalculatedMMV, mmv);
+                   finalCalculatedMMV, mmv);
         return finalCalculatedMMV;
       } else {
         return mmv;
