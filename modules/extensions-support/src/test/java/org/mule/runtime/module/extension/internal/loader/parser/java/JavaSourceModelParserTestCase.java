@@ -568,7 +568,7 @@ public class JavaSourceModelParserTestCase {
   private static class SourceOnBackPressure extends TestSource {
 
     @OnBackPressure
-    public void onBackPressure(BackPressureContext ctx, NotificationEmitter emitter) {}
+    public void onBackPressure(BackPressureContext ctx) {}
   }
 
   private static class SourceOnSuccess extends TestSource {
