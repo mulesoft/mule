@@ -29,4 +29,12 @@ public final class ExpressionUtils {
     String trimmed = value.trim();
     return trimmed.startsWith(DEFAULT_EXPRESSION_PREFIX) && trimmed.endsWith(DEFAULT_EXPRESSION_SUFFIX);
   }
+
+  public static String getUnfixedExpression(String value) {
+    if (!isExpression(value)) {
+      return null;
+    }
+    String trimmed = value.trim();
+    return trimmed.substring(2, trimmed.length() - 1);
+  }
 }
