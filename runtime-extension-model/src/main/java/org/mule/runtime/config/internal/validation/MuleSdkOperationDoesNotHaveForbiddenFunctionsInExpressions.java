@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind.DEPRECATED;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.*;
+import static org.mule.runtime.config.internal.validation.ValidationUtils.locationToAdditionalData;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.getUnfixedExpression;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 import static java.util.stream.Collectors.toList;
@@ -18,7 +18,6 @@ import static java.util.Optional.of;
 
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.validation.Location;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationItem;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -89,26 +88,6 @@ public class MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions extends 
             .map(parameter -> componentAst.getParameter(groupModel.getName(), parameter.getName())))
         .filter(param -> param.getRawValue() != null && isExpression(param.getRawValue()))
         .collect(toList());
-  }
-
-  private Map<String, String> locationToAdditionalData(Location location) {
-    Map<String, String> additionalData = new HashMap<>();
-
-    additionalData.put(LOCATION_START_POSITION_LINE,
-                       Integer.toString(location.getStartPosition().getLine()));
-    additionalData.put(LOCATION_START_POSITION_COLUMN,
-                       Integer.toString(location.getStartPosition().getColumn()));
-    additionalData.put(LOCATION_START_POSITION_OFFSET,
-                       Integer.toString(location.getStartPosition().getOffset()));
-    additionalData.put(LOCATION_END_POSITION_LINE,
-                       Integer.toString(location.getEndPosition().getLine()));
-    additionalData.put(LOCATION_END_POSITION_LINE,
-                       Integer.toString(location.getEndPosition().getColumn()));
-    additionalData.put(LOCATION_END_POSITION_OFFSET,
-                       Integer.toString(location.getEndPosition().getOffset()));
-
-    return additionalData;
-
   }
 
   private Optional<Pair<ComponentParameterAst, ScopePhaseValidationItem>> getExpressionWithWarnings(ComponentAst component) {
