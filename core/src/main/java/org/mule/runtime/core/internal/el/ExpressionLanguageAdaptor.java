@@ -160,9 +160,9 @@ public interface ExpressionLanguageAdaptor {
   CompiledExpression compile(String expression, BindingContext bindingContext);
 
   /**
-   * @param script the script to be validated.
+   * @param script         the script to be validated.
    * @param nameIdentifier the name of the script file.
-   * @param bindings the {@link TypeBindings} to be considered for the validation.
+   * @param bindings       the {@link TypeBindings} to be considered for the validation.
    * @return A {@link ScopePhaseValidationMessages} with the result of the validations perform to the script.
    * @since 4.5
    */
