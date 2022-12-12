@@ -91,7 +91,7 @@ public class MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions extends 
         .collect(toList());
   }
 
-  protected final Map<String, String> locationToAdditionalData(Location location) {
+  private Map<String, String> locationToAdditionalData(Location location) {
     Map<String, String> additionalData = new HashMap<>();
 
     additionalData.put(LOCATION_START_POSITION_LINE,
