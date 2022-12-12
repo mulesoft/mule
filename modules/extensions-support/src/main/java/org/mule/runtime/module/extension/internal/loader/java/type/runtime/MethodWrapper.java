@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -141,6 +142,11 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method, typeLoader))
         : empty();
+  }
+
+  @Override
+  public Stream<Type> getAnnotations() {
+    return stream(method.getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), typeLoader));
   }
 
   @Override

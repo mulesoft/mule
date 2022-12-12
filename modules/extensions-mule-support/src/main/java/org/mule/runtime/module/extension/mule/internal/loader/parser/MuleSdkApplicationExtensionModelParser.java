@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.Category;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
@@ -69,6 +70,11 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   @Override
   public String getNamespace() {
     return APP_LOCAL_EXTENSION_NAMESPACE;
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return of(new MuleVersion("4.5"));
   }
 
   @Override

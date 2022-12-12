@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -37,6 +38,7 @@ import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.TypeElement;
 
@@ -111,6 +113,11 @@ public class TypeWrapper implements Type {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, aClass, typeLoader))
         : empty();
+  }
+
+  @Override
+  public Stream<Type> getAnnotations() {
+    return stream(aClass.getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), typeLoader));
   }
 
   /**
@@ -304,5 +311,15 @@ public class TypeWrapper implements Type {
     } catch (NoSuchMethodException e) {
       return Optional.empty();
     }
+  }
+
+  @Override
+  public Stream<MethodElement> getEnclosingMethods() {
+    return stream(aClass.getDeclaredMethods()).map(method -> new MethodWrapper(method, typeLoader));
+  }
+
+  @Override
+  public Stream<Type> getImplementingInterfaces() {
+    return stream(aClass.getInterfaces()).map(clazz -> new TypeWrapper(clazz, typeLoader));
   }
 }

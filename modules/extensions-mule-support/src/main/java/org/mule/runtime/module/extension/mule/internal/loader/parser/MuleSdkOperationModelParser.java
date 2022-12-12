@@ -23,6 +23,7 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -282,6 +283,11 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return empty();
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return of(new MuleVersion("4.5"));
   }
 
   @Override

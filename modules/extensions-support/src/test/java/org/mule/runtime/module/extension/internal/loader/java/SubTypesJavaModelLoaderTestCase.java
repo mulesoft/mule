@@ -71,6 +71,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     when(extensionElement.getOperationContainers()).thenReturn(emptyList());
     when(extensionElement.getFunctionContainers()).thenReturn(emptyList());
     when(extensionElement.getFunctions()).thenReturn(emptyList());
+    when(extensionElement.getTypeName()).thenReturn("java.");
 
     baseMetadataType = createMetadataType(BASE_TYPE_ID);
     subMetadataType = createMetadataType(SUBTYPE_ID);
