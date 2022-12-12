@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -13,6 +14,7 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -156,4 +158,17 @@ public interface ExpressionLanguageAdaptor {
    * @since 4.3.0
    */
   CompiledExpression compile(String expression, BindingContext bindingContext);
+
+  /**
+   * @param script         the script to be validated.
+   * @param nameIdentifier the name of the script file. If the script is inline, it can be an empty string.
+   * @param bindings       the {@link TypeBindings} to be considered for the validation.
+   * @return A {@link ScopePhaseValidationMessages} with the result of the validations performed to the script, considering
+   *         potential Warnings and Errors in the script.
+   * @since 4.5
+   */
+  default ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
+                                                                           TypeBindings bindings) {
+    throw new UnsupportedOperationException("The current ExpressionLanguage does not support collectScopePhaseValidationMessages() method. Please update the expression language version");
+  }
 }
