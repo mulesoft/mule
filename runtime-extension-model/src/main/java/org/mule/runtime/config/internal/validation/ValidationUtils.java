@@ -6,14 +6,20 @@
  */
 package org.mule.runtime.config.internal.validation;
 
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_END_POSITION_COLUMN;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_END_POSITION_LINE;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_END_POSITION_OFFSET;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_START_POSITION_COLUMN;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_START_POSITION_LINE;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_START_POSITION_OFFSET;
+
 import org.mule.runtime.api.el.validation.Location;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.*;
 
-public class ValidationUtils {
+class ValidationUtils {
 
   private ValidationUtils() {
     // do nothing

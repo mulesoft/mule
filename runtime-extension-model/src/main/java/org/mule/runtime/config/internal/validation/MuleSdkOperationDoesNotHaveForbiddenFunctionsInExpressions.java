@@ -107,6 +107,6 @@ public class MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions extends 
                             "Using an invalid function within a Mule SDK operation. All functions deprecated up to DataWeave 2.5 cannot be used inside a Mule Operation. Expression: "
                                 + pair.getFirst().getRawValue(),
                             locationToAdditionalData(pair.getSecond().getLocation())))
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 }
