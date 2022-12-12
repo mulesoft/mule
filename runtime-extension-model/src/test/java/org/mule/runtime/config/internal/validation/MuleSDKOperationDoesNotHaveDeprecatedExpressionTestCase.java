@@ -25,10 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.validation.Location;
-import org.mule.runtime.api.el.validation.ScopePhaseValidationItem;
-import org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind;
-import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.el.validation.*;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import io.qameta.allure.Features;
@@ -218,10 +215,12 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
 
     private final String since;
     private final String function;
+    private final Location location;
 
     public TestScopePhaseValidationItem(String since, String function) {
       this.since = since;
       this.function = function;
+      this.location = new Location(new Position(1, 1, 0), new Position(1, 20, 0));
     }
 
     @Override
@@ -244,7 +243,7 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
 
     @Override
     public Location getLocation() {
-      return null;
+      return location;
     }
   }
 

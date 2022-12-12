@@ -159,6 +159,13 @@ public interface ExpressionLanguageAdaptor {
    */
   CompiledExpression compile(String expression, BindingContext bindingContext);
 
+  /**
+   * @param script the script to be validated.
+   * @param nameIdentifier the name of the script file.
+   * @param bindings the {@link TypeBindings} to be considered for the validation.
+   * @return A {@link ScopePhaseValidationMessages} with the result of the validations perform to the script.
+   * @since 4.5
+   */
   default ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
                                                                            TypeBindings bindings) {
     throw new UnsupportedOperationException("The current ExpressionLanguage does not support collectScopePhaseValidationMessages() method. Please update the expression language version");
