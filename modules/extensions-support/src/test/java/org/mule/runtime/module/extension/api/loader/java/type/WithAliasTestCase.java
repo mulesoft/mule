@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -16,10 +17,12 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ClassBasedAnnotationValueFetcher;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.sdk.api.annotation.Alias;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,6 +71,11 @@ public class WithAliasTestCase {
     }
 
     @Override
+    public Stream<Type> getAnnotations() {
+      return stream(getClass().getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), TYPE_LOADER));
+    }
+
+    @Override
     public String getName() {
       return "elementTest";
     }
@@ -86,6 +94,11 @@ public class WithAliasTestCase {
       return isAnnotatedWith(annotationClass)
           ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, WithLegacyAliasImpl.class, TYPE_LOADER))
           : empty();
+    }
+
+    @Override
+    public Stream<Type> getAnnotations() {
+      return stream(getClass().getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), TYPE_LOADER));
     }
 
     @Override
@@ -108,6 +121,11 @@ public class WithAliasTestCase {
       return isAnnotatedWith(annotationClass)
           ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, WithBothAliasImpl.class, TYPE_LOADER))
           : empty();
+    }
+
+    @Override
+    public Stream<Type> getAnnotations() {
+      return stream(getClass().getAnnotations()).map(ann -> new TypeWrapper(ann.annotationType(), TYPE_LOADER));
     }
 
     @Override

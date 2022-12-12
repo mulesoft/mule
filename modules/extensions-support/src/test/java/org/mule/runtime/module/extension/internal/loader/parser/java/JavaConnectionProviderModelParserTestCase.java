@@ -16,17 +16,18 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
@@ -40,8 +41,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProvider
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ConnectionProviderTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -51,6 +50,10 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.MinMuleVersion;
+import org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter;
+import org.mule.sdk.api.runtime.parameter.Literal;
 
 public class JavaConnectionProviderModelParserTestCase {
 
@@ -200,6 +203,86 @@ public class JavaConnectionProviderModelParserTestCase {
   public void isSdkCachedConnectionProvider() {
     mockConnectionProviderWithClass(SdkCachedTransactionalConnectionProvider.class);
     assertThat(parser.getConnectionManagementType(), is(CACHED));
+  }
+
+  @Test
+  public void getMMVForLegacyApiConnectionProvider() {
+    mockConnectionProviderWithClass(LegacyConnectionProvider.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.1.1"));
+  }
+
+  @Test
+  public void getMMVForSdkApiConnectionProvider() {
+    mockConnectionProviderWithClass(SdkConnectionProvider.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5"));
+  }
+
+  @Test
+  public void getMMVForConnectionProviderWithSdkAnnotation() {
+    mockConnectionProviderWithClass(SdkAnnotatedConnectionProvider.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void getMMVForConnectionProviderWithParameterWithSdkAnnotation() {
+    mockConnectionProviderWithClass(ConnectionProviderWithParameterWithSdkAnnotation.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void getMMVForConnectionProviderWithSdkParameter() {
+    mockConnectionProviderWithClass(ConnectionProviderWithSdkParameter.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void getMMVForConnectionProviderWithSdkField() {
+    mockConnectionProviderWithClass(ConnectionProviderWithSdkField.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void getMMVForConnectionProviderExtendsSdkConnectionProvider() {
+    mockConnectionProviderWithClass(ConnectionProviderExtendsSdkConnectionProvider.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5"));
+  }
+
+  @Test
+  public void getMMVForConnectionProviderExtendsExtraConnectionProvider() {
+    mockConnectionProviderWithClass(ConnectionProviderExtendsSuperClass.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
+  }
+
+  @Test
+  public void getClassLevelMMVForConnectionProviderWithMMVAnnotation() {
+    mockConnectionProviderWithClass(ConnectionProviderWithHigherMMVAnnotation.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.6"));
+  }
+
+  @Test
+  public void getOverwrittenMMVForConnectionProviderWithMMVAnnotation() {
+    mockConnectionProviderWithClass(ConnectionProviderWithLowerMMVAnnotation.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5"));
   }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {
@@ -399,5 +482,96 @@ public class JavaConnectionProviderModelParserTestCase {
 
   private class SdkCachedTransactionalConnectionProvider extends SdkAbstractTransactionalConnectionProvider
       implements org.mule.sdk.api.connectivity.CachedConnectionProvider<SdkTestTransactionalConnection> {
+  }
+
+  private class LegacyConnectionProvider implements ConnectionProvider<String>, NoConnectivityTest {
+
+    @Override
+    public String connect() throws ConnectionException {
+      return null;
+    }
+
+    @Override
+    public void disconnect(String connection) {}
+
+    @Override
+    public ConnectionValidationResult validate(String connection) {
+      return null;
+    }
+  }
+
+  private class SdkConnectionProvider implements org.mule.sdk.api.connectivity.ConnectionProvider<String> {
+
+    @Override
+    public String connect() throws ConnectionException {
+      return null;
+    }
+
+    @Override
+    public void disconnect(String connection) {}
+
+    @Override
+    public org.mule.sdk.api.connectivity.ConnectionValidationResult validate(String connection) {
+      return null;
+    }
+  }
+
+  private class ConnectionProviderWithParameterWithSdkAnnotation extends LegacyConnectionProvider {
+
+    @OAuthParameter
+    String OAuthParameter;
+  }
+
+  private class ConnectionProviderWithSdkParameter extends LegacyConnectionProvider {
+
+    @Parameter
+    Literal<String> OAuthParameter;
+  }
+
+  private class ConnectionProviderWithSdkField extends LegacyConnectionProvider {
+
+    Literal<String> literalField;
+  }
+
+  private class ConnectionProviderExtendsSdkConnectionProvider extends SdkConnectionProvider {
+
+  }
+
+  @MinMuleVersion("4.6")
+  private class ConnectionProviderWithHigherMMVAnnotation extends SdkConnectionProvider {
+
+  }
+
+  @MinMuleVersion("4.4")
+  private class ConnectionProviderWithLowerMMVAnnotation extends SdkConnectionProvider {
+
+  }
+
+  private class ParametrizedSuperClass {
+
+    @org.mule.sdk.api.annotation.param.Parameter
+    String superClassParameter;
+  }
+
+  private class ConnectionProviderExtendsSuperClass extends ParametrizedSuperClass implements ConnectionProvider<String> {
+
+    @Override
+    public String connect() throws ConnectionException {
+      return null;
+    }
+
+    @Override
+    public void disconnect(String connection) {
+
+    }
+
+    @Override
+    public ConnectionValidationResult validate(String connection) {
+      return null;
+    }
+  }
+
+  @Alias(value = "Conn Alias")
+  private class SdkAnnotatedConnectionProvider extends LegacyConnectionProvider {
   }
 }

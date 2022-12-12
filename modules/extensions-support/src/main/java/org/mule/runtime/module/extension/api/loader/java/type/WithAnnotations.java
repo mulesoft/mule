@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * A generic contract for any kind of component that can be annotated
@@ -48,4 +49,11 @@ public interface WithAnnotations {
   default boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
     return getAnnotation(annotation).isPresent();
   }
+
+  /**
+   * Returns all the annotations present within the component as a {@link Type}
+   *
+   * @return A {@code List} of the annotations as a {@link Type}
+   */
+  Stream<Type> getAnnotations();
 }

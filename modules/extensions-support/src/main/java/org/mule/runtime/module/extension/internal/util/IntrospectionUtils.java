@@ -960,17 +960,17 @@ public final class IntrospectionUtils {
 
     if (superClasses) {
       methodStream = getAllSuperTypes(typeElement, processingEnvironment).stream()
-          .flatMap(type -> getEnclosingMethods(type).stream());
+          .flatMap(IntrospectionUtils::getEnclosingMethodsStream);
     } else {
-      methodStream = getEnclosingMethods(typeElement).stream();
+      methodStream = getEnclosingMethodsStream(typeElement);
     }
 
     return methodStream.filter(method -> method.getModifiers().contains(PUBLIC));
   }
 
-  private static Set<ExecutableElement> getEnclosingMethods(TypeElement typeElement) {
+  public static Stream<ExecutableElement> getEnclosingMethodsStream(TypeElement typeElement) {
     return typeElement.getEnclosedElements().stream().filter(elem -> elem.getKind().equals(METHOD))
-        .map(elem -> (ExecutableElement) elem).collect(toSet());
+        .map(elem -> (ExecutableElement) elem);
   }
 
   private static List<TypeElement> getAllSuperTypes(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
