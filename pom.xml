@@ -164,7 +164,7 @@
         <muleDslApiVersion>1.3.0-20221212</muleDslApiVersion>
         <muleAstVersion>0.8.0-20221212</muleAstVersion>
         <muleExtensionsApiVersion>1.3.0-20221212</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.3.1-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleHttpPolicyApiVersion>1.3.0-20221212</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.5.2-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.5.2-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.5.2-SNAPSHOT</muleMavenClientTest>
