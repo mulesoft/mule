@@ -9,8 +9,8 @@ package org.mule.runtime.module.deployment.logging;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.ERROR_REPORTING;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -45,7 +45,6 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.internal.AbstractApplicationDeploymentTestCase;
@@ -60,17 +59,19 @@ import java.util.List;
 import java.util.Optional;
 
 import com.github.valfirst.slf4jtest.TestLogger;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
-@Feature(CORE_COMPONENTS)
-@Story(LOGGER)
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
+@Feature(LOGGING)
+@Story(ERROR_REPORTING)
 @Issue("W-11090837")
 public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentTestCase {
 
@@ -82,8 +83,8 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
 
   private final File appLocation = new File("fakeLocation");
 
-  private TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
-  private TestLogger loggerDefaultArtifactDeployer = getTestLogger(DefaultArtifactDeployer.class);
+  private final TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
+  private final TestLogger loggerDefaultArtifactDeployer = getTestLogger(DefaultArtifactDeployer.class);
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

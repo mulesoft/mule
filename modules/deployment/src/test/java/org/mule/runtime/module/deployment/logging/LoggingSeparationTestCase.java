@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.logging;
 
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
 import static java.util.Arrays.asList;
 
@@ -24,14 +24,16 @@ import org.mule.runtime.module.deployment.internal.AbstractApplicationDeployment
 import java.util.List;
 
 import com.github.valfirst.slf4jtest.TestLogger;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Feature(CORE_COMPONENTS)
-@Story(LOGGER)
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(LOGGING)
+@Story(CONTEXT_FACTORY)
 public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTestCase {
 
   TestLogger logger = getTestLogger(LoggerMessageProcessor.class);

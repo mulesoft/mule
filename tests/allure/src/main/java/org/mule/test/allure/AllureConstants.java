@@ -847,6 +847,7 @@ public interface AllureConstants {
       String CONTEXT_FACTORY = "Log Context Factory";
       String PROCESSING_TYPE = "Processing Type";
       String LOG_FORMAT = "Logging Format";
+      String LOGGING_LIBS_SUPPORT = "Logging Libs Support";
 
     }
 
