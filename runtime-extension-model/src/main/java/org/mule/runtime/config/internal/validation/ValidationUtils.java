@@ -15,27 +15,27 @@ import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyVal
 
 public class ValidationUtils {
 
-    private ValidationUtils() {
-        // do nothing
-    }
+  private ValidationUtils() {
+    // do nothing
+  }
 
-    public static Map<String, String> locationToAdditionalData(Location location) {
-        Map<String, String> additionalData = new HashMap<>();
+  public static Map<String, String> locationToAdditionalData(Location location) {
+    Map<String, String> additionalData = new HashMap<>();
 
-        additionalData.put(LOCATION_START_POSITION_LINE,
-                Integer.toString(location.getStartPosition().getLine()));
-        additionalData.put(LOCATION_START_POSITION_COLUMN,
-                Integer.toString(location.getStartPosition().getColumn()));
-        additionalData.put(LOCATION_START_POSITION_OFFSET,
-                Integer.toString(location.getStartPosition().getOffset()));
-        additionalData.put(LOCATION_END_POSITION_LINE,
-                Integer.toString(location.getEndPosition().getLine()));
-        additionalData.put(LOCATION_END_POSITION_LINE,
-                Integer.toString(location.getEndPosition().getColumn()));
-        additionalData.put(LOCATION_END_POSITION_OFFSET,
-                Integer.toString(location.getEndPosition().getOffset()));
+    additionalData.put(LOCATION_START_POSITION_LINE,
+                       Integer.toString(location.getStartPosition().getLine()));
+    additionalData.put(LOCATION_START_POSITION_COLUMN,
+                       Integer.toString(location.getStartPosition().getColumn()));
+    additionalData.put(LOCATION_START_POSITION_OFFSET,
+                       Integer.toString(location.getStartPosition().getOffset()));
+    additionalData.put(LOCATION_END_POSITION_LINE,
+                       Integer.toString(location.getEndPosition().getLine()));
+    additionalData.put(LOCATION_END_POSITION_COLUMN,
+                       Integer.toString(location.getEndPosition().getColumn()));
+    additionalData.put(LOCATION_END_POSITION_OFFSET,
+                       Integer.toString(location.getEndPosition().getOffset()));
 
-        return additionalData;
+    return additionalData;
 
-    }
+  }
 }

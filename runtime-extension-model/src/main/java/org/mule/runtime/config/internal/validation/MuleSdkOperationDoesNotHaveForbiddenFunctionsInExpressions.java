@@ -13,8 +13,6 @@ import static org.mule.runtime.config.internal.validation.ValidationUtils.locati
 import static org.mule.runtime.core.internal.util.ExpressionUtils.getUnfixedExpression;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
 import static java.util.stream.Collectors.toList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -29,11 +27,9 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions extends MuleSdkOperationValidation {
 
@@ -90,24 +86,27 @@ public class MuleSdkOperationDoesNotHaveForbiddenFunctionsInExpressions extends 
         .collect(toList());
   }
 
-  private Optional<Pair<ComponentParameterAst, ScopePhaseValidationItem>> getExpressionWithWarnings(ComponentAst component) {
+  private List<Pair<ComponentParameterAst, ScopePhaseValidationItem>> getExpressionsWithWarnings(ComponentAst component) {
     List<ComponentParameterAst> expressions = new ArrayList<>();
     component.recursiveStream().forEach(componentAst -> componentAst.getModel(ParameterizedModel.class)
         .map(model -> getAllExpressions(model, componentAst)).ifPresent(expressions::addAll));
+
+    List<Pair<ComponentParameterAst, ScopePhaseValidationItem>> warnings = new ArrayList<>();
     for (ComponentParameterAst param : expressions) {
-      List<ScopePhaseValidationItem> warnings = getWarningMessages(param.getRawValue());
-      if (warnings.size() > 0) {
-        return of(new Pair<>(param, warnings.get(0)));
+      for (ScopePhaseValidationItem item : getWarningMessages(param.getRawValue())) {
+        warnings.add(new Pair<>(param, item));
       }
     }
-    return empty();
+    return warnings;
   }
 
   @Override
-  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
-    return getExpressionWithWarnings(component).map(pair -> create(component, pair.getFirst(), this,
-                                                                   "Using an invalid function within a Mule SDK operation. All functions deprecated up to DataWeave 2.5 cannot be used inside a Mule Operation. Expression: "
-                                                                       + pair.getFirst().getRawValue(),
-                                                                   locationToAdditionalData(pair.getSecond().getLocation())));
+  public List<ValidationResultItem> validateMany(ComponentAst component, ArtifactAst artifact) {
+    return getExpressionsWithWarnings(component).stream()
+        .map(pair -> create(component, pair.getFirst(), this,
+                            "Using an invalid function within a Mule SDK operation. All functions deprecated up to DataWeave 2.5 cannot be used inside a Mule Operation. Expression: "
+                                + pair.getFirst().getRawValue(),
+                            locationToAdditionalData(pair.getSecond().getLocation())))
+        .collect(Collectors.toList());
   }
 }

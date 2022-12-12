@@ -163,7 +163,8 @@ public interface ExpressionLanguageAdaptor {
    * @param script         the script to be validated.
    * @param nameIdentifier the name of the script file. If the script is inline, it can be an empty string.
    * @param bindings       the {@link TypeBindings} to be considered for the validation.
-   * @return A {@link ScopePhaseValidationMessages} with the result of the validations perform to the script, considering potential Warnings and Errors in the script.
+   * @return A {@link ScopePhaseValidationMessages} with the result of the validations perform to the script, considering
+   *         potential Warnings and Errors in the script.
    * @since 4.5
    */
   default ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
