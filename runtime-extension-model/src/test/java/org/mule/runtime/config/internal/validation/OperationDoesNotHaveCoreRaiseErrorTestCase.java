@@ -73,6 +73,6 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
-               containsString("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition"));
+               containsString("Usages of the component 'raise-error' are not allowed inside a Mule SDK Operation Definition"));
   }
 }
