@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -14,6 +16,7 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationItem;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -22,6 +25,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Binds Mule Core concepts {@link CoreEvent} or {@link FlowConstruct} and executes the underlying {@link ExpressionLanguage}.
@@ -169,6 +173,17 @@ public interface ExpressionLanguageAdaptor {
    */
   default ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
                                                                            TypeBindings bindings) {
-    throw new UnsupportedOperationException("The current ExpressionLanguage does not support collectScopePhaseValidationMessages() method. Please update the expression language version");
+    return new ScopePhaseValidationMessages() {
+
+      @Override
+      public List<ScopePhaseValidationItem> getErrors() {
+        return emptyList();
+      }
+
+      @Override
+      public List<ScopePhaseValidationItem> getWarnings() {
+        return emptyList();
+      }
+    };
   }
 }
