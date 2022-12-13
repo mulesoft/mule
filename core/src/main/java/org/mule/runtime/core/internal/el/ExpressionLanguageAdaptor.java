@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -24,8 +26,6 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.Iterator;
 import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Binds Mule Core concepts {@link CoreEvent} or {@link FlowConstruct} and executes the underlying {@link ExpressionLanguage}.
