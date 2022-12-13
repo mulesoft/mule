@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -162,4 +163,9 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @return an {@link Optional}<{@link SinceMuleVersionModelProperty}> if it was defined
    */
   Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
+
+  /**
+   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   */
+  Optional<MuleVersion> getMinMuleVersion();
 }

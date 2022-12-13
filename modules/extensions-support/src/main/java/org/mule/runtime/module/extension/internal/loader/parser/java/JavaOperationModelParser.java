@@ -26,10 +26,13 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateOperationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.getContainerAnnotationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -71,6 +74,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaE
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.sdk.api.annotation.Operations;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -404,6 +408,13 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(operationElement);
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return of(calculateOperationMinMuleVersion(operationElement, operationContainer,
+                                               getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
+                                                                                    Operations::value, operationContainer)));
   }
 
   @Override

@@ -19,6 +19,7 @@ import static java.lang.Thread.currentThread;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -26,6 +27,7 @@ import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -181,6 +183,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
       throws ExpressionRuntimeException {
     return resolveBoolean(evaluate(expression, DataType.BOOLEAN, bindingCtx).getValue(), nullReturnsTrue, nonBooleanReturnsTrue,
                           expression);
+  }
+
+  @Override
+  public ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
+                                                                          TypeBindings bindings) {
+    return expressionLanguage.collectScopePhaseValidationMessages(script, nameIdentifier, bindings);
   }
 
   protected static boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue,

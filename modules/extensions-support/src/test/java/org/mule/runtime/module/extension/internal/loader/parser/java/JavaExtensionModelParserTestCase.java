@@ -11,24 +11,30 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
+import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.Import;
+import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.PrivilegedExport;
+import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -120,17 +126,95 @@ public class JavaExtensionModelParserTestCase {
     assertThat(subTypes.values().iterator().next(), hasSize(2));
   }
 
+  @Test
+  public void getMMVForLegacyExtension() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<SimpleExtensionUsingLegacyApi> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(SimpleExtensionUsingLegacyApi.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    Optional<MuleVersion> minMuleVersion = javaExtensionModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
+  }
+
+  @Test
+  public void getMMVForSdkExtension() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<SimpleExtensionUsingSdkApi> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(SimpleExtensionUsingSdkApi.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    Optional<MuleVersion> minMuleVersion = javaExtensionModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void getMMVForExtensionWithSuperExtension() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<ExtensionWithSuperExtension> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(ExtensionWithSuperExtension.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    Optional<MuleVersion> minMuleVersion = javaExtensionModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
+  }
+
+  @Test
+  public void getMMVForParameterizedExtension() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<ParameterizedExtension> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(ParameterizedExtension.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    Optional<MuleVersion> minMuleVersion = javaExtensionModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
+  }
+
+  @Test
+  public void getMMVForExtensionWithConfiguration() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<ExtensionWithConfiguration> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(ExtensionWithConfiguration.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    Optional<MuleVersion> minMuleVersion = javaExtensionModelParser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
+  }
+
   @Extension(name = "SimpleExtension")
   @Import(type = KnockeableDoor.class)
   @PrivilegedExport(packages = {"org.mule.runtime.module.extension.internal.loader.parser.java"})
   private static class SimpleExtensionUsingSdkApi {
   }
 
-  @Extension(name = "SimpleExtension")
+  @org.mule.runtime.extension.api.annotation.Extension(name = "SimpleExtension")
   @org.mule.runtime.extension.api.annotation.Import(type = KnockeableDoor.class)
   @org.mule.runtime.extension.api.annotation.PrivilegedExport(
       packages = {"org.mule.runtime.module.extension.internal.loader.parser.java"})
   private static class SimpleExtensionUsingLegacyApi {
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "SimpleExtension")
+  @MinMuleVersion("4.2.1")
+  private static class SimpleExtensionUsingLegacyApiWithMMV {
+
+    @MinMuleVersion("4.6.1")
+    private String someField;
   }
 
   @Extension(name = "SimpleExtension")
@@ -161,6 +245,24 @@ public class JavaExtensionModelParserTestCase {
     @Parameter
     private String parameterTwo;
 
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "MixedConfigurationsAnnotationExtension")
+  @Configurations(ImplementationOne.class)
+  private static class ExtensionWithConfiguration {
+
+    Literal<String> extensionField;
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "MixedConfigurationsAnnotationExtension")
+  private static class ParameterizedExtension {
+
+    @org.mule.sdk.api.annotation.param.Parameter
+    String extensionParameter;
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionWithSuperExtension")
+  private static class ExtensionWithSuperExtension extends ParameterizedExtension {
   }
 
 }

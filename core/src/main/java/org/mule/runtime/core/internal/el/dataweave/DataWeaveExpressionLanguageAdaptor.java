@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize
 
 import static java.lang.System.getProperty;
 
+import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -31,6 +32,7 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -157,6 +159,12 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       }
       return new IllegalCompiledExpression(expression, e);
     }
+  }
+
+  @Override
+  public ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
+                                                                          TypeBindings bindings) {
+    return expressionExecutor.collectScopePhaseValidationMessages(script, nameIdentifier, bindings);
   }
 
   private boolean badExpressionFailsDeployment() {
