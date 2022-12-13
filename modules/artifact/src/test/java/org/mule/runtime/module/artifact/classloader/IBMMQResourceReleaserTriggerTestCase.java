@@ -156,7 +156,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
   public void releaserTriggerTest() throws Exception {
     // Driver not loaded yet. Should not cleanup on dispose.
-    Field shouldReleaseIbmMQResourcesField = getField(MulePluginClassLoader.class, "shouldReleaseIbmMQResources", false);
+    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
     // Force to load a Driver class so the resource releaser is flagged to run on dispose
@@ -176,7 +176,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   @Test
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should clean mbeans")
   public void releaserMBeansPropertyFalseTriggerTest() throws Exception {
-    Field shouldReleaseIbmMQResourcesField = getField(MulePluginClassLoader.class, "shouldReleaseIbmMQResources", false);
+    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
     // Force to load a Driver class so the resource releaser is flagged to run on dispose
@@ -190,7 +190,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed " +
       "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
   public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
-    Field shouldReleaseIbmMQResourcesField = getField(MulePluginClassLoader.class, "shouldReleaseIbmMQResources", false);
+    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
     // Force to load a Driver class so the resource releaser is flagged to run on dispose
