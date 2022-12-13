@@ -159,7 +159,7 @@ public class JavaConfigurationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
-  private JavaConfigurationModelParser getParser(Class<?> extension, Class<?> configuration) {
+  protected JavaConfigurationModelParser getParser(Class<?> extension, Class<?> configuration) {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
