@@ -76,7 +76,7 @@ class ForeachRouter {
         .doOnNext(event -> {
 
           if (owner.validateExpression(event)) {
-            downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
+            downstreamRecorder.next(left(new MessagingException(event, new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE))));
           }
 
           inflightEvents.getAndIncrement();

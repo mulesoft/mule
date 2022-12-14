@@ -409,7 +409,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return (throwable, object) -> {
       throwable = unwrap(throwable);
 
-      if (object == null && !(throwable instanceof MessagingException)) {
+      if (!(object instanceof CoreEvent) && !(throwable instanceof MessagingException)) {
         LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
         throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
       }
