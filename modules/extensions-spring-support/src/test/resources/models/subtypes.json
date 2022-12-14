@@ -1,14 +1,14 @@
 {
   "name": "SubtypesConnector",
   "description": "",
-  "version": "4.5.0-SNAPSHOT",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "subtypes",
     "namespace": "http://www.mulesoft.org/schema/mule/subtypes",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd",
-    "schemaVersion": "4.5.0-SNAPSHOT",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-subtypes.xsd"
   },
   "resources": [],

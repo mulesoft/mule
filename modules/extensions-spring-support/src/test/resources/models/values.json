@@ -1,14 +1,14 @@
 {
   "name": "Values",
   "description": "",
-  "version": "4.5.0-SNAPSHOT",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "values",
     "namespace": "http://www.mulesoft.org/schema/mule/values",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd",
-    "schemaVersion": "4.5.0-SNAPSHOT",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-values.xsd"
   },
   "resources": [],

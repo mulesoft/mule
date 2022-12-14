@@ -1,14 +1,14 @@
 {
   "name": "implicit",
   "description": "",
-  "version": "4.5.0-SNAPSHOT",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "implicit",
     "namespace": "http://www.mulesoft.org/schema/mule/implicit",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/implicit/current/mule-implicit.xsd",
-    "schemaVersion": "4.5.0-SNAPSHOT",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-implicit.xsd"
   },
   "resources": [],
