@@ -80,6 +80,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -247,7 +248,16 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void routeError(Consumer<Exception> errorRouter, Exception throwable) {
     if (!isTransactionActive() && !schedulerService.isCurrentThreadInWaitGroup()) {
-      switchOnErrorScheduler.submit(() -> errorRouter.accept(throwable));
+      Map<String, String> mdc = MDC.getCopyOfContextMap();
+      switchOnErrorScheduler.submit(() -> {
+        try {
+          MDC.setContextMap(mdc);
+          errorRouter.accept(throwable);
+        } finally {
+          MDC.clear();
+        }
+
+      });
     } else {
       errorRouter.accept(throwable);
     }
