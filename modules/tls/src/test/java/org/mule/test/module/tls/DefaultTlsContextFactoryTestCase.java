@@ -115,7 +115,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void insecureTrustStoreShouldNotBeConfiguredIfFFIsEnabled() throws IOException, InitialisationException {
-    assert getFeatureFlaggingService().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION);
+    assertTrue(getFeatureFlaggingService().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION));
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap(), getFeatureFlaggingService());
     tlsContextFactory.setTrustStorePath("trustStore");
     tlsContextFactory.setTrustStoreInsecure(true);
@@ -124,7 +124,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void insecureTrustStoreShouldBeConfiguredIfFFIsDisabled() throws IOException, InitialisationException {
-    assert !getFeatureFlaggingServiceWithFFDisabled().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION);
+    assertFalse(getFeatureFlaggingServiceWithFFDisabled().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION));
     DefaultTlsContextFactory tlsContextFactory =
         new DefaultTlsContextFactory(emptyMap(), getFeatureFlaggingServiceWithFFDisabled());
     tlsContextFactory.setTrustStorePath("trustStore");
