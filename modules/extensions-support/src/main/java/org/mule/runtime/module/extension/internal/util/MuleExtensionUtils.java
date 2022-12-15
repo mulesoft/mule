@@ -656,6 +656,12 @@ public class MuleExtensionUtils {
     return java.util.Optional.empty();
   }
 
+  public static String getDefaultValue(String optionalAnnotationDefaultValue) {
+    return optionalAnnotationDefaultValue.equals(org.mule.runtime.extension.api.annotation.param.Optional.NULL)
+        || optionalAnnotationDefaultValue.equals(org.mule.sdk.api.annotation.param.Optional.NULL) ? null
+            : optionalAnnotationDefaultValue;
+  }
+
   /**
    * Checks the given {@link ParameterGroupModel}s against the given resolved parameters and validates that the group
    * exclusiveness is honored.

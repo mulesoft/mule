@@ -156,7 +156,15 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public ParameterRole getRole() {
-    return roleOf(parameter.getAnnotation(Content.class));
+    return mapReduceSingleAnnotation(parameter, "parameter", parameter.getName(), Content.class,
+                                     org.mule.sdk.api.annotation.param.Content.class,
+                                     legacyContentAnnotationValueFetcher -> legacyContentAnnotationValueFetcher
+                                         .getBooleanValue(Content::primary) ? ParameterRole.PRIMARY_CONTENT
+                                             : ParameterRole.CONTENT,
+                                     sdkContentAnnotationValueFetcher -> sdkContentAnnotationValueFetcher
+                                         .getBooleanValue(org.mule.sdk.api.annotation.param.Content::primary)
+                                             ? ParameterRole.PRIMARY_CONTENT
+                                             : ParameterRole.CONTENT).orElse(ParameterRole.BEHAVIOUR);
   }
 
   @Override
@@ -174,17 +182,17 @@ public class JavaParameterModelParser implements ParameterModelParser {
     if (dslConfiguration == null) {
       dslConfiguration =
           mapReduceAnnotation(parameter, ParameterDsl.class, org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class,
-                              legacyAnnotationValueFetcher -> of(ParameterDslConfiguration.builder()
+                              legacyAnnotationValueFetcher -> ParameterDslConfiguration.builder()
                                   .allowsInlineDefinition(legacyAnnotationValueFetcher
                                       .getBooleanValue(ParameterDsl::allowInlineDefinition))
                                   .allowsReferences(legacyAnnotationValueFetcher.getBooleanValue(ParameterDsl::allowReferences))
-                                  .build()),
-                              sdkAnnotationValueFetcher -> of(ParameterDslConfiguration.builder()
+                                  .build(),
+                              sdkAnnotationValueFetcher -> ParameterDslConfiguration.builder()
                                   .allowsInlineDefinition(sdkAnnotationValueFetcher
                                       .getBooleanValue(org.mule.sdk.api.annotation.dsl.xml.ParameterDsl::allowInlineDefinition))
                                   .allowsReferences(sdkAnnotationValueFetcher
                                       .getBooleanValue(org.mule.sdk.api.annotation.dsl.xml.ParameterDsl::allowReferences))
-                                  .build()),
+                                  .build(),
                               () -> new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
                                                                                         parameter.getName(),
                                                                                         ParameterDsl.class.getName(),
@@ -212,7 +220,8 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public boolean isComponentId() {
-    return parameter.getAnnotation(ComponentId.class).isPresent();
+    return parameter.isAnnotatedWith(ComponentId.class)
+        || parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.stereotype.ComponentId.class);
   }
 
   @Override
@@ -278,7 +287,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public boolean isExcludedFromConnectivitySchema() {
-    return parameter.getAnnotation(ExcludeFromConnectivitySchema.class).isPresent();
+    return parameter.isAnnotatedWith(ExcludeFromConnectivitySchema.class);
   }
 
   @Override
