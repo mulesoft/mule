@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.api.tracing.customization;
 
+import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -16,8 +18,6 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
 /**
  * A {@link InitialSpanInfo} based on a component.
