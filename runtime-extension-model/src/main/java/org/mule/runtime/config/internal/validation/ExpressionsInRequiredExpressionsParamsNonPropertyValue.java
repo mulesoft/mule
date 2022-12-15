@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Expressions are provided for parameters that require expressions.
+ * Expressions are fixed for parameters that require expressions.
+ * 
+ * @since 4.5
  */
 public class ExpressionsInRequiredExpressionsParamsNonPropertyValue implements Validation {
 
