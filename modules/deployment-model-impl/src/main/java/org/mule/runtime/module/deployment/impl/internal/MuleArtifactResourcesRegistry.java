@@ -316,7 +316,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     configureEnableProfilingService();
 
     return new FeatureFlaggingServiceBuilder()
-        .withContext(new FeatureContext(new MuleVersion("4.5.0-SNAPSHOT"), CONTAINER_FEATURE_CONTEXT_NAME))
+        .withContext(new FeatureContext(new MuleVersion("4.6.0-SNAPSHOT"), CONTAINER_FEATURE_CONTEXT_NAME))
         .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();
