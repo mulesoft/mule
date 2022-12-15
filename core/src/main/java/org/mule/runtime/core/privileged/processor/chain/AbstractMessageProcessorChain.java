@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -131,7 +132,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
   private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
   private static final String UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE =
-      "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException";
+      "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException. " +
+          "This may lead to an event getting stuck, or even a processor may stop responding.";
   public static final String UNKNOWN = "unknown";
 
   private static Class<ClassLoader> appClClass;
@@ -411,10 +413,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
       if (!(object instanceof CoreEvent) && !(throwable instanceof MessagingException)) {
         LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
-        throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+
+        // This line is just a workaround added for robustness, but this code should never be reached. If it's happening in
+        // production code, please review who is calling this method with an exception other than a MessagingException, and
+        // fix that call.
+        throwable = new MessagingException(getNullEvent(), throwable);
       }
 
-      if (object != null && !(object instanceof CoreEvent) && throwable instanceof MessagingException) {
+      if (object != null && !(object instanceof CoreEvent)) {
         notifyError(processor,
                     (BaseEventContext) ((MessagingException) throwable).getEvent().getContext(),
                     messagingExceptionMapper.apply((MessagingException) throwable),
