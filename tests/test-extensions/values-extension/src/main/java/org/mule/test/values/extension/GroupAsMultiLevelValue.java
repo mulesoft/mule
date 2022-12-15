@@ -25,7 +25,7 @@ public class GroupAsMultiLevelValue {
   private String continent;
 
   @Optional(defaultValue = "USA")
-  @ValuePart(order = 2)
+  @org.mule.sdk.api.annotation.values.ValuePart(order = 2)
   @Parameter
   private String country;
 
