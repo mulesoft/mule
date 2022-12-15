@@ -96,42 +96,5 @@ public final class JavaExternalLibModelParserUtils {
     return null;
   }
 
-  private static ExternalLibraryModel parseExternalLib(ExternalLib externalLibAnnotation) {
-    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
-        .withName(externalLibAnnotation.name())
-        .withDescription(externalLibAnnotation.description())
-        .withType(externalLibAnnotation.type())
-        .isOptional(externalLibAnnotation.optional());
-
-    ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
-    ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
-    ifNotBlank(externalLibAnnotation.coordinates(), builder::withCoordinates);
-
-    return builder.build();
-  }
-
-  private static ExternalLibraryModel parseExternalLib(org.mule.sdk.api.annotation.ExternalLib externalLibAnnotation) {
-    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
-        .withName(externalLibAnnotation.name())
-        .withDescription(externalLibAnnotation.description())
-        .withType(toMuleApi(externalLibAnnotation.type()))
-        .isOptional(externalLibAnnotation.optional());
-
-    ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
-    ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
-    ifNotBlank(externalLibAnnotation.coordinates(), builder::withCoordinates);
-
-    return builder.build();
-  }
-
-  private static <A extends Annotation> void parseExternalLibs(WithAnnotations element,
-                                                               Class<A> annotationClass,
-                                                               Function<A, List<ExternalLibraryModel>> mapper,
-                                                               List<ExternalLibraryModel> accumulator) {
-    element.getAnnotation(annotationClass)
-        .map(mapper)
-        .ifPresent(accumulator::addAll);
-  }
-
   private JavaExternalLibModelParserUtils() {}
 }
