@@ -1444,7 +1444,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableApplyObjectProcessor() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
-                                                minMuleVersion("4.6.0"));
+                                                minMuleVersion("4.7.0"));
   }
 
   /**

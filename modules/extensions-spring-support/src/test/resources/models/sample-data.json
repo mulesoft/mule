@@ -1,14 +1,14 @@
 {
   "name": "SampleData",
   "description": "",
-  "version": "4.5.0-SNAPSHOT",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "sample-data",
     "namespace": "http://www.mulesoft.org/schema/mule/sample-data",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/sample-data/current/mule-sample-data.xsd",
-    "schemaVersion": "4.5.0-SNAPSHOT",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-sample-data.xsd"
   },
   "resources": [],
