@@ -28,7 +28,6 @@ import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEF
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -116,6 +115,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void insecureTrustStoreShouldNotBeConfiguredIfFFIsEnabled() throws IOException, InitialisationException {
+    assert getFeatureFlaggingService().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION);
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap(), getFeatureFlaggingService());
     tlsContextFactory.setTrustStorePath("trustStore");
     tlsContextFactory.setTrustStoreInsecure(true);
@@ -124,6 +124,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void insecureTrustStoreShouldBeConfiguredIfFFIsDisabled() throws IOException, InitialisationException {
+    assert !getFeatureFlaggingServiceWithFFDisabled().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION);
     DefaultTlsContextFactory tlsContextFactory =
         new DefaultTlsContextFactory(emptyMap(), getFeatureFlaggingServiceWithFFDisabled());
     tlsContextFactory.setTrustStorePath("trustStore");
@@ -217,7 +218,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleContextTestCas
   }
 
   private FeatureFlaggingService getFeatureFlaggingServiceWithFFDisabled() {
-    return feature -> !((MuleRuntimeFeature) feature).name().equals(HONOUR_INSECURE_TLS_CONFIGURATION.name());
+    return feature -> !feature.equals(HONOUR_INSECURE_TLS_CONFIGURATION);
   }
 
   private void defaultIncludesDEfaultTlsVersionCiphers(String sslVersion)
