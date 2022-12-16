@@ -20,6 +20,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
@@ -342,6 +343,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
       configureSuppressErrors();
       configureRethrowExceptionsInIdempotentMessageValidator();
+      configureForeachRouterRejectsMapExpressionFeatureFlag();
     }
   }
 
@@ -1511,6 +1513,16 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR,
                                                 minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureForeachRouterRejectsMapExpressionFeatureFlag() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS, minMuleVersion("4.5.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
