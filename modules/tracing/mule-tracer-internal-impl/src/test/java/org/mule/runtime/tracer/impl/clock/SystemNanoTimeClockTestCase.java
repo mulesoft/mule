@@ -24,7 +24,7 @@ import org.junit.Test;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class SystemNanotimeClockTestCase {
+public class SystemNanoTimeClockTestCase {
 
   @Test
   public void testClock() throws Exception {

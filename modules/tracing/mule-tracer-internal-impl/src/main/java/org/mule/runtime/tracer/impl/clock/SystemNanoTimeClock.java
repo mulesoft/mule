@@ -14,9 +14,9 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  *
  * @since 4.5.0
  */
-public class SystemNanotimeClock implements Clock {
+public class SystemNanoTimeClock implements Clock {
 
-  private final static Clock INSTANCE = new SystemNanotimeClock();
+  private static final Clock INSTANCE = new SystemNanoTimeClock();
   private final long epochNanos;
   private final long nanoTime;
 
@@ -24,7 +24,7 @@ public class SystemNanotimeClock implements Clock {
     return INSTANCE;
   }
 
-  private SystemNanotimeClock() {
+  private SystemNanoTimeClock() {
     this.epochNanos = MILLISECONDS.toNanos(System.currentTimeMillis());;
     this.nanoTime = System.nanoTime();
   }

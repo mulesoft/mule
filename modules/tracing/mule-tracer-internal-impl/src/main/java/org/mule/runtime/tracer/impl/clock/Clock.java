@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.impl.clock;
 
-import static org.mule.runtime.tracer.impl.clock.SystemNanotimeClock.getInstance;
+import static org.mule.runtime.tracer.impl.clock.SystemNanoTimeClock.getInstance;
 
 /**
  * A clock used for tracing and measure the duration of {@link org.mule.runtime.tracer.api.span.InternalSpan}.
