@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.5.0-SNAPSHOT</version>
+    <version>4.6.0-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -152,7 +152,7 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.5.0-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.6.0-SNAPSHOT</muleBomVersion>
 
         <activemqVersion>5.15.12</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
@@ -162,22 +162,22 @@
         <weaveVersion>2.5.0-SNAPSHOT</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
+        <mulePropertiesApiVersion>1.2.0-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.6.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.5.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.7.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.7.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.7.0-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.5.0-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.5.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.5.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleHttpPolicyApiVersion>1.6.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.8.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.8.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.8.0-SNAPSHOT</muleMavenClientTest>
+        <mulePolicyApiVersion>1.6.0-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.6.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.6.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
          its version is not changed by the versions:set plugin -->
-        <muleTestComponentsVersion>4.5.0-SNAPSHOT</muleTestComponentsVersion>
-        <muleTxExtVersion>4.5.0-SNAPSHOT</muleTxExtVersion>
+        <muleTestComponentsVersion>4.6.0-SNAPSHOT</muleTestComponentsVersion>
+        <muleTxExtVersion>4.6.0-SNAPSHOT</muleTxExtVersion>
 
         <!-- Test Extensions -->
         <muleTestingProcessingStrategiesExtensionVersion>1.0.0-SNAPSHOT</muleTestingProcessingStrategiesExtensionVersion>
@@ -212,11 +212,11 @@
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.4.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.5.0-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.5.0-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.5.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.5.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.6.0-SNAPSHOT</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.6.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.6.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
@@ -228,7 +228,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.4.0</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.5.0-SNAPSHOT</oldMuleArtifactVersion>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>

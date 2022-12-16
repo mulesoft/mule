@@ -258,6 +258,24 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(valueProviderModel.getModelProperty(SinceMuleVersionModelProperty.class).isPresent(), is(false));
   }
 
+  @Test
+  public void verifyPartOrderIsAddedUsingBothApis() {
+    ParameterDeclaration continentParameterDeclaration =
+        getParameterByOperationAndName("multiLevelValue", "continent");
+
+    assertThat(continentParameterDeclaration.getValueProviderModel().getPartOrder(), is(1));
+
+    ParameterDeclaration countryParameterDeclaration =
+        getParameterByOperationAndName("multiLevelValue", "country");
+
+    assertThat(countryParameterDeclaration.getValueProviderModel().getPartOrder(), is(2));
+
+    ParameterDeclaration cityParameterDeclaration =
+        getParameterByOperationAndName("multiLevelValue", "city");
+
+    assertThat(cityParameterDeclaration.getValueProviderModel().getPartOrder(), is(3));
+  }
+
   private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {
     OperationDeclaration operationDeclaration = getNamedObject(this.declaration.getOperations(), operationName);
     return getNamedObject(operationDeclaration.getAllParameters(), parameterName);

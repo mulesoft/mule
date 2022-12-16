@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.FieldValueProviderNameUtils.getFieldValueProviderName;
 import static org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils.getConfigFields;
 import static org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils.getConnectionFields;
@@ -41,6 +42,7 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
@@ -54,6 +56,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.FieldsVal
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
 import org.mule.sdk.api.annotation.binding.Binding;
@@ -389,8 +392,26 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
   private Map<ParameterDeclaration, Integer> getParts(ParameterGroupDeclaration paramDeclaration) {
     Map<ParameterDeclaration, Integer> parts = new HashMap<>();
 
-    paramDeclaration.getParameters().forEach(param -> getAnnotation(param, ValuePart.class)
-        .ifPresent(part -> parts.put(param, part.order())));
+    paramDeclaration.getParameters()
+        .forEach(param -> param.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+            .ifPresent(extensionParameterDescriptorModelProperty -> mapReduceAnnotation(extensionParameterDescriptorModelProperty
+                .getExtensionParameter(),
+                                                                                        ValuePart.class,
+                                                                                        org.mule.sdk.api.annotation.values.ValuePart.class,
+                                                                                        value -> value
+                                                                                            .getNumberValue(ValuePart::order),
+                                                                                        value -> value
+                                                                                            .getNumberValue(org.mule.sdk.api.annotation.values.ValuePart::order),
+                                                                                        () -> new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                                                                                  param
+                                                                                                                                                      .getName(),
+                                                                                                                                                  ValuePart.class
+                                                                                                                                                      .getName(),
+                                                                                                                                                  org.mule.sdk.api.annotation.values.ValuePart.class
+                                                                                                                                                      .getName())))
+                                                                                                                                                          .ifPresent(order -> parts
+                                                                                                                                                              .put(param,
+                                                                                                                                                                   order))));
 
     return parts;
   }

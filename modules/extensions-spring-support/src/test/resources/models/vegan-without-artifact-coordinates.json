@@ -1,14 +1,14 @@
 {
   "name": "vegan",
   "description": "",
-  "version": "4.5.0-SNAPSHOT",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "vegan",
     "namespace": "http://www.mulesoft.org/schema/mule/vegan",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd",
-    "schemaVersion": "4.5.0-SNAPSHOT",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-vegan.xsd"
   },
   "resources": [],

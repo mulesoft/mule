@@ -1,14 +1,14 @@
 {
   "name": "reconnection",
   "description": "",
-  "version": "4.5.0-SNAPSHOT",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "reconnection",
     "namespace": "http://www.mulesoft.org/schema/mule/reconnection",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd",
-    "schemaVersion": "4.5.0-SNAPSHOT",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-reconnection.xsd"
   },
   "resources": [],
