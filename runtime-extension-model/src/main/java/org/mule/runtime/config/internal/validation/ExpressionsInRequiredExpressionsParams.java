@@ -10,6 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
@@ -44,9 +45,12 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_NAME).build();
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
+  private final boolean ignoreParamsWithProperties;
 
-  public ExpressionsInRequiredExpressionsParams(Optional<FeatureFlaggingService> featureFlaggingService) {
+  public ExpressionsInRequiredExpressionsParams(Optional<FeatureFlaggingService> featureFlaggingService,
+                                                boolean ignoreParamsWithProperties) {
     this.featureFlaggingService = featureFlaggingService;
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
 
   @Override
@@ -89,6 +93,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
             .collect(toList()))
         .orElse(emptyList())
         .stream()
+        .filter(param -> !hasPropertyPlaceholder(param.getRawValue()))
         .filter(param -> {
           if (param.getValueOrResolutionError().isRight() && param.getResolvedRawValue() instanceof String) {
             final String stringValue = param.getResolvedRawValue();

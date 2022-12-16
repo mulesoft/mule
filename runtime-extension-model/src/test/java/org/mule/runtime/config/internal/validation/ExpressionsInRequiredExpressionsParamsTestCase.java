@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -22,7 +23,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
 
   @Override
   protected Validation getValidation() {
-    return new ExpressionsInRequiredExpressionsParams(empty());
+    return new ExpressionsInRequiredExpressionsParams(empty(), false);
   }
 
   @Test
