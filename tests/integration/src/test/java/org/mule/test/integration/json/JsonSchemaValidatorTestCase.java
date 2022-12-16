@@ -38,7 +38,7 @@ public class JsonSchemaValidatorTestCase extends FunctionalTestCase {
 
   @Test
   @Description("W-11577522: Validates one use case where the version of com.github.java-json-tools:json-schema-validator " +
-      "and com.fasterxml.jackson.core:jackson-databind are compatible.")
+      "and com.fasterxml.jackson.core:jackson-databind must be compatible.")
   public void invokeValidateJsonSchemaToProveJsonSchemaValidatorAndJacksonDatabindAreCompatible() throws Exception {
     MuleMessage message = new DefaultMuleMessage(JSON_MESSAGE, muleContext);
     assertThat(muleContext.getClient()
