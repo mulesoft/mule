@@ -68,15 +68,15 @@ class ForeachRouter {
   private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
 
   ForeachRouter(Foreach owner, StreamingManager streamingManager, Publisher<CoreEvent> publisher, String expression,
-                int batchSize, MessageProcessorChain nestedChain) {
+                int batchSize, MessageProcessorChain nestedChain, boolean rejectsMapExpressions) {
     this.owner = owner;
     this.streamingManager = streamingManager;
 
     upstreamFlux = from(publisher)
         .doOnNext(event -> {
-
-          if (owner.validateExpression(event)) {
-            downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
+          if (rejectsMapExpressions && owner.isMapExpression(event)) {
+            downstreamRecorder
+                .next(left(new MessagingException(event, new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE), owner)));
           }
 
           inflightEvents.getAndIncrement();
@@ -85,7 +85,6 @@ class ForeachRouter {
             // Inject it into the inner flux
             innerRecorder.next(responseEvent);
           }
-
         })
         .doOnComplete(() -> {
           // TODO MULE-18170

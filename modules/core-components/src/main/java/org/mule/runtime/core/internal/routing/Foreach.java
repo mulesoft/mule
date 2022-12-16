@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
@@ -18,6 +19,7 @@ import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -74,6 +76,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   @Inject
   protected StreamingManager streamingManager;
 
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
   private int batchSize = 1;
@@ -88,7 +93,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return new ForeachRouter(this, streamingManager, publisher, expression, batchSize, nestedChain).getDownstreamPublisher();
+    return new ForeachRouter(this, streamingManager, publisher, expression, batchSize, nestedChain, shouldRejectMapExpressions())
+        .getDownstreamPublisher();
+  }
+
+  private boolean shouldRejectMapExpressions() {
+    if (featureFlaggingService == null) {
+      return true;
+    }
+
+    return featureFlaggingService.isEnabled(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS);
   }
 
   @Override
@@ -138,7 +152,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     return splittingStrategy;
   }
 
-  boolean validateExpression(CoreEvent event) {
+  boolean isMapExpression(CoreEvent event) {
     return expression.equals(DEFAULT_SPLIT_EXPRESSION)
         && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType());
   }
