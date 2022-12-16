@@ -137,8 +137,8 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
                                    .getStringValue(org.mule.sdk.api.annotation.param.Optional::defaultValue)),
                                () -> new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
                                                                                          getName(),
-                                                                                         ParameterDsl.class.getName(),
-                                                                                         org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class
+                                                                                         Optional.class.getName(),
+                                                                                         org.mule.sdk.api.annotation.param.Optional.class
                                                                                              .getName())));
   }
 
