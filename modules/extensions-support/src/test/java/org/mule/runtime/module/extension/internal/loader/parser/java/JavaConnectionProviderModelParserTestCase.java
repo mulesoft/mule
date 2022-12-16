@@ -334,20 +334,20 @@ public class JavaConnectionProviderModelParserTestCase {
                                                    connectionProviderElement);
   }
 
-  private static class BaseTestConnectionProvider implements ConnectionProvider {
+  private static class BaseTestConnectionProvider implements ConnectionProvider<String> {
 
     @Override
-    public Object connect() throws ConnectionException {
-      return null;
+    public String connect() throws ConnectionException {
+      return "";
     }
 
     @Override
-    public void disconnect(Object connection) {
+    public void disconnect(String connection) {
 
     }
 
     @Override
-    public ConnectionValidationResult validate(Object connection) {
+    public ConnectionValidationResult validate(String connection) {
       return null;
     }
   }
