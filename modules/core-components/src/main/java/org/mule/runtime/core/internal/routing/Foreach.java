@@ -99,7 +99,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   private boolean shouldRejectMapExpressions() {
     if (featureFlaggingService == null) {
-      return false;
+      return true;
     }
 
     return featureFlaggingService.isEnabled(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS);
