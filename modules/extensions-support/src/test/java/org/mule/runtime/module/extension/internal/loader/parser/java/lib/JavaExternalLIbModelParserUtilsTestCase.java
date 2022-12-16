@@ -51,13 +51,18 @@ public class JavaExternalLIbModelParserUtilsTestCase {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
 
-    ExtensionTypeWrapper<SimpleRepeatingApiExtension> extensionTypeWrapper =
-        new ExtensionTypeWrapper<>(SimpleRepeatingApiExtension.class, typeLoader);
+    ExtensionTypeWrapper<SimpleExtensionUsingLegacyApi> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(SimpleExtensionUsingLegacyApi.class, typeLoader);
 
     List<ExternalLibraryModel> externalLibraryModelList =
         JavaExternalLibModelParserUtils.parseExternalLibraryModels(extensionTypeWrapper);
 
-    int a = 2;
+    assertThat(externalLibraryModelList.size(), is(1));
+    assertThat(externalLibraryModelList.get(0).getName(), is(EXTERNAL_LIB_NAME));
+    assertThat(externalLibraryModelList.get(0).getDescription(), is(EXTERNAL_LIB_DESCRIPTION));
+    assertThat(externalLibraryModelList.get(0).getRegexMatcher().get(), is(EXTERNAL_LIB_FILE_NAME));
+    assertThat(externalLibraryModelList.get(0).getRequiredClassName().get(), is(EXTERNAL_LIB_CLASS_NAME));
+    assertThat(externalLibraryModelList.get(0).getType(), equalTo(NATIVE));
   }
 
   @Test

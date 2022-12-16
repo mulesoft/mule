@@ -137,7 +137,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(ANY)
-  public String usingInterfaceB(@Content MyInterface myInterface) {
+  public String usingInterfaceB(@org.mule.sdk.api.annotation.param.Content MyInterface myInterface) {
     return null;
   }
 

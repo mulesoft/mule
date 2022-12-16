@@ -28,12 +28,12 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
-import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.sdk.api.annotation.param.stereotype.ComponentId;
 import org.mule.test.marvel.model.Relic;
 
 import java.io.ByteArrayInputStream;

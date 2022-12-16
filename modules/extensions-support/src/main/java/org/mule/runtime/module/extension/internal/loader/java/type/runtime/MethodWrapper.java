@@ -138,6 +138,11 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
   }
 
   @Override
+  public boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
+    return method.getAnnotation(annotation) != null;
+  }
+
+  @Override
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method, typeLoader))
