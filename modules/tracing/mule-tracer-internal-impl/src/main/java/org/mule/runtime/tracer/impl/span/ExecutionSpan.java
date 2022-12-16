@@ -22,11 +22,11 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
@@ -47,7 +47,7 @@ public class ExecutionSpan implements InternalSpan {
   private final Long startTime;
   private Long endTime;
   private final Map<String, String> attributes = new HashMap<>();
-  private final Set<SpanError> errors = new HashSet<>();
+  private final List<SpanError> errors = new ArrayList<>(1);
 
   private ExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
                         InternalSpan parent) {
@@ -77,7 +77,7 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public Set<SpanError> getErrors() {
+  public List<SpanError> getErrors() {
     return errors;
   }
 
