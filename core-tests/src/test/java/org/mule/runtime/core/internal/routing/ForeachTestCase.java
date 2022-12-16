@@ -35,7 +35,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.getContext;
-import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.internal.util.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -227,13 +226,6 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     process(simpleForeach, eventBuilder(muleContext).message(of(iterable.iterator())).build());
 
     assertSimpleProcessedMessages();
-  }
-
-  @Test
-  public void mapPayload() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(MAP_NOT_SUPPORTED_MESSAGE);
-    process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
   @Test

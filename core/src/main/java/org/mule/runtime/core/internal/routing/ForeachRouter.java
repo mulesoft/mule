@@ -52,9 +52,6 @@ import reactor.util.context.Context;
 class ForeachRouter {
 
   private static final Logger LOGGER = getLogger(ForeachRouter.class);
-
-  static final String MAP_NOT_SUPPORTED_MESSAGE =
-      "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
   private final Foreach owner;
   private final StreamingManager streamingManager;
 
@@ -75,11 +72,6 @@ class ForeachRouter {
 
     upstreamFlux = from(publisher)
         .doOnNext(event -> {
-
-          if (owner.validateExpression(event)) {
-            downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
-          }
-
           inflightEvents.getAndIncrement();
           final CoreEvent responseEvent = prepareEvent(event, expression);
           if (responseEvent != null) {
