@@ -46,7 +46,7 @@ public class ForeachFeatureFlagForMapExpressionsTestCase extends AbstractForeach
         new SystemProperty(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS_PROPERTY, valueOf(featureFlagEnabled));
   }
 
-  @Parameterized.Parameters(name = "{0}")
+  @Parameterized.Parameters(name = "Mode: {0}, FeatureFlagEnabled: {1}")
   public static Collection<Object[]> parameters() {
     return asList(
                   new Object[] {BLOCKING, true},
