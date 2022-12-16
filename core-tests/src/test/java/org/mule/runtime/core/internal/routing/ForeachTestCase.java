@@ -229,6 +229,17 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
+  public void mapPayload() throws Exception {
+    // In newer versions of the runtime, there is a validation that prevents you from using a Map payload, but we
+    // removed it from 4.4 in order to avoid breaking backwards compatibility. That's why we don't expect an exception
+    // here...
+    //
+    // expectedException.expect(IllegalArgumentException.class);
+
+    process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
+  }
+
+  @Test
   public void mapEntrySetExpression() throws Exception {
     simpleForeach.setCollectionExpression("#[dw::core::Objects::entrySet(payload)]");
     CoreEvent event = process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
