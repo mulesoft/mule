@@ -416,7 +416,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
         // This line is just a workaround added for robustness, but this code should never be reached. If it's happening in
         // production code, please review who is calling this method with an exception other than a MessagingException, and
-        // fix that call.
+        // fix that call. We NEED either an event or a MessagingException because we complete the EventContext (with the
+        // corresponding error) within the notifyError method. Not having the EventContext here will cause events being stuck.
         throwable = new MessagingException(getNullEvent(), throwable);
       }
 
