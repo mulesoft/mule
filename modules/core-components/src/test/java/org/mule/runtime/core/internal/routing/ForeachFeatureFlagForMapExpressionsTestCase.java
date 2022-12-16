@@ -42,17 +42,17 @@ public class ForeachFeatureFlagForMapExpressionsTestCase extends AbstractForeach
   public ForeachFeatureFlagForMapExpressionsTestCase(Mode mode, boolean featureFlagEnabled) {
     super(mode);
     this.featureFlagEnabled = featureFlagEnabled;
-    this.featureFlagEnabledProperty = new SystemProperty(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS_PROPERTY, valueOf(featureFlagEnabled));
+    this.featureFlagEnabledProperty =
+        new SystemProperty(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS_PROPERTY, valueOf(featureFlagEnabled));
   }
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
     return asList(
-            new Object[] {BLOCKING, true},
-            new Object[] {NON_BLOCKING, true},
-            new Object[] {BLOCKING, false},
-            new Object[] {NON_BLOCKING, false}
-    );
+                  new Object[] {BLOCKING, true},
+                  new Object[] {NON_BLOCKING, true},
+                  new Object[] {BLOCKING, false},
+                  new Object[] {NON_BLOCKING, false});
   }
 
   @Test

@@ -75,7 +75,8 @@ class ForeachRouter {
     upstreamFlux = from(publisher)
         .doOnNext(event -> {
           if (rejectsMapExpressions && owner.isMapExpression(event)) {
-            downstreamRecorder.next(left(new MessagingException(event, new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE), owner)));
+            downstreamRecorder
+                .next(left(new MessagingException(event, new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE), owner)));
           }
 
           inflightEvents.getAndIncrement();
