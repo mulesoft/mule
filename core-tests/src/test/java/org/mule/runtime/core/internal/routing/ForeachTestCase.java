@@ -35,7 +35,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.getContext;
-import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.internal.util.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -231,8 +230,12 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void mapPayload() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(MAP_NOT_SUPPORTED_MESSAGE);
+    // In newer versions of the runtime, there is a validation that prevents you from using a Map payload, but we
+    // removed it from 4.4 in order to avoid breaking backwards compatibility. That's why we don't expect an exception
+    // here...
+    //
+    // expectedException.expect(IllegalArgumentException.class);
+
     process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
