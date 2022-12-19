@@ -401,8 +401,7 @@ public final class JavaParserUtils {
   }
 
   private static MuleVersion getEnforcedMinMuleVersion(Type type) {
-    if (isPrimitiveType(type) || type.getTypeName().contains("java.lang")
-        || type.isAnnotatedWith(DoNotEnforceMinMuleVersion.class)) {
+    if (type.isAnnotatedWith(DoNotEnforceMinMuleVersion.class)) {
       return FIRST_MULE_VERSION;
     }
     return getMinMuleVersionFromAnnotations(type).orElse(FIRST_MULE_VERSION);
@@ -430,11 +429,5 @@ public final class JavaParserUtils {
 
   private static boolean belongsToSdkApiPackages(String fullyQualifiedName) {
     return fullyQualifiedName.startsWith("org.mule.sdk.api");
-  }
-
-  private static boolean isPrimitiveType(Type type) {
-    return (type.isSameType(byte.class) || type.isSameType(char.class) || type.isSameType(short.class)
-        || type.isSameType(int.class) || type.isSameType(long.class) || type.isSameType(float.class)
-        || type.isSameType(double.class) || type.isSameType(boolean.class) || type.isSameType(void.class));
   }
 }
