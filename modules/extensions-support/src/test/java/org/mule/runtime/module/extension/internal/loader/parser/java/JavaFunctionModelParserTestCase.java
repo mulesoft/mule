@@ -12,12 +12,12 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FunctionWrapper;
 import org.mule.sdk.api.annotation.ExpressionFunctions;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
@@ -27,17 +27,15 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 
 public class JavaFunctionModelParserTestCase {
 
-  private JavaFunctionModelParser parser;
-  private FunctionElement functionElement;
-  private ExtensionElement extensionElement;
+  protected JavaFunctionModelParser parser;
+  protected FunctionElement functionElement;
 
   ClassTypeLoader typeLoader =
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
 
   @Test
   public void getMMVForFunction() throws NoSuchMethodException {
-    functionElement = new FunctionWrapper(Functions.class.getMethod("function"), typeLoader);
-    parser = new JavaFunctionModelParser(mock(ExtensionElement.class), functionElement, mock(ExtensionLoadingContext.class));
+    setParser(Functions.class.getMethod("function"), ConfigurationFunctions.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     Assert.assertThat(minMuleVersion.isPresent(), is(true));
     Assert.assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
@@ -45,8 +43,7 @@ public class JavaFunctionModelParserTestCase {
 
   @Test
   public void getMMVForSdkAnnotatedFunction() throws NoSuchMethodException {
-    functionElement = new FunctionWrapper(SdkFunctions.class.getMethod("sdkFunction"), typeLoader);
-    parser = new JavaFunctionModelParser(mock(ExtensionElement.class), functionElement, mock(ExtensionLoadingContext.class));
+    setParser(SdkFunctions.class.getMethod("sdkFunction"), ConfigurationFunctions.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     Assert.assertThat(minMuleVersion.isPresent(), is(true));
     Assert.assertThat(minMuleVersion.get().toString(), is("4.5.0"));
@@ -54,12 +51,16 @@ public class JavaFunctionModelParserTestCase {
 
   @Test
   public void getMMVForFunctionFromConfigurationWithSdkFunctionsAnnotation() throws NoSuchMethodException {
-    functionElement = new FunctionWrapper(Functions.class.getMethod("function"), typeLoader);
-    parser = new JavaFunctionModelParser(new ExtensionTypeWrapper<>(ConfigurationWithSdkFunctionsAnnotation.class, TYPE_LOADER),
-                                         functionElement, mock(ExtensionLoadingContext.class));
+    setParser(Functions.class.getMethod("function"), ConfigurationWithSdkFunctionsAnnotation.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     Assert.assertThat(minMuleVersion.isPresent(), is(true));
     Assert.assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  protected void setParser(Method method, Class<?> extensionClass) {
+    functionElement = new FunctionWrapper(method, typeLoader);
+    parser = new JavaFunctionModelParser(new ExtensionTypeWrapper<>(extensionClass, TYPE_LOADER), functionElement,
+                                         mock(ExtensionLoadingContext.class));
   }
 
   private class Functions {
@@ -71,6 +72,10 @@ public class JavaFunctionModelParserTestCase {
 
     @org.mule.sdk.api.annotation.Alias("alias")
     public void sdkFunction() {}
+  }
+
+  @org.mule.runtime.extension.api.annotation.ExpressionFunctions({Functions.class, SdkFunctions.class})
+  private class ConfigurationFunctions {
   }
 
   @ExpressionFunctions(Functions.class)

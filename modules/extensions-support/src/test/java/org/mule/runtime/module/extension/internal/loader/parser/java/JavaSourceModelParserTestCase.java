@@ -67,8 +67,8 @@ import javax.inject.Inject;
 
 public class JavaSourceModelParserTestCase {
 
-  private JavaSourceModelParser parser;
-  private SourceElement sourceElement;
+  protected JavaSourceModelParser parser;
+  protected SourceElement sourceElement;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -380,7 +380,7 @@ public class JavaSourceModelParserTestCase {
     return parser.getSourceClusterSupportModelProperty();
   }
 
-  private void mockSourceWrapperWithClass(Class<? extends Source> sourceClass) {
+  protected void mockSourceWrapperWithClass(Class<? extends Source> sourceClass) {
     sourceElement = new SourceTypeWrapper<>(sourceClass, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     parser = new JavaSourceModelParser(mock(ExtensionElement.class), sourceElement, mock(ExtensionLoadingContext.class));

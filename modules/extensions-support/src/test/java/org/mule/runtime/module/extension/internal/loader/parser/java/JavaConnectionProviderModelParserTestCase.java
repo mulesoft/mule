@@ -57,8 +57,8 @@ import org.mule.sdk.api.runtime.parameter.Literal;
 
 public class JavaConnectionProviderModelParserTestCase {
 
-  private JavaConnectionProviderModelParser parser;
-  private ConnectionProviderElement connectionProviderElement;
+  protected JavaConnectionProviderModelParser parser;
+  protected ConnectionProviderElement connectionProviderElement;
 
   private static final String ACCESS_TOKEN_URL = "accessTokenUrl";
   private static final String AUTHORIZATION_URL = "authorizationUrl";
@@ -326,7 +326,7 @@ public class JavaConnectionProviderModelParserTestCase {
         .map(OAuthCallbackValuesModelProperty.class::cast).findFirst();
   }
 
-  private void mockConnectionProviderWithClass(Class<?> connectionProviderClass) {
+  protected void mockConnectionProviderWithClass(Class<?> connectionProviderClass) {
     connectionProviderElement =
         new ConnectionProviderTypeWrapper(connectionProviderClass, new DefaultExtensionsTypeLoaderFactory()
             .createTypeLoader(Thread.currentThread().getContextClassLoader()));
@@ -334,20 +334,20 @@ public class JavaConnectionProviderModelParserTestCase {
                                                    connectionProviderElement);
   }
 
-  private static class BaseTestConnectionProvider implements ConnectionProvider {
+  private static class BaseTestConnectionProvider implements ConnectionProvider<String> {
 
     @Override
-    public Object connect() throws ConnectionException {
-      return null;
+    public String connect() throws ConnectionException {
+      return "";
     }
 
     @Override
-    public void disconnect(Object connection) {
+    public void disconnect(String connection) {
 
     }
 
     @Override
-    public ConnectionValidationResult validate(Object connection) {
+    public ConnectionValidationResult validate(String connection) {
       return null;
     }
   }

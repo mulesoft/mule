@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
@@ -26,10 +25,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationContainer
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterWrapper;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,22 +41,28 @@ import org.mule.sdk.api.runtime.parameter.Literal;
 
 public class JavaOperationModelParserTestCase {
 
-  private JavaOperationModelParser parser;
-  private OperationElement operationElement;
+  protected JavaOperationModelParser parser;
+  protected OperationElement operationElement;
 
   @Test
   public void parseTransactionalOperation() throws NoSuchMethodException {
-    parseTransactionalOperation(getMethod());
+    parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
+                   JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
+    assertThat(parser.isTransactional(), is(true));
   }
 
   @Test
   public void parseSdkTransactionalOperation() throws NoSuchMethodException {
-    parseTransactionalOperation(getSdkMethod());
+    parseOperation(mock(ExtensionElement.class), SdkTransactionalOperations.class, "transactionalOperation",
+                   JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection.class);
+    assertThat(parser.isTransactional(), is(true));
   }
 
   @Test
   public void getMMVForVanillaOperation() throws NoSuchMethodException {
-    parseTransactionalOperation(getMethod());
+    parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
+                   JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
+    assertThat(parser.isTransactional(), is(true));
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
@@ -67,7 +70,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationAnnotatedWithMMV() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("annotatedWithMMV"));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "annotatedWithMMV");
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -75,7 +78,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getOverwrittenMMVForOperationAnnotatedWithMMV() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("overwriteMMV"));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "overwriteMMV");
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
@@ -83,7 +86,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithSdkParameter() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withSdkParameter", Literal.class));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkParameter", Literal.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
@@ -91,7 +94,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithSdkImplicitParameter() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withSdkImplicitParameter", CorrelationInfo.class));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkImplicitParameter", CorrelationInfo.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
@@ -99,7 +102,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithSdkAnnotatedParameter() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withSdkAnnotatedParameter", String.class));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkAnnotatedParameter", String.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -107,7 +110,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithParameterGroup() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withParameterGroup", SdkParameterGroup.class));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterGroup", SdkParameterGroup.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -115,7 +118,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithConfigParameter() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withConfigParameter", SomeConfiguration.class));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withConfigParameter", SomeConfiguration.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -123,7 +126,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithSdkPagingProvider() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withSdkPagingProvider"));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkPagingProvider");
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -131,7 +134,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithPagingProviderSdkGeneric() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withPagingProviderSdkGeneric"));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withPagingProviderSdkGeneric");
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -139,7 +142,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithResultOutput() throws NoSuchMethodException {
-    parseOperation(SkdOperations.class.getMethod("withResultOutput"));
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withResultOutput");
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -147,8 +150,8 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVLegacyApiTransactionalOperation() throws NoSuchMethodException {
-    parseOperation(TransactionalOperations.class
-        .getMethod("transactionalOperation", JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class));
+    parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
+                   JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
@@ -156,8 +159,8 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVLegacySdkApiTransactionalOperation() throws NoSuchMethodException {
-    parseOperation(SdkTransactionalOperations.class
-        .getMethod("transactionalOperation", JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection.class));
+    parseOperation(mock(ExtensionElement.class), SdkTransactionalOperations.class, "transactionalOperation",
+                   JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
@@ -165,7 +168,7 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForParameterizedOperationsContainer() throws NoSuchMethodException {
-    parseOperation(ParameterizedOperations.class.getMethod("noArgumentsOperation"));
+    parseOperation(mock(ExtensionElement.class), ParameterizedOperations.class, "noArgumentsOperation");
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
@@ -173,52 +176,31 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationFromConfigurationWithSdkOperationsAnnotation() throws NoSuchMethodException {
-    Method method = TransactionalOperations.class
-        .getMethod("transactionalOperation", JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
-    operationElement = new OperationWrapper(method, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    parser = new JavaOperationModelParser(mock(JavaExtensionModelParser.class),
-                                          new ExtensionTypeWrapper<>(ConfigurationWithSdkOperationsAnnotation.class, TYPE_LOADER),
-                                          mock(OperationContainerElement.class), operationElement,
-                                          mock(ExtensionLoadingContext.class));
+    parseOperation(getExtensionElement(ConfigurationWithSdkOperationsAnnotation.class), TransactionalOperations.class,
+                   "transactionalOperation", JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4.0"));
   }
 
-  public void parseTransactionalOperation(Method method) {
+  public void parseOperation(ExtensionElement extensionElement, Class<?> operationClass, String methodName,
+                             Class<?>... parameterType)
+      throws NoSuchMethodException {
+    Method method = operationClass.getMethod(methodName, parameterType);
     operationElement = new OperationWrapper(method, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    ExtensionElement extensionElement = mock(ExtensionElement.class);
-    when(extensionElement.getParametersAnnotatedWith(Connection.class))
-        .thenReturn(Collections.singletonList(new ParameterWrapper(method, 0, TYPE_LOADER)));
-    parser = new JavaOperationModelParser(mock(JavaExtensionModelParser.class), mock(ExtensionElement.class),
-                                          mock(OperationContainerElement.class), operationElement,
-                                          mock(ExtensionLoadingContext.class));
-    assertThat(parser.isTransactional(), is(true));
-  }
-
-  public void parseOperation(Method method) {
-    operationElement = new OperationWrapper(method, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    parser = new JavaOperationModelParser(mock(JavaExtensionModelParser.class), mock(ExtensionElement.class),
+    parser = new JavaOperationModelParser(mock(JavaExtensionModelParser.class), extensionElement,
                                           mock(OperationContainerElement.class), operationElement,
                                           mock(ExtensionLoadingContext.class));
   }
 
-  public Method getMethod() throws NoSuchMethodException {
-    return TransactionalOperations.class.getMethod("transactionalOperation",
-                                                   JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
+  protected ExtensionElement getExtensionElement(Class<?> extensionClass) {
+    return new ExtensionTypeWrapper<>(extensionClass, TYPE_LOADER);
   }
 
   private class TransactionalOperations {
 
     public void transactionalOperation(@Connection JavaConnectionProviderModelParserTestCase.TestTransactionalConnection connection) {}
-  }
-
-  public Method getSdkMethod() throws NoSuchMethodException {
-    return SdkTransactionalOperations.class
-        .getMethod("transactionalOperation", JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection.class);
   }
 
   private static class SdkTransactionalOperations {
