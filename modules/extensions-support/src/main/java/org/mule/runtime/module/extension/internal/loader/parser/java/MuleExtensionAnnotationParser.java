@@ -245,14 +245,16 @@ public final class MuleExtensionAnnotationParser {
   private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
                                                    org.mule.sdk.api.annotation.param.display.Text.class,
-                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
+                                                   org.mule.sdk.api.annotation.param.display.Placement.class,
+                                                   org.mule.sdk.api.annotation.semantics.security.Password.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
   }
 
   private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class,
                                                    org.mule.sdk.api.annotation.param.display.Text.class,
-                                                   org.mule.sdk.api.annotation.param.display.Placement.class);
+                                                   org.mule.sdk.api.annotation.param.display.Placement.class,
+                                                   org.mule.sdk.api.annotation.semantics.security.Password.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.isAnnotatedWith(annotation));
   }
 
