@@ -11,6 +11,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDL
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
@@ -306,6 +307,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableByteBuddyObjectCreation();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
       configureRethrowExceptionsInIdempotentMessageValidator();
+      configureHonourInsecureTlsConfiguration();
     }
   }
 
@@ -1328,6 +1330,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     featureFlaggingRegistry.registerFeatureFlag(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#HONOUR_INSECURE_TLS_CONFIGURATION} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureHonourInsecureTlsConfiguration() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(HONOUR_INSECURE_TLS_CONFIGURATION,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                  .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
 
 }
