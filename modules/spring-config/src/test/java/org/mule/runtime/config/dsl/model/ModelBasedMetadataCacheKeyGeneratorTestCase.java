@@ -6,11 +6,21 @@
  */
 package org.mule.runtime.config.dsl.model;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_CACHE;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -22,12 +32,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
-import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -56,12 +60,12 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.metadata.api.cache.MetadataCacheId;
-import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
+import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 
 import java.util.ArrayList;
@@ -74,13 +78,21 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
-import io.qameta.allure.Issue;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.internal.creation.MockSettingsImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import org.mockito.internal.creation.MockSettingsImpl;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
+@Feature(SDK_TOOLING_SUPPORT)
+@Story(METADATA_CACHE)
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelBasedMetadataCacheKeyGeneratorTestCase.class);
