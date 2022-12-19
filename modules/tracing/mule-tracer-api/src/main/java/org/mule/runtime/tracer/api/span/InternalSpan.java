@@ -18,9 +18,9 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * A {@link InternalSpan} used internally by the runtime. It defines an extension of the span contract that is only used
@@ -29,8 +29,6 @@ import java.util.Set;
  * @since 4.5.0
  */
 public interface InternalSpan extends Span {
-
-  public static final String THREAD_END_NAME_KEY = "thread.end.name";
 
   /**
    * Ends the span.
@@ -163,7 +161,7 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public Set<SpanError> getErrors() {
+    public List<SpanError> getErrors() {
       return span.getErrors();
     }
 
