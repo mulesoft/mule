@@ -12,7 +12,6 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
@@ -167,7 +166,6 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    */
   List<ErrorModelParser> getErrorModelParsers();
 
-  Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 
   /**
    * @return a {@link MuleVersion} representing the minimum mule version this component can run on

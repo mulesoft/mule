@@ -39,7 +39,6 @@ import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
@@ -242,11 +241,6 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
 
   @Override
   public Optional<OAuthParameterModelProperty> getOAuthParameterModelProperty() {
-    return empty();
-  }
-
-  @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
     return empty();
   }
 

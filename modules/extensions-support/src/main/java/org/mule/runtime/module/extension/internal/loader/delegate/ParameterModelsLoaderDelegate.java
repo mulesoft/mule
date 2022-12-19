@@ -87,7 +87,6 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getLayoutModel().ifPresent(parameter::withLayout);
         parameterParser.getDslConfiguration().ifPresent(parameter::withDsl);
         parameterParser.getDeprecationModel().ifPresent(parameter::withDeprecation);
-        parameterParser.getSinceMuleVersionModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getOAuthParameterModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);

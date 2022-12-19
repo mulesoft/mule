@@ -70,7 +70,6 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -325,11 +324,6 @@ public class JavaParameterModelParser implements ParameterModelParser {
                                                                                                              SdkParameterPlacementUtils
                                                                                                                  .from(oAuthParameterAnnotationValueFetcher
                                                                                                                      .getEnumValue(org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter::placement))));
-  }
-
-  @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(parameter);
   }
 
   @Override
