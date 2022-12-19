@@ -14,6 +14,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
@@ -323,6 +324,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
       configureSuppressErrors();
       configureRethrowExceptionsInIdempotentMessageValidator();
+      configureHonourInsecureTlsConfiguration();
     }
   }
 
@@ -1391,6 +1393,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureRethrowExceptionsInIdempotentMessageValidator() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR,
+                                                minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#HONOUR_INSECURE_TLS_CONFIGURATION} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureHonourInsecureTlsConfiguration() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(HONOUR_INSECURE_TLS_CONFIGURATION,
                                                 minMuleVersion("4.5.0"));
   }
 
