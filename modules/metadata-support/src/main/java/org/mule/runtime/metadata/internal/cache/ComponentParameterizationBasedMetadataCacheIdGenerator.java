@@ -140,14 +140,6 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
   }
 
   private Optional<MetadataCacheId> doResolve(ComponentParameterization<?> parameterization) {
-    if (parameterization.getModel() instanceof HasOutputModel) {
-      HasOutputModel hasOutputModel = (HasOutputModel) parameterization.getModel();
-      if (!hasOutputModel.getOutput().hasDynamicType()
-          && !hasOutputModel.getOutputAttributes().hasDynamicType()) {
-        return empty();
-      }
-    }
-
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     resolveConfigId(parameterization).ifPresent(keyParts::add);
@@ -162,7 +154,11 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
       resolveNamedConfigId(parameterization).ifPresent(keyParts::add);
     }
 
-    return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
+    if (keyParts.isEmpty()) {
+      return empty();
+    } else {
+      return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
+    }
   }
 
   private Optional<MetadataCacheId> resolveCategoryId(ComponentParameterization<?> parameterization) {
