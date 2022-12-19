@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -59,37 +58,32 @@ public class JavaParameterModelParserTestCase {
 
   @Test
   public void minMuleVersionParameter() throws Exception {
-    ExtensionParameter extensionParameter = new FieldWrapper(TestConnectionProvider.class
-        .getField("parameter"), new DefaultExtensionsTypeLoaderFactory()
-            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    JavaParameterModelParser javaParameterModelParser =
-        new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+    JavaParameterModelParser javaParameterModelParser = getParser("parameter");
     Optional<MuleVersion> minMuleVersion = javaParameterModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(false));
   }
 
   @Test
   public void minMuleVersionSdkParameter() throws Exception {
-    ExtensionParameter extensionParameter = new FieldWrapper(TestConnectionProvider.class
-        .getField("sdkOAuthParameter"), new DefaultExtensionsTypeLoaderFactory()
-            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    JavaParameterModelParser javaParameterModelParser =
-        new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+    JavaParameterModelParser javaParameterModelParser = getParser("sdkOAuthParameter");
     Optional<MuleVersion> minMuleVersion = javaParameterModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(false));
   }
 
-  private Optional<OAuthParameterModelProperty> getOAuthParameterModelPropertyFromParameterName(String parameterName)
+  protected Optional<OAuthParameterModelProperty> getOAuthParameterModelPropertyFromParameterName(String parameterName)
       throws Exception {
-    ExtensionParameter extensionParameter = new FieldWrapper(TestConnectionProvider.class
-        .getField(parameterName), new DefaultExtensionsTypeLoaderFactory()
-            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    JavaParameterModelParser javaParameterModelParser =
-        new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+    JavaParameterModelParser javaParameterModelParser = getParser(parameterName);
     return javaParameterModelParser.getOAuthParameterModelProperty();
   }
 
-  private static class TestConnectionProvider implements ConnectionProvider<Object> {
+  protected JavaParameterModelParser getParser(String parameterName) throws NoSuchFieldException {
+    ExtensionParameter extensionParameter =
+        new FieldWrapper(TestConnectionProvider.class.getField(parameterName), new DefaultExtensionsTypeLoaderFactory()
+            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    return new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+  }
+
+  protected static class TestConnectionProvider implements ConnectionProvider<Object> {
 
     @Parameter
     public String parameter;

@@ -616,7 +616,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return sameRootContainerLocation(transaction);
     }
     String transactionLocation = transaction.getComponentLocation().get().getLocation();
-    return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
+    return errorHandlerLocation.equals(transactionLocation);
   }
 
   private boolean sameRootContainerLocation(TransactionAdapter transaction) {

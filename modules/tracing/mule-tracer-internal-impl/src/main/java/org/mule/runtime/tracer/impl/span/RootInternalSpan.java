@@ -16,8 +16,8 @@ import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static java.util.Collections.emptyMap;
 
@@ -49,7 +49,7 @@ public class RootInternalSpan implements InternalSpan {
   }
 
   @Override
-  public Set<SpanError> getErrors() {
+  public List<SpanError> getErrors() {
     return null;
   }
 

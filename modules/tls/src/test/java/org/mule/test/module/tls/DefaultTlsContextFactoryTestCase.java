@@ -16,14 +16,18 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -110,6 +114,25 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void insecureTrustStoreShouldNotBeConfiguredIfFFIsEnabled() throws IOException, InitialisationException {
+    assertTrue(getFeatureFlaggingService().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION));
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap(), getFeatureFlaggingService());
+    tlsContextFactory.setTrustStorePath("trustStore");
+    tlsContextFactory.setTrustStoreInsecure(true);
+    assertFalse(tlsContextFactory.isTrustStoreConfigured());
+  }
+
+  @Test
+  public void insecureTrustStoreShouldBeConfiguredIfFFIsDisabled() throws IOException, InitialisationException {
+    assertFalse(getFeatureFlaggingServiceWithFFDisabled().isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION));
+    DefaultTlsContextFactory tlsContextFactory =
+        new DefaultTlsContextFactory(emptyMap(), getFeatureFlaggingServiceWithFFDisabled());
+    tlsContextFactory.setTrustStorePath("trustStore");
+    tlsContextFactory.setTrustStoreInsecure(true);
+    assertTrue(tlsContextFactory.isTrustStoreConfigured());
+  }
+
+  @Test
   public void useConfigFileIfDefaultProtocolsAndCipherSuites() throws Exception {
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     tlsContextFactory.setEnabledCipherSuites("DEFAULT");
@@ -192,6 +215,10 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
     assumeThat(IS_JAVA_1_8, is(false));
 
     defaultIncludesDEfaultTlsVersionCiphers("TLSv1.3");
+  }
+
+  private FeatureFlaggingService getFeatureFlaggingServiceWithFFDisabled() {
+    return feature -> !feature.equals(HONOUR_INSECURE_TLS_CONFIGURATION);
   }
 
   private void defaultIncludesDEfaultTlsVersionCiphers(String sslVersion)
