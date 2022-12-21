@@ -512,6 +512,7 @@ public interface AllureConstants {
     interface MetadataTypeResolutionStory {
 
       String METADATA_SERVICE = "Metadata Service";
+      String METADATA_CACHE = "Metadata Cache";
 
     }
 
