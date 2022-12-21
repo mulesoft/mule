@@ -13,7 +13,6 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 
 import java.util.List;
@@ -93,6 +92,4 @@ public interface ConnectionProviderModelParser extends SemanticTermsParser, Ster
    * @return the connection provider's {@link DisplayModel}
    */
   Optional<DisplayModel> getDisplayModel();
-
-  Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 }

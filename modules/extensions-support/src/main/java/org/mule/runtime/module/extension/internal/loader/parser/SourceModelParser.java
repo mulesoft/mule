@@ -12,7 +12,6 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
@@ -149,8 +148,6 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
    * @return the type of cluster support this source provides
    */
   SourceClusterSupportModelProperty getSourceClusterSupportModelProperty();
-
-  Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a

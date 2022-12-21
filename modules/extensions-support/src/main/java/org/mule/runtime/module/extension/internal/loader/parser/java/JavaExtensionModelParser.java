@@ -44,7 +44,6 @@ import org.mule.runtime.extension.api.annotation.notification.NotificationAction
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -380,11 +379,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public String getNamespace() {
     return namespace;
-  }
-
-  @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(extensionElement);
   }
 
   public StereotypeModelLoaderDelegate getStereotypeLoaderDelegate() {

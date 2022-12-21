@@ -47,8 +47,6 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
 
       parser.getDeprecationModel().ifPresent(function::withDeprecation);
 
-      parser.getSinceMuleVersionModelProperty().ifPresent(function::withModelProperty);
-
       parser.getFunctionExecutorModelProperty().ifPresent(function::withModelProperty);
 
       parser.getOutputType().applyOn(function.withOutput());
