@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
@@ -167,6 +164,4 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    * @return a list with an {@link ErrorModelParser} per each error that the operation can raise.
    */
   List<ErrorModelParser> getErrorModelParsers();
-
-  Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 }

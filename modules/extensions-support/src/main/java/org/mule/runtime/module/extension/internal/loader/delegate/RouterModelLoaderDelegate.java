@@ -48,7 +48,6 @@ final class RouterModelLoaderDelegate extends AbstractComponentModelLoaderDelega
     parser.getDeprecationModel().ifPresent(router::withDeprecation);
     parser.getExecutorModelProperty().ifPresent(router::withModelProperty);
     parser.getMediaTypeModelProperty().ifPresent(router::withModelProperty);
-    parser.getSinceMuleVersionModelProperty().ifPresent(router::withModelProperty);
     parser.getAdditionalModelProperties().forEach(router::withModelProperty);
 
     loader.getParameterModelsLoaderDelegate().declare(router, parser.getParameterGroupModelParsers());

@@ -96,7 +96,6 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       parser.getMediaTypeModelProperty().ifPresent(operation::withModelProperty);
       parser.getDeprecationModel().ifPresent(operation::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
-      parser.getSinceMuleVersionModelProperty().ifPresent(operation::withModelProperty);
 
       loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
       addSemanticTerms(operation.getDeclaration(), parser);

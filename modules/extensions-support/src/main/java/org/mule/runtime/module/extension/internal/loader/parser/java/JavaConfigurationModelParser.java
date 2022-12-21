@@ -25,7 +25,6 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
@@ -179,10 +178,5 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
     return JavaExtensionModelParserUtils.getDeprecationModel(configElement);
-  }
-
-  @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(configElement);
   }
 }

@@ -105,7 +105,6 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
-    parser.getSinceMuleVersionModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
 
     declareErrorModels(parser, declarer);
