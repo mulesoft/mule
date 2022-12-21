@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
-import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,6 +15,14 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findSource;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -31,6 +34,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -38,6 +43,9 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
+import org.mule.runtime.extension.api.client.source.SourceHandler;
+import org.mule.runtime.extension.api.client.source.SourceParameterizer;
+import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -45,6 +53,8 @@ import org.mule.runtime.module.extension.internal.runtime.client.operation.Defau
 import org.mule.runtime.module.extension.internal.runtime.client.operation.EventedOperationsParameterDecorator;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationKey;
+import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultSourceParameterizer;
+import org.mule.runtime.module.extension.internal.runtime.client.source.SourceClient;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -99,10 +109,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private StreamingManager streamingManager;
 
   @Inject
+  private NotificationDispatcher notificationDispatcher;
+
+  @Inject
   private MuleContext muleContext;
 
   private ExecutorService cacheShutdownExecutor;
-  private LoadingCache<OperationKey, OperationClient> clientCache;
+  private LoadingCache<OperationKey, OperationClient> operationClientCache;
 
   @Override
   public <T, A> CompletableFuture<Result<T, A>> execute(String extensionName,
@@ -112,14 +125,45 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     DefaultOperationParameterizer parameterizer = new DefaultOperationParameterizer();
     parameters.accept(parameterizer);
 
-    OperationKey key = toKey(extensionName, operationName, parameterizer);
+    OperationKey key = toOperationKey(extensionName, operationName, parameterizer);
 
-    return clientCache.get(key).execute(key, parameterizer);
+    return operationClientCache.get(key).execute(key, parameterizer);
   }
 
-  private OperationKey toKey(String extensionName,
-                             String operationName,
-                             DefaultOperationParameterizer parameterizer) {
+  @Override
+  public <T, A> SourceHandler createSource(String extensionName,
+                                           String sourceName,
+                                           Consumer<SourceResultCallback<T, A>> callback,
+                                           Consumer<SourceParameterizer> parameters) {
+    DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
+    parameters.accept(parameterizer);
+
+    ExtensionModel extensionModel = findExtension(extensionName);
+    SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
+    SourceClient sourceClient = SourceClient.from(extensionModel,
+                                                  sourceModel,
+                                                  parameterizer,
+                                                  callback,
+                                                  extensionManager,
+                                                  expressionManager,
+                                                  streamingManager,
+                                                  reflectionCache,
+                                                  notificationDispatcher,
+                                                  muleContext.getTransactionFactoryManager(),
+                                                  muleContext);
+
+    try {
+      initialiseIfNeeded(sourceClient, true, muleContext);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    return null;
+  }
+
+  private OperationKey toOperationKey(String extensionName,
+                                      String operationName,
+                                      DefaultOperationParameterizer parameterizer) {
     return new OperationKey(extensionName,
                             parameterizer.getConfigRef(),
                             operationName,
@@ -128,7 +172,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                             extensionManager);
   }
 
-  private LoadingCache<OperationKey, OperationClient> createClientCache() {
+  private LoadingCache<OperationKey, OperationClient> createOperationClientCache() {
     return Caffeine.newBuilder()
         // Since the removal listener runs asynchronously, force waiting for all cleanup tasks to be complete before proceeding
         // (and finalizing) the context disposal.
@@ -173,6 +217,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private OperationModel findOperationModel(ExtensionModel extensionModel, String operationName) {
     return findOperation(extensionModel, operationName)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No Operation [%s] Found", operationName))));
+  }
+
+  private SourceModel findSourceModel(ExtensionModel extensionModel, String sourceName) {
+    return findSource(extensionModel, sourceName)
+      .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No Source [%s] Found", sourceName))));
   }
 
   private ExtensionModel findExtension(String extensionName) {
@@ -281,13 +330,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Override
   public void initialise() throws InitialisationException {
     cacheShutdownExecutor = new ShutdownExecutor();
-    clientCache = createClientCache();
+    operationClientCache = createOperationClientCache();
   }
 
   @Override
   public void dispose() {
-    if (clientCache != null) {
-      clientCache.invalidateAll();
+    if (operationClientCache != null) {
+      operationClientCache.invalidateAll();
     }
 
     if (cacheShutdownExecutor != null) {

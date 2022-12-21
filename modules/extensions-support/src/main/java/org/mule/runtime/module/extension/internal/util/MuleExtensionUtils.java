@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.singleton;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -32,6 +24,16 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTyp
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -58,6 +60,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -789,6 +792,30 @@ public class MuleExtensionUtils {
     }.walk(extensionModel);
 
     return ofNullable(operation.get());
+  }
+
+  /**
+   * Finds a source of the given {@code sourceName} in the passed {@code extensionModel}
+   *
+   * @param extensionModel an {@link ExtensionModel}
+   * @param sourceName  the name of the target source
+   * @return optionally an {@link SourceModel}
+   * @since 4.6.0
+   */
+  public static Optional<SourceModel> findSource(ExtensionModel extensionModel, String sourceName) {
+    Reference<SourceModel> source = new Reference<>();
+    new ExtensionWalker() {
+
+      @Override
+      protected void onSource(HasSourceModels owner, SourceModel model) {
+        if (sourceName.equals(model.getName())) {
+          source.set(model);
+          stop();
+        }
+      }
+    }.walk(extensionModel);
+
+    return ofNullable(source.get());
   }
 
   /**
