@@ -43,7 +43,6 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -304,11 +303,6 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     }
 
     return new SourceClusterSupportModelProperty(resultingSourceClusterSupport);
-  }
-
-  @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return JavaExtensionModelParserUtils.getSinceMuleVersionModelProperty(sourceElement);
   }
 
   @Override

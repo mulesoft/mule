@@ -14,7 +14,6 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
@@ -157,9 +156,4 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @return the extension's namespace.
    */
   String getNamespace();
-
-  /**
-   * @return an {@link Optional}<{@link SinceMuleVersionModelProperty}> if it was defined
-   */
-  Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty();
 }
