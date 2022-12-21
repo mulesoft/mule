@@ -72,7 +72,7 @@ public class WeaponXOperations {
     }
   }
 
-  public void gambitReluctantCharge(@Content @Optional InputStream input) {
+  public void gambitReluctantCharge(@org.mule.sdk.api.annotation.param.Content @Optional InputStream input) {
     // do nothing
   }
 

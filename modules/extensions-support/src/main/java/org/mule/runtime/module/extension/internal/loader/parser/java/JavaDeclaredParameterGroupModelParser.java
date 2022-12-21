@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
@@ -17,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -88,15 +90,16 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    Optional<DisplayModel> displayModel = groupParameter.getAnnotation(DisplayName.class)
-        .map(ann -> buildDisplayModel(ann.value()));
-
-    if (!displayModel.isPresent()) {
-      displayModel = groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.display.DisplayName.class)
-          .map(ann -> buildDisplayModel(ann.value()));
-    }
-
-    return displayModel;
+    return mapReduceAnnotation(groupParameter, DisplayName.class, org.mule.sdk.api.annotation.param.display.DisplayName.class,
+                               legacyAnnotationValueFetcher -> buildDisplayModel(legacyAnnotationValueFetcher
+                                   .getStringValue(DisplayName::value)),
+                               sdkAnnotationValueFetcher -> buildDisplayModel(sdkAnnotationValueFetcher
+                                   .getStringValue(org.mule.sdk.api.annotation.param.display.DisplayName::value)),
+                               () -> new IllegalParameterModelDefinitionException(format("ParameterGroup '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                         getName(),
+                                                                                         DisplayName.class.getName(),
+                                                                                         org.mule.sdk.api.annotation.param.display.DisplayName.class
+                                                                                             .getName())));
   }
 
   @Override
@@ -111,11 +114,13 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
 
   @Override
   public boolean showsInDsl() {
-    return groupParameter.getAnnotation(ParameterGroup.class)
-        .map(ParameterGroup::showInDsl)
-        .orElseGet(() -> groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class)
-            .map(org.mule.sdk.api.annotation.param.ParameterGroup::showInDsl)
-            .orElse(false));
+    return mapReduceSingleAnnotation(groupParameter, "parameter group", "",
+                                     ParameterGroup.class,
+                                     org.mule.sdk.api.annotation.param.ParameterGroup.class,
+                                     value -> value.getBooleanValue(ParameterGroup::showInDsl),
+                                     value -> value
+                                         .getBooleanValue(org.mule.sdk.api.annotation.param.ParameterGroup::showInDsl))
+                                             .orElse(false);
   }
 
   @Override
@@ -176,11 +181,12 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
   }
 
   private String fetchGroupName() {
-    return groupParameter.getAnnotation(ParameterGroup.class)
-        .map(ParameterGroup::name)
-        .orElseGet(() -> groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class)
-            .map(org.mule.sdk.api.annotation.param.ParameterGroup::name)
-            .orElse(DEFAULT_GROUP_NAME));
+    return mapReduceSingleAnnotation(groupParameter, "parameter group", "",
+                                     ParameterGroup.class,
+                                     org.mule.sdk.api.annotation.param.ParameterGroup.class,
+                                     value -> value.getStringValue(ParameterGroup::name),
+                                     value -> value.getStringValue(org.mule.sdk.api.annotation.param.ParameterGroup::name))
+                                         .orElse(DEFAULT_GROUP_NAME);
   }
 
   private DisplayModel buildDisplayModel(String displayName) {

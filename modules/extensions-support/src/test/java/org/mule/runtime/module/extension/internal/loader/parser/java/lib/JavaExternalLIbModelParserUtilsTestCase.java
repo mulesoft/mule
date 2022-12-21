@@ -89,6 +89,35 @@ public class JavaExternalLIbModelParserUtilsTestCase {
     assertThat(externalLibraryModelList.get(1).getType(), equalTo(NATIVE));
   }
 
+  @Test
+  public void getExternalLibraryFromExtensionRepeatingheLegacyApi() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+
+    ExtensionTypeWrapper<SimpleRepeatingApiExtension> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(SimpleRepeatingApiExtension.class, typeLoader);
+
+    List<ExternalLibraryModel> externalLibraryModelList =
+        JavaExternalLibModelParserUtils.parseExternalLibraryModels(extensionTypeWrapper);
+
+    assertThat(externalLibraryModelList.size(), is(3));
+    assertThat(externalLibraryModelList.get(0).getName(), is(EXTERNAL_LIB_NAME));
+    assertThat(externalLibraryModelList.get(0).getDescription(), is(EXTERNAL_LIB_DESCRIPTION));
+    assertThat(externalLibraryModelList.get(0).getRegexMatcher().get(), is(EXTERNAL_LIB_FILE_NAME));
+    assertThat(externalLibraryModelList.get(0).getRequiredClassName().get(), is(EXTERNAL_LIB_CLASS_NAME));
+    assertThat(externalLibraryModelList.get(0).getType(), equalTo(NATIVE));
+    assertThat(externalLibraryModelList.get(1).getName(), is(EXTERNAL_LIB_NAME));
+    assertThat(externalLibraryModelList.get(1).getDescription(), is(EXTERNAL_LIB_DESCRIPTION));
+    assertThat(externalLibraryModelList.get(1).getRegexMatcher().get(), is(EXTERNAL_LIB_FILE_NAME));
+    assertThat(externalLibraryModelList.get(1).getRequiredClassName().get(), is(EXTERNAL_LIB_CLASS_NAME));
+    assertThat(externalLibraryModelList.get(1).getType(), equalTo(NATIVE));
+    assertThat(externalLibraryModelList.get(2).getName(), is(EXTERNAL_LIB_NAME));
+    assertThat(externalLibraryModelList.get(2).getDescription(), is(EXTERNAL_LIB_DESCRIPTION));
+    assertThat(externalLibraryModelList.get(2).getRegexMatcher().get(), is(EXTERNAL_LIB_FILE_NAME));
+    assertThat(externalLibraryModelList.get(2).getRequiredClassName().get(), is(EXTERNAL_LIB_CLASS_NAME));
+    assertThat(externalLibraryModelList.get(2).getType(), equalTo(NATIVE));
+  }
+
 
   public static final String EXTERNAL_LIB_NAME = "SimpleExtension.so";
   public static final String EXTERNAL_LIB_DESCRIPTION = "Cool lib description";
@@ -120,5 +149,19 @@ public class JavaExternalLIbModelParserUtilsTestCase {
       nameRegexpMatcher = EXTERNAL_LIB_FILE_NAME, requiredClassName = EXTERNAL_LIB_CLASS_NAME,
       type = org.mule.runtime.api.meta.ExternalLibraryType.NATIVE)
   private static class SimpleMixedApiExtension {
+  }
+
+  @Extension(name = "SimpleExtension")
+  @Export(classes = {SimpleExportedType.class}, resources = "simpleResource.json")
+  @ExternalLib(name = EXTERNAL_LIB_NAME, description = EXTERNAL_LIB_DESCRIPTION,
+      nameRegexpMatcher = EXTERNAL_LIB_FILE_NAME,
+      requiredClassName = EXTERNAL_LIB_CLASS_NAME, type = ExternalLibraryType.NATIVE)
+  @ExternalLib(name = EXTERNAL_LIB_NAME, description = EXTERNAL_LIB_DESCRIPTION,
+      nameRegexpMatcher = EXTERNAL_LIB_FILE_NAME,
+      requiredClassName = EXTERNAL_LIB_CLASS_NAME, type = ExternalLibraryType.NATIVE)
+  @org.mule.runtime.extension.api.annotation.ExternalLib(name = EXTERNAL_LIB_NAME, description = EXTERNAL_LIB_DESCRIPTION,
+      nameRegexpMatcher = EXTERNAL_LIB_FILE_NAME, requiredClassName = EXTERNAL_LIB_CLASS_NAME,
+      type = org.mule.runtime.api.meta.ExternalLibraryType.NATIVE)
+  private static class SimpleRepeatingApiExtension {
   }
 }

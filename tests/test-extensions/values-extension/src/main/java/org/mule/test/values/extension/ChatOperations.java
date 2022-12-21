@@ -30,6 +30,7 @@ public class ChatOperations {
 
   public void withJsonBodyParameterWithMultiLevelField(@Connection ChatConnection chatConnection, @FieldValues(
       value = ChatMultiLevelValueProvider.class,
-      targetSelectors = {"workspace", "channelId"}) @TypeResolver(JsonTypeResolver.class) @Content InputStream body) {}
+      targetSelectors = {"workspace",
+          "channelId"}) @TypeResolver(JsonTypeResolver.class) @org.mule.sdk.api.annotation.param.Content InputStream body) {}
 
 }

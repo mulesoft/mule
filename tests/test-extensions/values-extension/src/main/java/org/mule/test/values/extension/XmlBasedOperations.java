@@ -27,6 +27,6 @@ public class XmlBasedOperations {
 
   public void tagContentAsActingForAttributeValue(@FieldValues(value = WithRequiredParameterSdkValueProvider.class,
       targetSelectors = "nested.tag.@customAttribute", bindings = @Binding(actingParameter = "requiredValue",
-          extractionExpression = "xmlBody.nested.someTag")) @Content @TypeResolver(XmlTypeResolver.class) InputStream xmlBody) {}
+          extractionExpression = "xmlBody.nested.someTag")) @org.mule.sdk.api.annotation.param.Content @TypeResolver(XmlTypeResolver.class) InputStream xmlBody) {}
 
 }

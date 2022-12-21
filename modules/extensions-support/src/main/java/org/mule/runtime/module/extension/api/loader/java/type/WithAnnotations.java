@@ -47,7 +47,7 @@ public interface WithAnnotations {
    * @return A {@code boolean} indicating if the {@link WithAnnotations} element is annotated with the given {@code annotation}
    */
   default boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
-    return getAnnotation(annotation).isPresent();
+    return getValueFromAnnotation(annotation).isPresent();
   }
 
   /**

@@ -27,6 +27,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_S
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
@@ -154,7 +155,15 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public ParameterRole getRole() {
-    return roleOf(parameter.getAnnotation(Content.class));
+    return mapReduceSingleAnnotation(parameter, "parameter", parameter.getName(), Content.class,
+                                     org.mule.sdk.api.annotation.param.Content.class,
+                                     legacyContentAnnotationValueFetcher -> legacyContentAnnotationValueFetcher
+                                         .getBooleanValue(Content::primary) ? ParameterRole.PRIMARY_CONTENT
+                                             : ParameterRole.CONTENT,
+                                     sdkContentAnnotationValueFetcher -> sdkContentAnnotationValueFetcher
+                                         .getBooleanValue(org.mule.sdk.api.annotation.param.Content::primary)
+                                             ? ParameterRole.PRIMARY_CONTENT
+                                             : ParameterRole.CONTENT).orElse(ParameterRole.BEHAVIOUR);
   }
 
   @Override
@@ -170,30 +179,25 @@ public class JavaParameterModelParser implements ParameterModelParser {
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
     if (dslConfiguration == null) {
-      Optional<ParameterDsl> legacyAnnotation = parameter.getAnnotation(ParameterDsl.class);
-      Optional<org.mule.sdk.api.annotation.dsl.xml.ParameterDsl> sdkAnnotation =
-          parameter.getAnnotation(org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class);
-      if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
-        throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
-                                                                  parameter.getName(),
-                                                                  ParameterDsl.class.getName(),
-                                                                  org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class
-                                                                      .getName()));
-      } else if (legacyAnnotation.isPresent()) {
-        dslConfiguration = legacyAnnotation.map(parameterDsl -> ParameterDslConfiguration.builder()
-            .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
-            .allowsReferences(parameterDsl.allowReferences())
-            .build());
-      } else if (sdkAnnotation.isPresent()) {
-        dslConfiguration = sdkAnnotation.map(parameterDsl -> ParameterDslConfiguration.builder()
-            .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
-            .allowsReferences(parameterDsl.allowReferences())
-            .build());
-      } else {
-        dslConfiguration = empty();
-      }
+      dslConfiguration =
+          mapReduceAnnotation(parameter, ParameterDsl.class, org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class,
+                              legacyAnnotationValueFetcher -> ParameterDslConfiguration.builder()
+                                  .allowsInlineDefinition(legacyAnnotationValueFetcher
+                                      .getBooleanValue(ParameterDsl::allowInlineDefinition))
+                                  .allowsReferences(legacyAnnotationValueFetcher.getBooleanValue(ParameterDsl::allowReferences))
+                                  .build(),
+                              sdkAnnotationValueFetcher -> ParameterDslConfiguration.builder()
+                                  .allowsInlineDefinition(sdkAnnotationValueFetcher
+                                      .getBooleanValue(org.mule.sdk.api.annotation.dsl.xml.ParameterDsl::allowInlineDefinition))
+                                  .allowsReferences(sdkAnnotationValueFetcher
+                                      .getBooleanValue(org.mule.sdk.api.annotation.dsl.xml.ParameterDsl::allowReferences))
+                                  .build(),
+                              () -> new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                        parameter.getName(),
+                                                                                        ParameterDsl.class.getName(),
+                                                                                        org.mule.sdk.api.annotation.dsl.xml.ParameterDsl.class
+                                                                                            .getName())));
     }
-
     return dslConfiguration;
   }
 
@@ -215,7 +219,8 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public boolean isComponentId() {
-    return parameter.getAnnotation(ComponentId.class).isPresent();
+    return parameter.isAnnotatedWith(ComponentId.class)
+        || parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.stereotype.ComponentId.class);
   }
 
   @Override
@@ -281,7 +286,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
 
   @Override
   public boolean isExcludedFromConnectivitySchema() {
-    return parameter.getAnnotation(ExcludeFromConnectivitySchema.class).isPresent();
+    return parameter.isAnnotatedWith(ExcludeFromConnectivitySchema.class);
   }
 
   @Override

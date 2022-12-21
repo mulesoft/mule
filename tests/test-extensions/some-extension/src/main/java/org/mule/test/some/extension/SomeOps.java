@@ -56,7 +56,7 @@ public class SomeOps {
    * @return a byte array representation of <it>value</it>
    */
   @MediaType(ANY)
-  public Result<InputStream, Object> inputStreamConsumingOperation(@Content TypedValue<InputStream> value) {
+  public Result<InputStream, Object> inputStreamConsumingOperation(@org.mule.sdk.api.annotation.param.Content TypedValue<InputStream> value) {
     LOGGER.info("A new message is passing through 'inputStreamConsumingOperation': {}", value.getValue());
     return Result.<InputStream, Object>builder().output(value.getValue()).attributes(null).build();
   }
