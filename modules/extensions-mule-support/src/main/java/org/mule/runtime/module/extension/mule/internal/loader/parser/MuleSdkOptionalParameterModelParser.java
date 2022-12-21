@@ -10,12 +10,10 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 import java.util.Optional;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 /**
@@ -46,11 +44,6 @@ public class MuleSdkOptionalParameterModelParser extends MuleSdkParameterModelPa
   @Override
   public Object getDefaultValue() {
     return defaultValue;
-  }
-
-  @Override
-  public Optional<SinceMuleVersionModelProperty> getSinceMuleVersionModelProperty() {
-    return empty();
   }
 
   @Override

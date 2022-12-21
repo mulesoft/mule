@@ -41,7 +41,6 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       }
 
       configParser.getDeprecationModel().ifPresent(dm -> configurationDeclarer.getDeclaration().withDeprecation(dm));
-      configParser.getSinceMuleVersionModelProperty().ifPresent(configurationDeclarer::withModelProperty);
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
       configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
 
