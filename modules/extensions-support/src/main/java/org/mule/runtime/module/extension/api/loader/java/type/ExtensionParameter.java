@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 
 import org.mule.api.annotation.NoImplement;
@@ -19,11 +21,13 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
@@ -126,16 +130,16 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    * @return The {@link java.util.Optional} default value of the operation
    */
   default java.util.Optional<String> defaultValue() {
-    final java.util.Optional<org.mule.sdk.api.annotation.param.Optional> sdkAnnotation =
-        getAnnotation(org.mule.sdk.api.annotation.param.Optional.class);
-    if (sdkAnnotation.isPresent()) {
-      return getDefaultValue(sdkAnnotation.get());
-    }
-    final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
-    if (annotation.isPresent()) {
-      return getDefaultValue(annotation.get());
-    }
-    return java.util.Optional.empty();
+    return mapReduceAnnotation(this, Optional.class, org.mule.sdk.api.annotation.param.Optional.class,
+                               legacyAnnotationValueFetcher -> getDefaultValue(legacyAnnotationValueFetcher
+                                   .getStringValue(Optional::defaultValue)),
+                               sdkAnnotationValueFetcher -> getDefaultValue(sdkAnnotationValueFetcher
+                                   .getStringValue(org.mule.sdk.api.annotation.param.Optional::defaultValue)),
+                               () -> new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' and '@%s' at the same time",
+                                                                                         getName(),
+                                                                                         Optional.class.getName(),
+                                                                                         org.mule.sdk.api.annotation.param.Optional.class
+                                                                                             .getName())));
   }
 
   /**

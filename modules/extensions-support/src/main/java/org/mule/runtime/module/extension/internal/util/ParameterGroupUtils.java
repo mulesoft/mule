@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -68,18 +69,16 @@ public class ParameterGroupUtils {
    *         do not correspond to a parameter group.
    */
   public static Optional<ParameterGroupInfo> getParameterGroupInfo(ExtensionParameter extensionParameter) {
-    Optional<ParameterGroup> legacyParameterGroupAnnotation = extensionParameter.getAnnotation(ParameterGroup.class);
-    if (legacyParameterGroupAnnotation.isPresent()) {
-      ParameterGroup legacyParameterGroupAnnotationObject = legacyParameterGroupAnnotation.get();
-      return of(new ParameterGroupInfo(legacyParameterGroupAnnotationObject.name(),
-                                       legacyParameterGroupAnnotationObject.showInDsl()));
-    }
-    Optional<org.mule.sdk.api.annotation.param.ParameterGroup> parameterGroupAnnotation =
-        extensionParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class);
-    if (parameterGroupAnnotation.isPresent()) {
-      org.mule.sdk.api.annotation.param.ParameterGroup parameterGroupAnnotationObject = parameterGroupAnnotation.get();
-      return of(new ParameterGroupInfo(parameterGroupAnnotationObject.name(), parameterGroupAnnotationObject.showInDsl()));
-    }
-    return empty();
+    return mapReduceSingleAnnotation(extensionParameter, "parameter group", extensionParameter.getName(),
+                                     ParameterGroup.class,
+                                     org.mule.sdk.api.annotation.param.ParameterGroup.class,
+                                     legacyParameterGroupAnnotationValueFetcher -> new ParameterGroupInfo(legacyParameterGroupAnnotationValueFetcher
+                                         .getStringValue(ParameterGroup::name),
+                                                                                                          legacyParameterGroupAnnotationValueFetcher
+                                                                                                              .getBooleanValue(ParameterGroup::showInDsl)),
+                                     sdkParameterGroupAnnotationValueFetcher -> new ParameterGroupInfo(sdkParameterGroupAnnotationValueFetcher
+                                         .getStringValue(org.mule.sdk.api.annotation.param.ParameterGroup::name),
+                                                                                                       sdkParameterGroupAnnotationValueFetcher
+                                                                                                           .getBooleanValue(org.mule.sdk.api.annotation.param.ParameterGroup::showInDsl)));
   }
 }

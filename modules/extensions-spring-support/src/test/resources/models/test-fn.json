@@ -625,11 +625,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "echo",
@@ -683,11 +678,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "bool",
@@ -726,11 +716,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "number",
@@ -768,11 +753,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "doubles",
@@ -809,11 +789,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -853,11 +828,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "longs",
@@ -894,11 +864,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -986,11 +951,6 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "payload",
@@ -1014,11 +974,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1170,11 +1125,6 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "listToSplit",
@@ -1212,11 +1162,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1287,11 +1232,6 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1373,11 +1313,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1487,11 +1422,6 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "notObject",
@@ -1514,11 +1444,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1559,11 +1484,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "stream",
@@ -1586,11 +1506,6 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -1664,11 +1579,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "expression",
@@ -1709,11 +1619,6 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
-              },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "item",
@@ -1736,11 +1641,6 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
