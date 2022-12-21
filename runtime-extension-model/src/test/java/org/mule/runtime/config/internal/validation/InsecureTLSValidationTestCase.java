@@ -51,8 +51,7 @@ public class InsecureTLSValidationTestCase extends AbstractCoreValidationTestCas
         +
         "     </tls:context>\n" +
         "    \n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.get().getValidation().getLevel(), is(WARN));
     assertThat(msg.get().getMessage(),
