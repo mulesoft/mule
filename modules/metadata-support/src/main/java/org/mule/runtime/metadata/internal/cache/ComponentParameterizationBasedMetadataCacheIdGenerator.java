@@ -25,15 +25,15 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.api.cache.ComponentParameterizationMetadataCacheIdGenerator;
-import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.api.cache.ConfigurationMetadataCacheIdGenerator;
-import org.mule.runtime.api.parameterization.ComponentParameterization;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.internal.types.AttributesMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.ComponentParameterizationInputMetadataResolutionTypeInformation;
 import org.mule.runtime.metadata.internal.types.KeysMetadataResolutionTypeInformation;
@@ -154,7 +154,11 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
       resolveNamedConfigId(parameterization).ifPresent(keyParts::add);
     }
 
-    return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
+    if (keyParts.isEmpty()) {
+      return empty();
+    } else {
+      return of(new MetadataCacheId(keyParts, sourceElementName(parameterization)));
+    }
   }
 
   private Optional<MetadataCacheId> resolveCategoryId(ComponentParameterization<?> parameterization) {
