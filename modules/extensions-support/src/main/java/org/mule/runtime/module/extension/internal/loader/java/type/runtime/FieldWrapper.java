@@ -55,6 +55,11 @@ public class FieldWrapper implements FieldElement {
     fieldSetter.set(object, value);
   }
 
+  @Override
+  public boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
+    return field.getAnnotation(annotation) != null;
+  }
+
   /**
    * {@inheritDoc}
    */

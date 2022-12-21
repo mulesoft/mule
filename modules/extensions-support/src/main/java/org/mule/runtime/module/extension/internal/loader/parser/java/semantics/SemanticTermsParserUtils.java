@@ -16,13 +16,13 @@ import java.util.Set;
 public final class SemanticTermsParserUtils {
 
   public static void addCustomTerms(WithAnnotations annotated, Set<String> terms) {
-    annotated.getAnnotation(SemanticTerms.class).ifPresent(a -> {
-      for (String term : a.value()) {
-        if (!isBlank(term)) {
-          terms.add(term.trim());
-        }
-      }
-    });
+    annotated.getValueFromAnnotation(SemanticTerms.class)
+        .ifPresent(semanticTermsAnnotationValueFetcher -> semanticTermsAnnotationValueFetcher.getArrayValue(SemanticTerms::value)
+            .forEach(term -> {
+              if (!isBlank(term)) {
+                terms.add(term.trim());
+              }
+            }));
   }
 
   public static void addTermIfPresent(Set<String> searchSpace, String searchTerm, String mappedTerm, Set<String> targetSpace) {

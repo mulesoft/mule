@@ -6,8 +6,8 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.param.Content;
 
 import java.io.InputStream;
 
