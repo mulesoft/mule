@@ -55,6 +55,7 @@ module org.mule.runtime.extensions.spring.support {
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.connection to
       org.mule.runtime.spring.config,
+      org.mule.runtime.extensions.xml.support,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.config to
       org.mule.runtime.spring.config,
@@ -66,6 +67,7 @@ module org.mule.runtime.extensions.spring.support {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.parameter to
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.source to

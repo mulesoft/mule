@@ -91,6 +91,9 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.loader.java to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.loader.java.property to
+      org.mule.runtime.extensions.soap.support,
+      org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.metadata to
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime to
@@ -98,21 +101,34 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.config to
-      org.mule.runtime.tooling.support;
+      org.mule.runtime.tooling.support,
+      org.mule.runtime.extensions.soap.support,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support;
+  exports org.mule.runtime.module.extension.internal.runtime.exception to
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.execution.executor to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.runtime.objectbuilder to
+      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.resolver to
+      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.source to

@@ -259,6 +259,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.soap.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.connectivity to
@@ -317,6 +318,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.event to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
@@ -500,6 +502,7 @@ module org.mule.runtime.core {
       org.mule.runtime.service,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.repository,
       org.mule.runtime.spring.config,
       org.mule.runtime.launcher,
