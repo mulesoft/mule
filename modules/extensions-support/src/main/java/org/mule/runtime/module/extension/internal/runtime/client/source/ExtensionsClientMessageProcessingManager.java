@@ -1,0 +1,55 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.extension.internal.runtime.client.source;
+
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
+
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
+
+public class ExtensionsClientMessageProcessingManager implements MessageProcessingManager {
+
+  @Override
+  public void processMessage(FlowProcessTemplate template, MessageProcessContext messageProcessContext) {
+    checkArgument(template instanceof ExtensionsFlowProcessingTemplate, "invalid processing template");
+    ExtensionsFlowProcessingTemplate process = (ExtensionsFlowProcessingTemplate) template;
+    SourceResultAdapter resultAdapter = process.getSourceMessage();
+
+    Result result = getResult(resultAdapter);
+
+
+
+  }
+
+  private Result<Object, Object> getResult(SourceResultAdapter adapter) {
+    org.mule.sdk.api.runtime.operation.Result<Object, Object> sdkResult =
+      adapter.getPayloadMediaTypeResolver().resolve(adapter.getResult());
+
+    return withNullEvent(event -> {
+                           EventContext context = event.getContext();
+                           Result.Builder<Object, Object> builder = Result.builder()
+                             .output(adapter.getCursorProviderFactory().of(context, sdkResult.getOutput(), context.getOriginatingLocation()));
+
+                           if (sdkResult.getMediaType().isPresent()) {
+                             builder.mediaType(sdkResult.getMediaType().get());
+                           }
+                           sdkResult.getMediaType().ifPresent(builder::mediaType);
+                           sdkResult.getAttributes().ifPresent(builder::attributes);
+                           sdkResult.getAttributesMediaType().ifPresent(builder::attributesMediaType);
+                           sdkResult.getByteLength().ifPresent(builder::length);
+
+                           return builder.build();
+                         }
+    );
+  }
+}
