@@ -7,18 +7,31 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.TextMapGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.impl.exporter.optel.span.MuleOpenTelemetrySpan;
-import org.mule.runtime.tracer.impl.exporter.optel.span.NoExportInitialSpanInfo;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import static org.mule.runtime.tracer.impl.exporter.optel.span.provider.MuleOpenTelemetrySpanProvider.getNewOpenTelemetrySpan;
+import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
+import static org.mule.runtime.tracer.impl.exporter.OpentelemetryTraceIdUtils.generateSpanId;
+import static org.mule.runtime.tracer.impl.exporter.OpentelemetryTraceIdUtils.generateTraceId;
+import static org.mule.runtime.tracer.impl.exporter.OpentelemetryTraceIdUtils.getContext;
 
 public class OpenTelemetrySpanExporter implements SpanExporter {
+
+  private final boolean isRootSpan;
+  private final boolean isPolicySpan;
+  private final OpentelemetryExportQueue queue;
+  private boolean exportable;
+
+  public static final TextMapGetter<Map<String, String>> OPEN_TELEMETRY_SPAN_GETTER = new MuleOpenTelemetryRemoteContextGetter();
 
   public static OpenTelemetrySpanExportBuilder builder() {
     return new OpenTelemetrySpanExportBuilder();
@@ -26,29 +39,41 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
 
   public static final String NO_EXPORTABLE_SERVICE = "no-exportable-service";
 
+  private String name;
   private final InternalSpan internalSpan;
-  private final InitialSpanInfo initialSpanInfo;
+
+  private Set<String> noExportUntil;
   private final String artifactId;
   private final String artifactType;
 
-  private MuleOpenTelemetrySpan openTelemetrySpan;
   private OpenTelemetrySpanExporter rootSpan = this;
   private String rootName;
   private final Map<String, String> rootAttributes = new HashMap<>();
+  private String spanId;
+  private String traceId;
 
   private OpenTelemetrySpanExporter(InternalSpan internalSpan,
                                     InitialSpanInfo initialSpanInfo,
                                     String artifactId,
-                                    String artifactType) {
+                                    String artifactType,
+                                    OpentelemetryExportQueue queue) {
     this.internalSpan = internalSpan;
-    this.initialSpanInfo = initialSpanInfo;
+    this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
+    this.isRootSpan = initialSpanInfo.isRootSpan();
+    this.isPolicySpan = initialSpanInfo.isPolicySpan();
+    this.exportable = initialSpanInfo.getInitialExportInfo().isExportable();
     this.artifactId = artifactId;
     this.artifactType = artifactType;
+    this.spanId = generateSpanId();
+    this.traceId = generateTraceId(getAsInternalSpan(internalSpan.getParent()));
+    this.queue = queue;
   }
 
   @Override
   public void export() {
-    openTelemetrySpan.end(internalSpan, initialSpanInfo, artifactId, artifactType);
+    if (exportable) {
+      queue.offer(this);
+    }
   }
 
   @Override
@@ -56,23 +81,19 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     if (rootSpan != this) {
       rootSpan.updateNameForExport(newName);
     } else {
-      openTelemetrySpan.updateName(newName);
+      name = newName;
     }
   }
 
   @Override
   public Map<String, String> exportedSpanAsMap() {
-    return openTelemetrySpan.getDistributedTraceContextMap();
-  }
-
-  public MuleOpenTelemetrySpan getOpenTelemetrySpan() {
-    return openTelemetrySpan;
+    return OpentelemetryTraceIdUtils.getContext(this);
   }
 
   @Override
   public void setRootName(String rootName) {
-    if (openTelemetrySpan.isRoot()) {
-      openTelemetrySpan.updateName(rootName);
+    if (isRootSpan) {
+      name = rootName;
     } else {
       this.rootName = rootName;
     }
@@ -80,8 +101,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
 
   @Override
   public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
-    if (openTelemetrySpan.isRoot()) {
-      openTelemetrySpan.setAttribute(rootAttributeKey, rootAttributeValue);
+    if (isRootSpan) {
+      internalSpan.addAttribute(rootAttributeKey, rootAttributeValue);
     } else {
       this.rootAttributes.put(rootAttributeKey, rootAttributeValue);
     }
@@ -92,9 +113,20 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     if (childSpanExporter instanceof OpenTelemetrySpanExporter) {
       OpenTelemetrySpanExporter childOpenTelemetrySpanExporter = (OpenTelemetrySpanExporter) childSpanExporter;
 
+      // If it isn't exportable propagate the traceId and spanId
+      if (!childOpenTelemetrySpanExporter.exportable) {
+        childOpenTelemetrySpanExporter.traceId = traceId;
+        childOpenTelemetrySpanExporter.spanId = spanId;
+        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
+        childOpenTelemetrySpanExporter.setRootName(rootName);
+        return;
+      }
+
       // If it is a policy span, propagate the rootSpan.
-      if (childOpenTelemetrySpanExporter.getOpenTelemetrySpan().onlyPropagateNamesAndAttributes()) {
-        childOpenTelemetrySpanExporter.setRootSpan(rootSpan);
+      if (childOpenTelemetrySpanExporter.isPolicySpan) {
+        childOpenTelemetrySpanExporter.setRootName(rootName);
+        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
       }
 
       // Propagates the root name until it finds a root.
@@ -104,20 +136,15 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       }
 
       // No export if no export till reset.
-      if (!openTelemetrySpan.getNoExportUntil().isEmpty()
-          && !openTelemetrySpan.getNoExportUntil().contains(getWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
-        childOpenTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan,
-                                                                                   new NoExportInitialSpanInfo(childOpenTelemetrySpanExporter
-                                                                                       .getOpenTelemetrySpan()
-                                                                                       .getNoExportUntil()),
-                                                                                   NO_EXPORTABLE_SERVICE);
+      if (!noExportUntil.isEmpty()
+          && !noExportUntil.contains(getWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
+        childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
+        childOpenTelemetrySpanExporter.spanId = spanId;
+        childOpenTelemetrySpanExporter.traceId = traceId;
+        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.exportable = false;
       }
     }
-
-  }
-
-  private void setRootSpan(OpenTelemetrySpanExporter openTelemetrySpan) {
-    this.rootSpan = openTelemetrySpan;
   }
 
   private String getWithoutNamespace(String name) {
@@ -134,12 +161,38 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     return internalSpan;
   }
 
+  public String getTraceId() {
+    return traceId;
+  }
+
+  public String getSpanId() {
+    return spanId;
+  }
+
+  public Context getOpenTelemetrySpanContext() {
+    return W3CTraceContextPropagator.getInstance().extract(Context.current(), getContext(this),
+                                                           OPEN_TELEMETRY_SPAN_GETTER);
+  }
+
+  public String getArtifactId() {
+    return artifactId;
+  }
+
+  public String getArtifacttype() {
+    return artifactType;
+  }
+
+  public String getName() {
+    return name;
+  }
+
   public static class OpenTelemetrySpanExportBuilder {
 
     private InitialSpanInfo initialSpanInfo;
     private InternalSpan internalSpan;
     private String artifactId;
     private String artifactType;
+    private OpentelemetryExportQueue opentelemetryExportQueue;
 
     public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
       this.initialSpanInfo = initialSpanInfo;
@@ -161,6 +214,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       return this;
     }
 
+    public OpenTelemetrySpanExportBuilder withOpentelemetryExportQueue(OpentelemetryExportQueue opentelemetryExportQueue) {
+      this.opentelemetryExportQueue = opentelemetryExportQueue;
+      return this;
+    }
+
     public OpenTelemetrySpanExporter build() {
 
       if (initialSpanInfo == null) {
@@ -176,9 +234,31 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       }
 
       OpenTelemetrySpanExporter openTelemetrySpanExporter =
-          new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType);
-      openTelemetrySpanExporter.openTelemetrySpan = getNewOpenTelemetrySpan(internalSpan, initialSpanInfo, artifactId);
+          new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, opentelemetryExportQueue);
       return openTelemetrySpanExporter;
+    }
+  }
+
+  /**
+   * An Internal {@link TextMapGetter} to retrieve the remote span context.
+   *
+   * This is used to resolve a remote OpTel Span propagated through W3C Trace Context.
+   */
+  private static class MuleOpenTelemetryRemoteContextGetter implements TextMapGetter<Map<String, String>> {
+
+    @Override
+    public Iterable<String> keys(Map<String, String> stringStringMap) {
+      return stringStringMap.keySet();
+    }
+
+    @Nullable
+    @Override
+    public String get(@Nullable Map<String, String> stringStringMap, @Nullable String key) {
+      if (stringStringMap == null) {
+        return null;
+      }
+
+      return stringStringMap.get(key);
     }
   }
 }

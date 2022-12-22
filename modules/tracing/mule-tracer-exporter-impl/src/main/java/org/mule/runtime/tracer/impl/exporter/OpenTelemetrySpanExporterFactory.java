@@ -25,12 +25,15 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
   @Inject
   MuleContext muleContext;
 
+  private OpentelemetryExportQueue opentelemetryExportQueue = new OpentelemetryExportQueue();
+
   @Override
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
     return builder()
         .withStartSpanInfo(initialExportInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
+        .withOpentelemetryExportQueue(opentelemetryExportQueue)
         .withInternalSpan(internalSpan)
         .build();
   }

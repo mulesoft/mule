@@ -120,6 +120,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public Map<String, String> getAttributes() {
+    attributes.putAll(initialSpanInfo.getInitialAttributes());
     return attributes;
   }
 
