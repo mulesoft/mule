@@ -9,7 +9,12 @@ package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
 import io.opentelemetry.sdk.trace.IdGenerator;
 
-public class ThreadIdGenerator implements IdGenerator {
+/**
+ * An Open Telemetry ID Generator that retrieves the span id from a thread local.
+ *
+ * @since 4.5.0
+ */
+public class ThreadLocalIdGenerator implements IdGenerator {
 
   public static ThreadLocal<String> spanIdHolder = new ThreadLocal<>();
 
@@ -26,7 +31,7 @@ public class ThreadIdGenerator implements IdGenerator {
     return IdGenerator.random().generateTraceId();
   }
 
-  public static void setSpanIdHolder(String threadSpanId) {
+  public static void setOpenTelemetrySpanId(String threadSpanId) {
     spanIdHolder.set(threadSpanId);
   }
 }

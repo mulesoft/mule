@@ -25,14 +25,13 @@ import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 import static io.opentelemetry.sdk.trace.export.SimpleSpanProcessor.create;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import io.opentelemetry.sdk.trace.IdGenerator;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.capturer.CapturingSpanExporterWrapper;
 
 import java.util.Collection;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -47,6 +46,7 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import io.opentelemetry.sdk.trace.IdGenerator;
 
 /**
  * A Retriever open telemetry resources.
@@ -57,7 +57,7 @@ public class OpenTelemetryResources {
 
   private OpenTelemetryResources() {}
 
-  private static IdGenerator ID_GENERATOR = new ThreadIdGenerator();
+  private static IdGenerator ID_GENERATOR = new ThreadLocalIdGenerator();
 
   private static final ContextPropagators PROPAGATOR = create(W3CTraceContextPropagator.getInstance());
 

@@ -139,7 +139,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     requireNonNull(message);
     this.messageFactory = e -> message;
     this.modified = true;
-
     return this;
   }
 

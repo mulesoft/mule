@@ -7,15 +7,17 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import io.opentelemetry.context.propagation.TextMapGetter;
-
-import javax.annotation.Nullable;
 import java.util.Map;
+import javax.annotation.Nullable;
+
+import io.opentelemetry.context.propagation.TextMapGetter;
 
 /**
  * An Internal {@link TextMapGetter} to retrieve the remote span context.
  * <p>
  * This is used to resolve a remote OpTel Span propagated through W3C Trace Context.
+ *
+ * @since 4.5.0
  */
 public class MuleOpenTelemetryRemoteContextGetter implements TextMapGetter<Map<String, String>> {
 

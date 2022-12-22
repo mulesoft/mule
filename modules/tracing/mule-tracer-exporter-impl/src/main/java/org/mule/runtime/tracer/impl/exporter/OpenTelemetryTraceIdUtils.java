@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.tracer.api.span.InternalSpan;
 
 import java.util.HashMap;
@@ -15,9 +17,14 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
-import static java.util.Collections.emptyMap;
+/**
+ * Utils for generating Open Telemetry Trace Ids
+ *
+ * @since 4.5.0
+ */
+public class OpenTelemetryTraceIdUtils {
 
-public class OpentelemetryTraceIdUtils {
+  private OpenTelemetryTraceIdUtils() {}
 
   private static final Supplier<Random> randomSupplier = ThreadLocalRandom::current;
 
@@ -96,6 +103,7 @@ public class OpentelemetryTraceIdUtils {
       buffer = new char[len];
       CHAR_ARRAY.set(buffer);
     }
+
     return buffer;
   }
 
@@ -138,7 +146,7 @@ public class OpentelemetryTraceIdUtils {
 
   public static Map<String, String> getContext(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
     Map<String, String> context = new HashMap<>();
-    if (openTelemetrySpanExporter.getSpanId() == INVALID) {
+    if (openTelemetrySpanExporter.getSpanId().equals(INVALID)) {
       return emptyMap();
     }
 

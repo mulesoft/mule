@@ -21,6 +21,7 @@ import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.GRPC;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.HTTP;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.ThreadLocalIdGenerator.setOpenTelemetrySpanId;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
@@ -146,7 +147,7 @@ public class OpenTelemetryExporterConfigTestCase {
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
              "{\"Header\": \"Header Value\"}");
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
-
+    setOpenTelemetrySpanId(getUUID());
 
     tracer.spanBuilder(getUUID()).startSpan().end();
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
@@ -175,6 +176,7 @@ public class OpenTelemetryExporterConfigTestCase {
              "{\"Header\": \"Header Value\"}");
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
+    setOpenTelemetrySpanId(getUUID());
     tracer.spanBuilder(getUUID()).startSpan().end();
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
@@ -196,6 +198,7 @@ public class OpenTelemetryExporterConfigTestCase {
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
              "{\"Header\": \"Header Value\"}");
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+    setOpenTelemetrySpanId(getUUID());
 
     tracer.spanBuilder(getUUID()).startSpan().end();
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
@@ -224,6 +227,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION, serverTls.certificateFile().toPath().toString());
 
     Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+    setOpenTelemetrySpanId(getUUID());
 
     tracer.spanBuilder(getUUID()).startSpan().end();
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
