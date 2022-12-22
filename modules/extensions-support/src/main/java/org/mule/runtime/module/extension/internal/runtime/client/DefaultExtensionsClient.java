@@ -135,11 +135,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                            String sourceName,
                                            Consumer<SourceResultCallback<T, A>> callback,
                                            Consumer<SourceParameterizer> parameters) {
-    DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
+    final ExtensionModel extensionModel = findExtension(extensionName);
+    final SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
+    final DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
     parameters.accept(parameterizer);
 
-    ExtensionModel extensionModel = findExtension(extensionName);
-    SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
     SourceClient sourceClient = SourceClient.from(extensionModel,
                                                   sourceModel,
                                                   parameterizer,
