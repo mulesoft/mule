@@ -106,14 +106,6 @@ public class GlobalErrorHandler extends ErrorHandler {
         .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
   }
 
-  public ErrorHandler createLocalErrorHandler(ComponentLocation flowLocation) {
-    ErrorHandler local = new ErrorHandler();
-    local.setName(name);
-    local.setExceptionListeners(getExceptionListeners());
-    local.setExceptionListenersLocation(flowLocation);
-    return local;
-  }
-
   public Map<Component, Consumer<Exception>> getRouters() {
     return routers;
   }
