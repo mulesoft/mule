@@ -7,9 +7,12 @@
 package org.mule.runtime.module.tls.internal;
 
 import static java.util.Arrays.copyOf;
+
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -53,6 +56,11 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
 
   private String name;
 
+  /**
+   * When set to true, {@link #isTrustStoreConfigured()} will return false if the trust store is configured to be insecure.
+   */
+  private final boolean treatInsecureTrustStoreAsNotConfigured;
+
   private final TlsConfiguration tlsConfiguration;
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
@@ -60,9 +68,18 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
   private String[] enabledProtocols;
   private String[] enabledCipherSuites;
 
+  public DefaultTlsContextFactory(Map<QName, Object> annotations, FeatureFlaggingService featureFlaggingService) {
+    this(annotations, featureFlaggingService.isEnabled(HONOUR_INSECURE_TLS_CONFIGURATION));
+  }
+
   public DefaultTlsContextFactory(Map<QName, Object> annotations) {
+    this(annotations, false);
+  }
+
+  private DefaultTlsContextFactory(Map<QName, Object> annotations, boolean treatInsecureTrustStoreAsNotConfigured) {
     tlsConfiguration = new TlsConfiguration(null);
     tlsConfiguration.setAnnotations(annotations);
+    this.treatInsecureTrustStoreAsNotConfigured = treatInsecureTrustStoreAsNotConfigured;
   }
 
   @Override
@@ -276,7 +293,10 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
 
   @Override
   public boolean isTrustStoreConfigured() {
-    return tlsConfiguration.getTrustStore() != null;
+    if (tlsConfiguration.getTrustStore() == null) {
+      return false;
+    }
+    return !trustStoreInsecure || !treatInsecureTrustStoreAsNotConfigured;
   }
 
   @Override

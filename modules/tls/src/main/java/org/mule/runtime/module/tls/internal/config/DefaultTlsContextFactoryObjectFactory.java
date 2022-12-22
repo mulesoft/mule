@@ -8,10 +8,13 @@ package org.mule.runtime.module.tls.internal.config;
 
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+
+import javax.inject.Inject;
 
 /**
  * {@link ObjectFactory} for TLS context factory
@@ -20,12 +23,19 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
  */
 public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFactory<DefaultTlsContextFactory> {
 
+  private final FeatureFlaggingService featureFlaggingService;
+
   private String name;
   private TlsContextKeyStoreConfiguration keyStore;
   private TlsContextTrustStoreConfiguration trustStore;
   private RevocationCheck revocationCheck;
   private String enabledProtocols;
   private String enabledCipherSuites;
+
+  @Inject
+  public DefaultTlsContextFactoryObjectFactory(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
 
   public void setName(String name) {
     this.name = name;
@@ -53,7 +63,7 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
 
   @Override
   public DefaultTlsContextFactory doGetObject() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(getAnnotations());
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(getAnnotations(), featureFlaggingService);
 
     tlsContextFactory.setName(name);
     tlsContextFactory.setEnabledProtocols(enabledProtocols);
