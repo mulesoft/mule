@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
-
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
@@ -29,10 +27,7 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
-      if (reuseGlobalErrorHandler()) {
-        return delegate;
-      }
-      return delegate.createLocalErrorHandler(this.getLocation());
+      return delegate;
     }
 
     ErrorHandler errorHandler;
