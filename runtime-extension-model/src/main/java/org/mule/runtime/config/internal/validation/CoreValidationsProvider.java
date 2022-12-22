@@ -39,7 +39,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new ExpressionsInRequiredExpressionsParams(),
                   new NoExpressionsInNoExpressionsSupportedParams(),
                   new PollingSourceHasSchedulingStrategy(),
-                  new ScatterGatherRoutes()
+                  new ScatterGatherRoutes(),
+                  new InsecureTLSValidation()
     // Commented out because this causes failures because of a lying extension model for munit, in the 'ignore' parameter
     // new NoExpressionsInNoExpressionsSupportedParams()
     // validate expressions!
