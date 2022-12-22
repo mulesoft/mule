@@ -108,7 +108,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -208,11 +207,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         initialiserEvent = getInitialiserEvent(muleContext);
         Optional<ConfigurationInstance> configurationInstance = startUsingConfiguration(initialiserEvent);
         sourceAdapter =
-            sourceAdapterFactory.createAdapter(configurationInstance,
-                                               createSourceCallbackFactory(),
-                                               this,
-                                               sourceConnectionManager,
-                                               restarting);
+          sourceAdapterFactory.createAdapter(configurationInstance,
+                                             createSourceCallbackFactory(),
+                                             this,
+                                             sourceConnectionManager,
+                                             restarting);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
         initialiseIfNeeded(retryPolicyTemplate, true, muleContext);

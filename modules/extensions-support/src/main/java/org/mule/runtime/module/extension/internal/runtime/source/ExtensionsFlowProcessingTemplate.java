@@ -21,7 +21,7 @@ import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import java.util.List;
 import java.util.Map;
 
-final class ExtensionsFlowProcessingTemplate extends FlowProcessingTemplate {
+public final class ExtensionsFlowProcessingTemplate extends FlowProcessingTemplate {
 
   private SourceResultAdapter sourceMessage;
   private final SourceCompletionHandler completionHandler;

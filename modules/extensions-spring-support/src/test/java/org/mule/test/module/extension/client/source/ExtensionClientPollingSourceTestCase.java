@@ -8,13 +8,18 @@ package org.mule.test.module.extension.client.source;
 
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.source.SourceHandler;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import javax.inject.Inject;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ExtensionClientPollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Rule
+  public SystemProperty configProperty = new SystemProperty("configName", "petstore");
 
   @Inject
   private ExtensionsClient extensionsClient;
@@ -27,11 +32,11 @@ public class ExtensionClientPollingSourceTestCase extends AbstractExtensionFunct
   @Test
   public void initPollingSource() throws Exception {
     SourceHandler handler = extensionsClient.createSource("petstore",
-                                                          "connected-pet-adoption-source",
+                                                          "ConnectedPetAdoptionSource",
                                                           callback -> {
                                                           },
                                                           parameters -> parameters
-                                                            .withConfigRef("config")
+                                                            .withConfigRef(configProperty.getValue())
                                                             .withParameter("watermark", true)
                                                             .withParameter("idempotent", true));
   }
