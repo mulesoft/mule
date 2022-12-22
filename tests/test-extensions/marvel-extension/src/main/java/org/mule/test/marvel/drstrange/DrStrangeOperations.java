@@ -83,7 +83,7 @@ public class DrStrangeOperations {
 
   @MediaType(TEXT_PLAIN)
   public InputStream objectToStream(@Connection MysticConnection connection,
-                                    @Optional @org.mule.sdk.api.annotation.param.Optional(defaultValue = PAYLOAD) Object data) {
+                                    @org.mule.sdk.api.annotation.param.Optional(defaultValue = PAYLOAD) Object data) {
     return connection.manage((InputStream) data);
   }
 
