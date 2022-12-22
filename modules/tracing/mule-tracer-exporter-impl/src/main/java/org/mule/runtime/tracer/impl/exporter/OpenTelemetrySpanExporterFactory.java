@@ -33,7 +33,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
         .withStartSpanInfo(initialExportInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
-        .withOpentelemetryExportQueue(opentelemetryExportQueue)
+        .withOpenTelemetryExportQueue(opentelemetryExportQueue)
         .withInternalSpan(internalSpan)
         .build();
   }

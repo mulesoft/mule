@@ -20,7 +20,6 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources;
-import org.mule.runtime.tracer.impl.exporter.optel.resources.ThreadIdGenerator;
 
 import java.util.Queue;
 
@@ -128,7 +127,7 @@ public class OpentelemetryExportQueue {
         }
 
         span.setAttribute(ARTIFACT_ID, spanExporter.getArtifactId());
-        span.setAttribute(ARTIFACT_TYPE, spanExporter.getArtifacttype());
+        span.setAttribute(ARTIFACT_TYPE, spanExporter.getArtifactType());
 
         internalSpan.getAttributes().forEach(span::setAttribute);
 

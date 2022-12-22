@@ -7,23 +7,29 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
-import io.opentelemetry.context.Context;
-import io.opentelemetry.context.propagation.TextMapGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
+import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.getWithoutNamespace;
 import static org.mule.runtime.tracer.impl.exporter.OpentelemetryTraceIdUtils.generateSpanId;
 import static org.mule.runtime.tracer.impl.exporter.OpentelemetryTraceIdUtils.generateTraceId;
 import static org.mule.runtime.tracer.impl.exporter.OpentelemetryTraceIdUtils.getContext;
 
+import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.TextMapGetter;
+
+/**
+ * A {@link SpanExporter} that exports the spans as Open Telemetry Spans.
+ *
+ * @since 4.5.0
+ */
 public class OpenTelemetrySpanExporter implements SpanExporter {
 
   private final boolean isRootSpan;
@@ -37,8 +43,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     return new OpenTelemetrySpanExportBuilder();
   }
 
-  public static final String NO_EXPORTABLE_SERVICE = "no-exportable-service";
-
   private String name;
   private final InternalSpan internalSpan;
 
@@ -46,9 +50,9 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   private final String artifactId;
   private final String artifactType;
 
+  private final Map<String, String> rootAttributes = new HashMap<>();
   private OpenTelemetrySpanExporter rootSpan = this;
   private String rootName;
-  private final Map<String, String> rootAttributes = new HashMap<>();
   private String spanId;
   private String traceId;
 
@@ -64,8 +68,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     this.exportable = initialSpanInfo.getInitialExportInfo().isExportable();
     this.artifactId = artifactId;
     this.artifactType = artifactType;
+
+    // Generates the span id so that the opentelemetry spans can be lazily initialised.
     this.spanId = generateSpanId();
     this.traceId = generateTraceId(getAsInternalSpan(internalSpan.getParent()));
+
     this.queue = queue;
   }
 
@@ -147,15 +154,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     }
   }
 
-  private String getWithoutNamespace(String name) {
-    int index = name.lastIndexOf(":");
-    if (index != -1) {
-      return name.substring(index + 1);
-    } else {
-      return name;
-    }
-  }
-
   @Override
   public InternalSpan getInternalSpan() {
     return internalSpan;
@@ -178,7 +176,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     return artifactId;
   }
 
-  public String getArtifacttype() {
+  public String getArtifactType() {
     return artifactType;
   }
 
@@ -186,6 +184,9 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
     return name;
   }
 
+  /**
+   * Builder
+   */
   public static class OpenTelemetrySpanExportBuilder {
 
     private InitialSpanInfo initialSpanInfo;
@@ -214,7 +215,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
       return this;
     }
 
-    public OpenTelemetrySpanExportBuilder withOpentelemetryExportQueue(OpentelemetryExportQueue opentelemetryExportQueue) {
+    public OpenTelemetrySpanExportBuilder withOpenTelemetryExportQueue(OpentelemetryExportQueue opentelemetryExportQueue) {
       this.opentelemetryExportQueue = opentelemetryExportQueue;
       return this;
     }
@@ -233,32 +234,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
         throw new IllegalArgumentException("Artifact type is null");
       }
 
-      OpenTelemetrySpanExporter openTelemetrySpanExporter =
-          new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, opentelemetryExportQueue);
-      return openTelemetrySpanExporter;
-    }
-  }
-
-  /**
-   * An Internal {@link TextMapGetter} to retrieve the remote span context.
-   *
-   * This is used to resolve a remote OpTel Span propagated through W3C Trace Context.
-   */
-  private static class MuleOpenTelemetryRemoteContextGetter implements TextMapGetter<Map<String, String>> {
-
-    @Override
-    public Iterable<String> keys(Map<String, String> stringStringMap) {
-      return stringStringMap.keySet();
-    }
-
-    @Nullable
-    @Override
-    public String get(@Nullable Map<String, String> stringStringMap, @Nullable String key) {
-      if (stringStringMap == null) {
-        return null;
+      if (opentelemetryExportQueue == null) {
+        throw new IllegalArgumentException("Open telemery export queue is null");
       }
 
-      return stringStringMap.get(key);
+      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, opentelemetryExportQueue);
     }
   }
+
 }
