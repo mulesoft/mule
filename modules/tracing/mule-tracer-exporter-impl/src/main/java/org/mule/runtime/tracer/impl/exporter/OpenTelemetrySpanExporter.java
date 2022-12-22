@@ -8,12 +8,14 @@
 package org.mule.runtime.tracer.impl.exporter;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.impl.exporter.optel.span.MuleOpenTelemetrySpan;
 import org.mule.runtime.tracer.impl.exporter.optel.span.NoExportInitialSpanInfo;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.mule.runtime.tracer.impl.exporter.optel.span.provider.MuleOpenTelemetrySpanProvider.getNewOpenTelemetrySpan;
@@ -34,7 +36,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   private MuleOpenTelemetrySpan openTelemetrySpan;
   private OpenTelemetrySpanExporter rootSpan = this;
   private String rootName;
-  private final Map<String, String> rootAttributes = new HashMap<>();
+  private final List<SpanAttribute> rootAttributes = new ArrayList<>();
 
   private OpenTelemetrySpanExporter(InternalSpan internalSpan,
                                     InitialSpanInfo initialSpanInfo,
@@ -79,11 +81,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   }
 
   @Override
-  public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
+  public void setRootAttribute(SpanAttribute spanAttribute) {
     if (openTelemetrySpan.isRoot()) {
-      openTelemetrySpan.setAttribute(rootAttributeKey, rootAttributeValue);
+      openTelemetrySpan.setAttribute(spanAttribute.getKey(), spanAttribute.getValue());
     } else {
-      this.rootAttributes.put(rootAttributeKey, rootAttributeValue);
+      this.rootAttributes.add(spanAttribute);
     }
   }
 

@@ -9,7 +9,6 @@ package org.mule.runtime.tracer.impl.span;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import org.mule.runtime.api.profiling.tracing.Span;
@@ -17,13 +16,13 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +45,7 @@ public class ExecutionSpan implements InternalSpan {
   private final InternalSpan parent;
   private final Long startTime;
   private Long endTime;
-  private final Map<String, String> attributes = new HashMap<>();
+  private final List<SpanAttribute> attributes = new ArrayList<>();
   private final List<SpanError> errors = new ArrayList<>(1);
 
   private ExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
@@ -82,8 +81,8 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void setRootAttribute(String s, String s1) {
-    spanExporter.setRootAttribute(s, s1);
+  public void setRootAttribute(SpanAttribute spanAttribute) {
+    spanExporter.setRootAttribute(spanAttribute);
   }
 
   @Override
@@ -98,8 +97,8 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void end() {
-    this.attributes.put(THREAD_END_NAME, currentThread().getName());
     this.endTime = getDefault().now();
+    this.attributes.add(new SpanAttribute(THREAD_END_NAME, currentThread().getName()));
     this.spanExporter.export();
   }
 
@@ -119,7 +118,7 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public Map<String, String> getAttributes() {
+  public List<SpanAttribute> getAttributes() {
     return attributes;
   }
 
@@ -154,12 +153,13 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    attributes.put(key, value);
+    attributes.add(new SpanAttribute(key, value));
   }
 
   @Override
   public Optional<String> getAttribute(String key) {
-    return ofNullable(attributes.get(key));
+    return attributes.stream().filter(spanAttribute -> spanAttribute.getKey().equals(key)).findFirst()
+        .map(SpanAttribute::getValue);
   }
 
   @Override

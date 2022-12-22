@@ -7,8 +7,8 @@
 
 package org.mule.runtime.tracer.api.span;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.profiling.tracing.Span;
@@ -93,7 +93,7 @@ public interface InternalSpan extends Span {
    *
    * @return a map with the span attributes.
    */
-  Map<String, String> getAttributes();
+  List<SpanAttribute> getAttributes();
 
   /**
    * Updates the child {@link InternalSpan}.
@@ -123,10 +123,9 @@ public interface InternalSpan extends Span {
    * the flow, and it has to be propagated to the flow span. This propagation is needed, for example, if a source sets a name for
    * complying with semantic conventions for the flow and there is a policy applied to the source.
    *
-   * @param rootAttributeKey   the key for root attribute.
-   * @param rootAttributeValue the value for the root attribute.
+   * @param spanAttribute The span attribute to set.
    */
-  default void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {}
+  default void setRootAttribute(SpanAttribute spanAttribute) {}
 
 
   /**
@@ -191,8 +190,8 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public Map<String, String> getAttributes() {
-      return emptyMap();
+    public List<SpanAttribute> getAttributes() {
+      return emptyList();
     }
 
     @Override

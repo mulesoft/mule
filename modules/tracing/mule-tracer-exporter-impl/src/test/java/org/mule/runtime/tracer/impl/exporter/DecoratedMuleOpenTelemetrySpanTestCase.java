@@ -20,11 +20,12 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
@@ -51,8 +52,8 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
     SpanDuration spanDuration = mock(SpanDuration.class);
     when(spanDuration.getStart()).thenReturn(nanoTime());
     when(internalSpan.getDuration()).thenReturn(spanDuration);
-    Map<String, String> spanAttributes = new HashMap<>();
-    spanAttributes.put(DecoratedMuleOpenTelemetrySpan.SPAN_KIND, spanKind);
+    List<SpanAttribute> spanAttributes = new ArrayList<>();
+    spanAttributes.add(new SpanAttribute(DecoratedMuleOpenTelemetrySpan.SPAN_KIND, spanKind));
     when(internalSpan.getAttributes()).thenReturn(spanAttributes);
 
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);
@@ -108,8 +109,8 @@ public class DecoratedMuleOpenTelemetrySpanTestCase extends AbstractMuleTestCase
     SpanDuration spanDuration = mock(SpanDuration.class);
     when(spanDuration.getStart()).thenReturn(nanoTime());
     when(internalSpan.getDuration()).thenReturn(spanDuration);
-    Map<String, String> spanAttributes = new HashMap<>();
-    spanAttributes.put(DecoratedMuleOpenTelemetrySpan.STATUS, spanStatus);
+    List<SpanAttribute> spanAttributes = new ArrayList<>();
+    spanAttributes.add(new SpanAttribute(DecoratedMuleOpenTelemetrySpan.STATUS, spanStatus));
     when(internalSpan.getAttributes()).thenReturn(spanAttributes);
 
     InitialSpanInfo initialSpanInfo = mock(InitialSpanInfo.class);

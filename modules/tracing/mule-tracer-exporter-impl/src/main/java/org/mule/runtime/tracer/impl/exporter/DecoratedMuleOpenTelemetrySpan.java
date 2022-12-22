@@ -98,29 +98,31 @@ public class DecoratedMuleOpenTelemetrySpan implements MuleOpenTelemetrySpan {
       recordSpanExceptions(internalSpan);
     }
     initialSpanInfo.getInitialAttributes().forEach(delegate::setAttribute);
-    updateSpanKind(internalSpan);
-    updateSpanStatus(internalSpan);
-    internalSpan.getAttributes().forEach(delegate::setAttribute);
+    internalSpan.getAttributes().forEach(spanAttribute -> {
+      if (spanAttribute.getKey().equals(SPAN_KIND)) {
+        updateSpanKind(delegate.getSpanContext().getSpanId(), spanAttribute.getValue());
+      } else if (spanAttribute.getKey().equals(STATUS)) {
+        updateSpanStatus(spanAttribute.getValue());
+      } else {
+        delegate.setAttribute(spanAttribute.getKey(), spanAttribute.getValue());
+      }
+    });
     delegate.setAttribute(ARTIFACT_ID, artifactId);
     delegate.setAttribute(ARTIFACT_TYPE, artifactType);
     delegate.end(internalSpan.getDuration().getEnd(), NANOSECONDS);
   }
 
-  private void updateSpanStatus(InternalSpan internalSpan) {
-    String spanStatus = internalSpan.getAttributes().remove(STATUS);
-    if (spanStatus != null) {
-      delegate.setStatus(StatusCode.valueOf(spanStatus));
-    }
+  private void updateSpanStatus(String spanStatus) {
+    delegate.setStatus(StatusCode.valueOf(spanStatus));
   }
 
-  private void updateSpanKind(InternalSpan internalSpan) {
-    String spanKind = internalSpan.getAttributes().remove(SPAN_KIND);
-    if (spanKind != null && SPAN_KIND_FIELD != null && delegate.getClass().getName().equals(SDK_SPAN_CLASS)) {
+  private void updateSpanKind(String spanId, String spanKind) {
+    if (SPAN_KIND_FIELD != null && delegate.getClass().getName().equals(SDK_SPAN_CLASS)) {
       try {
         SPAN_KIND_FIELD.set(delegate, SpanKind.valueOf(spanKind));
       } catch (IllegalAccessException e) {
         throw new MuleRuntimeException(createStaticMessage(format("Span Kind of span: %s could not be changed to: %s",
-                                                                  internalSpan.getName(), spanKind)),
+                                                                  spanId, spanKind)),
                                        e);
       }
     }

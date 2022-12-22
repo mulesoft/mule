@@ -12,13 +12,15 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 public class RootInternalSpan implements InternalSpan {
@@ -26,7 +28,7 @@ public class RootInternalSpan implements InternalSpan {
   public static final String ROOT_SPAN = "root";
 
   private String name = ROOT_SPAN;
-  private Map<String, String> attributes = new HashMap<>();
+  private final List<SpanAttribute> attributes = new ArrayList<>();
 
   @Override
   public Span getParent() {
@@ -50,7 +52,7 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public List<SpanError> getErrors() {
-    return null;
+    return emptyList();
   }
 
   @Override
@@ -79,8 +81,8 @@ public class RootInternalSpan implements InternalSpan {
   }
 
   @Override
-  public Map<String, String> getAttributes() {
-    return null;
+  public List<SpanAttribute> getAttributes() {
+    return emptyList();
   }
 
   @Override
@@ -99,6 +101,6 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    attributes.put(key, value);
+    attributes.add(new SpanAttribute(key, value));
   }
 }
