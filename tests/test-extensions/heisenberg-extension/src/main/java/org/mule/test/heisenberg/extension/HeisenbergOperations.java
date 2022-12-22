@@ -282,7 +282,7 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   public Result<String, IntegerAttributes> getEnemy(@Config HeisenbergExtension config,
-                                                    @Optional(defaultValue = "-1") @org.mule.sdk.api.annotation.param.Optional(
+                                                    @org.mule.sdk.api.annotation.param.Optional(
                                                         defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
     org.mule.runtime.api.metadata.DataType dt =
