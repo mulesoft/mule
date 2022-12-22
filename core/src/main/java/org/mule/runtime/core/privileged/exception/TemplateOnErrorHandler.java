@@ -12,7 +12,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_GLOBAL_ERROR_HANDLER_IMPROVEMENTS_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -634,7 +634,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   public static boolean reuseGlobalErrorHandler() {
     if (reuseGlobalErrorHandler == null) {
-      reuseGlobalErrorHandler = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
+      reuseGlobalErrorHandler = !parseBoolean(getProperty(DISABLE_GLOBAL_ERROR_HANDLER_IMPROVEMENTS_PROPERTY));
     }
     return reuseGlobalErrorHandler;
   }
