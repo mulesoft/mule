@@ -1069,7 +1069,7 @@
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
-                    "password": true,
+                    "password": false,
                     "text": false,
                     "query": false,
                     "order": 9
@@ -6138,7 +6138,7 @@
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
-                "password": true,
+                "password": false,
                 "text": false,
                 "query": false,
                 "order": 9

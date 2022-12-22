@@ -102,8 +102,8 @@ abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaMo
    */
   protected void parseComponentByteStreaming(WithAnnotations element) {
     supportsStreaming = JavaModelLoaderUtils.isInputStream(outputType.getType())
-        || element.isAnnotatedWith(Streaming.class)
-        || element.isAnnotatedWith(org.mule.sdk.api.annotation.Streaming.class);
+        || element.getAnnotation(Streaming.class).isPresent()
+        || element.getAnnotation(org.mule.sdk.api.annotation.Streaming.class).isPresent();
   }
 
   private Type resolveConnectionType(ExtensionParameter connectionParameter) {

@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.sdk.api.annotation.Export;
 import org.mule.sdk.api.annotation.Extension;
@@ -36,7 +37,6 @@ import org.mule.sdk.api.annotation.ExternalLib;
 import org.mule.sdk.api.annotation.OnException;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.sdk.api.annotation.param.display.Example;
-import org.mule.sdk.api.annotation.param.display.Text;
 import org.mule.sdk.api.meta.ExpressionSupport;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.SdkHeisenbergConnectionExceptionEnricher;
@@ -173,6 +173,7 @@ public class HeisenbergExtension implements Lifecycle {
   private Map<String, KnockeableDoor> candidateDoors;
 
   @Parameter
+  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "OTHER")
   @org.mule.sdk.api.annotation.param.Optional(defaultValue = "CANCER")
   private HealthStatus initialHealth;
 

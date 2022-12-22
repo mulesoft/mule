@@ -137,7 +137,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(ANY)
-  public String usingInterfaceB(@org.mule.sdk.api.annotation.param.Content MyInterface myInterface) {
+  public String usingInterfaceB(@Content MyInterface myInterface) {
     return null;
   }
 
@@ -287,7 +287,7 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   public Result<String, IntegerAttributes> getEnemy(@Config HeisenbergExtension config,
-                                                    @org.mule.sdk.api.annotation.param.Optional(
+                                                    @Optional(defaultValue = "-1") @org.mule.sdk.api.annotation.param.Optional(
                                                         defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
     DataType dt =

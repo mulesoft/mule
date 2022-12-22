@@ -36,7 +36,6 @@ import org.mule.runtime.api.util.collection.Collectors;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -50,7 +49,6 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
-import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -67,12 +65,10 @@ import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 
-import javax.lang.model.element.AnnotationValue;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -232,15 +228,10 @@ public class DynamicMetadataDeclarationEnricher implements WalkingDeclarationEnr
 
       private void enrichWithDsql(OperationDeclaration declaration,
                                   MethodElement method) {
-        AnnotationValueFetcher<Query> queryAnnotationValueFetcher = method.getValueFromAnnotation(Query.class).get();
-
-        Class nativeOutputResolverType = getClassFromAnnotationFetcher(queryAnnotationValueFetcher, Query::nativeOutputResolver);
-        Class entityResolverType = getClassFromAnnotationFetcher(queryAnnotationValueFetcher, Query::entityResolver);
-        Class translatorType = getClassFromAnnotationFetcher(queryAnnotationValueFetcher, Query::translator);
-
+        Query query = method.getAnnotation(Query.class).get();
         final MetadataResolverFactory resolverFactory = new QueryMetadataResolverFactory(
-                                                                                         nativeOutputResolverType,
-                                                                                         entityResolverType);
+                                                                                         query.nativeOutputResolver(),
+                                                                                         query.entityResolver());
         declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> resolverFactory));
 
         final MetadataScopeAdapter metadataScope = new MetadataScopeAdapter() {
@@ -292,24 +283,15 @@ public class DynamicMetadataDeclarationEnricher implements WalkingDeclarationEnr
             return NULL_METADATA_RESOLVER;
           }
         };
-        addQueryModelProperties(declaration, translatorType);
+        addQueryModelProperties(declaration, query);
         declareDynamicType(declaration.getOutput());
         declareMetadataKeyId(declaration, null);
         enrichMetadataKeyParameters(declaration, metadataScope);
         declareResolversInformation(declaration, metadataScope, getCategoryName(metadataScope));
       }
 
-      private Class getClassFromAnnotationFetcher(AnnotationValueFetcher<Query> queryAnnotationValueFetcher,
-                                                  Function<Query, Class> classMapper) {
-        Type resolvedType = queryAnnotationValueFetcher.getClassValue(classMapper);
-        if (resolvedType == null) {
-          return null;
-        }
-        return resolvedType.getDeclaringClass().orElse(null);
-      }
 
-
-      private void addQueryModelProperties(OperationDeclaration declaration, Class translatorType) {
+      private void addQueryModelProperties(OperationDeclaration declaration, Query query) {
         ParameterDeclaration parameterDeclaration = declaration.getAllParameters()
             .stream()
             .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).isPresent())
@@ -319,7 +301,7 @@ public class DynamicMetadataDeclarationEnricher implements WalkingDeclarationEnr
             .orElseThrow(() -> new IllegalParameterModelDefinitionException(
                                                                             "Query operation must have a parameter annotated with @MetadataKeyId"));
 
-        parameterDeclaration.addModelProperty(new QueryParameterModelProperty(translatorType));
+        parameterDeclaration.addModelProperty(new QueryParameterModelProperty(query.translator()));
         parameterDeclaration.setLayoutModel(builderFrom(parameterDeclaration.getLayoutModel()).asQuery().build());
       }
 

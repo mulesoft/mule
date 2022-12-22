@@ -150,7 +150,7 @@ public class MetadataOperations {
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   @MediaType(value = ANY, strict = false)
   public Object contentMetadataWithoutKeyId(@org.mule.sdk.api.annotation.param.Connection MetadataConnection connection,
-                                            @org.mule.sdk.api.annotation.param.Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
+                                            @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
     return null;
   }
 

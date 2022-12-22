@@ -61,11 +61,6 @@ public class WithAliasTestCase {
     }
 
     @Override
-    public boolean isAnnotatedWith(Class<? extends Annotation> annotationClass) {
-      return getClass().getAnnotation(annotationClass) != null;
-    }
-
-    @Override
     public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
       return isAnnotatedWith(annotationClass)
           ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, WithSdkAliasImpl.class, TYPE_LOADER))
@@ -84,11 +79,6 @@ public class WithAliasTestCase {
     @Override
     public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
       return ofNullable(getClass().getAnnotation(annotationClass));
-    }
-
-    @Override
-    public boolean isAnnotatedWith(Class<? extends Annotation> annotationClass) {
-      return getClass().getAnnotation(annotationClass) != null;
     }
 
     @Override
@@ -118,11 +108,6 @@ public class WithAliasTestCase {
       return isAnnotatedWith(annotationClass)
           ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, WithBothAliasImpl.class, TYPE_LOADER))
           : empty();
-    }
-
-    @Override
-    public boolean isAnnotatedWith(Class<? extends Annotation> annotationClass) {
-      return getClass().getAnnotation(annotationClass) != null;
     }
 
     @Override

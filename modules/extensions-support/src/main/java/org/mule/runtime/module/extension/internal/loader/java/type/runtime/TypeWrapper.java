@@ -107,11 +107,6 @@ public class TypeWrapper implements Type {
   }
 
   @Override
-  public boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
-    return aClass.getAnnotation(annotation) != null;
-  }
-
-  @Override
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, aClass, typeLoader))
