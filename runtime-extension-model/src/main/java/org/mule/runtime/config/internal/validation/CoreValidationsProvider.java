@@ -103,7 +103,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new SourcePositiveMaxItemsPerPoll(),
                                                           new OperationRaiseErrorDoesntSpecifyNamespace(),
                                                           new OperationDoesNotHaveCoreRaiseError(),
-                                                          new OperationDoesNotHaveFlowRef()));
+                                                          new OperationDoesNotHaveFlowRef(),
+                                                          new InsecureTLSValidation()));
 
     // Do not fail if the expressionLanguage was not provided, skip these validations.
     if (expressionLanguage != null) {
