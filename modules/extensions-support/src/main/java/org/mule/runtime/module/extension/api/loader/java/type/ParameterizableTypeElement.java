@@ -60,7 +60,7 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
    */
   default List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
     return getParameters().stream()
-        .filter(field -> field.isAnnotatedWith(annotationClass))
+        .filter(field -> field.getAnnotation(annotationClass).isPresent())
         .distinct()
         .collect(toList());
   }

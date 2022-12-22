@@ -125,7 +125,7 @@ public final class JavaParameterTypeModelValidator implements ExtensionModelVali
       private void checkInvalidFieldAnnotations(NamedObject model, String typeName, FieldElement field,
                                                 Class<? extends Annotation>... invalidAnnotations) {
         for (Class<? extends Annotation> annotation : invalidAnnotations) {
-          if (field.isAnnotatedWith(annotation)) {
+          if (field.getAnnotation(annotation).isPresent()) {
             problemsReporter.addError(new Problem(model,
                                                   format(
                                                          "Type '%s' has a field with name '%s' declared as '%s', which is not allowed.",

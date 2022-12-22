@@ -116,13 +116,13 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static boolean isParameterGroup(ExtensionParameter groupParameter) {
-    return groupParameter.isAnnotatedWith(ParameterGroup.class)
-        || groupParameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.ParameterGroup.class);
+    return groupParameter.getAnnotation(ParameterGroup.class).isPresent()
+        || groupParameter.getAnnotation(org.mule.sdk.api.annotation.param.ParameterGroup.class).isPresent();
   }
 
   public static boolean isParameter(ExtensionParameter parameter) {
-    return parameter.isAnnotatedWith(Parameter.class)
-        || parameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.Parameter.class);
+    return parameter.getAnnotation(Parameter.class).isPresent()
+        || parameter.getAnnotation(org.mule.sdk.api.annotation.param.Parameter.class).isPresent();
   }
 
 

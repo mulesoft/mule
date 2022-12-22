@@ -22496,7 +22496,7 @@
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
-                    "password": true,
+                    "password": false,
                     "text": false,
                     "query": false,
                     "order": 2
@@ -23506,6 +23506,11 @@
                   }
                 ],
                 "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
                 "showInDsl": true,
                 "name": "Response",
                 "description": "",
@@ -23686,6 +23691,11 @@
                   }
                 ],
                 "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
                 "showInDsl": true,
                 "name": "Error Response",
                 "description": "",
@@ -40664,7 +40674,7 @@
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
-                "password": true,
+                "password": false,
                 "text": false,
                 "query": false,
                 "order": 2
@@ -43379,6 +43389,7 @@
       "type": "Object",
       "annotations": {
         "typeId": "http://example.com/example.json",
+        "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -43392,8 +43403,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "label": "Person"
+        }
       },
       "open": {
         "type": "Any"

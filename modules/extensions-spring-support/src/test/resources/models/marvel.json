@@ -14083,6 +14083,11 @@
               }
             ],
             "exclusiveParametersModels": [],
+            "layoutModel": {
+              "password": false,
+              "text": false,
+              "query": false
+            },
             "showInDsl": true,
             "name": "Response",
             "description": "",
@@ -14483,6 +14488,11 @@
               }
             ],
             "exclusiveParametersModels": [],
+            "layoutModel": {
+              "password": false,
+              "text": false,
+              "query": false
+            },
             "showInDsl": true,
             "name": "Response",
             "description": "",

@@ -24,7 +24,7 @@ public class MetadataFailureOperations extends MetadataOperationsParent {
   @MediaType(value = ANY, strict = false)
   public Object failWithResolvingException(@Connection MetadataConnection connection,
                                            @MetadataKeyId(TestMetadataResolverMetadataResolvingFailure.class) String type,
-                                           @org.mule.sdk.api.annotation.param.Content @TypeResolver(TestMetadataResolverMetadataResolvingFailure.class) Object content) {
+                                           @Content @TypeResolver(TestMetadataResolverMetadataResolvingFailure.class) Object content) {
     return null;
   }
 

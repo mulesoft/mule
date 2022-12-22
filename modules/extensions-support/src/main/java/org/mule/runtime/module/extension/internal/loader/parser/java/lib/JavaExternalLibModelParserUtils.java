@@ -7,16 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.lib;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.ExternalLibraryType.DEPENDENCY;
-import static org.mule.runtime.api.meta.ExternalLibraryType.JAR;
-import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.toMuleApi;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 
-import org.mule.runtime.api.meta.ExternalLibraryType;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
-import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
@@ -37,63 +31,62 @@ public final class JavaExternalLibModelParserUtils {
   public static List<ExternalLibraryModel> parseExternalLibraryModels(WithAnnotations element) {
     List<ExternalLibraryModel> libraries = new LinkedList<>();
 
-    mapReduceRepeatableAnnotation(element, ExternalLib.class, org.mule.sdk.api.annotation.ExternalLib.class,
-                                  container -> ((ExternalLibs) container).value(),
-                                  container -> ((org.mule.sdk.api.annotation.ExternalLibs) container).value(),
-                                  externalLibAnnotationValueFetcher -> {
-                                    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
-                                        .withName(externalLibAnnotationValueFetcher.getStringValue(ExternalLib::name))
-                                        .withDescription(externalLibAnnotationValueFetcher
-                                            .getStringValue(ExternalLib::description))
-                                        .withType(externalLibAnnotationValueFetcher.getEnumValue(ExternalLib::type))
-                                        .isOptional(externalLibAnnotationValueFetcher.getBooleanValue(ExternalLib::optional));
+    parseExternalLibs(element,
+                      ExternalLibs.class,
+                      libs -> Stream.of(libs.value()).map(lib -> parseExternalLib(lib)).collect(toList()),
+                      libraries);
 
-                                    ifNotBlank(externalLibAnnotationValueFetcher.getStringValue(ExternalLib::nameRegexpMatcher),
-                                               builder::withRegexpMatcher);
-                                    ifNotBlank(externalLibAnnotationValueFetcher.getStringValue(ExternalLib::requiredClassName),
-                                               builder::withRequiredClassName);
-                                    ifNotBlank(externalLibAnnotationValueFetcher.getStringValue(ExternalLib::coordinates),
-                                               builder::withCoordinates);
+    parseExternalLibs(element,
+                      org.mule.sdk.api.annotation.ExternalLibs.class,
+                      libs -> Stream.of(libs.value()).map(lib -> parseExternalLib(lib)).collect(toList()),
+                      libraries);
 
-                                    return builder.build();
-                                  },
-                                  externalLibAnnotationValueFetcher -> {
-                                    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
-                                        .withName(externalLibAnnotationValueFetcher
-                                            .getStringValue(org.mule.sdk.api.annotation.ExternalLib::name))
-                                        .withDescription(externalLibAnnotationValueFetcher
-                                            .getStringValue(org.mule.sdk.api.annotation.ExternalLib::description))
-                                        .withType(of(externalLibAnnotationValueFetcher
-                                            .getEnumValue(org.mule.sdk.api.annotation.ExternalLib::type)))
-                                        .isOptional(externalLibAnnotationValueFetcher
-                                            .getBooleanValue(org.mule.sdk.api.annotation.ExternalLib::optional));
+    element.getAnnotation(ExternalLib.class)
+        .map(lib -> parseExternalLib(lib))
+        .ifPresent(libraries::add);
 
-                                    ifNotBlank(externalLibAnnotationValueFetcher
-                                        .getStringValue(org.mule.sdk.api.annotation.ExternalLib::nameRegexpMatcher),
-                                               builder::withRegexpMatcher);
-                                    ifNotBlank(externalLibAnnotationValueFetcher
-                                        .getStringValue(org.mule.sdk.api.annotation.ExternalLib::requiredClassName),
-                                               builder::withRequiredClassName);
-                                    ifNotBlank(externalLibAnnotationValueFetcher
-                                        .getStringValue(org.mule.sdk.api.annotation.ExternalLib::coordinates),
-                                               builder::withCoordinates);
-
-                                    return builder.build();
-                                  }).forEach(libraries::add);
+    element.getAnnotation(org.mule.sdk.api.annotation.ExternalLib.class)
+        .map(lib -> parseExternalLib(lib))
+        .ifPresent(libraries::add);
 
     return libraries;
   }
 
-  private static ExternalLibraryType of(org.mule.sdk.api.meta.ExternalLibraryType externalLibraryType) {
-    switch (externalLibraryType) {
-      case JAR:
-        return JAR;
-      case NATIVE:
-        return NATIVE;
-      case DEPENDENCY:
-        return DEPENDENCY;
-    }
-    return null;
+  private static ExternalLibraryModel parseExternalLib(ExternalLib externalLibAnnotation) {
+    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
+        .withName(externalLibAnnotation.name())
+        .withDescription(externalLibAnnotation.description())
+        .withType(externalLibAnnotation.type())
+        .isOptional(externalLibAnnotation.optional());
+
+    ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
+    ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
+    ifNotBlank(externalLibAnnotation.coordinates(), builder::withCoordinates);
+
+    return builder.build();
+  }
+
+  private static ExternalLibraryModel parseExternalLib(org.mule.sdk.api.annotation.ExternalLib externalLibAnnotation) {
+    ExternalLibraryModel.ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
+        .withName(externalLibAnnotation.name())
+        .withDescription(externalLibAnnotation.description())
+        .withType(toMuleApi(externalLibAnnotation.type()))
+        .isOptional(externalLibAnnotation.optional());
+
+    ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
+    ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
+    ifNotBlank(externalLibAnnotation.coordinates(), builder::withCoordinates);
+
+    return builder.build();
+  }
+
+  private static <A extends Annotation> void parseExternalLibs(WithAnnotations element,
+                                                               Class<A> annotationClass,
+                                                               Function<A, List<ExternalLibraryModel>> mapper,
+                                                               List<ExternalLibraryModel> accumulator) {
+    element.getAnnotation(annotationClass)
+        .map(mapper)
+        .ifPresent(accumulator::addAll);
   }
 
   private JavaExternalLibModelParserUtils() {}
