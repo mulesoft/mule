@@ -7,10 +7,11 @@
 package org.mule.runtime.core.api.source.scheduler;
 
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.FixedFrequencySchedulerConfiguration;
@@ -43,6 +44,19 @@ public final class FixedFrequencyScheduler extends PeriodicScheduler implements 
   @Optional(defaultValue = "0")
   private long startDelay = 1000l;
 
+  public FixedFrequencyScheduler() {
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @since 4.6.0
+   */
+  public FixedFrequencyScheduler(long frequency, long startDelay, TimeUnit timeUnit) {
+    setFrequency(frequency);
+    setStartDelay(startDelay);
+    setTimeUnit(timeUnit);
+  }
 
   @Override
   public ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {

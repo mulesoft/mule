@@ -14,10 +14,19 @@ import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
 
-public class ExtensionsClientMessageProcessingManager implements MessageProcessingManager {
+import java.util.function.Consumer;
+
+public class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessingManager {
+
+  private final Consumer<SourceResultCallback<T, A>> callbackConsumer;
+
+  public ExtensionsClientMessageProcessingManager(Consumer<SourceResultCallback<T, A>> callbackConsumer) {
+    this.callbackConsumer = callbackConsumer;
+  }
 
   @Override
   public void processMessage(FlowProcessTemplate template, MessageProcessContext messageProcessContext) {
@@ -27,29 +36,27 @@ public class ExtensionsClientMessageProcessingManager implements MessageProcessi
 
     Result result = getResult(resultAdapter);
 
-
-
+    callbackConsumer.accept(new DefaultSourceResultCallback<>(result, template, messageProcessContext));
   }
 
   private Result<Object, Object> getResult(SourceResultAdapter adapter) {
     org.mule.sdk.api.runtime.operation.Result<Object, Object> sdkResult =
-      adapter.getPayloadMediaTypeResolver().resolve(adapter.getResult());
+        adapter.getPayloadMediaTypeResolver().resolve(adapter.getResult());
 
     return withNullEvent(event -> {
-                           EventContext context = event.getContext();
-                           Result.Builder<Object, Object> builder = Result.builder()
-                             .output(adapter.getCursorProviderFactory().of(context, sdkResult.getOutput(), context.getOriginatingLocation()));
+      EventContext context = event.getContext();
+      Result.Builder<Object, Object> builder = Result.builder()
+          .output(adapter.getCursorProviderFactory().of(context, sdkResult.getOutput(), context.getOriginatingLocation()));
 
-                           if (sdkResult.getMediaType().isPresent()) {
-                             builder.mediaType(sdkResult.getMediaType().get());
-                           }
-                           sdkResult.getMediaType().ifPresent(builder::mediaType);
-                           sdkResult.getAttributes().ifPresent(builder::attributes);
-                           sdkResult.getAttributesMediaType().ifPresent(builder::attributesMediaType);
-                           sdkResult.getByteLength().ifPresent(builder::length);
+      if (sdkResult.getMediaType().isPresent()) {
+        builder.mediaType(sdkResult.getMediaType().get());
+      }
+      sdkResult.getMediaType().ifPresent(builder::mediaType);
+      sdkResult.getAttributes().ifPresent(builder::attributes);
+      sdkResult.getAttributesMediaType().ifPresent(builder::attributesMediaType);
+      sdkResult.getByteLength().ifPresent(builder::length);
 
-                           return builder.build();
-                         }
-    );
+      return builder.build();
+    });
   }
 }

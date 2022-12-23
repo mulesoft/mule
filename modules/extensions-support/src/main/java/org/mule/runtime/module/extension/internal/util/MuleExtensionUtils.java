@@ -798,7 +798,7 @@ public class MuleExtensionUtils {
    * Finds a source of the given {@code sourceName} in the passed {@code extensionModel}
    *
    * @param extensionModel an {@link ExtensionModel}
-   * @param sourceName  the name of the target source
+   * @param sourceName     the name of the target source
    * @return optionally an {@link SourceModel}
    * @since 4.6.0
    */

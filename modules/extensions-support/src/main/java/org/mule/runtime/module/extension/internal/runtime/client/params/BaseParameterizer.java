@@ -30,7 +30,7 @@ import java.util.function.Function;
 public abstract class BaseParameterizer<T> {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
-  
+
   private String configRef;
   private final Map<String, Object> rawParameters = new HashMap<>();
   private final Map<Pair<String, String>, Object> groupedParameters = new HashMap<>();
@@ -68,18 +68,18 @@ public abstract class BaseParameterizer<T> {
   }
 
   public T withInMemoryRepeatableStreaming(DataSize initialBufferSize,
-                                                                DataSize bufferSizeIncrement,
-                                                                DataSize maxBufferSize) {
+                                           DataSize bufferSizeIncrement,
+                                           DataSize maxBufferSize) {
     cursorProviderFunction = sm -> sm.forBytes().getInMemoryCursorProviderFactory(
-      new InMemoryCursorStreamConfig(initialBufferSize,
-                                     bufferSizeIncrement,
-                                     maxBufferSize));
+                                                                                  new InMemoryCursorStreamConfig(initialBufferSize,
+                                                                                                                 bufferSizeIncrement,
+                                                                                                                 maxBufferSize));
     return (T) this;
   }
 
   public T withFileStoreRepeatableStreaming(DataSize maxInMemorySize) {
     cursorProviderFunction = sm -> sm.forBytes().getFileStoreCursorStreamProviderFactory(
-      new FileStoreCursorStreamConfig(maxInMemorySize));
+                                                                                         new FileStoreCursorStreamConfig(maxInMemorySize));
     return (T) this;
   }
 
@@ -89,17 +89,17 @@ public abstract class BaseParameterizer<T> {
   }
 
   public T withInMemoryRepeatableIterables(int initialBufferSize, int bufferSizeIncrement,
-                                                                int maxBufferSize) {
+                                           int maxBufferSize) {
     cursorProviderFunction = sm -> sm.forObjects().getInMemoryCursorProviderFactory(
-      new InMemoryCursorIteratorConfig(initialBufferSize,
-                                       bufferSizeIncrement,
-                                       maxBufferSize));
+                                                                                    new InMemoryCursorIteratorConfig(initialBufferSize,
+                                                                                                                     bufferSizeIncrement,
+                                                                                                                     maxBufferSize));
     return (T) this;
   }
 
   public T withFileStoreRepeatableIterables(int maxInMemoryInstances) {
     cursorProviderFunction = sm -> sm.forObjects().getFileStoreCursorIteratorProviderFactory(
-      new FileStoreCursorIteratorConfig(maxInMemoryInstances));
+                                                                                             new FileStoreCursorIteratorConfig(maxInMemoryInstances));
     return (T) this;
   }
 

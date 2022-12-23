@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.api.source.scheduler;
 
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.CronSchedulerConfiguration;
@@ -43,6 +44,19 @@ public final class CronScheduler extends PeriodicScheduler implements CronSchedu
   @Optional
   @Expression(NOT_SUPPORTED)
   private String timeZone;
+
+  public CronScheduler() {
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @since 4.6.0
+   */
+  public CronScheduler(String expression, String timeZone) {
+    this.expression = expression;
+    this.timeZone = timeZone;
+  }
 
   @Override
   protected ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {

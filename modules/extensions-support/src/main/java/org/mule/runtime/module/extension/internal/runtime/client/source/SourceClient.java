@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.source;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -31,6 +33,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -42,17 +45,18 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
-public class SourceClient implements Lifecycle {
+public class SourceClient<T, A> implements Lifecycle {
 
   private static final Logger LOGGER = getLogger(SourceClient.class);
 
   private final ExtensionMessageSource source;
+  private final Consumer<SourceResultCallback> callbackConsumer;
   private final MuleContext muleContext;
 
   public static <T, A> SourceClient from(ExtensionModel extensionModel,
                                   SourceModel sourceModel,
                                   DefaultSourceParameterizer parameterizer,
-                                  Consumer<SourceResultCallback<T, A>> callback,
+                                  Consumer<SourceResultCallback<T, A>> callbackConsumer,
                                   ExtensionManager extensionManager,
                                   ExpressionManager expressionManager,
                                   StreamingManager streamingManager,
@@ -85,17 +89,23 @@ public class SourceClient implements Lifecycle {
                                                                transactionFactoryManager,
                                                                "");
 
-    return new SourceClient(source, muleContext);
+    source.setAnnotations(SmallMap.of(LOCATION_KEY, DefaultComponentLocation.from(sourceModel.getName())));
+    source.setListener(event -> event);
+    return new SourceClient(source, callbackConsumer, muleContext);
   }
 
-  private SourceClient(ExtensionMessageSource source, MuleContext muleContext) {
+  private SourceClient(ExtensionMessageSource source,
+                       Consumer<SourceResultCallback> callbackConsumer,
+                       MuleContext muleContext) {
     this.source = source;
+    this.callbackConsumer = callbackConsumer;
     this.muleContext = muleContext;
   }
 
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(source, true, muleContext);
+    source.setMessageProcessingManager(new ExtensionsClientMessageProcessingManager(callbackConsumer));
   }
 
   @Override
@@ -125,7 +135,7 @@ public class SourceClient implements Lifecycle {
     ComponentParameterization.Builder<SourceModel> paramsBuilder = ComponentParameterization.builder(sourceModel);
     parameterizer.setValuesOn(paramsBuilder);
 
-      ResolverSet resolverSet;
+    ResolverSet resolverSet;
     try {
       resolverSet = getResolverSetFromComponentParameterization(
         paramsBuilder.build(),
@@ -150,8 +160,10 @@ public class SourceClient implements Lifecycle {
                                     muleContext);
   }
 
-  private static ConfigurationProvider getConfigurationProvider(ExtensionManager extensionManager, DefaultSourceParameterizer parameterizer) {
+  private static ConfigurationProvider getConfigurationProvider(ExtensionManager extensionManager,
+                                                                DefaultSourceParameterizer parameterizer) {
     return extensionManager.getConfigurationProvider(parameterizer.getConfigRef())
-      .orElseThrow(() -> new IllegalArgumentException("No configuration registered for key '" + parameterizer.getConfigRef() + "'"));
+      .orElseThrow(() -> new IllegalArgumentException("No configuration registered for key '" + parameterizer.getConfigRef()
+                                                        + "'"));
   }
 }

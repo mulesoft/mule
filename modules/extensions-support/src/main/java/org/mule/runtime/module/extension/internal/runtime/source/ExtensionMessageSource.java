@@ -122,9 +122,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
   @Inject
-  private MessageProcessingManager messageProcessingManager;
-
-  @Inject
   private SchedulerService schedulerService;
 
   @Inject
@@ -147,6 +144,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ProfilingService profilingService;
+
+  // obtained through setter injection
+  private MessageProcessingManager messageProcessingManager;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -207,11 +207,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         initialiserEvent = getInitialiserEvent(muleContext);
         Optional<ConfigurationInstance> configurationInstance = startUsingConfiguration(initialiserEvent);
         sourceAdapter =
-          sourceAdapterFactory.createAdapter(configurationInstance,
-                                             createSourceCallbackFactory(),
-                                             this,
-                                             sourceConnectionManager,
-                                             restarting);
+            sourceAdapterFactory.createAdapter(configurationInstance,
+                                               createSourceCallbackFactory(),
+                                               this,
+                                               sourceConnectionManager,
+                                               restarting);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
         initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
@@ -648,6 +648,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void setListener(Processor listener) {
     messageProcessor = listener;
+  }
+
+  @Inject
+  public void setMessageProcessingManager(MessageProcessingManager messageProcessingManager) {
+    this.messageProcessingManager = messageProcessingManager;
   }
 
   /**

@@ -53,6 +53,7 @@ import org.mule.runtime.module.extension.internal.runtime.client.operation.Defau
 import org.mule.runtime.module.extension.internal.runtime.client.operation.EventedOperationsParameterDecorator;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationKey;
+import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultSourceHandler;
 import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultSourceParameterizer;
 import org.mule.runtime.module.extension.internal.runtime.client.source.SourceClient;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
@@ -133,7 +134,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Override
   public <T, A> SourceHandler createSource(String extensionName,
                                            String sourceName,
-                                           Consumer<SourceResultCallback<T, A>> callback,
+                                           Consumer<SourceResultCallback<T, A>> callbackConsumer,
                                            Consumer<SourceParameterizer> parameters) {
     final ExtensionModel extensionModel = findExtension(extensionName);
     final SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
@@ -143,7 +144,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     SourceClient sourceClient = SourceClient.from(extensionModel,
                                                   sourceModel,
                                                   parameterizer,
-                                                  callback,
+                                                  callbackConsumer,
                                                   extensionManager,
                                                   expressionManager,
                                                   streamingManager,
@@ -155,10 +156,10 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     try {
       initialiseIfNeeded(sourceClient, true, muleContext);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new MuleRuntimeException(createStaticMessage("Exception initializing source:" + e.getMessage()), e);
     }
 
-    return null;
+    return new DefaultSourceHandler(sourceClient);
   }
 
   private OperationKey toOperationKey(String extensionName,
@@ -221,7 +222,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private SourceModel findSourceModel(ExtensionModel extensionModel, String sourceName) {
     return findSource(extensionModel, sourceName)
-      .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No Source [%s] Found", sourceName))));
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No Source [%s] Found", sourceName))));
   }
 
   private ExtensionModel findExtension(String extensionName) {

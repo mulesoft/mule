@@ -22,7 +22,8 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class DefaultOperationParameterizer extends BaseParameterizer<OperationParameterizer> implements InternalOperationParameterizer {
+public class DefaultOperationParameterizer extends BaseParameterizer<OperationParameterizer>
+    implements InternalOperationParameterizer {
 
   private CoreEvent contextEvent;
 
