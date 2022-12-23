@@ -7,6 +7,10 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
+
+import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
@@ -33,10 +37,12 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
+import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -55,6 +61,11 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Inject
   FeatureFlaggingService featureFlaggingService;
+
+  @Inject
+  EventTracer<CoreEvent> coreEventTracer;
+
+  SpanExporterConfiguration spanExporterConfiguration = discoverSpanExporterConfiguration();
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
@@ -161,7 +172,12 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
-    return getProfilingService().getCoreEventTracer();
+    if (parseBoolean(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED))) {
+      return coreEventTracer;
+    }
+
+    return getNoopCoreEventTracer();
+
   }
 
   @Override
@@ -205,6 +221,16 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
     if (profilingService instanceof Stoppable) {
       ((Stoppable) profilingService).stop();
+    }
+  }
+
+  public static SpanExporterConfiguration discoverSpanExporterConfiguration() {
+    try {
+      return  new SpiServiceRegistry()
+        .lookupProvider(SpanExporterConfiguration.class,
+                        SpanExporterConfiguration.class.getClassLoader());
+    } catch (Exception e) {
+      return key -> null;
     }
   }
 }
