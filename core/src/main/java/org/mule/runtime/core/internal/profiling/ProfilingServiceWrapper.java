@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
-import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 
 import static java.lang.Boolean.parseBoolean;
@@ -176,8 +175,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
       return coreEventTracer;
     }
 
-    return getNoopCoreEventTracer();
-
+    return getProfilingService().getCoreEventTracer();
   }
 
   @Override
@@ -224,11 +222,11 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     }
   }
 
-  public static SpanExporterConfiguration discoverSpanExporterConfiguration() {
+  private static SpanExporterConfiguration discoverSpanExporterConfiguration() {
     try {
-      return  new SpiServiceRegistry()
-        .lookupProvider(SpanExporterConfiguration.class,
-                        SpanExporterConfiguration.class.getClassLoader());
+      return new SpiServiceRegistry()
+          .lookupProvider(SpanExporterConfiguration.class,
+                          SpanExporterConfiguration.class.getClassLoader());
     } catch (Exception e) {
       return key -> null;
     }
