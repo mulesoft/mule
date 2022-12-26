@@ -538,7 +538,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private String normalizeLocation(ComponentLocation loc) {
     String location = loc.getLocation();
-    if (location.endsWith("errorHandler")) {
+    if (location.endsWith("/errorHandler")) {
       return location.substring(0, location.lastIndexOf('/'));
     }
     return location;
