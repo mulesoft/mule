@@ -12,7 +12,6 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -29,8 +28,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
 import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
@@ -106,9 +103,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     implements MessagingExceptionHandlerAcceptor {
 
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
-
-  // To check the value of the system property use the method with the same name.
-  public static Boolean reuseGlobalErrorHandler;
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
   private final EventBasedInitialSpanInfoProvider eventBasedStartStartInfoProvider =
@@ -321,7 +315,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public void start() throws MuleException {
-    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+    if (fromGlobalErrorHandler) {
       if (ownedProcessingStrategy.isPresent()) {
         startIfNeeded(ownedProcessingStrategy);
       }
@@ -331,7 +325,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public void stop() throws MuleException {
-    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+    if (fromGlobalErrorHandler) {
       if (ownedProcessingStrategy.isPresent()) {
         stopIfNeeded(ownedProcessingStrategy);
       }
@@ -343,7 +337,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy;
-    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+    if (fromGlobalErrorHandler) {
       processingStrategy =
           ofNullable(getDefaultProcessingStrategyFactory(muleContext).create(muleContext, getLocation().getRootContainerName()));
       initialiseIfNeeded(processingStrategy);
@@ -373,7 +367,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public void dispose() {
-    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+    if (fromGlobalErrorHandler) {
       ownedProcessingStrategy.ifPresent(processingStrategy -> disposeIfNeeded(processingStrategy, LOGGER));
     }
     disposeIfNeeded(fluxFactory, LOGGER);
@@ -554,7 +548,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private String normalizeLocation(ComponentLocation loc) {
     String location = loc.getLocation();
-    if (location.endsWith("errorHandler")) {
+    if (location.endsWith("/errorHandler")) {
       return location.substring(0, location.lastIndexOf('/'));
     }
     return location;
@@ -595,13 +589,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return defaultErrorHandlerOwnsTransaction(transaction);
     }
 
-    if (reuseGlobalErrorHandler() && fromGlobalErrorHandler && exception != null) {
+    if (fromGlobalErrorHandler && exception != null) {
       String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
       return transaction.getComponentLocation().get().getRootContainerName().equals(location);
-    }
-
-    if (!reuseGlobalErrorHandler() && flowLocation.isPresent()) {
-      return isTransactionInGlobalErrorHandler(transaction);
     }
 
     return isOwnedTransactionByLocalErrorHandler(transaction);
@@ -646,13 +636,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
     this.fromGlobalErrorHandler = fromGlobalErrorHandler;
-  }
-
-  public static boolean reuseGlobalErrorHandler() {
-    if (reuseGlobalErrorHandler == null) {
-      reuseGlobalErrorHandler = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
-    }
-    return reuseGlobalErrorHandler;
   }
 
 }
