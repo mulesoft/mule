@@ -82,7 +82,6 @@ public class ExecutionSpan implements InternalSpan {
     }
 
     return emptyList();
-
   }
 
   @Override
