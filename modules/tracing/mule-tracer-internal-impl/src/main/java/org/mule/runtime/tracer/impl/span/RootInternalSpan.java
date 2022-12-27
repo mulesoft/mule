@@ -18,6 +18,7 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static java.util.Collections.emptyMap;
 
@@ -79,11 +80,6 @@ public class RootInternalSpan implements InternalSpan {
   }
 
   @Override
-  public Map<String, String> getAttributes() {
-    return attributes;
-  }
-
-  @Override
   public int getAttributesCount() {
     return attributes.size();
   }
@@ -101,6 +97,11 @@ public class RootInternalSpan implements InternalSpan {
       attributes.forEach(internalSpan::setRootAttribute);
     }
     internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
+  }
+
+  @Override
+  public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+    attributes.forEach(biConsumer);
   }
 
   @Override

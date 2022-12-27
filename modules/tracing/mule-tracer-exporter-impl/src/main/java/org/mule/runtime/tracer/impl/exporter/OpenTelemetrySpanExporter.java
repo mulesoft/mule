@@ -24,7 +24,6 @@ import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUti
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryTraceIdUtils.extractContextFromTraceParent;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryTraceIdUtils.generateSpanId;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryTraceIdUtils.generateTraceId;
-import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigurationDiscoverer.discoverSpanExporterConfiguration;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;

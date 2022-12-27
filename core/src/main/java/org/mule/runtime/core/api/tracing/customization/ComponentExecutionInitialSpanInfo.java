@@ -17,7 +17,6 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -25,7 +24,7 @@ import java.util.function.BiConsumer;
  * A {@link InitialSpanInfo} based on a component.
  *
  * @since 4.5.0
- */
+ */o
 public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
 
@@ -51,17 +50,6 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
     this.component = component;
     this.coreEvent = coreEvent;
     this.name = SpanInitialInfoUtils.getSpanName(component.getIdentifier());
-  }
-
-  @Override
-  public Map<String, String> getInitialAttributes() {
-    Map<String, String> attributes = new HashMap<>();
-    attributes.put(LOCATION_KEY, getLocationAsString(coreEvent));
-    attributes.put(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
-    attributes.put(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
-    attributes.put(THREAD_START_NAME_KEY, Thread.currentThread().getName());
-    addLoggingVariablesAsAttributes(coreEvent, attributes);
-    return attributes;
   }
 
   @Override

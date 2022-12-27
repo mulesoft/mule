@@ -52,13 +52,6 @@ public interface InternalSpan extends Span {
   default void addAttribute(String key, String value) {}
 
   /**
-   * @return the attribute corresponding to the {@param key}
-   */
-  default Optional<String> getAttribute(String key) {
-    return empty();
-  }
-
-  /**
    * @param span the {@link Span}
    * @return the span as internal.
    */
@@ -89,12 +82,6 @@ public interface InternalSpan extends Span {
    */
   SpanExporter getSpanExporter();
 
-  /**
-   * Gets the attributes.
-   *
-   * @return a map with the span attributes.
-   */
-  Map<String, String> getAttributes();
 
   /**
    * Updates the child {@link InternalSpan}.
@@ -108,9 +95,7 @@ public interface InternalSpan extends Span {
    *
    * @param biConsumer the operation to apply.
    */
-  default void forEachAttribute(BiConsumer<String, String> biConsumer) {
-    getAttributes().forEach(biConsumer);
-  }
+  void forEachAttribute(BiConsumer<String, String> biConsumer);
 
   /**
    * Serializes the span as a map.
@@ -206,8 +191,8 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public Map<String, String> getAttributes() {
-      return emptyMap();
+    public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+      // Nothing to do.
     }
 
     @Override

@@ -12,7 +12,6 @@ import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
@@ -27,7 +26,6 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /**
@@ -130,13 +128,6 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public Map<String, String> getAttributes() {
-    Map<String, String> attributes = new HashMap<>(initialSpanInfo.getInitialAttributes());
-    attributes.putAll(initialSpanInfo.getInitialAttributes());
-    return additionalAttributes;
-  }
-
-  @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     initialSpanInfo.forEachAttribute(biConsumer);
     if (!additionalAttributes.isEmpty()) {
@@ -177,11 +168,6 @@ public class ExecutionSpan implements InternalSpan {
   public void addAttribute(String key, String value) {
     additionalAttributes.put(key, value);
     spanExporter.onAdditionalAttribute(key, value);
-  }
-
-  @Override
-  public Optional<String> getAttribute(String key) {
-    return ofNullable(getAttributes().get(key));
   }
 
   @Override
