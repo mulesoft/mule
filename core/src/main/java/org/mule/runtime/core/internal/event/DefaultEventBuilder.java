@@ -107,9 +107,13 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
-
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.loggingVariables = (CaseInsensitiveHashMap<String, String>) event.getLoggingVariables().orElse(null);
+    CaseInsensitiveHashMap<String, String> loggingVariablesCopyMap = new CaseInsensitiveHashMap<>();
+    if (loggingVariables != null) {
+      loggingVariablesCopyMap.putAll(loggingVariables);
+      this.loggingVariables = loggingVariablesCopyMap;
+    }
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
     flowProcessMediatorContext = copyOf(event.getFlowProcessMediatorContext());
     foreachInternalContext = copyOf(event.getForeachInternalContext());
