@@ -32,6 +32,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   public static final String CORRELATION_ID_KEY = "correlation.id";
   public static final String THREAD_START_ID_KEY = "thread.start.id";
   public static final String THREAD_START_NAME_KEY = "thread.start.name";
+  public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 4;
 
   protected final CoreEvent coreEvent;
   protected final Component component;
@@ -65,7 +66,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   @Override
   public int getInitialAttributesCount() {
-    int count = 4;
+    int count = INITIAL_ATTRIBUTES_BASE_COUNT;
 
     if (coreEvent instanceof PrivilegedEvent) {
       count += ((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(emptyMap()).size();

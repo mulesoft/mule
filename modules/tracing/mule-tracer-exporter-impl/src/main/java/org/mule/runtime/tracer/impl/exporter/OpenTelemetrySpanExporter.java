@@ -11,7 +11,7 @@ import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.ARTIFACT_ID;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.ARTIFACT_TYPE;
-import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.EXCEPTIONS_HAS_BEEN_RECORDED;
+import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.EXCEPTIONS_HAVE_BEEN_RECORDED;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.EXCEPTION_ESCAPED_KEY;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.EXCEPTION_EVENT_NAME;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.EXCEPTION_MESSAGE_KEY;
@@ -40,7 +40,6 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -78,6 +77,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private static final String MULE_INSTRUMENTATION_LIBRARY = "mule";
   private static final String MULE_INSTRUMENTATION_LIBRARY_VERSION = "1.0.0";
+  public static final int EXPORTER_ATTRIBUTES_BASE_SIZE = 3;
 
   private final boolean isRootSpan;
   private final boolean isPolicySpan;
@@ -135,7 +135,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public int size() {
-    return 3 + internalSpan.getAttributesCount();
+    return EXPORTER_ATTRIBUTES_BASE_SIZE + internalSpan.getAttributesCount();
   }
 
   @Override
@@ -231,7 +231,9 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         rootAttributes.forEach(childOpenTelemetrySpanExporter::setRootAttribute);
       }
 
-      // No export if no export till reset.
+      // In case "no export until" is set, and it is not a child span that resets that condition (because
+      // we have a span that begins again to be exportable), we have to propagate that condition to the
+      // child span.
       if (!noExportUntil.isEmpty()
           && !noExportUntil.contains(getNameWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
@@ -315,7 +317,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void onError(InternalSpanError spanError) {
-    statusData = StatusData.create(ERROR, EXCEPTIONS_HAS_BEEN_RECORDED);
+    statusData = StatusData.create(ERROR, EXCEPTIONS_HAVE_BEEN_RECORDED);
     Attributes errorAttributes = of(EXCEPTION_TYPE_KEY, spanError.getError().getErrorType().toString(),
                                     EXCEPTION_MESSAGE_KEY, spanError.getError().getDescription(),
                                     EXCEPTION_STACK_TRACE_KEY,
@@ -342,6 +344,9 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public int getTotalRecordedEvents() {
+    // This is for performance purposes. We know that in the current
+    // implementation we only have one error. So we inform this to the open
+    // telemetry sdk.
     if (errorEvents.isEmpty()) {
       return 0;
     }

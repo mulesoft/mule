@@ -110,7 +110,7 @@ public interface SpanExporter {
   /**
    * Updates parent span from a map
    *
-   * @param serializeAsMap the serialization map
+   * @param serializeAsMap the serialization map that represents the span in W3C format.
    */
   default void updateParentSpanFrom(Map<String, String> serializeAsMap) {}
 }

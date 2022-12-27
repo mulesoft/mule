@@ -27,7 +27,7 @@ public class OpenTelemetrySpanExporterUtils {
   public static final AttributeKey<String> EXCEPTION_STACK_TRACE_KEY = stringKey("exception.stacktrace");
   public static final AttributeKey<Boolean> EXCEPTION_ESCAPED_KEY = booleanKey("exception.escaped");
   public static final AttributeKey<String> THREAD_END_NAME_KEY = stringKey("thread.end.name");
-  public static final String EXCEPTIONS_HAS_BEEN_RECORDED = "Exceptions have been recorded.";
+  public static final String EXCEPTIONS_HAVE_BEEN_RECORDED = "Exceptions have been recorded.";
 
   public static final AttributeKey<String> ARTIFACT_ID = stringKey("artifact.id");
   public static final AttributeKey<String> ARTIFACT_TYPE = stringKey("artifact.type");
