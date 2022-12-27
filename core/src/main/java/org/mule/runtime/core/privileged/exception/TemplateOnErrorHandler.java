@@ -12,7 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_GLOBAL_ERROR_HANDLER_IMPROVEMENTS_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -518,7 +518,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private String normalizeLocation(ComponentLocation loc) {
     String location = loc.getLocation();
-    if (location.endsWith("errorHandler")) {
+    if (location.endsWith("/errorHandler")) {
       return location.substring(0, location.lastIndexOf('/'));
     }
     return location;
@@ -614,7 +614,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   public static boolean reuseGlobalErrorHandler() {
     if (reuseGlobalErrorHandler == null) {
-      reuseGlobalErrorHandler = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
+      reuseGlobalErrorHandler = !parseBoolean(getProperty(DISABLE_GLOBAL_ERROR_HANDLER_IMPROVEMENTS_PROPERTY));
     }
     return reuseGlobalErrorHandler;
   }
