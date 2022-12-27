@@ -32,6 +32,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   public static final String CORRELATION_ID_KEY = "correlation.id";
   public static final String THREAD_START_ID_KEY = "thread.start.id";
   public static final String THREAD_START_NAME_KEY = "thread.start.name";
+  // These are location, correlation.id, thread.start.id, thread.start.name
   public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 4;
 
   protected final CoreEvent coreEvent;

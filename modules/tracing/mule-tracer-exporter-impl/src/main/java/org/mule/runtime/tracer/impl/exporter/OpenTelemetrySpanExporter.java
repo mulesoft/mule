@@ -77,6 +77,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private static final String MULE_INSTRUMENTATION_LIBRARY = "mule";
   private static final String MULE_INSTRUMENTATION_LIBRARY_VERSION = "1.0.0";
+  // These are artifact.id, artifact.type and thread.end.name.
   public static final int EXPORTER_ATTRIBUTES_BASE_SIZE = 3;
 
   private final boolean isRootSpan;
