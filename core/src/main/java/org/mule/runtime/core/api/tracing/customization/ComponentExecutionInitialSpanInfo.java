@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
  * A {@link InitialSpanInfo} based on a component.
  *
  * @since 4.5.0
- */o
+ */
 public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
 
