@@ -21,6 +21,7 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link InternalSpan} used internally by the runtime. It defines an extension of the span contract that is only used
@@ -103,6 +104,15 @@ public interface InternalSpan extends Span {
   default void updateChildSpanExporter(InternalSpan childInternalSpan) {}
 
   /**
+   * Performs the {@param biConsumer} operation on each key/value
+   *
+   * @param biConsumer the operation to apply.
+   */
+  default void forEachAttribute(BiConsumer<String, String> biConsumer) {
+    getAttributes().forEach(biConsumer);
+  }
+
+  /**
    * Serializes the span as a map.
    *
    * @return the serialized span.
@@ -127,6 +137,11 @@ public interface InternalSpan extends Span {
    * @param rootAttributeValue the value for the root attribute.
    */
   default void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {}
+
+  /**
+   * @return the attributes count.
+   */
+  int getAttributesCount();
 
 
   /**
@@ -198,6 +213,11 @@ public interface InternalSpan extends Span {
     @Override
     public Map<String, String> serializeAsMap() {
       return emptyMap();
+    }
+
+    @Override
+    public int getAttributesCount() {
+      return 0;
     }
   }
 }

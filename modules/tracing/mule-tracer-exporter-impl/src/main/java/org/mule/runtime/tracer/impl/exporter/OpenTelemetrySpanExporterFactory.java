@@ -9,9 +9,6 @@ package org.mule.runtime.tracer.impl.exporter;
 
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
 
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
@@ -23,12 +20,10 @@ import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResour
 
 import javax.inject.Inject;
 
-public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Initialisable, Disposable {
+public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
   @Inject
   MuleContext muleContext;
-
-  private OpenTelemetryExportQueue opentelemetryExportQueue;
 
   @Override
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
@@ -36,19 +31,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, In
         .withStartSpanInfo(initialExportInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
-        .withOpenTelemetryExportQueue(opentelemetryExportQueue)
         .withInternalSpan(internalSpan)
         .build();
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    opentelemetryExportQueue = new OpenTelemetryExportQueue(muleContext.getConfiguration().getId());
-  }
-
-  @Override
-  public void dispose() {
-    opentelemetryExportQueue.stopWorker();
   }
 
   @Override

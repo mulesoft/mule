@@ -9,15 +9,17 @@ package org.mule.runtime.core.api.tracing.customization;
 
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link InitialSpanInfo} based on a component.
@@ -62,6 +64,28 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
     return attributes;
   }
 
+  @Override
+  public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+    biConsumer.accept(LOCATION_KEY, getLocationAsString(coreEvent));
+    biConsumer.accept(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
+    biConsumer.accept(THREAD_START_NAME_KEY, Thread.currentThread().getName());
+    biConsumer.accept(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
+    if (coreEvent instanceof PrivilegedEvent) {
+      ((PrivilegedEvent) coreEvent).getLoggingVariables().ifPresent(loggingVariables -> loggingVariables.forEach(biConsumer));
+    }
+  }
+
+  @Override
+  public int getInitialAttributesCount() {
+    int count = 4;
+
+    if (coreEvent instanceof PrivilegedEvent) {
+      count += ((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(emptyMap()).size();
+    }
+
+    return count;
+  }
+
   protected String getLocationAsString(CoreEvent coreEvent) {
     return SpanInitialInfoUtils.getLocationAsString(component.getLocation());
   }
@@ -69,7 +93,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   private void addLoggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
     if (coreEvent instanceof PrivilegedEvent) {
-      attributes.putAll(((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(Collections.emptyMap()));
+      attributes.putAll(((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(emptyMap()));
     }
   }
 

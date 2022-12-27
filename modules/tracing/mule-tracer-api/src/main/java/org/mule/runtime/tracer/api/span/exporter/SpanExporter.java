@@ -10,6 +10,7 @@ package org.mule.runtime.tracer.api.span.exporter;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 
 import java.util.Map;
 
@@ -90,4 +91,26 @@ public interface SpanExporter {
    * @param rootName the root name.
    */
   default void setRootName(String rootName) {}
+
+  /**
+   * Operation to do when an attribute is added.
+   *
+   * @param key   the key for the new attribute added
+   * @param value the value for the attribute
+   */
+  default void onAdditionalAttribute(String key, String value) {}
+
+  /**
+   * Operation to do when an attribute an error occurs.
+   *
+   * @param error the error.
+   */
+  default void onError(InternalSpanError error) {}
+
+  /**
+   * Updates parent span from a map
+   *
+   * @param serializeAsMap the serialization map
+   */
+  default void updateParentSpanFrom(Map<String, String> serializeAsMap) {}
 }

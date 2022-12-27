@@ -80,7 +80,12 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public Map<String, String> getAttributes() {
-    return null;
+    return attributes;
+  }
+
+  @Override
+  public int getAttributesCount() {
+    return attributes.size();
   }
 
   @Override
@@ -94,6 +99,7 @@ public class RootInternalSpan implements InternalSpan {
     if (!ROOT_SPAN.equals(name)) {
       internalSpan.updateRootName(name);
       attributes.forEach(internalSpan::setRootAttribute);
+      internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
     }
   }
 

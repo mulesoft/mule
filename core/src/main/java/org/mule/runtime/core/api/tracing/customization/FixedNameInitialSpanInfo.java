@@ -35,4 +35,9 @@ public class FixedNameInitialSpanInfo implements InitialSpanInfo {
   public InitialExportInfo getInitialExportInfo() {
     return DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
+
+  @Override
+  public int getInitialAttributesCount() {
+    return 0;
+  }
 }

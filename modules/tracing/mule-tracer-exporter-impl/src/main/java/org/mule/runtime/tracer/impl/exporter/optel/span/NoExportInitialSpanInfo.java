@@ -31,4 +31,9 @@ public class NoExportInitialSpanInfo implements InitialSpanInfo {
   public InitialExportInfo getInitialExportInfo() {
     return initialExportInfo;
   }
+
+  @Override
+  public int getInitialAttributesCount() {
+    return 0;
+  }
 }

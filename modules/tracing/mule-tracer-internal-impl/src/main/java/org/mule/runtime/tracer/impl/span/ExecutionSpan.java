@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
-import static java.lang.Thread.currentThread;
-import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 
-import static java.util.Optional.ofNullable;
+import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
@@ -22,11 +24,11 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
@@ -35,9 +37,9 @@ import java.util.Optional;
  */
 public class ExecutionSpan implements InternalSpan {
 
-  public static final String THREAD_END_NAME = "thread.end.name";
   private final InitialSpanInfo initialSpanInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
+  private SpanError lastError;
 
   public static ExecutionSpanBuilder getExecutionSpanBuilder() {
     return new ExecutionSpanBuilder();
@@ -46,8 +48,7 @@ public class ExecutionSpan implements InternalSpan {
   private final InternalSpan parent;
   private final Long startTime;
   private Long endTime;
-  private final Map<String, String> attributes = new HashMap<>();
-  private final List<SpanError> errors = new ArrayList<>(1);
+  private final Map<String, String> additionalAttributes = new HashMap<>();
 
   private ExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
                         InternalSpan parent) {
@@ -78,12 +79,22 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public List<SpanError> getErrors() {
-    return errors;
+    if (lastError != null) {
+      return singletonList(lastError);
+    }
+
+    return emptyList();
+
   }
 
   @Override
   public void setRootAttribute(String s, String s1) {
     spanExporter.setRootAttribute(s, s1);
+  }
+
+  @Override
+  public int getAttributesCount() {
+    return initialSpanInfo.getInitialAttributesCount() + additionalAttributes.size();
   }
 
   @Override
@@ -93,19 +104,19 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public boolean hasErrors() {
-    return !errors.isEmpty();
+    return lastError != null;
   }
 
   @Override
   public void end() {
-    this.attributes.put(THREAD_END_NAME, currentThread().getName());
     this.endTime = getDefault().now();
     this.spanExporter.export();
   }
 
   @Override
   public void addError(InternalSpanError error) {
-    this.errors.add(error);
+    this.lastError = error;
+    spanExporter.onError(error);
   }
 
   @Override
@@ -120,8 +131,17 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public Map<String, String> getAttributes() {
+    Map<String, String> attributes = new HashMap<>(initialSpanInfo.getInitialAttributes());
     attributes.putAll(initialSpanInfo.getInitialAttributes());
-    return attributes;
+    return additionalAttributes;
+  }
+
+  @Override
+  public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+    initialSpanInfo.forEachAttribute(biConsumer);
+    if (!additionalAttributes.isEmpty()) {
+      additionalAttributes.forEach(biConsumer);
+    }
   }
 
   @Override
@@ -155,12 +175,13 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    attributes.put(key, value);
+    additionalAttributes.put(key, value);
+    spanExporter.onAdditionalAttribute(key, value);
   }
 
   @Override
   public Optional<String> getAttribute(String key) {
-    return ofNullable(attributes.get(key));
+    return ofNullable(getAttributes().get(key));
   }
 
   @Override

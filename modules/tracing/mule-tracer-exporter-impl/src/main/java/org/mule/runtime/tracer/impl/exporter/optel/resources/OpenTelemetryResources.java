@@ -57,8 +57,6 @@ public class OpenTelemetryResources {
 
   private OpenTelemetryResources() {}
 
-  private static IdGenerator ID_GENERATOR = new ThreadLocalIdGenerator();
-
   private static final ContextPropagators PROPAGATOR = create(W3CTraceContextPropagator.getInstance());
 
   // This is only defined in the semconv artifact which is in alpha state and is only needed for this.
@@ -89,17 +87,10 @@ public class OpenTelemetryResources {
       throws SpanExporterConfiguratorException {
     SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder();
 
-    Resource resource = getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, serviceName)));
+    Resource resource = getResource(serviceName);
 
     // Verify if the opentelemetry span exporter is enabled.
-    if (parseBoolean(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()))) {
-      sdkTracerProviderBuilder = sdkTracerProviderBuilder.addSpanProcessor(resolveExporterProcessor(spanExporterConfiguration));
-    } else {
-      sdkTracerProviderBuilder =
-          sdkTracerProviderBuilder.addSpanProcessor(resolveDummyExporterWithSniffer());
-    }
-
-    sdkTracerProviderBuilder.setIdGenerator(ID_GENERATOR);
+    sdkTracerProviderBuilder = sdkTracerProviderBuilder.addSpanProcessor(resolveExporterProcessor(spanExporterConfiguration));
 
     SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.setResource(resource).build();
 
@@ -109,6 +100,10 @@ public class OpenTelemetryResources {
         .build();
 
     return openTelemetry.getTracer(MULE_INSTRUMENTATION_NAME, INSTRUMENTATION_VERSION);
+  }
+
+  public static Resource getResource(String serviceName) {
+    return getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, serviceName)));
   }
 
   public static ExportedSpanSniffer getNewExportedSpanCapturer() {
@@ -123,9 +118,13 @@ public class OpenTelemetryResources {
     return PROPAGATOR;
   }
 
-  private static SpanProcessor resolveExporterProcessor(
-                                                        SpanExporterConfiguration spanExporterConfiguration)
+  public static SpanProcessor resolveExporterProcessor(
+                                                       SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
+
+    if (!parseBoolean(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()))) {
+      return resolveDummyExporterWithSniffer();
+    }
 
     int batchSize = parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512"));
 

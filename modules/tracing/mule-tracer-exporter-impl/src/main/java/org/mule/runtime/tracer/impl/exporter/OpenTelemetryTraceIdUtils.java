@@ -9,11 +9,19 @@ package org.mule.runtime.tracer.impl.exporter;
 
 import static java.util.Collections.emptyMap;
 
+import io.opentelemetry.api.internal.OtelEncodingUtils;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.SpanId;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceId;
+import io.opentelemetry.api.trace.TraceState;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
@@ -169,5 +177,49 @@ public class OpenTelemetryTraceIdUtils {
     context.put(TRACE_PARENT, new String(chars, 0, TRACEPARENT_HEADER_SIZE));
 
     return context;
+  }
+
+  public static SpanContext extractContextFromTraceParent(String traceparent) {
+    boolean isValid = traceparent != null && (traceparent.length() == TRACEPARENT_HEADER_SIZE
+        || traceparent.length() > TRACEPARENT_HEADER_SIZE && traceparent.charAt(TRACEPARENT_HEADER_SIZE) == '-')
+        && traceparent.charAt(2) == '-' && traceparent.charAt(SPAN_ID_OFFSET - 1) == '-'
+        && traceparent.charAt(TRACE_OPTION_OFFSET - 1) == '-';
+    if (!isValid) {
+      return SpanContext.getInvalid();
+    } else {
+      String version = traceparent.substring(0, 2);
+      if (!VALID_VERSIONS.contains(version)) {
+        return SpanContext.getInvalid();
+      } else if (version.equals("00") && traceparent.length() > TRACEPARENT_HEADER_SIZE) {
+        return SpanContext.getInvalid();
+      } else {
+        String traceId = traceparent.substring(3, 3 + TraceId.getLength());
+        String spanId = traceparent.substring(SPAN_ID_OFFSET, SPAN_ID_OFFSET + SpanId.getLength());
+        char firstTraceFlagsChar = traceparent.charAt(TRACE_OPTION_OFFSET);
+        char secondTraceFlagsChar = traceparent.charAt(TRACE_OPTION_OFFSET + 1);
+        if (OtelEncodingUtils.isValidBase16Character(firstTraceFlagsChar)
+            && OtelEncodingUtils.isValidBase16Character(secondTraceFlagsChar)) {
+          TraceFlags traceFlags =
+              TraceFlags.fromByte(OtelEncodingUtils.byteFromBase16(firstTraceFlagsChar, secondTraceFlagsChar));
+          return SpanContext.createFromRemoteParent(traceId, spanId, traceFlags, TraceState.getDefault());
+        } else {
+          return SpanContext.getInvalid();
+        }
+      }
+    }
+  }
+
+  private static final Set<String> VALID_VERSIONS = new HashSet();
+
+  static {
+    for (int i = 0; i < 255; ++i) {
+      String version = Long.toHexString((long) i);
+      if (version.length() < 2) {
+        version = '0' + version;
+      }
+
+      VALID_VERSIONS.add(version);
+    }
+
   }
 }
