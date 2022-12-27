@@ -99,8 +99,8 @@ public class RootInternalSpan implements InternalSpan {
     if (!ROOT_SPAN.equals(name)) {
       internalSpan.updateRootName(name);
       attributes.forEach(internalSpan::setRootAttribute);
-      internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
     }
+    internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
   }
 
   @Override
