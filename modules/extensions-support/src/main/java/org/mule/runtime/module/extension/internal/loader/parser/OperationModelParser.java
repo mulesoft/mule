@@ -112,6 +112,13 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
   boolean isConnected();
 
   /**
+   * @return whether this operation requires a connection provided to it from an associated connection provider
+   */
+  default boolean requiresOwnConnection() {
+    return isConnected();
+  }
+
+  /**
    * @return whether this operation requires a configuration object to function
    */
   boolean hasConfig();

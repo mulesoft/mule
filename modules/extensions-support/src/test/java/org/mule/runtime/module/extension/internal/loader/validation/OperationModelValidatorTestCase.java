@@ -10,6 +10,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
+
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -23,6 +25,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.validator.OperationModelValidator;
+import org.mule.runtime.extension.internal.property.NoConnectionProvisioningModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -99,11 +102,33 @@ public class OperationModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void globalConnectedOperationWithoutConnectionProviderButNoConnectionProvisioning() {
+    when(operationModel.requiresConnection()).thenReturn(true);
+    when(operationModel.getModelProperty(NoConnectionProvisioningModelProperty.class))
+        .thenReturn(of(new NoConnectionProvisioningModelProperty()));
+
+    validate();
+  }
+
+  @Test
   public void configLevelOperationWithGlobalConnectionProvider() {
     when(operationModel.requiresConnection()).thenReturn(true);
     when(extensionModel.getOperationModels()).thenReturn(emptyList());
     when(configurationModel.getOperationModels()).thenReturn(singletonList(operationModel));
     when(extensionModel.getConnectionProviders()).thenReturn(singletonList(mock(ConnectionProviderModel.class)));
+
+    validate();
+  }
+
+  @Test
+  public void configLevelOperationWithoutConnectionProviderButNoConnectionProvisioning() {
+    when(operationModel.requiresConnection()).thenReturn(true);
+    when(operationModel.getModelProperty(NoConnectionProvisioningModelProperty.class))
+        .thenReturn(of(new NoConnectionProvisioningModelProperty()));
+    when(extensionModel.getOperationModels()).thenReturn(emptyList());
+    when(configurationModel.getOperationModels()).thenReturn(singletonList(operationModel));
+    when(configurationModel.getConnectionProviders()).thenReturn(emptyList());
+    when(extensionModel.getConfigurationModels()).thenReturn(singletonList(configurationModel));
 
     validate();
   }

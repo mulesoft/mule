@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConnectionProvisioning;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
@@ -133,13 +134,19 @@ public class ReconnectionUtils {
                                                                      ReflectionCache reflectionCache) {
     InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
 
-    if (componentModel instanceof ConnectableComponentModel) {
-      if (((ConnectableComponentModel) componentModel).requiresConnection()) {
-        addConnectionInterceptors(chainBuilder, extensionModel, componentModel, connectionSupplier, reflectionCache);
-      }
+    if (requiresConnectionInterceptors(componentModel)) {
+      addConnectionInterceptors(chainBuilder, extensionModel, componentModel, connectionSupplier, reflectionCache);
     }
 
     return chainBuilder.build();
+  }
+
+  private static boolean requiresConnectionInterceptors(ComponentModel componentModel) {
+    if (componentModel instanceof ConnectableComponentModel) {
+      return requiresConnectionProvisioning((ConnectableComponentModel) componentModel);
+    }
+
+    return false;
   }
 
   private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,

@@ -37,7 +37,7 @@ public final class ModelLoaderDelegateUtils {
    * @return whether the given {@code parser} represents an operation which requires a config to function
    */
   public static boolean requiresConfig(OperationModelParser parser) {
-    return parser.hasConfig() || parser.isConnected() || parser.isAutoPaging();
+    return parser.hasConfig() || parser.requiresOwnConnection() || parser.isAutoPaging();
   }
 
   /**

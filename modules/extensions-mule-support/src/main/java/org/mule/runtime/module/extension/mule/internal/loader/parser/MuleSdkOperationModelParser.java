@@ -37,6 +37,8 @@ import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.property.ComposedOperationModelProperty;
+import org.mule.runtime.extension.internal.property.NoConnectionProvisioningModelProperty;
+import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
 import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -55,6 +57,7 @@ import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Aggre
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.ComponentAstWithHierarchy;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsBlockingCharacteristic;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsConnectedCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsTransactionalCharacteristic;
 
 import java.util.Collections;
@@ -93,12 +96,15 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   private final ExtensionModelHelper extensionModelHelper;
 
   private final Characteristic<Boolean> isBlocking = new IsBlockingCharacteristic();
+  private final Characteristic<Boolean> isConnected = new IsConnectedCharacteristic();
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
   private final FilteringCharacteristic<Boolean> isTransactional = new IsTransactionalCharacteristic();
   private final Characteristic<List<ErrorModelParser>> errorModels;
 
   private final List<ModelProperty> additionalModelProperties =
       asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty(),
+             new NoConnectionProvisioningModelProperty(),
+             new NoReconnectionStrategyModelProperty(),
              new ComposedOperationModelProperty());
 
   private String name;
@@ -213,7 +219,11 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public boolean isConnected() {
-    // TODO: MULE-20077
+    return isConnected.getValue();
+  }
+
+  @Override
+  public boolean requiresOwnConnection() {
     return false;
   }
 
@@ -397,7 +407,8 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParser> operationModelParsersByName) {
-    computeCharacteristicsWithoutFiltering(asList(isBlocking, notificationModels, errorModels), operationModelParsersByName);
+    computeCharacteristicsWithoutFiltering(asList(isBlocking, isConnected, notificationModels, errorModels),
+                                           operationModelParsersByName);
     computeCharacteristicsWithFiltering(singletonList(isTransactional), operationModelParsersByName);
   }
 
