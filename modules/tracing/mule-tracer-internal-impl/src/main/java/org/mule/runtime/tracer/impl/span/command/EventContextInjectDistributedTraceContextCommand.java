@@ -13,32 +13,33 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 
+import java.util.function.BiConsumer;
+
+import org.slf4j.Logger;
+
 /**
- * A {@link VoidCommand} that injects the span context.
+ * An {@link AbstractFailSafeVoidBiCommand} that injects the span context.
  *
  * The carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextInjectDistributedTraceContextCommand extends AbstractFailsafeSpanVoidCommand {
+public class EventContextInjectDistributedTraceContextCommand
+    extends AbstractFailSafeVoidBiCommand<EventContext, DistributedTraceContextGetter> {
 
-  public static final String ERROR_MESSAGE = "Error injecting the span context";
-
-  private final EventContext eventContext;
-  private final DistributedTraceContextGetter getter;
-
-  public static VoidCommand getEventContextInjectDistributedTraceContextCommand(EventContext eventContext,
-                                                                                DistributedTraceContextGetter getter) {
-    return new EventContextInjectDistributedTraceContextCommand(eventContext, getter);
+  public static EventContextInjectDistributedTraceContextCommand getEventContextInjectDistributedTraceContextCommand(Logger logger,
+                                                                                                                     String errorMessage,
+                                                                                                                     boolean propagateExceptions) {
+    return new EventContextInjectDistributedTraceContextCommand(logger, errorMessage, propagateExceptions);
   }
 
-  private EventContextInjectDistributedTraceContextCommand(EventContext eventContext, DistributedTraceContextGetter getter) {
-    this.eventContext = eventContext;
-    this.getter = getter;
+  private EventContextInjectDistributedTraceContextCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
+    super(logger, errorMessage, propagateExceptions);
   }
 
-  protected Runnable getRunnable() {
-    return () -> {
+  @Override
+  BiConsumer<EventContext, DistributedTraceContextGetter> getConsumer() {
+    return (eventContext, getter) -> {
       if (eventContext instanceof SpanContextAware) {
         ((SpanContextAware) eventContext).setSpanContext(
                                                          builder()
@@ -46,10 +47,5 @@ public class EventContextInjectDistributedTraceContextCommand extends AbstractFa
                                                              .build());
       }
     };
-  }
-
-  @Override
-  protected String getErrorMessage() {
-    return ERROR_MESSAGE;
   }
 }

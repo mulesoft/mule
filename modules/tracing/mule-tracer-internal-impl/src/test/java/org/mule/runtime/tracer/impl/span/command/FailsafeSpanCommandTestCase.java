@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
-import static org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand.getFailsafeSpanCommand;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -18,7 +17,6 @@ import static org.mockito.Mockito.when;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.tracer.impl.span.command.FailsafeSpanCommand;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -26,15 +24,16 @@ import org.slf4j.Logger;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class FailSafeSpanCommandTestCase {
+public class FailsafeSpanCommandTestCase {
 
   public static final String EXPECTED_WARNING_MESSAGE = "expectedWarningMessage";
 
   public static final RuntimeException TEST_EXCEPTION = new RuntimeException();
+  public static final String TEST_PARAMETER_1 = "param1";
+  public static final String TEST_PARAMETER_2 = "param2";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
 
   @Test
   public void executePropagate() {
@@ -58,9 +57,10 @@ public class FailSafeSpanCommandTestCase {
   }
 
   private void doExecuteFailsafeCommand(boolean propagateException, Logger logger) {
-    FailsafeSpanCommand failsafeSpanCommand = getFailsafeSpanCommand(logger, EXPECTED_WARNING_MESSAGE, propagateException);
-    failsafeSpanCommand.execute(() -> {
+    FailsafeBiCommandExecutor<String, String> failsafeSpanCommand =
+        new FailsafeBiCommandExecutor(logger, EXPECTED_WARNING_MESSAGE, propagateException);
+    failsafeSpanCommand.execute((parameter1, parameter2) -> {
       throw TEST_EXCEPTION;
-    });
+    }, TEST_PARAMETER_1, TEST_PARAMETER_2);
   }
 }

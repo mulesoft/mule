@@ -7,47 +7,40 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
-import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.tracer.api.context.SpanContext;
-
-import java.util.Map;
-
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.tracer.api.context.SpanContext;
+import org.slf4j.Logger;
+
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 /**
- * A {@link VoidCommand} that ads span attributes. The carrier is the {@link EventContext}
+ * A {@link AbstractFailSafeVoidBiCommand} that ads span attributes. The carrier is the {@link EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextAddAttributesCommand extends AbstractFailsafeSpanVoidCommand {
+public class EventContextAddAttributesCommand extends AbstractFailSafeVoidBiCommand<EventContext, Map<String, String>> {
 
-  public static final String ERROR_MESSAGE = "Error adding a span attributes";
-
-  private final EventContext eventContext;
-  private final Map<String, String> attributes;
-
-  public static VoidCommand getEventContextAddSpanAttributesCommandFrom(EventContext eventContext,
-                                                                        Map<String, String> attributes) {
-    return new EventContextAddAttributesCommand(eventContext, attributes);
+  public static EventContextAddAttributesCommand getEventContextAddAttributesCommand(Logger logger,
+                                                                                     String errorMessage,
+                                                                                     boolean propagateException) {
+    return new EventContextAddAttributesCommand(logger, errorMessage, propagateException);
   }
 
-  private EventContextAddAttributesCommand(EventContext eventContext, Map<String, String> attributes) {
-    this.eventContext = eventContext;
-    this.attributes = attributes;
+  private EventContextAddAttributesCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
+    super(logger, errorMessage, propagateExceptions);
   }
 
-  protected Runnable getRunnable() {
-    return () -> {
+  @Override
+  BiConsumer<EventContext, Map<String, String>> getConsumer() {
+    return (eventContext, attributes) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
         spanContext.getSpan().ifPresent(span -> attributes.forEach(span::addAttribute));
       }
     };
-  }
-
-  @Override
-  protected String getErrorMessage() {
-    return ERROR_MESSAGE;
   }
 }

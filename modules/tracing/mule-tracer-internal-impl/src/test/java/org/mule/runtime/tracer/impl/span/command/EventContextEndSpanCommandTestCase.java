@@ -22,10 +22,13 @@ import org.mule.runtime.tracer.api.span.validation.Assertion;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
 public class EventContextEndSpanCommandTestCase {
+
+  public static final String TEST_ERROR = "Test error";
 
   @Test
   public void verifyEndsSpanIfPresent() {
@@ -37,8 +40,8 @@ public class EventContextEndSpanCommandTestCase {
     Assertion assertion = mock(Assertion.class);
 
     EventContextEndSpanCommand endCommand =
-        EventContextEndSpanCommand.getEventContextEndSpanCommandFrom((EventContext) eventContext, assertion);
-    endCommand.execute();
+        EventContextEndSpanCommand.getEventContextEndSpanCommandFrom(mock(Logger.class), TEST_ERROR, true);
+    endCommand.execute((EventContext) eventContext, assertion);
 
     verify(spanContext).endSpan(assertion);
   }
