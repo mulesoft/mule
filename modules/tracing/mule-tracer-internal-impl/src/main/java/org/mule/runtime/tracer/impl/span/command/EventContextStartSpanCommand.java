@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.function.TriFunction;
 
 /**
- * A {@link AbstractFailsafeTriCommand} that starts the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The carrier
+ * An {@link AbstractFailsafeTriCommand} that starts the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The carrier
  * is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
