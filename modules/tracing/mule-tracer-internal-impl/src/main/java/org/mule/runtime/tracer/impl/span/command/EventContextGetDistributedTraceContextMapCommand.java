@@ -20,7 +20,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 
 /**
- * A {@link AbstractFailsafeUnaryCommand} gets the current distributed trace context map.
+ * An {@link AbstractFailsafeUnaryCommand} gets the current distributed trace context map.
  *
  * The carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
