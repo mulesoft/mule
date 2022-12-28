@@ -59,8 +59,7 @@ import org.slf4j.Logger;
  */
 public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
-  private static final boolean PROPAGATE_TRACING_EXCEPTIONS =
-      getBoolean(MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
+  private final boolean propagateTracingExceptions = getBoolean(MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
 
   private static final Logger LOGGER = getLogger(CoreEventTracer.class);
   public static final String ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE =
@@ -160,26 +159,26 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   @Override
   public void initialise() throws InitialisationException {
     startCommand = getEventContextStartSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE,
-                                                       PROPAGATE_TRACING_EXCEPTIONS, eventSpanFactory);
+                                                       propagateTracingExceptions, eventSpanFactory);
     endCommand = getEventContextEndSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_END_COMMAND_MESSAGE,
-                                                   PROPAGATE_TRACING_EXCEPTIONS);
+                                                   propagateTracingExceptions);
     injectDistributedTraceContextCommand = getEventContextInjectDistributedTraceContextCommand(LOGGER,
                                                                                                ERROR_ON_EXECUTING_CORE_EVENT_TRACER_INJECT_DISTRIBUTED_TRACE_CONTEXT_COMMAND_MESSAGE,
                                                                                                false);
     recordErrorAtCurrentSpanCommand = getEventContextRecordErrorCommand(LOGGER,
                                                                         ERROR_ON_EXECUTING_CORE_EVENT_TRACER_RECORD_ERROR_COMMAND_MESSAGE,
-                                                                        PROPAGATE_TRACING_EXCEPTIONS);
+                                                                        propagateTracingExceptions);
     eventContextAddSpanAttributesCommand = getEventContextAddAttributesCommand(LOGGER,
                                                                                ERROR_ON_EXECUTING_CORE_EVENT_TRACER_ADD_ATTRIBUTES_COMMAND_MESSAGE,
-                                                                               PROPAGATE_TRACING_EXCEPTIONS);
+                                                                               propagateTracingExceptions);
     eventContextAddSpanAttributeCommand = getEventContextAddAttributeCommand(LOGGER,
                                                                              ERROR_ON_EXECUTING_CORE_EVENT_TRACER_ADD_ATTRIBUTE_COMMAND_MESSAGE,
-                                                                             PROPAGATE_TRACING_EXCEPTIONS);
+                                                                             propagateTracingExceptions);
     eventContextSetCurrentSpanCommand = getEventContextSetCurrentSpanNameCommand(LOGGER,
                                                                                  ERROR_ON_EXECUTING_CORE_EVENT_SET_CURRENT_SPAN_COMMAND_MESSAGE,
-                                                                                 PROPAGATE_TRACING_EXCEPTIONS);
+                                                                                 propagateTracingExceptions);
     eventContextGetDistributedTraceContextMap = getEventContextGetDistributedTraceContextMapCommand(LOGGER,
                                                                                                     ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE,
-                                                                                                    PROPAGATE_TRACING_EXCEPTIONS);
+                                                                                                    propagateTracingExceptions);
   }
 }
