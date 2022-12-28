@@ -17,7 +17,6 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -78,13 +77,6 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   protected String getLocationAsString(CoreEvent coreEvent) {
     return SpanInitialInfoUtils.getLocationAsString(component.getLocation());
-  }
-
-
-  private void addLoggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
-    if (coreEvent instanceof PrivilegedEvent) {
-      attributes.putAll(((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(emptyMap()));
-    }
   }
 
   @Override
