@@ -17,14 +17,14 @@ import org.mule.runtime.tracer.api.span.InternalSpanCallStack;
  */
 public class DefaultSpanCallStack implements InternalSpanCallStack {
 
-  private final FlowCallStack flowStack;
+  private final String flowStack;
 
   public DefaultSpanCallStack(FlowCallStack flowStack) {
-    this.flowStack = flowStack;
+    this.flowStack = flowStack.toString();
   }
 
   @Override
   public String toString() {
-    return flowStack.toString();
+    return flowStack;
   }
 }

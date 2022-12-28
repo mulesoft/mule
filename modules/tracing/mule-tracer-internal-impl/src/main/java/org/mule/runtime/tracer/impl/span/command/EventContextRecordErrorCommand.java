@@ -11,6 +11,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
+import org.mule.runtime.tracer.impl.span.error.DefaultSpanCallStack;
 import org.mule.runtime.tracer.impl.span.error.DefaultSpanError;
 
 import java.util.function.Supplier;
@@ -52,7 +53,7 @@ public class EventContextRecordErrorCommand extends AbstractFailsafeSpanVoidComm
       if (eventContext instanceof SpanContextAware) {
         ((SpanContextAware) eventContext)
             .getSpanContext()
-            .recordErrorAtSpan(new DefaultSpanError(spanErrorSupplier.get(), flowCallStack,
+            .recordErrorAtSpan(new DefaultSpanError(spanErrorSupplier.get(), new DefaultSpanCallStack(flowCallStack),
                                                     isErrorEscapingCurrentSpan));
       }
     };
