@@ -7,15 +7,17 @@
 
 package org.mule.runtime.core.api.tracing.customization;
 
+import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * A {@link InitialSpanInfo} based on a component.
@@ -32,20 +34,21 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   protected final CoreEvent coreEvent;
   protected final Component component;
-  private String suffix = "";
+  private final String name;
 
   public ComponentExecutionInitialSpanInfo(Component component,
                                            CoreEvent coreEvent,
-                                           String suffix) {
+                                           String spanNameSuffix) {
     this.component = component;
     this.coreEvent = coreEvent;
-    this.suffix = suffix;
+    this.name = SpanInitialInfoUtils.getSpanName(component.getIdentifier()) + spanNameSuffix;
   }
 
   public ComponentExecutionInitialSpanInfo(Component component,
                                            CoreEvent coreEvent) {
     this.component = component;
     this.coreEvent = coreEvent;
+    this.name = SpanInitialInfoUtils.getSpanName(component.getIdentifier());
   }
 
   @Override
@@ -66,48 +69,27 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   private void addLoggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
     if (coreEvent instanceof PrivilegedEvent) {
-      Optional<Map<String, String>> loggingVariables = ((PrivilegedEvent) coreEvent).getLoggingVariables();
-      if (loggingVariables.isPresent()) {
-        for (Map.Entry<String, String> entry : ((PrivilegedEvent) coreEvent).getLoggingVariables().get().entrySet()) {
-          attributes.put(entry.getKey(), entry.getValue());
-        }
-      }
+      attributes.putAll(((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(Collections.emptyMap()));
     }
   }
 
   @Override
   public String getName() {
-    return SpanInitialInfoUtils.getSpanName(component.getIdentifier()) + suffix;
+    return name;
   }
 
   @Override
   public InitialExportInfo getInitialExportInfo() {
-    return new InitialExportInfo() {
-
-      @Override
-      public boolean isExportable() {
-        return true;
-      }
-    };
+    return DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
 
   @Override
   public boolean isPolicySpan() {
-    if (component.getIdentifier() != null && component.getIdentifier().getName() != null
-        && component.getIdentifier().getName().equals("execute-next")) {
-      return true;
-    } else {
-      return false;
-    }
+    return component.getIdentifier() != null && "execute-next".equals(component.getIdentifier().getName());
   }
 
   @Override
   public boolean isRootSpan() {
-    if (component.getIdentifier() != null && component.getIdentifier().getName() != null
-        && component.getIdentifier().getName().equals("flow")) {
-      return true;
-    } ;
-
-    return false;
+    return component.getIdentifier() != null && "flow".equals(component.getIdentifier().getName());
   }
 }
