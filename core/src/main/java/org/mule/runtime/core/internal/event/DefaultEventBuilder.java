@@ -109,8 +109,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.loggingVariables = (CaseInsensitiveHashMap<String, String>) event.getLoggingVariables().orElse(null);
-    CaseInsensitiveHashMap<String, String> loggingVariablesCopyMap = new CaseInsensitiveHashMap<>();
     if (loggingVariables != null) {
+      CaseInsensitiveHashMap<String, String> loggingVariablesCopyMap = new CaseInsensitiveHashMap<>();
       loggingVariablesCopyMap.putAll(loggingVariables);
       this.loggingVariables = loggingVariablesCopyMap;
     }
