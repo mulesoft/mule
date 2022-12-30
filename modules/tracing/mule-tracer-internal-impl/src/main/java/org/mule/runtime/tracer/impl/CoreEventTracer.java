@@ -7,6 +7,7 @@
 package org.mule.runtime.tracer.impl;
 
 import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
+import static org.mule.runtime.tracer.impl.SpanInfoUtils.enrichInitialSpanInfo;
 import static org.mule.runtime.tracer.impl.span.command.EventContextAddAttributeCommand.getEventContextAddSpanAttributeCommandFrom;
 import static org.mule.runtime.tracer.impl.span.command.EventContextAddAttributesCommand.getEventContextAddSpanAttributesCommandFrom;
 import static org.mule.runtime.tracer.impl.span.command.EventContextEndSpanCommand.getEventContextEndSpanCommandFrom;
@@ -53,7 +54,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent> {
                                                    Assertion assertion) {
     return getEventContextStartSpanCommandFrom(coreEvent.getContext(),
                                                eventSpanFactory,
-                                               initialSpanInfo,
+                                               enrichInitialSpanInfo(initialSpanInfo, coreEvent),
                                                assertion).execute();
   }
 

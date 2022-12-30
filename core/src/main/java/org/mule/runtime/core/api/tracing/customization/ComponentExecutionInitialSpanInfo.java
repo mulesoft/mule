@@ -7,13 +7,11 @@
 
 package org.mule.runtime.core.api.tracing.customization;
 
+import static org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils.getLocationAsString;
+import static org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils.getSpanName;
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
-import static java.util.Collections.emptyMap;
-
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
@@ -28,55 +26,37 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
 
   public static final String LOCATION_KEY = "location";
-  public static final String CORRELATION_ID_KEY = "correlation.id";
-  public static final String THREAD_START_ID_KEY = "thread.start.id";
-  public static final String THREAD_START_NAME_KEY = "thread.start.name";
   // These are location, correlation.id, thread.start.id, thread.start.name
-  public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 4;
+  public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 1;
+  public static final String EXECUTE_NEXT = "execute-next";
+  public static final String FLOW = "flow";
 
-  protected final CoreEvent coreEvent;
   protected final Component component;
   private final String name;
+  private final boolean isPolicySpan;
+  private final boolean rootSpan;
 
   public ComponentExecutionInitialSpanInfo(Component component,
-                                           CoreEvent coreEvent,
                                            String spanNameSuffix) {
     this.component = component;
-    this.coreEvent = coreEvent;
-    this.name = SpanInitialInfoUtils.getSpanName(component.getIdentifier()) + spanNameSuffix;
+    this.name = getSpanName(component.getIdentifier()) + spanNameSuffix;
+    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT);
+    this.rootSpan = isComponentOfName(component, FLOW);
+
   }
 
-  public ComponentExecutionInitialSpanInfo(Component component,
-                                           CoreEvent coreEvent) {
-    this.component = component;
-    this.coreEvent = coreEvent;
-    this.name = SpanInitialInfoUtils.getSpanName(component.getIdentifier());
+  public ComponentExecutionInitialSpanInfo(Component component) {
+    this(component, "");
   }
 
   @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
-    biConsumer.accept(LOCATION_KEY, getLocationAsString(coreEvent));
-    biConsumer.accept(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
-    biConsumer.accept(THREAD_START_NAME_KEY, Thread.currentThread().getName());
-    biConsumer.accept(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
-    if (coreEvent instanceof PrivilegedEvent) {
-      ((PrivilegedEvent) coreEvent).getLoggingVariables().ifPresent(loggingVariables -> loggingVariables.forEach(biConsumer));
-    }
+    biConsumer.accept(LOCATION_KEY, getLocationAsString(component.getLocation()));
   }
 
   @Override
   public int getInitialAttributesCount() {
-    int count = INITIAL_ATTRIBUTES_BASE_COUNT;
-
-    if (coreEvent instanceof PrivilegedEvent) {
-      count += ((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(emptyMap()).size();
-    }
-
-    return count;
-  }
-
-  protected String getLocationAsString(CoreEvent coreEvent) {
-    return SpanInitialInfoUtils.getLocationAsString(component.getLocation());
+    return INITIAL_ATTRIBUTES_BASE_COUNT;
   }
 
   @Override
@@ -91,11 +71,16 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   @Override
   public boolean isPolicySpan() {
-    return component.getIdentifier() != null && "execute-next".equals(component.getIdentifier().getName());
+    return isPolicySpan;
   }
 
   @Override
   public boolean isRootSpan() {
-    return component.getIdentifier() != null && "flow".equals(component.getIdentifier().getName());
+    return rootSpan;
+  }
+
+
+  private boolean isComponentOfName(Component component, String name) {
+    return component.getIdentifier() != null && name.equals(component.getIdentifier().getName());
   }
 }

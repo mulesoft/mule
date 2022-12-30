@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
@@ -79,7 +79,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     this.nestedChain =
         buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
-                                          new SuffixComponentEventBasedInitialSpanInfoProvider(this, "attempt"));
+                                          new ComponentExecutionInitialSpanInfo(this, ":attempt"));
 
     super.initialise();
 

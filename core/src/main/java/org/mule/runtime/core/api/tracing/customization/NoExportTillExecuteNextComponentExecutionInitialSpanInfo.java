@@ -21,9 +21,8 @@ public class NoExportTillExecuteNextComponentExecutionInitialSpanInfo extends Co
 
   public static final String EXECUTE_NEXT = "execute-next";
 
-  public NoExportTillExecuteNextComponentExecutionInitialSpanInfo(Component component,
-                                                                  CoreEvent coreEvent) {
-    super(component, coreEvent);
+  public NoExportTillExecuteNextComponentExecutionInitialSpanInfo(Component component) {
+    super(component);
   }
 
   @Override
