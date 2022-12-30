@@ -10,8 +10,8 @@ package org.mule.runtime.tracer.impl.exporter;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
 import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigurationDiscoverer.discoverSpanExporterConfiguration;
 
-import io.opentelemetry.sdk.trace.SpanProcessor;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.profiling.configuration.AutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -23,9 +23,12 @@ import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResour
 
 import javax.inject.Inject;
 
+import io.opentelemetry.sdk.trace.SpanProcessor;
+
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
-  private static final SpanExporterConfiguration CONFIGURATION = discoverSpanExporterConfiguration();
+  private static final SpanExporterConfiguration CONFIGURATION =
+      new AutoConfigurableSpanExporterConfiguration(discoverSpanExporterConfiguration());
 
   @Inject
   MuleContext muleContext;

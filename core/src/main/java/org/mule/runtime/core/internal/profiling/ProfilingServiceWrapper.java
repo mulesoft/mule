@@ -31,17 +31,20 @@ import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
+
+import org.mule.runtime.core.internal.profiling.configuration.AutoConfigurableSpanExporterConfiguration;
 
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
-import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,7 +67,8 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   @Inject
   EventTracer<CoreEvent> coreEventTracer;
 
-  private static final SpanExporterConfiguration spanExporterConfiguration = discoverSpanExporterConfiguration();
+  private static final SpanExporterConfiguration spanExporterConfiguration =
+      new AutoConfigurableSpanExporterConfiguration(discoverSpanExporterConfiguration());
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
@@ -171,10 +175,9 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
-    if (parseBoolean(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED))) {
+    if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED))) {
       return coreEventTracer;
     }
-
     return getProfilingService().getCoreEventTracer();
   }
 

@@ -49,7 +49,7 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
   @Override
   public SpanExporter configExporter(SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
-    String endpoint = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT);
+    String endpoint = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT);
 
     // If we have an endpoint, we set it.
     OtlpHttpSpanExporterBuilder builder = OtlpHttpSpanExporter.builder();
@@ -58,24 +58,24 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
     }
 
     // We verify if we have a compression type and set it.
-    String type = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE);
+    String type = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE);
     if (type != null) {
       builder.setCompression(type);
     }
 
     // If we must enable tls, we do it.
-    if (spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "false").equals(TRUE.toString())) {
+    if (spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "false").equals(TRUE.toString())) {
       configureTls(builder, spanExporterConfiguration);
     }
 
     // Headers
-    String headers = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS);
+    String headers = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS);
     if (headers != null) {
       configureHeaders(builder, headers);
     }
 
     // Timeout
-    String timeout = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT);
+    String timeout = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT);
     if (timeout != null) {
       configureTimeout(builder, timeout);
     }
@@ -112,7 +112,7 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
                                                    SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
 
-    String caFilePath = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION);
+    String caFilePath = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION);
 
     if (caFilePath != null) {
       try {
@@ -126,8 +126,8 @@ public class HttpSpanExporterConfigurator implements SpanExporterConfigurator {
 
   private void configureClientTls(OtlpHttpSpanExporterBuilder builder, SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
-    String certFilePath = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION);
-    String keyFilePath = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
+    String certFilePath = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION);
+    String keyFilePath = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
 
     if (certFilePath != null && keyFilePath != null) {
       try {

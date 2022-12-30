@@ -19,7 +19,7 @@ import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 public class SystemPropertiesSpanExporterConfiguration implements SpanExporterConfiguration {
 
   @Override
-  public String getValue(String key) {
+  public String getStringValue(String key) {
     return getProperty(key);
   }
 }

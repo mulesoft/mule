@@ -40,38 +40,38 @@ public class FileSpanExporterConfigurationTestCase {
   @Test
   public void returnsTheValueForANonSystemProperty() {
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), equalTo(
-                                                                                                 VALUE_PROPERTY_NON_SYSTEM_PROPERTY));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), equalTo(
+                                                                                                       VALUE_PROPERTY_NON_SYSTEM_PROPERTY));
   }
 
   @Test
   public void returnsTheResolvedSystemProperty() {
     setProperty(KEY_PROPERTY_SYSTEM_PROPERTY, VALUE_PROPERTY_SYSTEM_PROPERTY);
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
-                                                                                             VALUE_PROPERTY_SYSTEM_PROPERTY));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
+                                                                                                   VALUE_PROPERTY_SYSTEM_PROPERTY));
   }
 
   @Test
   public void whenASystemPropertyCannotBeResolvedAnExceptionIsRaised() {
     expectedException.expect(PropertyNotFoundException.class);
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
-                                                                                             VALUE_PROPERTY_SYSTEM_PROPERTY));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
+                                                                                                   VALUE_PROPERTY_SYSTEM_PROPERTY));
   }
 
   @Test
   public void whenNoPropertyIsInTheFileNullValueIsReturned() {
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(NO_KEY_IN_FILE), is(nullValue()));
+    assertThat(fileSpanExporterConfiguration.getStringValue(NO_KEY_IN_FILE), is(nullValue()));
   }
 
   @Test
   public void whenFileIsNotFoundNoPropertyIsFound() {
     TestNoFileFoundSpanExporterConfiguration testNoFileFoundSpanExporterConfiguration =
         new TestNoFileFoundSpanExporterConfiguration();
-    assertThat(testNoFileFoundSpanExporterConfiguration.getValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
-    assertThat(testNoFileFoundSpanExporterConfiguration.getValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
+    assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
+    assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
   }
 
   /**

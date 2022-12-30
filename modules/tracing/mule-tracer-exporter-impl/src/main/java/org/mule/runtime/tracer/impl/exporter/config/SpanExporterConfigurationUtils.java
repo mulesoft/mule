@@ -79,15 +79,17 @@ public class SpanExporterConfigurationUtils {
 
     public RetryPolicy build() {
       return RetryPolicy.builder()
-          .setBackoffMultiplier(parseDouble(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER,
-                                                                               DEFAULT_BACKOFF_MULTIPLIER)))
-          .setInitialBackoff(ofSeconds(parseLong(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF,
-                                                                                    DEFAULT_INITIAL_BACKOFF))))
-          .setMaxBackoff(ofSeconds(parseLong(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF,
-                                                                                DEFAULT_MAXIMUM_BACKOFF))))
+          .setBackoffMultiplier(parseDouble(spanExporterConfiguration
+              .getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER,
+                              DEFAULT_BACKOFF_MULTIPLIER)))
+          .setInitialBackoff(ofSeconds(parseLong(spanExporterConfiguration
+              .getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF,
+                              DEFAULT_INITIAL_BACKOFF))))
+          .setMaxBackoff(ofSeconds(parseLong(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF,
+                                                                                      DEFAULT_MAXIMUM_BACKOFF))))
           .setMaxAttempts(Integer
-              .parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS,
-                                                           DEFAULT_MAX_ATTEMPTS)))
+              .parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS,
+                                                                 DEFAULT_MAX_ATTEMPTS)))
           .build();
     }
   }

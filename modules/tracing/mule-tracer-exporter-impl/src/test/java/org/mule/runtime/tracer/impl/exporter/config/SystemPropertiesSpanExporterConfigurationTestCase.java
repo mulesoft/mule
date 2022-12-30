@@ -29,10 +29,10 @@ public class SystemPropertiesSpanExporterConfigurationTestCase {
     String propertyValue = "propertyAValue";
     testWithSystemProperty(propertyKey, propertyValue, () -> {
       SystemPropertiesSpanExporterConfiguration configuration = new SystemPropertiesSpanExporterConfiguration();
-      assertThat(configuration.getValue(propertyKey),
+      assertThat(configuration.getStringValue(propertyKey),
                  is(propertyValue));
 
-      assertThat(configuration.getValue("propertyNonExizting"), is(nullValue()));
+      assertThat(configuration.getStringValue("propertyNonExizting"), is(nullValue()));
     });
   }
 }
