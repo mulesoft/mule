@@ -47,6 +47,7 @@ public class EventContextRecordErrorCommandTestCase {
 
     Supplier<Error> spanErrorSupplier = () -> mock(Error.class);
     FlowCallStack flowStack = mock(FlowCallStack.class);
+    when(coreEvent.getFlowCallStack()).thenReturn(flowStack);
     EventContextRecordErrorCommand eventContextRecordErrorCommand =
         EventContextRecordErrorCommand.getEventContextRecordErrorCommand(mock(Logger.class),
                                                                          TEST_ERROR_MESSAGE, true);
