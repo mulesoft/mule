@@ -72,4 +72,20 @@ public interface InitialSpanInfo {
   default int getInitialAttributesCount() {
     return 0;
   }
+
+  /**
+   * Sets a span that can be reused.
+   *
+   * @param reusableSpan internal span.
+   */
+  default void setReusableSpan(InternalSpan reusableSpan) {}
+
+  /**
+   * Gets a reusable span.
+   *
+   * @return the reusable span.
+   */
+  default InternalSpan getReusableSpan() {
+    return null;
+  }
 }

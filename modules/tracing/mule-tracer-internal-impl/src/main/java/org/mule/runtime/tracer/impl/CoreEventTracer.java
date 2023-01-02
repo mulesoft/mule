@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
 import static org.mule.runtime.tracer.impl.SpanInfoUtils.enrichInitialSpanInfo;
 import static org.mule.runtime.tracer.impl.span.command.EventContextAddAttributeCommand.getEventContextAddAttributeCommand;
@@ -107,6 +108,10 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   @Override
   public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo initialSpanInfo,
                                                    Assertion assertion) {
+    if (initialSpanInfo.getReusableSpan() != null) {
+      return of(initialSpanInfo.getReusableSpan());
+    }
+
     return startCommand.execute(coreEvent.getContext(), enrichInitialSpanInfo(initialSpanInfo, coreEvent), assertion);
   }
 

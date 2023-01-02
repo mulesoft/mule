@@ -128,6 +128,15 @@ public interface InternalSpan extends Span {
    */
   int getAttributesCount();
 
+  /**
+   * Resets the span for reuse
+   *
+   * @return the reset {@link InternalSpan}
+   */
+  default InternalSpan reset() {
+    return this;
+  }
+
 
   /**
    * A wrapper as InternalSpan for other type of {@link Span}

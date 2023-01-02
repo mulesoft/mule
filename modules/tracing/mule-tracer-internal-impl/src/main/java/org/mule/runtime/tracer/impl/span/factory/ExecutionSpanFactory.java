@@ -10,7 +10,7 @@ package org.mule.runtime.tracer.impl.span.factory;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.span.info.EnrichedInitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import javax.inject.Inject;
@@ -24,7 +24,7 @@ public class ExecutionSpanFactory implements EventSpanFactory {
 
   @Override
   public InternalSpan getSpan(SpanContext spanContext,
-                              InitialSpanInfo initialSpanInfo) {
+                              EnrichedInitialSpanInfo initialSpanInfo) {
     return getExecutionSpanBuilder()
         .withStartSpanInfo(initialSpanInfo)
         .withParentSpan(spanContext.getSpan().orElse(null))

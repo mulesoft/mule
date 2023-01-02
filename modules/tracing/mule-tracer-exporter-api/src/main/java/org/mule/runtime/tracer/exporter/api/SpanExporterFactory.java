@@ -8,6 +8,7 @@
 package org.mule.runtime.tracer.exporter.api;
 
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.span.info.EnrichedInitialSpanInfo;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -26,7 +27,7 @@ public interface SpanExporterFactory {
    *
    * @return a {@link SpanExporter} for the {@link InternalSpan}.
    */
-  SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo);
+  SpanExporter getSpanExporter(InternalSpan internalSpan, EnrichedInitialSpanInfo initialExportInfo);
 
   /**
    * @return a {@link SpanSnifferManager}.

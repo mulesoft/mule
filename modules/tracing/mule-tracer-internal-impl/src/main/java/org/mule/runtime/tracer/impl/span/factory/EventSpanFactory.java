@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.info.EnrichedInitialSpanInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
@@ -24,14 +25,12 @@ public interface EventSpanFactory {
    * Provides a span for related to a component that is hit by an event.
    *
    * @param spanContext     the {@link SpanContext}.
-   * @param artifactId      the artifact id.
-   * @param artifactType    the {@link ArtifactType}
    * @param initialSpanInfo the {@link InitialSpanInfo}.
    *
    * @return the resulting {@link InternalSpan}
    */
   InternalSpan getSpan(SpanContext spanContext,
-                       InitialSpanInfo initialSpanInfo);
+                       EnrichedInitialSpanInfo initialSpanInfo);
 
   SpanSnifferManager getSpanSnifferManager();
 }

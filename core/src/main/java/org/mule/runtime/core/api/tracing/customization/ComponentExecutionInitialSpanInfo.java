@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUti
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
@@ -35,6 +36,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String name;
   private final boolean isPolicySpan;
   private final boolean rootSpan;
+  private InternalSpan reusableSpan;
 
   public ComponentExecutionInitialSpanInfo(Component component,
                                            String spanNameSuffix) {
@@ -82,5 +84,15 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   private boolean isComponentOfName(Component component, String name) {
     return component.getIdentifier() != null && name.equals(component.getIdentifier().getName());
+  }
+
+  @Override
+  public void setReusableSpan(InternalSpan reusableSpan) {
+    this.reusableSpan = reusableSpan;
+  }
+
+  @Override
+  public InternalSpan getReusableSpan() {
+    return reusableSpan.reset();
   }
 }

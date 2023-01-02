@@ -19,6 +19,7 @@ import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
+import org.mule.runtime.tracer.api.span.info.EnrichedInitialSpanInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
@@ -174,6 +175,13 @@ public class ExecutionSpan implements InternalSpan {
     spanExporter.updateChildSpanExporter(internalSpan.getSpanExporter());
   }
 
+  @Override
+  public InternalSpan reset() {
+    additionalAttributes.clear();
+    spanExporter.reset();
+    return this;
+  }
+
   /**
    * x A Builder for {@link ExecutionSpan}
    *
@@ -186,11 +194,11 @@ public class ExecutionSpan implements InternalSpan {
     private InternalSpan parent;
     private Long startTime;
     private SpanExporterFactory spanExporterFactory;
-    private InitialSpanInfo initialSpanInfo;
+    private EnrichedInitialSpanInfo initialSpanInfo;
 
     private ExecutionSpanBuilder() {}
 
-    public ExecutionSpanBuilder withStartSpanInfo(InitialSpanInfo spanCustomizationInfo) {
+    public ExecutionSpanBuilder withStartSpanInfo(EnrichedInitialSpanInfo spanCustomizationInfo) {
       this.initialSpanInfo = spanCustomizationInfo;
       return this;
     }
