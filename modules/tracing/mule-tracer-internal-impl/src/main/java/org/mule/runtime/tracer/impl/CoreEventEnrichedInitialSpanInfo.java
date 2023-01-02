@@ -22,6 +22,7 @@ public class CoreEventEnrichedInitialSpanInfo implements EnrichedInitialSpanInfo
   private static final String CORRELATION_ID_KEY = "correlation.id";
   private static final String THREAD_START_NAME_KEY = "thread.start.name";
   private static final String THREAD_START_ID_KEY = "thread.start.id";
+  // These are correlation.id, thread.start.id, thread.start.name
   public static final int ADDITIONAL_SPAN_ATTRIBUTES_COUNT = 3;
 
   private final InitialSpanInfo baseInitialSpanInfo;

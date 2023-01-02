@@ -26,7 +26,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
 
   public static final String LOCATION_KEY = "location";
-  // These are location, correlation.id, thread.start.id, thread.start.name
+  // Only attribute is the location key.
   public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 1;
   public static final String EXECUTE_NEXT = "execute-next";
   public static final String FLOW = "flow";
