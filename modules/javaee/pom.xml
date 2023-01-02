@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.4.0-20221212</version>
+        <version>4.4.0-20230102</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
