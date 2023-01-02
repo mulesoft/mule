@@ -5,23 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.tracing.customization;
+package org.mule.runtime.tracer.impl;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.tracer.api.span.info.EnrichedInitialSpanInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
-/**
- * A provider for {@link InitialSpanInfo} based on {@link CoreEvent}
- *
- * @since 4.5.0
- */
-public interface EventBasedInitialSpanInfoProvider {
+public class SpanInfoUtils {
 
-  /**
-   * @param core a {@link CoreEvent}
-   *
-   * @return the {@link InitialSpanInfo}
-   */
-  InitialSpanInfo get(CoreEvent core);
+  public static EnrichedInitialSpanInfo enrichInitialSpanInfo(InitialSpanInfo spanCustomizationInfo, CoreEvent coreEvent) {
+    return new CoreEventEnrichedInitialSpanInfo(spanCustomizationInfo, coreEvent);
+  }
 
 }

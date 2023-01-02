@@ -20,8 +20,8 @@ import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
  */
 public class NoExportComponentExecutionInitialSpanInfo extends ComponentExecutionInitialSpanInfo {
 
-  public NoExportComponentExecutionInitialSpanInfo(Component component, CoreEvent coreEvent) {
-    super(component, coreEvent);
+  public NoExportComponentExecutionInitialSpanInfo(Component component) {
+    super(component);
   }
 
   @Override

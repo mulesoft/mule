@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 
@@ -76,7 +76,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     routes.add(new ProcessorRoute(defaultProcessor));
 
     for (ProcessorRoute route : routes) {
-      route.setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
+      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
       initialiseIfNeeded(route, muleContext);
     }
   }
