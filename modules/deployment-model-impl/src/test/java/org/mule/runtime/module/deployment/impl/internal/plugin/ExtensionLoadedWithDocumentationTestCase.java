@@ -24,6 +24,7 @@ import org.mule.runtime.module.artifact.activation.internal.descriptor.DefaultDe
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -34,7 +35,7 @@ import io.qameta.allure.Issue;
 import org.junit.Test;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
-public class ExtensionLoadedWithDocumentationTestCase {
+public class ExtensionLoadedWithDocumentationTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-12289043")
@@ -53,7 +54,7 @@ public class ExtensionLoadedWithDocumentationTestCase {
 
     assertThat(extensionModels, hasItem(hasProperty("name", is("Database"))));
     ExtensionModel dbExtensionModel = extensionModels.stream().filter(em -> em.getName().equals("Database")).findAny().get();
-    assertThat(dbExtensionModel.getDescription(), not(is("")));
+    assertThat(dbExtensionModel.getDescription().trim(), not(is("")));
 
     stopIfNeeded(extensionModelLoaderRepository);
   }
