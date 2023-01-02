@@ -93,6 +93,9 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   @Override
   public InternalSpan getReusableSpan() {
+    if (reusableSpan == null) {
+      return reusableSpan;
+    }
     return reusableSpan.reset();
   }
 }
