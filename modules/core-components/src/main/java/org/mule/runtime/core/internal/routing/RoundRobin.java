@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
@@ -58,7 +58,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
+      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
       initialiseIfNeeded(route, muleContext);
     }
   }

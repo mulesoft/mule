@@ -3,6 +3,264 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentEventBasedInitialSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.CORRELATION_ID_KEY",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "fieldName": "CORRELATION_ID_KEY",
+          "elementKind": "field",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.THREAD_START_ID_KEY",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "fieldName": "THREAD_START_ID_KEY",
+          "elementKind": "field",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.THREAD_START_NAME_KEY",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "fieldName": "THREAD_START_NAME_KEY",
+          "elementKind": "field",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.coreEvent",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "fieldName": "coreEvent",
+          "elementKind": "field",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, ===org.mule.runtime.core.api.event.CoreEvent===)",
+          "new": "parameter void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, ===java.lang.String===)",
+          "oldType": "org.mule.runtime.core.api.event.CoreEvent",
+          "newType": "java.lang.String",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "methodName": "<init>",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, org.mule.runtime.core.api.event.CoreEvent, java.lang.String)",
+          "new": "method void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component)",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method java.lang.String org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::getLocationAsString(org.mule.runtime.core.api.event.CoreEvent)",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "methodName": "getLocationAsString",
+          "elementKind": "method",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "EventBasedInitialSpanInfoProvider",
+          "elementKind": "interface",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.FixedNameComponentEventInitialSpanSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "FixedNameComponentEventInitialSpanSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.FixedNameEventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "FixedNameEventBasedInitialSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportComponentEventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportComponentEventBasedInitialSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, org.mule.runtime.core.api.event.CoreEvent)",
+          "new": "method void org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component)",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportComponentExecutionInitialSpanInfo",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportFixedNameEventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportFixedNameEventBasedInitialSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentEventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportTillExecuteNextComponentEventBasedInitialSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, org.mule.runtime.core.api.event.CoreEvent)",
+          "new": "method void org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component)",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportTillExecuteNextComponentExecutionInitialSpanInfo",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "SuffixComponentEventBasedInitialSpanInfoProvider",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, java.lang.String, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
+          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, java.lang.String, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
+          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
+          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "parameterIndex": "4",
+          "elementKind": "parameter",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
+          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
+          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
+          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "parameterIndex": "3",
+          "elementKind": "parameter",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
+          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
+          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
+          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "parameterIndex": "2",
+          "elementKind": "parameter",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::newChain(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
+          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::newChain(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
+          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
+          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "newChain",
+          "parameterIndex": "2",
+          "elementKind": "parameter",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder.eventBasedInitialSpanInfoProvider",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "AbstractMessageProcessorChainBuilder",
+          "fieldName": "eventBasedInitialSpanInfoProvider",
+          "elementKind": "field",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder::setEventBasedInitialSpanInfoProvider(org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider)",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "AbstractMessageProcessorChainBuilder",
+          "methodName": "setEventBasedInitialSpanInfoProvider",
+          "elementKind": "method",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChain::setEventBasedInitialSpanInfoProvider(org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider) @ org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "DefaultMessageProcessorChain",
+          "methodName": "setEventBasedInitialSpanInfoProvider",
+          "elementKind": "method",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+          "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+          "interface": "org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "DefaultMessageProcessorChainBuilder",
+          "elementKind": "class",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder::setEventBasedInitialSpanInfoProvider(org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider)",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "MessageProcessorChainBuilder",
+          "methodName": "setEventBasedInitialSpanInfoProvider",
+          "elementKind": "method",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware",
+          "package": "org.mule.runtime.core.privileged.profiling.tracing",
+          "classSimpleName": "EventBasedInitialSpanInfoProviderAware",
+          "elementKind": "interface",
+          "justification": "To remove once cherry-picked in 4.5.x"
+        },
+        {
           "code": "java.field.removed",
           "old": "field org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler",
           "package": "org.mule.runtime.core.privileged.exception",

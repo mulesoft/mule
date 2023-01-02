@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware;
+import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
 import org.reactivestreams.Publisher;
 
 /**
@@ -62,9 +62,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   public void setRoutes(List<MessageProcessorChain> routes) {
     this.routes = routes;
     for (MessageProcessorChain route : routes) {
-      if (route instanceof EventBasedInitialSpanInfoProviderAware) {
-        ((EventBasedInitialSpanInfoProviderAware) route)
-            .setEventBasedInitialSpanInfoProvider(new SuffixComponentEventBasedInitialSpanInfoProvider(this, "route"));
+      if (route instanceof InitialSpanInfoAware) {
+        ((InitialSpanInfoAware) route)
+            .setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
       }
     }
   }
