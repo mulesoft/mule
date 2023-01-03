@@ -10,6 +10,7 @@ package org.mule.runtime.tracer.impl.exporter.config;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.tracer.exporter.api.config.SystemPropertiesSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 import org.slf4j.Logger;

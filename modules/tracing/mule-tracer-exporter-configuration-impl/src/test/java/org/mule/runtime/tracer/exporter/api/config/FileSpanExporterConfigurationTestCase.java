@@ -5,6 +5,8 @@
  * LICENSE.txt file.
  */
 
+package org.mule.runtime.tracer.exporter.api.config;
+
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -16,7 +18,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
-import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
