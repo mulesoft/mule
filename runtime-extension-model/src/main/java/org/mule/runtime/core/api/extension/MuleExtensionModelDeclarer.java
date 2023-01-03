@@ -65,6 +65,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
@@ -99,6 +100,7 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
@@ -211,6 +213,9 @@ class MuleExtensionModelDeclarer {
 
     // errors
     declareErrors(extensionDeclarer);
+
+    // functions
+    declareFunctions(extensionDeclarer);
 
     // misc
     declareNotifications(extensionDeclarer);
@@ -1022,6 +1027,24 @@ class MuleExtensionModelDeclarer {
     extensionDeclarer.withErrorModel(overloadError);
     extensionDeclarer.withErrorModel(newError(FLOW_BACK_PRESSURE).handleable(false).withParent(overloadError).build());
     extensionDeclarer.withErrorModel(newError(FATAL).handleable(false).withParent(criticalError).build());
+  }
+
+  private void declareFunctions(ExtensionDeclarer extensionDeclarer) {
+    FunctionDeclarer functionDeclarer = extensionDeclarer.withFunction("p");
+    functionDeclarer.onDefaultParameterGroup().withRequiredParameter("name").ofType(STRING_TYPE);
+    functionDeclarer.withOutput().describedAs("Returns the value of a property").ofType(STRING_TYPE);
+
+    functionDeclarer = extensionDeclarer.withFunction("lookup");
+    functionDeclarer.onDefaultParameterGroup().withRequiredParameter("flowName").ofType(STRING_TYPE);
+    functionDeclarer.onDefaultParameterGroup().withRequiredParameter("payload").ofType(ANY_TYPE);
+    functionDeclarer.onDefaultParameterGroup().withOptionalParameter("timeoutMillis").ofType(INTEGER_TYPE);
+    functionDeclarer.withOutput().describedAs("Executes the desired flow with the specified payload and returns its result")
+        .ofType(ANY_TYPE);
+
+    functionDeclarer = extensionDeclarer.withFunction("causedBy");
+    functionDeclarer.onDefaultParameterGroup().withRequiredParameter("error").ofType(ERROR);
+    functionDeclarer.onDefaultParameterGroup().withRequiredParameter("type").ofType(STRING_TYPE);
+    functionDeclarer.withOutput().describedAs("Determines whether an error matches a certain error type").ofType(BOOLEAN_TYPE);
   }
 
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer) {

@@ -26,11 +26,15 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
@@ -60,6 +64,7 @@ import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
@@ -817,6 +822,51 @@ public class CoreExtensionModelTestCase {
     assertThat(value.isComponentId(), is(false));
     assertThat(value.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(value.getType(), is(instanceOf(StringType.class)));
+  }
+
+  @Test
+  public void runtimeFunctions() {
+    assertThat(coreExtensionModel.getFunctionModels(), hasSize(3));
+
+    Optional<FunctionModel> p = coreExtensionModel.getFunctionModel("p");
+    assertThat(p.isPresent(), is(true));
+    assertThat(p.get().getOutput().getType(), is(STRING_TYPE));
+    assertThat(p.get().getAllParameterModels(), hasSize(1));
+    ParameterModel parameter = p.get().getAllParameterModels().get(0);
+    assertThat(parameter.getName(), is("name"));
+    assertThat(parameter.isRequired(), is(true));
+    assertThat(parameter.getType(), is(STRING_TYPE));
+
+    Optional<FunctionModel> lookup = coreExtensionModel.getFunctionModel("lookup");
+    assertThat(lookup.isPresent(), is(true));
+    assertThat(lookup.get().getOutput().getType(), is(ANY_TYPE));
+    assertThat(lookup.get().getAllParameterModels(), hasSize(3));
+    Optional<ParameterModel> param =
+        lookup.get().getAllParameterModels().stream().filter(par -> par.getName().equals("flowName")).findFirst();
+    assertThat(param.isPresent(), is(true));
+    assertThat(param.get().isRequired(), is(true));
+    assertThat(param.get().getType(), is(STRING_TYPE));
+    param = lookup.get().getAllParameterModels().stream().filter(par -> par.getName().equals("payload")).findFirst();
+    assertThat(param.isPresent(), is(true));
+    assertThat(param.get().isRequired(), is(true));
+    assertThat(param.get().getType(), is(ANY_TYPE));
+    param = lookup.get().getAllParameterModels().stream().filter(par -> par.getName().equals("timeoutMillis")).findFirst();
+    assertThat(param.isPresent(), is(true));
+    assertThat(param.get().isRequired(), is(false));
+    assertThat(param.get().getType(), is(INTEGER_TYPE));
+
+    Optional<FunctionModel> causedBy = coreExtensionModel.getFunctionModel("causedBy");
+    assertThat(causedBy.isPresent(), is(true));
+    assertThat(causedBy.get().getOutput().getType(), is(BOOLEAN_TYPE));
+    assertThat(causedBy.get().getAllParameterModels(), hasSize(2));
+    param = causedBy.get().getAllParameterModels().stream().filter(par -> par.getName().equals("error")).findFirst();
+    assertThat(param.isPresent(), is(true));
+    assertThat(param.get().isRequired(), is(true));
+    assertThat(param.get().getType(), is(ERROR));
+    param = causedBy.get().getAllParameterModels().stream().filter(par -> par.getName().equals("type")).findFirst();
+    assertThat(param.isPresent(), is(true));
+    assertThat(param.get().isRequired(), is(true));
+    assertThat(param.get().getType(), is(STRING_TYPE));
   }
 
   void verifyOnError(NestedRouteModel route) {
