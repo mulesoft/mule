@@ -46,7 +46,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                              ArtifactPluginDescriptor artifactPluginDescriptor,
                                              Set<ExtensionModel> dependencies) {
     Map<String, Object> additionalAttributes = new HashMap<>(discoveryRequest.getParameters());
-    if (discoveryRequest.isEnrichDescriptions()) {
+    if (!discoveryRequest.isEnrichDescriptions()) {
       additionalAttributes.put("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT", true);
     }
 
