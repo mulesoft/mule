@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.ARTIFACT_ID;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.ARTIFACT_TYPE;
@@ -89,7 +88,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private final SpanProcessor spanProcessor;
 
   private boolean exportable;
-  private SpanContext spanContext;
+  private SpanContext spanContext = getInvalid();
   private SpanContext parentSpanContext = getInvalid();
   private SpanKind spanKind = INTERNAL;
   private StatusData statusData = ok();
@@ -114,10 +113,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactId = artifactId;
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
-
-    // Generates the span id so that the opentelemetry spans can be lazily initialised.
-    this.spanContext = SpanContext.create(generateTraceId(getAsInternalSpan(internalSpan.getParent())), generateSpanId(),
-                                          TraceFlags.getSampled(), TraceState.getDefault());
   }
 
   @Nullable
@@ -203,12 +198,28 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
     parentSpanContext = extractContextFromTraceParent(serializeAsMap.get("traceparent"));
+    spanContext = updateSpanContext(parentSpanContext);
+  }
+
+  private SpanContext updateSpanContext(SpanContext parentSpanContext) {
+    String traceId = null;
+    if (parentSpanContext == getInvalid()) {
+      traceId = generateTraceId();
+    } else {
+      traceId = parentSpanContext.getTraceId();
+    }
+
+    // Generates the span id so that the open telemetry spans can be lazily initialised.
+    return SpanContext.create(traceId, generateSpanId(),
+                              TraceFlags.getSampled(), TraceState.getDefault());
   }
 
   @Override
   public void updateChildSpanExporter(SpanExporter childSpanExporter) {
     if (childSpanExporter instanceof OpenTelemetrySpanExporter) {
       OpenTelemetrySpanExporter childOpenTelemetrySpanExporter = (OpenTelemetrySpanExporter) childSpanExporter;
+
+      childOpenTelemetrySpanExporter.spanContext = updateSpanContext(spanContext);
 
       // If it isn't exportable propagate the traceId and spanId
       if (!childOpenTelemetrySpanExporter.exportable) {

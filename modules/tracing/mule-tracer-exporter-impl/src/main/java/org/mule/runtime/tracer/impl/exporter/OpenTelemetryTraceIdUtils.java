@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import static io.opentelemetry.sdk.trace.IdGenerator.random;
+
 import static java.util.Collections.emptyMap;
 
 import io.opentelemetry.api.internal.OtelEncodingUtils;
@@ -15,15 +17,10 @@ import io.opentelemetry.api.trace.SpanId;
 import io.opentelemetry.api.trace.TraceFlags;
 import io.opentelemetry.api.trace.TraceId;
 import io.opentelemetry.api.trace.TraceState;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Supplier;
 
 /**
  * Utils for generating Open Telemetry Trace Ids
@@ -34,23 +31,13 @@ public class OpenTelemetryTraceIdUtils {
 
   private OpenTelemetryTraceIdUtils() {}
 
-  private static final Supplier<Random> randomSupplier = ThreadLocalRandom::current;
-
-  private static final long INVALID_ID = 0;
-
   private static final ThreadLocal<char[]> CHAR_ARRAY = new ThreadLocal<>();
 
   private static final String INVALID = "0000000000000000";
 
-  private static final String ALPHABET = "0123456789abcdef";
-
   private static final int BYTES_LENGTH = 16;
 
   private static final int HEX_LENGTH = 2 * BYTES_LENGTH;
-
-  static final int BYTE_BASE16 = 2;
-
-  private static final char[] ENCODING = buildEncodingArray();
 
   static final String TRACE_PARENT = "traceparent";
 
@@ -69,42 +56,6 @@ public class OpenTelemetryTraceIdUtils {
       SPAN_ID_OFFSET + SPAN_ID_HEX_SIZE + TRACEPARENT_DELIMITER_SIZE;
   private static final int TRACEPARENT_HEADER_SIZE = TRACE_OPTION_OFFSET + TRACE_OPTION_HEX_SIZE;
 
-
-  private static char[] buildEncodingArray() {
-    char[] encoding = new char[512];
-    for (int i = 0; i < 256; ++i) {
-      encoding[i] = ALPHABET.charAt(i >>> 4);
-      encoding[i | 0x100] = ALPHABET.charAt(i & 0xF);
-    }
-    return encoding;
-  }
-
-  public static String fromLong(long id) {
-    if (id == 0) {
-      return getInvalid();
-    }
-    char[] result = chars(HEX_LENGTH_SPAN_ID);
-    longToBase16String(id, result, 0);
-    return new String(result, 0, HEX_LENGTH_SPAN_ID);
-  }
-
-  public static void longToBase16String(long value, char[] dest, int destOffset) {
-    byteToBase16((byte) (value >> 56 & 0xFFL), dest, destOffset);
-    byteToBase16((byte) (value >> 48 & 0xFFL), dest, destOffset + BYTE_BASE16);
-    byteToBase16((byte) (value >> 40 & 0xFFL), dest, destOffset + 2 * BYTE_BASE16);
-    byteToBase16((byte) (value >> 32 & 0xFFL), dest, destOffset + 3 * BYTE_BASE16);
-    byteToBase16((byte) (value >> 24 & 0xFFL), dest, destOffset + 4 * BYTE_BASE16);
-    byteToBase16((byte) (value >> 16 & 0xFFL), dest, destOffset + 5 * BYTE_BASE16);
-    byteToBase16((byte) (value >> 8 & 0xFFL), dest, destOffset + 6 * BYTE_BASE16);
-    byteToBase16((byte) (value & 0xFFL), dest, destOffset + 7 * BYTE_BASE16);
-  }
-
-  public static void byteToBase16(byte value, char[] dest, int destOffset) {
-    int b = value & 0xFF;
-    dest[destOffset] = ENCODING[b];
-    dest[destOffset + 1] = ENCODING[b | 0x100];
-  }
-
   public static char[] chars(int len) {
     char[] buffer = CHAR_ARRAY.get();
     if (buffer == null || buffer.length < len) {
@@ -115,41 +66,16 @@ public class OpenTelemetryTraceIdUtils {
     return buffer;
   }
 
-  public static String fromLongs(long traceIdLongHighPart, long traceIdLongLowPart) {
-    if (traceIdLongHighPart == 0 && traceIdLongLowPart == 0) {
-      return getInvalid();
-    }
-    char[] chars = chars(HEX_LENGTH);
-    longToBase16String(traceIdLongHighPart, chars, 0);
-    longToBase16String(traceIdLongLowPart, chars, 16);
-    return new String(chars, 0, HEX_LENGTH);
-  }
-
   public static String getInvalid() {
     return INVALID;
   }
 
   public static String generateSpanId() {
-    long id;
-    Random random = randomSupplier.get();
-    do {
-      id = random.nextLong();
-    } while (id == INVALID_ID);
-    return fromLong(id);
+    return random().generateSpanId();
   }
 
-  public static String generateTraceId(InternalSpan parentInternalSpan) {
-    if (parentInternalSpan != null && parentInternalSpan.getSpanExporter() instanceof OpenTelemetrySpanExporter) {
-      return ((OpenTelemetrySpanExporter) parentInternalSpan.getSpanExporter()).getTraceId();
-    }
-
-    Random random = randomSupplier.get();
-    long idHi = random.nextLong();
-    long idLo;
-    do {
-      idLo = random.nextLong();
-    } while (idLo == INVALID_ID);
-    return fromLongs(idHi, idLo);
+  public static String generateTraceId() {
+    return random().generateTraceId();
   }
 
   public static Map<String, String> getContext(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
@@ -209,11 +135,11 @@ public class OpenTelemetryTraceIdUtils {
     }
   }
 
-  private static final Set<String> VALID_VERSIONS = new HashSet();
+  private static final HashSet VALID_VERSIONS = new HashSet();
 
   static {
     for (int i = 0; i < 255; ++i) {
-      String version = Long.toHexString((long) i);
+      String version = Long.toHexString(i);
       if (version.length() < 2) {
         version = '0' + version;
       }
