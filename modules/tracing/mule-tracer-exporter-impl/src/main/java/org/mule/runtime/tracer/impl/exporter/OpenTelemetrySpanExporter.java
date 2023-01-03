@@ -34,6 +34,8 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.trace.data.StatusData.ok;
 import static io.opentelemetry.api.trace.SpanContext.getInvalid;
+import static io.opentelemetry.api.trace.TraceFlags.getSampled;
+import static io.opentelemetry.api.trace.TraceState.getDefault;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
@@ -47,8 +49,6 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.api.trace.TraceFlags;
-import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.sdk.common.InstrumentationLibraryInfo;
 import io.opentelemetry.sdk.common.InstrumentationScopeInfo;
 import io.opentelemetry.sdk.resources.Resource;
@@ -211,7 +211,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
     // Generates the span id so that the open telemetry spans can be lazily initialised.
     return SpanContext.create(traceId, generateSpanId(),
-                              TraceFlags.getSampled(), TraceState.getDefault());
+                              getSampled(), getDefault());
   }
 
   @Override
