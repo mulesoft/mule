@@ -123,7 +123,9 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   @Override
   public void injectDistributedTraceContext(EventContext eventContext,
                                             DistributedTraceContextGetter distributedTraceContextGetter) {
-    injectDistributedTraceContextCommand.execute(eventContext, distributedTraceContextGetter);
+    if (!distributedTraceContextGetter.isEmptyDistributedTraceContext()) {
+      injectDistributedTraceContextCommand.execute(eventContext, distributedTraceContextGetter);
+    }
   }
 
   @Override
