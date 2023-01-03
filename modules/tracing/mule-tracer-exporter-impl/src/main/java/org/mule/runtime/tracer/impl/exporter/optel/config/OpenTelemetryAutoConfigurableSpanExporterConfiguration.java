@@ -31,14 +31,14 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   public static final String DEFAULT_EXPORTER_TYPE = GRPC_EXPORTER_TYPE;
   public static final String DEFAULT_GRPC_EXPORTER_ENDPOINT = "http://localhost:4317";
   public static final String DEFAULT_HTTP_EXPORTER_ENDPOINT = "http://localhost:4318/v1/traces";
-  public static final String DEFAULT_EXPORTER_TIMEOUT = "10";
+  public static final String DEFAULT_EXPORTER_TIMEOUT = "10000";
 
   private final SpanExporterConfiguration delegate;
-  private final Map<String, String> defaultConfigurationValues;
+  private final Map<String, String> defaultConfigurationValues = new HashMap<>();
 
   public OpenTelemetryAutoConfigurableSpanExporterConfiguration(SpanExporterConfiguration delegate) {
     this.delegate = delegate;
-    defaultConfigurationValues = getDefaultValues();
+    initializeDefaultConfigurationValues();
   }
 
   @Override
@@ -46,23 +46,20 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     return delegate.getStringValue(key, defaultConfigurationValues.getOrDefault(key, null));
   }
 
-  private Map<String, String> getDefaultValues() {
-    Map<String, String> defaultValues = new HashMap<>();
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false");
+  private void initializeDefaultConfigurationValues() {
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false");
 
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, DEFAULT_EXPORTER_TYPE);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, DEFAULT_EXPORTER_TYPE);
     if (getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE).equals(GRPC_EXPORTER_TYPE)) {
-      defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT, DEFAULT_GRPC_EXPORTER_ENDPOINT);
+      defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT, DEFAULT_GRPC_EXPORTER_ENDPOINT);
     } else {
-      defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT, DEFAULT_HTTP_EXPORTER_ENDPOINT);
+      defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT, DEFAULT_HTTP_EXPORTER_ENDPOINT);
     }
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT, DEFAULT_EXPORTER_TIMEOUT);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT, DEFAULT_EXPORTER_TIMEOUT);
 
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER, DEFAULT_BACKOFF_MULTIPLIER);
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF, DEFAULT_INITIAL_BACKOFF);
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF);
-    defaultValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS, DEFAULT_BACKOFF_MAX_ATTEMPTS);
-
-    return defaultValues;
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER, DEFAULT_BACKOFF_MULTIPLIER);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF, DEFAULT_INITIAL_BACKOFF);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS, DEFAULT_BACKOFF_MAX_ATTEMPTS);
   }
 }
