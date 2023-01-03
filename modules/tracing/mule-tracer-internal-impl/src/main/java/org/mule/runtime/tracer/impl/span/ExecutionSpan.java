@@ -35,6 +35,9 @@ import java.util.function.BiConsumer;
  */
 public class ExecutionSpan implements InternalSpan {
 
+  private static final String SPAN_KIND = "span.kind.override";
+  private static final String STATUS = "status.override";
+
   private final InitialSpanInfo initialSpanInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
   private SpanError lastError;
@@ -165,7 +168,9 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    additionalAttributes.put(key, value);
+    if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
+      additionalAttributes.put(key, value);
+    }
     spanExporter.onAdditionalAttribute(key, value);
   }
 
