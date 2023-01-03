@@ -16,7 +16,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import org.slf4j.Logger;
 
 /**
- * An {@link AbstractFailSafeVoidTriCommand} that ads a span attribute. The carrier is the
+ * An {@link AbstractFailSafeVoidTriCommand} that adds a span attribute. The carrier is the
  * {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0

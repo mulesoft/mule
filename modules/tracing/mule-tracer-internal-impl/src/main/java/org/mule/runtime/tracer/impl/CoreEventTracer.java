@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
 import static org.mule.runtime.tracer.impl.SpanInfoUtils.enrichInitialSpanInfo;
 import static org.mule.runtime.tracer.impl.span.command.EventContextAddAttributeCommand.getEventContextAddAttributeCommand;
@@ -26,7 +27,6 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
@@ -59,7 +59,7 @@ import org.slf4j.Logger;
  */
 public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
-  private final boolean propagateTracingExceptions = getBoolean(MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
+  private final boolean propagateTracingExceptions = getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
 
   private static final Logger LOGGER = getLogger(CoreEventTracer.class);
   public static final String ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE =

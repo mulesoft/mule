@@ -25,6 +25,8 @@ import org.slf4j.Logger;
  */
 public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<EventContext, Assertion> {
 
+  private final BiConsumer<EventContext, Assertion> consumer;
+
   public static EventContextEndSpanCommand getEventContextEndSpanCommandFrom(Logger logger,
                                                                              String errorMessage,
                                                                              boolean propagateException) {
@@ -33,16 +35,17 @@ public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<Ev
 
   private EventContextEndSpanCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
     super(logger, errorMessage, propagateExceptions);
-  }
-
-  @Override
-  BiConsumer<EventContext, Assertion> getConsumer() {
-    return (eventContext, assertion) -> {
+    this.consumer = (eventContext, assertion) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
         spanContext.endSpan(assertion);
       }
     };
+  }
+
+  @Override
+  BiConsumer<EventContext, Assertion> getConsumer() {
+    return consumer;
   }
 }
