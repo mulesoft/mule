@@ -1,0 +1,20 @@
+{
+  "name": "extension-with-doc",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "app-extension-with-doc.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "configs": [
+    "app-extension-with-doc.xml"
+  ]
+}
