@@ -105,7 +105,12 @@ abstract class DispatchingLogger extends Logger {
           } catch (RecursiveLoggerContextInstantiationException rle) {
             // The required Logger is already under construction by a previous resolveLogger call. Falling back to container
             // classloader.
-            return resolveLogger(this.getClass().getClassLoader());
+            try {
+              return resolveLogger(this.getClass().getClassLoader());
+            } catch (RecursiveLoggerContextInstantiationException e) {
+              return originalLogger;
+            }
+
           }
           loggerReference.set(logger);
         }
