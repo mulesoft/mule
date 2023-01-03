@@ -24,10 +24,13 @@ import org.mule.runtime.tracer.impl.context.EventSpanContext;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
 public class EventContextInjectDistributedTraceContextCommandTestCase {
+
+  public static final String TEST_ERROR_MESSAGE = "Test error";
 
   @Test
   public void distributedTraceContextIsInjected() {
@@ -35,10 +38,8 @@ public class EventContextInjectDistributedTraceContextCommandTestCase {
 
     DistributedTraceContextGetter getter = mock(DistributedTraceContextGetter.class);
 
-    VoidCommand injectDistributedTraceContextCommand =
-        getEventContextInjectDistributedTraceContextCommand((EventContext) eventContext, getter);
-
-    injectDistributedTraceContextCommand.execute();
+    getEventContextInjectDistributedTraceContextCommand(mock(Logger.class), TEST_ERROR_MESSAGE, true)
+        .execute((EventContext) eventContext, getter);
 
     verify(eventContext).setSpanContext(any(EventSpanContext.class));
 

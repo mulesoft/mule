@@ -294,6 +294,11 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       public Optional<String> get(String key) {
         return Optional.ofNullable(context.getDistributedSourceTraceContext().getRemoteTraceContextMap().get(key));
       }
+
+      @Override
+      public boolean isEmptyDistributedTraceContext() {
+        return context.getDistributedSourceTraceContext().getRemoteTraceContextMap().isEmpty();
+      }
     };
   }
 
