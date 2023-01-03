@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.exporter.api.config;
+package org.mule.runtime.tracer.impl.exporter.config;
 
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;

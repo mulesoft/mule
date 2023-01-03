@@ -5,7 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.exporter.api.config;
+package org.mule.runtime.tracer.impl.exporter.config;
+
+import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 import static java.lang.System.getProperty;
 
