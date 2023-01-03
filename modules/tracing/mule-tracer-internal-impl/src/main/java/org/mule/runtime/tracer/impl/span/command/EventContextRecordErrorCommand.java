@@ -9,58 +9,52 @@ package org.mule.runtime.tracer.impl.span.command;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.impl.span.error.DefaultSpanCallStack;
 import org.mule.runtime.tracer.impl.span.error.DefaultSpanError;
 
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.function.TriFunction;
+import org.slf4j.Logger;
+
 /**
- * A {@link VoidCommand} that records an error
+ * An {@link AbstractFailSafeVoidTriCommand} that records an error
  *
  * The carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextRecordErrorCommand extends AbstractFailsafeSpanVoidCommand {
+public class EventContextRecordErrorCommand extends AbstractFailSafeVoidTriCommand<CoreEvent, Supplier<Error>, Boolean> {
 
-  public static final String ERROR_MESSAGE = "Error recording a span error";
+  private final TriFunction<CoreEvent, Supplier<Error>, Boolean, Void> triConsumer;
 
-  private final EventContext eventContext;
-  private final Supplier<Error> spanErrorSupplier;
-  private final boolean isErrorEscapingCurrentSpan;
-  private final FlowCallStack flowCallStack;
-
-  public static VoidCommand getEventContextRecordErrorCommand(EventContext eventContext,
-                                                              Supplier<Error> spanErrorSupplier,
-                                                              boolean isErrorEscapingCurrentSpan,
-                                                              FlowCallStack flowCallStack) {
-    return new EventContextRecordErrorCommand(eventContext, spanErrorSupplier, isErrorEscapingCurrentSpan, flowCallStack);
+  public static EventContextRecordErrorCommand getEventContextRecordErrorCommand(Logger logger,
+                                                                                 String errorMessage,
+                                                                                 boolean propagateException) {
+    return new EventContextRecordErrorCommand(logger, errorMessage, propagateException);
   }
 
-  public EventContextRecordErrorCommand(EventContext eventContext, Supplier<Error> spanErrorSupplier,
-                                        boolean isErrorEscapingCurrentSpan, FlowCallStack flowCallStack) {
-    this.eventContext = eventContext;
-    this.spanErrorSupplier = spanErrorSupplier;
-    this.isErrorEscapingCurrentSpan = isErrorEscapingCurrentSpan;
-    this.flowCallStack = flowCallStack;
-  }
-
-
-  protected Runnable getRunnable() {
-    return () -> {
+  public EventContextRecordErrorCommand(Logger logger, String errorMessage, boolean propagateException) {
+    super(logger, errorMessage, propagateException);
+    this.triConsumer = (coreEvent, spanErrorSupplier, isErrorEscapingCurrentSpan) -> {
+      EventContext eventContext = coreEvent.getContext();
       if (eventContext instanceof SpanContextAware) {
         ((SpanContextAware) eventContext)
             .getSpanContext()
-            .recordErrorAtSpan(new DefaultSpanError(spanErrorSupplier.get(), new DefaultSpanCallStack(flowCallStack),
+            .recordErrorAtSpan(new DefaultSpanError(spanErrorSupplier.get(),
+                                                    new DefaultSpanCallStack(coreEvent.getFlowCallStack()),
                                                     isErrorEscapingCurrentSpan));
       }
+
+      return null;
     };
   }
 
+
   @Override
-  protected String getErrorMessage() {
-    return ERROR_MESSAGE;
+  TriFunction<CoreEvent, Supplier<Error>, Boolean, Void> getTriConsumer() {
+    return triConsumer;
   }
 }

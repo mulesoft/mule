@@ -13,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.anEmptyMap;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -31,6 +32,7 @@ import java.util.Map;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 
 @Feature(PROFILING)
@@ -51,9 +53,9 @@ public class EventContextGetDistributedTraceContextMapCommandTestCase {
     when(span.serializeAsMap()).thenReturn(serialization);
 
     EventContextGetDistributedTraceContextMapCommand getDistributedTraceContextMapCommand =
-        getEventContextGetDistributedTraceContextMapCommand((EventContext) eventContext);
+        getEventContextGetDistributedTraceContextMapCommand(mock(Logger.class), "Test error", true);
 
-    Map<String, String> map = getDistributedTraceContextMapCommand.execute();
+    Map<String, String> map = getDistributedTraceContextMapCommand.execute((EventContext) eventContext);
 
     assertThat(map, equalTo(map));
   }
@@ -68,9 +70,9 @@ public class EventContextGetDistributedTraceContextMapCommandTestCase {
     when(spanContext.getSpan()).thenReturn(empty());
 
     EventContextGetDistributedTraceContextMapCommand getDistributedTraceContextMapCommand =
-        getEventContextGetDistributedTraceContextMapCommand((EventContext) eventContext);
+        getEventContextGetDistributedTraceContextMapCommand(mock(Logger.class), "Test error", true);
 
-    Map<String, String> map = getDistributedTraceContextMapCommand.execute();
+    Map<String, String> map = getDistributedTraceContextMapCommand.execute((EventContext) eventContext);
 
     assertThat(map, anEmptyMap());
   }

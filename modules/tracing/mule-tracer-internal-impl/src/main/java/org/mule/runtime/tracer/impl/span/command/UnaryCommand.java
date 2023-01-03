@@ -8,14 +8,19 @@
 package org.mule.runtime.tracer.impl.span.command;
 
 /**
- * A command interface.
+ * A command with one parameter that returns an object.
  *
- * @since 4.5.0
+ * @param <A> the type of the first parameter.
+ * @param <R> the return type.
  */
-public interface VoidCommand {
+public interface UnaryCommand<A, R> {
 
   /**
-   * executes the command.
+   * Executes the command
+   *
+   * @param parameter the parameter
+   *
+   * @return the resulting object
    */
-  void execute();
+  R execute(A parameter);
 }

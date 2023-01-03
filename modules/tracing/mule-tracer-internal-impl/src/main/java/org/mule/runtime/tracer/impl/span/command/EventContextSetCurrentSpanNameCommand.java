@@ -12,31 +12,30 @@ import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextF
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 
+import java.util.function.BiConsumer;
+
+import org.slf4j.Logger;
+
 /**
- * A {@link VoidCommand} that sets the current span name.
+ * An {@link AbstractFailSafeVoidBiCommand} that sets the current span name.
  *
  * The carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextSetCurrentSpanNameCommand extends AbstractFailsafeSpanVoidCommand {
+public class EventContextSetCurrentSpanNameCommand extends AbstractFailSafeVoidBiCommand<EventContext, String> {
 
-  public static final String ERROR_MESSAGE = "Error setting the current span name";
-  private final EventContext eventContext;
-  private final String name;
+  private BiConsumer<EventContext, String> consumer;
 
-  public static VoidCommand getEventContextSetCurrentSpanNameCommand(EventContext eventContext,
-                                                                     String name) {
-    return new EventContextSetCurrentSpanNameCommand(eventContext, name);
+  public static EventContextSetCurrentSpanNameCommand getEventContextSetCurrentSpanNameCommand(Logger logger,
+                                                                                               String errorMessage,
+                                                                                               boolean propagateException) {
+    return new EventContextSetCurrentSpanNameCommand(logger, errorMessage, propagateException);
   }
 
-  public EventContextSetCurrentSpanNameCommand(EventContext eventContext, String name) {
-    this.eventContext = eventContext;
-    this.name = name;
-  }
-
-  protected Runnable getRunnable() {
-    return () -> {
+  private EventContextSetCurrentSpanNameCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
+    super(logger, errorMessage, propagateExceptions);
+    this.consumer = (eventContext, name) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
@@ -46,7 +45,9 @@ public class EventContextSetCurrentSpanNameCommand extends AbstractFailsafeSpanV
   }
 
   @Override
-  protected String getErrorMessage() {
-    return ERROR_MESSAGE;
+  BiConsumer<EventContext, String> getConsumer() {
+    return consumer;
   }
+
+
 }
