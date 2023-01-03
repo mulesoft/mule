@@ -23,6 +23,8 @@ import java.util.function.BiConsumer;
  */
 public class EventContextAddAttributesCommand extends AbstractFailSafeVoidBiCommand<EventContext, Map<String, String>> {
 
+  private BiConsumer<EventContext, Map<String, String>> consumer;
+
   public static EventContextAddAttributesCommand getEventContextAddAttributesCommand(Logger logger,
                                                                                      String errorMessage,
                                                                                      boolean propagateException) {
@@ -31,16 +33,17 @@ public class EventContextAddAttributesCommand extends AbstractFailSafeVoidBiComm
 
   private EventContextAddAttributesCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
     super(logger, errorMessage, propagateExceptions);
-  }
-
-  @Override
-  BiConsumer<EventContext, Map<String, String>> getConsumer() {
-    return (eventContext, attributes) -> {
+    this.consumer = (eventContext, attributes) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
         spanContext.getSpan().ifPresent(span -> attributes.forEach(span::addAttribute));
       }
     };
+  }
+
+  @Override
+  BiConsumer<EventContext, Map<String, String>> getConsumer() {
+    return consumer;
   }
 }

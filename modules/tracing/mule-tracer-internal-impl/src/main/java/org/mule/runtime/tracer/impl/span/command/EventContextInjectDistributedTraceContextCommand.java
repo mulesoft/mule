@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 public class EventContextInjectDistributedTraceContextCommand
     extends AbstractFailSafeVoidBiCommand<EventContext, DistributedTraceContextGetter> {
 
+  private BiConsumer<EventContext, DistributedTraceContextGetter> consumer;
+
   public static EventContextInjectDistributedTraceContextCommand getEventContextInjectDistributedTraceContextCommand(Logger logger,
                                                                                                                      String errorMessage,
                                                                                                                      boolean propagateExceptions) {
@@ -35,11 +37,7 @@ public class EventContextInjectDistributedTraceContextCommand
 
   private EventContextInjectDistributedTraceContextCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
     super(logger, errorMessage, propagateExceptions);
-  }
-
-  @Override
-  BiConsumer<EventContext, DistributedTraceContextGetter> getConsumer() {
-    return (eventContext, getter) -> {
+    this.consumer = (eventContext, getter) -> {
       if (eventContext instanceof SpanContextAware) {
         ((SpanContextAware) eventContext).setSpanContext(
                                                          builder()
@@ -47,5 +45,10 @@ public class EventContextInjectDistributedTraceContextCommand
                                                              .build());
       }
     };
+  }
+
+  @Override
+  BiConsumer<EventContext, DistributedTraceContextGetter> getConsumer() {
+    return consumer;
   }
 }

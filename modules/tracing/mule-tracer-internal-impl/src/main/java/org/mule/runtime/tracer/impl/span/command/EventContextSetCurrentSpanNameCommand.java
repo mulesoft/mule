@@ -25,6 +25,8 @@ import org.slf4j.Logger;
  */
 public class EventContextSetCurrentSpanNameCommand extends AbstractFailSafeVoidBiCommand<EventContext, String> {
 
+  private BiConsumer<EventContext, String> consumer;
+
   public static EventContextSetCurrentSpanNameCommand getEventContextSetCurrentSpanNameCommand(Logger logger,
                                                                                                String errorMessage,
                                                                                                boolean propagateException) {
@@ -33,17 +35,18 @@ public class EventContextSetCurrentSpanNameCommand extends AbstractFailSafeVoidB
 
   private EventContextSetCurrentSpanNameCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
     super(logger, errorMessage, propagateExceptions);
-  }
-
-  @Override
-  BiConsumer<EventContext, String> getConsumer() {
-    return (eventContext, name) -> {
+    this.consumer = (eventContext, name) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
         spanContext.getSpan().ifPresent(span -> span.updateName(name));
       }
     };
+  }
+
+  @Override
+  BiConsumer<EventContext, String> getConsumer() {
+    return consumer;
   }
 
 
