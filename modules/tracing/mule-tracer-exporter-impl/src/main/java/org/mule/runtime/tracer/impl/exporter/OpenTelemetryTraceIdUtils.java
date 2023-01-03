@@ -22,6 +22,7 @@ import io.opentelemetry.api.trace.TraceState;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utils for generating Open Telemetry Trace Ids
@@ -136,7 +137,7 @@ public class OpenTelemetryTraceIdUtils {
     }
   }
 
-  private static final HashSet VALID_VERSIONS = new HashSet();
+  private static final Set<String> VALID_VERSIONS = new HashSet<>();
 
   static {
     for (int i = 0; i < 255; ++i) {
