@@ -9,6 +9,7 @@ package org.mule.runtime.tracer.impl.exporter;
 
 import static io.opentelemetry.sdk.trace.IdGenerator.random;
 
+import static java.lang.Long.toHexString;
 import static java.util.Collections.emptyMap;
 
 import io.opentelemetry.api.internal.OtelEncodingUtils;
@@ -139,7 +140,7 @@ public class OpenTelemetryTraceIdUtils {
 
   static {
     for (int i = 0; i < 255; ++i) {
-      String version = Long.toHexString(i);
+      String version = toHexString(i);
       if (version.length() < 2) {
         version = '0' + version;
       }
