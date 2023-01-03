@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * A {@link AbstractFailSafeVoidBiCommand} that ads span attributes. The carrier is the {@link EventContext}
+ * A {@link AbstractFailSafeVoidBiCommand} that adds span attributes. The carrier is the {@link EventContext}
  *
  * @since 4.5.0
  */
