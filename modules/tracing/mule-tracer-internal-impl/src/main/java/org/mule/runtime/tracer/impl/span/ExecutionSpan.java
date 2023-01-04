@@ -19,8 +19,8 @@ import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.util.HashMap;
@@ -34,9 +34,6 @@ import java.util.function.BiConsumer;
  * @since 4.5.0
  */
 public class ExecutionSpan implements InternalSpan {
-
-  private static final String SPAN_KIND = "span.kind.override";
-  private static final String STATUS = "status.override";
 
   private final InitialSpanInfo initialSpanInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
@@ -168,10 +165,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    //TODO W-12297079: Move this check to the OpentelemetrySpanExporter foreach
-    if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
-      additionalAttributes.put(key, value);
-    }
+    additionalAttributes.put(key, value);
     spanExporter.onAdditionalAttribute(key, value);
   }
 
@@ -194,7 +188,8 @@ public class ExecutionSpan implements InternalSpan {
     private SpanExporterFactory spanExporterFactory;
     private InitialSpanInfo initialSpanInfo;
 
-    private ExecutionSpanBuilder() {}
+    private ExecutionSpanBuilder() {
+    }
 
     public ExecutionSpanBuilder withStartSpanInfo(InitialSpanInfo spanCustomizationInfo) {
       this.initialSpanInfo = spanCustomizationInfo;
@@ -221,8 +216,8 @@ public class ExecutionSpan implements InternalSpan {
       }
 
       ExecutionSpan executionSpan = new ExecutionSpan(initialSpanInfo,
-                                                      startTime,
-                                                      parent);
+          startTime,
+          parent);
 
 
       executionSpan.spanExporter = spanExporterFactory.getSpanExporter(executionSpan, initialSpanInfo);
