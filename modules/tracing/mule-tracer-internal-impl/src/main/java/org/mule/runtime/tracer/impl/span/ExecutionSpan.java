@@ -168,6 +168,7 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
+    //TODO W-12297079: Move this check to the OpentelemetrySpanExporter foreach
     if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
       additionalAttributes.put(key, value);
     }
