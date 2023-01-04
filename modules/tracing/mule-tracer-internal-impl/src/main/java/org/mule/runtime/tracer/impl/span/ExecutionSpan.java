@@ -188,8 +188,7 @@ public class ExecutionSpan implements InternalSpan {
     private SpanExporterFactory spanExporterFactory;
     private InitialSpanInfo initialSpanInfo;
 
-    private ExecutionSpanBuilder() {
-    }
+    private ExecutionSpanBuilder() {}
 
     public ExecutionSpanBuilder withStartSpanInfo(InitialSpanInfo spanCustomizationInfo) {
       this.initialSpanInfo = spanCustomizationInfo;
@@ -216,8 +215,8 @@ public class ExecutionSpan implements InternalSpan {
       }
 
       ExecutionSpan executionSpan = new ExecutionSpan(initialSpanInfo,
-          startTime,
-          parent);
+                                                      startTime,
+                                                      parent);
 
 
       executionSpan.spanExporter = spanExporterFactory.getSpanExporter(executionSpan, initialSpanInfo);
