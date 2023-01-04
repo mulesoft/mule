@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
-// TODO: Move the OPTEL config properties away from API.
 /**
  * Properties for Span Configuration Exporter.
  *

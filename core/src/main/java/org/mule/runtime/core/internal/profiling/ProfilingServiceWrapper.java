@@ -222,7 +222,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     }
   }
 
-  // TODO: Remove dependency between ProfilingService and SpanExporterConfiguration
+  // TODO W-12296677: Remove dependency between ProfilingService and SpanExporterConfiguration
   private static SpanExporterConfiguration discoverSpanExporterConfiguration() {
     try {
       return new SpiServiceRegistry()
