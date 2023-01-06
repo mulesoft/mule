@@ -23,8 +23,8 @@ import static org.mule.runtime.module.extension.internal.loader.enricher.LevelEr
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -122,26 +122,18 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
   @Test
   public void operationThrowsOverridesExtensionThrows() {
     extensionModel = loadExtension(HeisenbergWithOperationThrows.class);
-    OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
-    Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(OPERATION.getType())).findFirst();
-    assertThat(operationError.isPresent(), is(true));
+
+    assertErrorPresent(extensionModel.getOperationModel("someOperation").get(), OPERATION.getType());
   }
 
   @Test
   public void operationAndConstructInheritExtensionErrorThrows() {
     extensionModel = loadExtension(HeisenbergWithExtensionThrows.class);
 
-    OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
-    Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(EXTENSION.getType())).findFirst();
-    assertThat(operationError.isPresent(), is(true));
+    assertErrorPresent(extensionModel.getOperationModel("someOperation").get(), EXTENSION.getType());
 
     // W-12289050
-    ConstructModel someConstruct = extensionModel.getConstructModel("someConstruct").get();
-    Optional<ErrorModel> constructError = someConstruct.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(EXTENSION.getType())).findFirst();
-    assertThat(constructError.isPresent(), is(true));
+    assertErrorPresent(extensionModel.getConstructModel("someConstruct").get(), EXTENSION.getType());
   }
 
   @Test
@@ -149,10 +141,14 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
   public void constructHasErrorModels() {
     extensionModel = loadExtension(HeisenbergWithConstructThrows.class);
 
-    ConstructModel someConstruct = extensionModel.getConstructModel("someConstruct").get();
-    Optional<ErrorModel> constructError = someConstruct.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(CONSTRUCT.getType())).findFirst();
-    assertThat(constructError.isPresent(), is(true));
+    assertErrorPresent(extensionModel.getConstructModel("someConstruct").get(), CONSTRUCT.getType());
+  }
+
+  private void assertErrorPresent(ComponentModel componentModel, String errorType) {
+    Optional<ErrorModel> componentError = componentModel.getErrorModels().stream()
+        .filter(errorModel -> errorModel.getType().equals(errorType)).findFirst();
+
+    assertThat(componentError.isPresent(), is(true));
   }
 
   @ErrorTypes(CyclicErrorTypes.class)
