@@ -36,7 +36,7 @@ public class ExtensionsClientMessageProcessingManager<T, A> implements MessagePr
 
     Result result = getResult(resultAdapter);
 
-    callbackConsumer.accept(new DefaultSourceResultCallback<>(result, template, messageProcessContext));
+    callbackConsumer.accept(new DefaultSourceResultCallback<>(result, process, messageProcessContext));
   }
 
   private Result<Object, Object> getResult(SourceResultAdapter adapter) {
