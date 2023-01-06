@@ -455,7 +455,14 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
   }
 
   private AppClassLoaderModel getAppPackagerClassLoaderModel(File classLoaderModelDescriptor) {
-    return deserialize(classLoaderModelDescriptor);
+    AppClassLoaderModel appPackagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
+
+    if (appPackagerClassLoaderModel.getArtifactCoordinates().getClassifier() == null) {
+      throw new IllegalArgumentException(format("Artifact coordinates from project's class loader model are missing the 'classifier' attribute. Valid values are '%s' and '%s'.",
+                                                MULE_APPLICATION_CLASSIFIER, MULE_DOMAIN_CLASSIFIER));
+    }
+
+    return appPackagerClassLoaderModel;
   }
 
   private ClassLoaderModel getPackagerClassLoaderModel(File classLoaderModelDescriptor) {
