@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import static java.util.Optional.of;
+
+import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -53,6 +55,7 @@ final class RouterModelLoaderDelegate extends AbstractComponentModelLoaderDelega
     loader.getParameterModelsLoaderDelegate().declare(router, parser.getParameterGroupModelParsers());
     addSemanticTerms(router.getDeclaration(), parser);
     declareRoutes(router, parser);
+    declareErrorModels(router, parser, (ExtensionDeclarer) actualDeclarer, loader.createErrorModelFactory());
 
     getStereotypeModelLoaderDelegate().addStereotypes(
                                                       parser,
