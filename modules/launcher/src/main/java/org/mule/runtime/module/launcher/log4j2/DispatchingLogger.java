@@ -108,9 +108,10 @@ abstract class DispatchingLogger extends Logger {
             try {
               return resolveLogger(this.getClass().getClassLoader());
             } catch (RecursiveLoggerContextInstantiationException e) {
+              // TODO: W-12337087 - this shouldn't happen, we have to check why the container logger is still in the process of
+              // being created.
               return originalLogger;
             }
-
           }
           loggerReference.set(logger);
         }
