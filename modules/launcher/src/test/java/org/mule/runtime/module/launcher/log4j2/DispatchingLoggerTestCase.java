@@ -149,4 +149,37 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     verify(regionClassLoaderLogger, times(1)).info("Test Message");
   }
 
+  @Test
+  public void whenFallbackToContainerClassLoaderFailsReturnOriginalLogger() {
+    // Expected Loggers
+    Logger containerLogger = mock(Logger.class);
+    Logger regionClassLoaderLogger = mock(Logger.class);
+    when(containerLoggerContext.getLogger(anyString(), any(MessageFactory.class))).thenReturn(containerLogger);
+    when(regionClassLoaderLoggerContext.getLogger(anyString(), any(MessageFactory.class))).thenReturn(regionClassLoaderLogger);
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
+        .thenThrow(RecursiveLoggerContextInstantiationException.class)
+        .thenAnswer(invocation -> containerLoggerContext);
+    // Triggers of the expected Loggers
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
+        .thenThrow(RecursiveLoggerContextInstantiationException.class)
+        .thenAnswer(invocation -> regionClassLoaderLoggerContext);
+    // Class under test
+    DispatchingLogger dispatchingLogger = new DispatchingLogger(originalLogger, currentClassLoader.hashCode(),
+                                                                containerLoggerContext, artifactAwareContextSelector,
+                                                                messageFactory) {
+
+      @Override
+      public String getName() {
+        return LOGGER_NAME;
+      }
+    };
+    // Test and assertions
+    withContextClassLoader(regionClassLoader, () -> {
+      dispatchingLogger.info("Fallback Test Message");
+      dispatchingLogger.info("Test Message");
+    });
+    verify(originalLogger, times(1)).info("Fallback Test Message");
+    verify(regionClassLoaderLogger, times(1)).info("Test Message");
+  }
+
 }
