@@ -168,6 +168,7 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
   }
 
   @Test
+  @Issue("W-12276189")
   public void projectWithInvalidClassLoaderModel() throws URISyntaxException {
     expectedException.expect(IllegalArgumentException.class);
     expectedException
