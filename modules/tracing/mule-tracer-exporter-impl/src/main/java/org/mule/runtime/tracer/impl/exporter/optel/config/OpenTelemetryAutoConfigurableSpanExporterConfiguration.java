@@ -16,6 +16,7 @@ import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
+import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 import java.util.HashMap;
@@ -43,12 +44,15 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   @Override
   public String getStringValue(String key) {
-    return delegate.getStringValue(key, defaultConfigurationValues.getOrDefault(key, null));
+    try {
+      return delegate.getStringValue(key, defaultConfigurationValues.get(key));
+    } catch (PropertyNotFoundException e) {
+      return defaultConfigurationValues.get(key);
+    }
   }
 
   private void initializeDefaultConfigurationValues() {
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false");
-
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, DEFAULT_EXPORTER_TYPE);
     if (getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE).equals(GRPC_EXPORTER_TYPE)) {
       defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT, DEFAULT_GRPC_EXPORTER_ENDPOINT);
@@ -56,7 +60,6 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
       defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT, DEFAULT_HTTP_EXPORTER_ENDPOINT);
     }
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT, DEFAULT_EXPORTER_TIMEOUT);
-
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER, DEFAULT_BACKOFF_MULTIPLIER);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF, DEFAULT_INITIAL_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF);

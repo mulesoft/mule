@@ -29,6 +29,7 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -172,10 +173,18 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
-    if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
+    if (isTracingExportEnabled()) {
       return coreEventTracer;
     }
     return getProfilingService().getCoreEventTracer();
+  }
+
+  private static boolean isTracingExportEnabled() {
+    try {
+      return parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"));
+    } catch (PropertyNotFoundException e) {
+      return false;
+    }
   }
 
   @Override
