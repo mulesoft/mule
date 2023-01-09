@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
@@ -33,5 +38,32 @@ public final class ModelLoaderDelegateUtils {
    */
   public static boolean requiresConfig(OperationModelParser parser) {
     return parser.hasConfig() || parser.isConnected() || parser.isAutoPaging();
+  }
+
+  /**
+   * Adds the {@link ErrorModel}s from the given {@code parser} to the given {@code declarer} and {@code extension}.
+   *
+   * @param declarer           {@link ComponentDeclarer} to populate with the {@link ErrorModel}s obtained from the
+   *                           {@code parser}.
+   * @param parser             {@link OperationModelParser} to get the {@link ErrorModel} parsers from.
+   * @param extension          {@link ExtensionDeclarer} to populate with the {@link ErrorModel}s obtained from the
+   *                           {@code parser}.
+   * @param errorsModelFactory factory to generate the {@link ErrorModel}s.
+   */
+  public static void declareErrorModels(ComponentDeclarer declarer, OperationModelParser parser, ExtensionDeclarer extension,
+                                        ErrorsModelFactory errorsModelFactory) {
+    for (ErrorModelParser errorModelParser : parser.getErrorModelParsers()) {
+      ErrorModel errorModel = errorsModelFactory.getErrorModel(errorModelParser);
+
+      // Only the non-suppressed errors must appear in the component model
+      if (!errorModelParser.isSuppressed()) {
+        declarer.withErrorModel(errorModel);
+      }
+
+      // All the errors from all the components will be declared in the extension, even if they are suppressed. The
+      // ErrorTypeRepository is populated with the errors declared in the ExtensionModel, then without changing the API,
+      // there is no way to avoid declaring them there.
+      extension.withErrorModel(errorModel);
+    }
   }
 }
