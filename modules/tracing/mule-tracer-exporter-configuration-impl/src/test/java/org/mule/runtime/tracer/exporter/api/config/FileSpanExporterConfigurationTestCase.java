@@ -5,6 +5,8 @@
  * LICENSE.txt file.
  */
 
+package org.mule.runtime.tracer.exporter.api.config;
+
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -16,7 +18,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
-import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -40,38 +41,38 @@ public class FileSpanExporterConfigurationTestCase {
   @Test
   public void returnsTheValueForANonSystemProperty() {
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), equalTo(
-                                                                                                 VALUE_PROPERTY_NON_SYSTEM_PROPERTY));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), equalTo(
+                                                                                                       VALUE_PROPERTY_NON_SYSTEM_PROPERTY));
   }
 
   @Test
   public void returnsTheResolvedSystemProperty() {
     setProperty(KEY_PROPERTY_SYSTEM_PROPERTY, VALUE_PROPERTY_SYSTEM_PROPERTY);
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
-                                                                                             VALUE_PROPERTY_SYSTEM_PROPERTY));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
+                                                                                                   VALUE_PROPERTY_SYSTEM_PROPERTY));
   }
 
   @Test
   public void whenASystemPropertyCannotBeResolvedAnExceptionIsRaised() {
     expectedException.expect(PropertyNotFoundException.class);
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
-                                                                                             VALUE_PROPERTY_SYSTEM_PROPERTY));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
+                                                                                                   VALUE_PROPERTY_SYSTEM_PROPERTY));
   }
 
   @Test
   public void whenNoPropertyIsInTheFileNullValueIsReturned() {
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
-    assertThat(fileSpanExporterConfiguration.getValue(NO_KEY_IN_FILE), is(nullValue()));
+    assertThat(fileSpanExporterConfiguration.getStringValue(NO_KEY_IN_FILE), is(nullValue()));
   }
 
   @Test
   public void whenFileIsNotFoundNoPropertyIsFound() {
     TestNoFileFoundSpanExporterConfiguration testNoFileFoundSpanExporterConfiguration =
         new TestNoFileFoundSpanExporterConfiguration();
-    assertThat(testNoFileFoundSpanExporterConfiguration.getValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
-    assertThat(testNoFileFoundSpanExporterConfiguration.getValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
+    assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
+    assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
   }
 
   /**

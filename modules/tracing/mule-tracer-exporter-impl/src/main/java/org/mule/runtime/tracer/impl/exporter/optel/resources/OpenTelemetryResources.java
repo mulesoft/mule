@@ -46,7 +46,6 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import io.opentelemetry.sdk.trace.IdGenerator;
 
 /**
  * A Retriever open telemetry resources.
@@ -122,18 +121,18 @@ public class OpenTelemetryResources {
                                                        SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
 
-    if (!parseBoolean(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()))) {
+    if (!parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()))) {
       return resolveDummyExporterWithSniffer();
     }
 
-    int batchSize = parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512"));
+    int batchSize = parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512"));
 
     if (batchSize < 512) {
       throw new SpanExporterConfiguratorException("The batch max size cannot be lower than 512");
     }
 
     int batchMaxQueueSize =
-        parseInt(spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE, "2048"));
+        parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE, "2048"));
 
     return builder(createExporter(spanExporterConfiguration))
         .setMaxQueueSize(batchMaxQueueSize)
@@ -142,7 +141,7 @@ public class OpenTelemetryResources {
 
   private static SpanExporter createExporter(SpanExporterConfiguration spanExporterConfiguration)
       throws SpanExporterConfiguratorException {
-    String type = spanExporterConfiguration.getValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE);
+    String type = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE);
 
     if (type == null) {
       throw new SpanExporterConfiguratorException("A type for span export was not created");
