@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
-import static java.lang.System.in;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
@@ -25,13 +24,14 @@ import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPro
 import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,21 +55,26 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private Properties properties;
   private ClassLoaderResourceProvider resourceProvider;
 
-  public FileSpanExporterConfiguration() {}
-
   @Override
   public String getStringValue(String key) {
     String value = properties.getProperty(key);
 
     if (value != null) {
-      return propertyResolver.apply(properties.getProperty(key));
-    }
+      value = propertyResolver.apply(properties.getProperty(key));
+      if (key.equals(OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION)) {
+        Path path = Paths.get(value);
 
-    if (key.equals(OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION)) {
-      Path path = Paths.get(value);
+        try {
+          if (!path.isAbsolute()) {
+            URL url = muleContext.getExecutionClassLoader().getResource(value);
 
-      if (!path.isAbsolute()) {
-        return muleContext.getExecutionClassLoader().getResource(resourceProvider.getResourceAsStream(path.toString())))git.getPath().
+            if (url != null) {
+              return new File(url.toURI()).getAbsolutePath();
+            }
+          }
+        } catch (URISyntaxException e) {
+          return value;
+        }
       }
     }
 
