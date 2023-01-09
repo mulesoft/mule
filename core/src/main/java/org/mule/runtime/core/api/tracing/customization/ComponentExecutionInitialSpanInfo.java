@@ -9,15 +9,15 @@ package org.mule.runtime.core.api.tracing.customization;
 
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link InitialSpanInfo} based on a component.
@@ -31,6 +31,8 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   public static final String CORRELATION_ID_KEY = "correlation.id";
   public static final String THREAD_START_ID_KEY = "thread.start.id";
   public static final String THREAD_START_NAME_KEY = "thread.start.name";
+  // These are location, correlation.id, thread.start.id, thread.start.name
+  public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 4;
 
   protected final CoreEvent coreEvent;
   protected final Component component;
@@ -52,25 +54,29 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   }
 
   @Override
-  public Map<String, String> getInitialAttributes() {
-    Map<String, String> attributes = new HashMap<>();
-    attributes.put(LOCATION_KEY, getLocationAsString(coreEvent));
-    attributes.put(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
-    attributes.put(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
-    attributes.put(THREAD_START_NAME_KEY, Thread.currentThread().getName());
-    addLoggingVariablesAsAttributes(coreEvent, attributes);
-    return attributes;
+  public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+    biConsumer.accept(LOCATION_KEY, getLocationAsString(coreEvent));
+    biConsumer.accept(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
+    biConsumer.accept(THREAD_START_NAME_KEY, Thread.currentThread().getName());
+    biConsumer.accept(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
+    if (coreEvent instanceof PrivilegedEvent) {
+      ((PrivilegedEvent) coreEvent).getLoggingVariables().ifPresent(loggingVariables -> loggingVariables.forEach(biConsumer));
+    }
+  }
+
+  @Override
+  public int getInitialAttributesCount() {
+    int count = INITIAL_ATTRIBUTES_BASE_COUNT;
+
+    if (coreEvent instanceof PrivilegedEvent) {
+      count += ((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(emptyMap()).size();
+    }
+
+    return count;
   }
 
   protected String getLocationAsString(CoreEvent coreEvent) {
     return SpanInitialInfoUtils.getLocationAsString(component.getLocation());
-  }
-
-
-  private void addLoggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
-    if (coreEvent instanceof PrivilegedEvent) {
-      attributes.putAll(((PrivilegedEvent) coreEvent).getLoggingVariables().orElse(Collections.emptyMap()));
-    }
   }
 
   @Override

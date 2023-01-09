@@ -21,6 +21,7 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link InternalSpan} used internally by the runtime. It defines an extension of the span contract that is only used
@@ -49,13 +50,6 @@ public interface InternalSpan extends Span {
    * @param value the value for the attribute added
    */
   default void addAttribute(String key, String value) {}
-
-  /**
-   * @return the attribute corresponding to the {@param key}
-   */
-  default Optional<String> getAttribute(String key) {
-    return empty();
-  }
 
   /**
    * @param span the {@link Span}
@@ -88,12 +82,6 @@ public interface InternalSpan extends Span {
    */
   SpanExporter getSpanExporter();
 
-  /**
-   * Gets the attributes.
-   *
-   * @return a map with the span attributes.
-   */
-  Map<String, String> getAttributes();
 
   /**
    * Updates the child {@link InternalSpan}.
@@ -101,6 +89,13 @@ public interface InternalSpan extends Span {
    * @param childInternalSpan the child {@link InternalSpan}.
    */
   default void updateChildSpanExporter(InternalSpan childInternalSpan) {}
+
+  /**
+   * Performs the {@param biConsumer} operation on each key/value
+   *
+   * @param biConsumer the operation to apply.
+   */
+  void forEachAttribute(BiConsumer<String, String> biConsumer);
 
   /**
    * Serializes the span as a map.
@@ -127,6 +122,11 @@ public interface InternalSpan extends Span {
    * @param rootAttributeValue the value for the root attribute.
    */
   default void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {}
+
+  /**
+   * @return the attributes count.
+   */
+  int getAttributesCount();
 
 
   /**
@@ -191,13 +191,18 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public Map<String, String> getAttributes() {
-      return emptyMap();
+    public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+      // Nothing to do.
     }
 
     @Override
     public Map<String, String> serializeAsMap() {
       return emptyMap();
+    }
+
+    @Override
+    public int getAttributesCount() {
+      return 0;
     }
   }
 }

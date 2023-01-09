@@ -12,6 +12,7 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import static java.util.Collections.emptyMap;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * Initial info for a starting an {@link InternalSpan}.
@@ -55,4 +56,20 @@ public interface InitialSpanInfo {
    * @return initial information concerning the export of the span.
    */
   InitialExportInfo getInitialExportInfo();
+
+  /**
+   * An operation to apply on each of the attributes
+   *
+   * @param biConsumer the operation to apply.
+   */
+  default void forEachAttribute(BiConsumer<String, String> biConsumer) {
+    getInitialAttributes().forEach(biConsumer);
+  }
+
+  /**
+   * @return count of the initial attributes.
+   */
+  default int getInitialAttributesCount() {
+    return 0;
+  }
 }
