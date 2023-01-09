@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
@@ -18,10 +19,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -112,7 +110,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       });
 
       loader.registerOutputTypes(operation.getDeclaration());
-      declareErrorModels(operation, parser, extensionDeclarer);
+      declareErrorModels(operation, parser, extensionDeclarer, loader.createErrorModelFactory());
       getStereotypeModelLoaderDelegate().addStereotypes(
                                                         parser,
                                                         operation,
@@ -122,23 +120,6 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       declareEmittedNotifications(parser, operation, loader::getNotificationModel);
 
       operationDeclarers.put(parser, operation);
-    }
-  }
-
-  private void declareErrorModels(OperationDeclarer operation, OperationModelParser parser, ExtensionDeclarer extension) {
-    final ErrorsModelFactory errorsModelFactory = loader.createErrorModelFactory();
-    for (ErrorModelParser errorModelParser : parser.getErrorModelParsers()) {
-      ErrorModel errorModel = errorsModelFactory.getErrorModel(errorModelParser);
-
-      // Only the non-suppressed errors must appear in the operation model
-      if (!errorModelParser.isSuppressed()) {
-        operation.withErrorModel(errorModel);
-      }
-
-      // All the errors from all the operations will be declared in the extension, even if they are suppressed. The
-      // ErrorTypeRepository is populated with the errors declared in the ExtensionModel, then without changing the API,
-      // there is no way to avoid declaring them there.
-      extension.withErrorModel(errorModel);
     }
   }
 }
