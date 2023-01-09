@@ -66,7 +66,8 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   @Inject
   EventTracer<CoreEvent> coreEventTracer;
 
-  private static final SpanExporterConfiguration spanExporterConfiguration = discoverSpanExporterConfiguration();
+  @Inject
+  SpanExporterConfiguration spanExporterConfiguration;
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(

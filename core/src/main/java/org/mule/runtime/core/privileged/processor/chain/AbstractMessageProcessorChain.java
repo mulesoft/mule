@@ -185,11 +185,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private EventTracer<CoreEvent> muleEventTracer;
+
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> startingOperationExecutionDataProducer;
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
 
   private Scheduler switchOnErrorScheduler;
-  private EventTracer<CoreEvent> muleEventTracer;
+
 
   private InitialSpanInfo chainInitialSpanInfo;
 
@@ -753,8 +756,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (switchOnErrorScheduler == null) {
       switchOnErrorScheduler = schedulerService.cpuLightScheduler();
     }
-
-    muleEventTracer = profilingService.getCoreEventTracer();
 
     if (chainInitialSpanInfo == null) {
       chainInitialSpanInfo = new ComponentExecutionInitialSpanInfo(this);

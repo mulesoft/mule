@@ -7,18 +7,27 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
+import static java.lang.System.in;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
@@ -29,19 +38,18 @@ import java.util.Properties;
  *
  * @since 4.5.0
  */
-public class FileSpanExporterConfiguration implements SpanExporterConfiguration {
+public class FileSpanExporterConfiguration implements SpanExporterConfiguration, Initialisable {
+
+  @Inject
+  MuleContext muleContext;
 
   private static final String PROPERTIES_FILE_NAME = "tracer-exporter.conf";
 
-  private final ConfigurationPropertiesResolver propertyResolver;
-  private final Properties properties;
+  private ConfigurationPropertiesResolver propertyResolver;
+  private Properties properties;
+  private ClassLoaderResourceProvider resourceProvider;
 
-  public FileSpanExporterConfiguration() {
-    properties = getSpanExporterConfiguration();
-    propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(),
-                                                   new SystemPropertiesConfigurationProvider());
-  }
+  public FileSpanExporterConfiguration() {}
 
   @Override
   public String getStringValue(String key) {
@@ -55,6 +63,13 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   }
 
   private Properties getSpanExporterConfiguration() {
+    try {
+      InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
+      return loadProperties(is);
+    } catch (MuleRuntimeException | IOException e) {
+
+    }
+
     try {
       InputStream is = getResourceAsStream(getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName(),
                                            FileSpanExporterConfiguration.class);
@@ -85,5 +100,14 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
     } finally {
       is.close();
     }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    resourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
+    properties = getSpanExporterConfiguration();
+    propertyResolver =
+        new DefaultConfigurationPropertiesResolver(empty(),
+                                                   new SystemPropertiesConfigurationProvider());
   }
 }

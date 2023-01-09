@@ -27,8 +27,8 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
-  private static final SpanExporterConfiguration CONFIGURATION =
-      new OpenTelemetryAutoConfigurableSpanExporterConfiguration(discoverSpanExporterConfiguration());
+  @Inject
+  SpanExporterConfiguration configuration;
 
   @Inject
   MuleContext muleContext;
@@ -48,7 +48,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
   private SpanProcessor getSpanProcessor() {
     if (spanProcessor == null) {
-      spanProcessor = OpenTelemetryResources.resolveExporterProcessor(CONFIGURATION);
+      spanProcessor = OpenTelemetryResources.resolveExporterProcessor(configuration);
     }
     return spanProcessor;
   }

@@ -244,6 +244,7 @@ public class MuleProperties {
   public static final String MULE_PROFILING_SERVICE_KEY = "_muleProfilingService";
   public static final String MULE_CORE_EVENT_TRACER_KEY = "_muleCoreEventTracer";
   public static final String MULE_CORE_SPAN_FACTORY_KEY = "_muleCoreSpanFactory";
+  public static final String MULE_SPAN_EXPORTER_CONFIGURATION_KEY = "_muleSpanExporterConfiguration";
   public static final String MULE_CORE_EXPORTER_FACTORY_KEY = "_muleCoreExporterFactory";
   public static final String SERVER_NOTIFICATION_MANAGER = "_serverNotificationManager";
   public static final String OBJECT_ARTIFACT_TYPE_LOADER = "_artifactTypeLoader";

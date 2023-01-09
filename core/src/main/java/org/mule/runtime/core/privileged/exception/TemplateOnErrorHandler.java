@@ -120,8 +120,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private ConfigurationProperties configurationProperties;
 
   @Inject
-  private InternalProfilingService profilingService;
-
   private EventTracer<CoreEvent> coreEventEventTracer;
 
   protected Optional<String> flowLocation = empty();
@@ -217,7 +215,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   public synchronized void initialise() throws InitialisationException {
     initialSpanInfo = new ComponentExecutionInitialSpanInfo(TemplateOnErrorHandler.this);
-    coreEventEventTracer = profilingService.getCoreEventTracer();
     super.initialise();
   }
 
