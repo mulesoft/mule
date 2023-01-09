@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -26,11 +27,14 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -44,6 +48,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   MuleContext muleContext;
 
   private static final String PROPERTIES_FILE_NAME = "tracer-exporter.conf";
+
+  private static final Logger LOGGER = getLogger(FileSpanExporterConfiguration.class);
 
   private ConfigurationPropertiesResolver propertyResolver;
   private Properties properties;
@@ -59,6 +65,14 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       return propertyResolver.apply(properties.getProperty(key));
     }
 
+    if (key.equals(OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION)) {
+      Path path = Paths.get(value);
+
+      if (!path.isAbsolute()) {
+        return muleContext.getExecutionClassLoader().getResource(resourceProvider.getResourceAsStream(path.toString())))git.getPath().
+      }
+    }
+
     return null;
   }
 
@@ -67,7 +81,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
       return loadProperties(is);
     } catch (MuleRuntimeException | IOException e) {
-
+      LOGGER.info("No tracer-exporter config found in app. Loading it from the conf.");
     }
 
     try {
@@ -75,6 +89,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
                                            FileSpanExporterConfiguration.class);
       return loadProperties(is);
     } catch (IOException e) {
+      LOGGER.info("No tracer-exporter config found in conf directory.");
       return getProperties();
     }
   }

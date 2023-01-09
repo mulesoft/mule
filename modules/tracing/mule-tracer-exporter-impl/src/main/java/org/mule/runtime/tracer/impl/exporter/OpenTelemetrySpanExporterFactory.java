@@ -8,7 +8,6 @@
 package org.mule.runtime.tracer.impl.exporter;
 
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
-import static org.mule.runtime.tracer.impl.exporter.config.SpanExporterConfigurationDiscoverer.discoverSpanExporterConfiguration;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.impl.exporter.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
