@@ -20,7 +20,7 @@ class TestSpanExporterConfiguration implements SpanExporterConfiguration {
   }
 
   @Override
-  public String getValue(String key) {
+  public String getStringValue(String key) {
     return properties.get(key);
   }
 }

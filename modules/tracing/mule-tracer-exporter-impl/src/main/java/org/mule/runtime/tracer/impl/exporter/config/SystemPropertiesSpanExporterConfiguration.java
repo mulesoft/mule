@@ -7,9 +7,9 @@
 
 package org.mule.runtime.tracer.impl.exporter.config;
 
-import static java.lang.System.getProperty;
-
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+
+import static java.lang.System.getProperty;
 
 /**
  * A {@link SpanExporterConfiguration} that is based on system properties.
@@ -19,7 +19,7 @@ import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 public class SystemPropertiesSpanExporterConfiguration implements SpanExporterConfiguration {
 
   @Override
-  public String getValue(String key) {
+  public String getStringValue(String key) {
     return getProperty(key);
   }
 }
