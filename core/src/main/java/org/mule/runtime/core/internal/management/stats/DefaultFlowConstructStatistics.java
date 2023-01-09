@@ -25,7 +25,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   protected boolean enabled = false;
   private long samplePeriod = 0;
   protected final AtomicLong receivedEvents = new AtomicLong(0);
-  protected final AtomicLong dispatchedMessages = new AtomicLong(0);
+  protected transient final AtomicLong dispatchedMessages = new AtomicLong(0);
 
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
