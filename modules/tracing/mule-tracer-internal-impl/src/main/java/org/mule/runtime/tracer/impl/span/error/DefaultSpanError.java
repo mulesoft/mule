@@ -15,10 +15,10 @@ import org.mule.runtime.tracer.api.span.InternalSpanCallStack;
 public class DefaultSpanError implements InternalSpanError {
 
   private final Error error;
-  private final FlowCallStack errorStackTrace;
+  private final InternalSpanCallStack errorStackTrace;
   private final boolean isEscapingSpan;
 
-  public DefaultSpanError(Error error, FlowCallStack errorStackTrace, boolean isEscapingSpan) {
+  public DefaultSpanError(Error error, InternalSpanCallStack errorStackTrace, boolean isEscapingSpan) {
     this.error = error;
     this.errorStackTrace = errorStackTrace;
     this.isEscapingSpan = isEscapingSpan;
@@ -36,7 +36,7 @@ public class DefaultSpanError implements InternalSpanError {
 
   @Override
   public InternalSpanCallStack getErrorStacktrace() {
-    return new DefaultSpanCallStack(errorStackTrace);
+    return errorStackTrace;
   }
 
 }

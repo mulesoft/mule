@@ -17,11 +17,13 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.CONSTRUCT;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.EXTENSION;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.OPERATION;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -32,14 +34,17 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.route.WhenRoute;
 
 import java.util.Optional;
 import java.util.Set;
 
+import io.qameta.allure.Issue;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -117,20 +122,33 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
   @Test
   public void operationThrowsOverridesExtensionThrows() {
     extensionModel = loadExtension(HeisenbergWithOperationThrows.class);
-    OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
-    Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(OPERATION.getType())).findFirst();
-    assertThat(operationError.isPresent(), is(true));
+
+    assertErrorPresent(extensionModel.getOperationModel("someOperation").get(), OPERATION.getType());
   }
 
   @Test
-  public void operationInheritsExtensionErrorThrows() {
+  public void operationAndConstructInheritExtensionErrorThrows() {
     extensionModel = loadExtension(HeisenbergWithExtensionThrows.class);
 
-    OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
-    Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(EXTENSION.getType())).findFirst();
-    assertThat(operationError.isPresent(), is(true));
+    assertErrorPresent(extensionModel.getOperationModel("someOperation").get(), EXTENSION.getType());
+
+    // W-12289050
+    assertErrorPresent(extensionModel.getConstructModel("someConstruct").get(), EXTENSION.getType());
+  }
+
+  @Test
+  @Issue("W-12289050")
+  public void constructHasErrorModels() {
+    extensionModel = loadExtension(HeisenbergWithConstructThrows.class);
+
+    assertErrorPresent(extensionModel.getConstructModel("someConstruct").get(), CONSTRUCT.getType());
+  }
+
+  private void assertErrorPresent(ComponentModel componentModel, String errorType) {
+    Optional<ErrorModel> componentError = componentModel.getErrorModels().stream()
+        .filter(errorModel -> errorModel.getType().equals(errorType)).findFirst();
+
+    assertThat(componentError.isPresent(), is(true));
   }
 
   @ErrorTypes(CyclicErrorTypes.class)
@@ -156,13 +174,6 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
 
 
   @Extension(name = "Heisenberg")
-  @Operations(OperationWithThrows.class)
-  public static class HeisenbergWithoutErrorTypes extends HeisenbergExtension {
-
-  }
-
-
-  @Extension(name = "Heisenberg")
   @ErrorTypes(LevelErrorTypes.class)
   @Throws(ExtensionLevelErrorTypeProvider.class)
   @Operations(OperationWithThrows.class)
@@ -174,7 +185,16 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
   @Extension(name = "Heisenberg")
   @ErrorTypes(LevelErrorTypes.class)
   @Throws(ExtensionLevelErrorTypeProvider.class)
-  @Operations(OperationWithOutThrows.class)
+  @Operations(ConstructWithThrows.class)
+  public static class HeisenbergWithConstructThrows extends HeisenbergExtension {
+
+  }
+
+
+  @Extension(name = "Heisenberg")
+  @ErrorTypes(LevelErrorTypes.class)
+  @Throws(ExtensionLevelErrorTypeProvider.class)
+  @Operations({OperationWithoutThrows.class, ConstructWithoutThrows.class})
   public static class HeisenbergWithExtensionThrows extends HeisenbergExtension {
 
   }
@@ -248,9 +268,24 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
   }
 
 
-  private static class OperationWithOutThrows {
+  private static class OperationWithoutThrows {
 
     public void someOperation() {
+
+    }
+  }
+
+  private static class ConstructWithThrows {
+
+    @Throws(ConstructLevelErrorTypeProvider.class)
+    public void someConstruct(WhenRoute route, RouterCompletionCallback completionCallback) {
+
+    }
+  }
+
+  private static class ConstructWithoutThrows {
+
+    public void someConstruct(WhenRoute route, RouterCompletionCallback completionCallback) {
 
     }
   }
@@ -261,6 +296,15 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
     @Override
     public Set<ErrorTypeDefinition> getErrorTypes() {
       return singleton(OPERATION);
+    }
+  }
+
+
+  public static class ConstructLevelErrorTypeProvider implements ErrorTypeProvider {
+
+    @Override
+    public Set<ErrorTypeDefinition> getErrorTypes() {
+      return singleton(CONSTRUCT);
     }
   }
 

@@ -12,5 +12,5 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
  * This can't be moved to an inner Enum due to compilation issues
  */
 public enum LevelErrorTypes implements ErrorTypeDefinition<LevelErrorTypes> {
-  OPERATION, EXTENSION
+  OPERATION, EXTENSION, CONSTRUCT
 }
