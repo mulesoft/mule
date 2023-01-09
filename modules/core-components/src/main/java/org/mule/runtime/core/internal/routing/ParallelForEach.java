@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -74,7 +74,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   public void initialise() throws InitialisationException {
     nestedChain =
         buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors,
-                                          new SuffixComponentEventBasedInitialSpanInfoProvider(this, "iteration"));
+                                          new ComponentExecutionInitialSpanInfo(this, ":iteration"));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, collectionExpression);
     super.initialise();
   }

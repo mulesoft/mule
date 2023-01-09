@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.tracing.customization.NoExportComponentEventBasedInitialSpanInfoProvider;
+import org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -49,7 +49,7 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 
 /**
@@ -69,8 +69,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
-  public final EventBasedInitialSpanInfoProvider NO_EXPORT_CHILD_NAMED_SPAN_BASED_ON_PARENT_SPAN_CHILD_SPAN_CUSTOMIZATION_INFO =
-      new NoExportComponentEventBasedInitialSpanInfoProvider(this);
+  public final InitialSpanInfo NO_EXPORT_CHILD_NAMED_SPAN_BASED_ON_PARENT_SPAN_CHILD_SPAN_CUSTOMIZATION_INFO =
+      new NoExportComponentExecutionInitialSpanInfo(this);
 
   @Inject
   private MuleContext muleContext;
