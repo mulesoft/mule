@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+
+import static java.lang.String.format;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,6 +25,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -35,11 +40,16 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
 public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Test
   public void createBasicDeployableProjectModel() throws Exception {
@@ -155,6 +165,17 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
         getDeployableProjectModel("apps/heavyweight/basic-lightweight-local-repository");
 
     testBasicDeployableProjectModel(deployableProjectModel);
+  }
+
+  @Test
+  @Issue("W-12276189")
+  public void projectWithInvalidClassLoaderModel() throws URISyntaxException {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException
+        .expectMessage(format("Artifact coordinates from project's class loader model are missing the 'classifier' attribute. Valid values are '%s' and '%s'.",
+                              MULE_APPLICATION_CLASSIFIER, MULE_DOMAIN_CLASSIFIER));
+
+    getDeployableProjectModel("apps/heavyweight/invalid-classloader-model");
   }
 
   private void testBasicDeployableProjectModel(DeployableProjectModel deployableProjectModel) {
