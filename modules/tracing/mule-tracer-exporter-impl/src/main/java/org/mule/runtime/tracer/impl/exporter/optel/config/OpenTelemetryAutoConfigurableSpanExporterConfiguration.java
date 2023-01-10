@@ -50,7 +50,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   public OpenTelemetryAutoConfigurableSpanExporterConfiguration(SpanExporterConfiguration delegate) {
     this.delegate = delegate;
-    initializeDefaultConfigurationValues();
+    initialiseDefaultConfigurationValues();
   }
 
   @Override
@@ -62,7 +62,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     }
   }
 
-  private void initializeDefaultConfigurationValues() {
+  private void initialiseDefaultConfigurationValues() {
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false");
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, DEFAULT_EXPORTER_TYPE);
     if (getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE).equals(GRPC_EXPORTER_TYPE)) {
@@ -80,6 +80,6 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   @Override
   public void initialise() throws InitialisationException {
     this.delegate = new FileSpanExporterConfiguration(muleContext);
-    initializeDefaultConfigurationValues();
+    initialiseDefaultConfigurationValues();
   }
 }
