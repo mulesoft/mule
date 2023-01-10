@@ -23,9 +23,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration, Initialisable {
 
