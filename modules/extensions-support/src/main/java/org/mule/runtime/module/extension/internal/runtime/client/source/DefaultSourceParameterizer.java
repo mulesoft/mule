@@ -21,7 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.client.params.BasePara
 
 import java.util.concurrent.TimeUnit;
 
-public class DefaultSourceParameterizer extends BaseParameterizer<SourceParameterizer> implements SourceParameterizer {
+class DefaultSourceParameterizer extends BaseParameterizer<SourceParameterizer> implements SourceParameterizer {
 
   private BackPressureMode backPressureMode = WAIT;
   private SchedulingStrategy schedulingStrategy = null;

@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.client.source.SourceHandler;
 
 import org.slf4j.Logger;
 
-public final class DefaultSourceHandler implements SourceHandler {
+public class DefaultSourceHandler implements SourceHandler {
 
   private static final Logger LOGGER = getLogger(DefaultSourceHandler.class);
 

@@ -20,11 +20,14 @@ import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowP
 
 import java.util.function.Consumer;
 
-public class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessingManager {
+class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessingManager {
 
+  private final SourceClient sourceClient;
   private final Consumer<SourceResultCallback<T, A>> callbackConsumer;
 
-  public ExtensionsClientMessageProcessingManager(Consumer<SourceResultCallback<T, A>> callbackConsumer) {
+  ExtensionsClientMessageProcessingManager(SourceClient sourceClient,
+                                                  Consumer<SourceResultCallback<T, A>> callbackConsumer) {
+    this.sourceClient = sourceClient;
     this.callbackConsumer = callbackConsumer;
   }
 
@@ -36,7 +39,7 @@ public class ExtensionsClientMessageProcessingManager<T, A> implements MessagePr
 
     Result result = getResult(resultAdapter);
 
-    callbackConsumer.accept(new DefaultSourceResultCallback<>(result, process, messageProcessContext));
+    callbackConsumer.accept(new DefaultSourceResultCallback<>(sourceClient, result, process));
   }
 
   private Result<Object, Object> getResult(SourceResultAdapter adapter) {

@@ -28,6 +28,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
@@ -60,6 +61,32 @@ public class ExtensionClientConnectedPollingSourceTestCase extends AbstractExten
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopAndDispose(handler);
+  }
+
+  @Test
+  public void test() {
+    CompletableFuture<Void> f = new CompletableFuture<>();
+    f = f.whenComplete((v, e) -> {
+      if (e != null) {
+        System.out.println("error");
+      } else {
+        System.out.println("yes");
+      }
+    });
+
+    f.complete(null);
+
+    CompletableFuture<Void> f2 = new CompletableFuture<>();
+    f2 = f2.whenComplete((v, e) -> {
+      if (e != null) {
+        System.out.println("error");
+      } else {
+        System.out.println("yes");
+      }
+    });
+
+    f2.completeExceptionally(new RuntimeException());
+
   }
 
   @Test

@@ -54,7 +54,6 @@ import org.mule.runtime.module.extension.internal.runtime.client.operation.Event
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.OperationKey;
 import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultSourceHandler;
-import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultSourceParameterizer;
 import org.mule.runtime.module.extension.internal.runtime.client.source.SourceClient;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -138,17 +137,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                            Consumer<SourceParameterizer> parameters) {
     final ExtensionModel extensionModel = findExtension(extensionName);
     final SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
-    final DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
-    parameters.accept(parameterizer);
 
-    SourceClient sourceClient = SourceClient.from(extensionModel,
+    SourceClient<T, A> sourceClient = new SourceClient<>(extensionModel,
                                                   sourceModel,
-                                                  parameterizer,
+                                                  parameters,
                                                   callbackConsumer,
                                                   extensionManager,
-                                                  expressionManager,
                                                   streamingManager,
                                                   reflectionCache,
+                                                  expressionManager,
                                                   notificationDispatcher,
                                                   muleContext.getTransactionFactoryManager(),
                                                   muleContext);

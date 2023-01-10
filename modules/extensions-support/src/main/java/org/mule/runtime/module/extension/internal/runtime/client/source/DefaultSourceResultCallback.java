@@ -6,31 +6,42 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.source;
 
+import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
+import static org.mule.runtime.module.extension.internal.runtime.client.util.SarazaUtils.evaluate;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
-import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+
 final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T, A> {
 
+  private static final Logger LOGGER = getLogger(DefaultSourceResultCallback.class);
+
+  private final SourceClient sourceClient;
   private final Result<T, A> result;
   private final ExtensionsFlowProcessingTemplate template;
-  private final MessageProcessContext messageProcessContext;
 
-  DefaultSourceResultCallback(Result<T, A> result,
-                              ExtensionsFlowProcessingTemplate template,
-                              MessageProcessContext messageProcessContext) {
+  DefaultSourceResultCallback(SourceClient sourceClient,
+                              Result<T, A> result,
+                              ExtensionsFlowProcessingTemplate template) {
+    this.sourceClient = sourceClient;
     this.result = result;
     this.template = template;
-    this.messageProcessContext = messageProcessContext;
   }
 
   @Override
@@ -40,37 +51,67 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
 
   @Override
   public CompletableFuture<Void> completeWithSuccess(Consumer<SourceParameterizer> successCallbackParameters) {
-    final CompletableFuture<Void> future = new CompletableFuture<>();
-    try {
-      withNullEvent(event -> {
-        try {
-          template.sendResponseToClient(event, null, new FutureCompletionCallback(future));
+    return withNullEvent(event -> {
+      final CompletableFuture<Void> future = new CompletableFuture<>();
+      future.whenComplete((v, t) -> {
+        if (t != null) {
+          if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("Failed to send success response to client: " + t.getMessage(), t);
+          }
+          template.afterPhaseExecution(left(asMessagingException(t, event)));
+        } else {
           template.afterPhaseExecution(right(event));
-        } catch (Throwable t) {
-
-          // this t? or a messaging exception? or whatever makes it to the error callback?
-          future.completeExceptionally(t);
         }
-          return null;
       });
-    } catch (Throwable t) {
-      future.completeExceptionally(t);
-    }
-    return future;
+
+      try {
+        Map<String, Object> params = evaluate(sourceClient.toResolverSet(successCallbackParameters),
+                                              sourceClient.resolveConfigurationInstance(event),
+                                              event);
+
+        template.sendResponseToClient(event, params, new FutureCompletionCallback(future));
+      } catch (Throwable t) {
+        future.completeExceptionally(t);
+      }
+      return future;
+    });
   }
 
   @Override
-  public CompletableFuture<Void> completeWithError() {
-    final CompletableFuture<Void> future = new CompletableFuture<>();
-    try {
-      withNullEvent(event -> {
-//        template.sendFailureResponseToClient(event, null, new FutureCompletionCallback(future));
-        return null;
+  public CompletableFuture<Void> completeWithError(Throwable exception, Consumer<SourceParameterizer> errorCallbackParameters) {
+    return withNullEvent(event -> {
+      final MessagingException messagingException = asMessagingException(exception, event);
+      final CompletableFuture<Void> future = new CompletableFuture<>();
+      future.whenComplete((v, t) -> {
+        if (t != null) {
+          if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("Failed to send error response to client: " + t.getMessage(), t);
+          }
+          template.afterPhaseExecution(left(asMessagingException(t, event)));
+        } else {
+          template.afterPhaseExecution(left(messagingException));
+        }
       });
-    } catch (Throwable t) {
-      future.completeExceptionally(t);
+
+      try {
+        Map<String, Object> params = evaluate(sourceClient.toResolverSet(errorCallbackParameters),
+                                              sourceClient.resolveConfigurationInstance(event),
+                                              event);
+
+        template.sendFailureResponseToClient(messagingException, params, new FutureCompletionCallback(future));
+      } catch (Throwable t) {
+        future.completeExceptionally(t);
+      }
+      return future;
+    });
+  }
+
+  private MessagingException asMessagingException(Throwable t, CoreEvent event) {
+    if (t instanceof MessagingException) {
+      return (MessagingException) t;
     }
-    return future;
+
+    return new MessagingException(createStaticMessage(t.getMessage()), event, t, sourceClient.getMessageSource());
   }
 
   private class FutureCompletionCallback implements CompletableCallback<Void> {
