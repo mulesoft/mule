@@ -109,11 +109,6 @@ public class FileSpanExporterConfigurationTestCase {
     public static final String TEST_CONF_FILE_NAME = "test.conf";
 
     @Override
-    protected String getConfFolder() {
-      return ".";
-    }
-
-    @Override
     protected String getPropertiesFileName() {
       return TEST_CONF_FILE_NAME;
     }

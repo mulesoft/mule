@@ -8,21 +8,19 @@
 package org.mule.runtime.tracer.exporter.api.config;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
-import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
-import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.slf4j.Logger;
 
@@ -65,16 +63,17 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
     String value = properties.getProperty(key);
 
     if (value != null) {
-      // We resolve to verify if it is a sysprop.
+      // Verify if it is a system property.
       value = propertyResolver.apply(value);
 
       if (isAValueCorrespondingToAPath(key)) {
-        // We obtain the absolute path and return it if possible.
+        // Obtain absolute path and return it if possible.
         String absolutePath = getAbsolutePath(value);
 
         if (absolutePath != null) {
           return absolutePath;
         }
+        // Otherwise, return the non-resolved value so that the error message makes sense.
       }
 
       return value;
@@ -102,8 +101,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   }
 
   private boolean isAValueCorrespondingToAPath(String key) {
-    return key.equals(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION) || key.equals(
-                                                                                   MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
+    return key.equals(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION) ||
+        key.equals(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
   }
 
   private Properties getSpanExporterConfiguration() {
@@ -115,10 +114,6 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
       LOGGER.info("No tracer exporter config found in app. Loading it from the conf directory.");
       return getProperties();
     }
-  }
-
-  protected String getConfFolder() {
-    return MuleFoldersUtil.getConfFolder().getAbsolutePath();
   }
 
   protected String getPropertiesFileName() {
