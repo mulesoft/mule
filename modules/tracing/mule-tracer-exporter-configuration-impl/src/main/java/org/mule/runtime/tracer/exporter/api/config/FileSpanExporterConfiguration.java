@@ -8,7 +8,6 @@
 package org.mule.runtime.tracer.exporter.api.config;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
