@@ -32,7 +32,6 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
@@ -68,6 +67,8 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Inject
   SpanExporterConfiguration spanExporterConfiguration;
+
+  private boolean isTracingExportEnabled;
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
@@ -174,13 +175,13 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
-    if (isTracingExportEnabled()) {
+    if (isTracingExportEnabled) {
       return coreEventTracer;
     }
     return getProfilingService().getCoreEventTracer();
   }
 
-  private static boolean isTracingExportEnabled() {
+  private boolean isTracingExportEnabled() {
     try {
       return parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"));
     } catch (PropertyNotFoundException e) {
@@ -208,6 +209,8 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     if (profilingService instanceof Initialisable) {
       ((Initialisable) profilingService).initialise();
     }
+
+    isTracingExportEnabled = isTracingExportEnabled();
   }
 
   @Override
@@ -229,17 +232,6 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
     if (profilingService instanceof Stoppable) {
       ((Stoppable) profilingService).stop();
-    }
-  }
-
-  // TODO W-12296677: Remove dependency between ProfilingService and SpanExporterConfiguration
-  private static SpanExporterConfiguration discoverSpanExporterConfiguration() {
-    try {
-      return new SpiServiceRegistry()
-          .lookupProvider(SpanExporterConfiguration.class,
-                          SpanExporterConfiguration.class.getClassLoader());
-    } catch (Exception e) {
-      return key -> null;
     }
   }
 }
