@@ -8,12 +8,10 @@ package org.mule.test.marvel.xmen;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -23,8 +21,14 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 @MediaType(TEXT_PLAIN)
 public class MagnetoMutantSummon extends Source<InputStream, Void> {
+
+  public static final String MESSAGE = "We are the future. ... You have lived in the shadows of shame and fear for too long!";
 
   @Override
   public void onStart(SourceCallback<InputStream, Void> sourceCallback) throws MuleException {
@@ -33,8 +37,7 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   private Result<InputStream, Void> makeResult() {
     return Result.<InputStream, Void>builder()
-        .output(new ByteArrayInputStream("We are the future. ... You have lived in the shadows of shame and fear for too long!"
-            .getBytes()))
+        .output(new ByteArrayInputStream(MESSAGE.getBytes()))
         .build();
   }
 
@@ -51,6 +54,12 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
       ((CursorStreamProvider) mutantResponse.getBody().getValue()).openCursor().read(new byte[1024]);
     }
   }
+
+  @OnError
+  public void onError(Error error) {
+    error.toString();
+  }
+
 
   @Override
   public void onStop() {

@@ -12,9 +12,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.module.extension.internal.runtime.client.util.SarazaUtils.evaluate;
 
+import static java.util.Collections.emptyMap;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
@@ -23,6 +26,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -65,9 +69,9 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
       });
 
       try {
-        Map<String, Object> params = evaluate(sourceClient.toResolverSet(successCallbackParameters),
-                                              sourceClient.resolveConfigurationInstance(event),
-                                              event);
+        Map<String, Object> params = resolveCallbackParameters(sourceClient.getSourceModel().getSuccessCallback(),
+                                                               successCallbackParameters,
+                                                               event);
 
         template.sendResponseToClient(event, params, new FutureCompletionCallback(future));
       } catch (Throwable t) {
@@ -94,9 +98,9 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
       });
 
       try {
-        Map<String, Object> params = evaluate(sourceClient.toResolverSet(errorCallbackParameters),
-                                              sourceClient.resolveConfigurationInstance(event),
-                                              event);
+        Map<String, Object> params = resolveCallbackParameters(sourceClient.getSourceModel().getErrorCallback(),
+                                                               errorCallbackParameters,
+                                                               event);
 
         template.sendFailureResponseToClient(messagingException, params, new FutureCompletionCallback(future));
       } catch (Throwable t) {
@@ -104,6 +108,15 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
       }
       return future;
     });
+  }
+
+  private Map<String, Object> resolveCallbackParameters(Optional<? extends ParameterizedModel> callbackModel,
+                                                        Consumer<SourceParameterizer> parameterizer,
+                                                        CoreEvent event) {
+    return callbackModel.map(model -> evaluate(sourceClient.toResolverSet(parameterizer, model),
+                                               sourceClient.resolveConfigurationInstance(event),
+                                               event))
+      .orElse(emptyMap());
   }
 
   private MessagingException asMessagingException(Throwable t, CoreEvent event) {

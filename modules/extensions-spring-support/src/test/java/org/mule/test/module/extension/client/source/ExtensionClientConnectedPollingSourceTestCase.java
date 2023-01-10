@@ -20,26 +20,20 @@ import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.extension.api.client.ExtensionsClient;
-import org.mule.runtime.extension.api.client.source.SourceHandler;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-
-import javax.inject.Inject;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ExtensionClientConnectedPollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
+public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtensionClientSourceTestCase {
 
   @Rule
   public SystemProperty configProperty = new SystemProperty("configName", "petstore");
@@ -47,46 +41,10 @@ public class ExtensionClientConnectedPollingSourceTestCase extends AbstractExten
   @Rule
   public ExpectedException expectedException = none();
 
-  @Inject
-  private ExtensionsClient extensionsClient;
-
-  private SourceHandler handler;
 
   @Override
   protected String getConfigFile() {
     return "petstore.xml";
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    stopAndDispose(handler);
-  }
-
-  @Test
-  public void test() {
-    CompletableFuture<Void> f = new CompletableFuture<>();
-    f = f.whenComplete((v, e) -> {
-      if (e != null) {
-        System.out.println("error");
-      } else {
-        System.out.println("yes");
-      }
-    });
-
-    f.complete(null);
-
-    CompletableFuture<Void> f2 = new CompletableFuture<>();
-    f2 = f2.whenComplete((v, e) -> {
-      if (e != null) {
-        System.out.println("error");
-      } else {
-        System.out.println("yes");
-      }
-    });
-
-    f2.completeExceptionally(new RuntimeException());
-
   }
 
   @Test
@@ -122,7 +80,7 @@ public class ExtensionClientConnectedPollingSourceTestCase extends AbstractExten
   }
 
   @Test
-  public void pollingSourceWithoutSchedulingStrategy() throws Exception {
+  public void pollingSourceWithoutSchedulingStrategy() {
     expectedException.expect(MuleRuntimeException.class);
     expectedException.expectCause(instanceOf(InitialisationException.class));
 
@@ -134,15 +92,5 @@ public class ExtensionClientConnectedPollingSourceTestCase extends AbstractExten
                                               .withConfigRef(configProperty.getValue())
                                               .withParameter("watermark", true)
                                               .withParameter("idempotent", true));
-  }
-
-  private void stopAndDispose(SourceHandler handler) throws Exception {
-    if (handler != null) {
-      try {
-        handler.stop();
-      } finally {
-        handler.dispose();
-      }
-    }
   }
 }

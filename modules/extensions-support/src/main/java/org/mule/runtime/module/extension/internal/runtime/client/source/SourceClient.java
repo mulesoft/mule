@@ -25,6 +25,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
@@ -143,15 +144,15 @@ public class SourceClient<T, A> implements Lifecycle {
     disposeIfNeeded(source, LOGGER);
   }
 
-  ResolverSet toResolverSet(Consumer<SourceParameterizer> consumer) {
+  ResolverSet toResolverSet(Consumer<SourceParameterizer> consumer, ParameterizedModel model) {
     DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
     consumer.accept(parameterizer);
 
-    return toResolverSet(parameterizer);
+    return toResolverSet(parameterizer, model);
   }
 
-  ResolverSet toResolverSet(DefaultSourceParameterizer parameterizer) {
-    ComponentParameterization.Builder<SourceModel> paramsBuilder = ComponentParameterization.builder(sourceModel);
+  ResolverSet toResolverSet(DefaultSourceParameterizer parameterizer, ParameterizedModel model) {
+    ComponentParameterization.Builder paramsBuilder = ComponentParameterization.builder(model);
     parameterizer.setValuesOn(paramsBuilder);
 
     ResolverSet resolverSet;
@@ -179,12 +180,16 @@ public class SourceClient<T, A> implements Lifecycle {
     return source;
   }
 
+  SourceModel getSourceModel() {
+    return sourceModel;
+  }
+
   private SourceAdapterFactory newSourceAdapterFactory(DefaultSourceParameterizer parameterizer,
                                                        CursorProviderFactory cursorProviderFactory,
                                                        BackPressureStrategy backPressureStrategy) {
     return new SourceAdapterFactory(extensionModel,
                                     sourceModel,
-                                    toResolverSet(parameterizer),
+                                    toResolverSet(parameterizer, sourceModel),
                                     NullResolverSet.INSTANCE,
                                     NullResolverSet.INSTANCE,
                                     cursorProviderFactory,
