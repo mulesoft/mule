@@ -28,13 +28,12 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static java.lang.Boolean.TRUE;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.testcontainers.Testcontainers.exposeHostPorts;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 import static org.testcontainers.utility.MountableFile.forHostPath;
 
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.exporter.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -80,6 +79,7 @@ public class OpenTelemetryExporterConfigTestCase {
   private static final Integer COLLECTOR_OTLP_GRPC_MTLS_PORT = 5317;
   private static final Integer COLLECTOR_OTLP_HTTP_MTLS_PORT = 5318;
   private static final Integer COLLECTOR_HEALTH_CHECK_PORT = 13133;
+
   public static final int TIMEOUT_MILLIS = 30000;
 
   private GenericContainer<?> collector;
@@ -134,7 +134,37 @@ public class OpenTelemetryExporterConfigTestCase {
   }
 
   @Test
-  public void defaultGrpcInsecureExporter() throws Exception {
+  public void defaultGrpcExporter() {
+    Map<String, String> properties = new HashMap<>();
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
+                   "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT));
+
+    Tracer tracer = getTracer(getSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+
+    tracer.spanBuilder(getUUID()).startSpan().end();
+
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> server.getTraceRequests().get(0).getResourceSpansCount() == 1));
+  }
+
+  @Test
+  public void defaultHttpExporter() {
+    Map<String, String> properties = new HashMap<>();
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
+    properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
+                   "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT));
+
+    Tracer tracer = getTracer(getSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+
+    tracer.spanBuilder(getUUID()).startSpan().end();
+
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> server.getTraceRequests().get(0).getResourceSpansCount() == 1));
+  }
+
+  @Test
+  public void configuredGrpcInsecureExporter() throws Exception {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
@@ -145,20 +175,17 @@ public class OpenTelemetryExporterConfigTestCase {
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
              "{\"Header\": \"Header Value\"}");
-    Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+    Tracer tracer = getTracer(getSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
 
     tracer.spanBuilder(getUUID()).startSpan().end();
-    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
-        return false;
-      }
-      return true;
-    }));
+
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> server.getTraceRequests().get(0).getResourceSpansCount() == 1));
   }
 
   @Test
-  public void defaultGrpcSecureExporter() throws Exception {
+  public void configuredGrpcSecureExporter() throws Exception {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
@@ -173,19 +200,16 @@ public class OpenTelemetryExporterConfigTestCase {
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
              "{\"Header\": \"Header Value\"}");
-    Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+    Tracer tracer = getTracer(getSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
     tracer.spanBuilder(getUUID()).startSpan().end();
-    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
-        return false;
-      }
-      return true;
-    }));
+
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> server.getTraceRequests().get(0).getResourceSpansCount() == 1));
   }
 
   @Test
-  public void defaultHttpInsecureExporter() throws Exception {
+  public void configuredHttpInsecureExporter() throws Exception {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, HTTP.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
@@ -195,19 +219,16 @@ public class OpenTelemetryExporterConfigTestCase {
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
              "{\"Header\": \"Header Value\"}");
-    Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+    Tracer tracer = getTracer(getSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
     tracer.spanBuilder(getUUID()).startSpan().end();
-    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
-        return false;
-      }
-      return true;
-    }));
+
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> server.getTraceRequests().get(0).getResourceSpansCount() == 1));
   }
 
   @Test
-  public void defaultHttpSecureExporter() throws Exception {
+  public void configuredHttpSecureExporter() throws Exception {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, HTTP.toString());
@@ -223,15 +244,17 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION, clientTls.certificateFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION, serverTls.certificateFile().toPath().toString());
 
-    Tracer tracer = getTracer(new TestSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
+    Tracer tracer = getTracer(getSpanExporterConfiguration(properties), TEST_SERVICE_NAME);
 
     tracer.spanBuilder(getUUID()).startSpan().end();
-    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      if (server.getTraceRequests().get(0).getResourceSpansCount() != 1) {
-        return false;
-      }
-      return true;
-    }));
+
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> server.getTraceRequests().get(0).getResourceSpansCount() == 1));
+  }
+
+  @NotNull
+  private static OpenTelemetryAutoConfigurableSpanExporterConfiguration getSpanExporterConfiguration(Map<String, String> properties) {
+    return new OpenTelemetryAutoConfigurableSpanExporterConfiguration(new TestSpanExporterConfiguration(properties));
   }
 
   /**
@@ -246,7 +269,7 @@ public class OpenTelemetryExporterConfigTestCase {
     }
 
     @Override
-    public String getValue(String key) {
+    public String getStringValue(String key) {
       return properties.get(key);
     }
   }

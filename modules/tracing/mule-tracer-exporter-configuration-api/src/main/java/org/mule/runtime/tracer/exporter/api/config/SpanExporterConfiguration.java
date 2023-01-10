@@ -19,10 +19,10 @@ public interface SpanExporterConfiguration {
    *
    * @return the value associated to the {@param key}
    */
-  String getValue(String key);
+  String getStringValue(String key);
 
-  default String getValue(String key, String defaultValue) {
-    String value = getValue(key);
+  default String getStringValue(String key, String defaultValue) {
+    String value = getStringValue(key);
 
     if (value == null) {
       value = defaultValue;

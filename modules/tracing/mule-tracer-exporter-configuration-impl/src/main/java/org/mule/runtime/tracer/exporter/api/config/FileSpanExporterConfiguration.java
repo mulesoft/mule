@@ -44,7 +44,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   }
 
   @Override
-  public String getValue(String key) {
+  public String getStringValue(String key) {
     String value = properties.getProperty(key);
 
     if (value != null) {
