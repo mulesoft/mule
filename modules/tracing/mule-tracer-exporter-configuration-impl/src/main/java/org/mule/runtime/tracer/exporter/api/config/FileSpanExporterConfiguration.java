@@ -105,18 +105,11 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   private Properties getSpanExporterConfiguration() {
     try {
+      // This will verify first in the app and then in the conf folder.
       InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
       return loadProperties(is);
     } catch (MuleRuntimeException | IOException e) {
       LOGGER.info("No tracer exporter config found in app. Loading it from the conf directory.");
-    }
-
-    try {
-      InputStream is = getResourceAsStream(getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName(),
-                                           FileSpanExporterConfiguration.class);
-      return loadProperties(is);
-    } catch (IOException e) {
-      LOGGER.info("No tracer exporter config found in conf directory. Using only system properties.");
       return getProperties();
     }
   }
