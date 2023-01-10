@@ -8,9 +8,10 @@
 package org.mule.runtime.tracer.impl.exporter;
 
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getNewExportedSpanCapturer;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.resolveExporterProcessor;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.tracer.impl.exporter.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -18,12 +19,17 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources;
 
 import javax.inject.Inject;
 
 import io.opentelemetry.sdk.trace.SpanProcessor;
 
+/**
+ * An implementation of {@link SpanExporterFactory} that creates {@link SpanExporter} that export the internal spans as
+ * {@link OpenTelemetrySpanExporter}
+ *
+ * @since 4.5.0
+ */
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
   @Inject
@@ -47,7 +53,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
   private SpanProcessor getSpanProcessor() {
     if (spanProcessor == null) {
-      spanProcessor = OpenTelemetryResources.resolveExporterProcessor(configuration);
+      spanProcessor = resolveExporterProcessor(configuration);
     }
     return spanProcessor;
   }
@@ -61,7 +67,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory {
 
     @Override
     public ExportedSpanSniffer getExportedSpanSniffer() {
-      return OpenTelemetryResources.getNewExportedSpanCapturer();
+      return getNewExportedSpanCapturer();
     }
   }
 }
