@@ -12,6 +12,8 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,25 +62,45 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     String value = properties.getProperty(key);
 
     if (value != null) {
-      value = propertyResolver.apply(properties.getProperty(key));
-      if (key.equals(OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION)) {
-        Path path = Paths.get(value);
+      // We resolve to verify if it is a sysprop.
+      value = propertyResolver.apply(value);
 
-        try {
-          if (!path.isAbsolute()) {
-            URL url = muleContext.getExecutionClassLoader().getResource(value);
+      if (isAValueCorrespondingToAPath(key)) {
+        // We obtain the absolute path and return it if possible.
+        String absolutePath = getAbsolutePath(value);
 
-            if (url != null) {
-              return new File(url.toURI()).getAbsolutePath();
-            }
-          }
-        } catch (URISyntaxException e) {
-          return value;
+        if (absolutePath != null) {
+          return absolutePath;
         }
       }
+
+      return value;
     }
 
     return null;
+  }
+
+  private String getAbsolutePath(String value) {
+    Path path = Paths.get(value);
+
+    try {
+      if (!path.isAbsolute()) {
+        URL url = muleContext.getExecutionClassLoader().getResource(value);
+
+        if (url != null) {
+          return new File(url.toURI()).getAbsolutePath();
+        }
+      }
+    } catch (URISyntaxException e) {
+      return value;
+    }
+
+    return null;
+  }
+
+  private boolean isAValueCorrespondingToAPath(String key) {
+    return key.equals(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION) || key.equals(
+                                                                                   MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
   }
 
   private Properties getSpanExporterConfiguration() {
@@ -124,10 +146,14 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   @Override
   public void initialise() throws InitialisationException {
-    resourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
+    resourceProvider = getResourceProvider(muleContext);
     properties = getSpanExporterConfiguration();
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
+  }
+
+  protected ClassLoaderResourceProvider getResourceProvider(MuleContext muleContext) {
+    return new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
   }
 }
