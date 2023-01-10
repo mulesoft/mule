@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
@@ -18,10 +17,10 @@ import static java.lang.System.setProperty;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 
@@ -126,8 +125,8 @@ public class FileSpanExporterConfigurationTestCase {
     }
 
     @Override
-    protected ClassLoaderResourceProvider getResourceProvider(MuleContext muleContext) {
-      return new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
+    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
+      return Thread.currentThread().getContextClassLoader();
     }
   }
 
@@ -144,8 +143,8 @@ public class FileSpanExporterConfigurationTestCase {
     }
 
     @Override
-    protected ClassLoaderResourceProvider getResourceProvider(MuleContext muleContext) {
-      return new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
+    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
+      return Thread.currentThread().getContextClassLoader();
     }
   }
 }

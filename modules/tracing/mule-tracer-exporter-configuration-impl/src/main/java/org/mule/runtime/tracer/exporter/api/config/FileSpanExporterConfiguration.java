@@ -85,7 +85,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
     try {
       if (!path.isAbsolute()) {
-        URL url = muleContext.getExecutionClassLoader().getResource(value);
+        URL url = getExecutionClassLoader(muleContext).getResource(value);
 
         if (url != null) {
           return new File(url.toURI()).getAbsolutePath();
@@ -146,14 +146,14 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   @Override
   public void initialise() throws InitialisationException {
-    resourceProvider = getResourceProvider(muleContext);
+    resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     properties = getSpanExporterConfiguration();
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
   }
 
-  protected ClassLoaderResourceProvider getResourceProvider(MuleContext muleContext) {
-    return new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
+  protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
+    return muleContext.getExecutionClassLoader();
   }
 }
