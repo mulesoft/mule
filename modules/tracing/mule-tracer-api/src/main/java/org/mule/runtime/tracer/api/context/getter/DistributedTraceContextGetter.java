@@ -52,4 +52,8 @@ public interface DistributedTraceContextGetter {
       }
     };
   }
+
+  default boolean isEmptyDistributedTraceContext() {
+    return false;
+  }
 }

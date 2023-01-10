@@ -6,20 +6,6 @@
  */
 package org.mule.tck.junit4;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
-import static java.lang.reflect.Proxy.getInvocationHandler;
-import static java.lang.reflect.Proxy.isProxyClass;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -35,6 +21,23 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import static java.lang.System.setProperty;
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
+import static java.lang.reflect.Proxy.getInvocationHandler;
+import static java.lang.reflect.Proxy.isProxyClass;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -184,16 +187,19 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     disposeContextPerClass = val;
   }
 
+  static {
+    setProperty(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING, "true");
+  }
+
   @Before
   public final void setUpMuleContext() throws Exception {
-    System.setProperty(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING, "true");
     if (!logConfigured) {
       configureLoggingForTest(getClass());
       logConfigured = true;
     }
     workingDirectory.create();
     String workingDirectoryOldValue =
-        System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
+        setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
     try {
       doSetUpBeforeMuleContextCreation();
 
@@ -216,7 +222,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       throw e;
     } finally {
       if (workingDirectoryOldValue != null) {
-        System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectoryOldValue);
+        setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectoryOldValue);
       } else {
         System.clearProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY);
       }

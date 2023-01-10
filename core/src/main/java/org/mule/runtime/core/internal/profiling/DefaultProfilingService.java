@@ -7,10 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.event.EventContext;
@@ -55,8 +53,6 @@ import reactor.core.publisher.Mono;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
-  private final boolean propagateTracingExceptions;
-
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
 
@@ -75,7 +71,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
       new ConcurrentHashMap<>();
 
   public DefaultProfilingService() {
-    this.propagateTracingExceptions = getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
+
   }
 
   @Override
