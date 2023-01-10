@@ -41,8 +41,7 @@ import java.util.Properties;
  */
 public class FileSpanExporterConfiguration implements SpanExporterConfiguration {
 
-  @Inject
-  MuleContext muleContext;
+  private final MuleContext muleContext;
 
   private static final String PROPERTIES_FILE_NAME = "tracer-exporter.conf";
 
@@ -52,6 +51,10 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   private Properties properties;
   private ClassLoaderResourceProvider resourceProvider;
   private boolean propertiesInitialised;
+
+  public FileSpanExporterConfiguration(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
   @Override
   public String getStringValue(String key) {

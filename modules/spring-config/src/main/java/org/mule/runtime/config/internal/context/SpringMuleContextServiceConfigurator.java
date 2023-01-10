@@ -145,9 +145,9 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.CoreEventTracer;
 import org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterFactory;
+import org.mule.runtime.tracer.impl.exporter.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -229,7 +229,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
-      .put(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, getBeanDefinition(FileSpanExporterConfiguration.class))
+      .put(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, getBeanDefinition(OpenTelemetryAutoConfigurableSpanExporterConfiguration.class))
       .put(MULE_PROFILING_SERVICE_KEY, getBeanDefinitionForProfilingService())
       .put(MULE_CORE_SPAN_FACTORY_KEY, getBeanDefinition(ExecutionSpanFactory.class))
       .put(MULE_CORE_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetrySpanExporterFactory.class))
