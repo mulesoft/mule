@@ -15,12 +15,12 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import static java.lang.Boolean.TRUE;
 import static java.lang.System.setProperty;
 
-import static org.mockito.Mockito.mock;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
