@@ -16,13 +16,22 @@ import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration {
+import javax.inject.Inject;
+
+public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration, Initialisable {
+
+  @Inject
+  private MuleContext muleContext;
 
   private static final String DEFAULT_BACKOFF_MULTIPLIER = "1.5";
   private static final String DEFAULT_INITIAL_BACKOFF = "1";
@@ -34,12 +43,14 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   public static final String DEFAULT_HTTP_EXPORTER_ENDPOINT = "http://localhost:4318/v1/traces";
   public static final String DEFAULT_EXPORTER_TIMEOUT = "10000";
 
-  private final SpanExporterConfiguration delegate;
+  private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
+
+  public OpenTelemetryAutoConfigurableSpanExporterConfiguration() {}
 
   public OpenTelemetryAutoConfigurableSpanExporterConfiguration(SpanExporterConfiguration delegate) {
     this.delegate = delegate;
-    initializeDefaultConfigurationValues();
+    initialiseDefaultConfigurationValues();
   }
 
   @Override
@@ -51,7 +62,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     }
   }
 
-  private void initializeDefaultConfigurationValues() {
+  private void initialiseDefaultConfigurationValues() {
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false");
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, DEFAULT_EXPORTER_TYPE);
     if (getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE).equals(GRPC_EXPORTER_TYPE)) {
@@ -64,5 +75,11 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF, DEFAULT_INITIAL_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS, DEFAULT_BACKOFF_MAX_ATTEMPTS);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.delegate = new FileSpanExporterConfiguration(muleContext);
+    initialiseDefaultConfigurationValues();
   }
 }

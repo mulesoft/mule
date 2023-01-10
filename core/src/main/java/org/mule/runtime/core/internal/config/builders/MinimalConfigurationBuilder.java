@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUG
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
@@ -84,6 +85,7 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
+import org.mule.runtime.core.internal.profiling.EmptySpanExporterConfiguration;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.profiling.NoopCoreEventTracer;
 import org.mule.runtime.core.internal.profiling.NoopSpanExporterFactory;
@@ -167,6 +169,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }
 
     configureCoreTracer(muleContext);
+
+    configureSpanExporterConfiguration(muleContext);
 
     configureSpanExporterFactory(muleContext);
 
@@ -313,5 +317,9 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   protected void configureSpanExporterFactory(MuleContext muleContext) throws RegistrationException {
     SpanExporterFactory spanExporterFactory = new NoopSpanExporterFactory();
     registerObject(MULE_CORE_EXPORTER_FACTORY_KEY, spanExporterFactory, muleContext);
+  }
+
+  protected void configureSpanExporterConfiguration(MuleContext muleContext) throws RegistrationException {
+    registerObject(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, new EmptySpanExporterConfiguration(), muleContext);
   }
 }
