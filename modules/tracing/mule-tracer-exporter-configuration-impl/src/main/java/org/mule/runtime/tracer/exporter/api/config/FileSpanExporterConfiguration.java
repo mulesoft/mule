@@ -17,7 +17,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
@@ -42,7 +41,7 @@ import java.util.Properties;
  *
  * @since 4.5.0
  */
-public class FileSpanExporterConfiguration implements SpanExporterConfiguration, Initialisable {
+public class FileSpanExporterConfiguration implements SpanExporterConfiguration {
 
   @Inject
   MuleContext muleContext;
@@ -54,9 +53,15 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private ConfigurationPropertiesResolver propertyResolver;
   private Properties properties;
   private ClassLoaderResourceProvider resourceProvider;
+  private boolean propertiesInitialised;
 
   @Override
   public String getStringValue(String key) {
+    if (!propertiesInitialised) {
+      initialiseProperties();
+      propertiesInitialised = true;
+    }
+
     String value = properties.getProperty(key);
 
     if (value != null) {
@@ -135,8 +140,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     }
   }
 
-  @Override
-  public void initialise() throws InitialisationException {
+  protected void initialiseProperties() {
     resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     properties = getSpanExporterConfiguration();
     propertyResolver =

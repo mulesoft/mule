@@ -39,7 +39,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
@@ -96,7 +95,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelp
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.tracer.api.EventTracer;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -179,7 +177,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private ExpressionManager expressionManager;
 
   @Inject
-  private EventTracer<CoreEvent> coreEventEventTracer;
+  private InternalProfilingService profilingService;
 
   @Inject
   private ExtensionsClient extensionsClient;
@@ -290,7 +288,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (isCorrelationInfoType(parameterType)) {
         argumentResolver = CORRELATION_INFO_ARGUMENT_RESOLVER;
       } else if (isDistributedTraceContextManagerType(parameterType)) {
-        argumentResolver = new DistributedTraceContextManagerResolver(coreEventEventTracer);
+        argumentResolver = new DistributedTraceContextManagerResolver(profilingService.getCoreEventTracer());
       } else if (NotificationEmitter.class.equals(parameterType)) {
         argumentResolver = LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.notification.NotificationEmitter.class.equals(parameterType)) {
