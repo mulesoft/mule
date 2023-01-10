@@ -7,9 +7,13 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
+import static java.lang.Boolean.TRUE;
 import static java.lang.System.setProperty;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -17,7 +21,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
+import org.mule.runtime.core.api.MuleContext;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -39,41 +48,65 @@ public class FileSpanExporterConfigurationTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   @Test
-  public void returnsTheValueForANonSystemProperty() {
+  public void returnsTheValueForANonSystemProperty() throws Exception {
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
+    fileSpanExporterConfiguration.initialise();
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), equalTo(
                                                                                                        VALUE_PROPERTY_NON_SYSTEM_PROPERTY));
   }
 
   @Test
-  public void returnsTheResolvedSystemProperty() {
+  public void returnsTheResolvedSystemProperty() throws Exception {
     setProperty(KEY_PROPERTY_SYSTEM_PROPERTY, VALUE_PROPERTY_SYSTEM_PROPERTY);
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
+    fileSpanExporterConfiguration.initialise();
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
                                                                                                    VALUE_PROPERTY_SYSTEM_PROPERTY));
   }
 
   @Test
-  public void whenASystemPropertyCannotBeResolvedAnExceptionIsRaised() {
+  public void whenASystemPropertyCannotBeResolvedAnExceptionIsRaised() throws Exception {
     expectedException.expect(PropertyNotFoundException.class);
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
+    fileSpanExporterConfiguration.initialise();
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
                                                                                                    VALUE_PROPERTY_SYSTEM_PROPERTY));
   }
 
   @Test
-  public void whenNoPropertyIsInTheFileNullValueIsReturned() {
+  public void whenNoPropertyIsInTheFileNullValueIsReturned() throws Exception {
     FileSpanExporterConfiguration fileSpanExporterConfiguration = new TestFileSpanExporterConfiguration();
+    fileSpanExporterConfiguration.initialise();
     assertThat(fileSpanExporterConfiguration.getStringValue(NO_KEY_IN_FILE), is(nullValue()));
   }
 
   @Test
-  public void whenFileIsNotFoundNoPropertyIsFound() {
+  public void whenFileIsNotFoundNoPropertyIsFound() throws Exception {
     TestNoFileFoundSpanExporterConfiguration testNoFileFoundSpanExporterConfiguration =
         new TestNoFileFoundSpanExporterConfiguration();
+    testNoFileFoundSpanExporterConfiguration.initialise();
     assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
     assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
   }
+
+  @Test
+  public void whenValueCorrespondingToPathGetAbsoluteValue() throws Exception {
+    TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
+        new TestFileSpanExporterConfiguration();
+    testFileSpanExporterConfiguration.initialise();
+    String caFileLocation = testFileSpanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION);
+    String keyFileLocation = testFileSpanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
+
+    assertThat(caFileLocation, is(notNullValue()));
+    assertThat(keyFileLocation, is(notNullValue()));
+
+    Path caFileLocationPath = Paths.get(caFileLocation);
+    Path keyFileLocationPath = Paths.get(keyFileLocation);
+
+    assertThat(caFileLocationPath.isAbsolute(), is(TRUE));
+    assertThat(keyFileLocationPath.isAbsolute(), is(TRUE));
+  }
+
 
   /**
    * {@link FileSpanExporterConfiguration} used for testing properties file.
@@ -91,6 +124,11 @@ public class FileSpanExporterConfigurationTestCase {
     protected String getPropertiesFileName() {
       return TEST_CONF_FILE_NAME;
     }
+
+    @Override
+    protected ClassLoaderResourceProvider getResourceProvider(MuleContext muleContext) {
+      return new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
+    }
   }
 
   /**
@@ -103,6 +141,11 @@ public class FileSpanExporterConfigurationTestCase {
     @Override
     protected String getPropertiesFileName() {
       return TEST_NOT_FOUND_CONF_FILE_NAME;
+    }
+
+    @Override
+    protected ClassLoaderResourceProvider getResourceProvider(MuleContext muleContext) {
+      return new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
     }
   }
 }

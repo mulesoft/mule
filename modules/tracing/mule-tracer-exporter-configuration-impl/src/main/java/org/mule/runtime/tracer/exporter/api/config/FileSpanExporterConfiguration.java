@@ -108,7 +108,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
       return loadProperties(is);
     } catch (MuleRuntimeException | IOException e) {
-      LOGGER.info("No tracer-exporter config found in app. Loading it from the conf.");
+      LOGGER.info("No tracer exporter config found in app. Loading it from the conf directory.");
     }
 
     try {
@@ -116,7 +116,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
                                            FileSpanExporterConfiguration.class);
       return loadProperties(is);
     } catch (IOException e) {
-      LOGGER.info("No tracer-exporter config found in conf directory.");
+      LOGGER.info("No tracer exporter config found in conf directory. Using only system properties.");
       return getProperties();
     }
   }
