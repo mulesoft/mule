@@ -112,7 +112,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
       return loadProperties(is);
     } catch (MuleRuntimeException | IOException e) {
       LOGGER
-          .info("No tracer exporter config found in app or in the conf directory. The config will be retrieved only from system properties.");
+          .info("No tracer exporter config found in the app or in the conf directory. The config will be retrieved only from the system properties.");
       return getProperties();
     }
   }
