@@ -104,6 +104,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new OperationRaiseErrorDoesntSpecifyNamespace(),
                                                           new OperationDoesNotHaveCoreRaiseError(),
                                                           new OperationDoesNotHaveFlowRef(),
+                                                          new OperationDoesNotHaveApikitRouter(),
+                                                          new OperationDoesNotHaveApikitConsole(),
                                                           new InsecureTLSValidation()));
 
     // Do not fail if the expressionLanguage was not provided, skip these validations.
