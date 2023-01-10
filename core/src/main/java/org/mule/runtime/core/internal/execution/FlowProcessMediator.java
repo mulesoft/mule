@@ -136,7 +136,7 @@ public class FlowProcessMediator implements Initialisable {
   private MuleContext muleContext;
 
   @Inject
-  private EventTracer<CoreEvent> coreEventTracer;
+  private InternalProfilingService profilingService;
 
   private final PolicyManager policyManager;
   private final PhaseResultNotifier phaseResultNotifier;
@@ -150,7 +150,7 @@ public class FlowProcessMediator implements Initialisable {
   private NotificationHelper notificationHelper;
   private final List<SourceInterceptor> sourceInterceptors = new LinkedList<>();
   private Optional<CorrelationIdGenerator> correlationIdGenerator;
-
+  private EventTracer<CoreEvent> coreEventTracer;
 
   public FlowProcessMediator(PolicyManager policyManager, PhaseResultNotifier phaseResultNotifier) {
     this.policyManager = policyManager;
@@ -159,6 +159,7 @@ public class FlowProcessMediator implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    this.coreEventTracer = profilingService.getCoreEventTracer();
     this.notificationHelper =
         new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
 
