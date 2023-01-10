@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.sdk.api.connectivity.ConnectionProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -112,7 +113,10 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
   boolean isConnected();
 
   /**
-   * @return whether this operation requires a connection provided to it from an associated connection provider
+   * @return whether this operation requires connections obtained through a {@link ConnectionProvider} defined in this same
+   *         extension
+   *
+   * @since 4.6.0
    */
   default boolean requiresOwnConnection() {
     return isConnected();
