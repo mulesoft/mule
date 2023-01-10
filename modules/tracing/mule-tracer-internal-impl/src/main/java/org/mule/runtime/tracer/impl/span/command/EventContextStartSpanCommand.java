@@ -7,67 +7,51 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
+import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
+import org.slf4j.Logger;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import static java.util.Optional.ofNullable;
-import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
+import org.apache.commons.lang3.function.TriFunction;
 
 /**
- * A {@link VoidCommand} that starts the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The carrier is the
- * {@link org.mule.runtime.api.event.EventContext}
+ * An {@link AbstractFailsafeTriCommand} that starts the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The
+ * carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSpanCommand {
+public class EventContextStartSpanCommand extends
+    AbstractFailsafeTriCommand<Optional<InternalSpan>, EventContext, InitialSpanInfo, Assertion> {
 
-  public static final String ERROR_MESSAGE = "Error starting a span";
+  private final TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> triFunction;
 
-  private final EventContext eventContext;
-  private final Assertion assertion;
-  private final EventSpanFactory eventSpanFactory;
-  private final InitialSpanInfo initialSpaninfo;
-
-  /**
-   *
-   * @param eventContext     the {@link EventContext}.xs
-   * @param eventSpanFactory the {@link EventSpanFactory} to create the span.
-   * @param initialSpanInfo  the {@link InitialSpanInfo} to indicate how the {@link InternalSpan} should be created.
-   * @param assertion        the {@link Assertion} to validate when starting the {@link EventContext}.
-   * @return
-   */
-  public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(EventContext eventContext,
-                                                                                 EventSpanFactory eventSpanFactory,
-                                                                                 InitialSpanInfo initialSpanInfo,
-                                                                                 Assertion assertion) {
-    return new EventContextStartSpanCommand(eventContext, eventSpanFactory, initialSpanInfo, assertion);
+  public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(Logger logger,
+                                                                                 String errorMessage,
+                                                                                 boolean propagateException,
+                                                                                 EventSpanFactory eventSpanFactory) {
+    return new EventContextStartSpanCommand(logger, errorMessage, propagateException, eventSpanFactory);
   }
 
-  private EventContextStartSpanCommand(EventContext eventContext,
-                                       EventSpanFactory eventSpanFactory,
-                                       InitialSpanInfo initialSpanInfo,
-                                       Assertion assertion) {
-    this.eventSpanFactory = eventSpanFactory;
-    this.eventContext = eventContext;
-    this.assertion = assertion;
-    this.initialSpaninfo = initialSpanInfo;
-  }
-
-  protected Supplier<Optional<InternalSpan>> getSupplier() {
-    return () -> {
+  private EventContextStartSpanCommand(Logger logger, String errorMessage, boolean propagateException,
+                                       EventSpanFactory eventSpanFactory) {
+    super(logger, errorMessage, propagateException, empty());
+    this.triFunction = (eventContext, initialSpanInfo, assertion) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       InternalSpan newSpan = null;
 
       if (spanContext != null) {
-        newSpan = eventSpanFactory.getSpan(spanContext, initialSpaninfo);
+        newSpan = eventSpanFactory.getSpan(spanContext, initialSpanInfo);
         spanContext.setSpan(newSpan, assertion);
       }
 
@@ -76,7 +60,7 @@ public class EventContextStartSpanCommand extends AbstractFailsafeSpanInternalSp
   }
 
   @Override
-  protected String getErrorMessage() {
-    return ERROR_MESSAGE;
+  TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> getTriFunction() {
+    return triFunction;
   }
 }

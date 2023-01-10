@@ -11,55 +11,41 @@ import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextF
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
-import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import org.slf4j.Logger;
 
 /**
- * A {@link VoidCommand} that ends the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The carrier is the
- * {@link org.mule.runtime.api.event.EventContext}
+ * A {@link AbstractFailSafeVoidBiCommand} that ends the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The
+ * carrier is the {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
-public class EventContextEndSpanCommand extends AbstractFailsafeSpanVoidCommand {
+public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<EventContext, Assertion> {
 
-  public static final String ERROR_MESSAGE = "Error ending a span";
-  public static final String THREAD_END_SPAN = "thread.end.name";
+  private final BiConsumer<EventContext, Assertion> consumer;
 
-  private final EventContext eventContext;
-  private final Assertion assertion;
-
-  /**
-   * Return a {@link VoidCommand} that ends the current span in the {@link EventContext}
-   *
-   * @param eventContext the {@link EventContext}.
-   * @param assertion    the {@link Assertion} to validate when ending the {@link EventContext}.
-   *
-   * @return the {@link EventContextEndSpanCommand}.
-   */
-  public static EventContextEndSpanCommand getEventContextEndSpanCommandFrom(EventContext eventContext, Assertion assertion) {
-    return new EventContextEndSpanCommand(eventContext, assertion);
+  public static EventContextEndSpanCommand getEventContextEndSpanCommandFrom(Logger logger,
+                                                                             String errorMessage,
+                                                                             boolean propagateException) {
+    return new EventContextEndSpanCommand(logger, errorMessage, propagateException);
   }
 
-  private EventContextEndSpanCommand(EventContext eventContext, Assertion assertion) {
-    this.eventContext = eventContext;
-    this.assertion = assertion;
-  }
-
-  protected Runnable getRunnable() {
-    return () -> {
+  private EventContextEndSpanCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
+    super(logger, errorMessage, propagateExceptions);
+    this.consumer = (eventContext, assertion) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
-        Optional<InternalSpan> span = spanContext.getSpan();
         spanContext.endSpan(assertion);
       }
     };
   }
 
   @Override
-  protected String getErrorMessage() {
-    return ERROR_MESSAGE;
+  BiConsumer<EventContext, Assertion> getConsumer() {
+    return consumer;
   }
 }

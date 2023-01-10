@@ -33,4 +33,9 @@ public class MapDistributedTraceContextGetter implements DistributedTraceContext
   public Optional<String> get(String key) {
     return ofNullable(serializedMap.get(key));
   }
+
+  @Override
+  public boolean isEmptyDistributedTraceContext() {
+    return serializedMap.isEmpty();
+  }
 }
