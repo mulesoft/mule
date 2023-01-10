@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 
 /**
- * An implementation of {@link SpanExporterFactory} that creates {@link SpanExporter} that export the internal spans as
+ * An implementation of {@link SpanExporterFactory} that creates {@link SpanExporter} that exports the internal spans as
  * {@link OpenTelemetrySpanExporter}
  *
  * @since 4.5.0
