@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -21,7 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class CommonBehaviourTransientRegistryTestCase extends AbstractRegistryTestCase {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {MuleContextWithRegistry.class, PrivilegedMuleContext.class})
-  private MuleContext muleContext;
+  private DefaultMuleContext muleContext;
 
   @Override
   public Registry getRegistry() {
