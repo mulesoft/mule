@@ -27,6 +27,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
@@ -134,28 +135,34 @@ public class ReconnectionUtils {
                                                                      ReflectionCache reflectionCache) {
     InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
 
-    if (requiresConnectionInterceptors(componentModel)) {
-      addConnectionInterceptors(chainBuilder, extensionModel, componentModel, connectionSupplier, reflectionCache);
+    if (componentModel instanceof ConnectableComponentModel) {
+      if (requiresConnectionInterceptors(extensionModel, (ConnectableComponentModel) componentModel)) {
+        addConnectionInterceptors(chainBuilder, connectionSupplier);
+      }
+
+      if (requiresCursorResetInterceptors((ConnectableComponentModel) componentModel)) {
+        addCursorResetInterceptor(chainBuilder, extensionModel, componentModel, reflectionCache);
+      }
     }
 
     return chainBuilder.build();
   }
 
-  private static boolean requiresConnectionInterceptors(ComponentModel componentModel) {
-    if (componentModel instanceof ConnectableComponentModel) {
-      return requiresConnectionProvisioning((ConnectableComponentModel) componentModel);
-    }
+  private static boolean requiresConnectionInterceptors(ExtensionModel extensionModel, ConnectableComponentModel componentModel) {
+    // Only connectable components that require a connection to be provided beforehand should add the connection interceptors
+    return requiresConnectionProvisioning(extensionModel, componentModel);
+  }
 
-    return false;
+  private static boolean requiresCursorResetInterceptors(ConnectableComponentModel componentModel) {
+    // Connectable components that don't allow for controlling the reconnection strategy should not add the cursor reset
+    // interceptors
+    return componentModel.requiresConnection()
+        && !componentModel.getModelProperty(NoReconnectionStrategyModelProperty.class).isPresent();
   }
 
   private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,
-                                                ExtensionModel extensionModel,
-                                                ComponentModel componentModel,
-                                                ExtensionConnectionSupplier connectionSupplier,
-                                                ReflectionCache reflectionCache) {
+                                                ExtensionConnectionSupplier connectionSupplier) {
     chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier));
-    addCursorResetInterceptor(chainBuilder, extensionModel, componentModel, reflectionCache);
   }
 
   private static void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder,

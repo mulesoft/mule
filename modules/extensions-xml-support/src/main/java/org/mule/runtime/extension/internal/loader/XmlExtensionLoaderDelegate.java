@@ -40,6 +40,7 @@ import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
+import static org.mule.runtime.extension.internal.property.SdkFlavorModelProperty.SdkFlavor.SDK_FLAVOR_XML;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
@@ -98,6 +99,7 @@ import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelPr
 import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
+import org.mule.runtime.extension.internal.property.SdkFlavorModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
@@ -466,6 +468,7 @@ public final class XmlExtensionLoaderDelegate {
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
     declarer.withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel));
+    declarer.withModelProperty(new SdkFlavorModelProperty(SDK_FLAVOR_XML));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations

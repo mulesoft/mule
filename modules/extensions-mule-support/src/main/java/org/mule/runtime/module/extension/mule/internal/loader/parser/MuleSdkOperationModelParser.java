@@ -37,7 +37,6 @@ import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.property.ComposedOperationModelProperty;
-import org.mule.runtime.extension.internal.property.NoConnectionProvisioningModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
 import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
@@ -103,7 +102,6 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   private final List<ModelProperty> additionalModelProperties =
       asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty(),
-             new NoConnectionProvisioningModelProperty(),
              new NoReconnectionStrategyModelProperty(),
              new ComposedOperationModelProperty());
 
