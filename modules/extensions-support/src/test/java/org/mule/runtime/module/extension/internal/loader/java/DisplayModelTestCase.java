@@ -39,6 +39,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
@@ -240,6 +242,16 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
     declarerFor(ExtensionWithInvalidUseOfClassValueAnnotation.class, "1.0.0-dev");
   }
 
+  @Test
+  public void parseConfigurationWithDisplayName() {
+    ExtensionDeclarer extensionDeclarer = declarerFor(ExtensionWithConfigWithDisplayName.class, "1.0.0-dev");
+    ConfigurationDeclaration configurationDeclaration =
+        findConfigByName(extensionDeclarer.getDeclaration(), "configurationWithDisplayName");
+
+    assertThat(configurationDeclaration.getDisplayModel(), is(notNullValue()));
+    assertThat(configurationDeclaration.getDisplayModel().getDisplayName(), is("Config display name"));
+  }
+
   private ConfigurationDeclaration findConfigByName(ExtensionDeclaration declaration, String name) {
     return declaration.getConfigurations().stream().filter(c -> c.getName().equals(name)).findAny().get();
   }
@@ -312,5 +324,15 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
     @ClassValue
     @org.mule.sdk.api.annotation.param.display.ClassValue
     public String firstParameter;
+  }
+
+  @Extension(name = "extensionWithConfigWithDisplayName")
+  @Configurations({ConfigurationWithDisplayName.class})
+  public static class ExtensionWithConfigWithDisplayName {
+  }
+
+  @Configuration(name = "configurationWithDisplayName")
+  @DisplayName("Config display name")
+  public static class ConfigurationWithDisplayName {
   }
 }
