@@ -13,7 +13,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.extension.internal.property.SdkFlavorModelProperty.SdkFlavor.SDK_FLAVOR_JAVA;
+import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
@@ -48,7 +48,7 @@ import org.mule.runtime.extension.api.annotation.notification.NotificationAction
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.property.SdkFlavorModelProperty;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -130,7 +130,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(extensionElement));
     extensionElement.getDeclaringClass()
         .ifPresent(extensionClass -> additionalModelProperties.add(new ImplementingTypeModelProperty(extensionClass)));
-    additionalModelProperties.add(new SdkFlavorModelProperty(SDK_FLAVOR_JAVA));
 
     parseExported();
     parseImportedTypes();
@@ -279,7 +278,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                extensionElement,
                                extensionElement,
                                loadingContext)
-                                   .filter(operation -> !requiresConfig(operation))
+                                   .filter(operation -> !requiresConfig(getDevelopmentFramework(), operation))
                                    .collect(toList());
   }
 
@@ -390,6 +389,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
     return of(calculateExtensionMinMuleVersion(extensionElement));
+  }
+
+  @Override
+  public ExtensionDevelopmentFramework getDevelopmentFramework() {
+    return JAVA_SDK;
   }
 
   public StereotypeModelLoaderDelegate getStereotypeLoaderDelegate() {

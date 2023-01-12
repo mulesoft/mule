@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
@@ -97,6 +98,8 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
+    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(parser.getDevelopmentFramework()));
+
     this.declarer = declarer;
     namespace = getExtensionsNamespace(declarer.getDeclaration());
     stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
@@ -116,7 +119,8 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
-    operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
+    operationLoaderDelegate.declareOperations(declarer, parser.getDevelopmentFramework(), declarer,
+                                              parser.getOperationModelParsers());
     functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
     sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
 

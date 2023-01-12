@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.extension.internal.util.ExtensionConnectivityUtils.requiresConnectionProvisioning;
+import static org.mule.runtime.extension.internal.util.ExtensionConnectivityUtils.isReconnectionStrategySupported;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
@@ -27,10 +27,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
@@ -120,49 +117,35 @@ public class ReconnectionUtils {
   }
 
   /**
-   * Creates an {@link InterceptorChain} that enables reconnection for connected components
+   * Adds the necessary interceptors to enable reconnection for connected components
    *
-   * @param extensionModel     the {@link ExtensionModel}
-   * @param componentModel     the {@link ComponentModel}
-   * @param connectionSupplier the connection supplier
-   * @param reflectionCache    a {@link ReflectionCache}
-   * @return a new {@link InterceptorChain}
-   * @since 4.5.0
+   * @param chainBuilder    the original {@link InterceptorChain.Builder}
+   * @param extensionModel  the {@link ExtensionModel}
+   * @param componentModel  the {@link ComponentModel}
+   * @param reflectionCache a {@link ReflectionCache}
+   * @return a potentially updated {@link InterceptorChain.Builder}
+   * @since 4.6.0
    */
-  public static InterceptorChain createReconnectionInterceptorsChain(ExtensionModel extensionModel,
-                                                                     ComponentModel componentModel,
-                                                                     ExtensionConnectionSupplier connectionSupplier,
-                                                                     ReflectionCache reflectionCache) {
-    InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
-
-    if (componentModel instanceof ConnectableComponentModel) {
-      if (requiresConnectionInterceptors(extensionModel, (ConnectableComponentModel) componentModel)) {
-        addConnectionInterceptors(chainBuilder, connectionSupplier);
-      }
-
-      if (requiresCursorResetInterceptors((ConnectableComponentModel) componentModel)) {
-        addCursorResetInterceptor(chainBuilder, extensionModel, componentModel, reflectionCache);
-      }
+  public static InterceptorChain.Builder addCursorResetInterceptorsIfRequired(InterceptorChain.Builder chainBuilder,
+                                                                              ExtensionModel extensionModel,
+                                                                              ComponentModel componentModel,
+                                                                              ReflectionCache reflectionCache) {
+    if (requiresCursorResetInterceptors(componentModel)) {
+      addCursorResetInterceptor(chainBuilder, extensionModel, componentModel, reflectionCache);
     }
 
-    return chainBuilder.build();
+    return chainBuilder;
   }
 
-  private static boolean requiresConnectionInterceptors(ExtensionModel extensionModel, ConnectableComponentModel componentModel) {
-    // Only connectable components that require a connection to be provided beforehand should add the connection interceptors
-    return requiresConnectionProvisioning(extensionModel, componentModel);
-  }
-
-  private static boolean requiresCursorResetInterceptors(ConnectableComponentModel componentModel) {
+  private static boolean requiresCursorResetInterceptors(ComponentModel componentModel) {
     // Connectable components that don't allow for controlling the reconnection strategy should not add the cursor reset
     // interceptors
-    return componentModel.requiresConnection()
-        && !componentModel.getModelProperty(NoReconnectionStrategyModelProperty.class).isPresent();
-  }
+    if (componentModel instanceof ConnectableComponentModel) {
+      return ((ConnectableComponentModel) componentModel).requiresConnection()
+          && isReconnectionStrategySupported((ConnectableComponentModel) componentModel);
+    }
 
-  private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,
-                                                ExtensionConnectionSupplier connectionSupplier) {
-    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier));
+    return false;
   }
 
   private static void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder,

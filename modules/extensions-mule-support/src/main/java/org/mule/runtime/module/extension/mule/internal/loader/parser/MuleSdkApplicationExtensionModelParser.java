@@ -7,28 +7,25 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.extension.internal.property.SdkFlavorModelProperty.SdkFlavor.SDK_FLAVOR_MULE_IN_APP;
+import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.extension.internal.property.SdkFlavorModelProperty;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -50,11 +47,6 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
                                                 ExtensionModelHelper extensionModelHelper) {
     super(ast, typeLoader, extensionModelHelper);
     this.extensionName = extensionName;
-  }
-
-  @Override
-  public List<ModelProperty> getAdditionalModelProperties() {
-    return singletonList(new SdkFlavorModelProperty(SDK_FLAVOR_MULE_IN_APP));
   }
 
   @Override
@@ -90,6 +82,11 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   @Override
   public LicenseModelProperty getLicenseModelProperty() {
     return new LicenseModelProperty(false, true, empty());
+  }
+
+  @Override
+  public ExtensionDevelopmentFramework getDevelopmentFramework() {
+    return MULE_DSL;
   }
 
   @Override

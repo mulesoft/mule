@@ -16,9 +16,9 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
+import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
-import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -308,10 +308,10 @@ public class OperationClient implements Lifecycle {
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
                                                                                 extensionModel,
                                                                                 operationModel,
-                                                                                createReconnectionInterceptorsChain(extensionModel,
-                                                                                                                    operationModel,
-                                                                                                                    extensionConnectionSupplier,
-                                                                                                                    reflectionCache),
+                                                                                createConnectionInterceptorsChain(extensionModel,
+                                                                                                                  operationModel,
+                                                                                                                  extensionConnectionSupplier,
+                                                                                                                  reflectionCache),
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 getPagingResultTransformer(operationModel,

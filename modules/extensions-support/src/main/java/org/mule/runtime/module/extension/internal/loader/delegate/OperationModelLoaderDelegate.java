@@ -20,6 +20,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -42,6 +43,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
   }
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
+                         ExtensionDevelopmentFramework extensionDevelopmentFramework,
                          HasOperationDeclarer ownerDeclarer,
                          List<OperationModelParser> operations) {
 
@@ -51,7 +53,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
         continue;
       }
 
-      final boolean requiresConfig = requiresConfig(parser);
+      final boolean requiresConfig = requiresConfig(extensionDevelopmentFramework, parser);
       HasOperationDeclarer actualDeclarer = requiresConfig
           ? ownerDeclarer
           : extensionDeclarer;
@@ -76,7 +78,8 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       }
 
       if (parser.isRouter()) {
-        routersDelegate.declareRouter(extensionDeclarer, (HasConstructDeclarer) ownerDeclarer, parser);
+        routersDelegate.declareRouter(extensionDeclarer, extensionDevelopmentFramework, (HasConstructDeclarer) ownerDeclarer,
+                                      parser);
         continue;
       }
 

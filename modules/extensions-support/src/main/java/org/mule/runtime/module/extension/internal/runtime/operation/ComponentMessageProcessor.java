@@ -43,10 +43,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_AC
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory.extractExecutorInitialisationParams;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
+import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
-import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.createReconnectionInterceptorsChain;
 import static org.mule.runtime.oauth.internal.util.ClassLoaderUtils.setContextClassLoader;
 
 import static java.lang.Runtime.getRuntime;
@@ -1020,8 +1020,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
                                         componentModel,
-                                        createReconnectionInterceptorsChain(extensionModel, componentModel,
-                                                                            extensionConnectionSupplier, reflectionCache),
+                                        createConnectionInterceptorsChain(extensionModel, componentModel,
+                                                                          extensionConnectionSupplier, reflectionCache),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,

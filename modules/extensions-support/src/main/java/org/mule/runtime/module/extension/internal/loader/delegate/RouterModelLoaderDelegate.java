@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -35,8 +36,9 @@ final class RouterModelLoaderDelegate extends AbstractComponentModelLoaderDelega
     super(delegate);
   }
 
-  void declareRouter(ExtensionDeclarer extensionDeclarer, HasConstructDeclarer ownerDeclarer, OperationModelParser parser) {
-    HasConstructDeclarer actualDeclarer = requiresConfig(parser)
+  void declareRouter(ExtensionDeclarer extensionDeclarer, ExtensionDevelopmentFramework extensionDevelopmentFramework,
+                     HasConstructDeclarer ownerDeclarer, OperationModelParser parser) {
+    HasConstructDeclarer actualDeclarer = requiresConfig(extensionDevelopmentFramework, parser)
         ? ownerDeclarer
         : extensionDeclarer;
 

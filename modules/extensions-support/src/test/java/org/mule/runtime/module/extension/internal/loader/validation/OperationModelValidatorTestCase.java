@@ -17,7 +17,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import static org.mule.runtime.extension.internal.property.SdkFlavorModelProperty.SdkFlavor.SDK_FLAVOR_MULE_IN_APP;
+import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -27,7 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.validator.OperationModelValidator;
-import org.mule.runtime.extension.internal.property.SdkFlavorModelProperty;
+import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -106,8 +106,8 @@ public class OperationModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void globalConnectedOperationFromMuleSdkInAppWithoutConnectionProvider() {
     when(operationModel.requiresConnection()).thenReturn(true);
-    when(extensionModel.getModelProperty(SdkFlavorModelProperty.class))
-        .thenReturn(of(new SdkFlavorModelProperty(SDK_FLAVOR_MULE_IN_APP)));
+    when(extensionModel.getModelProperty(DevelopmentFrameworkModelProperty.class))
+        .thenReturn(of(new DevelopmentFrameworkModelProperty(MULE_DSL)));
 
     validate();
   }
@@ -125,8 +125,8 @@ public class OperationModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void configLevelOperationMuleSdkInAppWithoutConnectionProvider() {
     when(operationModel.requiresConnection()).thenReturn(true);
-    when(extensionModel.getModelProperty(SdkFlavorModelProperty.class))
-        .thenReturn(of(new SdkFlavorModelProperty(SDK_FLAVOR_MULE_IN_APP)));
+    when(extensionModel.getModelProperty(DevelopmentFrameworkModelProperty.class))
+        .thenReturn(of(new DevelopmentFrameworkModelProperty(MULE_DSL)));
     when(extensionModel.getOperationModels()).thenReturn(emptyList());
     when(configurationModel.getOperationModels()).thenReturn(singletonList(operationModel));
     when(configurationModel.getConnectionProviders()).thenReturn(emptyList());

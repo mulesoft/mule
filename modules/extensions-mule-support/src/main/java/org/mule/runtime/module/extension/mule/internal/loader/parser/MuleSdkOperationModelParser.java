@@ -221,11 +221,6 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public boolean requiresOwnConnection() {
-    return false;
-  }
-
-  @Override
   public boolean hasConfig() {
     return false;
   }
