@@ -131,11 +131,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     biConsumer.accept(ARTIFACT_ID, artifactId);
     biConsumer.accept(ARTIFACT_TYPE, artifactType);
     biConsumer.accept(THREAD_END_NAME_KEY, endThreadNameValue);
-    internalSpan.forEachAttribute((key, value) -> {
-      if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
-        biConsumer.accept(stringKey(key), value);
-      }
-    });
+    internalSpan.forEachAttribute((key, value) -> biConsumer.accept(stringKey(key), value));
+
   }
 
   @Override
