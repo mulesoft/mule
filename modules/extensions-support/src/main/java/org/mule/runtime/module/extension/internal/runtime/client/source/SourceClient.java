@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -39,6 +40,9 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
@@ -65,6 +69,7 @@ public class SourceClient<T, A> implements Lifecycle {
   private final Consumer<SourceResultCallback<T, A>> callbackConsumer;
   private final ExtensionManager extensionManager;
   private final StreamingManager streamingManager;
+  private final ErrorTypeLocator errorTypeLocator;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
   private final NotificationDispatcher notificationDispatcher;
@@ -72,6 +77,7 @@ public class SourceClient<T, A> implements Lifecycle {
   private final MuleContext muleContext;
 
   private ExtensionMessageSource source;
+  private MessagingExceptionResolver messagingExceptionResolver;
   private Optional<ConfigurationProvider> configurationProvider = empty();
 
   public SourceClient(ExtensionModel extensionModel,
@@ -80,6 +86,7 @@ public class SourceClient<T, A> implements Lifecycle {
                       Consumer<SourceResultCallback<T, A>> callbackConsumer,
                       ExtensionManager extensionManager,
                       StreamingManager streamingManager,
+                      ErrorTypeLocator errorTypeLocator,
                       ReflectionCache reflectionCache,
                       ExpressionManager expressionManager,
                       NotificationDispatcher notificationDispatcher,
@@ -91,6 +98,7 @@ public class SourceClient<T, A> implements Lifecycle {
     this.callbackConsumer = callbackConsumer;
     this.extensionManager = extensionManager;
     this.streamingManager = streamingManager;
+    this.errorTypeLocator = errorTypeLocator;
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.notificationDispatcher = notificationDispatcher;
@@ -127,6 +135,7 @@ public class SourceClient<T, A> implements Lifecycle {
     source.setListener(event -> event);
     initialiseIfNeeded(source, true, muleContext);
     source.setMessageProcessingManager(new ExtensionsClientMessageProcessingManager(this, callbackConsumer));
+    messagingExceptionResolver = new MessagingExceptionResolver(source);
   }
 
   @Override
@@ -182,6 +191,13 @@ public class SourceClient<T, A> implements Lifecycle {
 
   SourceModel getSourceModel() {
     return sourceModel;
+  }
+
+  MessagingException asMessagingException(Throwable t, CoreEvent event) {
+    MessagingException exception = t instanceof MessagingException
+      ? (MessagingException) t
+      : new MessagingException(createStaticMessage(t.getMessage()), event, t, source);
+    return messagingExceptionResolver.resolve(exception, errorTypeLocator, emptySet());
   }
 
   private SourceAdapterFactory newSourceAdapterFactory(DefaultSourceParameterizer parameterizer,

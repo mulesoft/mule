@@ -6,11 +6,14 @@
  */
 package org.mule.test.marvel.xmen;
 
+import static org.mule.runtime.api.notification.AbstractServerNotification.CUSTOM_EVENT_ACTION_START_RANGE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -25,10 +28,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+
 @MediaType(TEXT_PLAIN)
 public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   public static final String MESSAGE = "We are the future. ... You have lived in the shadows of shame and fear for too long!";
+
+  @Inject
+  private ServerNotificationManager notificationManager;
 
   @Override
   public void onStart(SourceCallback<InputStream, Void> sourceCallback) throws MuleException {
@@ -57,9 +65,8 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   @OnError
   public void onError(Error error) {
-    error.toString();
+    notificationManager.fireNotification(new CustomNotification(error, CUSTOM_EVENT_ACTION_START_RANGE + 99));
   }
-
 
   @Override
   public void onStop() {

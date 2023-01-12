@@ -40,6 +40,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
@@ -97,6 +98,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private ErrorTypeRepository errorTypeRepository;
 
   @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
   private ExtensionConnectionSupplier extensionConnectionSupplier;
 
   @Inject
@@ -144,6 +148,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                   callbackConsumer,
                                                   extensionManager,
                                                   streamingManager,
+                                                  errorTypeLocator,
                                                   reflectionCache,
                                                   expressionManager,
                                                   notificationDispatcher,
