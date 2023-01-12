@@ -121,13 +121,6 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
-    if (!enableByteBuddy) {
-      return rootBeanDefinition(objectFactoryClassRepository
-          .getObjectFactoryDynamicClass(componentBuildingDefinition,
-                                        objectFactoryType, componentModel.getType(),
-                                        new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
-    }
-
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(objectFactoryType))
             .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
