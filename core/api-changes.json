@@ -3,6 +3,24 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.addedToInterface",
+          "new": "method long org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getEndSpanEpochNanos()",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classSimpleName": "CapturedExportedSpan",
+          "methodName": "getEndSpanEpochNanos",
+          "elementKind": "method",
+          "justification": "new method for testing"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method long org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getStartEpochSpanNanos()",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classSimpleName": "CapturedExportedSpan",
+          "methodName": "getStartEpochSpanNanos",
+          "elementKind": "method",
+          "justification": "new method for testing"
+        },
+        {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider",
           "package": "org.mule.runtime.core.api.tracing.customization",
