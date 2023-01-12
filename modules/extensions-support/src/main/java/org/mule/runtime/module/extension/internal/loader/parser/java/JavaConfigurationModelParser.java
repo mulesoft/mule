@@ -20,6 +20,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.ster
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
@@ -178,5 +179,10 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
     return JavaExtensionModelParserUtils.getDeprecationModel(configElement);
+  }
+
+  @Override
+  public Optional<DisplayModel> getDisplayModel() {
+    return JavaExtensionModelParserUtils.getDisplayModel(configElement, "configuration", configElement.getName());
   }
 }
