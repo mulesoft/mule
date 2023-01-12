@@ -339,7 +339,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public long getEndEpochNanos() {
-    return internalSpan.getDuration().getStart();
+    return internalSpan.getDuration().getEnd();
   }
 
   @Override
