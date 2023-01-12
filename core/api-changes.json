@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getTraceId()",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classSimpleName": "CapturedExportedSpan",
+          "methodName": "getTraceId",
+          "elementKind": "method",
+          "justification": "W-12368678: Distributed tracing not working due to spans on different flows having different trace ID"
+        },
+        {
+          "code": "java.method.addedToInterface",
           "new": "method long org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getEndSpanEpochNanos()",
           "package": "org.mule.runtime.tracer.api.sniffer",
           "classSimpleName": "CapturedExportedSpan",
