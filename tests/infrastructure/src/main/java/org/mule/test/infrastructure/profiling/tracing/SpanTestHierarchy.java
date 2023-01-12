@@ -146,7 +146,9 @@ public class SpanTestHierarchy {
     assertThat("Expected span: " + expectedNode.spanName + " was not found", actualSpan, notNullValue());
     assertAttributes(actualSpan, expectedNode);
     assertException(actualSpan, expectedNode);
-    assertThat(actualSpan.getStartEpochSpanNanos(), is(lessThan(actualSpan.getEndSpanEpochNanos())));
+    assertThat("Expected span: " + expectedNode.spanName + " has incorrect start or end time",
+               actualSpan.getStartEpochSpanNanos(),
+               is(lessThan(actualSpan.getEndSpanEpochNanos())));
     visitedSpans.add(actualSpan.getSpanId());
     return actualSpan;
   }
