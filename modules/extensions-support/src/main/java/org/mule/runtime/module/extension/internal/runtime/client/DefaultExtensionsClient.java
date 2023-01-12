@@ -143,17 +143,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
 
     SourceClient<T, A> sourceClient = new SourceClient<>(extensionModel,
-                                                  sourceModel,
-                                                  parameters,
-                                                  callbackConsumer,
-                                                  extensionManager,
-                                                  streamingManager,
-                                                  errorTypeLocator,
-                                                  reflectionCache,
-                                                  expressionManager,
-                                                  notificationDispatcher,
-                                                  muleContext.getTransactionFactoryManager(),
-                                                  muleContext);
+                                                         sourceModel,
+                                                         parameters,
+                                                         callbackConsumer,
+                                                         extensionManager,
+                                                         streamingManager,
+                                                         errorTypeLocator,
+                                                         reflectionCache,
+                                                         expressionManager,
+                                                         notificationDispatcher,
+                                                         muleContext.getTransactionFactoryManager(),
+                                                         muleContext);
 
     try {
       initialiseIfNeeded(sourceClient, true, muleContext);

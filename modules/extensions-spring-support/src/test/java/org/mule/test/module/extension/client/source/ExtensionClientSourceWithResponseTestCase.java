@@ -53,13 +53,14 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
       assertThat(message, equalTo(MESSAGE));
 
       callback.completeWithSuccess(params -> params.withParameter("body", responseStream))
-        .whenComplete((v, e) -> latch.release());
+          .whenComplete((v, e) -> latch.release());
     };
 
     handler = extensionsClient.createSource("Marvel",
                                             "MagnetoMutantSummon",
                                             callbackConsumer,
-                                            parameters -> {});
+                                            parameters -> {
+                                            });
 
     handler.start();
     assertThat(latch.await(5, SECONDS), is(true));
@@ -83,13 +84,15 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
       String message = IOUtils.toString(callback.getResult().getOutput());
       assertThat(message, equalTo(MESSAGE));
 
-      callback.completeWithError(new RuntimeException(errorMessage), params -> {});
+      callback.completeWithError(new RuntimeException(errorMessage), params -> {
+      });
     };
 
     handler = extensionsClient.createSource("Marvel",
                                             "MagnetoMutantSummon",
                                             callbackConsumer,
-                                            parameters -> {});
+                                            parameters -> {
+                                            });
 
     handler.start();
     assertThat(latch.await(5, SECONDS), is(true));

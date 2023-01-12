@@ -167,12 +167,12 @@ public class SourceClient<T, A> implements Lifecycle {
     ResolverSet resolverSet;
     try {
       resolverSet = getResolverSetFromComponentParameterization(
-        paramsBuilder.build(),
-        muleContext,
-        true,
-        reflectionCache,
-        expressionManager,
-        "");
+                                                                paramsBuilder.build(),
+                                                                muleContext,
+                                                                true,
+                                                                reflectionCache,
+                                                                expressionManager,
+                                                                "");
 
       resolverSet.initialise();
       return resolverSet;
@@ -195,8 +195,8 @@ public class SourceClient<T, A> implements Lifecycle {
 
   MessagingException asMessagingException(Throwable t, CoreEvent event) {
     MessagingException exception = t instanceof MessagingException
-      ? (MessagingException) t
-      : new MessagingException(createStaticMessage(t.getMessage()), event, t, source);
+        ? (MessagingException) t
+        : new MessagingException(createStaticMessage(t.getMessage()), event, t, source);
     return messagingExceptionResolver.resolve(exception, errorTypeLocator, emptySet());
   }
 

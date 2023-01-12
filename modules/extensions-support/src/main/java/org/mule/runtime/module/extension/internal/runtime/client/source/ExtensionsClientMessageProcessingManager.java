@@ -26,7 +26,7 @@ class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessin
   private final Consumer<SourceResultCallback<T, A>> callbackConsumer;
 
   ExtensionsClientMessageProcessingManager(SourceClient sourceClient,
-                                                  Consumer<SourceResultCallback<T, A>> callbackConsumer) {
+                                           Consumer<SourceResultCallback<T, A>> callbackConsumer) {
     this.sourceClient = sourceClient;
     this.callbackConsumer = callbackConsumer;
   }

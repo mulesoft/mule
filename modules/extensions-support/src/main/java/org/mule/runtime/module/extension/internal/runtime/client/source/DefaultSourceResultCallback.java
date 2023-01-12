@@ -113,10 +113,10 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
   private Map<String, Object> resolveCallbackParameters(Optional<? extends ParameterizedModel> callbackModel,
                                                         Consumer<SourceParameterizer> parameterizer,
                                                         CoreEvent event) {
-    return callbackModel.map(model -> evaluate(sourceClient.toResolverSet(parameterizer, model),
-                                               sourceClient.resolveConfigurationInstance(event),
-                                               event))
-      .orElse(emptyMap());
+    return (Map<String, Object>) callbackModel.map(model -> evaluate(sourceClient.toResolverSet(parameterizer, model),
+                                                                     sourceClient.resolveConfigurationInstance(event),
+                                                                     event))
+        .orElse(emptyMap());
   }
 
   private class FutureCompletionCallback implements CompletableCallback<Void> {

@@ -61,10 +61,10 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
                                             "ConnectedPetAdoptionSource",
                                             callbackConsumer,
                                             parameters -> parameters
-                                              .withConfigRef(configProperty.getValue())
-                                              .withParameter("watermark", true)
-                                              .withParameter("idempotent", true)
-                                              .withFixedSchedulingStrategy(1, SECONDS, 0));
+                                                .withConfigRef(configProperty.getValue())
+                                                .withParameter("watermark", true)
+                                                .withParameter("idempotent", true)
+                                                .withFixedSchedulingStrategy(1, SECONDS, 0));
 
     handler.start();
     assertThat(latch.await(5, SECONDS), is(true));
@@ -89,8 +89,8 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
                                             callback -> {
                                             },
                                             parameters -> parameters
-                                              .withConfigRef(configProperty.getValue())
-                                              .withParameter("watermark", true)
-                                              .withParameter("idempotent", true));
+                                                .withConfigRef(configProperty.getValue())
+                                                .withParameter("watermark", true)
+                                                .withParameter("idempotent", true));
   }
 }

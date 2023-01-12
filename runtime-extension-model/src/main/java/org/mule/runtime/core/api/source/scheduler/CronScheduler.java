@@ -45,8 +45,7 @@ public final class CronScheduler extends PeriodicScheduler implements CronSchedu
   @Expression(NOT_SUPPORTED)
   private String timeZone;
 
-  public CronScheduler() {
-  }
+  public CronScheduler() {}
 
   /**
    * Creates a new instance

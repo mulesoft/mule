@@ -53,6 +53,5 @@ public class NullResolverSet extends ResolverSet {
   }
 
   @Override
-  public void initialise() throws InitialisationException {
-  }
+  public void initialise() throws InitialisationException {}
 }

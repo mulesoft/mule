@@ -44,8 +44,7 @@ public final class FixedFrequencyScheduler extends PeriodicScheduler implements 
   @Optional(defaultValue = "0")
   private long startDelay = 1000l;
 
-  public FixedFrequencyScheduler() {
-  }
+  public FixedFrequencyScheduler() {}
 
   /**
    * Creates a new instance
