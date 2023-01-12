@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 
 import java.util.List;
@@ -92,4 +93,9 @@ public interface ConfigurationModelParser extends StereotypeModelParser, Additio
    * @return the configuration's {@link DeprecationModel} if one was defined
    */
   Optional<DeprecationModel> getDeprecationModel();
+
+  /**
+   * @return the configuration's {@link DisplayModel}
+   */
+  Optional<DisplayModel> getDisplayModel();
 }
