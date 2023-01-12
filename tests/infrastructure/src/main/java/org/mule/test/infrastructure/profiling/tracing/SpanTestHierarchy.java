@@ -7,15 +7,16 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
-import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,6 +146,9 @@ public class SpanTestHierarchy {
     assertThat("Expected span: " + expectedNode.spanName + " was not found", actualSpan, notNullValue());
     assertAttributes(actualSpan, expectedNode);
     assertException(actualSpan, expectedNode);
+    assertThat("Expected span: " + expectedNode.spanName + " has incorrect start or end time",
+               actualSpan.getStartEpochSpanNanos(),
+               is(lessThan(actualSpan.getEndSpanEpochNanos())));
     visitedSpans.add(actualSpan.getSpanId());
     return actualSpan;
   }
