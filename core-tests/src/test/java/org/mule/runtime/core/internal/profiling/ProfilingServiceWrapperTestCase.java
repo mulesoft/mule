@@ -24,6 +24,8 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.CoreEventTracer;
 
@@ -43,7 +45,12 @@ public class ProfilingServiceWrapperTestCase {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false")).thenReturn(TRUE.toString());
     ProfilingServiceWrapper profilingServiceWrapper = new TestProfilingServiceWrapper(spanExporterConfiguration);
-    assertThat(profilingServiceWrapper.getCoreEventTracer(), equalTo(MOCK_CORE_EVENT_TRACER));
+
+    EventTracer<CoreEvent> coreEventTracer = profilingServiceWrapper.getCoreEventTracer();
+    assertThat(coreEventTracer, equalTo(MOCK_CORE_EVENT_TRACER));
+
+    // We also verify that the core event tracer is the same when retrieved again.
+    assertThat(profilingServiceWrapper.getCoreEventTracer(), equalTo(coreEventTracer));
   }
 
   @Test
@@ -51,7 +58,11 @@ public class ProfilingServiceWrapperTestCase {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false")).thenReturn(FALSE.toString());
     ProfilingServiceWrapper profilingServiceWrapper = new TestProfilingServiceWrapper(spanExporterConfiguration);
-    assertThat(profilingServiceWrapper.getCoreEventTracer(), instanceOf(NoopCoreEventTracer.class));
+    EventTracer<CoreEvent> coreEventTracer = profilingServiceWrapper.getCoreEventTracer();
+    assertThat(coreEventTracer, instanceOf(NoopCoreEventTracer.class));
+
+    // We also verify that the core event tracer is the same when retrieved again.
+    assertThat(profilingServiceWrapper.getCoreEventTracer(), equalTo(coreEventTracer));
   }
 
   private static class TestProfilingServiceWrapper extends ProfilingServiceWrapper {
