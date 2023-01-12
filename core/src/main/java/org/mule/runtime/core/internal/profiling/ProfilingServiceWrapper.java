@@ -55,20 +55,20 @@ import reactor.core.publisher.Mono;
 public class ProfilingServiceWrapper implements InternalProfilingService, PrivilegedProfilingService, Lifecycle {
 
   @Inject
-  MuleContext muleContext;
+  protected MuleContext muleContext;
 
   InternalProfilingService profilingService;
 
   @Inject
-  FeatureFlaggingService featureFlaggingService;
+  protected FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  EventTracer<CoreEvent> coreEventTracer;
+  protected EventTracer<CoreEvent> coreEventTracer;
 
   @Inject
-  SpanExporterConfiguration spanExporterConfiguration;
+  protected SpanExporterConfiguration spanExporterConfiguration;
 
-  private boolean isTracingExportEnabled;
+  private Boolean isTracingExportEnabled = null;
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
@@ -175,9 +175,14 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
+    if (isTracingExportEnabled == null) {
+      isTracingExportEnabled = isTracingExportEnabled();
+    }
+
     if (isTracingExportEnabled) {
       return coreEventTracer;
     }
+
     return getProfilingService().getCoreEventTracer();
   }
 
@@ -209,8 +214,6 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
     if (profilingService instanceof Initialisable) {
       ((Initialisable) profilingService).initialise();
     }
-
-    isTracingExportEnabled = isTracingExportEnabled();
   }
 
   @Override
