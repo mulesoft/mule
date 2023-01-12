@@ -145,7 +145,7 @@ public class SpanTestHierarchy {
             && hasCorrectParent(exportedSpan, actualParent != null ? actualParent.getName() : null))
         .findFirst().orElse(null);
     assertThat("Expected span: " + expectedNode.spanName + " was not found", actualSpan, notNullValue());
-    assertTrue("Expected span: " + expectedNode.spanName + " has a different trace ID than parent.",
+    assertTrue("Expected span: " + expectedNode.spanName + " has a different trace ID than parent",
                hasCorrectTraceId(actualSpan, actualParent != null ? actualParent.getName() : null));
     assertAttributes(actualSpan, expectedNode);
     assertException(actualSpan, expectedNode);
