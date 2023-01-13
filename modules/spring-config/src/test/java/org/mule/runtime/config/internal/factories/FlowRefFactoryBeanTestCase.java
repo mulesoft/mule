@@ -384,7 +384,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .findFirst()
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
-        .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class))
+        .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class, Object.class))
             .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
             .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
             .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
