@@ -16,8 +16,6 @@ import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
@@ -28,7 +26,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration, Initialisable {
+public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration {
 
   @Inject
   private MuleContext muleContext;
@@ -46,6 +44,9 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
 
+  /**
+   * This constructor is needed for injection in the registry.
+   */
   public OpenTelemetryAutoConfigurableSpanExporterConfiguration() {}
 
   public OpenTelemetryAutoConfigurableSpanExporterConfiguration(SpanExporterConfiguration delegate) {
@@ -56,6 +57,11 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   @Override
   public String getStringValue(String key) {
     try {
+      if (delegate == null) {
+        this.delegate = new FileSpanExporterConfiguration(muleContext);
+        initialiseDefaultConfigurationValues();
+      }
+
       return delegate.getStringValue(key, defaultConfigurationValues.get(key));
     } catch (PropertyNotFoundException e) {
       return defaultConfigurationValues.get(key);
@@ -75,11 +81,5 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF, DEFAULT_INITIAL_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS, DEFAULT_BACKOFF_MAX_ATTEMPTS);
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    this.delegate = new FileSpanExporterConfiguration(muleContext);
-    initialiseDefaultConfigurationValues();
   }
 }
