@@ -1447,6 +1447,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                 minMuleVersion("4.4.0"));
   }
 
+
   /**
    * Configures the {@link MuleRuntimeFeature#VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER} feature flag.
    *
