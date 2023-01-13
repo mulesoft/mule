@@ -205,7 +205,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         // Ref: https://github.com/ben-manes/caffeine/issues/104#issuecomment-238068997
         .executor(cacheShutdownExecutor)
         .expireAfterAccess(5, MINUTES)
-        .removalListener((key, mediator, cause) -> disposeClient((OperationKey) key, (OperationClient) mediator))
+        .removalListener((key, client, cause) -> disposeClient((OperationKey) key, (OperationClient) client))
         .build(this::createOperationClient);
   }
 
