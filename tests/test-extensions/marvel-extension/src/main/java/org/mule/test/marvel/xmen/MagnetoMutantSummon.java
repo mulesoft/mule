@@ -81,7 +81,8 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
   }
 
   private void notifyContextClassLoader() {
-    notificationManager.fireNotification(new CustomNotification(currentThread().getContextClassLoader(), CLASSLOADER_NOTIFICATION_ACTION));
+    notificationManager
+        .fireNotification(new CustomNotification(currentThread().getContextClassLoader(), CLASSLOADER_NOTIFICATION_ACTION));
   }
 
 }

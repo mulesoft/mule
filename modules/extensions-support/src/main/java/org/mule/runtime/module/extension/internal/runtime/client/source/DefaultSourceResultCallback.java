@@ -81,7 +81,8 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
                                                                successCallbackParameters,
                                                                event);
 
-        withContextClassLoader(extensionClassLoader, () -> template.sendResponseToClient(event, params, new FutureCompletionCallback(future)));
+        withContextClassLoader(extensionClassLoader,
+                               () -> template.sendResponseToClient(event, params, new FutureCompletionCallback(future)));
       } catch (Throwable t) {
         future.completeExceptionally(t);
       }
@@ -112,7 +113,8 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
                                                                errorCallbackParameters,
                                                                messagingException.getEvent());
 
-        withContextClassLoader(extensionClassLoader, () -> template.sendFailureResponseToClient(messagingException, params, new FutureCompletionCallback(future)));
+        withContextClassLoader(extensionClassLoader, () -> template
+            .sendFailureResponseToClient(messagingException, params, new FutureCompletionCallback(future)));
       } catch (Throwable t) {
         future.completeExceptionally(t);
       }
