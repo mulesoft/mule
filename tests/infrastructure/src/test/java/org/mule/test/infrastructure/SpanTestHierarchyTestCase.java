@@ -877,6 +877,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     basicAttributes.put(ARTIFACT_TYPE_ID, APP.getAsString());
     when(mockedSpan.getAttributes()).thenReturn(basicAttributes);
     when(mockedSpan.getServiceName()).thenReturn(TEST_ARTIFACT_ID);
+    when(mockedSpan.getTraceId()).thenReturn("1-test-trace-id-1");
     return mockedSpan;
   }
 }
