@@ -6,23 +6,30 @@
  */
 package org.mule.test.module.extension.client.source;
 
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getExtensionClassLoader;
+import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
+import static org.mule.test.marvel.xmen.MagnetoMutantSummon.CLASSLOADER_NOTIFICATION_ACTION;
+import static org.mule.test.marvel.xmen.MagnetoMutantSummon.ERROR_NOTIFICATION_ACTION;
 import static org.mule.test.marvel.xmen.MagnetoMutantSummon.MESSAGE;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 
@@ -42,6 +49,22 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
+
+  @Inject
+  private ExtensionManager extensionManager;
+
+  private ClassLoader sourceCallbackContextClassLoader;
+  private Latch sourceCallbackContextClassLoaderLatch = new Latch();
+
+  @Override
+  protected void doSetUp() throws Exception {
+    notificationListenerRegistry.registerListener((CustomNotificationListener<CustomNotification>) notification -> {
+      if (notification.getAction().getActionId() == CLASSLOADER_NOTIFICATION_ACTION) {
+        sourceCallbackContextClassLoader = (ClassLoader) notification.getSource();
+        sourceCallbackContextClassLoaderLatch.release();
+      }
+    });
+  }
 
   @Test
   public void sendSuccessfulResponse() throws Exception {
@@ -65,6 +88,8 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
     handler.start();
     assertThat(latch.await(5, SECONDS), is(true));
     verify(responseStream).read(any(byte[].class));
+
+    assertSourceCallbackContextClassLoader();
   }
 
   @Test
@@ -74,7 +99,7 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
     final String errorMessage = "Long Live Professor X";
 
     notificationListenerRegistry.registerListener((CustomNotificationListener<CustomNotification>) notification -> {
-      if (notification instanceof CustomNotification) {
+      if (notification.getAction().getActionId() == ERROR_NOTIFICATION_ACTION) {
         capturedError.set((Error) notification.getSource());
         latch.release();
       }
@@ -101,5 +126,13 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
     assertThat(error.getDescription(), equalTo(errorMessage));
     assertThat(error.getErrorType().getIdentifier(), equalTo("UNKNOWN"));
     assertThat(error.getErrorType().getNamespace(), equalTo("MULE"));
+
+    assertSourceCallbackContextClassLoader();
+  }
+
+  private void assertSourceCallbackContextClassLoader() throws Exception {
+    ExtensionModel marvelModel = extensionManager.getExtension(MARVEL_EXTENSION).get();
+    assertThat(sourceCallbackContextClassLoaderLatch.await(5, SECONDS), is(true));
+    assertThat(sourceCallbackContextClassLoader, is(sameInstance(getExtensionClassLoader(marvelModel).get())));
   }
 }

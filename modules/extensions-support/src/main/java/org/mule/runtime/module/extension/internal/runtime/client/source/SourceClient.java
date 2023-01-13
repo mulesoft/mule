@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 
 import static java.util.Collections.emptySet;
@@ -36,7 +37,6 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -75,6 +75,7 @@ public class SourceClient<T, A> implements Lifecycle {
   private final NotificationDispatcher notificationDispatcher;
   private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final MuleContext muleContext;
+  private final ClassLoader extensionClassloader;
 
   private ExtensionMessageSource source;
   private MessagingExceptionResolver messagingExceptionResolver;
@@ -104,6 +105,8 @@ public class SourceClient<T, A> implements Lifecycle {
     this.notificationDispatcher = notificationDispatcher;
     this.transactionFactoryManager = transactionFactoryManager;
     this.muleContext = muleContext;
+
+    extensionClassloader = getClassLoader(extensionModel);
   }
 
   @Override
@@ -185,8 +188,8 @@ public class SourceClient<T, A> implements Lifecycle {
     return configurationProvider.map(provider -> provider.get(event));
   }
 
-  MessageSource getMessageSource() {
-    return source;
+  ClassLoader getExtensionClassLoader() {
+    return extensionClassloader;
   }
 
   SourceModel getSourceModel() {

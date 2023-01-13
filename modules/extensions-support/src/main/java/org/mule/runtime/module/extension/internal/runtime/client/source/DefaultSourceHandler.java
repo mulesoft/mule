@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.source;
 
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -15,6 +16,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.client.source.SourceHandler;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.slf4j.Logger;
 
 public class DefaultSourceHandler implements SourceHandler {
@@ -22,23 +25,44 @@ public class DefaultSourceHandler implements SourceHandler {
   private static final Logger LOGGER = getLogger(DefaultSourceHandler.class);
 
   private final SourceClient sourceClient;
+  private final Runnable afterDisposeAction;
+  private final AtomicBoolean started = new AtomicBoolean(false);
+  private final AtomicBoolean disposed = new AtomicBoolean(false);
 
-  public DefaultSourceHandler(SourceClient sourceClient) {
+  public DefaultSourceHandler(SourceClient sourceClient, Runnable afterDisposeAction) {
     this.sourceClient = sourceClient;
+    this.afterDisposeAction = afterDisposeAction;
   }
 
   @Override
   public void start() throws MuleException {
-    startIfNeeded(sourceClient);
+    assertNotDisposed();
+    if (started.compareAndSet(false, true)) {
+      startIfNeeded(sourceClient);
+    }
   }
 
   @Override
   public void stop() throws MuleException {
-    stopIfNeeded(sourceClient);
+    assertNotDisposed();
+    if (started.compareAndSet(true, false)) {
+      stopIfNeeded(sourceClient);
+    }
   }
 
   @Override
   public void dispose() {
-    disposeIfNeeded(sourceClient, LOGGER);
+    if (disposed.compareAndSet(false, true)) {
+      disposeIfNeeded(sourceClient, LOGGER);
+      try {
+        afterDisposeAction.run();
+      } catch (Exception e) {
+        LOGGER.error("Exception executing afterDisposeAction: " + e.getMessage(), e);
+      }
+    }
+  }
+
+  private void assertNotDisposed() {
+    checkState(!disposed.get(), "This source has already been disposed");
   }
 }

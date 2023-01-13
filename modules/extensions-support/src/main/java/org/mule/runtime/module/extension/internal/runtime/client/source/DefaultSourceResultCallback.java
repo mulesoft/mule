@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.client.source;
 
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.module.extension.internal.runtime.client.util.SarazaUtils.evaluate;
 
@@ -16,6 +17,7 @@ import static java.util.Collections.emptyMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -38,6 +40,7 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
   private final SourceClient sourceClient;
   private final Result<T, A> result;
   private final ExtensionsFlowProcessingTemplate template;
+  private final ClassLoader extensionClassLoader;
 
   DefaultSourceResultCallback(SourceClient sourceClient,
                               Result<T, A> result,
@@ -45,11 +48,17 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
     this.sourceClient = sourceClient;
     this.result = result;
     this.template = template;
+
+    extensionClassLoader = sourceClient.getExtensionClassLoader();
   }
 
   @Override
   public Result<T, A> getResult() {
     return result;
+  }
+
+  private void afterPhaseExecution(Either<MessagingException, CoreEvent> either, ClassLoader extensionClassLoader) {
+    withContextClassLoader(extensionClassLoader, () -> template.afterPhaseExecution(either));
   }
 
   @Override
@@ -61,9 +70,9 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
           if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("Failed to send success response to client: " + t.getMessage(), t);
           }
-          template.afterPhaseExecution(left(sourceClient.asMessagingException(t, event)));
+          afterPhaseExecution(left(sourceClient.asMessagingException(t, event)), extensionClassLoader);
         } else {
-          template.afterPhaseExecution(right(event));
+          afterPhaseExecution(right(event), extensionClassLoader);
         }
       });
 
@@ -72,7 +81,7 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
                                                                successCallbackParameters,
                                                                event);
 
-        template.sendResponseToClient(event, params, new FutureCompletionCallback(future));
+        withContextClassLoader(extensionClassLoader, () -> template.sendResponseToClient(event, params, new FutureCompletionCallback(future)));
       } catch (Throwable t) {
         future.completeExceptionally(t);
       }
@@ -82,6 +91,7 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
 
   @Override
   public CompletableFuture<Void> completeWithError(Throwable exception, Consumer<SourceParameterizer> errorCallbackParameters) {
+    final ClassLoader extensionClassLoader = sourceClient.getExtensionClassLoader();
     return withNullEvent(event -> {
       final MessagingException messagingException = sourceClient.asMessagingException(exception, event);
       final CompletableFuture<Void> future = new CompletableFuture<>();
@@ -91,9 +101,9 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
           if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("Failed to send error response to client: " + t.getMessage(), t);
           }
-          template.afterPhaseExecution(left(sourceClient.asMessagingException(t, event)));
+          afterPhaseExecution(left(sourceClient.asMessagingException(t, event)), extensionClassLoader);
         } else {
-          template.afterPhaseExecution(left(messagingException));
+          afterPhaseExecution(left(messagingException), extensionClassLoader);
         }
       });
 
@@ -102,7 +112,7 @@ final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T,
                                                                errorCallbackParameters,
                                                                messagingException.getEvent());
 
-        template.sendFailureResponseToClient(messagingException, params, new FutureCompletionCallback(future));
+        withContextClassLoader(extensionClassLoader, () -> template.sendFailureResponseToClient(messagingException, params, new FutureCompletionCallback(future)));
       } catch (Throwable t) {
         future.completeExceptionally(t);
       }

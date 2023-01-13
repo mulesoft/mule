@@ -9,6 +9,8 @@ package org.mule.test.marvel.xmen;
 import static org.mule.runtime.api.notification.AbstractServerNotification.CUSTOM_EVENT_ACTION_START_RANGE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.notification.CustomNotification;
@@ -34,6 +36,8 @@ import javax.inject.Inject;
 public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   public static final String MESSAGE = "We are the future. ... You have lived in the shadows of shame and fear for too long!";
+  public static final int ERROR_NOTIFICATION_ACTION = CUSTOM_EVENT_ACTION_START_RANGE + 99;
+  public static final int CLASSLOADER_NOTIFICATION_ACTION = CUSTOM_EVENT_ACTION_START_RANGE + 101;
 
   @Inject
   private ServerNotificationManager notificationManager;
@@ -54,6 +58,8 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
                         CorrelationInfo correlationInfo,
                         SourceCallbackContext callbackContext)
       throws IOException {
+    notifyContextClassLoader();
+
     if (mutantResponse.getBody().getValue() instanceof InputStream) {
       ((InputStream) mutantResponse.getBody().getValue()).read(new byte[1024]);
     }
@@ -65,12 +71,17 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   @OnError
   public void onError(Error error) {
-    notificationManager.fireNotification(new CustomNotification(error, CUSTOM_EVENT_ACTION_START_RANGE + 99));
+    notifyContextClassLoader();
+    notificationManager.fireNotification(new CustomNotification(error, ERROR_NOTIFICATION_ACTION));
   }
 
   @Override
   public void onStop() {
     // Nothing to do
+  }
+
+  private void notifyContextClassLoader() {
+    notificationManager.fireNotification(new CustomNotification(currentThread().getContextClassLoader(), CLASSLOADER_NOTIFICATION_ACTION));
   }
 
 }

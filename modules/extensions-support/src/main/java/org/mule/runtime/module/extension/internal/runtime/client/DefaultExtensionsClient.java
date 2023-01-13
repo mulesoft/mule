@@ -63,7 +63,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -120,6 +122,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
+  private Set<SourceClient> sourceClients = new HashSet<>();
 
   @Override
   public <T, A> CompletableFuture<Result<T, A>> execute(String extensionName,
@@ -161,7 +164,27 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       throw new MuleRuntimeException(createStaticMessage("Exception initializing source:" + e.getMessage()), e);
     }
 
-    return new DefaultSourceHandler(sourceClient);
+    return new DefaultSourceHandler(sourceClient, () -> discard(sourceClient));
+  }
+
+  private void discard(SourceClient sourceClient) {
+    synchronized (sourceClients) {
+      try {
+        stopAndDispose(sourceClient);
+      } finally {
+        sourceClients.remove(sourceClient);
+      }
+    }
+  }
+
+  private void stopAndDispose(SourceClient sourceClient) {
+    try {
+      sourceClient.stop();
+    } catch (Exception e) {
+      LOGGER.error("Exception found stopping source client: " + e.getMessage(), e);
+    } finally {
+      sourceClient.dispose();
+    }
   }
 
   private OperationKey toOperationKey(String extensionName,
@@ -340,6 +363,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public void dispose() {
     if (operationClientCache != null) {
       operationClientCache.invalidateAll();
+    }
+
+    synchronized (sourceClients) {
+      sourceClients.forEach(this::stopAndDispose);
+      sourceClients.clear();
     }
 
     if (cacheShutdownExecutor != null) {
