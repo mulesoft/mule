@@ -388,7 +388,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
             .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
             .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
             .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
-            .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
             .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
             .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
             .setScope(BeanDefinition.SCOPE_PROTOTYPE)
