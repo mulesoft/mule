@@ -125,6 +125,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       }
 
       @Override
+      public String getTraceId() {
+        return spanData.getTraceId();
+      }
+
+      @Override
       public Map<String, String> getAttributes() {
         Map<String, String> attributes = new HashMap<>();
         spanData.getAttributes().asMap().forEach((k, v) -> attributes.put(k.getKey(), valueOf(v)));

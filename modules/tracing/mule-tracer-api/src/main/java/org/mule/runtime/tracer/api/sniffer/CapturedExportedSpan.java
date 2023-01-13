@@ -36,6 +36,11 @@ public interface CapturedExportedSpan {
   String getSpanId();
 
   /**
+   * @return the trace id.
+   */
+  String getTraceId();
+
+  /**
    * @return the span attributes
    */
   Map<String, String> getAttributes();

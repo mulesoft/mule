@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,6 +145,8 @@ public class SpanTestHierarchy {
             && hasCorrectParent(exportedSpan, actualParent != null ? actualParent.getName() : null))
         .findFirst().orElse(null);
     assertThat("Expected span: " + expectedNode.spanName + " was not found", actualSpan, notNullValue());
+    assertTrue("Expected span: " + expectedNode.spanName + " has a different trace ID than parent",
+               hasCorrectTraceId(actualSpan, actualParent != null ? actualParent.getName() : null));
     assertAttributes(actualSpan, expectedNode);
     assertException(actualSpan, expectedNode);
     assertThat("Expected span: " + expectedNode.spanName + " has incorrect start or end time",
@@ -161,6 +164,17 @@ public class SpanTestHierarchy {
       return span.getParentSpanId().equals(NO_PARENT_SPAN);
     }
     return parentSpan.getName().equals(expectedParentName);
+  }
+
+  private boolean hasCorrectTraceId(CapturedExportedSpan span, String expectedParentName) {
+    CapturedExportedSpan parentSpan = spanHashMap.get(span.getParentSpanId());
+    if (expectedParentName != null && parentSpan == null) {
+      return false;
+    } else if (expectedParentName == null && parentSpan == null) {
+      // When it's a root span there is no trace ID to compare to
+      return true;
+    }
+    return parentSpan.getTraceId().equals(span.getTraceId());
   }
 
   private boolean hasCorrectLocation(CapturedExportedSpan span, String expectedLocation) {
