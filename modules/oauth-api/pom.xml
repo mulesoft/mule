@@ -10,7 +10,7 @@
     
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClientVersion>1.1.0-SNAPSHOT</muleOAuthClientVersion>
+        <muleOAuthClientVersion>1.1.0-rc3</muleOAuthClientVersion>
     </properties>
 
     <dependencies>
