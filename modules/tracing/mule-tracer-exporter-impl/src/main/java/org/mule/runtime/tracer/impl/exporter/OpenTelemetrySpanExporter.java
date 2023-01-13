@@ -204,6 +204,10 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
     parentSpanContext = extractContextFromTraceParent(serializeAsMap.get("traceparent"));
+    if (parentSpanContext.isValid()) {
+      spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
+                                       TraceFlags.getSampled(), TraceState.getDefault());
+    }
   }
 
   @Override
