@@ -157,6 +157,16 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       public boolean hasErrorStatus() {
         return spanData.getStatus().getStatusCode().equals(ERROR);
       }
+
+      @Override
+      public long getStartEpochSpanNanos() {
+        return spanData.getStartEpochNanos();
+      }
+
+      @Override
+      public long getEndSpanEpochNanos() {
+        return spanData.getEndEpochNanos();
+      }
     }
 
     /**

@@ -57,4 +57,13 @@ public interface CapturedExportedSpan {
    */
   boolean hasErrorStatus();
 
+  /**
+   * @return the start span nanos.
+   */
+  long getStartEpochSpanNanos();
+
+  /**
+   * @return the end span nanos.
+   */
+  long getEndSpanEpochNanos();
 }

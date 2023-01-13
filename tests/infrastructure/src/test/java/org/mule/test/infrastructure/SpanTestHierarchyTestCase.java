@@ -864,6 +864,11 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
 
   private CapturedExportedSpan mockCapturedExportedSpan() {
     CapturedExportedSpan mockedSpan = mock(CapturedExportedSpan.class);
+
+    // mocking start and end epoch nanos.
+    when(mockedSpan.getStartEpochSpanNanos()).thenReturn(0L);
+    when(mockedSpan.getEndSpanEpochNanos()).thenReturn(1L);
+
     Map<String, String> basicAttributes = new HashMap<>();
     basicAttributes.put(CORRELATION_ID_KEY, "test-correlation-id");
     basicAttributes.put(THREAD_START_ID_KEY, "12");
