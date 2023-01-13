@@ -1444,7 +1444,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnableByteBuddyObjectCreation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
-                                                minMuleVersion("4.4.0"));
+                                                minMuleVersion("4.6.0"));
   }
 
   /**
