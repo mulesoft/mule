@@ -12,14 +12,13 @@ import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -49,6 +48,27 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
 
   @Test
   public void initPollingSource() throws Exception {
+    Consumer<SourceParameterizer> parameterizer = parameters -> parameters
+      .withConfigRef(configProperty.getValue())
+      .withParameter("watermark", true)
+      .withParameter("idempotent", true)
+      .withFixedSchedulingStrategy(1, SECONDS, 0);
+
+
+    assertPolling(parameterizer);
+  }
+
+  @Test
+  public void pollingSourceWithoutSchedulingStrategy() throws Exception {
+    Consumer<SourceParameterizer> parameterizer = parameters -> parameters
+      .withConfigRef(configProperty.getValue())
+      .withParameter("watermark", true)
+      .withParameter("idempotent", true);
+
+    assertPolling(parameterizer);
+  }
+
+  private void assertPolling(Consumer<SourceParameterizer> parameterizer) throws MuleException, InterruptedException {
     List<Result<String, Void>> results = new CopyOnWriteArrayList<>();
     final int petCount = ALL_PETS.size();
     CountDownLatch latch = new CountDownLatch(petCount);
@@ -56,15 +76,10 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
       results.add(callback.getResult());
       latch.countDown();
     };
-
     handler = extensionsClient.createSource("petstore",
                                             "ConnectedPetAdoptionSource",
                                             callbackConsumer,
-                                            parameters -> parameters
-                                                .withConfigRef(configProperty.getValue())
-                                                .withParameter("watermark", true)
-                                                .withParameter("idempotent", true)
-                                                .withFixedSchedulingStrategy(1, SECONDS, 0));
+                                            parameterizer);
 
     handler.start();
     assertThat(latch.await(5, SECONDS), is(true));
@@ -77,20 +92,5 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
       assertThat(result.getAttributes().isPresent(), is(false));
       assertThat(result.getAttributesMediaType().isPresent(), is(false));
     }
-  }
-
-  @Test
-  public void pollingSourceWithoutSchedulingStrategy() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException.expectCause(instanceOf(InitialisationException.class));
-
-    handler = extensionsClient.createSource("petstore",
-                                            "ConnectedPetAdoptionSource",
-                                            callback -> {
-                                            },
-                                            parameters -> parameters
-                                                .withConfigRef(configProperty.getValue())
-                                                .withParameter("watermark", true)
-                                                .withParameter("idempotent", true));
   }
 }

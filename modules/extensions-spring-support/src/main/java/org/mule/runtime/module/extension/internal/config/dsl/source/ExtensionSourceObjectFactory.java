@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.source;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -31,8 +32,8 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -44,9 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-
 import com.google.common.base.Joiner;
+import org.slf4j.Logger;
 
 
 /**
@@ -111,15 +111,21 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     if (sourceModel.runsOnPrimaryNodeOnly()) {
       return true;
     }
-    try {
-      ValueResolver<?> primaryNodeOnlyValueResolver = nonCallbackParameters.getResolvers().get(PRIMARY_NODE_ONLY_PARAMETER_NAME);
-      return primaryNodeOnlyValueResolver == null ? false
-          : (Boolean) primaryNodeOnlyValueResolver.resolve(ValueResolvingContext.builder(getNullEvent()).build());
-    } catch (MuleException e) {
-      String errorMessage = format("There was a problem resolving the value of the %s parameter for the %s source.",
-                                   PRIMARY_NODE_ONLY_PARAMETER_NAME, sourceModel.getName());
-      LOGGER.error(errorMessage);
-      throw new MuleRuntimeException(createStaticMessage(errorMessage), e);
+    ValueResolver<?> primaryNodeOnlyValueResolver = nonCallbackParameters.getResolvers().get(PRIMARY_NODE_ONLY_PARAMETER_NAME);
+
+    if (primaryNodeOnlyValueResolver != null) {
+      return withNullEvent(event -> {
+        try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
+          return (Boolean) primaryNodeOnlyValueResolver.resolve(ctx);
+        } catch (Exception e) {
+          String errorMessage = format("There was a problem resolving the value of the %s parameter for the %s source.",
+                                       PRIMARY_NODE_ONLY_PARAMETER_NAME, sourceModel.getName());
+          LOGGER.error(errorMessage);
+          throw new MuleRuntimeException(createStaticMessage(errorMessage), e);
+        }
+      });
+    } else {
+      return false;
     }
   }
 
@@ -197,10 +203,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
-  }
-
-  public void setPrimaryNodeOnly(Boolean primaryNodeOnly) {
-    this.primaryNodeOnly = primaryNodeOnly;
   }
 
   public void setBackPressureStrategy(BackPressureStrategy backPressureStrategy) {

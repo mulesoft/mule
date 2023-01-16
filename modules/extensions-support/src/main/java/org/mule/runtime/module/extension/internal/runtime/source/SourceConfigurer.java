@@ -144,8 +144,6 @@ public final class SourceConfigurer {
                                                  resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent),
                                                  muleContext.getExceptionListener());
 
-        } else {
-          throw new IllegalStateException("No SchedulingStrategy provided for PollingSource");
         }
       }
 
