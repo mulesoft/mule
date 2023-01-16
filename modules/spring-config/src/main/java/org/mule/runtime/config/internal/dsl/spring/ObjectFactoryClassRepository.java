@@ -81,16 +81,16 @@ public class ObjectFactoryClassRepository {
    * {@code Class} instance should not be reused for another {@link ComponentBuildingDefinition}.
    *
    * @param objectFactoryType the {@link ObjectFactory} of the component
+   * @param objectTypeClass   the class of the object that the factory will instantiate
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
   public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType, Class objectTypeClass) {
     synchronized (this.getClass().getClassLoader()) {
-
       String name;
       boolean callingSuper = ObjectTypeProvider.class.isAssignableFrom(objectFactoryType);
 
       if (callingSuper) {
-        name = objectFactoryType.getName() + "_ByteBuddy_CallingSuper";
+        name = objectFactoryType.getName() + "_ByteBuddy_CallingSuperGetObjectType";
       } else {
         name = objectFactoryType.getName() + "_ByteBuddy_" + objectTypeClass.getName().replace(".", "_");
       }
@@ -113,10 +113,11 @@ public class ObjectFactoryClassRepository {
     return byteBuddy
         .subclass(objectFactoryType, IMITATE_SUPER_CLASS)
         .name(name)
-        // Add fields to set properties.
-        .defineField(IS_SINGLETON, Boolean.class, PRIVATE)
+        // W-12362157: set the objectTypeClass field static so spring can get it without fully initializing the object
         .defineField(OBJECT_TYPE_CLASS, Class.class, PRIVATE, STATIC)
         .initializer(new LoadedTypeInitializer.ForStaticField(OBJECT_TYPE_CLASS, objectTypeClass))
+        // Add fields to set properties.
+        .defineField(IS_SINGLETON, Boolean.class, PRIVATE)
         .defineField(IS_PROTOTYPE, Boolean.class, PRIVATE)
         .defineField(IS_EAGER_INIT, Supplier.class, PRIVATE)
         // Implements the SmartFactoryBeanInterceptor interface to add getters and setters for the fields. This interface extends
