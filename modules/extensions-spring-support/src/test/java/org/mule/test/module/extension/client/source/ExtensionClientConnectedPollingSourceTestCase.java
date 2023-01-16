@@ -49,10 +49,10 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
   @Test
   public void initPollingSource() throws Exception {
     Consumer<SourceParameterizer> parameterizer = parameters -> parameters
-      .withConfigRef(configProperty.getValue())
-      .withParameter("watermark", true)
-      .withParameter("idempotent", true)
-      .withFixedSchedulingStrategy(1, SECONDS, 0);
+        .withConfigRef(configProperty.getValue())
+        .withParameter("watermark", true)
+        .withParameter("idempotent", true)
+        .withFixedSchedulingStrategy(1, SECONDS, 0);
 
 
     assertPolling(parameterizer);
@@ -61,9 +61,9 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
   @Test
   public void pollingSourceWithoutSchedulingStrategy() throws Exception {
     Consumer<SourceParameterizer> parameterizer = parameters -> parameters
-      .withConfigRef(configProperty.getValue())
-      .withParameter("watermark", true)
-      .withParameter("idempotent", true);
+        .withConfigRef(configProperty.getValue())
+        .withParameter("watermark", true)
+        .withParameter("idempotent", true);
 
     assertPolling(parameterizer);
   }
