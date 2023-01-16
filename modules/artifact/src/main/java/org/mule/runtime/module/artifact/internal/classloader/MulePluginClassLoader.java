@@ -11,6 +11,8 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
+import java.security.CodeSource;
+import java.security.PermissionCollection;
 
 /**
  * Implementation of the ArtifactClassLoader interface for {@code mule-plugin}s, that manages shutdown listeners and has resource
@@ -36,4 +38,9 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader {
     super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
   }
 
+  @Override
+  protected PermissionCollection getPermissions(CodeSource codesource) {
+    // TODO Auto-generated method stub
+    return super.getPermissions(codesource);
+  }
 }

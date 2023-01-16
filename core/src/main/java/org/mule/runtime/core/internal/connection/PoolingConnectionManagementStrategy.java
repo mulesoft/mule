@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.min;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_GROW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.min;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -28,7 +29,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -141,6 +141,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     config.setMaxWaitMillis(poolingProfile.getMaxWait());
     config.setMinEvictableIdleTimeMillis(poolingProfile.getMinEvictionMillis());
     config.setTimeBetweenEvictionRunsMillis(poolingProfile.getEvictionCheckIntervalMillis());
+    config.setJmxEnabled(false);
     GenericObjectPool<C> genericPool = new GenericObjectPool<>(new ObjectFactoryAdapter(), config);
     LOGGER.debug("Creating pool with ID {} for config {}", poolId, ownerConfigName);
 

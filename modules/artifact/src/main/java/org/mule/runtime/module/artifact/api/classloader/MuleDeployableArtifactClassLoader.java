@@ -13,6 +13,8 @@ import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
+import java.security.CodeSource;
+import java.security.PermissionCollection;
 import java.util.List;
 
 /**
@@ -68,5 +70,11 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
             ? ((FilteringArtifactClassLoader) fcl).getArtifactClassLoader()
             : fcl)
         .collect(toList());
+  }
+
+  @Override
+  protected PermissionCollection getPermissions(CodeSource codesource) {
+    // TODO Auto-generated method stub
+    return super.getPermissions(codesource);
   }
 }
