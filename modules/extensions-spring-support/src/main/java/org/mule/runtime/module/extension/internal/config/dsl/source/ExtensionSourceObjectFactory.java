@@ -205,6 +205,10 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     this.cursorProviderFactory = cursorProviderFactory;
   }
 
+  public void setPrimaryNodeOnly(Boolean primaryNodeOnly) {
+    this.primaryNodeOnly = primaryNodeOnly;
+  }
+
   public void setBackPressureStrategy(BackPressureStrategy backPressureStrategy) {
     this.backPressureStrategy = backPressureStrategy;
   }

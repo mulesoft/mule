@@ -137,6 +137,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     return operationClientCache.get(key).execute(key, parameterizer);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T, A> SourceHandler createSource(String extensionName,
                                            String sourceName,
