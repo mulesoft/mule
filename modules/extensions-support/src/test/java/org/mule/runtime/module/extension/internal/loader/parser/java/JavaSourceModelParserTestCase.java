@@ -18,7 +18,7 @@ import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMe
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.FIRST_MULE_VERSION;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
@@ -48,7 +48,7 @@ import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.execution.OnError;
 import org.mule.sdk.api.annotation.source.EmitsResponse;
@@ -93,12 +93,12 @@ public class JavaSourceModelParserTestCase {
   public void before() throws Exception {
     infoMessages = new ArrayList<>();
     logger = createMockLogger(infoMessages, INFO);
-    oldLogger = setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, logger);
+    oldLogger = setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, logger);
   }
 
   @After
   public void restoreLogger() throws Exception {
-    setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, oldLogger);
+    setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test

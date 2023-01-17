@@ -26,8 +26,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateOperationMinMuleVersion;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.calculateOperationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 

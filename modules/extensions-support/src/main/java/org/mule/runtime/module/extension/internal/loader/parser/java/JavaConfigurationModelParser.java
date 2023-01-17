@@ -18,8 +18,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Mule
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateConfigMinMuleVersion;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.calculateConfigMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
 
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;

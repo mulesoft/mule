@@ -25,7 +25,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sour
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceOutputType;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateSourceMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.calculateSourceMinMuleVersion;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 

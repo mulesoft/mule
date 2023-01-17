@@ -14,7 +14,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.FIRST_MULE_VERSION;
 import static org.slf4j.event.Level.INFO;
 
 import org.junit.After;
@@ -29,7 +29,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.Import;
@@ -64,12 +64,12 @@ public class JavaExtensionModelParserTestCase {
   public void before() throws Exception {
     infoMessages = new ArrayList<>();
     logger = createMockLogger(infoMessages, INFO);
-    oldLogger = setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, logger);
+    oldLogger = setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, logger);
   }
 
   @After
   public void restoreLogger() throws Exception {
-    setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, oldLogger);
+    setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test

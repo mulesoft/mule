@@ -59,7 +59,7 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter;
@@ -111,12 +111,12 @@ public class JavaConnectionProviderModelParserTestCase {
   public void before() throws Exception {
     infoMessages = new ArrayList<>();
     logger = createMockLogger(infoMessages, INFO);
-    oldLogger = setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, logger);
+    oldLogger = setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, logger);
   }
 
   @After
   public void restoreLogger() throws Exception {
-    setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, oldLogger);
+    setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test

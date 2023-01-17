@@ -26,7 +26,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.erro
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseLegacyNotifications;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseNotifications;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateExtensionMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.calculateExtensionMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
 import org.mule.metadata.api.ClassTypeLoader;

@@ -31,7 +31,7 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils;
 import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
@@ -67,12 +67,12 @@ public class JavaConfigurationModelParserTestCase {
   public void before() throws Exception {
     infoMessages = new ArrayList<>();
     logger = createMockLogger(infoMessages, INFO);
-    oldLogger = setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, logger);
+    oldLogger = setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, logger);
   }
 
   @After
   public void restoreLogger() throws Exception {
-    setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, oldLogger);
+    setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
