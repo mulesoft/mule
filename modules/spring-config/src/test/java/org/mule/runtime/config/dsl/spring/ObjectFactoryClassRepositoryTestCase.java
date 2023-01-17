@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.dsl.spring;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -59,7 +60,7 @@ public class ObjectFactoryClassRepositoryTestCase {
     assertThat(byteBuddyClass.isSingleton(), is(false));
     assertThat(byteBuddyClass.isPrototype(), is(false));
     assertThat(byteBuddyClass.isEagerInit(), is(false));
-    assertThat(byteBuddyClass.getObject().getClass(), is(FakeObject.class));
+    assertThat(byteBuddyClass.getObject(), is(instanceOf(FakeObject.class)));
   }
 
   @Test
