@@ -129,9 +129,8 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
     }
 
     return rootBeanDefinition(objectFactoryClassRepository
-        .getObjectFactoryClass(objectFactoryType))
+        .getObjectFactoryClass(objectFactoryType, componentModel.getType()))
             .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
-            .addPropertyValue(OBJECT_TYPE_CLASS, componentModel.getType())
             .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
             .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
 
