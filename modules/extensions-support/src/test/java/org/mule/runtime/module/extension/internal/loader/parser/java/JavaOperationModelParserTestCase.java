@@ -7,11 +7,18 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import static org.slf4j.event.Level.INFO;
 
+import org.junit.After;
+import org.junit.Before;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -32,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.Operations;
@@ -39,11 +47,29 @@ import org.mule.sdk.api.annotation.param.Parameter;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.parameter.CorrelationInfo;
 import org.mule.sdk.api.runtime.parameter.Literal;
+import org.slf4j.Logger;
 
 public class JavaOperationModelParserTestCase {
 
   protected JavaOperationModelParser parser;
   protected OperationElement operationElement;
+
+  protected static final String LOGGER_FIELD_NAME = "LOGGER";
+  private List<String> infoMessages;
+  protected Logger logger;
+  private Logger oldLogger;
+
+  @Before
+  public void before() throws Exception {
+    infoMessages = new ArrayList<>();
+    logger = createMockLogger(infoMessages, INFO);
+    oldLogger = setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, logger);
+  }
+
+  @After
+  public void restoreLogger() throws Exception {
+    setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, oldLogger);
+  }
 
   @Test
   public void parseTransactionalOperation() throws NoSuchMethodException {
@@ -67,6 +93,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
+    verifyLogMessage(infoMessages,
+                     "Operation transactionalOperation has min mule version 4.1.1 because it is the default value.");
   }
 
   @Test
@@ -75,6 +103,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method annotatedWithMMV has min mule version 4.4 because it is the one set at the method level through the @MinMuleVersion annotation.");
   }
 
   @Test
@@ -83,6 +113,10 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Calculated Min Mule Version is 4.5.0 which is greater than the one set at the method level 4.4. Overriding it.");
+    verifyLogMessage(infoMessages,
+                     "Method overwriteMMV has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.Alias. org.mule.sdk.api.annotation.Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -91,6 +125,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Method withSdkParameter has min mule version 4.5.0 because of its parameter literalParameter. Parameter literalParameter has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -99,6 +135,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Method withSdkImplicitParameter has min mule version 4.5.0 because of its parameter info. Parameter info has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.CorrelationInfo. org.mule.sdk.api.runtime.parameter.CorrelationInfo has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -107,6 +145,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method withSdkAnnotatedParameter has min mule version 4.4 because of its parameter optionalParameter. Parameter optionalParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Optional. org.mule.sdk.api.annotation.param.Optional has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -115,6 +155,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method withParameterGroup has min mule version 4.4 because of its parameter someField. Field someField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -123,6 +165,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method withConfigParameter has min mule version 4.4 because of its parameter SomeConfiguration. Config SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -131,6 +175,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method withSdkPagingProvider has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.streaming.PagingProvider. org.mule.sdk.api.runtime.streaming.PagingProvider has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -139,6 +185,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method withPagingProviderSdkGeneric has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -147,6 +195,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Method withResultOutput has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -156,6 +206,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
+    verifyLogMessage(infoMessages,
+                     "Operation transactionalOperation has min mule version 4.1.1 because it is the default value.");
   }
 
   @Test
@@ -165,6 +217,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
+    verifyLogMessage(infoMessages,
+                     "Operation transactionalOperation has min mule version 4.1.1 because it is the default value.");
   }
 
   @Test
@@ -173,6 +227,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Operation noArgumentsOperation has min mule version 4.4 because of its parameter containerParameter. Parameter containerParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -182,6 +238,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4.0"));
+    verifyLogMessage(infoMessages,
+                     "Operation transactionalOperation has min mule version 4.4.0 because it was propagated from the @Operations annotation at the extension class used to add the operation's container TransactionalOperations.");
   }
 
   @Test

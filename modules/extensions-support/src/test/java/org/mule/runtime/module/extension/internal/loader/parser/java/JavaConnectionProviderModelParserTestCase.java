@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
@@ -15,8 +16,14 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
+import static org.slf4j.event.Level.INFO;
 
+import org.junit.After;
+import org.junit.Before;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -43,17 +50,21 @@ import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAu
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ConnectionProviderTypeWrapper;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.sdk.api.runtime.parameter.Literal;
+import org.slf4j.Logger;
 
 public class JavaConnectionProviderModelParserTestCase {
 
@@ -90,6 +101,23 @@ public class JavaConnectionProviderModelParserTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
+
+  protected static final String LOGGER_FIELD_NAME = "LOGGER";
+  private List<String> infoMessages;
+  protected Logger logger;
+  private Logger oldLogger;
+
+  @Before
+  public void before() throws Exception {
+    infoMessages = new ArrayList<>();
+    logger = createMockLogger(infoMessages, INFO);
+    oldLogger = setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, logger);
+  }
+
+  @After
+  public void restoreLogger() throws Exception {
+    setLogger(JavaParserUtils.class, LOGGER_FIELD_NAME, oldLogger);
+  }
 
   @Test
   public void noOAuthSupport() {
@@ -211,6 +239,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider LegacyConnectionProvider has min mule version 4.1.1 because it is the default value.");
   }
 
   @Test
@@ -219,6 +249,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider SdkConnectionProvider has min mule version 4.5 because of its interface org.mule.sdk.api.connectivity.ConnectionProvider. org.mule.sdk.api.connectivity.ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -227,6 +259,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider SdkAnnotatedConnectionProvider has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.Alias. org.mule.sdk.api.annotation.Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -235,6 +269,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderWithParameterWithSdkAnnotation has min mule version 4.5.0 because of its field OAuthParameter. Field OAuthParameter has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter. org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -243,6 +279,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderWithSdkParameter has min mule version 4.5.0 because of its field OAuthParameter. Field OAuthParameter has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -251,6 +289,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderWithSdkField has min mule version 4.5.0 because of its field literalField. Field literalField has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -259,6 +299,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderExtendsSdkConnectionProvider has min mule version 4.5 because of its super class SdkConnectionProvider. Connection Provider SdkConnectionProvider has min mule version 4.5 because of its interface org.mule.sdk.api.connectivity.ConnectionProvider. org.mule.sdk.api.connectivity.ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -267,6 +309,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderExtendsSuperClass has min mule version 4.4 because of its field superClassParameter. Field superClassParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test
@@ -275,6 +319,8 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.6"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderWithHigherMMVAnnotation has min mule version 4.6 because it is the one set at the class level.");
   }
 
   @Test
@@ -283,6 +329,10 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5"));
+    verifyLogMessage(infoMessages,
+                     "Connection Provider ConnectionProviderWithLowerMMVAnnotation has min mule version 4.5 because of its super class SdkConnectionProvider. Connection Provider SdkConnectionProvider has min mule version 4.5 because of its interface org.mule.sdk.api.connectivity.ConnectionProvider. org.mule.sdk.api.connectivity.ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion.");
+    verifyLogMessage(infoMessages,
+                     "Calculated Min Mule Version is 4.5 which is greater than the one set at the connection provider class level 4.4. Overriding it.");
   }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {

@@ -38,13 +38,11 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -58,10 +56,51 @@ public final class JavaParserUtils {
 
   private static final Logger LOGGER = getLogger(JavaParserUtils.class);
   private static final MuleVersion SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION =
-      new MuleVersion(Extension.class.getAnnotation(MinMuleVersion.class).value());
+          new MuleVersion(Extension.class.getAnnotation(MinMuleVersion.class).value());
   public static final MuleVersion FIRST_MULE_VERSION = new MuleVersion("4.1.1");
 
   private JavaParserUtils() {}
+
+  public static class ComponentInformation {
+
+    private String componentName;
+    private MuleVersion minMuleVersion;
+    private String reason;
+    private ComponentInformation innerComponent = null;
+
+    public ComponentInformation(String componentName, MuleVersion minMuleVersion, String reason) {
+      this.componentName = componentName;
+      this.minMuleVersion = minMuleVersion;
+      this.reason = reason;
+    }
+
+    public void setMinMuleVersion(MuleVersion minMuleVersion) {
+      this.minMuleVersion = minMuleVersion;
+    }
+
+    public MuleVersion getMinMuleVersion() {
+      return minMuleVersion;
+    }
+
+    public String getReason() {
+      if (innerComponent != null) {
+        return reason.concat(" ").concat(innerComponent.getReason());
+      }
+      return reason;
+    }
+
+    public String getName() {
+      return componentName;
+    }
+
+    public void updateIfHigherMMV(ComponentInformation candidate, String reason) {
+      if (!(this.minMuleVersion.atLeast(candidate.getMinMuleVersion()))) {
+        this.reason = reason;
+        this.minMuleVersion = candidate.getMinMuleVersion();
+        this.innerComponent = candidate;
+      }
+    }
+  }
 
   /**
    * Calculates the minimum {@link MuleVersion} for a given {@link ExtensionElement} by looking at the class annotation
@@ -72,31 +111,59 @@ public final class JavaParserUtils {
    * @return the minimum mule version of the given extension
    */
   public static MuleVersion calculateExtensionMinMuleVersion(Type extension) {
-    MuleVersion calculatedMMV =
-        extension.getSuperType().map(JavaParserUtils::calculateExtensionMinMuleVersion).orElse(FIRST_MULE_VERSION);
+    ComponentInformation componentInformation = createExtensionComponent(extension);
+    LOGGER.info(componentInformation.getReason());
+    return componentInformation.getMinMuleVersion();
+  }
+
+  private static ComponentInformation createExtensionComponent(Type extension) {
+    ComponentInformation extensionComponent;
     if (extension.isAnnotatedWith(Extension.class)) {
-      calculatedMMV = max(calculatedMMV, SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION);
+      extensionComponent = new ComponentInformation(extension.getName(), SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION,
+              format("Extension %s has min mule version %s because it if annotated with the new sdk api @Extension.",
+                      extension.getName(), SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION));
+    } else {
+      extensionComponent = createComponentWithDefaultMMV("Extension", extension.getName());
+    }
+    Optional<ComponentInformation> superExtension = extension.getSuperType().map(JavaParserUtils::createExtensionComponent);
+    if (superExtension.isPresent()) {
+      extensionComponent.updateIfHigherMMV(superExtension.get(),
+              format("Extension %s has min mule version %s due to its super class %s.",
+                      extension.getName(),
+                      superExtension.get().getMinMuleVersion(), superExtension.get().getName()));
     }
     if (!(extension.isAnnotatedWith(Configurations.class)
-        || extension.isAnnotatedWith(org.mule.sdk.api.annotation.Configurations.class))) {
-      for (FieldElement field : extension.getFields()) {
-        calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
+            || extension.isAnnotatedWith(org.mule.sdk.api.annotation.Configurations.class))) {
+      Optional<ComponentInformation> fieldComponent =
+              extension.getFields().stream().map(JavaParserUtils::calculateFieldMinMuleVersion).reduce(JavaParserUtils::max);
+      if (fieldComponent.isPresent()) {
+        extensionComponent.updateIfHigherMMV(fieldComponent.get(),
+                format("Extension %s has min mule version %s because of its field %s.",
+                        extension.getName(),
+                        fieldComponent.get().getMinMuleVersion(), fieldComponent.get().getName()));
       }
-      calculatedMMV = max(calculatedMMV, extension.getEnclosingMethods()
-          .map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION)).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+      Optional<ComponentInformation> methodComponent =
+              extension.getEnclosingMethods().map(JavaParserUtils::calculateMethodMinMuleVersion).reduce(JavaParserUtils::max);
+      if (methodComponent.isPresent()) {
+        extensionComponent.updateIfHigherMMV(methodComponent.get(),
+                format("Extension %s has min mule version %s because of its method %s.",
+                        extension.getName(), methodComponent.get().getMinMuleVersion(),
+                        methodComponent.get().getName()));
+      }
     }
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(extension);
-    MuleVersion finalCalculatedMMV = calculatedMMV;
-    return classLevelMMV.map(mmv -> {
-      if (mmv.priorTo(finalCalculatedMMV)) {
+    if (classLevelMMV.isPresent()) {
+      if (classLevelMMV.get().priorTo(extensionComponent.getMinMuleVersion())) {
         LOGGER
-            .debug("Calculated Min Mule Version is {} which is greater than the one set at the extension class level {}. Overriding it.",
-                   finalCalculatedMMV, mmv);
-        return finalCalculatedMMV;
+                .info("Calculated Min Mule Version is {} which is greater than the one set at the extension class level {}. Overriding it.",
+                        extensionComponent.getMinMuleVersion(), classLevelMMV.get());
       } else {
-        return mmv;
+        extensionComponent = new ComponentInformation(extension.getName(), classLevelMMV.get(),
+                format("Extension %s has min mule version %s because it is the one set at the class level through the @MinMuleVersion annotation.",
+                        extension.getName(), classLevelMMV.get()));
       }
-    }).orElse(calculatedMMV);
+    }
+    return extensionComponent;
   }
 
   /**
@@ -109,27 +176,59 @@ public final class JavaParserUtils {
    * @return the minimum mule version of the given configuration
    */
   public static MuleVersion calculateConfigMinMuleVersion(Type config, MuleVersion propagatedMinMuleVersion) {
-    MuleVersion calculatedMMV = max(propagatedMinMuleVersion, config.getSuperType()
-        .map(superType -> calculateConfigMinMuleVersion(superType, propagatedMinMuleVersion)).orElse(FIRST_MULE_VERSION));
-    calculatedMMV = max(calculatedMMV, config.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    for (FieldElement field : config.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
+    ComponentInformation componentInformation = createConfigurationComponent(config, propagatedMinMuleVersion);
+    LOGGER.info(componentInformation.getReason());
+    return componentInformation.getMinMuleVersion();
+  }
+
+  private static ComponentInformation createConfigurationComponent(Type config, MuleVersion propagatedMinMuleVersion) {
+    ComponentInformation configComponent = max(createComponentWithDefaultMMV("Configuration", config.getName()),
+            new ComponentInformation(config.getName(), propagatedMinMuleVersion,
+                    format("Configuration %s has min mule version %s because it was propagated from the annotation (either @Configurations or @Config) used to reference this config.",
+                            config.getName(), propagatedMinMuleVersion)));
+    Optional<Type> superType = config.getSuperType();
+    if (superType.isPresent()) {
+      ComponentInformation superConfigComponent = createConfigurationComponent(superType.get(), propagatedMinMuleVersion);
+      configComponent.updateIfHigherMMV(superConfigComponent,
+              format("Config %s has min mule version %s due to its super class %s.", config.getName(),
+                      superConfigComponent.getMinMuleVersion(), superConfigComponent.getName()));
     }
-    calculatedMMV = max(calculatedMMV, config.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION))
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    Optional<ComponentInformation> annotationComponent =
+            config.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion).reduce(JavaParserUtils::max);
+    if (annotationComponent.isPresent()) {
+      configComponent.updateIfHigherMMV(annotationComponent.get(),
+              format("Config %s has min mule version %s because it is annotated with %s.",
+                      config.getName(),
+                      annotationComponent.get().getMinMuleVersion(),
+                      annotationComponent.get().getName()));
+    }
+    Optional<ComponentInformation> fieldComponent =
+            config.getFields().stream().map(JavaParserUtils::calculateFieldMinMuleVersion).reduce(JavaParserUtils::max);
+    if (fieldComponent.isPresent()) {
+      configComponent.updateIfHigherMMV(fieldComponent.get(),
+              format("Config %s has min mule version %s because of its field %s.", config.getName(),
+                      fieldComponent.get().getMinMuleVersion(), fieldComponent.get().getName()));
+    }
+    Optional<ComponentInformation> methodComponent =
+            config.getEnclosingMethods().map(JavaParserUtils::calculateMethodMinMuleVersion).reduce(JavaParserUtils::max);
+    if (methodComponent.isPresent()) {
+      configComponent.updateIfHigherMMV(methodComponent.get(),
+              format("Config %s has min mule version %s because of its method %s", config.getName(),
+                      methodComponent.get().getMinMuleVersion(), methodComponent.get().getName()));
+    }
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(config);
-    MuleVersion finalCalculatedMMV = calculatedMMV;
-    return classLevelMMV.map(mmv -> {
-      if (mmv.priorTo(finalCalculatedMMV)) {
+    if (classLevelMMV.isPresent()) {
+      if (classLevelMMV.get().priorTo(configComponent.getMinMuleVersion())) {
         LOGGER
-            .debug("Calculated Min Mule Version is {} which is greater than the one set at the configuration class level {}. Overriding it.",
-                   finalCalculatedMMV, mmv);
-        return finalCalculatedMMV;
+                .info("Calculated Min Mule Version is {} which is greater than the one set at the configuration class level {}. Overriding it.",
+                        configComponent.getMinMuleVersion(), classLevelMMV.get());
       } else {
-        return mmv;
+        configComponent = new ComponentInformation(config.getName(), classLevelMMV.get(),
+                format("Configuration %s has min mule version %s because it is the one set at the class level through the @MinMuleVersion annotation.",
+                        config.getName(), classLevelMMV.get()));
       }
-    }).orElse(calculatedMMV);
+    }
+    return configComponent;
   }
 
   /**
@@ -142,7 +241,14 @@ public final class JavaParserUtils {
    * @return the minimum mule version of the given function
    */
   public static MuleVersion calculateFunctionMinMuleVersion(MethodElement<?> function, MuleVersion propagatedMinMuleVersion) {
-    return calculateMethodMinMuleVersion(function, propagatedMinMuleVersion);
+    ComponentInformation componentInformation =
+            max(createComponentWithDefaultMMV("Function", function.getName()),
+                    new ComponentInformation(function.getName(), propagatedMinMuleVersion,
+                            format("Function %s has min mule version %s because it was propagated from the @Functions annotation at the extension class used to add the function.",
+                                    function.getName(), propagatedMinMuleVersion)));
+    componentInformation = max(componentInformation, calculateMethodMinMuleVersion(function));
+    LOGGER.info(componentInformation.getReason());
+    return componentInformation.getMinMuleVersion();
   }
 
   /**
@@ -157,11 +263,23 @@ public final class JavaParserUtils {
   public static MuleVersion calculateOperationMinMuleVersion(MethodElement<?> operation,
                                                              OperationContainerElement operationContainer,
                                                              MuleVersion propagatedMinMuleVersion) {
-    MuleVersion calculatedMMV = propagatedMinMuleVersion;
-    for (ExtensionParameter containerParameter : operationContainer.getParameters()) {
-      calculatedMMV = max(calculatedMMV, calculateMethodParameterMinMuleVersion(containerParameter));
+    ComponentInformation operationComponent = createComponentWithDefaultMMV("Operation", operation.getName());
+    operationComponent = max(operationComponent, new ComponentInformation(operation.getName(), propagatedMinMuleVersion,
+            format("Operation %s has min mule version %s because it was propagated from the @Operations annotation at the extension class used to add the operation's container %s.",
+                    operation.getName(), propagatedMinMuleVersion,
+                    operationContainer.getName())));
+    Optional<ComponentInformation> parameterComponent = operationContainer.getParameters().stream()
+            .map(JavaParserUtils::calculateMethodParameterMinMuleVersion).reduce(JavaParserUtils::max);
+    if (parameterComponent.isPresent()) {
+      operationComponent.updateIfHigherMMV(parameterComponent.get(),
+              format("Operation %s has min mule version %s because of its parameter %s.",
+                      operation.getName(),
+                      parameterComponent.get().getMinMuleVersion(),
+                      parameterComponent.get().getName()));
     }
-    return calculateMethodMinMuleVersion(operation, calculatedMMV);
+    operationComponent = max(operationComponent, calculateMethodMinMuleVersion(operation));
+    LOGGER.info(operationComponent.getReason());
+    return operationComponent.getMinMuleVersion();
   }
 
   /**
@@ -173,32 +291,59 @@ public final class JavaParserUtils {
    * @return the minimum mule version of the given connection provider
    */
   public static MuleVersion calculateConnectionProviderMinMuleVersion(Type connectionProvider) {
-    MuleVersion calculatedMMV = connectionProvider.getSuperType().map(superType -> {
-      if (superType.isAssignableTo(ConnectionProvider.class)
-          || superType.isAssignableTo(org.mule.sdk.api.connectivity.ConnectionProvider.class)) {
-        return calculateConnectionProviderMinMuleVersion(superType);
+    ComponentInformation connectionProviderComponent = createConnectionProviderComponent(connectionProvider);
+    LOGGER.info(connectionProviderComponent.getReason());
+    return connectionProviderComponent.getMinMuleVersion();
+  }
+
+  private static ComponentInformation createConnectionProviderComponent(Type connectionProvider) {
+    ComponentInformation connectionProviderComponent =
+            createComponentWithDefaultMMV("Connection Provider", connectionProvider.getName());
+    Optional<Type> superType = connectionProvider.getSuperType();
+    if (superType.isPresent()) {
+      if (superType.get().isAssignableTo(ConnectionProvider.class)
+              || superType.get().isAssignableTo(org.mule.sdk.api.connectivity.ConnectionProvider.class)) {
+        ComponentInformation superTypeComponent = createConnectionProviderComponent(superType.get());
+        connectionProviderComponent.updateIfHigherMMV(superTypeComponent,
+                format("Connection Provider %s has min mule version %s because of its super class %s.",
+                        connectionProvider.getName(), superTypeComponent.getMinMuleVersion(),
+                        superTypeComponent.getName()));
       }
-      return FIRST_MULE_VERSION;
-    }).orElse(FIRST_MULE_VERSION);
-    calculatedMMV = max(calculatedMMV, connectionProvider.getImplementingInterfaces()
-        .map(JavaParserUtils::calculateInterfacesMinMuleVersion).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    calculatedMMV = max(calculatedMMV, connectionProvider.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    for (FieldElement field : connectionProvider.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
     }
+    Optional<ComponentInformation> interfaceComponent = connectionProvider.getImplementingInterfaces()
+            .map(JavaParserUtils::calculateInterfaceMinMuleVersion).reduce(JavaParserUtils::max);
+    interfaceComponent.ifPresent(comp -> connectionProviderComponent.updateIfHigherMMV(comp,
+            format("Connection Provider %s has min mule version %s because of its interface %s.",
+                    connectionProvider.getName(),
+                    comp.getMinMuleVersion(),
+                    comp.getName())));
+    Optional<ComponentInformation> annotationComponent =
+            connectionProvider.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion).reduce(JavaParserUtils::max);
+    annotationComponent.ifPresent(comp -> connectionProviderComponent.updateIfHigherMMV(comp,
+            format("Connection Provider %s has min mule version %s because it is annotated with %s.",
+                    connectionProvider.getName(),
+                    comp.getMinMuleVersion(),
+                    comp.getName())));
+    Optional<ComponentInformation> fieldComponent =
+            connectionProvider.getFields().stream().map(JavaParserUtils::calculateFieldMinMuleVersion).reduce(JavaParserUtils::max);
+    fieldComponent.ifPresent(comp -> connectionProviderComponent.updateIfHigherMMV(comp,
+            format("Connection Provider %s has min mule version %s because of its field %s.",
+                    connectionProvider.getName(),
+                    comp.getMinMuleVersion(),
+                    comp.getName())));
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(connectionProvider);
-    MuleVersion finalCalculatedMMV = calculatedMMV;
-    return classLevelMMV.map(mmv -> {
-      if (mmv.priorTo(finalCalculatedMMV)) {
+    if (classLevelMMV.isPresent()) {
+      if (classLevelMMV.get().priorTo((connectionProviderComponent.getMinMuleVersion()))) {
         LOGGER
-            .debug("Calculated Min Mule Version is {} which is greater than the one set at the connection provider class level {}. Overriding it.",
-                   finalCalculatedMMV, mmv);
-        return finalCalculatedMMV;
+                .info("Calculated Min Mule Version is {} which is greater than the one set at the connection provider class level {}. Overriding it.",
+                        connectionProviderComponent.getMinMuleVersion(), classLevelMMV.get());
       } else {
-        return mmv;
+        return new ComponentInformation(connectionProvider.getName(), classLevelMMV.get(),
+                format("Connection Provider %s has min mule version %s because it is the one set at the class level.",
+                        connectionProvider.getName(), classLevelMMV.get()));
       }
-    }).orElse(calculatedMMV);
+    }
+    return connectionProviderComponent;
   }
 
   /**
@@ -209,39 +354,86 @@ public final class JavaParserUtils {
    * @param source the connection provider, as a {@link Type}, to calculate its min mule version
    * @return the minimum mule version of the given source
    */
-  public static MuleVersion calculateSourceMinMuleVersion(SourceElement source) {
-    MuleVersion sourceGenericsMMV = calculateSourceGenericsMinMuleVersion(source.getSuperClassGenerics());
-    return max(getSourceMinMuleVersion(source), sourceGenericsMMV);
+  public static MuleVersion calculateSourceMinMuleVersion(Type source) {
+    ComponentInformation componentInformation = createSourceComponent(source);
+    LOGGER.info(componentInformation.getReason());
+    return componentInformation.getMinMuleVersion();
   }
 
-  public static MuleVersion getSourceMinMuleVersion(Type source) {
-    MuleVersion calculatedMMV = source.getSuperType().map(superType -> {
-      if (superType.isSameType(Source.class) || superType.isSameType(org.mule.sdk.api.runtime.source.Source.class)) {
-        return getEnforcedMinMuleVersion(superType);
-      }
-      return getSourceMinMuleVersion(superType);
-    }).orElse(FIRST_MULE_VERSION);
-    calculatedMMV = max(calculatedMMV, source.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    calculatedMMV = max(calculatedMMV, source.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    for (FieldElement field : source.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
-    }
-    calculatedMMV = max(calculatedMMV, source.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION))
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(source);
-    MuleVersion finalCalculatedMMV = calculatedMMV;
-    return classLevelMMV.map(mmv -> {
-      if (mmv.priorTo(finalCalculatedMMV)) {
-        LOGGER
-            .debug("Calculated Min Mule Version is {} which is greater than the one set at the source class level {}. Overriding it.",
-                   finalCalculatedMMV, mmv);
-        return finalCalculatedMMV;
+  private static ComponentInformation createSourceComponent(Type source) {
+    ComponentInformation sourceComponent = createComponentWithDefaultMMV("Source", source.getName());
+    Optional<Type> superType = source.getSuperType();
+    if (superType.isPresent()) {
+      ComponentInformation superTypeComponent;
+      if (superType.get().isSameType(Source.class) || superType.get().isSameType(org.mule.sdk.api.runtime.source.Source.class)) {
+        superTypeComponent = getEnforcedMinMuleVersion(superType.get());
       } else {
-        return mmv;
+        superTypeComponent = createSourceComponent(superType.get());
       }
-    }).orElse(calculatedMMV);
+      sourceComponent.updateIfHigherMMV(superTypeComponent,
+              format("Source %s has min mule version %s because of its super class %s.",
+                      source.getName(),
+                      superTypeComponent.getMinMuleVersion(), superTypeComponent.getName()));
+    }
+    if (source.isAssignableTo(Source.class)) {
+      ComponentInformation genericsComponent = calculateSourceGenericsMinMuleVersion(source.getSuperTypeGenerics(Source.class));
+      sourceComponent.updateIfHigherMMV(genericsComponent,
+              format("Source %s has min mule version %s because it has a generic of type %s.",
+                      source.getName(), genericsComponent.getMinMuleVersion(),
+                      genericsComponent.getName()));
+    }
+    if (source.isAssignableTo(org.mule.sdk.api.runtime.source.Source.class)) {
+      ComponentInformation genericsComponent =
+              calculateSourceGenericsMinMuleVersion(source.getSuperTypeGenerics(org.mule.sdk.api.runtime.source.Source.class));
+      sourceComponent.updateIfHigherMMV(genericsComponent,
+              format("Source %s has min mule version %s because it has a generic of type %s.",
+                      source.getName(), genericsComponent.getMinMuleVersion(),
+                      genericsComponent.getName()));
+    }
+    Optional<ComponentInformation> interfaceComponent =
+            source.getImplementingInterfaces().map(JavaParserUtils::calculateInterfaceMinMuleVersion).reduce(JavaParserUtils::max);
+    if (interfaceComponent.isPresent()) {
+      sourceComponent.updateIfHigherMMV(interfaceComponent.get(),
+              format("Source %s has min mule version %s because it implements interface %s.",
+                      source.getName(), interfaceComponent.get().getMinMuleVersion(),
+                      interfaceComponent.get().getName()));
+    }
+    Optional<ComponentInformation> annotationComponent =
+            source.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion).reduce(JavaParserUtils::max);
+    if (annotationComponent.isPresent()) {
+      sourceComponent.updateIfHigherMMV(annotationComponent.get(),
+              format("Source %s has min mule version %s because it is annotated with %s.",
+                      source.getName(),
+                      annotationComponent.get().getMinMuleVersion(),
+                      annotationComponent.get().getName()));
+    }
+    Optional<ComponentInformation> fieldComponent =
+            source.getFields().stream().map(JavaParserUtils::calculateFieldMinMuleVersion).reduce(JavaParserUtils::max);
+    if (fieldComponent.isPresent()) {
+      sourceComponent.updateIfHigherMMV(fieldComponent.get(),
+              format("Source %s has min mule version %s because of its field %s.", source.getName(),
+                      fieldComponent.get().getMinMuleVersion(), fieldComponent.get().getName()));
+    }
+    Optional<ComponentInformation> methodComponent =
+            source.getEnclosingMethods().map(JavaParserUtils::calculateMethodMinMuleVersion).reduce(JavaParserUtils::max);
+    if (methodComponent.isPresent()) {
+      sourceComponent.updateIfHigherMMV(methodComponent.get(),
+              format("Source %s has min mule version %s because of its method %s.", source.getName(),
+                      methodComponent.get().getMinMuleVersion(), methodComponent.get().getName()));
+    }
+    Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(source);
+    if (classLevelMMV.isPresent()) {
+      if (classLevelMMV.get().priorTo(sourceComponent.getMinMuleVersion())) {
+        LOGGER
+                .info("Calculated Min Mule Version is {} which is greater than the one set at the source class level {}. Overriding it.",
+                        sourceComponent.getMinMuleVersion(), classLevelMMV);
+      } else {
+        sourceComponent = new ComponentInformation(source.getName(), classLevelMMV.get(),
+                format("Source %s has min mule version %s because it is the one set at the class level.",
+                        source.getName(), classLevelMMV.get()));
+      }
+    }
+    return sourceComponent;
   }
 
   /**
@@ -260,171 +452,240 @@ public final class JavaParserUtils {
                                                                                         Function<A, Class[]> mapper,
                                                                                         Type element) {
     List<Type> sdkConfigurations =
-        containerElement.getValueFromAnnotation(annotationClass).map(vf -> vf.getClassArrayValue(mapper)).orElse(emptyList());
+            containerElement.getValueFromAnnotation(annotationClass).map(vf -> vf.getClassArrayValue(mapper)).orElse(emptyList());
     if (sdkConfigurations.stream().anyMatch(element::isSameType)) {
       return new MuleVersion(annotationClass.getAnnotation(MinMuleVersion.class).value());
     }
     return FIRST_MULE_VERSION;
   }
 
-  private static MuleVersion calculateMethodMinMuleVersion(MethodElement<?> method, MuleVersion propagatedMinMuleVersion) {
-    MuleVersion calculatedMMV = propagatedMinMuleVersion;
-    // Parse the method annotations
-    calculatedMMV = max(calculatedMMV, method.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    for (ExtensionParameter parameter : method.getParameters()) {
-      calculatedMMV = max(calculatedMMV, calculateMethodParameterMinMuleVersion(parameter));
+  private static ComponentInformation calculateMethodMinMuleVersion(MethodElement<?> method) {
+    ComponentInformation methodComponent = createComponentWithDefaultMMV("Method", method.getName());
+    Optional<ComponentInformation> annotationComponent =
+            method.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion).reduce(JavaParserUtils::max);
+    if (annotationComponent.isPresent()) {
+      methodComponent.updateIfHigherMMV(annotationComponent.get(),
+              format("Method %s has min mule version %s because it is annotated with %s.",
+                      method.getName(),
+                      annotationComponent.get().getMinMuleVersion(),
+                      annotationComponent.get().getName()));
     }
-    calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(method.getReturnType()));
+    Optional<ComponentInformation> parameterComponent =
+            method.getParameters().stream().map(JavaParserUtils::calculateMethodParameterMinMuleVersion).reduce(JavaParserUtils::max);
+    if (parameterComponent.isPresent()) {
+      methodComponent.updateIfHigherMMV(parameterComponent.get(),
+              format("Method %s has min mule version %s because of its parameter %s.", method.getName(),
+                      parameterComponent.get().getMinMuleVersion(),
+                      parameterComponent.get().getName()));
+    }
+    ComponentInformation outputComponent = calculateOutputMinMuleVersion(method.getReturnType());
+    methodComponent.updateIfHigherMMV(outputComponent,
+            format("Method %s has min mule version %s because of its output type %s.", method.getName(),
+                    outputComponent.getMinMuleVersion(), outputComponent.getName()));
     Optional<MuleVersion> operationLevelMMV = getMinMuleVersionFromAnnotations(method);
-    MuleVersion finalCalculatedMMV = calculatedMMV;
-    return operationLevelMMV.map(mmv -> {
-      if (mmv.priorTo(finalCalculatedMMV)) {
+    if (operationLevelMMV.isPresent()) {
+      if (operationLevelMMV.get().priorTo(methodComponent.getMinMuleVersion())) {
         LOGGER
-            .debug("Calculated Min Mule Version is {} which is greater than the one set at the operation level {}. Overriding it.",
-                   finalCalculatedMMV, mmv);
-        return finalCalculatedMMV;
+                .info("Calculated Min Mule Version is {} which is greater than the one set at the method level {}. Overriding it.",
+                        methodComponent.getMinMuleVersion(), operationLevelMMV.get());
       } else {
-        return mmv;
+        methodComponent = new ComponentInformation(method.getName(), operationLevelMMV.get(),
+                format("Method %s has min mule version %s because it is the one set at the method level through the @MinMuleVersion annotation.",
+                        method.getName(), operationLevelMMV.get()));
       }
-    }).orElse(calculatedMMV);
-  }
-
-  private static MuleVersion calculateInterfacesMinMuleVersion(Type type) {
-    MuleVersion calculatedMMV = getEnforcedMinMuleVersion(type);
-    if (belongsToSdkPackages(type.getTypeName())) {
-      return calculatedMMV;
     }
-    calculatedMMV = max(calculatedMMV, type.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
-    return calculatedMMV;
+    return methodComponent;
   }
 
-  private static MuleVersion calculateSourceGenericsMinMuleVersion(List<Type> sourceGenerics) {
+  private static ComponentInformation calculateInterfaceMinMuleVersion(Type interfaceType) {
+    ComponentInformation interfaceComponent = getEnforcedMinMuleVersion(interfaceType);
+    if (belongsToSdkPackages(interfaceType.getTypeName())) {
+      return interfaceComponent;
+    }
+    Optional<ComponentInformation> superInterface = interfaceType.getImplementingInterfaces()
+            .map(JavaParserUtils::calculateInterfaceMinMuleVersion).reduce(JavaParserUtils::max);
+    superInterface.ifPresent(componentInformation -> interfaceComponent.updateIfHigherMMV(componentInformation,
+            format("Interface %s has min mule version %s because it implements %s.",
+                    interfaceType.getName(),
+                    componentInformation
+                            .getMinMuleVersion(),
+                    componentInformation
+                            .getName())));
+    return interfaceComponent;
+  }
+
+  private static ComponentInformation calculateSourceGenericsMinMuleVersion(List<Type> sourceGenerics) {
     Type outputType = sourceGenerics.get(0);
     Type attributesType = sourceGenerics.get(1);
     return max(getEnforcedMinMuleVersion(attributesType), calculateOutputMinMuleVersion(outputType));
   }
 
-  private static MuleVersion calculateOutputMinMuleVersion(Type outputType) {
-    MuleVersion calculatedMMV = FIRST_MULE_VERSION;
-    if (outputType.isArray()) {
-      calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(outputType.getArrayComponentType().get()));
-    } else if (outputType.isAssignableTo(Iterable.class) || outputType.isAssignableTo(Iterator.class)) {
+  private static ComponentInformation calculateOutputMinMuleVersion(Type outputType) {
+    ComponentInformation componentInformation = createComponentWithDefaultMMV("Output type", outputType.getName());
+    if (outputType.asMetadataType() instanceof ArrayType) {
       for (TypeGeneric typeGeneric : outputType.getGenerics()) {
-        calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(typeGeneric.getConcreteType()));
+        componentInformation = max(componentInformation, calculateOutputMinMuleVersion(typeGeneric.getConcreteType()));
       }
     } else if (outputType.isSameType(Result.class) || outputType.isSameType(org.mule.sdk.api.runtime.operation.Result.class)) {
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(outputType));
+      componentInformation = max(componentInformation, getEnforcedMinMuleVersion(outputType));
       for (TypeGeneric resultTypeGeneric : outputType.getGenerics()) {
-        calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(resultTypeGeneric.getConcreteType()));
+        componentInformation = max(componentInformation, getEnforcedMinMuleVersion(resultTypeGeneric.getConcreteType()));
       }
     } else if (outputType.isSameType(PagingProvider.class)
-        || outputType.isSameType(org.mule.sdk.api.runtime.streaming.PagingProvider.class)) {
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(outputType));
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(outputType.getGenerics().get(1).getConcreteType()));
+            || outputType.isSameType(org.mule.sdk.api.runtime.streaming.PagingProvider.class)) {
+      componentInformation = max(componentInformation, getEnforcedMinMuleVersion(outputType));
+      componentInformation =
+              max(componentInformation, getEnforcedMinMuleVersion(outputType.getGenerics().get(1).getConcreteType()));
     } else {
-      calculatedMMV = getEnforcedMinMuleVersion(outputType);
+      componentInformation = getEnforcedMinMuleVersion(outputType);
     }
-    return calculatedMMV;
+    return componentInformation;
   }
 
-  private static MuleVersion calculateFieldMinMuleVersion(ExtensionParameter field, Set<String> seenTypesForRecursionControl) {
+  private static ComponentInformation calculateFieldMinMuleVersion(ExtensionParameter field) {
+    ComponentInformation componentInformation = getMinMuleVersionFromAnnotations(field)
+            .map(mmv -> new ComponentInformation(field.getName(), mmv,
+                    format("Field %s has min mule version %s because it is annotated with @MinMuleVersion.",
+                            field.getName(), mmv)))
+            .orElse(createComponentWithDefaultMMV("Field", field.getName()));
     Type parameterType = field.getType();
-    if (seenTypesForRecursionControl.contains(parameterType.getTypeName())) {
-      return FIRST_MULE_VERSION;
-    } else {
-      seenTypesForRecursionControl.add(parameterType.getTypeName());
+    // Parse sdk fields (this also catches automatically injected fields)
+    if (belongsToSdkPackages(parameterType.getTypeName())) {
+      ComponentInformation typeComponent = getEnforcedMinMuleVersion(parameterType);
+      componentInformation.updateIfHigherMMV(typeComponent,
+              format("Field %s has min mule version %s because it is of type %s.", field.getName(),
+                      typeComponent.getMinMuleVersion(), typeComponent.getName()));
     }
-    MuleVersion calculatedMMV = getMinMuleVersionFromAnnotations(field).orElse(FIRST_MULE_VERSION);
     for (Type annotation : field.getAnnotations().collect(toList())) {
       if (annotation.isSameType(Inject.class) && !parameterType.isSameType(Optional.class)) {
         // Parse injected classes but exclude Optionals (such as ForwardCompatibilityHelper)
-        calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(parameterType));
+        ComponentInformation typeComponent = getEnforcedMinMuleVersion(parameterType);
+        componentInformation.updateIfHigherMMV(typeComponent,
+                format("Field %s has min mule version %s because it is of type %s.",
+                        field.getName(),
+                        typeComponent.getMinMuleVersion(), typeComponent.getName()));
       }
       if (annotation.isSameType(Parameter.class)
-          || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.Parameter.class)) {
-        calculatedMMV =
-            max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypesForRecursionControl));
+              || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.Parameter.class)) {
+        ComponentInformation parameterContainerComponent = calculateParameterContainerMinMuleVersion(parameterType);
+        componentInformation.updateIfHigherMMV(parameterContainerComponent,
+                format("Field %s has min mule version %s because it is a parameter container of type %s.",
+                        field.getName(), parameterContainerComponent.getMinMuleVersion(),
+                        parameterContainerComponent.getName()));
       }
       if (annotation.isSameType(ParameterGroup.class)
-          || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
-        calculatedMMV =
-            max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypesForRecursionControl));
+              || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
+        ComponentInformation parameterGroupComponent = calculateParameterContainerMinMuleVersion(parameterType);
+        componentInformation.updateIfHigherMMV(parameterGroupComponent,
+                format("Field %s has min mule version %s because it is a parameter group of type %s.",
+                        field.getName(), parameterGroupComponent.getMinMuleVersion(),
+                        parameterGroupComponent.getName()));
       }
       if (annotation.isSameType(Connection.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Connection.class)) {
         // Sources inject the ConnectionProvider instead of the connection
         if (parameterType.isAssignableTo(ConnectionProvider.class)
-            || parameterType.isAssignableTo(org.mule.sdk.api.connectivity.ConnectionProvider.class)) {
-          calculatedMMV = max(calculatedMMV, calculateConnectionProviderMinMuleVersion(parameterType));
+                || parameterType.isAssignableTo(org.mule.sdk.api.connectivity.ConnectionProvider.class)) {
+          ComponentInformation connectionProviderComponent = createConnectionProviderComponent(parameterType);
+          componentInformation.updateIfHigherMMV(connectionProviderComponent,
+                  format("Field %s has min mule version %s because it is a connection provider of type %s.",
+                          field.getName(), connectionProviderComponent.getMinMuleVersion(),
+                          connectionProviderComponent.getName()));
         }
       }
       if (annotation.isSameType(Config.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Config.class)) {
-        calculatedMMV =
-            max(calculatedMMV, calculateConfigMinMuleVersion(parameterType, getEnforcedMinMuleVersion(annotation)));
+        ComponentInformation configurationComponent =
+                createConfigurationComponent(parameterType, getEnforcedMinMuleVersion(annotation).getMinMuleVersion());
+        componentInformation.updateIfHigherMMV(configurationComponent,
+                format("Field %s has min mule version %s because it is a configuration of type %s.",
+                        field.getName(), configurationComponent.getMinMuleVersion(),
+                        configurationComponent.getName()));
       }
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(annotation));
+      ComponentInformation annotationComponent = getEnforcedMinMuleVersion(annotation);
+      componentInformation.updateIfHigherMMV(annotationComponent,
+              format("Field %s has min mule version %s because it is annotated with %s.",
+                      field.getName(),
+                      annotationComponent.getMinMuleVersion(), annotationComponent.getName()));
     }
-    // Parse sdk fields (this also catches automatically injected fields)
-    if (belongsToSdkPackages(parameterType.getTypeName())) {
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(parameterType));
-    }
-    return calculatedMMV;
+    return componentInformation;
   }
 
-  private static MuleVersion calculateMethodParameterMinMuleVersion(ExtensionParameter methodParameter) {
-    MuleVersion calculatedMMV = FIRST_MULE_VERSION;
+  private static ComponentInformation calculateMethodParameterMinMuleVersion(ExtensionParameter methodParameter) {
+    ComponentInformation methodParameterComponent = createComponentWithDefaultMMV("Parameter", methodParameter.getName());
     for (Type annotation : methodParameter.getAnnotations().collect(toList())) {
       if (annotation.isSameType(ParameterGroup.class)
-          || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
-        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(methodParameter.getType(), new HashSet<>()));
+              || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
+        methodParameterComponent =
+                max(methodParameterComponent, calculateParameterContainerMinMuleVersion(methodParameter.getType()));
       }
       if (annotation.isSameType(Config.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Config.class)) {
-        calculatedMMV =
-            max(calculatedMMV,
-                calculateConfigMinMuleVersion(methodParameter.getType(), getEnforcedMinMuleVersion(annotation)));
+        methodParameterComponent =
+                max(methodParameterComponent,
+                        createConfigurationComponent(methodParameter.getType(),
+                                getEnforcedMinMuleVersion(annotation).getMinMuleVersion()));
       }
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(annotation));
+      ComponentInformation annotationComponent = getEnforcedMinMuleVersion(annotation);
+      methodParameterComponent.updateIfHigherMMV(annotationComponent,
+              format("Parameter %s has min mule version %s because it is annotated with %s.",
+                      methodParameter.getName(), annotationComponent.getMinMuleVersion(),
+                      annotationComponent.getName()));
     }
     // Parse sdk fields (this also catches automatically injected fields)
     if (belongsToSdkPackages(methodParameter.getType().getTypeName())) {
-      calculatedMMV = max(calculatedMMV, getEnforcedMinMuleVersion(methodParameter.getType()));
+      ComponentInformation typeComponent = getEnforcedMinMuleVersion(methodParameter.getType());
+      methodParameterComponent.updateIfHigherMMV(typeComponent,
+              format("Parameter %s has min mule version %s because it is of type %s.",
+                      methodParameter.getName(), typeComponent.getMinMuleVersion(),
+                      typeComponent.getName()));
     }
-    return calculatedMMV;
+    return methodParameterComponent;
   }
 
-  private static MuleVersion calculateParameterContainerMinMuleVersion(Type containerType,
-                                                                       Set<String> seenTypesForRecursionControl) {
+  private static ComponentInformation calculateParameterContainerMinMuleVersion(Type containerType) {
     Optional<MuleVersion> minMuleVersionAnnotation = getMinMuleVersionFromAnnotations(containerType);
     if (minMuleVersionAnnotation.isPresent()) {
-      return minMuleVersionAnnotation.get();
+      String reason = format("Parameter container %s has min mule version %s because it is annotated with @MinMuleVersion",
+              containerType.getName(), minMuleVersionAnnotation.get());
+      return new ComponentInformation(containerType.getName(), minMuleVersionAnnotation.get(), reason);
     }
-    MuleVersion calculatedMMV = FIRST_MULE_VERSION;
-    calculatedMMV = max(calculatedMMV, containerType.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
-        .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
+    ComponentInformation componentInformation = createComponentWithDefaultMMV("Parameter container", containerType.getName());
+    componentInformation = containerType.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
+            .reduce(componentInformation, JavaParserUtils::max);
     for (FieldElement field : containerType.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, seenTypesForRecursionControl));
+      componentInformation = max(componentInformation, calculateFieldMinMuleVersion(field));
     }
-    return calculatedMMV;
+    return componentInformation;
   }
 
-  private static MuleVersion getEnforcedMinMuleVersion(Type type) {
+  private static ComponentInformation getEnforcedMinMuleVersion(Type type) {
     if (type.isAnnotatedWith(DoNotEnforceMinMuleVersion.class)) {
-      return FIRST_MULE_VERSION;
+      return new ComponentInformation(type.getTypeName(), FIRST_MULE_VERSION,
+              format("%s has the default base min mule version %s because it is annotated with @DoNotEnforceMinMuleVersion.",
+                      type.getTypeName(), FIRST_MULE_VERSION));
     }
-    return getMinMuleVersionFromAnnotations(type).orElse(FIRST_MULE_VERSION);
+    Optional<MuleVersion> mmv = getMinMuleVersionFromAnnotations(type);
+    return mmv
+            .map(muleVersion -> new ComponentInformation(type.getTypeName(), muleVersion,
+                    format("%s has min mule version %s because it is annotated with @MinMuleVersion.",
+                            type.getTypeName(), muleVersion)))
+            .orElseGet(() -> createComponentWithDefaultMMV("Type", type.getTypeName()));
   }
 
   private static Optional<MuleVersion> getMinMuleVersionFromAnnotations(WithAnnotations type) {
     return type.getValueFromAnnotation(MinMuleVersion.class)
-        .map(fetcher -> new MuleVersion(fetcher.getStringValue(MinMuleVersion::value)));
+            .map(fetcher -> new MuleVersion(fetcher.getStringValue(MinMuleVersion::value)));
   }
 
-  private static MuleVersion max(MuleVersion currentMax, MuleVersion candidate) {
-    if (currentMax.atLeast(candidate)) {
+  private static ComponentInformation max(ComponentInformation currentMax, ComponentInformation candidate) {
+    if (currentMax.getMinMuleVersion().atLeast(candidate.getMinMuleVersion())) {
       return currentMax;
     }
     return candidate;
+  }
+
+  private static ComponentInformation createComponentWithDefaultMMV(String componentDescription, String componentName) {
+    return new ComponentInformation(componentName, FIRST_MULE_VERSION,
+            format("%s %s has min mule version %s because it is the default value.",
+                    componentDescription, componentName, FIRST_MULE_VERSION));
   }
 
   private static boolean belongsToSdkPackages(String fullyQualifiedName) {
