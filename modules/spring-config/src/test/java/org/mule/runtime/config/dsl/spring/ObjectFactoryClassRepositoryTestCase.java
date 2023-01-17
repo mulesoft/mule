@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.dsl.spring;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -13,6 +14,8 @@ import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY;
 
 import io.qameta.allure.Issue;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -33,7 +36,7 @@ public class ObjectFactoryClassRepositoryTestCase {
   public SystemProperty enableByteBuddy = new SystemProperty(ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY, "true");
 
   @Test
-  public void testSetters() throws InstantiationException, IllegalAccessException {
+  public void testSetters() throws Exception {
 
     ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
@@ -57,6 +60,7 @@ public class ObjectFactoryClassRepositoryTestCase {
     assertThat(byteBuddyClass.isSingleton(), is(false));
     assertThat(byteBuddyClass.isPrototype(), is(false));
     assertThat(byteBuddyClass.isEagerInit(), is(false));
+    assertThat(byteBuddyClass.getObject(), is(instanceOf(FakeObject.class)));
   }
 
   @Test
@@ -126,7 +130,7 @@ public class ObjectFactoryClassRepositoryTestCase {
     }
   }
 
-  public static class FakeObject {
+  public static class FakeObject extends AbstractComponent {
   }
 
 }
