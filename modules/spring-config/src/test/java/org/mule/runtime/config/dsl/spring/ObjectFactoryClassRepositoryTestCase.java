@@ -60,6 +60,19 @@ public class ObjectFactoryClassRepositoryTestCase {
   }
 
   @Test
+  @Issue("W-12362157")
+  public void getObjectTypeWithoutInitializingTheFields() throws InstantiationException, IllegalAccessException {
+    ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+
+    ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
+        (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, String.class).newInstance();
+
+    assertThat(byteBuddyClass.getObjectType(), is(String.class));
+  }
+
+  @Test
+  @Issue("W-12362157")
   public void testSameClassWithDifferentObjectTypeCreateDifferentDynamicClasses()
       throws InstantiationException, IllegalAccessException {
     ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
@@ -93,7 +106,7 @@ public class ObjectFactoryClassRepositoryTestCase {
   public static class FakeObjectConnectionProviderObjectFactory extends AbstractComponentFactory {
 
     @Override
-    public Object doGetObject() throws Exception {
+    public Object doGetObject() {
       return new FakeObject();
     }
 
@@ -103,7 +116,7 @@ public class ObjectFactoryClassRepositoryTestCase {
       implements ObjectTypeProvider {
 
     @Override
-    public Object doGetObject() throws Exception {
+    public Object doGetObject() {
       return new FakeObject();
     }
 
