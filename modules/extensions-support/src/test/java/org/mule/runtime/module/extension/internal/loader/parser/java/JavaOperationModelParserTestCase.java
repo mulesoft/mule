@@ -166,7 +166,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
     verifyLogMessage(infoMessages,
-                     "Method withConfigParameter has min mule version 4.4 because of its parameter SomeConfiguration. Config SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
+                     "Method withConfigParameter has min mule version 4.4 because of its parameter SomeConfiguration. Configuration SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
   }
 
   @Test

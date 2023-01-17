@@ -190,7 +190,8 @@ public final class JavaParserUtils {
     if (superType.isPresent()) {
       ComponentInformation superConfigComponent = createConfigurationComponent(superType.get(), propagatedMinMuleVersion);
       configComponent.updateIfHigherMMV(superConfigComponent,
-                                        format("Configuration %s has min mule version %s due to its super class %s.", config.getName(),
+                                        format("Configuration %s has min mule version %s due to its super class %s.",
+                                               config.getName(),
                                                superConfigComponent.getMinMuleVersion(), superConfigComponent.getName()));
     }
     Optional<ComponentInformation> annotationComponent =
@@ -206,14 +207,16 @@ public final class JavaParserUtils {
             config.getFields().stream().map(JavaParserUtils::calculateFieldMinMuleVersion).reduce(JavaParserUtils::max);
     if (fieldComponent.isPresent()) {
       configComponent.updateIfHigherMMV(fieldComponent.get(),
-                                        format("Configuration %s has min mule version %s because of its field %s.", config.getName(),
+                                        format("Configuration %s has min mule version %s because of its field %s.",
+                                               config.getName(),
                                                fieldComponent.get().getMinMuleVersion(), fieldComponent.get().getName()));
     }
     Optional<ComponentInformation> methodComponent =
             config.getEnclosingMethods().map(JavaParserUtils::calculateMethodMinMuleVersion).reduce(JavaParserUtils::max);
     if (methodComponent.isPresent()) {
       configComponent.updateIfHigherMMV(methodComponent.get(),
-                                        format("Configuration %s has min mule version %s because of its method %s", config.getName(),
+                                        format("Configuration %s has min mule version %s because of its method %s",
+                                               config.getName(),
                                                methodComponent.get().getMinMuleVersion(), methodComponent.get().getName()));
     }
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(config);
