@@ -7,6 +7,8 @@
 package org.mule.test.module.extension.client.source;
 
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.MESSAGE_SOURCE;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -28,10 +30,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Feature(EXTENSIONS_CLIENT)
+@Story(MESSAGE_SOURCE)
 public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtensionClientSourceTestCase {
 
   @Rule

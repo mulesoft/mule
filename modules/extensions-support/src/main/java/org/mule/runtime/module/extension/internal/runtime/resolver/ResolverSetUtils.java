@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -44,6 +45,8 @@ import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
@@ -422,5 +425,28 @@ public class ResolverSetUtils {
 
   public static boolean acceptsReferences(ParameterModel parameterModel) {
     return parameterModel.getDslConfiguration().allowsReferences();
+  }
+
+  /**
+   * Evaluates the given {@code resolverSet} in the context of a {@code configurationInstance} and {@code event}
+   *
+   * @param resolverSet           the set to be evaluated
+   * @param configurationInstance an optional {@link ConfigurationInstance}
+   * @param event                 the context event
+   * @return a {@link Map} with the evaluation result
+   *
+   * @since 4.6.0
+   */
+  public static Map<String, Object> evaluate(ResolverSet resolverSet,
+                                             Optional<ConfigurationInstance> configurationInstance,
+                                             CoreEvent event) {
+    ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
+    configurationInstance.ifPresent(ctxBuilder::withConfig);
+
+    try (ValueResolvingContext ctx = ctxBuilder.build()) {
+      return resolverSet.resolve(ctx).asMap();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Exception found while evaluating parameters:" + e.getMessage()), e);
+    }
   }
 }

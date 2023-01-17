@@ -261,8 +261,9 @@ public interface AllureConstants {
 
     interface ExtensionsClientStory {
 
-      String BLOCKING_CLIENT = "Blocking Client";
-      String NON_BLOCKING_CLIENT = "Non-Blocking Client";
+      String BLOCKING_CLIENT = "Blocking Extension Client";
+      String NON_BLOCKING_CLIENT = "Non-Blocking Extension Client";
+      String MESSAGE_SOURCE = "Extension Client with Message sources";
     }
   }
 

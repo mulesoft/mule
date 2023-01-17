@@ -10,7 +10,7 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
-import static org.mule.runtime.module.extension.internal.runtime.client.util.SarazaUtils.evaluate;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
 
 import static java.util.Collections.emptyMap;
 
@@ -33,6 +33,11 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
+/**
+ * Default implementation of {@link SourceResultCallback}
+ *
+ * @since 4.6.0
+ */
 final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T, A> {
 
   private static final Logger LOGGER = getLogger(DefaultSourceResultCallback.class);

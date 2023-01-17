@@ -7,6 +7,8 @@
 package org.mule.test.module.extension.client.source;
 
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getExtensionClassLoader;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.MESSAGE_SOURCE;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.xmen.MagnetoMutantSummon.CLASSLOADER_NOTIFICATION_ACTION;
 import static org.mule.test.marvel.xmen.MagnetoMutantSummon.ERROR_NOTIFICATION_ACTION;
@@ -38,8 +40,12 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
+@Feature(EXTENSIONS_CLIENT)
+@Story(MESSAGE_SOURCE)
 public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClientSourceTestCase {
 
   @Override

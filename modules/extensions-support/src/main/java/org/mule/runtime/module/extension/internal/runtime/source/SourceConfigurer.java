@@ -149,7 +149,7 @@ public final class SourceConfigurer {
         return sdkSource;
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Exception was found trying to configure source of type "
-                                                             + source.getClass().getName()), e);
+            + source.getClass().getName()), e);
       }
     });
   }

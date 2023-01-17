@@ -20,6 +20,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
+/**
+ * Default implementation of {@link SourceHandler}
+ *
+ * @since 4.6.0
+ */
 public class DefaultSourceHandler implements SourceHandler {
 
   private static final Logger LOGGER = getLogger(DefaultSourceHandler.class);

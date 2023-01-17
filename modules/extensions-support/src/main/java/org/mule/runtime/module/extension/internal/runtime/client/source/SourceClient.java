@@ -44,6 +44,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -59,6 +60,11 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
+/**
+ * {@link ExtensionsClient} delegate class for creating and operating message sources
+ *
+ * @since 4.6.0
+ */
 public class SourceClient<T, A> implements Lifecycle {
 
   private static final Logger LOGGER = getLogger(SourceClient.class);

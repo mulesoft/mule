@@ -364,13 +364,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Override
   public void dispose() {
-    if (operationClientCache != null) {
-      operationClientCache.invalidateAll();
-    }
-
     synchronized (sourceClients) {
       sourceClients.forEach(this::stopAndDispose);
       sourceClients.clear();
+    }
+
+    if (operationClientCache != null) {
+      operationClientCache.invalidateAll();
     }
 
     if (cacheShutdownExecutor != null) {

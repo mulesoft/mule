@@ -14,12 +14,18 @@ import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.source.SourceResultCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
 
 import java.util.function.Consumer;
 
+/**
+ * Implementation of {@link MessageProcessingManager} for sources created through the {@link ExtensionsClient}
+ *
+ * @since 4.6.0
+ */
 class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessingManager {
 
   private final SourceClient sourceClient;

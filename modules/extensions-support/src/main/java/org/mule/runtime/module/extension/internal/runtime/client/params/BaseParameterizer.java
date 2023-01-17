@@ -22,12 +22,18 @@ import org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.object.FileStoreCursorIteratorConfig;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.extension.api.client.params.ComponentParameterizer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class BaseParameterizer<T> {
+/**
+ * Base implementation of {@link ComponentParameterizer}
+ *
+ * @since 4.6.0
+ */
+public abstract class BaseParameterizer<T extends ComponentParameterizer> implements ComponentParameterizer<T> {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
 
@@ -37,36 +43,43 @@ public abstract class BaseParameterizer<T> {
   private Function<StreamingManager, CursorProviderFactory> cursorProviderFunction = sm -> NULL_CURSOR_PROVIDER_FACTORY;
   private RetryPolicyTemplate retryPolicyTemplate = new NoRetryPolicyTemplate();
 
+  @Override
   public T withConfigRef(String configRef) {
     this.configRef = configRef;
     return (T) this;
   }
 
+  @Override
   public T withParameter(String parameterName, Object value) {
     rawParameters.put(parameterName, value);
     return (T) this;
   }
 
+  @Override
   public T withParameter(String parameterGroup, String parameter, Object value) {
     groupedParameters.put(new Pair<>(parameterGroup, parameter), value);
     return (T) this;
   }
 
+  @Override
   public T withSimpleReconnection(int frequency, int maxAttempts) {
     retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, maxAttempts);
     return (T) this;
   }
 
+  @Override
   public T reconnectingForever(int frequency) {
     withSimpleReconnection(frequency, RETRY_COUNT_FOREVER);
     return (T) this;
   }
 
+  @Override
   public T withDefaultRepeatableStreaming() {
     cursorProviderFunction = sm -> sm.forBytes().getDefaultCursorProviderFactory();
     return (T) this;
   }
 
+  @Override
   public T withInMemoryRepeatableStreaming(DataSize initialBufferSize,
                                            DataSize bufferSizeIncrement,
                                            DataSize maxBufferSize) {
@@ -77,17 +90,20 @@ public abstract class BaseParameterizer<T> {
     return (T) this;
   }
 
+  @Override
   public T withFileStoreRepeatableStreaming(DataSize maxInMemorySize) {
     cursorProviderFunction = sm -> sm.forBytes().getFileStoreCursorStreamProviderFactory(
                                                                                          new FileStoreCursorStreamConfig(maxInMemorySize));
     return (T) this;
   }
 
+  @Override
   public T withDefaultRepeatableIterables() {
     cursorProviderFunction = sm -> sm.forObjects().getDefaultCursorProviderFactory();
     return (T) this;
   }
 
+  @Override
   public T withInMemoryRepeatableIterables(int initialBufferSize, int bufferSizeIncrement,
                                            int maxBufferSize) {
     cursorProviderFunction = sm -> sm.forObjects().getInMemoryCursorProviderFactory(
@@ -97,6 +113,7 @@ public abstract class BaseParameterizer<T> {
     return (T) this;
   }
 
+  @Override
   public T withFileStoreRepeatableIterables(int maxInMemoryInstances) {
     cursorProviderFunction = sm -> sm.forObjects().getFileStoreCursorIteratorProviderFactory(
                                                                                              new FileStoreCursorIteratorConfig(maxInMemoryInstances));
