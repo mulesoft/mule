@@ -39,7 +39,7 @@ public final class MuleRuntimeSecurityManager extends SecurityManager {
     // }
     // }
   }
-  
+
   @Override
   public void checkPermission(Permission perm, Object context) {
     checkPermission(perm);
