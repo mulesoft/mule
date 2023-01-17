@@ -10,8 +10,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
@@ -26,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 class DefaultSourceParameterizer extends BaseParameterizer<SourceParameterizer> implements SourceParameterizer {
 
   private BackPressureMode backPressureMode = WAIT;
-  private SchedulingStrategy schedulingStrategy = new FixedFrequencyScheduler(60000, 0, MILLISECONDS);
+  private SchedulingStrategy schedulingStrategy = null;
 
   @Override
   public SourceParameterizer withBackPressureMode(BackPressureMode backPressureMode) {
