@@ -128,9 +128,9 @@ public final class JavaParserUtils {
     Optional<ComponentInformation> superExtension = extension.getSuperType().map(JavaParserUtils::createExtensionComponent);
     if (superExtension.isPresent()) {
       extensionComponent.updateIfHigherMMV(superExtension.get(),
-              format("Extension %s has min mule version %s due to its super class %s.",
-                      extension.getName(),
-                      superExtension.get().getMinMuleVersion(), superExtension.get().getName()));
+                                           format("Extension %s has min mule version %s because of its super class %s.",
+                                                  extension.getName(),
+                                                  superExtension.get().getMinMuleVersion(), superExtension.get().getName()));
     }
     if (!(extension.isAnnotatedWith(Configurations.class)
             || extension.isAnnotatedWith(org.mule.sdk.api.annotation.Configurations.class))) {
@@ -183,38 +183,38 @@ public final class JavaParserUtils {
 
   private static ComponentInformation createConfigurationComponent(Type config, MuleVersion propagatedMinMuleVersion) {
     ComponentInformation configComponent = max(createComponentWithDefaultMMV("Configuration", config.getName()),
-            new ComponentInformation(config.getName(), propagatedMinMuleVersion,
-                    format("Configuration %s has min mule version %s because it was propagated from the annotation (either @Configurations or @Config) used to reference this config.",
-                            config.getName(), propagatedMinMuleVersion)));
+                                               new ComponentInformation(config.getName(), propagatedMinMuleVersion,
+                                                                        format("Configuration %s has min mule version %s because it was propagated from the annotation (either @Configurations or @Config) used to reference this configuration.",
+                                                                               config.getName(), propagatedMinMuleVersion)));
     Optional<Type> superType = config.getSuperType();
     if (superType.isPresent()) {
       ComponentInformation superConfigComponent = createConfigurationComponent(superType.get(), propagatedMinMuleVersion);
       configComponent.updateIfHigherMMV(superConfigComponent,
-              format("Config %s has min mule version %s due to its super class %s.", config.getName(),
-                      superConfigComponent.getMinMuleVersion(), superConfigComponent.getName()));
+                                        format("Configuration %s has min mule version %s due to its super class %s.", config.getName(),
+                                               superConfigComponent.getMinMuleVersion(), superConfigComponent.getName()));
     }
     Optional<ComponentInformation> annotationComponent =
             config.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion).reduce(JavaParserUtils::max);
     if (annotationComponent.isPresent()) {
       configComponent.updateIfHigherMMV(annotationComponent.get(),
-              format("Config %s has min mule version %s because it is annotated with %s.",
-                      config.getName(),
-                      annotationComponent.get().getMinMuleVersion(),
-                      annotationComponent.get().getName()));
+                                        format("Configuration %s has min mule version %s because it is annotated with %s.",
+                                               config.getName(),
+                                               annotationComponent.get().getMinMuleVersion(),
+                                               annotationComponent.get().getName()));
     }
     Optional<ComponentInformation> fieldComponent =
             config.getFields().stream().map(JavaParserUtils::calculateFieldMinMuleVersion).reduce(JavaParserUtils::max);
     if (fieldComponent.isPresent()) {
       configComponent.updateIfHigherMMV(fieldComponent.get(),
-              format("Config %s has min mule version %s because of its field %s.", config.getName(),
-                      fieldComponent.get().getMinMuleVersion(), fieldComponent.get().getName()));
+                                        format("Configuration %s has min mule version %s because of its field %s.", config.getName(),
+                                               fieldComponent.get().getMinMuleVersion(), fieldComponent.get().getName()));
     }
     Optional<ComponentInformation> methodComponent =
             config.getEnclosingMethods().map(JavaParserUtils::calculateMethodMinMuleVersion).reduce(JavaParserUtils::max);
     if (methodComponent.isPresent()) {
       configComponent.updateIfHigherMMV(methodComponent.get(),
-              format("Config %s has min mule version %s because of its method %s", config.getName(),
-                      methodComponent.get().getMinMuleVersion(), methodComponent.get().getName()));
+                                        format("Configuration %s has min mule version %s because of its method %s", config.getName(),
+                                               methodComponent.get().getMinMuleVersion(), methodComponent.get().getName()));
     }
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(config);
     if (classLevelMMV.isPresent()) {
