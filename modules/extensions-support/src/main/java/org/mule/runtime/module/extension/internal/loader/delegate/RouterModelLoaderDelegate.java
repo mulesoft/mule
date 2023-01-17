@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 import static java.util.Optional.of;
 
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
+import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -34,8 +36,9 @@ final class RouterModelLoaderDelegate extends AbstractComponentModelLoaderDelega
     super(delegate);
   }
 
-  void declareRouter(ExtensionDeclarer extensionDeclarer, HasConstructDeclarer ownerDeclarer, OperationModelParser parser) {
-    HasConstructDeclarer actualDeclarer = parser.hasConfig() || parser.isConnected()
+  void declareRouter(ExtensionDeclarer extensionDeclarer, ExtensionDevelopmentFramework extensionDevelopmentFramework,
+                     HasConstructDeclarer ownerDeclarer, OperationModelParser parser) {
+    HasConstructDeclarer actualDeclarer = requiresConfig(extensionDevelopmentFramework, parser)
         ? ownerDeclarer
         : extensionDeclarer;
 

@@ -3950,7 +3950,7 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "requiresConnection": false,
+      "requiresConnection": true,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],

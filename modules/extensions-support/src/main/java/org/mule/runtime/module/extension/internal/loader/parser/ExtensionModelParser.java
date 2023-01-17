@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 
@@ -162,4 +163,11 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @return a {@link MuleVersion} representing the minimum mule version this component can run on
    */
   Optional<MuleVersion> getMinMuleVersion();
+
+  /**
+   * @return the {@link ExtensionDevelopmentFramework} used to develop the extension being parsed.
+   *
+   * @since 4.6.0
+   */
+  ExtensionDevelopmentFramework getDevelopmentFramework();
 }

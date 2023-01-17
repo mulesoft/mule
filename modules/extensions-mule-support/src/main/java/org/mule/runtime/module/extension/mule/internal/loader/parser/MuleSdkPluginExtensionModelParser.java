@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_SDK;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
@@ -98,6 +100,11 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   @Override
   public LicenseModelProperty getLicenseModelProperty() {
     return licenseModelProperty;
+  }
+
+  @Override
+  public ExtensionDevelopmentFramework getDevelopmentFramework() {
+    return MULE_SDK;
   }
 
   @Override

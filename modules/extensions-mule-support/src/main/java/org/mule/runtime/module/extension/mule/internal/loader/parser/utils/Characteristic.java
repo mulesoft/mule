@@ -138,6 +138,9 @@ public class Characteristic<T> {
       super(predicate, false, true);
     }
 
+    public AnyMatchCharacteristic(Predicate<OperationModel> predicate, boolean defaultIfOperationModelNotPresent) {
+      this(fromOperationModelPredicate(predicate, defaultIfOperationModelNotPresent));
+    }
   }
 
   /**
@@ -216,25 +219,31 @@ public class Characteristic<T> {
   public static class IsBlockingCharacteristic extends AnyMatchCharacteristic {
 
     public IsBlockingCharacteristic() {
-      super(IsBlockingCharacteristic::isBlocking);
+      super(OperationModel::isBlocking, false);
     }
+  }
 
-    public static boolean isBlocking(ComponentAstWithHierarchy operationAst) {
-      return operationAst.getComponentAst().getModel(OperationModel.class).map(OperationModel::isBlocking).orElse(false)
-          .booleanValue();
+  public static class IsConnectedCharacteristic extends AnyMatchCharacteristic {
+
+    public IsConnectedCharacteristic() {
+      super(OperationModel::requiresConnection, false);
     }
   }
 
   public static class IsTransactionalCharacteristic extends AnyMatchFilteringCharacteristic {
 
     public IsTransactionalCharacteristic() {
-      super(IsTransactionalCharacteristic::isTransactional, MuleSdkOperationModelParserUtils::isSkippedScopeForTx,
+      super(fromOperationModelPredicate(OperationModel::isTransactional, false),
+            MuleSdkOperationModelParserUtils::isSkippedScopeForTx,
             MuleSdkOperationModelParserUtils::isIgnoredComponentForTx);
     }
+  }
 
-    private static boolean isTransactional(ComponentAstWithHierarchy operationAst) {
-      return operationAst.getComponentAst().getModel(OperationModel.class).map(OperationModel::isTransactional).orElse(false)
-          .booleanValue();
-    }
+  private static Predicate<ComponentAstWithHierarchy> fromOperationModelPredicate(Predicate<OperationModel> operationModelPredicate,
+                                                                                  boolean defaultIfOperationModelNotPresent) {
+    return componentAstWithHierarchy -> componentAstWithHierarchy.getComponentAst()
+        .getModel(OperationModel.class)
+        .map(operationModelPredicate::test)
+        .orElse(defaultIfOperationModelNotPresent);
   }
 }
