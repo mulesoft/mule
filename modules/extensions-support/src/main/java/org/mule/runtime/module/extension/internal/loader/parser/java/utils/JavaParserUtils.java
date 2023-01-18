@@ -41,8 +41,11 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -429,5 +432,16 @@ public final class JavaParserUtils {
 
   private static boolean belongsToSdkApiPackages(String fullyQualifiedName) {
     return fullyQualifiedName.startsWith("org.mule.sdk.api");
+  }
+
+  /**
+   * ADD EXPLANAITION
+   */
+  public static Optional<MuleVersion> calculateMinMuleVersionSafely(Supplier<MuleVersion> minMuleVersionSupplier) {
+    try {
+      return of(minMuleVersionSupplier.get());
+    } catch (Throwable throwable) {
+      return empty();
+    }
   }
 }

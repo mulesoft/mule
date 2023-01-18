@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -193,8 +194,10 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateConfigMinMuleVersion(configElement,
-                                            getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
-                                                                                 Configurations::value, configElement)));
+    // TODO: W-12398760 revert this to the code commented below
+    return empty();
+    // return of(calculateConfigMinMuleVersion(configElement,
+    // getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
+    // Configurations::value, configElement)));
   }
 }

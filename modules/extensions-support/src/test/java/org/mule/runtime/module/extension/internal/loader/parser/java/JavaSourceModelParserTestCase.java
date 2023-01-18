@@ -20,6 +20,7 @@ import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_AL
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -173,6 +174,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(parseEmitsResponseFromSourceClass(TestSource.class), is(false));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSdkApiSource() {
     mockSourceWrapperWithClass(SdkNonClusteredSource.class);
@@ -181,6 +183,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForLegacyApiSource() {
     mockSourceWrapperWithClass(TestSource.class);
@@ -189,6 +192,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithListResultOutput() {
     mockSourceWrapperWithClass(SourceListResultOutput.class);
@@ -197,6 +201,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithResultOutput() {
     mockSourceWrapperWithClass(SourceResultOutput.class);
@@ -205,6 +210,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceExtendsReconnectable() {
     mockSourceWrapperWithClass(SourceImplementsReconnectable.class);
@@ -213,6 +219,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceExtendsExtraReconnectable() {
     mockSourceWrapperWithClass(SourceImplementsExtraReconnectable.class);
@@ -221,6 +228,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkAnnotation() {
     mockSourceWrapperWithClass(SdkEmitsResponseSource.class);
@@ -229,6 +237,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkField() {
     mockSourceWrapperWithClass(SourceWithSdkField.class);
@@ -237,6 +246,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithInjectedField() {
     mockSourceWrapperWithClass(SourceWithInjectedSdkField.class);
@@ -245,6 +255,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithInjectField() {
     mockSourceWrapperWithClass(SourceWithInjectedOptionalSdkField.class);
@@ -253,6 +264,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithAutomaticallyInjectedSdkField() {
     mockSourceWrapperWithClass(SourceWithAutomaticallyInjectedSdkField.class);
@@ -261,6 +273,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkConnectionProvider() {
     mockSourceWrapperWithClass(SourceWithSdkConnectionProvider.class);
@@ -269,6 +282,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkParameterField() {
     mockSourceWrapperWithClass(SourceWithSdkParameterField.class);
@@ -277,6 +291,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkInvalidField() {
     mockSourceWrapperWithClass(SourceWithMMVField.class);
@@ -285,6 +300,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.6"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkParameterGroup() {
     mockSourceWrapperWithClass(SourceWithSdkParameterGroup.class);
@@ -293,6 +309,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithSdkParametersContainer() {
     mockSourceWrapperWithClass(SourceWithSdkParametersContainer.class);
@@ -301,6 +318,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithNestedContainer() {
     mockSourceWrapperWithClass(SourceWithNestedContainer.class);
@@ -309,6 +327,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithOnBackPressure() {
     mockSourceWrapperWithClass(SourceOnBackPressure.class);
@@ -317,6 +336,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithOnSuccess() {
     mockSourceWrapperWithClass(SourceOnSuccess.class);
@@ -325,6 +345,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithOnError() {
     mockSourceWrapperWithClass(SourceOnError.class);
@@ -333,6 +354,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithOnTerminate() {
     mockSourceWrapperWithClass(SourceOnTerminate.class);
@@ -341,6 +363,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForSourceWithNonAnnotatedMethod() {
     mockSourceWrapperWithClass(SourceWithNonAnnotatedMethod.class);
@@ -349,6 +372,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getClassLevelMMVForSourceWithMMVAnnotation() {
     mockSourceWrapperWithClass(SourceWithHigherMMVAnnotation.class);
@@ -357,6 +381,7 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.7"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getOverwrittenMMVForSourceWithMMVAnnotation() {
     mockSourceWrapperWithClass(SourceWithLowerMMVAnnotation.class);

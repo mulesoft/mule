@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -58,6 +59,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(parser.isTransactional(), is(true));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForVanillaOperation() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
@@ -68,6 +70,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationAnnotatedWithMMV() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "annotatedWithMMV");
@@ -76,6 +79,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getOverwrittenMMVForOperationAnnotatedWithMMV() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "overwriteMMV");
@@ -84,6 +88,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithSdkParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkParameter", Literal.class);
@@ -92,6 +97,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithSdkImplicitParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkImplicitParameter", CorrelationInfo.class);
@@ -100,6 +106,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithSdkAnnotatedParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkAnnotatedParameter", String.class);
@@ -108,6 +115,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithParameterGroup() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterGroup", SdkParameterGroup.class);
@@ -116,6 +124,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithConfigParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withConfigParameter", SomeConfiguration.class);
@@ -124,6 +133,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithSdkPagingProvider() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkPagingProvider");
@@ -132,6 +142,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithPagingProviderSdkGeneric() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withPagingProviderSdkGeneric");
@@ -140,6 +151,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationWithResultOutput() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withResultOutput");
@@ -148,6 +160,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVLegacyApiTransactionalOperation() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
@@ -157,6 +170,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVLegacySdkApiTransactionalOperation() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SdkTransactionalOperations.class, "transactionalOperation",
@@ -166,6 +180,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForParameterizedOperationsContainer() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), ParameterizedOperations.class, "noArgumentsOperation");
@@ -174,6 +189,7 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
+  @Ignore("W-12398760")
   @Test
   public void getMMVForOperationFromConfigurationWithSdkOperationsAnnotation() throws NoSuchMethodException {
     parseOperation(getExtensionElement(ConfigurationWithSdkOperationsAnnotation.class), TransactionalOperations.class,

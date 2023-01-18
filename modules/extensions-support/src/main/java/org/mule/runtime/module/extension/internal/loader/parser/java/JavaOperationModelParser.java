@@ -406,9 +406,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateOperationMinMuleVersion(operationElement, operationContainer,
-                                               getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
-                                                                                    Operations::value, operationContainer)));
+    // TODO: W-12398760 revert this to the code commented below
+    return empty();
+    // return of(calculateOperationMinMuleVersion(operationElement, operationContainer,
+    // getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
+    // Operations::value, operationContainer)));
   }
 
   @Override

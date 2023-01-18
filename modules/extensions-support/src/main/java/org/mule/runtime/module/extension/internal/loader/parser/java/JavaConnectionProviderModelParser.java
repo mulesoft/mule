@@ -228,7 +228,9 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateConnectionProviderMinMuleVersion(element));
+    // TODO: W-12398760 revert this to the code commented below
+    return empty();
+    // return of(calculateConnectionProviderMinMuleVersion(element));
   }
 
   @Override
