@@ -77,17 +77,17 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
     Latch latch = new Latch();
     InputStream responseStream = mock(InputStream.class);
 
-    Consumer<SourceResultHandler<InputStream, Void>> callbackConsumer = callback -> {
-      String message = IOUtils.toString(callback.getResult().getOutput());
+    Consumer<SourceResultHandler<InputStream, Void>> handlerConsumer = handler -> {
+      String message = IOUtils.toString(handler.getResult().getOutput());
       assertThat(message, equalTo(MESSAGE));
 
-      callback.completeWithSuccess(params -> params.withParameter("body", responseStream))
+      handler.completeWithSuccess(params -> params.withParameter("body", responseStream))
           .whenComplete((v, e) -> latch.release());
     };
 
     handler = extensionsClient.createSource("Marvel",
                                             "MagnetoMutantSummon",
-                                            callbackConsumer,
+                                            handlerConsumer,
                                             parameters -> {
                                             });
 
@@ -111,17 +111,17 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
       }
     });
 
-    Consumer<SourceResultHandler<InputStream, Void>> callbackConsumer = callback -> {
-      String message = IOUtils.toString(callback.getResult().getOutput());
+    Consumer<SourceResultHandler<InputStream, Void>> handlerConsumer = handler -> {
+      String message = IOUtils.toString(handler.getResult().getOutput());
       assertThat(message, equalTo(MESSAGE));
 
-      callback.completeWithError(new RuntimeException(errorMessage), params -> {
+      handler.completeWithError(new RuntimeException(errorMessage), params -> {
       });
     };
 
     handler = extensionsClient.createSource("Marvel",
                                             "MagnetoMutantSummon",
-                                            callbackConsumer,
+                                            handlerConsumer,
                                             parameters -> {
                                             });
 

@@ -78,15 +78,15 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
     List<Result<String, Void>> results = new CopyOnWriteArrayList<>();
     final int petCount = ALL_PETS.size();
     CountDownLatch latch = new CountDownLatch(petCount);
-    Consumer<SourceResultHandler<String, Void>> callbackConsumer = callback -> {
-      results.add(callback.getResult());
-      callback.completeWithSuccess(params -> {
+    Consumer<SourceResultHandler<String, Void>> handlerConsumer = handler -> {
+      results.add(handler.getResult());
+      handler.completeWithSuccess(params -> {
       });
       latch.countDown();
     };
     handler = extensionsClient.createSource("petstore",
                                             "ConnectedPetAdoptionSource",
-                                            callbackConsumer,
+                                            handlerConsumer,
                                             parameterizer);
 
     handler.start();
