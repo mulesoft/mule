@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+
 import static java.lang.Class.forName;
+
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
+import static net.bytebuddy.description.modifier.Ownership.STATIC;
 import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION;
 import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.IMITATE_SUPER_CLASS;
 import static net.bytebuddy.implementation.FieldAccessor.ofBeanProperty;
-import static net.bytebuddy.implementation.MethodCall.invokeSuper;
 import static net.bytebuddy.implementation.MethodCall.invoke;
+import static net.bytebuddy.implementation.MethodCall.invokeSuper;
 import static net.bytebuddy.implementation.MethodDelegation.to;
 import static net.bytebuddy.implementation.MethodDelegation.toField;
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.named;
-
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.bytebuddy.ByteBuddy;
@@ -32,6 +34,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
+
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
@@ -42,6 +45,16 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.LoadedTypeInitializer;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.This;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 
@@ -83,11 +96,20 @@ public class ObjectFactoryClassRepository {
    * {@code Class} instance should not be reused for another {@link ComponentBuildingDefinition}.
    *
    * @param objectFactoryType the {@link ObjectFactory} of the component
+   * @param objectTypeClass   the class of the object that the factory will instantiate
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
-  public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType, boolean hasCustomFunction) {
+  public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType, boolean hasCustomFunction, Class objectTypeClass) {
     synchronized (this.getClass().getClassLoader()) {
-      String name = objectFactoryType.getName() + "_ByteBuddy" + hasCustomFunction;
+      String name;
+      boolean callingSuper = ObjectTypeProvider.class.isAssignableFrom(objectFactoryType);
+
+      if (callingSuper) {
+        name = objectFactoryType.getName() + "_ByteBuddy_CallingSuperGetObjectType_" + hasCustomFunction;
+      } else {
+        name = objectFactoryType.getName() + "_ByteBuddy_" + hasCustomFunction + "_" +
+            objectTypeClass.getName().replace(".", "_");
+      }
       ClassLoader classLoader = getClass().getClassLoader();
       if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
         classLoader = COMPOSITE_CL_CACHE.get(objectFactoryType.getClassLoader());
@@ -97,18 +119,24 @@ public class ObjectFactoryClassRepository {
       } catch (ClassNotFoundException e) {
         // class doesn't exist, generate
       }
-      return createObjectFactoryDynamicClass(objectFactoryType, name, classLoader, hasCustomFunction);
+
+      return createObjectFactoryDynamicClass(objectFactoryType, name, classLoader, hasCustomFunction, callingSuper,
+                                             objectTypeClass);
     }
   }
 
   private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name, ClassLoader classLoader,
-                                                               boolean hasCustomFunction) {
+                                                               boolean hasCustomFunction, boolean callingSuper,
+                                                               Class objectTypeClass) {
+
     return byteBuddy
         .subclass(objectFactoryType, IMITATE_SUPER_CLASS)
         .name(name)
+        // W-12362157: set the objectTypeClass field static so spring can get it without fully initializing the object
+        .defineField(OBJECT_TYPE_CLASS, Class.class, PRIVATE, STATIC)
+        .initializer(new LoadedTypeInitializer.ForStaticField(OBJECT_TYPE_CLASS, objectTypeClass))
         // Add fields to set properties.
         .defineField(IS_SINGLETON, Boolean.class, PRIVATE)
-        .defineField(OBJECT_TYPE_CLASS, Class.class, PRIVATE)
         .defineField(IS_PROTOTYPE, Boolean.class, PRIVATE)
         .defineField(IS_EAGER_INIT, Supplier.class, PRIVATE)
         .defineField(INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL, Optional.class)
@@ -118,8 +146,7 @@ public class ObjectFactoryClassRepository {
         // Implements the SmartFactoryBean methods and delegates to the fields.
         .method(named(IS_SINGLETON).and(isDeclaredBy(FactoryBean.class))).intercept(toField(IS_SINGLETON))
         .method(named("getObjectType").and(isDeclaredBy(FactoryBean.class)))
-        .intercept(ObjectTypeProvider.class.isAssignableFrom(objectFactoryType) ? invokeSuper()
-            : invoke(named("getObjectTypeClass")))
+        .intercept(callingSuper ? invokeSuper() : invoke(named("getObjectTypeClass")))
         .method(named(IS_PROTOTYPE).and(isDeclaredBy(SmartFactoryBean.class))).intercept(toField(IS_PROTOTYPE))
         .method(named(IS_EAGER_INIT).and(isDeclaredBy(SmartFactoryBean.class))).intercept(to(isEagerInitGetterInterceptor))
         .method(named("getObject")).intercept(hasCustomFunction ? to(getObjectInterceptor) : invokeSuper())
@@ -224,8 +251,6 @@ public class ObjectFactoryClassRepository {
     void setIsSingleton(Boolean isSingleton);
 
     Class getObjectTypeClass();
-
-    void setObjectTypeClass(Class objectType);
 
     boolean getIsPrototype();
 
