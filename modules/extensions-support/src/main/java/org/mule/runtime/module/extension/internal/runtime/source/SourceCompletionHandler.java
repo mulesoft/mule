@@ -45,7 +45,7 @@ public interface SourceCompletionHandler {
    * Resolves the set of parameters of the response function of the source against the supplied {@code Event}.
    *
    * @param event the {@code Event} with the result of the successful flow processing.
-   * @return the response function parameters with it's values.
+   * @return the response function parameters with its values.
    */
   Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException;
 
@@ -53,7 +53,7 @@ public interface SourceCompletionHandler {
    * Resolves the set of parameters of the failure response function of the source against the supplied {@code Event}.
    *
    * @param event the {@code Event} with the result of the failed flow processing.
-   * @return the failed response function parameters with it's values.
+   * @return the failed response function parameters with its values.
    */
   Map<String, Object> createFailureResponseParameters(CoreEvent event) throws MessagingException;
 

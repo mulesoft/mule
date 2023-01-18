@@ -6,14 +6,17 @@
  */
 package org.mule.test.marvel.xmen;
 
+import static org.mule.runtime.api.notification.AbstractServerNotification.CUSTOM_EVENT_ACTION_START_RANGE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -23,8 +26,21 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.inject.Inject;
+
 @MediaType(TEXT_PLAIN)
 public class MagnetoMutantSummon extends Source<InputStream, Void> {
+
+  public static final String MESSAGE = "We are the future. ... You have lived in the shadows of shame and fear for too long!";
+  public static final int ERROR_NOTIFICATION_ACTION = CUSTOM_EVENT_ACTION_START_RANGE + 99;
+  public static final int CLASSLOADER_NOTIFICATION_ACTION = CUSTOM_EVENT_ACTION_START_RANGE + 101;
+
+  @Inject
+  private ServerNotificationManager notificationManager;
 
   @Override
   public void onStart(SourceCallback<InputStream, Void> sourceCallback) throws MuleException {
@@ -33,8 +49,7 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   private Result<InputStream, Void> makeResult() {
     return Result.<InputStream, Void>builder()
-        .output(new ByteArrayInputStream("We are the future. ... You have lived in the shadows of shame and fear for too long!"
-            .getBytes()))
+        .output(new ByteArrayInputStream(MESSAGE.getBytes()))
         .build();
   }
 
@@ -43,6 +58,8 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
                         CorrelationInfo correlationInfo,
                         SourceCallbackContext callbackContext)
       throws IOException {
+    notifyContextClassLoader();
+
     if (mutantResponse.getBody().getValue() instanceof InputStream) {
       ((InputStream) mutantResponse.getBody().getValue()).read(new byte[1024]);
     }
@@ -52,9 +69,20 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
     }
   }
 
+  @OnError
+  public void onError(Error error) {
+    notifyContextClassLoader();
+    notificationManager.fireNotification(new CustomNotification(error, ERROR_NOTIFICATION_ACTION));
+  }
+
   @Override
   public void onStop() {
     // Nothing to do
+  }
+
+  private void notifyContextClassLoader() {
+    notificationManager
+        .fireNotification(new CustomNotification(currentThread().getContextClassLoader(), CLASSLOADER_NOTIFICATION_ACTION));
   }
 
 }

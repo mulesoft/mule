@@ -108,7 +108,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -121,9 +120,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent, LifecycleStateEnabled {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
-
-  @Inject
-  private MessageProcessingManager messageProcessingManager;
 
   @Inject
   private SchedulerService schedulerService;
@@ -148,6 +144,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ProfilingService profilingService;
+
+  // obtained through setter injection
+  private MessageProcessingManager messageProcessingManager;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -649,6 +648,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void setListener(Processor listener) {
     messageProcessor = listener;
+  }
+
+  @Inject
+  public void setMessageProcessingManager(MessageProcessingManager messageProcessingManager) {
+    this.messageProcessingManager = messageProcessingManager;
   }
 
   /**

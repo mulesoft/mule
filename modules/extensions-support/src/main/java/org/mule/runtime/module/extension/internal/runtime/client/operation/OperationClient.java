@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.operation;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -15,10 +14,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
+
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -30,6 +33,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.streaming.Cursor;
@@ -48,7 +52,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
-import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -58,7 +61,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Extension
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -205,24 +207,22 @@ public class OperationClient implements Lifecycle {
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
     parameterizer.setValuesOn(paramsBuilder);
 
+    ResolverSet resolverSet;
     try {
-      ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-                                                                            paramsBuilder.build(),
-                                                                            muleContext,
-                                                                            true,
-                                                                            reflectionCache,
-                                                                            expressionManager,
-                                                                            "");
+      resolverSet = getResolverSetFromComponentParameterization(
+                                                                paramsBuilder.build(),
+                                                                muleContext,
+                                                                true,
+                                                                reflectionCache,
+                                                                expressionManager,
+                                                                "");
 
-      ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
-      configurationInstance.ifPresent(ctxBuilder::withConfig);
-
-      try (ValueResolvingContext ctx = ctxBuilder.build()) {
-        return resolverSet.resolve(ctx).asMap();
-      }
+      resolverSet.initialise();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
+
+    return evaluate(resolverSet, configurationInstance, event);
   }
 
   private <T, A> EventCompletingValue<Result<T, A>> asEventCompletingResult(Object value,
@@ -350,6 +350,7 @@ public class OperationClient implements Lifecycle {
     }
   }
 
+
   private static class EventCompletingCursorStreamProviderDecorator
       extends EventCompletingCursorProviderDecorator<CursorStream> implements CursorStreamProvider {
 
@@ -358,6 +359,7 @@ public class OperationClient implements Lifecycle {
     }
   }
 
+
   private static class EventCompletingCursorIteratorProviderDecorator
       extends EventCompletingCursorProviderDecorator<CursorIterator> implements CursorIteratorProvider {
 
@@ -365,6 +367,7 @@ public class OperationClient implements Lifecycle {
       super(delegate, event);
     }
   }
+
 
   private static class EventCompletingValue<T> {
 
@@ -376,6 +379,7 @@ public class OperationClient implements Lifecycle {
       this.shouldCompleteEvent = shouldCompleteEvent;
     }
   }
+
 
   private static class NullProfilingDataProducer
       implements ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> {

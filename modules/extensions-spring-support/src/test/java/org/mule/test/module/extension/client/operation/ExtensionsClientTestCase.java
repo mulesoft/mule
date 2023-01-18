@@ -4,9 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension.client;
+package org.mule.test.module.extension.client.operation;
+
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
+import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 
 import static java.util.Collections.emptyList;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,12 +22,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
-import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
-import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
-import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;

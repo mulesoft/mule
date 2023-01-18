@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static com.google.common.collect.ImmutableBiMap.of;
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,6 +18,11 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
+
+import static com.google.common.collect.ImmutableBiMap.of;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -38,16 +41,19 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.api.parameterization.ComponentParameterization;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -162,13 +168,24 @@ public class ResolverSetUtils {
 
           }
           ValueResolver objectBuilderValuerResolver = new ObjectBuilderValueResolver<>(defaultObjectBuilder, muleContext);
-          return of(((Field) parameterGroupModelProperty.get().getDescriptor()
-              .getContainer()).getName(), objectBuilderValuerResolver);
+          return of(getGroupName(parameterGroupModelProperty), objectBuilderValuerResolver);
         }
       }
     }
     return parameterGroupParametersValueResolvers;
   }
+
+  private static String getGroupName(Optional<ParameterGroupModelProperty> groupModelProperty) {
+    Object container = groupModelProperty.get().getDescriptor().getContainer();
+    if (container instanceof Field) {
+      return ((Field) container).getName();
+    } else if (container instanceof Parameter) {
+      return ((Parameter) container).getName();
+    } else {
+      throw new IllegalArgumentException("Group container of unexpected type: " + container);
+    }
+  }
+
 
   private static Map<String, ValueResolver> getParameterGroupParametersValueResolvers(ParameterGroupModel parameterGroupModel,
                                                                                       ComponentParameterization componentParameterization,
@@ -408,5 +425,28 @@ public class ResolverSetUtils {
 
   public static boolean acceptsReferences(ParameterModel parameterModel) {
     return parameterModel.getDslConfiguration().allowsReferences();
+  }
+
+  /**
+   * Evaluates the given {@code resolverSet} in the context of a {@code configurationInstance} and {@code event}
+   *
+   * @param resolverSet           the set to be evaluated
+   * @param configurationInstance an optional {@link ConfigurationInstance}
+   * @param event                 the context event
+   * @return a {@link Map} with the evaluation result
+   *
+   * @since 4.6.0
+   */
+  public static Map<String, Object> evaluate(ResolverSet resolverSet,
+                                             Optional<ConfigurationInstance> configurationInstance,
+                                             CoreEvent event) {
+    ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
+    configurationInstance.ifPresent(ctxBuilder::withConfig);
+
+    try (ValueResolvingContext ctx = ctxBuilder.build()) {
+      return resolverSet.resolve(ctx).asMap();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Exception found while evaluating parameters:" + e.getMessage()), e);
+    }
   }
 }

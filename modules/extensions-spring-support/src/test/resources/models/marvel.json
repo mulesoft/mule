@@ -14493,6 +14493,12 @@
         "description": "",
         "modelProperties": {}
       },
+      "errorCallback": {
+        "parameterGroupModels": [],
+        "name": "onError",
+        "description": "",
+        "modelProperties": {}
+      },
       "output": {
         "type": {
           "format": {
