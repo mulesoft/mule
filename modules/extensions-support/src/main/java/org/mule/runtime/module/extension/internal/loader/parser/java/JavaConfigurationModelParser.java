@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Mule
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.calculateConfigMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getConfigurationComponent;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
 
 import org.mule.runtime.api.meta.MuleVersion;
@@ -70,11 +70,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.minMuleVersion = calculateConfigMinMuleVersion(configElement,
-                                                        getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                             Configurations.class,
-                                                                                             Configurations::value,
-                                                                                             configElement));
+    this.minMuleVersion = getMinMuleVersion().get();
   }
 
   private void parseStructure() {
@@ -199,6 +195,19 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(this.minMuleVersion);
+    // TODO W-12392052
+    return of(getConfigurationComponent(configElement,
+                                        getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
+                                                                             Configurations::value, configElement))
+                                                                                 .getMinMuleVersion());
+  }
+
+  @Override
+  public Optional<String> getMinMuleVersionReason() {
+    // TODO W-12392052
+    return of(getConfigurationComponent(configElement,
+                                        getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
+                                                                             Configurations::value, configElement))
+                                                                                 .getReason());
   }
 }

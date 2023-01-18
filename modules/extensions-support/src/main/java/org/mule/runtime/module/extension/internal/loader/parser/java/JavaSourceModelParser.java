@@ -25,7 +25,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sour
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceOutputType;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.calculateSourceMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getSourceComponent;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
@@ -101,7 +101,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      this.minMuleVersion = calculateSourceMinMuleVersion(sourceElement);
+      this.minMuleVersion = getMinMuleVersion().get();
     }
   }
 
@@ -312,7 +312,14 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(this.minMuleVersion);
+    // TODO W-12392052
+    return of(getSourceComponent(sourceElement).getMinMuleVersion());
+  }
+
+  @Override
+  public Optional<String> getMinMuleVersionReason() {
+    // TODO W-12392052
+    return of(getSourceComponent(sourceElement).getReason());
   }
 
   @Override

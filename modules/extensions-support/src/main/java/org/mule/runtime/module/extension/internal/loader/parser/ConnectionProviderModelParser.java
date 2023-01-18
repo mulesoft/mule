@@ -98,4 +98,9 @@ public interface ConnectionProviderModelParser extends SemanticTermsParser, Ster
    * @return a {@link MuleVersion} representing the minimum mule version this component can run on
    */
   Optional<MuleVersion> getMinMuleVersion();
+
+  /**
+   * @return the reason why the model has the minimum mule version specified in {@link #getMinMuleVersion()}
+   */
+  Optional<String> getMinMuleVersionReason();
 }

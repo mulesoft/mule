@@ -165,6 +165,11 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   Optional<MuleVersion> getMinMuleVersion();
 
   /**
+   * @return the reason why the model has the minimum mule version specified in {@link #getMinMuleVersion()}
+   */
+  Optional<String> getMinMuleVersionReason();
+
+  /**
    * @return the {@link ExtensionDevelopmentFramework} used to develop the extension being parsed.
    *
    * @since 4.6.0

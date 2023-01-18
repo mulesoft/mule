@@ -80,6 +80,11 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   }
 
   @Override
+  public Optional<String> getMinMuleVersionReason() {
+    return empty();
+  }
+
+  @Override
   public LicenseModelProperty getLicenseModelProperty() {
     return new LicenseModelProperty(false, true, empty());
   }

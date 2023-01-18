@@ -98,6 +98,11 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   }
 
   @Override
+  public Optional<String> getMinMuleVersionReason() {
+    return empty();
+  }
+
+  @Override
   public LicenseModelProperty getLicenseModelProperty() {
     return licenseModelProperty;
   }

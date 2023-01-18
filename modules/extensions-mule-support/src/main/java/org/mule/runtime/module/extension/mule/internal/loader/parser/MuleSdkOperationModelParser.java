@@ -288,6 +288,11 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
+  public Optional<String> getMinMuleVersionReason() {
+    return empty();
+  }
+
+  @Override
   public Set<String> getSemanticTerms() {
     return emptySet();
   }

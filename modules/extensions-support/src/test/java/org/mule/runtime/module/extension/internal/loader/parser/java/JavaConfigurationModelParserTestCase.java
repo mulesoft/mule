@@ -13,13 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.slf4j.event.Level.INFO;
 
-import org.junit.After;
-import org.junit.Before;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -31,7 +25,6 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils;
 import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
@@ -47,33 +40,13 @@ import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
-import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class JavaConfigurationModelParserTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
-
-  protected static final String LOGGER_FIELD_NAME = "LOGGER";
-  private List<String> infoMessages;
-  protected Logger logger;
-  private Logger oldLogger;
-
-  @Before
-  public void before() throws Exception {
-    infoMessages = new ArrayList<>();
-    logger = createMockLogger(infoMessages, INFO);
-    oldLogger = setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, logger);
-  }
-
-  @After
-  public void restoreLogger() throws Exception {
-    setLogger(SdkComponentsMinMuleVersionUtils.class, LOGGER_FIELD_NAME, oldLogger);
-  }
 
   @Test
   public void getConfigurationNameFromConfigurationUsingSdkApi() {
@@ -121,8 +94,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.3"));
-    verifyLogMessage(infoMessages,
-                     "Configuration NoImplicitLegacyConfiguration has min mule version 4.3 because it is annotated with org.mule.runtime.extension.api.annotation.NoImplicit. org.mule.runtime.extension.api.annotation.NoImplicit has min mule version 4.3 because it is annotated with @MinMuleVersion.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration NoImplicitLegacyConfiguration has min mule version 4.3 because it is annotated with org.mule.runtime.extension.api.annotation.NoImplicit. org.mule.runtime.extension.api.annotation.NoImplicit has min mule version 4.3 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -132,8 +105,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    verifyLogMessage(infoMessages,
-                     "Configuration NoImplicitSdkConfiguration has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.NoImplicit. org.mule.sdk.api.annotation.NoImplicit has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration NoImplicitSdkConfiguration has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.NoImplicit. org.mule.sdk.api.annotation.NoImplicit has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -143,8 +116,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
-    verifyLogMessage(infoMessages,
-                     "Configuration LegacyAnnotationConfiguration has min mule version 4.1.1 because it is the default value.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration LegacyAnnotationConfiguration has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
@@ -154,8 +127,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    verifyLogMessage(infoMessages,
-                     "Configuration SdkAnnotationConfiguration has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.Configuration. org.mule.sdk.api.annotation.Configuration has min mule version 4.5.0 because it is annotated with @MinMuleVersion.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration SdkAnnotationConfiguration has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.Configuration. org.mule.sdk.api.annotation.Configuration has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -165,8 +138,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
-    verifyLogMessage(infoMessages,
-                     "Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -176,8 +149,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
-    verifyLogMessage(infoMessages,
-                     "Configuration ExtendsParameterizedConfiguration has min mule version 4.4 due to its super class ParameterizedConfiguration. Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration ExtendsParameterizedConfiguration has min mule version 4.4 due to its super class ParameterizedConfiguration. Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -187,8 +160,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
-    verifyLogMessage(infoMessages,
-                     "Configuration AnnotatedConfiguration has min mule version 4.1.1 because it is the default value.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration AnnotatedConfiguration has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
@@ -198,8 +171,8 @@ public class JavaConfigurationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = javaConfigurationModelParser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    verifyLogMessage(infoMessages,
-                     "Configuration SimpleLegacyConfiguration has min mule version 4.5.0 because it was propagated from the annotation (either @Configurations or @Config) used to reference this configuration.");
+    assertThat(javaConfigurationModelParser.getMinMuleVersionReason().get(),
+               is("Configuration SimpleLegacyConfiguration has min mule version 4.5.0 because it was propagated from the annotation (either @Configurations or @Config) used to reference this configuration."));
   }
 
   protected JavaConfigurationModelParser getParser(Class<?> extension, Class<?> configuration) {

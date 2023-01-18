@@ -155,6 +155,11 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   Optional<MuleVersion> getMinMuleVersion();
 
   /**
+   * @return the reason why the model has the minimum mule version specified in {@link #getMinMuleVersion()}
+   */
+  Optional<String> getMinMuleVersionReason();
+
+  /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a
    * uniform way, regardless of the actual syntax used by the extension developer.
    *
