@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.config.dsl.spring;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY;
 
 import io.qameta.allure.Issue;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -32,16 +36,15 @@ public class ObjectFactoryClassRepositoryTestCase {
   public SystemProperty enableByteBuddy = new SystemProperty(ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY, "true");
 
   @Test
-  public void testSetters() throws InstantiationException, IllegalAccessException {
+  public void testSetters() throws Exception {
 
     ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, String.class).newInstance();
 
     byteBuddyClass.setIsSingleton(true);
-    byteBuddyClass.setObjectTypeClass(String.class);
     byteBuddyClass.setIsPrototype(true);
     byteBuddyClass.setIsEagerInit(new LazyValue<>(() -> true));
 
@@ -51,33 +54,45 @@ public class ObjectFactoryClassRepositoryTestCase {
     assertThat(byteBuddyClass.isEagerInit(), is(true));
 
     byteBuddyClass.setIsSingleton(false);
-    byteBuddyClass.setObjectTypeClass(Integer.class);
     byteBuddyClass.setIsPrototype(false);
     byteBuddyClass.setIsEagerInit(new LazyValue<>(() -> false));
 
     assertThat(byteBuddyClass.isSingleton(), is(false));
-    assertThat(byteBuddyClass.getObjectType(), is(Integer.class));
     assertThat(byteBuddyClass.isPrototype(), is(false));
     assertThat(byteBuddyClass.isEagerInit(), is(false));
+    assertThat(byteBuddyClass.getObject(), is(instanceOf(FakeObject.class)));
   }
 
   @Test
-  public void testLoadSameClassHasDifferentInterceptors() throws InstantiationException, IllegalAccessException {
+  @Issue("W-12362157")
+  public void getObjectTypeWithoutInitializingTheFields() throws InstantiationException, IllegalAccessException {
     ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
-    byteBuddyClass.setObjectTypeClass(String.class);
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, String.class).newInstance();
+
+    assertThat(byteBuddyClass.getObjectType(), is(String.class));
+  }
+
+  @Test
+  @Issue("W-12362157")
+  public void testSameClassWithDifferentObjectTypeCreateDifferentDynamicClasses()
+      throws InstantiationException, IllegalAccessException {
+    ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+
+    ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
+        (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, String.class).newInstance();
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor otherByteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
-    otherByteBuddyClass.setObjectTypeClass(Integer.class);
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, Integer.class).newInstance();
 
-    assertThat(byteBuddyClass.getClass(), is(otherByteBuddyClass.getClass()));
+    assertThat(byteBuddyClass.getClass(), is(not(otherByteBuddyClass.getClass())));
     assertThat(byteBuddyClass.getObjectType(), is(String.class));
     assertThat(otherByteBuddyClass.getObjectType(), is(Integer.class));
+    assertThat(byteBuddyClass.getClass().getSuperclass().getName(), is(otherByteBuddyClass.getClass().getSuperclass().getName()));
   }
 
   @Test
@@ -87,16 +102,15 @@ public class ObjectFactoryClassRepositoryTestCase {
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(OtherFakeObjectConnectionProviderObjectFactory.class).newInstance();
+            .getObjectFactoryClass(OtherFakeObjectConnectionProviderObjectFactory.class, String.class).newInstance();
 
-    byteBuddyClass.setObjectTypeClass(String.class);
     assertThat(byteBuddyClass.getObjectType(), is(Long.class));
   }
 
   public static class FakeObjectConnectionProviderObjectFactory extends AbstractComponentFactory {
 
     @Override
-    public Object doGetObject() throws Exception {
+    public Object doGetObject() {
       return new FakeObject();
     }
 
@@ -106,7 +120,7 @@ public class ObjectFactoryClassRepositoryTestCase {
       implements ObjectTypeProvider {
 
     @Override
-    public Object doGetObject() throws Exception {
+    public Object doGetObject() {
       return new FakeObject();
     }
 
@@ -116,7 +130,7 @@ public class ObjectFactoryClassRepositoryTestCase {
     }
   }
 
-  public static class FakeObject {
+  public static class FakeObject extends AbstractComponent {
   }
 
 }
