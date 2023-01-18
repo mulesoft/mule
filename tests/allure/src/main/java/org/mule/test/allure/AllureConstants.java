@@ -482,6 +482,8 @@ public interface AllureConstants {
 
     interface WscStory {
 
+      String HTTP_REQUEST = "HTTP Request";
+
     }
 
   }
