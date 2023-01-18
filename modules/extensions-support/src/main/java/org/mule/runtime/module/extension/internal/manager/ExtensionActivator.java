@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSubtypeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
@@ -60,7 +61,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
 
   void activateExtension(ExtensionModel extensionModel) {
     registerEnumTransformers(extensionModel);
-    registerExpressionFunctions(extensionModel);
+    registerAsModuleDefinition(extensionModel);
   }
 
   private void registerEnumTransformers(ExtensionModel extensionModel) {
@@ -86,18 +87,14 @@ public final class ExtensionActivator implements Startable, Stoppable {
         });
   }
 
-  private void registerExpressionFunctions(ExtensionModel extensionModel) {
-    if (extensionModel.getFunctionModels().isEmpty()) {
+  private void registerAsModuleDefinition(ExtensionModel extensionModel) {
+    if (extensionModel.getFunctionModels().isEmpty() && extensionModel.getTypes().isEmpty()) {
       return;
     }
 
-    ExpressionModule.Builder moduleBuilder = new DefaultExpressionModuleBuilder(new ModuleNamespace(extensionModel
-        .getXmlDslModel().getPrefix()));
-
-    registerExpressionFunctions(extensionModel.getFunctionModels().stream(), moduleBuilder);
+    ExpressionModule expressionModule = extensionAsModuleDefinition(extensionModel);
     try {
-      final BindingContext bindingContext = new DefaultBindingContextBuilder().addModule(moduleBuilder.build()).build();
-
+      final BindingContext bindingContext = new DefaultBindingContextBuilder().addModule(expressionModule).build();
       registerObject(muleContext, extensionModel.getName() + "GlobalBindingContextProvider",
                      (GlobalBindingContextProvider) () -> bindingContext);
     } catch (Exception e) {
@@ -105,8 +102,25 @@ public final class ExtensionActivator implements Startable, Stoppable {
     }
   }
 
-  private void registerExpressionFunctions(Stream<FunctionModel> functions,
-                                           ExpressionModule.Builder module) {
+  private ExpressionModule extensionAsModuleDefinition(ExtensionModel extensionModel) {
+    ModuleNamespace namespace = new ModuleNamespace(extensionModel.getXmlDslModel().getPrefix());
+    ExpressionModule.Builder moduleBuilder = new DefaultExpressionModuleBuilder(namespace);
+
+    if (!extensionModel.getFunctionModels().isEmpty()) {
+      addExtensionFunctions(extensionModel.getFunctionModels().stream(), moduleBuilder);
+    }
+    if (!extensionModel.getTypes().isEmpty()) {
+      addExtensionTypes(extensionModel.getTypes().stream(), moduleBuilder);
+    }
+
+    return moduleBuilder.build();
+  }
+
+  private void addExtensionTypes(Stream<ObjectType> objectTypes, ExpressionModule.Builder module) {
+    objectTypes.forEach(module::addType);
+  }
+
+  private void addExtensionFunctions(Stream<FunctionModel> functions, ExpressionModule.Builder module) {
     final FunctionParameterDefaultValueResolverFactory valueResolverFactory = (defaultValue, type) -> context -> {
       ExtendedExpressionManager em = muleContext.getExpressionManager();
       String value = String.valueOf(defaultValue);
