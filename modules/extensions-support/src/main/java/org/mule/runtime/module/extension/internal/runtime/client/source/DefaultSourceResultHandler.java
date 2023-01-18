@@ -22,7 +22,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
 
@@ -34,22 +34,22 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 
 /**
- * Default implementation of {@link SourceResultCallback}
+ * Default implementation of {@link SourceResultHandler}
  *
  * @since 4.6.0
  */
-final class DefaultSourceResultCallback<T, A> implements SourceResultCallback<T, A> {
+final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A> {
 
-  private static final Logger LOGGER = getLogger(DefaultSourceResultCallback.class);
+  private static final Logger LOGGER = getLogger(DefaultSourceResultHandler.class);
 
   private final SourceClient sourceClient;
   private final Result<T, A> result;
   private final ExtensionsFlowProcessingTemplate template;
   private final ClassLoader extensionClassLoader;
 
-  DefaultSourceResultCallback(SourceClient sourceClient,
-                              Result<T, A> result,
-                              ExtensionsFlowProcessingTemplate template) {
+  DefaultSourceResultHandler(SourceClient sourceClient,
+                             Result<T, A> result,
+                             ExtensionsFlowProcessingTemplate template) {
     this.sourceClient = sourceClient;
     this.result = result;
     this.template = template;

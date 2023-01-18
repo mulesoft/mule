@@ -46,7 +46,7 @@ import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.client.source.SourceHandler;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -143,7 +143,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Override
   public <T, A> SourceHandler createSource(String extensionName,
                                            String sourceName,
-                                           Consumer<SourceResultCallback<T, A>> callbackConsumer,
+                                           Consumer<SourceResultHandler<T, A>> handler,
                                            Consumer<SourceParameterizer> parameters) {
     final ExtensionModel extensionModel = findExtension(extensionName);
     final SourceModel sourceModel = findSourceModel(extensionModel, sourceName);
@@ -151,7 +151,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     SourceClient<T, A> sourceClient = new SourceClient<>(extensionModel,
                                                          sourceModel,
                                                          parameters,
-                                                         callbackConsumer,
+                                                         handler,
                                                          extensionManager,
                                                          streamingManager,
                                                          errorTypeLocator,

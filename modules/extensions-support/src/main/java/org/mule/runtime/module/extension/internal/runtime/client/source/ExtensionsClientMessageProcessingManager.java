@@ -15,7 +15,7 @@ import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
 
@@ -29,12 +29,12 @@ import java.util.function.Consumer;
 class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessingManager {
 
   private final SourceClient sourceClient;
-  private final Consumer<SourceResultCallback<T, A>> callbackConsumer;
+  private final Consumer<SourceResultHandler<T, A>> handlerConsumer;
 
   ExtensionsClientMessageProcessingManager(SourceClient sourceClient,
-                                           Consumer<SourceResultCallback<T, A>> callbackConsumer) {
+                                           Consumer<SourceResultHandler<T, A>> handlerConsumer) {
     this.sourceClient = sourceClient;
-    this.callbackConsumer = callbackConsumer;
+    this.handlerConsumer = handlerConsumer;
   }
 
   @Override
@@ -45,7 +45,7 @@ class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessin
 
     Result result = getResult(resultAdapter);
 
-    callbackConsumer.accept(new DefaultSourceResultCallback<>(sourceClient, result, process));
+    handlerConsumer.accept(new DefaultSourceResultHandler<>(sourceClient, result, process));
   }
 
   private Result<Object, Object> getResult(SourceResultAdapter adapter) {

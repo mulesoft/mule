@@ -21,7 +21,7 @@ import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -78,8 +78,10 @@ public class ExtensionClientConnectedPollingSourceTestCase extends BaseExtension
     List<Result<String, Void>> results = new CopyOnWriteArrayList<>();
     final int petCount = ALL_PETS.size();
     CountDownLatch latch = new CountDownLatch(petCount);
-    Consumer<SourceResultCallback<String, Void>> callbackConsumer = callback -> {
+    Consumer<SourceResultHandler<String, Void>> callbackConsumer = callback -> {
       results.add(callback.getResult());
+      callback.completeWithSuccess(params -> {
+      });
       latch.countDown();
     };
     handler = extensionsClient.createSource("petstore",

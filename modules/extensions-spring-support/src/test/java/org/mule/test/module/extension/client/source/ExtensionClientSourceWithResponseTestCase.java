@@ -33,7 +33,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -77,7 +77,7 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
     Latch latch = new Latch();
     InputStream responseStream = mock(InputStream.class);
 
-    Consumer<SourceResultCallback<InputStream, Void>> callbackConsumer = callback -> {
+    Consumer<SourceResultHandler<InputStream, Void>> callbackConsumer = callback -> {
       String message = IOUtils.toString(callback.getResult().getOutput());
       assertThat(message, equalTo(MESSAGE));
 
@@ -111,7 +111,7 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
       }
     });
 
-    Consumer<SourceResultCallback<InputStream, Void>> callbackConsumer = callback -> {
+    Consumer<SourceResultHandler<InputStream, Void>> callbackConsumer = callback -> {
       String message = IOUtils.toString(callback.getResult().getOutput());
       assertThat(message, equalTo(MESSAGE));
 

@@ -46,7 +46,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullResolverSet;
@@ -72,7 +72,7 @@ public class SourceClient<T, A> implements Lifecycle {
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final Consumer<SourceParameterizer> sourceParameterizerConsumer;
-  private final Consumer<SourceResultCallback<T, A>> callbackConsumer;
+  private final Consumer<SourceResultHandler<T, A>> handlerConsumer;
   private final ExtensionManager extensionManager;
   private final StreamingManager streamingManager;
   private final ErrorTypeLocator errorTypeLocator;
@@ -90,7 +90,7 @@ public class SourceClient<T, A> implements Lifecycle {
   public SourceClient(ExtensionModel extensionModel,
                       SourceModel sourceModel,
                       Consumer<SourceParameterizer> sourceParameterizerConsumer,
-                      Consumer<SourceResultCallback<T, A>> callbackConsumer,
+                      Consumer<SourceResultHandler<T, A>> handlerConsumer,
                       ExtensionManager extensionManager,
                       StreamingManager streamingManager,
                       ErrorTypeLocator errorTypeLocator,
@@ -102,7 +102,7 @@ public class SourceClient<T, A> implements Lifecycle {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.sourceParameterizerConsumer = sourceParameterizerConsumer;
-    this.callbackConsumer = callbackConsumer;
+    this.handlerConsumer = handlerConsumer;
     this.extensionManager = extensionManager;
     this.streamingManager = streamingManager;
     this.errorTypeLocator = errorTypeLocator;
@@ -143,7 +143,7 @@ public class SourceClient<T, A> implements Lifecycle {
     source.setAnnotations(SmallMap.of(LOCATION_KEY, DefaultComponentLocation.from(sourceModel.getName())));
     source.setListener(event -> event);
     initialiseIfNeeded(source, true, muleContext);
-    source.setMessageProcessingManager(new ExtensionsClientMessageProcessingManager(this, callbackConsumer));
+    source.setMessageProcessingManager(new ExtensionsClientMessageProcessingManager(this, handlerConsumer));
     messagingExceptionResolver = new MessagingExceptionResolver(source);
   }
 

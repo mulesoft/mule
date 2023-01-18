@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.client.source.SourceHandler;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
-import org.mule.runtime.extension.api.client.source.SourceResultCallback;
+import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.EventedOperationsParameterDecorator;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.InternalOperationParameterizer;
@@ -64,8 +64,8 @@ public class EventedExtensionsClientDecorator implements ExtensionsClient {
 
   @Override
   public <T, A> SourceHandler createSource(String extension, String sourceName,
-                                           Consumer<SourceResultCallback<T, A>> callback,
+                                           Consumer<SourceResultHandler<T, A>> handler,
                                            Consumer<SourceParameterizer> parameters) {
-    return extensionsClient.createSource(extension, sourceName, callback, parameters);
+    return extensionsClient.createSource(extension, sourceName, handler, parameters);
   }
 }
