@@ -482,7 +482,7 @@ public interface AllureConstants {
 
     interface WscStory {
 
-      String HTTP_REQUEST = "HTTP Request";
+      String REMOTE_WSDL_LOADING = "Remote WSDL loading";
 
     }
 
