@@ -131,7 +131,9 @@ public class HttpConstants {
 
     GATEWAY_TIMEOUT(504, "Gateway Timeout"),
 
-    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported");
+    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported"),
+
+    UNPROCESSABLE_ENTITY(422, "Unprocessable Entity");
 
     private int statusCode;
     private String reasonPhrase;
