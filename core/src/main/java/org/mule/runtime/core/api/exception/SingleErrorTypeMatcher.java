@@ -8,21 +8,11 @@ package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.api.message.ErrorType;
 
-public final class SingleErrorTypeMatcher implements ErrorTypeMatcher {
-
-  private final ErrorType errorType;
+public final class SingleErrorTypeMatcher extends org.mule.runtime.api.exception.matcher.SingleErrorTypeMatcher
+    implements ErrorTypeMatcher {
 
   public SingleErrorTypeMatcher(ErrorType errorType) {
-    this.errorType = errorType;
+    super(errorType);
   }
 
-  @Override
-  public boolean match(ErrorType errorType) {
-    return this.errorType.equals(errorType) || isChild(errorType);
-  }
-
-  private boolean isChild(ErrorType errorType) {
-    ErrorType parentErrorType = errorType.getParentErrorType();
-    return parentErrorType != null && this.match(parentErrorType);
-  }
 }
