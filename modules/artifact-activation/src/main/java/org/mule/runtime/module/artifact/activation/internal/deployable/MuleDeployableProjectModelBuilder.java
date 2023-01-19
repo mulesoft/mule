@@ -61,6 +61,8 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -109,7 +111,8 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     AppClassLoaderModel packagerClassLoaderModel = getAppPackagerClassLoaderModel(getClassLoaderModelDescriptor(projectFolder));
 
     Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors = packagerClassLoaderModel.getDependencies().stream()
-        .collect(toMap(Artifact::getArtifactCoordinates, artifact -> buildBundleDescriptor(artifact.getArtifactCoordinates())));
+        .collect(toMap(Artifact::getArtifactCoordinates, artifact -> buildBundleDescriptor(artifact.getArtifactCoordinates()),
+                       (bundleDescriptor1, bundleDescriptor2) -> bundleDescriptor1));
 
     Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies =
         getAdditionalPluginDependencies(packagerClassLoaderModel, bundleDescriptors);
@@ -178,6 +181,9 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
           .orElse(createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver()).apply(artifact));
     }).collect(toList());
 
+    // Dependencies might be repeated (see W-12395077)
+    dependencies = getUniqueDependencies(dependencies);
+
     dependencies = dependencies.stream().map(d -> new BundleDependency.Builder(d)
         .setTransitiveDependencies(getTransitiveDependencies(d))
         .build()).collect(toList());
@@ -201,6 +207,21 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     }
 
     return patchBundleDependencies;
+  }
+
+  private List<BundleDependency> getUniqueDependencies(List<BundleDependency> dependencies) {
+    Set<String> uniqueDependenciesIds = new HashSet<>();
+
+    // Filtering is done this way to preserve the order
+    return dependencies.stream().filter(dependency -> {
+      BundleDescriptor descriptor = dependency.getDescriptor();
+      String pluginKey =
+          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getVersion()
+              + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
+      boolean keep = !uniqueDependenciesIds.contains(pluginKey);
+      uniqueDependenciesIds.add(pluginKey);
+      return keep;
+    }).collect(toList());
   }
 
   private List<BundleDependency> getTransitiveDependencies(BundleDependency bundleDependency) {

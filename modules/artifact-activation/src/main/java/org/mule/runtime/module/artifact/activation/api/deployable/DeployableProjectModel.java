@@ -117,7 +117,7 @@ public final class DeployableProjectModel {
     }
 
     getRepeatedDependencies(dependencies).forEach((key, value) -> validationMessages
-        .add(format("Mule Plugin '%s' is depended upon in the project with multiple versions ('%s') in the dependency graph.",
+        .add(format("Mule Plugin '%s' is depended upon in the project multiple times with versions ('%s') in the dependency graph.",
                     key, value.stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
 
     if (!validationMessages.isEmpty()) {
@@ -131,8 +131,8 @@ public final class DeployableProjectModel {
 
     for (BundleDependency dependency : dependencies) {
       BundleDescriptor descriptor = dependency.getDescriptor();
-      String pluginKey =
-          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getClassifier().orElse("");
+      String pluginKey = descriptor.getGroupId() + ":" + descriptor.getArtifactId()
+          + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
       repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
       repeatedDependencies.get(pluginKey).add(descriptor);
     }

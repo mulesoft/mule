@@ -209,7 +209,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
 
     expected.expect(ArtifactActivationException.class);
     expected
-        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a:mule-plugin' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
+        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a:mule-plugin' is depended upon in the project multiple times with versions ('0.0.1, 0.1.0') in the dependency graph.");
     new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
