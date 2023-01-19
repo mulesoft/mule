@@ -178,6 +178,16 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
     getDeployableProjectModel("apps/heavyweight/invalid-classloader-model");
   }
 
+  @Test
+  @Issue("W-12395077")
+  public void projectWithDuplicatedDependencyInClassLoaderModel() throws URISyntaxException {
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/heavyweight/duplicated-dependency-classloader-model");
+
+    assertThat(deployableProjectModel.getDependencies(),
+               contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("duplicated-dependency")))));
+  }
+
   private void testBasicDeployableProjectModel(DeployableProjectModel deployableProjectModel) {
     assertThat(deployableProjectModel.getPackages(), contains("org.test"));
     assertThat(deployableProjectModel.getResources(),
