@@ -10,6 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -17,9 +18,9 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
+import org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.Optional;
@@ -41,7 +42,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
 
-    sourceErrorMatcher = new SingleErrorTypeMatcher(getErrorTypeRepository().getSourceResponseErrorType());
+    sourceErrorMatcher = createErrorTypeMatcher(getErrorTypeRepository().getSourceResponseErrorType());
 
     if (errorType != null) {
       String[] errors = errorType.split(",");
@@ -58,7 +59,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
       }
     } else if (!when.isPresent()) {
       // No error type and no expression, force ANY matcher
-      errorTypeMatcher = new SingleErrorTypeMatcher(getErrorTypeRepository().getAnyErrorType());
+      errorTypeMatcher = createErrorTypeMatcher(getErrorTypeRepository().getAnyErrorType());
     }
 
   }

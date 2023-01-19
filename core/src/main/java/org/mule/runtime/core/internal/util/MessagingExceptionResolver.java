@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util;
 
 import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
+import static org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -25,10 +26,10 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
@@ -143,7 +144,7 @@ public class MessagingExceptionResolver {
     }
 
     // We look if there is a more specific error in the chain that matches with the root error (is child or has the same error)
-    SingleErrorTypeMatcher matcher = new SingleErrorTypeMatcher(errors.get(errors.size() - 1).getSecond());
+    ErrorTypeMatcher matcher = createErrorTypeMatcher(errors.get(errors.size() - 1).getSecond());
 
     return errors.stream()
         .filter(p -> matcher.match(p.getSecond()))

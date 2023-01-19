@@ -19,11 +19,12 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
+import org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -43,7 +44,7 @@ import java.util.function.Function;
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private static final String COMPONENT_IDENTIFIER = CORE_PREFIX + ":" + ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER;
-  private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+  private final ErrorTypeMatcher redeliveryExhaustedMatcher;
 
   @Inject
   private ProfilingService profilingService;
@@ -59,7 +60,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     // handling.
     setAnnotations(Collections.singletonMap(ANNOTATION_NAME, buildFromStringRepresentation(COMPONENT_IDENTIFIER)));
 
-    redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+    redeliveryExhaustedMatcher = ErrorTypeMatcherUtils.createErrorTypeMatcher(redeliveryExhaustedErrorType);
   }
 
   @Override

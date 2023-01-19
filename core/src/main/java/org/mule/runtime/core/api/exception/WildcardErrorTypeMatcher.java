@@ -7,8 +7,15 @@
 package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils;
 
-public final class WildcardErrorTypeMatcher extends org.mule.runtime.api.exception.matcher.WildcardErrorTypeMatcher
+/**
+ * @deprecated create the {@link org.mule.runtime.api.message.matcher.ErrorTypeMatcher} using
+ *             {@link ErrorTypeMatcherUtils#createErrorTypeMatcher(ErrorTypeRepository, String)}
+ */
+@Deprecated
+public final class WildcardErrorTypeMatcher extends org.mule.runtime.api.message.matcher.WildcardErrorTypeMatcher
     implements ErrorTypeMatcher {
 
   public WildcardErrorTypeMatcher(ComponentIdentifier errorTypeIdentifier) {
