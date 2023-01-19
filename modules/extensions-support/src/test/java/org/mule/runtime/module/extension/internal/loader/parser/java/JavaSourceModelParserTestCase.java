@@ -231,8 +231,7 @@ public class JavaSourceModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
-               is("Source SourceImplementsExtraReconnectable has min mule version 4.5.0 because it implements interface org.mule.runtime.module.extension.internal.loader.parser.java.JavaSourceModelParserTestCase$ExtraReconnectable. Interface ExtraReconnectable has min mule version 4.5.0 because it implements org.mule.sdk.api.runtime.connectivity.Reconnectable. org.mule.sdk.api.runtime.connectivity.Reconnectable has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+    assertThat(parser.getMinMuleVersionReason().get(), is(getMessageStringForSourceExtendsExtraReconnectable()));
   }
 
   @Test
@@ -452,6 +451,9 @@ public class JavaSourceModelParserTestCase {
     parser = new JavaSourceModelParser(mock(ExtensionElement.class), sourceElement, mock(ExtensionLoadingContext.class));
   }
 
+  protected String getMessageStringForSourceExtendsExtraReconnectable() {
+    return "Source SourceImplementsExtraReconnectable has min mule version 4.5.0 because it implements interface org.mule.runtime.module.extension.internal.loader.parser.java.JavaSourceModelParserTestCase$ExtraReconnectable. Interface ExtraReconnectable has min mule version 4.5.0 because it implements org.mule.sdk.api.runtime.connectivity.Reconnectable. org.mule.sdk.api.runtime.connectivity.Reconnectable has min mule version 4.5.0 because it is annotated with @MinMuleVersion.";
+  }
 
   public static class TestSource extends Source<String, Object> {
 

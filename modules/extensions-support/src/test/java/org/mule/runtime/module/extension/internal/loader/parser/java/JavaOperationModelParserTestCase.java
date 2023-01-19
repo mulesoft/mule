@@ -66,8 +66,8 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
-    // assertThat(parser.getMinMuleVersionReason().get(),
-    // is("Operation transactionalOperation has min mule version 4.1.1 because it is the default value."));
+    assertThat(parser.getMinMuleVersionReason().get(),
+               is("Operation transactionalOperation has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
@@ -116,8 +116,7 @@ public class JavaOperationModelParserTestCase {
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
     assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
-               is("Method withSdkAnnotatedParameter has min mule version 4.4 because of its parameter optionalParameter. Parameter optionalParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Optional. org.mule.sdk.api.annotation.param.Optional has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+    assertThat(parser.getMinMuleVersionReason().get(), is(getMessageForOperationWithSdkAnnotatedParameter()));
   }
 
   @Test
@@ -242,6 +241,10 @@ public class JavaOperationModelParserTestCase {
 
   protected ExtensionElement getExtensionElement(Class<?> extensionClass) {
     return new ExtensionTypeWrapper<>(extensionClass, TYPE_LOADER);
+  }
+
+  protected String getMessageForOperationWithSdkAnnotatedParameter() {
+    return "Method withSdkAnnotatedParameter has min mule version 4.4 because of its parameter optionalParameter. Parameter optionalParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Optional. org.mule.sdk.api.annotation.param.Optional has min mule version 4.4 because it is annotated with @MinMuleVersion.";
   }
 
   private class TransactionalOperations {
