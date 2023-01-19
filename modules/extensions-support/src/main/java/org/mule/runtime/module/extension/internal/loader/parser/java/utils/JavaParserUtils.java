@@ -433,15 +433,4 @@ public final class JavaParserUtils {
   private static boolean belongsToSdkApiPackages(String fullyQualifiedName) {
     return fullyQualifiedName.startsWith("org.mule.sdk.api");
   }
-
-  /**
-   * ADD EXPLANAITION
-   */
-  public static Optional<MuleVersion> calculateMinMuleVersionSafely(Supplier<MuleVersion> minMuleVersionSupplier) {
-    try {
-      return of(minMuleVersionSupplier.get());
-    } catch (Throwable throwable) {
-      return empty();
-    }
-  }
 }
