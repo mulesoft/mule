@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
-import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
@@ -60,7 +60,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     // handling.
     setAnnotations(Collections.singletonMap(ANNOTATION_NAME, buildFromStringRepresentation(COMPONENT_IDENTIFIER)));
 
-    redeliveryExhaustedMatcher = ErrorTypeMatcherUtils.createErrorTypeMatcher(redeliveryExhaustedErrorType);
+    redeliveryExhaustedMatcher = createErrorTypeMatcher(redeliveryExhaustedErrorType);
   }
 
   @Override

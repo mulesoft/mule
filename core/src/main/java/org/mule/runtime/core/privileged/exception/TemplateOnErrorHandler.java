@@ -381,6 +381,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     return createErrorType(errorTypeRepository, errorTypeNames);
   }
 
+  /**
+   * @deprecated use
+   *             {@link org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils#createErrorTypeMatcher(ErrorTypeRepository, String)}
+   *             instead.
+   */
+  @Deprecated
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
     return createErrorTypeMatcher(errorTypeRepository, errorTypeNames);
   }

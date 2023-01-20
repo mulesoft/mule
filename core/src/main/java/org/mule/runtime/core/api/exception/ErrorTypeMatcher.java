@@ -13,8 +13,7 @@ import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils;
  * Decides whether an error type is acceptable.
  *
  * @since 4.0
- * @deprecated create the {@link org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher} using
- *             {@link ErrorTypeMatcherUtils#createErrorTypeMatcher(ErrorTypeRepository, String)}
+ * @deprecated use {@link org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher} instead.
  */
 @Deprecated
 public interface ErrorTypeMatcher extends org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher {

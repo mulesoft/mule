@@ -21,7 +21,8 @@ public final class DisjunctiveErrorTypeMatcher extends org.mule.runtime.api.mess
     implements ErrorTypeMatcher {
 
   public DisjunctiveErrorTypeMatcher(List<ErrorTypeMatcher> errorTypeMatchers) {
-    super(errorTypeMatchers.stream().map(em -> (org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher) em).collect(toList()));
+    super(errorTypeMatchers.stream().map(em -> (org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher) em)
+        .collect(toList()));
   }
 
 }
