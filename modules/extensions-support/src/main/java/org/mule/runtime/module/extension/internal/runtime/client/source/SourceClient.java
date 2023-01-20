@@ -49,6 +49,7 @@ import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.client.params.BaseParameterizer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
@@ -162,14 +163,14 @@ public class SourceClient<T, A> implements Lifecycle {
     disposeIfNeeded(source, LOGGER);
   }
 
-  ResolverSet toResolverSet(Consumer<SourceParameterizer> consumer, ParameterizedModel model) {
-    DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
-    consumer.accept(parameterizer);
+//  ResolverSet toResolverSet(Consumer<SourceParameterizer> consumer, ParameterizedModel model) {
+//    DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
+//    consumer.accept(parameterizer);
+//
+//    return toResolverSet(parameterizer, model);
+//  }
 
-    return toResolverSet(parameterizer, model);
-  }
-
-  ResolverSet toResolverSet(DefaultSourceParameterizer parameterizer, ParameterizedModel model) {
+  ResolverSet toResolverSet(BaseParameterizer parameterizer, ParameterizedModel model) {
     ComponentParameterization.Builder paramsBuilder = ComponentParameterization.builder(model);
     parameterizer.setValuesOn(paramsBuilder);
 

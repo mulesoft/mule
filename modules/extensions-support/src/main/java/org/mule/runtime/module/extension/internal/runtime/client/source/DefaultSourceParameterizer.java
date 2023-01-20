@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
-import org.mule.runtime.module.extension.internal.runtime.client.params.BaseParameterizer;
+import org.mule.runtime.module.extension.internal.runtime.client.params.BaseComponentParameterizer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.6.0
  */
-class DefaultSourceParameterizer extends BaseParameterizer<SourceParameterizer> implements SourceParameterizer {
+class DefaultSourceParameterizer extends BaseComponentParameterizer<SourceParameterizer> implements SourceParameterizer {
 
   private BackPressureMode backPressureMode = WAIT;
   private SchedulingStrategy schedulingStrategy = null;
