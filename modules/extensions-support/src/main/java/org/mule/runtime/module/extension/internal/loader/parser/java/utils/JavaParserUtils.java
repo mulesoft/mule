@@ -440,8 +440,4 @@ public final class JavaParserUtils {
   private static boolean belongsToSdkApiPackages(String fullyQualifiedName) {
     return fullyQualifiedName.startsWith("org.mule.sdk.api");
   }
-
-  private static boolean belongsToJavaPackages(String fullyQualifiedName) {
-    return fullyQualifiedName.startsWith("java.");
-  }
 }
