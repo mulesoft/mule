@@ -304,6 +304,54 @@
           "methodName": "reuseGlobalErrorHandler",
           "elementKind": "method",
           "justification": "W-12181063: [Global Error Handling] remove the kill switch for enabling the memory fixes in 4.5"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.core.api.exception.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String)",
+          "new": "method org.mule.runtime.api.message.matcher.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String)",
+          "oldType": "org.mule.runtime.core.api.exception.ErrorTypeMatcher",
+          "newType": "org.mule.runtime.api.message.matcher.ErrorTypeMatcher",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "createErrorType",
+          "elementKind": "method",
+          "justification": "W-12405425: Move ErrorTypeMatchers to Mule API"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.core.api.exception.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String, org.mule.runtime.api.component.ConfigurationProperties)",
+          "new": "method org.mule.runtime.api.message.matcher.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String, org.mule.runtime.api.component.ConfigurationProperties)",
+          "oldType": "org.mule.runtime.core.api.exception.ErrorTypeMatcher",
+          "newType": "org.mule.runtime.api.message.matcher.ErrorTypeMatcher",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "createErrorType",
+          "elementKind": "method",
+          "justification": "W-12405425: Move ErrorTypeMatchers to Mule API"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.core.api.exception.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String)",
+          "new": "method org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String)",
+          "oldType": "org.mule.runtime.core.api.exception.ErrorTypeMatcher",
+          "newType": "org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "createErrorType",
+          "elementKind": "method",
+          "justification": "W-12405425: Move ErrorTypeMatchers to Mule API"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.core.api.exception.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String, org.mule.runtime.api.component.ConfigurationProperties)",
+          "new": "method org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String, org.mule.runtime.api.component.ConfigurationProperties)",
+          "oldType": "org.mule.runtime.core.api.exception.ErrorTypeMatcher",
+          "newType": "org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "createErrorType",
+          "elementKind": "method",
+          "justification": "W-12405425: Move ErrorTypeMatchers to Mule API"
         }
       ]
     }

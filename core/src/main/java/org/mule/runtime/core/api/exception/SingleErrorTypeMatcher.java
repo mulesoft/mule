@@ -6,23 +6,20 @@
  */
 package org.mule.runtime.core.api.exception;
 
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils;
 
-public final class SingleErrorTypeMatcher implements ErrorTypeMatcher {
-
-  private final ErrorType errorType;
+/**
+ * @deprecated create the {@link org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher} using
+ *             {@link ErrorTypeMatcherUtils#createErrorTypeMatcher(ErrorTypeRepository, String)}
+ */
+@Deprecated
+public final class SingleErrorTypeMatcher extends org.mule.runtime.api.message.error.matcher.SingleErrorTypeMatcher
+    implements ErrorTypeMatcher {
 
   public SingleErrorTypeMatcher(ErrorType errorType) {
-    this.errorType = errorType;
+    super(errorType);
   }
 
-  @Override
-  public boolean match(ErrorType errorType) {
-    return this.errorType.equals(errorType) || isChild(errorType);
-  }
-
-  private boolean isChild(ErrorType errorType) {
-    ErrorType parentErrorType = errorType.getParentErrorType();
-    return parentErrorType != null && this.match(parentErrorType);
-  }
 }

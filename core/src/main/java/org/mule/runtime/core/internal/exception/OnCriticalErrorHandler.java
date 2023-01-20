@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
 
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
@@ -39,7 +39,7 @@ public class OnCriticalErrorHandler implements MessagingExceptionHandlerAcceptor
 
   private static final Logger logger = LoggerFactory.getLogger(OnCriticalErrorHandler.class);
 
-  private final ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
+  private final ErrorTypeMatcher criticalMatcher = createErrorTypeMatcher(CRITICAL_ERROR_TYPE);
   private final ErrorTypeMatcher overloadMatcher;
 
   @Inject

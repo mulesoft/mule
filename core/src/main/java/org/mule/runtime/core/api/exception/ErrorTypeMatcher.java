@@ -6,19 +6,16 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils;
 
 /**
  * Decides whether an error type is acceptable.
  *
  * @since 4.0
+ * @deprecated use {@link org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher} instead.
  */
-public interface ErrorTypeMatcher {
-
-  /**
-   * @param errorType the {@link ErrorType} to check
-   * @return {@code true} if a match is possible, {@code false} otherwise
-   */
-  boolean match(ErrorType errorType);
+@Deprecated
+public interface ErrorTypeMatcher extends org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher {
 
 }

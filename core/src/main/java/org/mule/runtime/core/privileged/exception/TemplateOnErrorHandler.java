@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
-import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -27,7 +25,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
@@ -35,32 +32,25 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
-import static java.util.stream.Collectors.toList;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
@@ -78,7 +68,6 @@ import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -392,52 +381,14 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     return createErrorType(errorTypeRepository, errorTypeNames);
   }
 
+  /**
+   * @deprecated use
+   *             {@link org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils#createErrorTypeMatcher(ErrorTypeRepository, String)}
+   *             instead.
+   */
+  @Deprecated
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
-    if (errorTypeNames == null) {
-      return null;
-    }
-    String[] errorTypeIdentifiers = errorTypeNames.split(",");
-    List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
-      String parsedIdentifier = identifier.trim();
-      final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
-
-      if (doesErrorTypeContainWildcards(errorTypeComponentIdentifier)) {
-        return new WildcardErrorTypeMatcher(errorTypeComponentIdentifier);
-      } else {
-        return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
-            .orElseGet(() -> {
-              if (getBoolean(MULE_LAX_ERROR_TYPES)) {
-                LOGGER.warn("Could not find ErrorType for the given identifier: {}", parsedIdentifier);
-                return ErrorTypeBuilder.builder()
-                    .namespace(errorTypeComponentIdentifier.getNamespace())
-                    .identifier(errorTypeComponentIdentifier.getName())
-                    .parentErrorType(errorTypeRepository.getAnyErrorType())
-                    .build();
-              } else {
-                throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
-                                                                   parsedIdentifier));
-              }
-            }));
-      }
-
-    }).collect(toList());
-    return new DisjunctiveErrorTypeMatcher(matchers);
-  }
-
-  private static boolean doesErrorTypeContainWildcards(ComponentIdentifier errorTypeIdentifier) {
-    if (errorTypeIdentifier == null) {
-      return false;
-    }
-
-    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getName())) {
-      return true;
-    }
-
-    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
-      return true;
-    }
-
-    return false;
+    return createErrorTypeMatcher(errorTypeRepository, errorTypeNames);
   }
 
   public void setWhen(String when) {

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -28,7 +29,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
@@ -177,8 +177,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   private void addCriticalErrorHandler() {
-    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(errorTypeRepository
-        .getErrorType(OVERLOAD).get())));
+    exceptionListeners.add(0,
+                           new OnCriticalErrorHandler(createErrorTypeMatcher(errorTypeRepository.getErrorType(OVERLOAD).get())));
   }
 
   private void addDefaultErrorHandlerIfRequired() throws InitialisationException {
