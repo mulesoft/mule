@@ -14,13 +14,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -88,22 +83,6 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     assertInjection(object);
     assertThat(object.getKeyChild(), is(sameInstance(child1)));
     assertThat(object.getKey2Child(), is(sameInstance(child2)));
-  }
-
-  @Test
-  public void muleContextAware() throws Exception {
-    MuleContextAware muleContextAware = mock(MuleContextAware.class);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(KEY, muleContextAware);
-    assertRegistered(muleContextAware);
-    verify(muleContextAware).setMuleContext(muleContext);
-  }
-
-  @Test
-  public void lifecycleSateAware() throws Exception {
-    LifecycleStateAware lifecycleStateAware = mock(LifecycleStateAware.class);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(KEY, lifecycleStateAware);
-    assertRegistered(lifecycleStateAware);
-    verify(lifecycleStateAware).setLifecycleState(any(LifecycleState.class));
   }
 
   private void assertInjection(TestLifecycleObject object) {

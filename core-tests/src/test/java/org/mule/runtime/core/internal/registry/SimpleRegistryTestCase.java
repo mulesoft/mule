@@ -32,12 +32,13 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.junit.Test;
 import org.slf4j.Logger;
+
+import org.junit.Test;
 
 public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
 
-  private static final String LIFECYCLE_PHASES = "[setMuleContext, initialise, start, stop, dispose]";
+  private static final String LIFECYCLE_PHASES = "[initialise, start, stop, dispose]";
   public static final String TEST_KEY = "test";
 
   @Test
