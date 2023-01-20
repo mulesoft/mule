@@ -60,7 +60,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -118,7 +117,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
+    implements MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
     ComponentSampleDataProvider, Lifecycle {
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
@@ -151,6 +150,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   private SampleDataProviderMediator sampleDataProviderMediator;
 
+  @Inject
   protected MuleContext muleContext;
 
   @Inject
@@ -417,11 +417,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     } catch (Exception e) {
       throw new IllegalArgumentException(e.getMessage(), e);
     }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
   /**

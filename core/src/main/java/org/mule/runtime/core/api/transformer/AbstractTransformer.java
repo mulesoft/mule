@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.transformer;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Objects.hash;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
+
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.hash;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.inject.Inject;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
@@ -327,6 +329,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }

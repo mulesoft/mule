@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.transformer;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
@@ -15,6 +14,8 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -29,6 +30,8 @@ import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.nio.charset.Charset;
+
+import javax.inject.Inject;
 
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference to the current message. This message can be used
@@ -45,6 +48,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   private MuleClientFlowConstruct flowConstruct;
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
     flowConstruct = new MuleClientFlowConstruct(context);

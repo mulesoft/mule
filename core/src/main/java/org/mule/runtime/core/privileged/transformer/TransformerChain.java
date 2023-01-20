@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -23,12 +24,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * A referencable chain of transformers that can be used as a single transformer
  */
 public final class TransformerChain extends AbstractMessageTransformer {
 
-  private List<Transformer> transformers;
+  private final List<Transformer> transformers;
 
   public TransformerChain(List<Transformer> transformers) {
     super();
@@ -87,6 +90,7 @@ public final class TransformerChain extends AbstractMessageTransformer {
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext muleContext) {
     super.setMuleContext(muleContext);
     for (Transformer transformer : transformers) {
