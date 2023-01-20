@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
@@ -280,5 +281,38 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                emptySet(),
                                emptyMap()).validate();
 
+  }
+
+  @Test
+  @Issue("W-12395077")
+  public void noFailureWithApiDependencies() {
+    for (String classifier : API_CLASSIFIERS) {
+      List<BundleDependency> dependencies = new ArrayList<>();
+
+      dependencies.add(new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder()
+              .setGroupId("org.mule.sample")
+              .setArtifactId("test-api-a")
+              .setVersion("0.0.1")
+              .setClassifier(classifier)
+              .build())
+          .build());
+      dependencies.add(new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder()
+              .setGroupId("org.mule.sample")
+              .setArtifactId("test-api-a")
+              .setVersion("0.1.0")
+              .setClassifier(classifier)
+              .build())
+          .build());
+
+      new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
+                                 appDescriptor,
+                                 () -> null,
+                                 new File("."),
+                                 dependencies,
+                                 emptySet(),
+                                 emptyMap()).validate();
+    }
   }
 }
