@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
-import static org.mule.runtime.module.artifact.activation.internal.BundleDependencyMatcher.bundleDependency;
 import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
@@ -18,8 +17,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
 import org.mule.maven.client.api.MavenReactorResolver;

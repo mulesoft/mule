@@ -134,7 +134,7 @@ public final class DeployableProjectModel {
       BundleDescriptor descriptor = dependency.getDescriptor();
       if (descriptor.getClassifier().map(classifier -> !API_CLASSIFIERS.contains(classifier)).orElse(true)) {
         String pluginKey = descriptor.getGroupId() + ":" + descriptor.getArtifactId()
-                + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
+            + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
         repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
         repeatedDependencies.get(pluginKey).add(descriptor);
       }

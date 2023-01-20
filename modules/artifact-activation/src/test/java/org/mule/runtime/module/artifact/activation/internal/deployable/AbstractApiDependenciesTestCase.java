@@ -23,67 +23,72 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
+@Issue("W-12395077")
 public abstract class AbstractApiDependenciesTestCase extends AbstractMuleTestCase {
 
   @Test
   public void allApiDependenciesAreAddedRAML() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel(format("apps/%s/raml-api-app", getDeploymentType()));
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel(format("apps/%s/raml-api-app", getDeploymentType()));
 
     assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                    bundleDependency("raml-api-a"),
-                                                                    bundleDependency("raml-api-b"),
-                                                                    bundleDependency("raml-fragment", "1.0.0"),
-                                                                    bundleDependency("raml-fragment", "2.0.0")));
+                                                                            bundleDependency("raml-api-a"),
+                                                                            bundleDependency("raml-api-b"),
+                                                                            bundleDependency("raml-fragment", "1.0.0"),
+                                                                            bundleDependency("raml-fragment", "2.0.0")));
 
   }
 
   @Test
   public void allApiDependenciesAreAddedWSDL() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel(format("apps/%s/wsdl-api-app", getDeploymentType()));
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel(format("apps/%s/wsdl-api-app", getDeploymentType()));
 
     assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                    bundleDependency("wsdl-api-a"),
-                                                                    bundleDependency("wsdl-api-b"),
-                                                                    bundleDependency("wsdl-fragment", "1.0.0"),
-                                                                    bundleDependency("wsdl-fragment", "2.0.0"),
-                                                                    bundleDependency("library", "2.0.0")));
+                                                                            bundleDependency("wsdl-api-a"),
+                                                                            bundleDependency("wsdl-api-b"),
+                                                                            bundleDependency("wsdl-fragment", "1.0.0"),
+                                                                            bundleDependency("wsdl-fragment", "2.0.0"),
+                                                                            bundleDependency("library", "2.0.0")));
   }
 
   @Test
   public void allApiDependenciesAreAddedOAS() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel(format("apps/%s/oas-api-app", getDeploymentType()));
     assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                    bundleDependency("oas-api-a"),
-                                                                    bundleDependency("oas-api-b"),
-                                                                    bundleDependency("oas-fragment", "1.0.0"),
-                                                                    bundleDependency("oas-fragment", "2.0.0")));
+                                                                            bundleDependency("oas-api-a"),
+                                                                            bundleDependency("oas-api-b"),
+                                                                            bundleDependency("oas-fragment", "1.0.0"),
+                                                                            bundleDependency("oas-fragment", "2.0.0")));
   }
 
   @Test
   public void apiDependsOnLibraryThatDependsOnApiThatDependsOnApi() throws Exception {
-    DeployableProjectModel deployableProjectModel = getDeployableProjectModel(format("apps/%s/api-multiple-levels-app", getDeploymentType()));
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel(format("apps/%s/api-multiple-levels-app", getDeploymentType()));
     assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                    bundleDependency("raml-api-a"),
-                                                                    bundleDependency("library-depends-on-api"),
-                                                                    bundleDependency("api-depends-on-library"),
-                                                                    bundleDependency("raml-fragment", "1.0.0"),
-                                                                    bundleDependency("raml-fragment", "2.0.0")));
+                                                                            bundleDependency("raml-api-a"),
+                                                                            bundleDependency("library-depends-on-api"),
+                                                                            bundleDependency("api-depends-on-library"),
+                                                                            bundleDependency("raml-fragment", "1.0.0"),
+                                                                            bundleDependency("raml-fragment", "2.0.0")));
   }
 
   @Test
   public void apiTransitiveDependenciesDontOverrideMavenResolved() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel(format("apps/%s/api-app", getDeploymentType()));
     assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                    bundleDependency("wsdl-api-a"),
-                                                                    bundleDependency("wsdl-api-b"),
-                                                                    bundleDependency("wsdl-fragment", "1.0.0"),
-                                                                    bundleDependency("wsdl-fragment", "2.0.0"),
-                                                                    bundleDependency("library", "1.0.0")));
+                                                                            bundleDependency("wsdl-api-a"),
+                                                                            bundleDependency("wsdl-api-b"),
+                                                                            bundleDependency("wsdl-fragment", "1.0.0"),
+                                                                            bundleDependency("wsdl-fragment", "2.0.0"),
+                                                                            bundleDependency("library", "1.0.0")));
   }
 
   protected abstract String getDeploymentType();
@@ -101,5 +106,5 @@ public abstract class AbstractApiDependenciesTestCase extends AbstractMuleTestCa
   protected File getDeployableFolder(String appPath) throws URISyntaxException {
     return new File(getClass().getClassLoader().getResource(appPath).toURI());
   }
-  
+
 }
