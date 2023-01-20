@@ -25,6 +25,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sour
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceOutputType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateSourceMinMuleVersion;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
@@ -85,6 +86,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   private final Class<?> sourceClass;
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
+  private MuleVersion minMuleVersion;
 
 
   public JavaSourceModelParser(ExtensionElement extensionElement,
@@ -100,6 +102,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
+      this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
     }
   }
 

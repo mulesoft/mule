@@ -26,6 +26,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateOperationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.getContainerAnnotationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
@@ -102,6 +103,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
+  private MuleVersion minMuleVersion;
 
   private ExtensionParameter nestedChain;
   private boolean blocking = false;
@@ -128,6 +130,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
+      this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
     } else {
       this.operationContainer = null;
       enclosingType = null;

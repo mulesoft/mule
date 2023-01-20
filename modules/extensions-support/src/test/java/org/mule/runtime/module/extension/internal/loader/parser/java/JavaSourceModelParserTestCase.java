@@ -51,7 +51,6 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.mule.sdk.api.connectivity.ConnectionProvider;
-import org.mule.sdk.api.notification.NotificationEmitter;
 import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.connectivity.ReconnectionCallback;
 import org.mule.sdk.api.runtime.operation.Result;

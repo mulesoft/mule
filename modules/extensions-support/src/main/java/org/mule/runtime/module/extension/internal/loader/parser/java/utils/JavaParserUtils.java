@@ -38,8 +38,12 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
@@ -77,7 +81,7 @@ public final class JavaParserUtils {
     if (!(extension.isAnnotatedWith(Configurations.class)
         || extension.isAnnotatedWith(org.mule.sdk.api.annotation.Configurations.class))) {
       for (FieldElement field : extension.getFields()) {
-        calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
+        calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
       }
       calculatedMMV = max(calculatedMMV, extension.getEnclosingMethods()
           .map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION)).reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
@@ -111,7 +115,7 @@ public final class JavaParserUtils {
     calculatedMMV = max(calculatedMMV, config.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : config.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
+      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
     }
     calculatedMMV = max(calculatedMMV, config.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION))
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
@@ -182,7 +186,7 @@ public final class JavaParserUtils {
     calculatedMMV = max(calculatedMMV, connectionProvider.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : connectionProvider.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
+      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
     }
     Optional<MuleVersion> classLevelMMV = getMinMuleVersionFromAnnotations(connectionProvider);
     MuleVersion finalCalculatedMMV = calculatedMMV;
@@ -228,7 +232,7 @@ public final class JavaParserUtils {
     calculatedMMV = max(calculatedMMV, source.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : source.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
+      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, new HashSet<>()));
     }
     calculatedMMV = max(calculatedMMV, source.getEnclosingMethods().map(m -> calculateMethodMinMuleVersion(m, FIRST_MULE_VERSION))
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
@@ -310,7 +314,8 @@ public final class JavaParserUtils {
 
   private static MuleVersion calculateOutputMinMuleVersion(Type outputType) {
     MuleVersion calculatedMMV = FIRST_MULE_VERSION;
-    if (outputType.asMetadataType() instanceof ArrayType) {
+    if (outputType.isAssignableTo(Collection.class) || outputType.isAssignableTo(Iterable.class)
+        || outputType.isAssignableTo(Iterator.class)) {
       for (TypeGeneric typeGeneric : outputType.getGenerics()) {
         calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(typeGeneric.getConcreteType()));
       }
@@ -329,9 +334,14 @@ public final class JavaParserUtils {
     return calculatedMMV;
   }
 
-  private static MuleVersion calculateFieldMinMuleVersion(ExtensionParameter field) {
-    MuleVersion calculatedMMV = getMinMuleVersionFromAnnotations(field).orElse(FIRST_MULE_VERSION);
+  private static MuleVersion calculateFieldMinMuleVersion(ExtensionParameter field, Set<String> seenTypes) {
     Type parameterType = field.getType();
+    if (seenTypes.contains(parameterType.getTypeName())) {
+      return FIRST_MULE_VERSION;
+    } else {
+      seenTypes.add(parameterType.getTypeName());
+    }
+    MuleVersion calculatedMMV = getMinMuleVersionFromAnnotations(field).orElse(FIRST_MULE_VERSION);
     for (Type annotation : field.getAnnotations().collect(toList())) {
       if (annotation.isSameType(Inject.class) && !parameterType.isSameType(Optional.class)) {
         // Parse injected classes but exclude Optionals (such as ForwardCompatibilityHelper)
@@ -339,11 +349,11 @@ public final class JavaParserUtils {
       }
       if (annotation.isSameType(Parameter.class)
           || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.Parameter.class)) {
-        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType));
+        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypes));
       }
       if (annotation.isSameType(ParameterGroup.class)
           || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
-        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType));
+        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypes));
       }
       if (annotation.isSameType(Connection.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Connection.class)) {
         // Sources inject the ConnectionProvider instead of the connection
@@ -370,7 +380,7 @@ public final class JavaParserUtils {
     for (Type annotation : methodParameter.getAnnotations().collect(toList())) {
       if (annotation.isSameType(ParameterGroup.class)
           || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
-        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(methodParameter.getType()));
+        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(methodParameter.getType(), new HashSet<>()));
       }
       if (annotation.isSameType(Config.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Config.class)) {
         calculatedMMV =
@@ -386,7 +396,7 @@ public final class JavaParserUtils {
     return calculatedMMV;
   }
 
-  private static MuleVersion calculateParameterContainerMinMuleVersion(Type containerType) {
+  private static MuleVersion calculateParameterContainerMinMuleVersion(Type containerType, Set<String> seenTypes) {
     Optional<MuleVersion> minMuleVersionAnnotation = getMinMuleVersionFromAnnotations(containerType);
     if (minMuleVersionAnnotation.isPresent()) {
       return minMuleVersionAnnotation.get();
@@ -395,7 +405,7 @@ public final class JavaParserUtils {
     calculatedMMV = max(calculatedMMV, containerType.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : containerType.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field));
+      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, seenTypes));
     }
     return calculatedMMV;
   }
@@ -429,5 +439,9 @@ public final class JavaParserUtils {
 
   private static boolean belongsToSdkApiPackages(String fullyQualifiedName) {
     return fullyQualifiedName.startsWith("org.mule.sdk.api");
+  }
+
+  private static boolean belongsToJavaPackages(String fullyQualifiedName) {
+    return fullyQualifiedName.startsWith("java.");
   }
 }

@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forFunction;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateFunctionMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.getContainerAnnotationMinMuleVersion;
 
@@ -48,6 +49,7 @@ import java.util.Set;
 public class JavaFunctionModelParser extends AbstractJavaExecutableComponentModelParser implements FunctionModelParser {
 
   private final FunctionElement functionElement;
+  private MuleVersion minMuleVersion;
 
   public JavaFunctionModelParser(ExtensionElement extensionElement,
                                  FunctionElement functionElement,
@@ -59,6 +61,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
+      this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
     }
   }
 

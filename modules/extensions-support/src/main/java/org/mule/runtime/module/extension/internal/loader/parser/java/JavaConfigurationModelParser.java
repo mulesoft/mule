@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Mule
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateConfigMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.getContainerAnnotationMinMuleVersion;
 
@@ -59,6 +60,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   private final JavaExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
+  private final MuleVersion minMuleVersion;
 
   public JavaConfigurationModelParser(JavaExtensionModelParser extensionModelParser,
                                       ExtensionElement extensionElement,
@@ -69,6 +71,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
+    this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
   }
 
   private void parseStructure() {

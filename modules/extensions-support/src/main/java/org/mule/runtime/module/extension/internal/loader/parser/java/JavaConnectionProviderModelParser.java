@@ -27,6 +27,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.conn
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.calculateConnectionProviderMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
@@ -84,6 +85,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   private final ConnectionProviderElement element;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
+  private final MuleVersion minMuleVersion;
 
   public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
                                            ExtensionElement extensionElement,
@@ -95,6 +97,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
+    this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
   }
 
   @Override
