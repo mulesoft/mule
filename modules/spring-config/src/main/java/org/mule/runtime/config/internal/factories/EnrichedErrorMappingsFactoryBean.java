@@ -44,8 +44,13 @@ public class EnrichedErrorMappingsFactoryBean extends AbstractComponentFactory<E
 
   @Override
   public EnrichedErrorMapping doGetObject() throws Exception {
-    ErrorTypeMatcher errorTypeMatcher = source != null ? createErrorTypeMatcher(errorTypeRepository, source)
-        : createErrorTypeMatcher(errorTypeRepository.lookupErrorType(ANY).get());
+    ErrorTypeMatcher errorTypeMatcher;
+    try {
+      errorTypeMatcher = source != null ? createErrorTypeMatcher(errorTypeRepository, source)
+          : createErrorTypeMatcher(errorTypeRepository.lookupErrorType(ANY).get());
+    } catch (IllegalArgumentException e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
+    }
     ErrorType targetValue = resolveErrorType(target);
     return new EnrichedErrorMapping(errorTypeMatcher, targetValue);
   }
