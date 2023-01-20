@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableCollection;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.ATTRIBUTES;
 import static org.mule.runtime.api.el.BindingContextUtils.AUTHENTICATION;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
@@ -22,9 +15,20 @@ import static org.mule.runtime.api.el.BindingContextUtils.PARAMS;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.Binding;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
+import org.mule.runtime.api.el.ModuleNamespace;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.collection.SmallMap;
 
@@ -40,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
 
 public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
@@ -258,6 +263,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   public static class BindingContextImplementation implements BindingContext {
 
+    private static final Logger LOGGER = getLogger(BindingContextImplementation.class);
+
     private final List<BindingContext> delegates;
 
     private final Optional<TypedValue> payloadBinding;
@@ -395,12 +402,39 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
     @Override
     public Collection<ExpressionModule> modules() {
-      List<ExpressionModule> mods = new ArrayList<>();
-      mods.addAll(modules);
-      for (BindingContext bindingContext : delegates) {
-        mods.addAll(bindingContext.modules());
+      Map<ModuleNamespace, ExpressionModule> modulesByNamespace = new HashMap<>();
+      for (ExpressionModule module : modules) {
+        addOrMerge(modulesByNamespace, module);
       }
-      return mods;
+      for (BindingContext bindingContext : delegates) {
+        for (ExpressionModule module : bindingContext.modules()) {
+          addOrMerge(modulesByNamespace, module);
+        }
+      }
+      return modulesByNamespace.values();
+    }
+
+    private static void addOrMerge(Map<ModuleNamespace, ExpressionModule> modulesByNamespace, ExpressionModule module) {
+      ModuleNamespace namespace = module.namespace();
+      if (modulesByNamespace.containsKey(namespace)) {
+        reportRepeatedNamespace(namespace);
+        modulesByNamespace.put(namespace, new CompositeExpressionModule(module, modulesByNamespace.get(namespace)));
+      } else {
+        modulesByNamespace.put(namespace, module);
+      }
+    }
+
+    private static void reportRepeatedNamespace(ModuleNamespace namespace) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Two modules with namespace '{}' were found in a binding context. We're merging them into a single one " +
+            "in order to make the expression language able to use the content of both, but the maintainer of such module " +
+            "should review this situation.\nIt may happen when an extension with types or functions also declares a " +
+            "GlobalBindingContextProvider that adds a ExpressionModule to the resulting BindingContext. If that's the case," +
+            "the provider should be removed and the types/functions should be added to the extension model.", namespace);
+      } else {
+        LOGGER.warn("Two modules with namespace '{}' were found in a binding context. Set log level to DEBUG for details",
+                    namespace);
+      }
     }
   }
 }
