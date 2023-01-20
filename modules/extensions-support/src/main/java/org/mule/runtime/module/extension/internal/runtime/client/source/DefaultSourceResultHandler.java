@@ -96,7 +96,8 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
   }
 
   @Override
-  public CompletableFuture<Void> completeWithError(Throwable exception, Consumer<SourceCallbackParameterizer> errorCallbackParameters) {
+  public CompletableFuture<Void> completeWithError(Throwable exception,
+                                                   Consumer<SourceCallbackParameterizer> errorCallbackParameters) {
     final ClassLoader extensionClassLoader = sourceClient.getExtensionClassLoader();
     return withNullEvent(event -> {
       final MessagingException messagingException = sourceClient.asMessagingException(exception, event);

@@ -163,20 +163,12 @@ public class SourceClient<T, A> implements Lifecycle {
     disposeIfNeeded(source, LOGGER);
   }
 
-//  ResolverSet toResolverSet(Consumer<SourceParameterizer> consumer, ParameterizedModel model) {
-//    DefaultSourceParameterizer parameterizer = new DefaultSourceParameterizer();
-//    consumer.accept(parameterizer);
-//
-//    return toResolverSet(parameterizer, model);
-//  }
-
   ResolverSet toResolverSet(BaseParameterizer parameterizer, ParameterizedModel model) {
     ComponentParameterization.Builder paramsBuilder = ComponentParameterization.builder(model);
     parameterizer.setValuesOn(paramsBuilder);
 
-    ResolverSet resolverSet;
     try {
-      resolverSet = getResolverSetFromComponentParameterization(
+      ResolverSet resolverSet = getResolverSetFromComponentParameterization(
                                                                 paramsBuilder.build(),
                                                                 muleContext,
                                                                 true,

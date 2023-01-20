@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.client.source;
 import org.mule.runtime.extension.api.client.source.SourceCallbackParameterizer;
 import org.mule.runtime.module.extension.internal.runtime.client.params.BaseParameterizer;
 
-public class DefaultSourceCallbackParameterizer extends BaseParameterizer<SourceCallbackParameterizer> implements SourceCallbackParameterizer {
+public class DefaultSourceCallbackParameterizer extends BaseParameterizer<SourceCallbackParameterizer>
+    implements SourceCallbackParameterizer {
 
 }

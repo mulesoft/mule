@@ -28,7 +28,8 @@ import java.util.function.Function;
  *
  * @since 4.6.0
  */
-public abstract class BaseComponentParameterizer<T extends ComponentParameterizer> extends BaseParameterizer<T> implements ComponentParameterizer<T> {
+public abstract class BaseComponentParameterizer<T extends ComponentParameterizer> extends BaseParameterizer<T>
+    implements ComponentParameterizer<T> {
 
   private static final CursorProviderFactory NULL_CURSOR_PROVIDER_FACTORY = new NullCursorProviderFactory();
 
