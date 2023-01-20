@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -32,6 +33,7 @@ import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithDeclaringClass;
@@ -64,7 +66,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
 
     ExtensionElement extensionElement = mock(ExtensionElement.class, RETURNS_DEEP_STUBS);
     when(extensionElement.getName()).thenReturn("LoaderTest");
-    when(extensionElement.getConfigurations()).thenReturn(emptyList());
+    when(extensionElement.getConfigurations()).thenReturn(singletonList(mock(ConfigurationElement.class)));
     when(extensionElement.getConnectionProviders()).thenReturn(emptyList());
     when(extensionElement.getSources()).thenReturn(emptyList());
     when(extensionElement.getOperations()).thenReturn(emptyList());
