@@ -433,7 +433,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
             "the provider should be removed and the types/functions should be added to the extension model.", namespace);
       } else {
         LOGGER.warn("Two modules with namespace '{}' were found in a binding context. Set log level to DEBUG for details",
-                namespace);
+                    namespace);
       }
     }
   }
