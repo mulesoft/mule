@@ -47,8 +47,13 @@ public class CausedByFunction implements ExpressionFunction {
     checkArgument(error != null, "There's no error to match against.");
     String errorIdentifier = (String) parameters[1];
 
-    ErrorTypeMatcher errorTypeMatcher = createErrorTypeMatcher(errorTypeRepository, errorIdentifier);
+    ErrorTypeMatcher errorTypeMatcher = createErrorTypeMatcher(resolveErrorType(errorIdentifier));
     return errorTypeMatcher.match(error.getErrorType());
+  }
+
+  private ErrorType resolveErrorType(String errorIdentifier) {
+    return errorTypeRepository.getErrorType(buildFromStringRepresentation(errorIdentifier))
+        .orElseThrow(() -> new IllegalArgumentException(format("Could not find error type '%s'.", errorIdentifier)));
   }
 
   @Override
