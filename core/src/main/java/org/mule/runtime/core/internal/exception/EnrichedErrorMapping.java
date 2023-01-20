@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 
 /**
  * Represents a mapping between source and target {@link ErrorType}s, indicating that if the first or a match for it is found then

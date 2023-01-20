@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.el.function;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
-import static org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
@@ -20,7 +20,7 @@ import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 

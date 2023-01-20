@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.util;
 
 import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
-import static org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -26,7 +26,7 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;

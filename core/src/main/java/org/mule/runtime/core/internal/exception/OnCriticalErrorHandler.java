@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
 
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;

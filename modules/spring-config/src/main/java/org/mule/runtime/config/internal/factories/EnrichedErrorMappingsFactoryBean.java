@@ -8,9 +8,8 @@ package org.mule.runtime.config.internal.factories;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
+import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -20,8 +19,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.matcher.ErrorTypeMatcher;
-import org.mule.runtime.api.message.matcher.ErrorTypeMatcherUtils;
+import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
