@@ -304,6 +304,102 @@
           "methodName": "reuseGlobalErrorHandler",
           "elementKind": "method",
           "justification": "W-12181063: [Global Error Handling] remove the kill switch for enabling the memory fixes in 4.5"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractMessageTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractMessageTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.api.transformer",
+          "classSimpleName": "AbstractMessageTransformer",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.api.transformer",
+          "classSimpleName": "AbstractTransformer",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.api.util.compression",
+          "classSimpleName": "AbstractCompressionTransformer",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.privileged.transformer.TransformerChain::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "new": "method void org.mule.runtime.core.privileged.transformer.TransformerChain::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.privileged.transformer",
+          "classSimpleName": "TransformerChain",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractMessageTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.TransformerTemplate",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractMessageTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.TransformerTemplate",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.privileged.transformer",
+          "classSimpleName": "TransformerTemplate",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.privileged.transformer.simple",
+          "classSimpleName": "ByteArrayToObject",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.privileged.transformer.simple",
+          "classSimpleName": "ByteArrayToSerializable",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "annotationType": "javax.inject.Inject",
+          "annotation": "@javax.inject.Inject",
+          "package": "org.mule.runtime.core.privileged.transformer.simple",
+          "classSimpleName": "SerializableToByteArray",
+          "methodName": "setMuleContext",
+          "elementKind": "method",
+          "justification": "W-10781591: Use @Inject instead of MuleContextAware"
         }
       ]
     }
