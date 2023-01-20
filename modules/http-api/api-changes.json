@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.http.api.HttpConstants.HttpStatus.UNPROCESSABLE_ENTITY",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpStatus",
+          "fieldName": "UNPROCESSABLE_ENTITY",
+          "elementKind": "enumConstant",
+          "justification": "W-12293483: Add HTTP error 422 Unprocessable Entity"
+        },
+        {
           "code": "java.method.added",
           "new": "method org.mule.runtime.http.api.server.HttpServerConfiguration.Builder org.mule.runtime.http.api.server.HttpServerConfiguration.Builder::setReadTimeout(long)",
           "package": "org.mule.runtime.http.api.server",
