@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_EXPRESSION_BINDINGS;
+
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -22,12 +25,16 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.weave.v2.interpreted.node.executors.FunctionExecutor;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @Issue("W-12412432")
+@Feature(EXPRESSION_LANGUAGE)
+@Story(SUPPORT_EXPRESSION_BINDINGS)
 public class CompositeExpressionModuleTestCase extends AbstractMuleTestCase {
 
   @Rule
