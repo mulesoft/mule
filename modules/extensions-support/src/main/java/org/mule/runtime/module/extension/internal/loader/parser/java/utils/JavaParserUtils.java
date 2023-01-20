@@ -38,9 +38,7 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -210,23 +208,18 @@ public final class JavaParserUtils {
    * @param source the connection provider, as a {@link Type}, to calculate its min mule version
    * @return the minimum mule version of the given source
    */
-  public static MuleVersion calculateSourceMinMuleVersion(Type source) {
+  public static MuleVersion calculateSourceMinMuleVersion(SourceElement source) {
+    MuleVersion sourceGenericsMMV = calculateSourceGenericsMinMuleVersion(source.getSuperClassGenerics());
+    return max(getSourceMinMuleVersion(source), sourceGenericsMMV);
+  }
+
+  public static MuleVersion getSourceMinMuleVersion(Type source) {
     MuleVersion calculatedMMV = source.getSuperType().map(superType -> {
       if (superType.isSameType(Source.class) || superType.isSameType(org.mule.sdk.api.runtime.source.Source.class)) {
         return getEnforcedMinMuleVersion(superType);
       }
-      return calculateSourceMinMuleVersion(superType);
+      return getSourceMinMuleVersion(superType);
     }).orElse(FIRST_MULE_VERSION);
-    if (source.isAssignableTo(Source.class)) {
-      calculatedMMV =
-          max(calculatedMMV,
-              calculateSourceGenericsMinMuleVersion(source.getSuperTypeGenerics(Source.class)));
-    }
-    if (source.isAssignableTo(org.mule.sdk.api.runtime.source.Source.class)) {
-      calculatedMMV =
-          max(calculatedMMV,
-              calculateSourceGenericsMinMuleVersion(source.getSuperTypeGenerics(org.mule.sdk.api.runtime.source.Source.class)));
-    }
     calculatedMMV = max(calculatedMMV, source.getImplementingInterfaces().map(JavaParserUtils::calculateInterfacesMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     calculatedMMV = max(calculatedMMV, source.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
@@ -314,8 +307,7 @@ public final class JavaParserUtils {
 
   private static MuleVersion calculateOutputMinMuleVersion(Type outputType) {
     MuleVersion calculatedMMV = FIRST_MULE_VERSION;
-    if (outputType.isAssignableTo(Collection.class) || outputType.isAssignableTo(Iterable.class)
-        || outputType.isAssignableTo(Iterator.class)) {
+    if (outputType.asMetadataType() instanceof ArrayType) {
       for (TypeGeneric typeGeneric : outputType.getGenerics()) {
         calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(typeGeneric.getConcreteType()));
       }
