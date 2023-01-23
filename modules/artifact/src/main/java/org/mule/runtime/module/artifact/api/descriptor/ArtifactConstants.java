@@ -27,6 +27,10 @@ public class ArtifactConstants {
 
   private ArtifactConstants() {}
 
+  /**
+   * @return classifiers for API definition artifacts.
+   */
+  // TODO W-12422029 - use this method in the Maven Client
   public static Set<String> getApiClassifiers() {
     final String apiClassifiers = getProperty(org.mule.runtime.api.util.MuleSystemProperties.API_CLASSIFIERS);
     return apiClassifiers != null ? Arrays.stream(apiClassifiers.split(",")).map(String::trim).collect(Collectors.toSet())
