@@ -20,6 +20,7 @@ import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -191,7 +192,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     prepareScenario(applicationFileBuilder, mockDeploymentListener, redeploymentSuccessThrown);
 
-    deploymentService.redeploy(applicationFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, applicationFileBuilder.getArtifactFile().toURI());
 
     assertRededeployment(mockDeploymentListener, redeploymentSuccessThrown);
   }
@@ -207,7 +208,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     prepareScenario(applicationFileBuilder, mockDeploymentListener, redeploymentSuccessThrown);
 
-    deploymentService.redeploy(appName);
+    redeploy(deploymentService, appName);
 
     assertRededeployment(mockDeploymentListener, redeploymentSuccessThrown);
   }

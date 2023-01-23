@@ -7,31 +7,6 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
@@ -57,6 +32,8 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentFailureStory.DEPLOYMENT_FAILURE;
@@ -66,6 +43,33 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLO
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -101,14 +105,13 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 
 /**
  * Contains test for application deployment on the default domain
@@ -905,7 +908,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     reset(applicationDeploymentListener);
 
-    deploymentService.redeploy(emptyAppFileBuilder.getId());
+    redeploy(deploymentService, emptyAppFileBuilder.getId());
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
     deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
@@ -956,7 +959,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     }
 
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
     assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
@@ -974,7 +977,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     }
 
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
     for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
@@ -992,7 +995,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deployApplication(dummyAppDescriptorFileBuilder);
 
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
     assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
@@ -1039,7 +1042,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
       flow.stop();
     }
     reset(applicationDeploymentListener);
-    deploymentService.redeploy(dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilder, STARTED);
     for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
@@ -1624,7 +1627,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     reset(mockDeploymentListener);
 
     // Redeploy by using deploy method
-    deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
@@ -1647,7 +1650,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     // Redeploy by using deploy method
-    deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
