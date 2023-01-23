@@ -169,12 +169,12 @@ public class SourceClient<T, A> implements Lifecycle {
 
     try {
       ResolverSet resolverSet = getResolverSetFromComponentParameterization(
-                                                                paramsBuilder.build(),
-                                                                muleContext,
-                                                                true,
-                                                                reflectionCache,
-                                                                expressionManager,
-                                                                "");
+                                                                            paramsBuilder.build(),
+                                                                            muleContext,
+                                                                            true,
+                                                                            reflectionCache,
+                                                                            expressionManager,
+                                                                            "");
 
       resolverSet.initialise();
       return resolverSet;
