@@ -8,11 +8,13 @@ package org.mule.runtime.config.internal.context.lazy;
 
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -22,7 +24,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  */
 public class TrackingPostProcessor implements BeanPostProcessor {
 
-  private List<String> trackingList = new ArrayList<>();
+  private final Set<String> trackingOrderedSet = new LinkedHashSet<>();
+  private final Set<String> currentTrackingOrderedSet = new LinkedHashSet<>();
   private boolean tracking = false;
 
   @Override
@@ -33,33 +36,38 @@ public class TrackingPostProcessor implements BeanPostProcessor {
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     if (tracking) {
-      ifNotBlank(beanName, value -> {
-        if (!trackingList.contains(value)) {
-          trackingList.add(value);
-        }
-      });
+      ifNotBlank(beanName, currentTrackingOrderedSet::add);
     }
     return bean;
   }
 
-  public List<String> getBeansTracked() {
-    return ImmutableList.copyOf(trackingList);
+  public Set<String> getBeansTracked() {
+    return ImmutableSet.copyOf(trackingOrderedSet);
+  }
+
+  public List<String> getBeansTrackedInOrder() {
+    return ImmutableList.copyOf(trackingOrderedSet);
   }
 
   public void startTracking() {
     tracking = true;
+    currentTrackingOrderedSet.clear();
   }
 
   public void stopTracking() {
     tracking = false;
   }
 
-  public void intersection(Collection<String> beanNames) {
-    trackingList.removeIf(name -> !beanNames.contains(name));
+  public void commitOnly(Collection<String> beanNames) {
+    tracking = false;
+    currentTrackingOrderedSet.stream()
+        .filter(beanNames::contains)
+        .forEach(trackingOrderedSet::add);
+    currentTrackingOrderedSet.clear();
   }
 
   public void reset() {
-    trackingList.clear();
+    trackingOrderedSet.clear();
   }
 
 }

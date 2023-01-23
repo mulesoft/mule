@@ -50,6 +50,22 @@ public interface LazyComponentInitializer {
   void initializeComponent(Location location);
 
   /**
+   * Calling this method guarantees that the requested component from the configuration and its dependencies will be created,
+   * initialized and started.
+   * <p/>
+   * The requested component must exists in the configuration.
+   * <p/>
+   * Unlike {@link #initializeComponent(Location)} and {@link #initializeComponents(ComponentLocationFilter)}, calling this method
+   * will not affect previously created/started components.
+   *
+   * @param location the location of the configuration component.
+   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exist.
+   *
+   * @since 4.6
+   */
+  void initializeAdditionalComponent(Location location);
+
+  /**
    * Defines which {@link Component components} should be initialized by accepting it by {@link ComponentLocation}.
    *
    * @since 4.0

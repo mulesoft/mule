@@ -466,6 +466,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     createApplicationComponents(beanFactory, applicationModel, true);
   }
 
+  protected boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
+    return componentAst.getModel(HasStereotypeModel.class)
+        .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
+        .orElse(false);
+  }
+
   /**
    * Creates the definition for all the objects to be created form the enabled components in the {@code applicationModel}.
    *
@@ -487,9 +493,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                                            Map<ComponentAst, SpringComponentModel> springComponentModels) {
     Set<String> alwaysEnabledTopLevelComponents = new HashSet<>();
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(cm -> cm.getModel(HasStereotypeModel.class)
-            .map(stm -> stm.getStereotype().isAssignableTo(APP_CONFIG))
-            .orElse(false))
+        .filter(this::isAlwaysEnabledComponent)
         .peek(cm -> cm.getComponentId().ifPresent(alwaysEnabledTopLevelComponents::add))
         .filter(cm -> !cm.getComponentId().isPresent())
         .map(ComponentAst::getIdentifier)

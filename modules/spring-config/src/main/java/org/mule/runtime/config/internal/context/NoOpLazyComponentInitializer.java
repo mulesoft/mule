@@ -24,4 +24,8 @@ public class NoOpLazyComponentInitializer implements LazyComponentInitializer {
     // Nothing to do...
   }
 
+  @Override
+  public void initializeAdditionalComponent(Location location) {
+    // Nothing to do...
+  }
 }
