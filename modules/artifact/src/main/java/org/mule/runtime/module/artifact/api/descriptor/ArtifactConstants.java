@@ -6,16 +6,31 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static java.lang.System.getProperty;
+
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ArtifactConstants {
 
   /**
    * Classifiers for API definition artifacts.
+   *
+   * @deprecated since 4.5 use {@link #getApiClassifiers()} instead.
    */
+  @Deprecated
   public static final HashSet<String> API_CLASSIFIERS = newHashSet("raml", "oas", "raml-fragment", "wsdl");
 
   private ArtifactConstants() {}
+
+  public static Set<String> getApiClassifiers() {
+    final String apiClassifiers = getProperty(org.mule.runtime.api.util.MuleSystemProperties.API_CLASSIFIERS);
+    return apiClassifiers != null ? Arrays.stream(apiClassifiers.split(",")).map(String::trim).collect(Collectors.toSet())
+        : API_CLASSIFIERS;
+  }
+
 }

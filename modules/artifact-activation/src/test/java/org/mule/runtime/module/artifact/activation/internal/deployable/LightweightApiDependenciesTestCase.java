@@ -30,8 +30,11 @@ public class LightweightApiDependenciesTestCase extends AbstractApiDependenciesT
     installDependency("api-depends-on-library-1.0.0-raml.pom");
     installDependency("raml-api-a-1.0.0-raml.pom");
     installDependency("raml-api-b-1.0.0-raml.pom");
+    installDependency("raml-api-c-1.0.0-raml.pom");
     installDependency("raml-fragment-1.0.0-raml-fragment.pom");
     installDependency("raml-fragment-2.0.0-raml-fragment.pom");
+    installDependency("raml-fragment-b-1.0.0-raml-fragment.pom");
+    installDependency("raml-fragment-c-1.0.0-raml-fragment.pom");
     installDependency("wsdl-api-a-1.0.0-wsdl.pom");
     installDependency("wsdl-api-b-1.0.0-wsdl.pom");
     installDependency("wsdl-fragment-1.0.0-wsdl.pom");

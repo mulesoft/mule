@@ -5,7 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.test</groupId>
-    <artifactId>oas-fragment</artifactId>
+    <artifactId>raml-fragment-b</artifactId>
     <version>1.0.0</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.test</groupId>
+            <artifactId>raml-fragment-c</artifactId>
+            <version>1.0.0</version>
+            <classifier>raml-fragment</classifier>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
 
 </project>

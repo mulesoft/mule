@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
@@ -286,7 +286,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
   @Test
   @Issue("W-12395077")
   public void noFailureWithApiDependencies() {
-    for (String classifier : API_CLASSIFIERS) {
+    for (String classifier : getApiClassifiers()) {
       List<BundleDependency> dependencies = new ArrayList<>();
 
       dependencies.add(new BundleDependency.Builder()

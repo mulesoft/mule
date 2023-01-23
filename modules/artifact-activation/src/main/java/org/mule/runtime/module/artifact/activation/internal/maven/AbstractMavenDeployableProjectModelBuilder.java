@@ -19,7 +19,7 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
@@ -293,7 +293,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
       String pluginKey =
           descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getVersion()
               + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
-      boolean isApi = descriptor.getClassifier().map(API_CLASSIFIERS::contains).orElse(false);
+      boolean isApi = descriptor.getClassifier().map(getApiClassifiers()::contains).orElse(false);
       boolean keep = !uniqueDependenciesIds.contains(pluginKey) || isApi;
       uniqueDependenciesIds.add(pluginKey);
       return keep;
