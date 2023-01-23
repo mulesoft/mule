@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
 
 import java.io.File;

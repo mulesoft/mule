@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.api.descriptor;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.XmlMuleConfigurationsFilter;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Determines whether the given file is a configuration of a deployable project.

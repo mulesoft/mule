@@ -245,6 +245,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   }
 
   @Test
+  @Issue("W-12422216")
   public void createDeployableProjectModelWithConfigs() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/configs-not-in-model");
 
@@ -254,6 +255,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   }
 
   @Test
+  @Issue("W-12422216")
   public void configsAreHonouredIfProvided() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/configs-in-model");
 
