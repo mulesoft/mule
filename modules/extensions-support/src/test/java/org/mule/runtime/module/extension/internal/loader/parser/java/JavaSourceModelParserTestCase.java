@@ -56,11 +56,15 @@ import org.mule.sdk.api.runtime.connectivity.ReconnectionCallback;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.source.BackPressureContext;
+import org.mule.sdk.api.runtime.source.PollContext;
+import org.mule.sdk.api.runtime.source.PollingSource;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 import org.mule.sdk.api.runtime.source.SourceCompletionCallback;
 import org.mule.sdk.api.runtime.source.SourceResult;
 import org.mule.sdk.api.store.ObjectStoreManager;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
+import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 import javax.inject.Inject;
 
@@ -364,6 +368,22 @@ public class JavaSourceModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
+  @Test
+  public void getMMVForExtendsPollingSource() {
+    mockSourceWrapperWithClass(ExtendsPollingSource.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
+  }
+
+  @Test
+  public void getMMVForSourceWithRecursiveField() {
+    mockSourceWrapperWithClass(SourceWithRecursiveParameter.class);
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
   private boolean parseEmitsResponseFromSourceClass(Class<? extends Source> sourceClass) {
     mockSourceWrapperWithClass(sourceClass);
     return parser.emitsResponse();
@@ -379,7 +399,7 @@ public class JavaSourceModelParserTestCase {
     return parser.getSourceClusterSupportModelProperty();
   }
 
-  protected void mockSourceWrapperWithClass(Class<? extends Source> sourceClass) {
+  protected void mockSourceWrapperWithClass(Class sourceClass) {
     sourceElement = new SourceTypeWrapper<>(sourceClass, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     parser = new JavaSourceModelParser(mock(ExtensionElement.class), sourceElement, mock(ExtensionLoadingContext.class));
@@ -629,5 +649,34 @@ public class JavaSourceModelParserTestCase {
 
     @Parameter
     SdkParametersContainer nestedContainer;
+  }
+
+  private static class ExtendsPollingSource extends PollingSource<String, String> {
+
+    @Override
+    protected void doStart() throws MuleException {
+
+    }
+
+    @Override
+    protected void doStop() {
+
+    }
+
+    @Override
+    public void poll(PollContext<String, String> pollContext) {
+
+    }
+
+    @Override
+    public void onRejectedItem(Result<String, String> result, SourceCallbackContext callbackContext) {
+
+    }
+  }
+
+  private static class SourceWithRecursiveParameter extends TestSource {
+
+    @Parameter
+    KnockeableDoor door;
   }
 }
