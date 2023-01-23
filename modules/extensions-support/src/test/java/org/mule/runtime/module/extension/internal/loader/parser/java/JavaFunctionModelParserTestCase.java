@@ -34,7 +34,6 @@ public class JavaFunctionModelParserTestCase {
   ClassTypeLoader typeLoader =
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForFunction() throws NoSuchMethodException {
     setParser(Functions.class.getMethod("function"), ConfigurationFunctions.class);
@@ -43,7 +42,6 @@ public class JavaFunctionModelParserTestCase {
     Assert.assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForSdkAnnotatedFunction() throws NoSuchMethodException {
     setParser(SdkFunctions.class.getMethod("sdkFunction"), ConfigurationFunctions.class);
@@ -52,7 +50,6 @@ public class JavaFunctionModelParserTestCase {
     Assert.assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForFunctionFromConfigurationWithSdkFunctionsAnnotation() throws NoSuchMethodException {
     setParser(Functions.class.getMethod("function"), ConfigurationWithSdkFunctionsAnnotation.class);

@@ -206,7 +206,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(parser.getConnectionManagementType(), is(CACHED));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForLegacyApiConnectionProvider() {
     mockConnectionProviderWithClass(LegacyConnectionProvider.class);
@@ -215,7 +214,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.1.1"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForSdkApiConnectionProvider() {
     mockConnectionProviderWithClass(SdkConnectionProvider.class);
@@ -224,7 +222,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForConnectionProviderWithSdkAnnotation() {
     mockConnectionProviderWithClass(SdkAnnotatedConnectionProvider.class);
@@ -233,7 +230,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForConnectionProviderWithParameterWithSdkAnnotation() {
     mockConnectionProviderWithClass(ConnectionProviderWithParameterWithSdkAnnotation.class);
@@ -242,7 +238,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForConnectionProviderWithSdkParameter() {
     mockConnectionProviderWithClass(ConnectionProviderWithSdkParameter.class);
@@ -251,7 +246,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForConnectionProviderWithSdkField() {
     mockConnectionProviderWithClass(ConnectionProviderWithSdkField.class);
@@ -260,7 +254,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5.0"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForConnectionProviderExtendsSdkConnectionProvider() {
     mockConnectionProviderWithClass(ConnectionProviderExtendsSdkConnectionProvider.class);
@@ -269,7 +262,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.5"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getMMVForConnectionProviderExtendsExtraConnectionProvider() {
     mockConnectionProviderWithClass(ConnectionProviderExtendsSuperClass.class);
@@ -278,7 +270,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getClassLevelMMVForConnectionProviderWithMMVAnnotation() {
     mockConnectionProviderWithClass(ConnectionProviderWithHigherMMVAnnotation.class);
@@ -287,7 +278,6 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.6"));
   }
 
-  @Ignore("W-12398760")
   @Test
   public void getOverwrittenMMVForConnectionProviderWithMMVAnnotation() {
     mockConnectionProviderWithClass(ConnectionProviderWithLowerMMVAnnotation.class);
