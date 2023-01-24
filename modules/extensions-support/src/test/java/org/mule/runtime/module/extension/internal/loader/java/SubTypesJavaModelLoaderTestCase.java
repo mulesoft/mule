@@ -46,6 +46,8 @@ import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.stream.Stream;
+
 @SmallTest
 public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
 
@@ -74,6 +76,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     when(extensionElement.getFunctionContainers()).thenReturn(emptyList());
     when(extensionElement.getFunctions()).thenReturn(emptyList());
     when(extensionElement.getTypeName()).thenReturn("java.");
+    when(extensionElement.getEnclosingMethods()).thenReturn(Stream.empty());
 
     baseMetadataType = createMetadataType(BASE_TYPE_ID);
     subMetadataType = createMetadataType(SUBTYPE_ID);
