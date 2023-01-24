@@ -15,6 +15,7 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -53,22 +54,27 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
 
 import java.io.StringBufferInputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 @Feature(ROUTERS)
 @Story(SCATTER_GATHER)
 public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
+
+  private static final String KEY = "key";
+  private static final String VALUE_1 = "value1";
+  private static final String VALUE_2 = "value2";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -229,6 +235,46 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     expectedException.expect(instanceOf(MuleRuntimeException.class));
     router.process(CoreEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
+  }
+
+  @Test
+  @Issue("W-11932094")
+  @Description("An unmodifiable list in the first Scatter Gather's route must be able to be merged with the variables of the other routes.")
+  public void mergeVariablesWhenTheFirstRouteHasAnUnmodifiableList() throws Exception {
+    List<String> unmodifiableList = Collections.singletonList(VALUE_1);
+    MessageProcessorChain route1 = newChain(empty(), event -> addVariable(event, KEY, unmodifiableList));
+    MessageProcessorChain route2 = newChain(empty(), event -> addVariable(event, KEY, VALUE_2));
+
+    muleContext.getInjector().inject(router);
+    router.setRoutes(asList(route1, route2));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    CoreEvent process = router.process(CoreEvent.builder(testEvent()).message(Message.of(TEST_PAYLOAD)).build());
+    List<String> list = (List) process.getVariables().get(KEY).getValue();
+    assertThat(list, contains(VALUE_1, VALUE_2));
+  }
+
+  @Test
+  @Issue("W-11932094")
+  @Description("An unmodifiable list in the second Scatter Gather's route must be able to be merged with the variables of the other routes.")
+  public void mergeVariablesWhenTheSecondRouteHasAnUnmodifiableList() throws Exception {
+    List<String> unmodifiableList = Collections.singletonList(VALUE_2);
+    MessageProcessorChain route1 = newChain(empty(), event -> addVariable(event, KEY, VALUE_1));
+    MessageProcessorChain route2 = newChain(empty(), event -> addVariable(event, KEY, unmodifiableList));
+
+    muleContext.getInjector().inject(router);
+    router.setRoutes(asList(route1, route2));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    CoreEvent process = router.process(CoreEvent.builder(testEvent()).message(Message.of(TEST_PAYLOAD)).build());
+    List<String> list = (List) process.getVariables().get(KEY).getValue();
+    assertThat(list, contains(VALUE_1, unmodifiableList));
+  }
+
+  private CoreEvent addVariable(CoreEvent event, String key, Object value) {
+    return CoreEvent.builder(event).addVariable(key, value).build();
   }
 
   @Test
