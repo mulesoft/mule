@@ -1,20 +1,11 @@
 {
-  "configs": [
-    "app.xml"
-  ],
   "secureProperties": [],
   "redeploymentEnabled": true,
-  "name": "basic",
+  "name": "api-with-loop-app",
   "minMuleVersion": "4.4.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
-    "id": "mule",
-    "attributes": {
-      "exportedResources": [
-        "test-script.dwl",
-        "app.xml"
-      ]
-    }
+    "id": "mule"
   },
   "bundleDescriptorLoader": {
     "id": "mule",

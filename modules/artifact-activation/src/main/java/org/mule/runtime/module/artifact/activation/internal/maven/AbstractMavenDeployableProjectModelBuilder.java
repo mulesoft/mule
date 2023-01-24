@@ -19,6 +19,7 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
@@ -65,6 +66,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -283,16 +285,19 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   }
 
   private List<BundleDependency> getUniqueDependencies(List<BundleDependency> dependencies) {
-    Map<String, BundleDependency> uniqueDependencies = new HashMap<>();
+    Set<String> uniqueDependenciesIds = new HashSet<>();
 
-    for (BundleDependency dependency : dependencies) {
+    // Filtering is done this way to preserve the order
+    return dependencies.stream().filter(dependency -> {
       org.mule.maven.client.api.model.BundleDescriptor descriptor = dependency.getDescriptor();
       String pluginKey =
-          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getClassifier().orElse("");
-      uniqueDependencies.putIfAbsent(pluginKey, dependency);
-    }
-
-    return new ArrayList<>(uniqueDependencies.values());
+          descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + descriptor.getVersion()
+              + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
+      boolean isApi = descriptor.getClassifier().map(getApiClassifiers()::contains).orElse(false);
+      boolean keep = !uniqueDependenciesIds.contains(pluginKey) || isApi;
+      uniqueDependenciesIds.add(pluginKey);
+      return keep;
+    }).collect(toList());
   }
 
   private List<BundleDependency> collectTransitivePluginDependencies(BundleDependency rootDependency) {

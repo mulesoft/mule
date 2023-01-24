@@ -1,4 +1,22 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.typeChanged",
+          "old": "field org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS",
+          "new": "field org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS",
+          "oldType": "java.util.HashSet<java.lang.String>",
+          "newType": "java.util.Set<java.lang.String>",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ArtifactConstants",
+          "fieldName": "API_CLASSIFIERS",
+          "elementKind": "field",
+          "justification": "W-12395077: adding support for API dependency types."
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

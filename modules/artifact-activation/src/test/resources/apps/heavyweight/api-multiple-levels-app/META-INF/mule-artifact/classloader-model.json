@@ -1,0 +1,64 @@
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "test",
+    "artifactId": "api-multiple-levels-api",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "library-depends-on-api",
+        "version": "1.0.0",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/library-depends-on-api/1.0.0/library-depends-on-api-1.0.0.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "api-depends-on-library",
+        "version": "1.0.0",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/api-depends-on-library/1.0.0/api-depends-on-library-1.0.0.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "raml-api-a",
+        "version": "1.0.0",
+        "classifier": "raml",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/raml-api-a/1.0.0/raml-api-a-1.0.0-raml.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "raml-fragment",
+        "version": "1.0.0",
+        "classifier": "raml-fragment",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/raml-fragment/1.0.0/raml-fragment-1.0.0-raml-fragment.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "raml-fragment",
+        "version": "2.0.0",
+        "classifier": "raml-fragment",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/raml-fragment/2.0.0/raml-fragment-2.0.0-raml-fragment.pom"
+    }
+  ],
+  "packages": [
+  ],
+  "resources": [
+  ]
+}

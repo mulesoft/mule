@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
@@ -131,10 +132,12 @@ public final class DeployableProjectModel {
 
     for (BundleDependency dependency : dependencies) {
       BundleDescriptor descriptor = dependency.getDescriptor();
-      String pluginKey = descriptor.getGroupId() + ":" + descriptor.getArtifactId()
-          + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
-      repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
-      repeatedDependencies.get(pluginKey).add(descriptor);
+      if (descriptor.getClassifier().map(classifier -> !getApiClassifiers().contains(classifier)).orElse(true)) {
+        String pluginKey = descriptor.getGroupId() + ":" + descriptor.getArtifactId()
+            + descriptor.getClassifier().map(classifier -> ":" + classifier).orElse("");
+        repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
+        repeatedDependencies.get(pluginKey).add(descriptor);
+      }
     }
 
     return repeatedDependencies.entrySet().stream().filter(entry -> entry.getValue().size() > 1)
