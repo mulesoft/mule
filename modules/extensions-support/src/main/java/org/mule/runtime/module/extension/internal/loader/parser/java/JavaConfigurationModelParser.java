@@ -71,7 +71,12 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
+    // TODO W-10621050
+    this.minMuleVersion = calculateConfigMinMuleVersion(configElement,
+                                                        getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                             Configurations.class,
+                                                                                             Configurations::value,
+                                                                                             configElement));
   }
 
   private void parseStructure() {
@@ -196,8 +201,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateConfigMinMuleVersion(configElement,
-                                            getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
-                                                                                 Configurations::value, configElement)));
+    return of(this.minMuleVersion);
   }
 }

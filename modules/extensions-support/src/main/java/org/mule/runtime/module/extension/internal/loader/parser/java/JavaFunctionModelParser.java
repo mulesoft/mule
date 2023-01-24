@@ -61,7 +61,13 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
+      // TODO W-10621050
+      this.minMuleVersion = calculateFunctionMinMuleVersion(functionElement,
+              getContainerAnnotationMinMuleVersion(extensionElement,
+                      ExpressionFunctions.class,
+                      ExpressionFunctions::value,
+                      functionElement
+                              .getEnclosingType()));
     }
   }
 
@@ -143,10 +149,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateFunctionMinMuleVersion(functionElement,
-                                              getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
-                                                                                   ExpressionFunctions::value,
-                                                                                   functionElement.getEnclosingType())));
+    return of(this.minMuleVersion);
   }
 
   @Override

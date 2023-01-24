@@ -138,7 +138,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
+    // TODO W-10621050
+    this.minMuleVersion = calculateExtensionMinMuleVersion(extensionElement);
   }
 
   private void parseSubtypes() {
@@ -392,7 +393,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateExtensionMinMuleVersion(extensionElement));
+    return of(this.minMuleVersion);
   }
 
   @Override

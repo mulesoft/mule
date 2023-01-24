@@ -130,7 +130,12 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      this.minMuleVersion = getMinMuleVersion().orElse(FIRST_MULE_VERSION);
+      // TODO W-10621050
+      this.minMuleVersion = calculateOperationMinMuleVersion(operationElement, this.operationContainer,
+              getContainerAnnotationMinMuleVersion(extensionElement,
+                      Operations.class,
+                      Operations::value,
+                      this.operationContainer));
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -413,9 +418,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateOperationMinMuleVersion(operationElement, operationContainer,
-                                               getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
-                                                                                    Operations::value, operationContainer)));
+    return of(this.minMuleVersion);
   }
 
   @Override
