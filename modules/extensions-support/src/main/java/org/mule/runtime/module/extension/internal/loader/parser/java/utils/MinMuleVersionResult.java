@@ -14,14 +14,14 @@ import org.mule.sdk.api.annotation.MinMuleVersion;
  *
  * @since 4.6
  */
-public class SdkComponent {
+public class MinMuleVersionResult {
 
   private String componentName;
   private MuleVersion minMuleVersion;
   private String reason;
-  private SdkComponent innerComponent = null;
+  private MinMuleVersionResult innerComponent = null;
 
-  public SdkComponent(String componentName, MuleVersion minMuleVersion, String reason) {
+  public MinMuleVersionResult(String componentName, MuleVersion minMuleVersion, String reason) {
     this.componentName = componentName;
     this.minMuleVersion = minMuleVersion;
     this.reason = reason;
@@ -42,7 +42,7 @@ public class SdkComponent {
     return componentName;
   }
 
-  public void updateIfHigherMMV(SdkComponent candidate, String reason) {
+  public void updateIfHigherMMV(MinMuleVersionResult candidate, String reason) {
     if (!(this.minMuleVersion.atLeast(candidate.getMinMuleVersion()))) {
       this.reason = reason;
       this.minMuleVersion = candidate.getMinMuleVersion();

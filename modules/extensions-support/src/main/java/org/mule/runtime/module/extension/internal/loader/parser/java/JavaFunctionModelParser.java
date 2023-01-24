@@ -14,8 +14,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forFunction;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getFunctionComponent;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getFunctionResult;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
 
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -142,18 +142,20 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(getFunctionComponent(functionElement,
-                                   getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
-                                                                        ExpressionFunctions::value,
-                                                                        functionElement.getEnclosingType())).getMinMuleVersion());
+    // TODO W-12392052
+    return of(getFunctionResult(functionElement,
+                                getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
+                                                                     ExpressionFunctions::value,
+                                                                     functionElement.getEnclosingType())).getMinMuleVersion());
   }
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
-    return of(getFunctionComponent(functionElement,
-                                   getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
-                                                                        ExpressionFunctions::value,
-                                                                        functionElement.getEnclosingType())).getReason());
+    // TODO W-12392052
+    return of(getFunctionResult(functionElement,
+                                getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
+                                                                     ExpressionFunctions::value,
+                                                                     functionElement.getEnclosingType())).getReason());
   }
 
   @Override

@@ -27,7 +27,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.conn
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.getConnectionProviderComponent;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getConnectionProviderResult;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -231,13 +231,13 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
     // TODO W-12392052
-    return of(getConnectionProviderComponent(element).getMinMuleVersion());
+    return of(getConnectionProviderResult(element).getMinMuleVersion());
   }
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
     // TODO W-12392052
-    return of(getConnectionProviderComponent(element).getReason());
+    return of(getConnectionProviderResult(element).getReason());
   }
 
   @Override

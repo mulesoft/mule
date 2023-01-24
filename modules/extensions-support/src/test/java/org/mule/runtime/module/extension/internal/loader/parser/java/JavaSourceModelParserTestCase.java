@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.FIRST_MULE_VERSION;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.FIRST_MULE_VERSION;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;

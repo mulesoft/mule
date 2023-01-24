@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.SdkComponentsMinMuleVersionUtils.FIRST_MULE_VERSION;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
 import org.mule.runtime.api.exception.MuleException;
