@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeployDomain;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -25,11 +27,8 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import io.qameta.allure.Feature;
-import io.qameta.allure.Flaky;
+import org.junit.Test;
 
 @Feature(DOMAIN_DEPLOYMENT)
 public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDeploymentTestCase {
@@ -233,8 +232,6 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   }
 
   @Test
-  @Flaky
-  @Ignore("MULE-19333")
   public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -246,14 +243,14 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STOPPED);
 
     // Redeploy domain
-    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(deploymentService, emptyDomain100FileBuilder.getId());
 
     // Application was redeployed but it is not started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), CREATED);
 
     // Redeploy domain again
-    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(deploymentService, emptyDomain100FileBuilder.getId());
 
     // Application was redeployed twice but it is not started
     verify(mockDeploymentListener, times(2)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
@@ -270,7 +267,7 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
 
     // Redeploy domain
-    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+    redeployDomain(deploymentService, emptyDomain100FileBuilder.getId());
 
     // Application was redeployed and started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());

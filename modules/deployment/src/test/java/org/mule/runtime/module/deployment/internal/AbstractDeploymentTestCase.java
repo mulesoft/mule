@@ -6,43 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.System.currentTimeMillis;
-import static java.lang.System.getProperty;
-import static java.lang.System.setProperty;
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.apache.commons.io.FileUtils.copyFile;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.apache.commons.io.FileUtils.moveDirectory;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
-import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
-import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField;
-import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
@@ -77,8 +40,50 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeploy;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+
+import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.moveDirectory;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
+import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField;
+import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
@@ -582,7 +587,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   @After
   public void undeployApps() {
     if (deploymentService != null) {
-      deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
+      deploymentService.getApplications().forEach(app -> undeploy(deploymentService, app.getArtifactName()));
     }
     TestApplicationFactory.after();
   }
@@ -1781,14 +1786,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    deploymentService.deploy(uri, deploymentProperties);
+    deploy(deploymentService, uri, deploymentProperties);
   }
 
   protected void redeployId(String id, Properties deploymentProperties) throws IOException {
     if (deploymentProperties == null) {
-      deploymentService.redeploy(id);
+      redeploy(deploymentService, id);
     } else {
-      deploymentService.redeploy(id, deploymentProperties);
+      redeploy(deploymentService, id, deploymentProperties);
     }
   }
 
