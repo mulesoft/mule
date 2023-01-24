@@ -7,6 +7,8 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
 
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
 
@@ -24,9 +26,7 @@ public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
 
   private static final String CONFIG_FILE_EXTENSION = ".xml";
   private static final String muleLocalName = "mule";
-  private static final String muleDomainLocalName = "domain:mule-domain";
-  private static final String muleNamespace = "http://www.mulesoft.org/schema/mule/core";
-  private static final String muleDomainNamespace = "http://www.mulesoft.org/schema/mule/domain";
+  private static final String muleDomainLocalName = "mule-domain";
 
   @Override
   public boolean filter(File candidateConfig) {
@@ -39,8 +39,8 @@ public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
       String rootElementLocalName = doc.getDocumentElement().getLocalName();
       String rootElementNamespace = doc.getDocumentElement().getNamespaceURI();
 
-      return (rootElementLocalName.equals(muleLocalName) && rootElementNamespace.equals(muleNamespace))
-          || (rootElementLocalName.equals(muleDomainLocalName) && rootElementNamespace.equals(muleDomainNamespace));
+      return (rootElementLocalName.equals(muleLocalName) && rootElementNamespace.equals(CORE_NAMESPACE))
+          || (rootElementLocalName.equals(muleDomainLocalName) && rootElementNamespace.equals(DOMAIN_NAMESPACE));
     }
     return false;
   }
