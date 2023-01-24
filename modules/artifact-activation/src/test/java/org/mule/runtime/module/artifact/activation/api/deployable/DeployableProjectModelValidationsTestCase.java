@@ -6,15 +6,20 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.API_CLASSIFIERS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
+import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
@@ -32,7 +37,6 @@ import java.util.Set;
 
 import io.qameta.allure.Issue;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -280,5 +284,83 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                emptySet(),
                                emptyMap()).validate();
 
+  }
+
+  @Test
+  @Issue("W-12395077")
+  public void noFailureWithApiDependencies() {
+    for (String classifier : getApiClassifiers()) {
+      List<BundleDependency> dependencies = new ArrayList<>();
+
+      dependencies.add(new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder()
+              .setGroupId("org.mule.sample")
+              .setArtifactId("test-api-a")
+              .setVersion("0.0.1")
+              .setClassifier(classifier)
+              .build())
+          .build());
+      dependencies.add(new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder()
+              .setGroupId("org.mule.sample")
+              .setArtifactId("test-api-a")
+              .setVersion("0.1.0")
+              .setClassifier(classifier)
+              .build())
+          .build());
+
+      new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
+                                 appDescriptor,
+                                 () -> null,
+                                 new File("."),
+                                 dependencies,
+                                 emptySet(),
+                                 emptyMap()).validate();
+    }
+  }
+
+  @Test
+  @Issue("W-12395077")
+  public void noFailureWithCustomApiDependencies() {
+    final String oldValue = setProperty(API_CLASSIFIERS, " custom-classifier-a , custom-classifier-b  ");
+
+    Set<String> apiClassifiers = getApiClassifiers();
+
+    assertThat(apiClassifiers, containsInAnyOrder("custom-classifier-a", "custom-classifier-b"));
+
+    for (String classifier : apiClassifiers) {
+      List<BundleDependency> dependencies = new ArrayList<>();
+
+      dependencies.add(new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder()
+              .setGroupId("org.mule.sample")
+              .setArtifactId("test-api-a")
+              .setVersion("0.0.1")
+              .setClassifier(classifier)
+              .build())
+          .build());
+      dependencies.add(new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder()
+              .setGroupId("org.mule.sample")
+              .setArtifactId("test-api-a")
+              .setVersion("0.1.0")
+              .setClassifier(classifier)
+              .build())
+          .build());
+
+      new DeployableProjectModel(emptyList(), emptyList(), emptyList(),
+                                 appDescriptor,
+                                 () -> null,
+                                 new File("."),
+                                 dependencies,
+                                 emptySet(),
+                                 emptyMap()).validate();
+    }
+
+    if (oldValue == null) {
+      System.clearProperty(API_CLASSIFIERS);
+    } else {
+      System.setProperty(API_CLASSIFIERS, oldValue);
+    }
   }
 }

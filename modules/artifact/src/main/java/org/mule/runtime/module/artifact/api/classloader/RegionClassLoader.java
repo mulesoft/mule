@@ -8,7 +8,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -319,7 +319,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                      resource, groupId, artifactId, baseVersion, classifier, type);
         String normalizedResource = normalize(resource, true);
 
-        if (API_CLASSIFIERS.contains(classifier) && "zip".equals(type) && !WILDCARD.equals(baseVersion)) {
+        if (getApiClassifiers().contains(classifier) && "zip".equals(type) && !WILDCARD.equals(baseVersion)) {
           // Check whether it's a resource from an API dependency, since all those should be considered exported
           BundleDescriptor requiredDescriptor = new BundleDescriptor.Builder()
               .setGroupId(groupId)

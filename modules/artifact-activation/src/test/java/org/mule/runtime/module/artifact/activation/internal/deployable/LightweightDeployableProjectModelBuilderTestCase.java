@@ -43,7 +43,6 @@ import org.junit.Test;
 @Story(LIGHTWEIGHT)
 public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
 
-
   @Rule
   public SystemProperty repositoryLocation =
       new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
