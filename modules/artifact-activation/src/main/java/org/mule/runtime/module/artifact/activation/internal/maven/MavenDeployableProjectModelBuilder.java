@@ -26,6 +26,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
@@ -54,7 +55,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -135,12 +135,12 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
       List<String> packages = getAvailablePackages(pomModel.getBuild());
       List<String> muleResources = getAvailableMuleResources(pomModel.getBuild());
       List<String> nonMuleResources = getAvailableNonMuleResources(pomModel.getBuild());
-      List<String> allResources = Stream.concat(muleResources.stream(), nonMuleResources.stream()).collect(toList());
+      List<String> allResources = concat(muleResources.stream(), nonMuleResources.stream()).collect(toList());
+      Set<String> muleConfigs = getConfigs(getMuleResourcesDirectory(pomModel.getBuild()), muleResources);
 
       return new DeployableProjectModel(packages, allResources, resourcesPath,
                                         buildBundleDescriptor(deployableArtifactCoordinates),
-                                        getDeployableModelResolver(deployableArtifactCoordinates, allResources,
-                                                                   getMuleResourcesDirectory(pomModel.getBuild()), muleResources,
+                                        getDeployableModelResolver(deployableArtifactCoordinates, allResources, muleConfigs,
                                                                    packages),
                                         projectFolder, deployableBundleDependencies,
                                         sharedDeployableBundleDescriptors, additionalPluginDependencies);
@@ -150,18 +150,18 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   }
 
   private Supplier<MuleDeployableModel> getDeployableModelResolver(ArtifactCoordinates deployableArtifactCoordinates,
-                                                                   List<String> allResources, String muleResourcesDirectory,
-                                                                   List<String> muleResources, List<String> packages) {
+                                                                   List<String> allResources, Set<String> muleConfigs,
+                                                                   List<String> packages) {
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
         if (shouldEditApplicationModel(applicationModel)) {
-          applicationModel =
-              buildApplicationModel(applicationModel, allResources, muleResourcesDirectory, muleResources, packages);
+          applicationModel = buildApplicationModel(applicationModel, allResources, muleConfigs, packages);
         }
         return applicationModel;
       };
     } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
+      // TODO W-12428790 - the domain model creation must take into account the same concerns as the application model does
       return () -> domainModelResolver().resolve(projectFolder);
     } else {
       throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
@@ -180,8 +180,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   }
 
   private MuleApplicationModel buildApplicationModel(MuleApplicationModel applicationModel, List<String> allResources,
-                                                     String muleResourcesDirectory, List<String> muleResources,
-                                                     List<String> packages) {
+                                                     Set<String> muleConfigs, List<String> packages) {
     MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder()
         .setName(applicationModel.getName() != null ? applicationModel.getName() : "mule")
         .setMinMuleVersion(applicationModel.getMinMuleVersion())
@@ -193,18 +192,16 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
             : new MuleArtifactLoaderDescriptor("mule", emptyMap()))
         .setDomain(applicationModel.getDomain().orElse(null));
 
-    builder.setConfigs(getConfigs(applicationModel, muleResourcesDirectory, muleResources));
+    builder.setConfigs(applicationModel.getConfigs() != null ? applicationModel.getConfigs() : muleConfigs);
     builder.setRedeploymentEnabled(applicationModel.isRedeploymentEnabled());
     builder.setSecureProperties(applicationModel.getSecureProperties());
     builder.setLogConfigFile(applicationModel.getLogConfigFile());
     return builder.build();
   }
 
-  private Set<String> getConfigs(MuleApplicationModel applicationModel, String muleResourcesDirectory,
-                                 List<String> muleResources) {
-    return applicationModel.getConfigs() != null ? applicationModel.getConfigs()
-        : muleResources.stream().filter(muleResource -> muleConfigurationsFilter
-            .filter(resolveCandidateConfigsPath(muleResourcesDirectory, muleResource))).collect(toSet());
+  private Set<String> getConfigs(String muleResourcesDirectory, List<String> muleResources) {
+    return muleResources.stream().filter(muleResource -> muleConfigurationsFilter
+        .filter(resolveCandidateConfigsPath(muleResourcesDirectory, muleResource))).collect(toSet());
   }
 
   private File resolveCandidateConfigsPath(String muleResourcesDirectory, String candidateConfigFileName) {
@@ -213,7 +210,11 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
 
   private MuleArtifactLoaderDescriptor createClassLoaderModelDescriptorLoader(MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                                               List<String> resources, List<String> packages) {
-    Map<String, Object> attributes = new HashMap<>();
+    final String id = classLoaderModelLoaderDescriptor != null ? classLoaderModelLoaderDescriptor.getId() : "mule";
+    Map<String, Object> attributes =
+        classLoaderModelLoaderDescriptor != null && classLoaderModelLoaderDescriptor.getAttributes() != null
+            ? classLoaderModelLoaderDescriptor.getAttributes()
+            : new HashMap<>();
 
     if (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor && classLoaderModelLoaderDescriptor == null) {
       attributes.put(EXPORTED_RESOURCES, resources);
@@ -223,7 +224,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
       attributes.put(INCLUDE_TEST_DEPENDENCIES, "true");
     }
 
-    return new MuleArtifactLoaderDescriptor("mule", attributes);
+    return new MuleArtifactLoaderDescriptor(id, attributes);
   }
 
   private List<String> getAvailablePackages(Build build) throws IOException {

@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;

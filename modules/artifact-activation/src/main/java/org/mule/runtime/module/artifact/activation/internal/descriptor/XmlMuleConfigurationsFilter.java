@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault;
+
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
 
 import java.io.File;
@@ -15,13 +17,16 @@ import java.nio.file.Path;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
 
   private static final String CONFIG_FILE_EXTENSION = ".xml";
+  private static final String muleLocalName = "mule";
+  private static final String muleDomainLocalName = "domain:mule-domain";
+  private static final String muleNamespace = "http://www.mulesoft.org/schema/mule/core";
+  private static final String muleDomainNamespace = "http://www.mulesoft.org/schema/mule/domain";
 
   @Override
   public boolean filter(File candidateConfig) {
@@ -31,62 +36,23 @@ public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
 
   private boolean hasMuleAsRootElement(Document doc) {
     if (doc != null && doc.getDocumentElement() != null) {
-      String rootElementName = doc.getDocumentElement().getTagName();
-      return StringUtils.equals(rootElementName, "mule") || StringUtils.equals(rootElementName, "domain:mule-domain");
+      String rootElementLocalName = doc.getDocumentElement().getLocalName();
+      String rootElementNamespace = doc.getDocumentElement().getNamespaceURI();
+
+      return (rootElementLocalName.equals(muleLocalName) && rootElementNamespace.equals(muleNamespace))
+          || (rootElementLocalName.equals(muleDomainLocalName) && rootElementNamespace.equals(muleDomainNamespace));
     }
     return false;
   }
 
   private Document generateDocument(Path filePath) {
-    javax.xml.parsers.DocumentBuilderFactory factory = createSecureDocumentBuilderFactory();
+    DocumentBuilderFactory documentBuilderFactory = createDefault().getDocumentBuilderFactory();
+    documentBuilderFactory.setNamespaceAware(true);
 
     try {
-      return factory.newDocumentBuilder().parse(filePath.toFile());
+      return documentBuilderFactory.newDocumentBuilder().parse(filePath.toFile());
     } catch (IOException | ParserConfigurationException | SAXException e) {
       return null;
-    }
-  }
-
-  /**
-   * Creates a document builder factory.
-   *
-   * @return the factory created
-   */
-  private DocumentBuilderFactory createSecureDocumentBuilderFactory() {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      // Configuration based on
-      // https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.md#xpathexpression
-
-      // This is the PRIMARY defense. If DTDs (doctypes) are disallowed, almost all
-      // XML entity attacks are prevented
-      // Xerces 2 only - http://xerces.apache.org/xerces2-j/features.html#disallow-doctype-decl
-      String feature = "http://apache.org/xml/features/disallow-doctype-decl";
-      factory.setFeature(feature, true);
-
-      // If you can't completely disable DTDs, then at least do the following:
-      // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
-      // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
-      // JDK7+ - http://xml.org/sax/features/external-general-entities
-      feature = "http://xml.org/sax/features/external-general-entities";
-      factory.setFeature(feature, false);
-
-      // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
-      // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
-      // JDK7+ - http://xml.org/sax/features/external-parameter-entities
-      feature = "http://xml.org/sax/features/external-parameter-entities";
-      factory.setFeature(feature, false);
-
-      // Disable external DTDs as well
-      feature = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-      factory.setFeature(feature, false);
-
-      // and these as well, per Timothy Morgan's 2014 paper: "XML Schema, DTD, and Entity Attacks"
-      factory.setXIncludeAware(false);
-      factory.setExpandEntityReferences(false);
-      return factory;
-    } catch (ParserConfigurationException e) {
-      throw new IllegalStateException(e);// should never happen
     }
   }
 }
