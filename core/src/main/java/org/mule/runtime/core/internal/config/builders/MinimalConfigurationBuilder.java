@@ -163,7 +163,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
     registerObject(OBJECT_ARTIFACT_TYPE_LOADER, new DefaultArtifactTypeLoader(muleContext.getExtensionManager()), muleContext);
 
-    registerObject(OBJECT_ARTIFACT_TYPE_LOADER, new DefaultArtifactTypeLoader(muleContext.getExtensionManager()), muleContext);
     registerTransactionFactoryLocator(muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
