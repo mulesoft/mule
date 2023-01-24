@@ -403,13 +403,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     prepareObjectProviders();
   }
 
-  protected void prepareObjectProviders() {
+  protected void prepareObjectProviders(List<ConfigurableObjectProvider> objectProviders) {
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(configurationProperties, muleArtifactObjectProvider);
     for (ConfigurableObjectProvider objectProvider : objectProviders) {
       objectProvider.configure(providerConfiguration);
     }
+  }
+
+  protected void prepareObjectProviders() {
+    prepareObjectProviders(objectProviders);
   }
 
   /**
@@ -470,6 +474,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return componentAst.getModel(HasStereotypeModel.class)
         .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
         .orElse(false);
+  }
+
+  protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
+    objectProviders.add(objectProvider);
   }
 
   /**
@@ -538,7 +546,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     objectProvidersByName.stream()
         .map(pair -> springComponentModels.get(pair.getFirst()).getObjectInstance())
-        .forEach(this.objectProviders::add);
+        .forEach(this::onObjectProviderDiscovered);
     registerObjectFromObjectProviders(beanFactory);
 
     Set<String> objectProviderNames = objectProvidersByName.stream()

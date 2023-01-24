@@ -32,6 +32,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -438,11 +439,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       List<Pair<String, ComponentAst>> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalAst, false);
 
-      // TODO: we may have to also do this when initializing additional components unless we are sure all object providers are
-      // always enabled
-      if (!initializationRequest.isKeepPreviousRequested()) {
-        super.prepareObjectProviders();
-      }
+      // Prepares/configures any recently discovered object providers
+      prepareObjectProviders(currentComponentInitializationState.takeObjectProvidersToConfigure());
 
       // Finally, creates the beans corresponding to the requested components.
       LOGGER.debug("Will create beans: {}", applicationComponents);
@@ -600,6 +598,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   protected void prepareObjectProviders() {
     // Do not prepare object providers at this point. No components are going to be created yet. This will be done when creating
     // lazy components
+  }
+
+  @Override
+  protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
+    super.onObjectProviderDiscovered(objectProvider);
+    currentComponentInitializationState.registerObjectProviderToConfigure(objectProvider);
   }
 
   @Override

@@ -10,9 +10,12 @@ import static org.mule.runtime.api.component.location.Location.builderFromString
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.ast.api.ComponentAst;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,6 +25,7 @@ class ComponentInitializationState {
   private final ConfigurationComponentLocator componentLocator;
   private final TrackingPostProcessor trackingPostProcessor = new TrackingPostProcessor();
   private final Set<String> currentComponentLocationsRequested = new HashSet<>();
+  private final List<ConfigurableObjectProvider> objectProvidersToConfigure = new ArrayList<>();
   private boolean isApplyStartPhaseRequested = false;
   private boolean isInitializationAlreadyDone = false;
 
@@ -43,6 +47,16 @@ class ComponentInitializationState {
 
   public void registerTrackingPostProcessor(ConfigurableListableBeanFactory beanFactory) {
     beanFactory.addBeanPostProcessor(trackingPostProcessor);
+  }
+
+  public void registerObjectProviderToConfigure(ConfigurableObjectProvider objectProvider) {
+    objectProvidersToConfigure.add(objectProvider);
+  }
+
+  public List<ConfigurableObjectProvider> takeObjectProvidersToConfigure() {
+    List<ConfigurableObjectProvider> returnValue = new ArrayList<>(objectProvidersToConfigure);
+    objectProvidersToConfigure.clear();
+    return returnValue;
   }
 
   public boolean isRequestSatisfied(ComponentInitializationRequest componentInitializationRequest) {
@@ -71,6 +85,7 @@ class ComponentInitializationState {
     isApplyStartPhaseRequested = false;
     isInitializationAlreadyDone = false;
     currentComponentLocationsRequested.clear();
+    objectProvidersToConfigure.clear();
   }
 
   private Location getLocation(ComponentAst componentAst) {
