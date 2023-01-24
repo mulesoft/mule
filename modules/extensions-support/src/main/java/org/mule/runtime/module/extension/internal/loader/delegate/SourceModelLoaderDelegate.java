@@ -86,7 +86,8 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
 
-      parser.getMinMuleVersion().ifPresent(sourceDeclarer::withMinMuleVersion);
+      // TODO: W-12398760 uncomment the next line when done.
+      // parser.getMinMuleVersion().ifPresent(sourceDeclarer::withMinMuleVersion);
 
       loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers());
 

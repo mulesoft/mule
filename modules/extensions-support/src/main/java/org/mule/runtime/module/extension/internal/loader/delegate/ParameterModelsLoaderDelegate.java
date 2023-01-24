@@ -90,7 +90,8 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getOAuthParameterModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
-        parameterParser.getMinMuleVersion().ifPresent(parameter::withMinMuleVersion);
+        // TODO: W-12398760 uncomment the next line when done.
+        // parameterParser.getMinMuleVersion().ifPresent(parameter::withMinMuleVersion);
 
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
         stereotypeModelLoader.get().addStereotypes(parameterParser, parameter);
