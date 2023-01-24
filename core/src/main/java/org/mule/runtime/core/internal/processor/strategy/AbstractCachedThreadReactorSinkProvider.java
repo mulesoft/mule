@@ -57,7 +57,6 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
       if (fluxSinkWrapper.isBeingUsed()) {
         return createSink();
       }
-
       return fluxSinkWrapper;
     }
   }
