@@ -53,7 +53,6 @@ public final class MinMuleVersionUtils {
 
   private static final MuleVersion SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION =
       new MuleVersion(Extension.class.getAnnotation(MinMuleVersion.class).value());
-  public static final MuleVersion FIRST_MULE_VERSION = new MuleVersion("4.1.1");
 
   private MinMuleVersionUtils() {}
 
@@ -411,7 +410,7 @@ public final class MinMuleVersionUtils {
     if (sdkConfigurations.stream().anyMatch(element::isSameType)) {
       return new MuleVersion(annotationClass.getAnnotation(MinMuleVersion.class).value());
     }
-    return FIRST_MULE_VERSION;
+    return MuleVersion.FIRST_MULE_VERSION;
   }
 
   private static MinMuleVersionResult calculateMethodMinMuleVersion(MethodElement<?> method) {
@@ -615,9 +614,9 @@ public final class MinMuleVersionUtils {
 
   private static MinMuleVersionResult getEnforcedMinMuleVersion(Type type) {
     if (type.isAnnotatedWith(DoNotEnforceMinMuleVersion.class)) {
-      return new MinMuleVersionResult(type.getTypeName(), FIRST_MULE_VERSION,
+      return new MinMuleVersionResult(type.getTypeName(), MuleVersion.FIRST_MULE_VERSION,
                                       format("%s has the default base min mule version %s because it is annotated with @DoNotEnforceMinMuleVersion.",
-                                             type.getTypeName(), FIRST_MULE_VERSION));
+                                             type.getTypeName(), MuleVersion.FIRST_MULE_VERSION));
     }
     Optional<MuleVersion> mmv = getMinMuleVersionFromAnnotations(type);
     return mmv
@@ -640,9 +639,9 @@ public final class MinMuleVersionUtils {
   }
 
   private static MinMuleVersionResult createResultWithDefaultMMV(String componentDescription, String componentName) {
-    return new MinMuleVersionResult(componentName, FIRST_MULE_VERSION,
+    return new MinMuleVersionResult(componentName, MuleVersion.FIRST_MULE_VERSION,
                                     format("%s %s has min mule version %s because it is the default value.",
-                                           componentDescription, componentName, FIRST_MULE_VERSION));
+                                           componentDescription, componentName, MuleVersion.FIRST_MULE_VERSION));
   }
 
   private static boolean belongsToSdkPackages(String fullyQualifiedName) {
