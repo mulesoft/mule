@@ -326,12 +326,12 @@ public final class JavaParserUtils {
     return calculatedMMV;
   }
 
-  private static MuleVersion calculateFieldMinMuleVersion(ExtensionParameter field, Set<String> seenTypes) {
+  private static MuleVersion calculateFieldMinMuleVersion(ExtensionParameter field, Set<String> seenTypesForRecursionControl) {
     Type parameterType = field.getType();
-    if (seenTypes.contains(parameterType.getTypeName())) {
+    if (seenTypesForRecursionControl.contains(parameterType.getTypeName())) {
       return FIRST_MULE_VERSION;
     } else {
-      seenTypes.add(parameterType.getTypeName());
+      seenTypesForRecursionControl.add(parameterType.getTypeName());
     }
     MuleVersion calculatedMMV = getMinMuleVersionFromAnnotations(field).orElse(FIRST_MULE_VERSION);
     for (Type annotation : field.getAnnotations().collect(toList())) {
@@ -341,11 +341,13 @@ public final class JavaParserUtils {
       }
       if (annotation.isSameType(Parameter.class)
           || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.Parameter.class)) {
-        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypes));
+        calculatedMMV =
+            max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypesForRecursionControl));
       }
       if (annotation.isSameType(ParameterGroup.class)
           || annotation.isSameType(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class)) {
-        calculatedMMV = max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypes));
+        calculatedMMV =
+            max(calculatedMMV, calculateParameterContainerMinMuleVersion(parameterType, seenTypesForRecursionControl));
       }
       if (annotation.isSameType(Connection.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Connection.class)) {
         // Sources inject the ConnectionProvider instead of the connection
@@ -388,7 +390,8 @@ public final class JavaParserUtils {
     return calculatedMMV;
   }
 
-  private static MuleVersion calculateParameterContainerMinMuleVersion(Type containerType, Set<String> seenTypes) {
+  private static MuleVersion calculateParameterContainerMinMuleVersion(Type containerType,
+                                                                       Set<String> seenTypesForRecursionControl) {
     Optional<MuleVersion> minMuleVersionAnnotation = getMinMuleVersionFromAnnotations(containerType);
     if (minMuleVersionAnnotation.isPresent()) {
       return minMuleVersionAnnotation.get();
@@ -397,7 +400,7 @@ public final class JavaParserUtils {
     calculatedMMV = max(calculatedMMV, containerType.getAnnotations().map(JavaParserUtils::getEnforcedMinMuleVersion)
         .reduce(FIRST_MULE_VERSION, JavaParserUtils::max));
     for (FieldElement field : containerType.getFields()) {
-      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, seenTypes));
+      calculatedMMV = max(calculatedMMV, calculateFieldMinMuleVersion(field, seenTypesForRecursionControl));
     }
     return calculatedMMV;
   }
