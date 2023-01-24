@@ -422,7 +422,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       initializationRequest.getLocation()
           .ifPresent(location -> validateRequestedComponentExists(location, minimalAst));
 
-      // TODO: test this with the additional strategy (it is probably not working)
+      // We always initialize all components in the parent that are referenced from the *full* AST.
+      // For that reason, we don't need to make any particular consideration when "keep previous" is requested.
+      // Take that into account if we ever decide to change that.
       initializeComponentsFromParent(parentComponentModelInitializerAdapter);
 
       if (!initializationRequest.isKeepPreviousRequested()) {
