@@ -322,7 +322,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
   @Test
   @Issue("W-12395077")
   public void noFailureWithCustomApiDependencies() {
-    setProperty(API_CLASSIFIERS, " custom-classifier-a , custom-classifier-b  ");
+    final String oldValue = setProperty(API_CLASSIFIERS, " custom-classifier-a , custom-classifier-b  ");
 
     Set<String> apiClassifiers = getApiClassifiers();
 
@@ -355,6 +355,12 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                  dependencies,
                                  emptySet(),
                                  emptyMap()).validate();
+    }
+
+    if (oldValue == null) {
+      System.clearProperty(API_CLASSIFIERS);
+    } else {
+      System.setProperty(API_CLASSIFIERS, oldValue);
     }
   }
 }
