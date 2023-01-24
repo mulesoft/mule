@@ -64,7 +64,6 @@ import org.mule.sdk.api.runtime.source.SourceResult;
 import org.mule.sdk.api.store.ObjectStoreManager;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 import javax.inject.Inject;
 
@@ -381,7 +380,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithRecursiveParameter.class);
     Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    assertThat(minMuleVersion.get().toString(), is("4.1.1"));
   }
 
   private boolean parseEmitsResponseFromSourceClass(Class<? extends Source> sourceClass) {
@@ -677,6 +676,12 @@ public class JavaSourceModelParserTestCase {
   private static class SourceWithRecursiveParameter extends TestSource {
 
     @Parameter
-    KnockeableDoor door;
+    RecursiveClass recursiveParameter;
+  }
+
+  private static class RecursiveClass {
+
+    @Parameter
+    RecursiveClass recursiveField;
   }
 }
