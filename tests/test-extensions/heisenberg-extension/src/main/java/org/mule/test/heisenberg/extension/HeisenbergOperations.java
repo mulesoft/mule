@@ -717,4 +717,9 @@ public class HeisenbergOperations implements Disposable {
     HeisenbergOperations.secretSdkFutureFeature = secretSdkFutureFeature;
   }
 
+  @Ignore
+  public String ignoredInvalidOperation(CompletionCallback<String, String> invalidInput) {
+    return null;
+  }
+
 }

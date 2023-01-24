@@ -94,7 +94,8 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   boolean emitsResponse();
 
   /**
-   * @return whether this source should be ignored and excluded from the resulting {@link ExtensionModel}
+   * @return whether this source should be ignored and excluded from the resulting {@link ExtensionModel}. If the source is
+   *         ignored there is no guaranteed for it to be valid, no other parser method should be called if that is the case.
    */
   boolean isIgnored();
 

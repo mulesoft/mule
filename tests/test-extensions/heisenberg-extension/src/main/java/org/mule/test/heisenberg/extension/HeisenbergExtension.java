@@ -66,7 +66,8 @@ import javax.inject.Inject;
     KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class, HeisenbergOperationLifecycleValidator.class})
 @OnException(SdkHeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
-@Sources({HeisenbergSource.class, HeisenbergSourceAllOptionalCallbacks.class, DEARadioSource.class, AsyncHeisenbergSource.class})
+@Sources({HeisenbergSource.class, HeisenbergSourceAllOptionalCallbacks.class, DEARadioSource.class, AsyncHeisenbergSource.class,
+    InvalidIgnoredSource.class})
 @org.mule.sdk.api.annotation.Sources({ReconnectableHeisenbergSource.class, HeisenbergClusterSource.class,
     IgnoredHeisenbergSource.class, SdkIgnoredHeisenbergSource.class, ReconnectableHeisenbergSdkSource.class})
 @Export(classes = {HeisenbergExtension.class, DifferedKnockableDoor.class, HeisenbergErrors.class}, resources = "methRecipe.json")

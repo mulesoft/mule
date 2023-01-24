@@ -56,8 +56,10 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
     this.functionElement = functionElement;
 
-    parseStructure();
-    collectAdditionalModelProperties();
+    if (!isIgnored()) {
+      parseStructure();
+      collectAdditionalModelProperties();
+    }
   }
 
   @Override
