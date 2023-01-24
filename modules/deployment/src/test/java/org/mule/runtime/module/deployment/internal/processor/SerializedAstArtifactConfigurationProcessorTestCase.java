@@ -70,7 +70,7 @@ public class SerializedAstArtifactConfigurationProcessorTestCase extends Abstrac
               "  \"topLevelComponentAsts\": []," +
               "  \"errorTypeRepository\": {\"hierarchy\": []}," +
               "  \"importedResources\": []}",
-                                       UTF_8);
+                               UTF_8);
         } else {
           return SerializedAstArtifactConfigurationProcessorTestCase.class.getClassLoader().getResourceAsStream(name);
         }
