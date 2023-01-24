@@ -42,6 +42,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.ast.internal.FilteredArtifactAst;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
@@ -398,7 +399,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // This has to be called after all previous state has been cleared because the unregister/cleanup process requires the
     // errorTypeRepository as it was during its initialization.
     // TODO: check this, it used to be done with the filtered AST, doing it like this might have a perf impact (not confirmed)
-    doRegisterErrors(getApplicationModel());
+    // TODO: also note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
+    // is because the FilteredArtifactAst has some special case for error handlers.
+    doRegisterErrors(new FilteredArtifactAst(getApplicationModel(), c -> true));
   }
 
   private List<Object> createComponents(ComponentInitializationRequest initializationRequest,
