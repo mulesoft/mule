@@ -14,6 +14,11 @@ import org.mule.runtime.extension.api.client.params.Parameterizer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Base implementation of {@link Parameterizer}
+ *
+ * @since 4.6.0
+ */
 public abstract class BaseParameterizer<T extends Parameterizer> implements Parameterizer<T> {
 
   private final Map<String, Object> rawParameters = new HashMap<>();
