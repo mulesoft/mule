@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal.processor;
 
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -19,6 +20,7 @@ import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
@@ -59,7 +61,7 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
       throws ConfigurationException {
     try {
       MuleContext muleContext = artifactContextConfiguration.getMuleContext();
-      return defaultArtifactAstDeserializer
+      ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
           .deserialize(muleContext.getExecutionClassLoader()
               .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION),
                        name -> getExtensions(muleContext.getExtensionManager())
@@ -67,8 +69,30 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
                            .filter(x -> x.getName().equals(name))
                            .findFirst()
                            .orElse(null));
+
+      if (!isEquivalentAstArtifactType(artifactContextConfiguration.getArtifactType(),
+                                       deserializedArtifactAst.getArtifactType())) {
+        throw new IllegalStateException(format("Expected artifact type '%s' but serialized ast was '%s'",
+                                               artifactContextConfiguration.getArtifactType(),
+                                               deserializedArtifactAst.getArtifactType()));
+      }
+
+      return deserializedArtifactAst;
     } catch (Exception e) {
       throw new ConfigurationException(e);
+    }
+  }
+
+  private boolean isEquivalentAstArtifactType(ArtifactType artifactType, org.mule.runtime.ast.api.ArtifactType astArtifactType) {
+    switch (artifactType) {
+      case APP:
+        return astArtifactType == org.mule.runtime.ast.api.ArtifactType.APPLICATION;
+      case DOMAIN:
+        return astArtifactType == org.mule.runtime.ast.api.ArtifactType.DOMAIN;
+      case POLICY:
+        return astArtifactType == org.mule.runtime.ast.api.ArtifactType.POLICY;
+      default:
+        throw new IllegalArgumentException("The provided artifact type '" + artifactType + "' cannot be deployed.");
     }
   }
 
