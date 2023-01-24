@@ -93,7 +93,7 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
 
   /**
    * @return whether this operation should be ignored and excluded from the resulting {@link ExtensionModel}. If the operation is
-   *         ignored there is no guaranteed for it to be valid, no other parser method should be called if that is the case.
+   *         ignored there is no guarantee for it to be valid, no other parser method should be called if that is the case.
    */
   boolean isIgnored();
 
