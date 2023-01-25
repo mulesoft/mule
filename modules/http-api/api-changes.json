@@ -1,4 +1,19 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore":[
+        {
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.http.api.HttpConstants.HttpStatus.UNPROCESSABLE_ENTITY",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpStatus",
+          "fieldName": "UNPROCESSABLE_ENTITY",
+          "elementKind": "enumConstant",
+          "justification": "Java 17 8 fix"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [
