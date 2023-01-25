@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -42,11 +43,18 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
 
     this.extensionClassLoader = extensionClassLoader;
 
-    this.configurationType = new LazyValue<>(() -> withContextClassLoader(this.extensionClassLoader, () -> {
-      // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
-      // with the annotations stuff.
-      return addAnnotationsToClass(configurationType);
-    }));
+    this.configurationType = new LazyValue<>(() -> {
+      if (isMuleFramework()) {
+        return configurationType;
+      } else {
+        return withContextClassLoader(this.extensionClassLoader, () -> {
+          // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an
+          // extension
+          // with the annotations stuff.
+          return addAnnotationsToClass(configurationType);
+        });
+      }
+    });
   }
 
   /**

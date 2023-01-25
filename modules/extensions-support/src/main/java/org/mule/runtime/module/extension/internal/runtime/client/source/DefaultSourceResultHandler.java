@@ -21,7 +21,7 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.extension.api.client.source.SourceParameterizer;
+import org.mule.runtime.extension.api.client.source.SourceCallbackParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
@@ -67,7 +67,7 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
   }
 
   @Override
-  public CompletableFuture<Void> completeWithSuccess(Consumer<SourceParameterizer> successCallbackParameters) {
+  public CompletableFuture<Void> completeWithSuccess(Consumer<SourceCallbackParameterizer> successCallbackParameters) {
     return withNullEvent(event -> {
       final CompletableFuture<Void> future = new CompletableFuture<>();
       future.whenComplete((v, t) -> {
@@ -96,7 +96,8 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
   }
 
   @Override
-  public CompletableFuture<Void> completeWithError(Throwable exception, Consumer<SourceParameterizer> errorCallbackParameters) {
+  public CompletableFuture<Void> completeWithError(Throwable exception,
+                                                   Consumer<SourceCallbackParameterizer> errorCallbackParameters) {
     final ClassLoader extensionClassLoader = sourceClient.getExtensionClassLoader();
     return withNullEvent(event -> {
       final MessagingException messagingException = sourceClient.asMessagingException(exception, event);
@@ -128,8 +129,11 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
   }
 
   private Map<String, Object> resolveCallbackParameters(Optional<? extends ParameterizedModel> callbackModel,
-                                                        Consumer<SourceParameterizer> parameterizer,
+                                                        Consumer<SourceCallbackParameterizer> parameterizerConsumer,
                                                         CoreEvent event) {
+    DefaultSourceCallbackParameterizer parameterizer = new DefaultSourceCallbackParameterizer();
+    parameterizerConsumer.accept(parameterizer);
+
     return (Map<String, Object>) callbackModel.map(model -> evaluate(sourceClient.toResolverSet(parameterizer, model),
                                                                      sourceClient.resolveConfigurationInstance(event),
                                                                      event))
