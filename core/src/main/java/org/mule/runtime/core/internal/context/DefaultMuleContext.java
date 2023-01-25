@@ -1542,11 +1542,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * Configures the {@link MuleRuntimeFeature#USE_TRANSACTION_SINK_INDEX} feature flag.
    *
-   * @since 4.4.0
+   * @since 4.0.0
    */
   private static void configureUseTransactionSinkIndex() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, minMuleVersion("4.4.0"));
+    featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, minMuleVersion("4.0.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

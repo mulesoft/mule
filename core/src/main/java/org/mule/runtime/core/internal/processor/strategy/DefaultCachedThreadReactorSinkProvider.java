@@ -11,8 +11,12 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+import static org.mule.runtime.api.util.MuleSystemProperties.USE_TRANSACTION_SINK_INDEX_PROPERTY;
+
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -50,7 +54,9 @@ public class DefaultCachedThreadReactorSinkProvider extends AbstractCachedThread
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
   public DefaultCachedThreadReactorSinkProvider(FlowConstruct flowConstruct, ReactiveProcessor processor,
-                                                Consumer<CoreEvent> eventConsumer) {
+                                                Consumer<CoreEvent> eventConsumer,
+                                                FeatureFlaggingService featureFlaggingService) {
+    super(featureFlaggingService.isEnabled(USE_TRANSACTION_SINK_INDEX));
     this.flowConstruct = flowConstruct;
     this.processor = processor;
     this.eventConsumer = eventConsumer;

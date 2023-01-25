@@ -32,6 +32,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
+  private boolean sinkIndexEnabled;
 
   private final Cache<String, FluxSinkWrapper> sinks =
       Caffeine.newBuilder()
@@ -43,6 +44,12 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
           .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
                                                                                 removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+  public AbstractCachedThreadReactorSinkProvider() {}
+
+  public AbstractCachedThreadReactorSinkProvider(boolean enabled) {
+    this.sinkIndexEnabled = enabled;
+  }
 
   public void dispose() {
     sinks.asMap().values().forEach(FluxSink::complete);
@@ -60,7 +67,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
     if (txCoord.runningNestedTransaction()) {
       return sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
     } else {
-      if (featureFlaggingService.isEnabled(USE_TRANSACTION_SINK_INDEX)) {
+      if (sinkIndexEnabled) {
         int index = 0;
         while (true) {
           FluxSinkWrapper fluxSinkWrapper =
