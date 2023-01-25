@@ -1523,7 +1523,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnableTracerConfigurationInApp() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_IN_APP,
-                                                minMuleVersion("4.5.0"));
+                                                minMuleVersion("4.0.0"));
   }
 
 
