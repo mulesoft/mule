@@ -8,6 +8,8 @@ package org.mule.management.stats;
 
 import org.mule.api.management.stats.Statistics;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -23,6 +25,8 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     private long samplePeriod = 0;
     protected final AtomicLong receivedEventSync = new AtomicLong(0);
     protected final AtomicLong receivedEventASync = new AtomicLong(0);
+
+    private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
 
     public AbstractFlowConstructStatistics(String flowConstructType, String name)
     {
@@ -41,6 +45,7 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     /**
      * Are statistics logged
      */
+    @Override
     public boolean isEnabled()
     {
         return enabled;
@@ -67,11 +72,19 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     public void incReceivedEventSync()
     {
         receivedEventSync.addAndGet(1);
+        for (DefaultResetOnQueryCounter eventsReceivedCounter : eventsReceivedCounters)
+        {
+            eventsReceivedCounter.increment();
+        }
     }
 
     public void incReceivedEventASync()
     {
         receivedEventASync.addAndGet(1);
+        for (DefaultResetOnQueryCounter eventsReceivedCounter : eventsReceivedCounters)
+        {
+            eventsReceivedCounter.increment();
+        }
     }
 
     public long getAsyncEventsReceived()
@@ -97,5 +110,27 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     public long getSamplePeriod()
     {
         return System.currentTimeMillis() - samplePeriod;
+    }
+
+
+    /**
+     * Provides a counter for {@link #getTotalEventsReceived() total events received} that is not affected by calls to
+     * {@link #clear()} or {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
+     * <p>
+     * Counter initial value is set to the value of {@link #getTotalEventsReceived()} when this method is called.
+     * <p>
+     * If this is called concurrently with {@link #incReceivedEvents()}, there is chance of a race condition occurring where an
+     * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
+     * 
+     * @return a counter for {@link #getTotalEventsReceived()}.
+     * 
+     * @since 4.5
+     */
+    public ResetOnQueryCounter getEventsReceivedCounter()
+    {
+        DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+        eventsReceivedCounters.add(counter);
+        counter.add(getTotalEventsReceived());
+        return counter;
     }
 }
