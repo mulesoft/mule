@@ -9,10 +9,10 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleScope;
-import org.mule.maven.client.internal.AetherMavenClient;
 
 import java.io.File;
 import java.util.List;
@@ -22,9 +22,9 @@ public class DeployableDependencyResolver {
 
   private static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
 
-  private final AetherMavenClient muleMavenPluginClient;
+  private final MavenClient muleMavenPluginClient;
 
-  public DeployableDependencyResolver(AetherMavenClient muleMavenPluginClient) {
+  public DeployableDependencyResolver(MavenClient muleMavenPluginClient) {
     this.muleMavenPluginClient = muleMavenPluginClient;
   }
 

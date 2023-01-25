@@ -11,6 +11,7 @@ import static org.mule.maven.client.api.model.BundleScope.SYSTEM;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
@@ -50,7 +51,6 @@ import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
@@ -133,14 +133,14 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(pomModel);
 
-    AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
+    MavenClient mavenClient = createMavenClient(mavenConfiguration);
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
 
-    resolveDeployableDependencies(aetherMavenClient, pom, pomModel, activeProfiles);
+    resolveDeployableDependencies(mavenClient, pom, pomModel, activeProfiles);
 
     resolveDeployablePluginsData(deployableMavenBundleDependencies);
 
-    resolveAdditionalPluginDependencies(aetherMavenClient, pomModel, activeProfiles, pluginsArtifactDependencies);
+    resolveAdditionalPluginDependencies(mavenClient, pomModel, activeProfiles, pluginsArtifactDependencies);
 
     return doBuild(pomModel, deployableArtifactCoordinates);
   }
@@ -202,14 +202,14 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   /**
    * Resolves the dependencies of the deployable in the various forms needed to obtain the {@link DeployableProjectModel}.
    *
-   * @param aetherMavenClient the configured {@link AetherMavenClient}.
+   * @param mavenClient the configured {@link MavenClient}.
    * @param pom               POM file.
    * @param pomModel          parsed POM model.
    * @param activeProfiles    active Maven profiles.
    */
-  private void resolveDeployableDependencies(AetherMavenClient aetherMavenClient, File pom, Model pomModel,
+  private void resolveDeployableDependencies(MavenClient mavenClient, File pom, Model pomModel,
                                              List<String> activeProfiles) {
-    DeployableDependencyResolver deployableDependencyResolver = new DeployableDependencyResolver(aetherMavenClient);
+    DeployableDependencyResolver deployableDependencyResolver = new DeployableDependencyResolver(mavenClient);
 
     // Resolve the Maven bundle dependencies
     deployableMavenBundleDependencies =
@@ -217,7 +217,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     // MTF/MUnit declares the mule-plugin being tested as system scope, therefore its transitive dependencies
     // will not be included in the dependency graph of the deployable artifact and need to be resolved separately
-    deployableMavenBundleDependencies = resolveSystemScopeDependencies(aetherMavenClient, deployableMavenBundleDependencies);
+    deployableMavenBundleDependencies = resolveSystemScopeDependencies(mavenClient, deployableMavenBundleDependencies);
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
     List<Artifact> deployableArtifactDependencies =
@@ -253,7 +253,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     return empty();
   }
 
-  private List<BundleDependency> resolveSystemScopeDependencies(AetherMavenClient aetherMavenClient,
+  private List<BundleDependency> resolveSystemScopeDependencies(MavenClient mavenClient,
                                                                 List<BundleDependency> deployableMavenBundleDependencies) {
     List<BundleDependency> systemScopeDependenciesTransitiveDependencies = new ArrayList<>();
 
@@ -261,8 +261,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
       if (MULE_PLUGIN_CLASSIFIER.equals(bundleDependency.getDescriptor().getClassifier().orElse(null))
           && SYSTEM.equals(bundleDependency.getScope())) {
         try (MuleSystemPluginMavenReactorResolver reactor =
-            new MuleSystemPluginMavenReactorResolver(new File(bundleDependency.getBundleUri()), aetherMavenClient)) {
-          BundleDependency systemScopeDependency = aetherMavenClient
+            new MuleSystemPluginMavenReactorResolver(new File(bundleDependency.getBundleUri()), mavenClient)) {
+          BundleDependency systemScopeDependency = mavenClient
               .resolveArtifactDependencies(singletonList(bundleDependency.getDescriptor()),
                                            of(deployableArtifactRepositoryFolder),
                                            of(reactor))
@@ -364,7 +364,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
   }
 
-  private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
+  private void resolveAdditionalPluginDependencies(MavenClient mavenClient, Model pomModel,
                                                    List<String> activeProfiles,
                                                    Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     // Parse additional plugin dependencies
@@ -373,7 +373,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
             .map(this::getAdditionalPluginDependencies).orElse(emptyList());
 
     AdditionalPluginDependenciesResolver additionalPluginDependenciesResolver =
-        new AdditionalPluginDependenciesResolver(aetherMavenClient,
+        new AdditionalPluginDependenciesResolver(mavenClient,
                                                  initialAdditionalPluginDependencies,
                                                  new File("temp"),
                                                  getPomModels());

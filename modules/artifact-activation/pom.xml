@@ -16,21 +16,17 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleMavenClientApi>1.4.3</muleMavenClientApi>
-        <muleMavenClientImpl>1.4.3</muleMavenClientImpl>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-api</artifactId>
-            <version>${muleMavenClientApi}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
-            <version>${muleMavenClientImpl}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
