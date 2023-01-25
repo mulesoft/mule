@@ -405,7 +405,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private void disposePreviousComponents() {
     // First unregister any already initialized/started component
-    unregisterBeans(currentComponentInitializationState.getTrackingPostProcessor().getBeansTrackedInOrder());
+    unregisterBeans(currentComponentInitializationState.getTrackedBeansInOrder());
 
     objectProviders.clear();
     resetMuleSecurityManager();
@@ -525,7 +525,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @return List beans created for the given component names sorted by precedence.
    */
   private List<Object> createBeans(List<Pair<String, ComponentAst>> applicationComponentNames) {
-    currentComponentInitializationState.getTrackingPostProcessor().startTracking();
+    currentComponentInitializationState.startTrackingBeans();
     Map<Pair<String, ComponentAst>, Object> objects = new LinkedHashMap<>();
     // Create beans only once by calling the lookUp at the Registry
     applicationComponentNames.forEach(componentPair -> {
@@ -542,8 +542,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           objects.put(componentPair, object);
         }
       } catch (Exception e) {
-        currentComponentInitializationState.getTrackingPostProcessor()
-            .commitOnly(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+        currentComponentInitializationState
+            .commitTrackedBeansContainedIn(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
         safeUnregisterBean(componentPair.getFirst());
 
         throw new MuleRuntimeException(e);
@@ -559,8 +559,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     });
 
     // TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
-    currentComponentInitializationState.getTrackingPostProcessor()
-        .commitOnly(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+    currentComponentInitializationState
+        .commitTrackedBeansContainedIn(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
 
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());

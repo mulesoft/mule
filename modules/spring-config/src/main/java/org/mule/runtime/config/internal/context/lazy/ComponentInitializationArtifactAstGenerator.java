@@ -15,10 +15,19 @@ import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.ast.internal.FilteredArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Aids with the generation of filtered artifact ASTs in the context of lazy initialization of components.
+ */
 class ComponentInitializationArtifactAstGenerator {
 
+  /**
+   * A callback for performing validations over the minimal artifact AST.
+   * <p>
+   * Unlike a regular {@link Consumer}, this one can throw a {@link ConfigurationException}.
+   */
   @FunctionalInterface
   public interface ArtifactAstValidator {
 
@@ -27,10 +36,29 @@ class ComponentInitializationArtifactAstGenerator {
 
   private final ArtifactAstDependencyGraph graph;
 
+  /**
+   * Creates the generator instance.
+   *
+   * @param graph The {@link ArtifactAstDependencyGraph} to use for extracting the minimal AST from a predicate.
+   */
   ComponentInitializationArtifactAstGenerator(ArtifactAstDependencyGraph graph) {
     this.graph = graph;
   }
 
+  /**
+   * Creates the minimal artifact AST that satisfies the given {@code componentInitializationRequest} and taking into account the
+   * current {@code componentInitializationState}.
+   * <p>
+   * A minimal artifact AST in this context is the one that includes the requested components and all of their dependencies but
+   * excluding any that may be already initialized.
+   *
+   * @param componentInitializationRequest The {@link ComponentInitializationRequest} to satisfy.
+   * @param componentInitializationState   The current {@link ComponentInitializationState} to take into account.
+   * @param astValidator                   A validator to call with the minimal artifact AST. Already initialized components are
+   *                                       still included at this stage.
+   * @return The minimal (and potentially also filtered) artifact AST.
+   * @throws ConfigurationException If the validation fails.
+   */
   public ArtifactAst getMinimalArtifactAst(ComponentInitializationRequest componentInitializationRequest,
                                            ComponentInitializationState componentInitializationState,
                                            ArtifactAstValidator astValidator)
