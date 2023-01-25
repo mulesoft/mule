@@ -403,6 +403,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     prepareObjectProviders();
   }
 
+  /**
+   * Configures the given {@link ConfigurableObjectProvider}s.
+   *
+   * @param objectProviders The {@link ConfigurableObjectProvider}s to configure.
+   */
   protected void prepareObjectProviders(List<ConfigurableObjectProvider> objectProviders) {
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
@@ -412,6 +417,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
+  /**
+   * Configures the discovered {@link ConfigurableObjectProvider}s.
+   */
   protected void prepareObjectProviders() {
     prepareObjectProviders(objectProviders);
   }
@@ -470,14 +478,23 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     createApplicationComponents(beanFactory, applicationModel, true);
   }
 
+  /**
+   * @param componentAst The {@link ComponentAst} to test.
+   * @return if the {@code componentAst} needs to be always enabled.
+   */
   protected boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
     return componentAst.getModel(HasStereotypeModel.class)
         .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
         .orElse(false);
   }
 
+  /**
+   * Callback to perform actions when a new configurable object provider is discovered as part of the creation of components.
+   *
+   * @param objectProvider The {@link ConfigurableObjectProvider} just discovered.
+   */
   protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
-    objectProviders.add(objectProvider);
+    // Does nothing
   }
 
   /**
@@ -546,7 +563,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     objectProvidersByName.stream()
         .map(pair -> springComponentModels.get(pair.getFirst()).getObjectInstance())
-        .forEach(this::onObjectProviderDiscovered);
+        .forEach(objectProvider -> {
+          objectProviders.add(objectProvider);
+          onObjectProviderDiscovered(objectProvider);
+        });
     registerObjectFromObjectProviders(beanFactory);
 
     Set<String> objectProviderNames = objectProvidersByName.stream()
