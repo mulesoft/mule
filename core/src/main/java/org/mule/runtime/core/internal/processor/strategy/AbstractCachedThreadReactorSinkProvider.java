@@ -8,10 +8,14 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+
+import javax.inject.Inject;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -22,6 +26,9 @@ import reactor.core.publisher.FluxSink;
  * Abstract implementation of {@link ReactorSinkProvider} that uses a cache for the {@link FluxSink}s per thread.
  */
 public abstract class AbstractCachedThreadReactorSinkProvider implements ReactorSinkProvider {
+
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
@@ -53,15 +60,19 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
     if (txCoord.runningNestedTransaction()) {
       return sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
     } else {
-      int index = 0;
-      while (true) {
-        FluxSinkWrapper fluxSinkWrapper =
-            sinks.get(currentThread().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
-        if (fluxSinkWrapper.isBeingUsed()) {
-          index++;
-          continue;
+      if (featureFlaggingService.isEnabled(USE_TRANSACTION_SINK_INDEX)) {
+        int index = 0;
+        while (true) {
+          FluxSinkWrapper fluxSinkWrapper =
+              sinks.get(currentThread().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
+          if (fluxSinkWrapper.isBeingUsed()) {
+            index++;
+            continue;
+          }
+          return fluxSinkWrapper;
         }
-        return fluxSinkWrapper;
+      } else {
+        return sinks.get(String.valueOf(currentThread()), t -> (FluxSinkWrapper) createSink());
       }
     }
   }
