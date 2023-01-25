@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
