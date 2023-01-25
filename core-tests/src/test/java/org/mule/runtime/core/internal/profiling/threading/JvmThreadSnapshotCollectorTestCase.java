@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
 @RunWith(FlakinessDetectorTestRunner.class)
-@FlakyTest
+@FlakyTest(times = 1500)
 public class JvmThreadSnapshotCollectorTestCase extends AbstractMuleTestCase {
 
   private static final ExecutorService executor = newSingleThreadExecutor();
