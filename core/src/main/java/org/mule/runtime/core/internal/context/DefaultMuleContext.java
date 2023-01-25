@@ -1516,13 +1516,16 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_TRACER_CONFIGURATION_IN_APP} feature flag.
+   * Configures the {@link MuleRuntimeFeature#ENABLE_TRACER_CONFIGURATION_IN_APP} feature flag. The reason why the min mule
+   * version is 4.0.0 is that this will be enabled by default in mule 4, no matter for which min mule version the app was created.
+   *
+   * This is used for disabling the feature in CH.
    *
    * @since 4.5.0
    */
   private static void configureEnableTracerConfigurationInApp() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_IN_APP,
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_TRACER_CONFIGURATION_IN_APP,
                                                 minMuleVersion("4.0.0"));
   }
 
