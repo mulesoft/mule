@@ -8,14 +8,10 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-
-import javax.inject.Inject;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -27,9 +23,6 @@ import reactor.core.publisher.FluxSink;
  */
 public abstract class AbstractCachedThreadReactorSinkProvider implements ReactorSinkProvider {
 
-  @Inject
-  FeatureFlaggingService featureFlaggingService;
-
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
   private boolean sinkIndexEnabled;
@@ -39,6 +32,14 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
           .removalListener((RemovalListener<String, FluxSink<CoreEvent>>) (String, coreEventFluxSink,
                                                                            removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+
+  private final Cache<Thread, FluxSink<CoreEvent>> legacySinks =
+      Caffeine.newBuilder().weakKeys()
+          .removalListener((RemovalListener<Thread, FluxSink<CoreEvent>>) (thread, coreEventFluxSink,
+                                                                           removalCause) -> coreEventFluxSink.complete())
+          .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
   private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
@@ -79,7 +80,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
           return fluxSinkWrapper;
         }
       } else {
-        return sinks.get(String.valueOf(currentThread()), t -> (FluxSinkWrapper) createSink());
+        return legacySinks.get(currentThread(), t -> new FluxSinkWrapper(createSink()));
       }
     }
   }
