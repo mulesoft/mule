@@ -17,7 +17,6 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
 
-import org.junit.Ignore;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;

@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;

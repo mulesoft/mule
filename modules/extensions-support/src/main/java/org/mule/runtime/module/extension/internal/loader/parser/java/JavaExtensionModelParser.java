@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;

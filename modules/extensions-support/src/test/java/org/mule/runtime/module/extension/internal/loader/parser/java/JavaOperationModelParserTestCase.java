@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
-import org.junit.Ignore;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.param.Config;

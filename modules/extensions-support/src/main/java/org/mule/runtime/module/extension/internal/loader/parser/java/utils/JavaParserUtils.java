@@ -41,11 +41,8 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 

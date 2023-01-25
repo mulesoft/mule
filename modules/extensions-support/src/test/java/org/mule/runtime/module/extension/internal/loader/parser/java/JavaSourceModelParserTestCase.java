@@ -20,7 +20,6 @@ import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_AL
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.connection.ConnectionException;
