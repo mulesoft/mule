@@ -394,8 +394,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
-  private void validateRequestedComponentExists(Location location, ArtifactAst minimalApplicationModel) {
-    if (minimalApplicationModel.recursiveStream()
+  private void validateRequestedComponentExists(Location location, ArtifactAst minimalArtifactAst) {
+    if (minimalArtifactAst.recursiveStream()
         .noneMatch(comp -> comp.getLocation() != null
             && comp.getLocation().getLocation().equals(location.toString()))) {
       throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
@@ -403,7 +403,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
-  private void disposePreviousComponents() {
+  private void cleanupAndResetComponentsState() {
     // First unregister any already initialized/started component
     unregisterBeans(currentComponentInitializationState.getTrackedBeansInOrder());
 
@@ -413,7 +413,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // This has to be called after all previous state has been cleared because the unregister/cleanup process requires the
     // errorTypeRepository as it was during its initialization.
     // TODO: check this, it used to be done with the filtered AST, doing it like this might have a perf impact (not confirmed)
-    // TODO: also note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
+    // Note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
     // is because the FilteredArtifactAst has some special case for error handlers.
     doRegisterErrors(new FilteredArtifactAst(getApplicationModel(), c -> true));
   }
@@ -442,22 +442,22 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       initializeComponentsFromParent(parentComponentModelInitializerAdapter);
 
       if (!initializationRequest.isKeepPreviousRequested()) {
-        disposePreviousComponents();
+        cleanupAndResetComponentsState();
       }
 
       // Remembers the currently requested locations in order to skip future requests if they are compatible.
       currentComponentInitializationState.update(initializationRequest);
 
-      // Registers the bean definitions for the application components in the minimal model.
-      List<Pair<String, ComponentAst>> applicationComponents =
+      // Registers the bean definitions for the artifact components in the minimal model.
+      List<Pair<String, ComponentAst>> components =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalAst, false);
 
       // Prepares/configures any recently discovered object providers
       prepareObjectProviders(currentComponentInitializationState.takeObjectProvidersToConfigure());
 
       // Finally, creates the beans corresponding to the requested components.
-      LOGGER.debug("Will create beans: {}", applicationComponents);
-      return createBeans(applicationComponents);
+      LOGGER.debug("Will create beans: {}", components);
+      return createBeans(components);
     });
   }
 
