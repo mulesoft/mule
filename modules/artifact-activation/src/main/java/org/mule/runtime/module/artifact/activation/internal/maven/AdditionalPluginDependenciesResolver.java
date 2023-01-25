@@ -106,7 +106,7 @@ public class AdditionalPluginDependenciesResolver {
         .map(ArtifactUtils::toBundleDescriptor)
         .collect(toList()),
                                                    of(mavenClient.getMavenConfiguration()
-                                                             .getLocalMavenRepositoryLocation()),
+                                                       .getLocalMavenRepositoryLocation()),
                                                    empty());
   }
 

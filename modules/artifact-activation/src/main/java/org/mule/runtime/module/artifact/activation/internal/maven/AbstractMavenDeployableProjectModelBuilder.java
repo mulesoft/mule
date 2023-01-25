@@ -204,10 +204,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   /**
    * Resolves the dependencies of the deployable in the various forms needed to obtain the {@link DeployableProjectModel}.
    *
-   * @param mavenClient the configured {@link MavenClient}.
-   * @param pom               POM file.
-   * @param pomModel          parsed POM model.
-   * @param activeProfiles    active Maven profiles.
+   * @param mavenClient    the configured {@link MavenClient}.
+   * @param pom            POM file.
+   * @param pomModel       parsed POM model.
+   * @param activeProfiles active Maven profiles.
    */
   private void resolveDeployableDependencies(MavenClient mavenClient, File pom, Model pomModel,
                                              List<String> activeProfiles) {

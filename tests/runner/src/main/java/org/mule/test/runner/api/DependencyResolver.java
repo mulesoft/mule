@@ -81,10 +81,10 @@ public class DependencyResolver {
                                                         mavenConfiguration.getForcePolicyUpdateAlways(),
                                                         mavenConfiguration.getOfflineMode(),
                                                         mavenConfiguration
-                                                         .getIgnoreArtifactDescriptorRepositories(),
+                                                            .getIgnoreArtifactDescriptorRepositories(),
                                                         empty(),
-                                                     session -> {
-                                                     },
+                                                        session -> {
+                                                        },
                                                         mavenConfiguration.getGlobalChecksumPolicy());
 
     if (logger.isDebugEnabled()) {
