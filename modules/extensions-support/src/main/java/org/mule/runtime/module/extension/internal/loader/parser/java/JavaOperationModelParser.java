@@ -116,19 +116,23 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                   OperationElement operationElement,
                                   ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
-
     this.extensionModelParser = extensionModelParser;
     this.operationElement = operationElement;
-
-    this.operationContainer = operationElement.getEnclosingType();
-    enclosingType = operationContainer != null ? operationContainer : this.operationContainer;
-    checkOperationIsNotAnExtension();
-
     configParameter = getConfigParameter(operationElement);
-    connectionParameter = getConnectionParameter(operationElement);
+    if (!isIgnored()) {
+      this.operationContainer = operationElement.getEnclosingType();
+      enclosingType = operationContainer != null ? operationContainer : this.operationContainer;
+      checkOperationIsNotAnExtension();
 
-    parseStructure();
-    collectAdditionalModelProperties();
+      connectionParameter = getConnectionParameter(operationElement);
+
+      parseStructure();
+      collectAdditionalModelProperties();
+    } else {
+      this.operationContainer = null;
+      enclosingType = null;
+      connectionParameter = null;
+    }
   }
 
   private void parseStructure() {
