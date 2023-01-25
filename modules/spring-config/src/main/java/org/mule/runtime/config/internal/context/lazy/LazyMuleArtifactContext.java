@@ -24,6 +24,8 @@ import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unre
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -217,30 +219,41 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     try {
       return super.getBean(name);
     } catch (NoSuchBeanDefinitionException e) {
-      // TODO: we should only attempt this if the name corresponds to a global element
-
       // It is possible that getting the bean failed because the bean definition was not yet registered.
-      // We will try to that now.
-      Location location = builderFromStringRepresentation(name).build();
-
-      if (initializingBeanLock.isHeldByCurrentThread()) {
-        // Reentrancy doesn't make sense. We shouldn't try to initialize some bean while we are trying to initialize some other.
-        throw e;
-      }
-
-      try {
-        initializingBeanLock.lock();
-        // TODO: re-check for bean existence because some other thread may have created it
-        initializeAdditionalComponent(location);
-      } catch (Exception ignored) {
-        // If the lazy initialization failed we will re-throw the original exception as if the lazy initialization attempt never
-        // occurred.
-        throw e;
-      } finally {
-        initializingBeanLock.unlock();
-      }
-      return super.getBean(name);
+      // We will try to do that now.
+      // If it fails, we will re-throw the original exception as if the lazy initialization attempt never occurred.
+      return tryInitializeAndGetBean(name).orElseThrow(() -> e);
     }
+  }
+
+  private Optional<Object> tryInitializeAndGetBean(String name) {
+    if (initializingBeanLock.isHeldByCurrentThread()) {
+      // Prevents reentrancy. We shouldn't try to initialize some missing bean while we are trying to initialize some other.
+      // (Dependencies should be handled by the lazy initialization mechanism without going through here)
+      return empty();
+    }
+
+    initializingBeanLock.lock();
+    try {
+      // Re-checks for bean existence in the registry again before attempting initialization.
+      // This is because some other thread may have initialized the bean already.
+      try {
+        return of(super.getBean(name));
+      } catch (NoSuchBeanDefinitionException e) {
+        // Builds a location just from the bean name, this will only work for top level components. It should be enough for our
+        // use cases.
+        // No need to check if the location exists in the artifact at this point. We will fail rather quickly during the
+        // initialization attempt.
+        Location location = builderFromStringRepresentation(name).build();
+        initializeAdditionalComponent(location);
+      }
+    } catch (Exception ignored) {
+      return empty();
+    } finally {
+      initializingBeanLock.unlock();
+    }
+
+    return of(super.getBean(name));
   }
 
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
