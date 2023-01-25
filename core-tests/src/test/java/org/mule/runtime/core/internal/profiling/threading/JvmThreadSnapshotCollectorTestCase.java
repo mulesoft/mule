@@ -6,38 +6,43 @@
  */
 package org.mule.runtime.core.internal.profiling.threading;
 
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
+
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
-public class JvmThreadSnapshotCollectorTestCase {
+@RunWith(FlakinessDetectorTestRunner.class)
+@FlakyTest
+public class JvmThreadSnapshotCollectorTestCase extends AbstractMuleTestCase {
 
   private static final ExecutorService executor = newSingleThreadExecutor();
   private static final long TEST_TIME = 10L;
-
   private final Object theSharedLock = new Object();
   private final ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
