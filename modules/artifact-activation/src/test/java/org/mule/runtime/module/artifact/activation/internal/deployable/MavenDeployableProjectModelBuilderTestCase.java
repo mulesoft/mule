@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -125,7 +124,8 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
 
-    assertThat(deployableProjectModel.getDeployableModel().getClassLoaderModelLoaderDescriptor(), is(nullValue()));
+    assertThat(deployableProjectModel.getDeployableModel().getClassLoaderModelLoaderDescriptor().getAttributes(),
+               aMapWithSize(0));
   }
 
   @Test
@@ -241,6 +241,24 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/include-test-dependencies");
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(0));
+  }
+
+  @Test
+  @Issue("W-12422216")
+  public void createDeployableProjectModelWithConfigs() throws Exception {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/configs-not-in-model");
+
+    assertThat(deployableProjectModel.getDeployableModel().getConfigs(), containsInAnyOrder("config.xml", "other-config.xml"));
+    assertThat(deployableProjectModel.getDeployableModel().getClassLoaderModelLoaderDescriptor().getAttributes(),
+               aMapWithSize(0));
+  }
+
+  @Test
+  @Issue("W-12422216")
+  public void configsAreHonouredIfProvided() throws Exception {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/configs-in-model");
+
+    assertThat(deployableProjectModel.getDeployableModel().getConfigs(), containsInAnyOrder("config.xml"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath,
