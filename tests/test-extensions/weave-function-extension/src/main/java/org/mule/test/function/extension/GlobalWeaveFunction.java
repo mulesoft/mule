@@ -15,7 +15,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
@@ -107,6 +109,11 @@ public class GlobalWeaveFunction implements Initialisable {
   @Alias("partition")
   public List<List<Object>> aliasedFunction(List<Object> listToSplit, int groupSize) {
     return partition(listToSplit, groupSize);
+  }
+
+  @Ignore
+  public String invalidIgnoredFunction(@Config String theConfiguration) {
+    return null;
   }
 
   private QName asQname(String name) {
