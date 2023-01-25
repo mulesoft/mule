@@ -1,0 +1,56 @@
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "test",
+    "artifactId": "oas-api-app",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "oas-api-a",
+        "version": "1.0.0",
+        "classifier": "oas",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/oas-api-a/1.0.0/oas-api-a-1.0.0-oas.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "oas-api-b",
+        "version": "1.0.0",
+        "classifier": "oas",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/oas-api-b/1.0.0/oas-api-b-1.0.0-oas.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "oas-fragment",
+        "version": "1.0.0",
+        "classifier": "oas",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/oas-fragment/1.0.0/oas-fragment-1.0.0-oas.pom"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.test",
+        "artifactId": "oas-fragment",
+        "version": "2.0.0",
+        "classifier": "oas",
+        "type": "pom"
+      },
+      "uri": "repository/org/mule/test/oas-fragment/2.0.0/oas-fragment-2.0.0-oas.pom"
+    }
+  ],
+  "packages": [
+  ],
+  "resources": [
+  ]
+}
