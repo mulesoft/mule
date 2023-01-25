@@ -55,7 +55,8 @@ public interface FunctionModelParser extends SemanticTermsParser, AdditionalProp
   Optional<FunctionExecutorModelProperty> getFunctionExecutorModelProperty();
 
   /**
-   * @return whether this function should be ignored and excluded from the resulting {@link ExtensionModel}
+   * @return whether this function should be ignored and excluded from the resulting {@link ExtensionModel}. If the function is
+   *         ignored there is no guarantee for it to be valid, no other parser method should be called if that is the case.
    */
   boolean isIgnored();
 

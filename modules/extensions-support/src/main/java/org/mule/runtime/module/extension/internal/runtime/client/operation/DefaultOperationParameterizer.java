@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
-import org.mule.runtime.module.extension.internal.runtime.client.params.BaseParameterizer;
+import org.mule.runtime.module.extension.internal.runtime.client.params.BaseComponentParameterizer;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class DefaultOperationParameterizer extends BaseParameterizer<OperationParameterizer>
+public class DefaultOperationParameterizer extends BaseComponentParameterizer<OperationParameterizer>
     implements InternalOperationParameterizer {
 
   private CoreEvent contextEvent;

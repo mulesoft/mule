@@ -33,6 +33,7 @@ import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -46,6 +47,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
@@ -377,6 +379,11 @@ public class PetStoreOperations {
   @MediaType(ANY)
   public String getStreamToString(InputStream stream) {
     return stream.toString();
+  }
+
+  @Ignore
+  public String ignoredInvalidOperation(CompletionCallback<String, String> invalidInput) {
+    return null;
   }
 
   public static class DistributedContextPropagatorOutputResolver

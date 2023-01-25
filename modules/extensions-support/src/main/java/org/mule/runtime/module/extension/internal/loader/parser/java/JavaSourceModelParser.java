@@ -94,12 +94,13 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     this.sourceElement = sourceElement;
 
     sourceClass = sourceElement.getDeclaringClass().orElse(null);
-
     configParameter = getConfigParameter(sourceElement);
     connectionParameter = getConnectionParameter(sourceElement);
 
-    parseStructure();
-    collectAdditionalModelProperties();
+    if (!isIgnored()) {
+      parseStructure();
+      collectAdditionalModelProperties();
+    }
   }
 
   @Override
