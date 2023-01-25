@@ -63,11 +63,11 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
       collectAdditionalModelProperties();
       // TODO W-10621050
       this.minMuleVersion = calculateFunctionMinMuleVersion(functionElement,
-              getContainerAnnotationMinMuleVersion(extensionElement,
-                      ExpressionFunctions.class,
-                      ExpressionFunctions::value,
-                      functionElement
-                              .getEnclosingType()));
+                                                            getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                 ExpressionFunctions.class,
+                                                                                                 ExpressionFunctions::value,
+                                                                                                 functionElement
+                                                                                                     .getEnclosingType()));
     }
   }
 

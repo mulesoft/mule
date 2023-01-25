@@ -132,10 +132,10 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       collectAdditionalModelProperties();
       // TODO W-10621050
       this.minMuleVersion = calculateOperationMinMuleVersion(operationElement, this.operationContainer,
-              getContainerAnnotationMinMuleVersion(extensionElement,
-                      Operations.class,
-                      Operations::value,
-                      this.operationContainer));
+                                                             getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                  Operations.class,
+                                                                                                  Operations::value,
+                                                                                                  this.operationContainer));
     } else {
       this.operationContainer = null;
       enclosingType = null;
