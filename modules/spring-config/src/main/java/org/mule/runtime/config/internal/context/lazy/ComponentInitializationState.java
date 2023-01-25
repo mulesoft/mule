@@ -75,7 +75,7 @@ class ComponentInitializationState {
   }
 
   /**
-   * Stops tracking beans and adds the one that had been tracked since the last call to {@link #startTrackingBeans()} to the
+   * Stops tracking beans and adds the ones that had been tracked since the last call to {@link #startTrackingBeans()} to the
    * remembered list.
    *
    * @param beanNames A {@link Collection} of bean names that we are interested in remembering from the last batch. Other created
