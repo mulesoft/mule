@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.impl.span.factory;
 
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -33,7 +33,7 @@ public class ExecutionSpanFactory implements EventSpanFactory {
   }
 
   @Override
-  public SpanSnifferManager getSpanSnifferManager() {
+  public SpanExporterManager getSpanSnifferManager() {
     return spanExporterFactory.getSpanExporterManager();
   }
 }

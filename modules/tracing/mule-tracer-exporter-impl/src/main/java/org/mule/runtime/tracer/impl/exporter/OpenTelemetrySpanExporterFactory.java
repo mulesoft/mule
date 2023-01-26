@@ -11,13 +11,13 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
-import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getNewExportedSpanCapturer;
-import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.resolveOpenTelemetrySpanProcessor;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getNewExportedSpanSniffer;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -45,7 +45,9 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   private SpanProcessor spanProcessor;
 
-  private io.opentelemetry.sdk.trace.export.SpanExporter dummyExporter = new OpenTelemetryResources.DummySpanExporter();
+  private final boolean isExportEnabled = parseBoolean(configuration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()));
+
+  private static final io.opentelemetry.sdk.trace.export.SpanExporter DUMMY_EXPORTER = new OpenTelemetryResources.DummySpanExporter();
 
   @Override
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
@@ -53,27 +55,28 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
         .withStartSpanInfo(initialExportInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
-        .withSpanProcessor(getSpanProcessor())
+        .withSpanProcessor(resolveOpenTelemetrySpanProcessor())
         .withInternalSpan(internalSpan)
         .build();
   }
 
-  private SpanProcessor getSpanProcessor() {
+  private SpanProcessor resolveOpenTelemetrySpanProcessor() {
     if (spanProcessor == null) {
-      spanProcessor = resolveOpenTelemetrySpanProcessor(configuration, resolveOpenTelemetrySpanExporter());
+      if (feat)
+      spanProcessor = OpenTelemetryResources.resolveOpenTelemetrySpanProcessor(configuration, resolveOpenTelemetrySpanExporter());
     }
     return spanProcessor;
   }
 
   protected io.opentelemetry.sdk.trace.export.SpanExporter resolveOpenTelemetrySpanExporter() {
     if (!parseBoolean(configuration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()))) {
-      return dummyExporter;
+      return DUMMY_EXPORTER;
     }
-    OpenTelemetryResources.
+    return OpenTelemetryResources.resolveOpenTelemetrySpanExporter(configuration);
   }
 
   @Override
-  public SpanSnifferManager getSpanExporterManager() {
+  public SpanExporterManager getSpanExporterManager() {
     return new OpenTelemetrySpanExporterManager();
   }
 
@@ -82,11 +85,11 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     spanProcessor.shutdown();
   }
 
-  private static class OpenTelemetrySpanExporterManager implements SpanSnifferManager {
+  private static class OpenTelemetrySpanExporterManager implements SpanExporterManager {
 
     @Override
     public ExportedSpanSniffer getExportedSpanSniffer() {
-      return getNewExportedSpanCapturer();
+      return getNewExportedSpanSniffer();
     }
   }
 }

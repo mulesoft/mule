@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
@@ -83,11 +83,11 @@ public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
   }
 
   @Override
-  public SpanSnifferManager getSpanExporterManager() {
-    return new NoopSpanSnifferManager();
+  public SpanExporterManager getSpanExporterManager() {
+    return new NoopSpanExporterManager();
   }
 
-  private class NoopSpanSnifferManager implements SpanSnifferManager {
+  private class NoopSpanExporterManager implements SpanExporterManager {
 
   }
 }

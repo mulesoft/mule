@@ -15,7 +15,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
 
 import java.util.Collection;
 
@@ -37,14 +37,14 @@ public interface PrivilegedProfilingService extends ProfilingService {
                                      DistributedTraceContextGetter distributedTraceContextGetter);
 
   /**
-   * @return gets an {@link SpanSnifferManager}.
+   * @return gets an {@link SpanExporterManager}.
    *
    *         This is used for capturing spans in privileged modules but should not be exposed as API.
    *
    * @since 4.5.0
    */
-  default SpanSnifferManager getSpanExportManager() {
-    return new SpanSnifferManager() {
+  default SpanExporterManager getSpanExportManager() {
+    return new SpanExporterManager() {
 
       @Override
       public ExportedSpanSniffer getExportedSpanSniffer() {

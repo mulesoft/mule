@@ -32,7 +32,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
@@ -125,7 +125,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public SpanSnifferManager getSpanExportManager() {
+  public SpanExporterManager getSpanExportManager() {
     if (profilingService instanceof PrivilegedProfilingService) {
       return ((PrivilegedProfilingService) getProfilingService()).getSpanExportManager();
     }

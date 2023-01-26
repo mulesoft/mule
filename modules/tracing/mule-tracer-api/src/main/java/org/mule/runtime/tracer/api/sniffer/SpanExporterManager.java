@@ -15,7 +15,7 @@ import java.util.Collection;
  *
  * @since 4.5.0
  */
-public interface SpanSnifferManager {
+public interface SpanExporterManager {
 
   /**
    * @return gets an {@link ExportedSpanSniffer}.
