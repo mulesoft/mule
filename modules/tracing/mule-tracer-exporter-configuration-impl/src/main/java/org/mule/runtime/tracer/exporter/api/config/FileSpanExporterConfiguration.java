@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_IN_APP;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
@@ -115,7 +115,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   }
 
   private Properties getSpanExporterConfigurationProperties() {
-    if (featureFlaggingService.isEnabled(ENABLE_TRACER_CONFIGURATION_IN_APP)) {
+    if (featureFlaggingService.isEnabled(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL)) {
       try {
         // This will verify first in the app and then in the conf folder.
         InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
