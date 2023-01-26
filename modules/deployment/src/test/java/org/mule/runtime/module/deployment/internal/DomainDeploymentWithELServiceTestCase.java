@@ -32,11 +32,13 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.weave.v2.el.WeaveServiceProvider;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -49,6 +51,12 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
 
   @ClassRule
   public static SystemProperty enableDynamicConfigRef = new SystemProperty(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY, "true");
+
+  @BeforeClass
+  public static void setUpELService() throws IOException {
+    testServicesSetup
+        .overrideExpressionLanguageService(DomainDeploymentWithELServiceTestCase::getRealExpressionLanguageServiceFile);
+  }
 
   private final DomainFileBuilder domainWithConfigsFileBuilder =
       new DomainFileBuilder("domain-with-configs")
@@ -84,15 +92,14 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
     TestDomainFactory.after();
   }
 
-  @Override
-  protected File getExpressionLanguageServiceFile(File tempFolder) {
+  private static File getRealExpressionLanguageServiceFile(File tempFolder) {
     final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
-    final File defaulServiceSchedulerJarFile = getResourceFile(weaveJarUrl.getFile(), tempFolder);
+    final File defaultServiceSchedulerJarFile = getResourceFile(weaveJarUrl.getFile(), tempFolder);
 
     return new ServiceFileBuilder("expressionLanguageService")
         .withServiceProviderClass("org.mule.weave.v2.el.WeaveServiceProvider")
         .forContract("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")
-        .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath())
+        .usingLibrary(defaultServiceSchedulerJarFile.getAbsolutePath())
         .unpack(true)
         .getArtifactFile();
   }
