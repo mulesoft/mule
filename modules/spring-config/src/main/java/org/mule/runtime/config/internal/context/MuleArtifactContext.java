@@ -406,13 +406,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   /**
    * Configures the given {@link ConfigurableObjectProvider}s.
    *
-   * @param objectProviders The {@link ConfigurableObjectProvider}s to configure.
+   * @param configurableObjectProviders The {@link ConfigurableObjectProvider}s to configure.
    */
-  protected void prepareObjectProviders(List<ConfigurableObjectProvider> objectProviders) {
+  protected void prepareObjectProviders(List<ConfigurableObjectProvider> configurableObjectProviders) {
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(configurationProperties, muleArtifactObjectProvider);
-    for (ConfigurableObjectProvider objectProvider : objectProviders) {
+    for (ConfigurableObjectProvider objectProvider : configurableObjectProviders) {
       objectProvider.configure(providerConfiguration);
     }
   }
