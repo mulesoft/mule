@@ -49,6 +49,8 @@ public class TestServicesSetup extends ExternalResource {
   }
 
   public void copyServicesToFolder(File servicesFolder) throws IOException {
+    initNotOverriddenServices();
+
     copyDirectory(schedulerService,
                   new File(servicesFolder, SCHEDULER_SERVICE_NAME));
     copyDirectory(expressionLanguageService,
@@ -57,12 +59,17 @@ public class TestServicesSetup extends ExternalResource {
                   new File(servicesFolder, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
   }
 
-  @Override
-  protected void before() throws Throwable {
-    schedulerService = buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
-    expressionLanguageService =
-        buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
-    expressionLanguageMetadataService =
-        buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+  private void initNotOverriddenServices() throws IOException {
+    if (schedulerService == null) {
+      schedulerService = buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
+    }
+    if (expressionLanguageService == null) {
+      expressionLanguageService =
+          buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
+    }
+    if (expressionLanguageMetadataService == null) {
+      expressionLanguageMetadataService =
+          buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+    }
   }
 }
