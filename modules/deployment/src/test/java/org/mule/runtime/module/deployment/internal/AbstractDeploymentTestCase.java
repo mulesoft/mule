@@ -160,6 +160,7 @@ import org.apache.logging.log4j.LogManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -214,6 +215,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected ModuleRepository moduleRepository;
   private TestModuleDiscoverer moduleDiscoverer;
 
+  private static File schedulerServiceFile;
+  private static File expressionLanguageServiceFile;
+  private static File expressionLanguageMetadataServiceFile;
+
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
     return asList(false, true);
@@ -224,7 +229,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static Latch undeployLatch = new Latch();
 
   @BeforeClass
-  public static void beforeClass() throws URISyntaxException, IllegalAccessException {
+  public static void beforeClass() throws URISyntaxException, IllegalAccessException, IOException {
     // Reduces unnecessary logging
     TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
     compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
@@ -238,6 +243,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     internalIsRunningTests =
         (Boolean) readDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true);
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true, true);
+
+    schedulerServiceFile = buildSchedulerServiceFile(
+            compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
+    expressionLanguageServiceFile = buildExpressionLanguageServiceFile(
+            compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
+    expressionLanguageMetadataServiceFile = buildExpressionLanguageMetadataServiceFile(
+            compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
   }
 
   @BeforeClass
@@ -268,8 +280,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
 
-  @Rule
-  public TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  @ClassRule
+  public static TemporaryFolder compilerWorkFolder = new TemporaryFolder();
 
   private File services;
 
@@ -295,13 +307,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     services = getServicesFolder();
     services.mkdirs();
-    copyDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME)),
-                  new File(services, SCHEDULER_SERVICE_NAME));
-    copyDirectory(getExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME)),
-                  new File(services, EXPRESSION_LANGUAGE_SERVICE_NAME));
-    copyDirectory(buildExpressionLanguageMetadataServiceFile(compilerWorkFolder
-        .newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME)),
-                  new File(services, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+    copyDirectory(schedulerServiceFile, new File(services, SCHEDULER_SERVICE_NAME));
+    copyDirectory(expressionLanguageServiceFile, new File(services, EXPRESSION_LANGUAGE_SERVICE_NAME));
+    copyDirectory(expressionLanguageMetadataServiceFile, new File(services, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     testDeploymentListener = new TestDeploymentListener();

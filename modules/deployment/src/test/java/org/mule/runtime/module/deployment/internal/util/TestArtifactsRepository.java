@@ -101,6 +101,13 @@ public class TestArtifactsRepository {
   public static LazyTestResource<File> loadsAppResourceCallbackClassFile;
   public static LazyTestResource<File> loadsAppResourceCallbackJarFile;
   public static LazyTestResource<File> pluginEcho1TestClassFile;
+  public static LazyTestResource<File> pluginEchoSpiTestClassFile;
+  public static LazyTestResource<File> pluginEcho3TestClassFile;
+  public static LazyTestResource<File> pluginEcho2TestClassFile;
+  public static LazyTestResource<File> pluginForbiddenJavaEchoTestClassFile;
+  public static LazyTestResource<File> pluginForbiddenMuleContainerEchoTestClassFile;
+  public static LazyTestResource<File> pluginForbiddenMuleThirdPartyEchoTestClassFile;
+  public static LazyTestResource<File> privilegedExtensionV1JarFile;
 
   private static void setUpFiles() {
     barUtils1ClassFile = new LazyTestResource<File>() {
@@ -412,6 +419,67 @@ public class TestArtifactsRepository {
             .compile(getResourceFile("/org/foo/Plugin1Echo.java"));
       }
     };
+
+    pluginEcho2TestClassFile = new LazyTestResource<File>() {
+      @Override
+      protected File doGet() throws Exception {
+        return
+                new SingleClassCompiler().dependingOn(barUtils2_0JarFile.get())
+                        .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
+      }
+    };
+
+    pluginEcho3TestClassFile = new LazyTestResource<File>() {
+      @Override
+      protected File doGet() throws Exception {
+        return new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
+      }
+    };
+
+    pluginEchoSpiTestClassFile = new LazyTestResource<File>() {
+
+      @Override
+      protected File doGet() throws Exception {
+        return new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/PluginSpiEcho.java"));
+      }
+    };
+
+    pluginForbiddenJavaEchoTestClassFile = new LazyTestResource<File>() {
+
+      @Override
+      protected File doGet() throws Exception {
+        return new SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile.get())
+                .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
+      }
+    };
+
+    pluginForbiddenMuleContainerEchoTestClassFile = new LazyTestResource<File>() {
+
+      @Override
+      protected File doGet() throws Exception {
+        return new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile.get())
+                .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
+      }
+    };
+
+    pluginForbiddenMuleThirdPartyEchoTestClassFile = new LazyTestResource<File>() {
+
+      @Override
+      protected File doGet() throws Exception {
+        return new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile.get())
+                .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
+      }
+    };
+
+    privilegedExtensionV1JarFile = new LazyTestResource<File>() {
+
+      @Override
+      protected File doGet() throws Exception {
+        return new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
+                        getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
+                .compile("mule-module-privileged-1.0.jar", "1.0");
+      }
+    };
   }
 
   /*
@@ -425,12 +493,16 @@ public class TestArtifactsRepository {
   public static LazyTestResource<ArtifactPluginFileBuilder> oracleExtensionPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> loadClassExtensionPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> callbackExtensionPlugin;
+  public static LazyTestResource<ArtifactPluginFileBuilder> callbackExtensionContainingEcho2Plugin;
+  public static LazyTestResource<ArtifactPluginFileBuilder> callbackExtensionContainingForbiddenPlugin;
+  public static LazyTestResource<ArtifactPluginFileBuilder> callbackExtensionDependingOnBarPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> exceptionThrowingPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> byeXmlExtensionPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> moduleUsingByeXmlExtensionPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> usingObjectStorePlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> classloaderConnectExtensionPlugin;
   public static LazyTestResource<ArtifactPluginFileBuilder> classloaderConfigConnectExtensionPlugin;
+
 
   private static void setUpApplicationPluginFileBuilders() {
     echoPlugin = new LazyTestResource<ArtifactPluginFileBuilder>() {
@@ -489,6 +561,31 @@ public class TestArtifactsRepository {
         return createCallbackExtensionPluginFileBuilder();
       }
     };
+    callbackExtensionContainingEcho2Plugin = new LazyTestResource<ArtifactPluginFileBuilder>() {
+
+      @Override
+      protected ArtifactPluginFileBuilder doGet() throws Exception {
+        return createCallbackExtensionPluginFileBuilder().containingClass(pluginEcho2TestClassFile.get(), "org/foo/echo/Plugin2Echo.class");
+      }
+    };
+    callbackExtensionContainingForbiddenPlugin = new LazyTestResource<ArtifactPluginFileBuilder>() {
+
+      @Override
+      protected ArtifactPluginFileBuilder doGet() throws Exception {
+        return createCallbackExtensionPluginFileBuilder().containingClass(pluginForbiddenJavaEchoTestClassFile.get(),
+                "org/foo/echo/PluginForbiddenJavaEcho.class");
+      }
+    };
+    callbackExtensionDependingOnBarPlugin = new LazyTestResource<ArtifactPluginFileBuilder>() {
+
+      @Override
+      protected ArtifactPluginFileBuilder doGet() throws Exception {
+        return createCallbackExtensionPluginFileBuilder()
+                .dependingOn(new JarFileBuilder("barUtils2", barUtils2_0JarFile.get()))
+                .containingClass(pluginEcho2TestClassFile.get(), "org/foo/echo/Plugin2Echo.class");
+      }
+    };
+
 
     exceptionThrowingPlugin = new LazyTestResource<ArtifactPluginFileBuilder>() {
 

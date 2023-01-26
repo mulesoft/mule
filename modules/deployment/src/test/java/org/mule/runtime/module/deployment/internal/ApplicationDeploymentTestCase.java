@@ -54,6 +54,7 @@ import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepo
 import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.moduleUsingByeXmlExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.pluginEcho1TestClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.privilegedExtensionV1JarFile;
 import static org.mule.runtime.module.deployment.internal.util.Utils.createBundleDescriptorLoader;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ArtifactAstSerialization.AST_JSON_DESERIALIZER;
@@ -1314,7 +1315,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void failsToDeploysAppZipWithInvalidPrivilegedExtensionPlugin() throws Exception {
     ArtifactPluginFileBuilder invalidPrivilegedPlugin =
         new ArtifactPluginFileBuilder("invalidPrivilegedPlugin")
-            .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile))
+            .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile.get()))
             .configuredWith(EXPORTED_RESOURCE_PROPERTY, "/");
 
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("invalidPrivilegedPluginApp")

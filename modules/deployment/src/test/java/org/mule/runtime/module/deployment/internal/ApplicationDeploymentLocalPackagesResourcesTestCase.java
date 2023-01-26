@@ -15,12 +15,14 @@ import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepo
 import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.callbackExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.loadsAppResourceCallbackClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.pluginEcho2TestClassFile;
 import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
 import java.util.List;
@@ -67,7 +69,7 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
         .dependingOn(callbackExtensionPlugin.get())
         .containingClass(barUtils1ClassFile.get(), "org/bar/BarUtils.class")
-        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
+        .containingClass(pluginEcho2TestClassFile.get(), "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourcePlugin);
@@ -92,7 +94,7 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .dependingOn(callbackExtensionPlugin.get().containingClass(loadsAppResourceCallbackClassFile.get(),
                                                                    "org/foo/LoadsAppResourceCallback.class"))
         .containingClass(barUtils1ClassFile.get(), "org/bar/BarUtils.class")
-        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
+        .containingClass(pluginEcho2TestClassFile.get(), "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 
@@ -110,9 +112,9 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
   @Description("Tests that code called form plugin's ProcessorInterceptor cannot access internal resources/packages of the application")
   public void deploysAppWithLocalPackageAndPluginWithInterceptors() throws Exception {
     File loadsAppResourceInterceptorFactoryClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptorFactory.java"));
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptorFactory.java"));
     File loadsAppResourceInterceptorClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptor.java"));
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptor.java"));
 
     ArtifactPluginFileBuilder loadsAppResourceInterceptorPlugin =
         new ArtifactPluginFileBuilder("loadsAppResourceInterceptorPlugin")
@@ -146,9 +148,9 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
   @Description("Tests that code called form application's ProcessorInterceptor can access internal resources/packages of the application")
   public void deploysAppWithInterceptorsAndLocalPackage() throws Exception {
     File loadsOwnResourceInterceptorFactoryClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptorFactory.java"));
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptorFactory.java"));
     File loadsOwnResourceInterceptorClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptor.java"));
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptor.java"));
 
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
         .configuredWith(EXPORTED_PACKAGES, "org.bar")

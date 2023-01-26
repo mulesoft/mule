@@ -51,50 +51,23 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     }
   };
 
-  // Classes and JAR resources
-  protected static File pluginEchoSpiTestClassFile;
-  protected static File pluginEcho3TestClassFile;
-  protected static File pluginEcho2TestClassFile;
-  protected static File pluginForbiddenJavaEchoTestClassFile;
-  protected static File pluginForbiddenMuleContainerEchoTestClassFile;
-  protected static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
-  protected static File privilegedExtensionV1JarFile;
-
   // Application artifact builders
-  protected static ApplicationFileBuilder incompleteAppFileBuilder;
-  protected static ApplicationFileBuilder brokenAppFileBuilder;
-  protected static ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder;
-  protected static ApplicationFileBuilder waitAppFileBuilder;
-  protected static ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
-  protected static ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilder;
+  protected ApplicationFileBuilder incompleteAppFileBuilder;
+  protected ApplicationFileBuilder brokenAppFileBuilder;
+  protected ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder;
+  protected ApplicationFileBuilder waitAppFileBuilder;
+  protected ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
+  protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilder;
 
   // Application plugin artifact builders
-  protected static ArtifactPluginFileBuilder echoPluginWithLib1;
+  protected ArtifactPluginFileBuilder echoPluginWithLib1;
 
-  @BeforeClass
-  public static void compileTestClasses() throws Exception {
-    pluginEcho2TestClassFile =
-        new SingleClassCompiler().dependingOn(barUtils2_0JarFile.get())
-            .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
-    pluginEcho3TestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
-    pluginEchoSpiTestClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/PluginSpiEcho.java"));
+  public AbstractApplicationDeploymentTestCase(boolean parallelDeployment) {
+    super(parallelDeployment);
+  }
 
-    pluginForbiddenJavaEchoTestClassFile =
-        new SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile.get())
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
-    pluginForbiddenMuleContainerEchoTestClassFile =
-        new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile.get())
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
-    pluginForbiddenMuleThirdPartyEchoTestClassFile =
-        new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile.get())
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
-
-    privilegedExtensionV1JarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
-                                                        getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
-            .compile("mule-module-privileged-1.0.jar", "1.0");
-
+  @Before
+  public void before() {
     incompleteAppFileBuilder = appFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
     brokenAppFileBuilder = appFileBuilder("broken-app").corrupted();
     brokenAppWithFunkyNameAppFileBuilder = appFileBuilder("broken-app+", brokenAppFileBuilder);
@@ -110,15 +83,11 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
         .containingClass(pluginEcho1TestClassFile.get(), "org/foo/Plugin1Echo.class");
   }
 
-  public AbstractApplicationDeploymentTestCase(boolean parallelDeployment) {
-    super(parallelDeployment);
-  }
-
-  protected static ApplicationFileBuilder appFileBuilder(final String artifactId) {
+  protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
     return new ApplicationFileBuilder(artifactId);
   }
 
-  protected static ApplicationFileBuilder appFileBuilder(String artifactId, ApplicationFileBuilder source) {
+  protected ApplicationFileBuilder appFileBuilder(String artifactId, ApplicationFileBuilder source) {
     return new ApplicationFileBuilder(artifactId, source);
   }
 
