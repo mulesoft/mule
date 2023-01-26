@@ -38,6 +38,8 @@ public class ApplicationContextBuilder {
   private ArtifactContext domainArtifactContext;
   private String[] applicationResources = new String[0];
   private ArtifactCoordinates artifactCoordinates;
+  private boolean isEnableLazyInit = false;
+  private boolean isDisableXmlValidations = false;
 
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
@@ -56,6 +58,28 @@ public class ApplicationContextBuilder {
 
   public ApplicationContextBuilder setApplicationResources(String... applicationResources) {
     this.applicationResources = applicationResources;
+    return this;
+  }
+
+  /**
+   * Controls whether lazy initialization of components is enabled/disabled.
+   *
+   * @param enableLazyInit whether lazy initialization is enabled.
+   * @since 4.6
+   */
+  public ApplicationContextBuilder setEnableLazyInit(boolean enableLazyInit) {
+    isEnableLazyInit = enableLazyInit;
+    return this;
+  }
+
+  /**
+   * Controls whether if XML validations should be done over the configuration file.
+   *
+   * @param disableXmlValidations whether XML validations are disabled.
+   * @since 4.6
+   */
+  public ApplicationContextBuilder setDisableXmlValidations(boolean disableXmlValidations) {
+    isDisableXmlValidations = disableXmlValidations;
     return this;
   }
 
@@ -117,7 +141,12 @@ public class ApplicationContextBuilder {
 
   protected ConfigurationBuilder getAppBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, false, configResources,
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(),
+                                                     isDisableXmlValidations,
+                                                     isEnableLazyInit,
+                                                     false,
+                                                     false,
+                                                     configResources,
                                                      expressionLanguageMetadataService);
     appBuilder.setParentArtifactContext(domainArtifactContext);
     return appBuilder;
