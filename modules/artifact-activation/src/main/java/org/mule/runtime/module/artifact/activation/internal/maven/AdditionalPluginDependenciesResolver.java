@@ -17,9 +17,9 @@ import static java.util.stream.Collectors.toList;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
-import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils;
 import org.mule.runtime.module.artifact.activation.internal.plugin.Plugin;
@@ -66,14 +66,14 @@ public class AdditionalPluginDependenciesResolver {
   private final File temporaryFolder;
   private final Map<ArtifactCoordinates, Supplier<Model>> pomModels;
 
-  private final AetherMavenClient aetherMavenClient;
+  private final MavenClient mavenClient;
   private final List<Plugin> pluginsWithAdditionalDependencies;
 
-  public AdditionalPluginDependenciesResolver(AetherMavenClient muleMavenPluginClient,
+  public AdditionalPluginDependenciesResolver(MavenClient muleMavenPluginClient,
                                               List<Plugin> additionalPluginDependencies,
                                               File temporaryFolder,
                                               Map<ArtifactCoordinates, Supplier<Model>> pomModels) {
-    this.aetherMavenClient = muleMavenPluginClient;
+    this.mavenClient = muleMavenPluginClient;
     this.pluginsWithAdditionalDependencies = new ArrayList<>(additionalPluginDependencies);
     this.temporaryFolder = temporaryFolder;
     this.pomModels = pomModels;
@@ -102,12 +102,12 @@ public class AdditionalPluginDependenciesResolver {
   }
 
   private List<BundleDependency> resolveDependencies(List<Dependency> additionalDependencies) {
-    return aetherMavenClient.resolveArtifactDependencies(additionalDependencies.stream()
+    return mavenClient.resolveArtifactDependencies(additionalDependencies.stream()
         .map(ArtifactUtils::toBundleDescriptor)
         .collect(toList()),
-                                                         of(aetherMavenClient.getMavenConfiguration()
-                                                             .getLocalMavenRepositoryLocation()),
-                                                         empty());
+                                                   of(mavenClient.getMavenConfiguration()
+                                                       .getLocalMavenRepositoryLocation()),
+                                                   empty());
   }
 
   private BundleDependency getPluginBundleDependency(Plugin plugin, List<BundleDependency> mulePlugins) {
@@ -167,15 +167,15 @@ public class AdditionalPluginDependenciesResolver {
     // See LightweightDeployableProjectModelBuilderTestCase#createDeployableProjectModelWithAdditionalDependenciesInAPlugin
     mulePlugins.stream()
         .filter(mulePlugin -> pomModels.getOrDefault(getArtifactCoordinates(mulePlugin),
-                                                     () -> aetherMavenClient
+                                                     () -> mavenClient
                                                          .getRawPomModel(new File(mulePlugin.getBundleUri())))
             .get().getPackaging().equals(MULE_APPLICATION_CLASSIFIER))
         .forEach(mulePlugin -> {
 
           Supplier<Model> pomModel =
               pomModels.getOrDefault(getArtifactCoordinates(mulePlugin),
-                                     () -> aetherMavenClient.getEffectiveModel(new File(mulePlugin.getBundleUri()),
-                                                                               of(temporaryFolder)));
+                                     () -> mavenClient.getEffectiveModel(new File(mulePlugin.getBundleUri()),
+                                                                         of(temporaryFolder)));
 
           Build build = pomModel.get().getBuild();
           if (build != null) {

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model.utils;
 
-import static org.mule.maven.client.internal.AetherMavenClient.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_DOMAIN;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.Constants.ARTIFACT_ID;
 import static org.mule.tools.api.classloader.Constants.GROUP_ID;
 import static org.mule.tools.api.classloader.Constants.MULE_MAVEN_PLUGIN_ARTIFACT_ID;

@@ -87,16 +87,22 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-api</artifactId>
+            <!-- provided by mule-maven-client-impl, needed to compile -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-util</artifactId>
+            <!-- provided by mule-maven-client-impl, needed to compile -->
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <!-- provided by mule-maven-client-impl, needed to compile -->
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->

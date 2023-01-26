@@ -16,21 +16,17 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleMavenClientApi>1.4.3</muleMavenClientApi>
-        <muleMavenClientImpl>1.4.3</muleMavenClientImpl>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-api</artifactId>
-            <version>${muleMavenClientApi}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
-            <version>${muleMavenClientImpl}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -62,12 +58,6 @@
             <artifactId>semantic-version</artifactId>
             <version>1.2.0</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <!-- provided by mule-maven-client-impl -->
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

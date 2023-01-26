@@ -14,8 +14,8 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.client.internal.AetherRepositoryState;
-import org.mule.maven.client.internal.AetherResolutionContext;
+import org.mule.maven.client.internal.MuleMavenRepositoryState;
+import org.mule.maven.client.internal.MuleMavenResolutionContext;
 
 import java.io.File;
 import java.util.Collection;
@@ -60,8 +60,8 @@ public class DependencyResolver {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private AetherResolutionContext resolutionContext;
-  private AetherRepositoryState repositoryState;
+  private MuleMavenResolutionContext resolutionContext;
+  private MuleMavenRepositoryState repositoryState;
 
   /**
    * Creates an instance of the resolver.
@@ -72,20 +72,20 @@ public class DependencyResolver {
   public DependencyResolver(MavenConfiguration mavenConfiguration, Optional<WorkspaceReader> workspaceReader) {
     checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
 
-    this.resolutionContext = new AetherResolutionContext(mavenConfiguration);
-    this.repositoryState = new AetherRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,
-                                                     resolutionContext.getAuthenticatorSelector(),
-                                                     resolutionContext.getProxySelector(),
-                                                     resolutionContext.getMirrorSelector(),
-                                                     mavenConfiguration.getForcePolicyUpdateNever(),
-                                                     mavenConfiguration.getForcePolicyUpdateAlways(),
-                                                     mavenConfiguration.getOfflineMode(),
-                                                     mavenConfiguration
-                                                         .getIgnoreArtifactDescriptorRepositories(),
-                                                     empty(),
-                                                     session -> {
-                                                     },
-                                                     mavenConfiguration.getGlobalChecksumPolicy());
+    this.resolutionContext = new MuleMavenResolutionContext(mavenConfiguration);
+    this.repositoryState = new MuleMavenRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,
+                                                        resolutionContext.getAuthenticatorSelector(),
+                                                        resolutionContext.getProxySelector(),
+                                                        resolutionContext.getMirrorSelector(),
+                                                        mavenConfiguration.getForcePolicyUpdateNever(),
+                                                        mavenConfiguration.getForcePolicyUpdateAlways(),
+                                                        mavenConfiguration.getOfflineMode(),
+                                                        mavenConfiguration
+                                                            .getIgnoreArtifactDescriptorRepositories(),
+                                                        empty(),
+                                                        session -> {
+                                                        },
+                                                        mavenConfiguration.getGlobalChecksumPolicy());
 
     if (logger.isDebugEnabled()) {
       resolutionContext.getAuthenticatorSelector()
