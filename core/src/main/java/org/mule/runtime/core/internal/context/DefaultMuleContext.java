@@ -16,7 +16,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CON
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_IN_APP;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
@@ -345,7 +345,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureRethrowExceptionsInIdempotentMessageValidator();
       configureForeachRouterRejectsMapExpressionFeatureFlag();
       configureHonourInsecureTlsConfiguration();
-      configureEnableTracerConfigurationInApp();
+      configureEnableTracerConfigurationAtApplicationLevel();
     }
   }
 
@@ -1516,17 +1516,14 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_TRACER_CONFIGURATION_IN_APP} feature flag. The reason why the min mule
-   * version is 4.0.0 is that this will be enabled by default in mule 4, no matter for which min mule version the app was created.
-   *
-   * This is used for disabling the feature in CH.
+   * Configures the {@link MuleRuntimeFeature#ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL} feature flag.
    *
    * @since 4.5.0
    */
-  private static void configureEnableTracerConfigurationInApp() {
+  private static void configureEnableTracerConfigurationAtApplicationLevel() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_TRACER_CONFIGURATION_IN_APP,
-                                                minMuleVersion("4.0.0"));
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL,
+                                                featureContext -> true);
   }
 
 
