@@ -9,12 +9,9 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
-import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -23,21 +20,8 @@ import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
@@ -50,7 +34,8 @@ import static org.mule.runtime.module.deployment.internal.processor.SerializedAs
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeploy;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.defaultFooServiceJarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.defaultServiceEchoJarFile;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
 import static java.lang.String.format;
@@ -67,7 +52,6 @@ import static java.util.stream.Collectors.joining;
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
-import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -104,19 +88,11 @@ import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
-import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
-import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
-import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
@@ -129,7 +105,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -146,9 +121,6 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
@@ -165,9 +137,6 @@ import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils;
-import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
-import org.mule.tck.util.CompilerUtils.JarCompiler;
-import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
 import java.io.File;
@@ -188,8 +157,6 @@ import java.util.function.Supplier;
 
 import com.github.valfirst.slf4jtest.TestLogger;
 import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -197,9 +164,8 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import org.mockito.verification.VerificationMode;
-
+import org.slf4j.Logger;
 import uk.org.lidalia.slf4jext.Level;
 
 @RunWith(Parameterized.class)
@@ -228,7 +194,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private static final int DEPLOYMENT_TIMEOUT = 10000;
   protected static final String[] NONE = new String[0];
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
-  protected static final String MULE_POLICY_CLASSIFIER = "mule-policy";
+
   protected static final String MANUAL_EXECUTION_CORRELATION_ID = "manualExecution";
 
   // Resources
@@ -240,9 +206,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String APP_WITH_EXTENSION_PLUGIN_CONFIG = "app-with-extension-plugin-config.xml";
   protected static final String APP_WITH_SHARED_EXTENSION_PLUGIN_CONFIG = "app-with-shared-extension-plugin-config.xml";
 
-  protected static final String BAR_POLICY_NAME = "barPolicy";
-  protected static final String BAZ_POLICY_NAME = "bazPolicy";
-  protected static final String EXCEPTION_POLICY_NAME = "exceptionPolicy";
   protected static final String FOO_POLICY_ID = "fooPolicy";
 
   protected static final String MIN_MULE_VERSION = "4.0.0";
@@ -255,54 +218,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   public static List<Boolean> params() {
     return asList(false, true);
   }
-
-  // Dynamically compiled classes and jars
-  protected static File barUtils1ClassFile;
-  protected static File barUtils1_0JarFile;
-
-  protected static File barUtils2ClassFile;
-  protected static File barUtils2_0JarFile;
-
-  protected static File barUtilsJavaxClassFile;
-  protected static File barUtilsJavaxJarFile;
-
-  protected static File barUtilsForbiddenJavaClassFile;
-  protected static File barUtilsForbiddenJavaJarFile;
-
-  protected static File barUtilsForbiddenMuleContainerClassFile;
-  protected static File barUtilsForbiddenMuleContainerJarFile;
-
-  protected static File barUtilsForbiddenMuleThirdPartyClassFile;
-  protected static File barUtilsForbiddenMuleThirdPartyJarFile;
-
-  protected static File echoTestClassFile;
-  protected static File echoTestJarFile;
-
-  protected static File oracleExtensionJarFile;
-
-  protected static File classloaderConnectionExtensionJarFile;
-  protected static File classloaderConfigConnectionExtensionJarFile;
-
-  private static File defaulServiceEchoJarFile;
-
-  private static File defaultFooServiceJarFile;
-
-  protected static File helloExtensionV1JarFile;
-  protected static File loadClassExtensionJarFile;
-  protected static File callbackExtensionJarFile;
-  protected static File callbackExtensionPomFile;
-  protected static File customExceptionClassFile;
-  protected static File usingObjectStoreJarFile;
-
-  protected static File goodbyeExtensionV1JarFile;
-
-  private static File helloExtensionV2JarFile;
-  protected static File policyDependencyInjectionExtensionJarFile;
-  protected static File policyConfigurationExtensionJarFile;
-
-  protected static File loadsAppResourceCallbackClassFile;
-  protected static File loadsAppResourceCallbackJarFile;
-  protected static File pluginEcho1TestClassFile;
 
   private static Boolean internalIsRunningTests;
 
@@ -320,127 +235,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     // Initialises logging plugins with correct classloader
     LogManager.getContext(false);
 
-    barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
-    barUtils1_0JarFile =
-        new JarFileBuilder("barUtils1",
-                           new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar"))
-                               .getArtifactFile();
-
-    barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
-    barUtils2_0JarFile =
-        new JarFileBuilder("barUtils2",
-                           new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar"))
-                               .getArtifactFile();
-
-    barUtilsJavaxClassFile = new SingleClassCompiler().compile(getResourceFile("/javax/annotation/BarUtils.java"));
-    barUtilsJavaxJarFile =
-        new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java")).compile("bar-javax.jar");
-
-    barUtilsForbiddenJavaClassFile = new SingleClassCompiler().compile(getResourceFile("/java/lang/BarUtils.java"));
-    barUtilsForbiddenJavaJarFile =
-        new JarCompiler().compiling(getResourceFile("/java/lang/BarUtils.java")).compile("bar-javaForbidden.jar");
-
-    barUtilsForbiddenMuleContainerClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"));
-    barUtilsForbiddenMuleContainerJarFile =
-        new JarCompiler().compiling(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"))
-            .compile("bar-muleContainerForbidden.jar");
-
-    barUtilsForbiddenMuleThirdPartyClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/slf4j/BarUtils.java"));
-    barUtilsForbiddenMuleThirdPartyJarFile =
-        new JarCompiler().compiling(getResourceFile("/org/slf4j/BarUtils.java"))
-            .compile("bar-muleThirdPartyForbidden.jar");
-
-    echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
-    echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
-
-    defaulServiceEchoJarFile = new JarCompiler()
-        .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
-                   getResourceFile("/org/mule/echo/EchoServiceProvider.java"))
-        .compile("mule-module-service-echo-default-4.0-SNAPSHOT.jar");
-
-    defaultFooServiceJarFile = new JarCompiler().compiling(getResourceFile("/org/mule/service/foo/DefaultFooService.java"),
-                                                           getResourceFile("/org/mule/service/foo/FooServiceProvider.java"))
-        .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
-        .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
-
-    helloExtensionV1JarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
-                   getResourceFile("/org/foo/hello/HelloOperation.java"))
-        .including(getResourceFile("/org/foo/hello/registry-bootstrap.properties"),
-                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
-        .compile("mule-module-hello-1.0.0.jar", "1.0.0");
-
-    loadClassExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/classloading/LoadClassExtension.java"),
-                   getResourceFile("/org/foo/classloading/LoadClassOperation.java"))
-        .including(getResourceFile("/org/foo/classloading/registry-bootstrap.properties"),
-                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
-        .compile("mule-module-classloading-1.0.0.jar", "1.0.0");
-
-    callbackExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/callback/CallbackExtension.java"),
-                   getResourceFile("/org/foo/callback/CallbackOperation.java"))
-        .compile("mule-module-callback-1.0.0.jar", "1.0.0");
-    callbackExtensionPomFile = new JarFileBuilder("callbackExtension", callbackExtensionJarFile)
-        .getArtifactPomFile();
-    customExceptionClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
-
-    oracleExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/oracle/OracleExtension.java"),
-                   getResourceFile("/org/foo/oracle/OracleOperation.java"))
-        .compile("mule-module-oracle-1.0.0.jar", "1.0.0");
-
-    classloaderConnectionExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/connection/operation/ClassloaderConnectExtension.java"),
-                   getResourceFile("/org/foo/connection/operation/ClassloaderOperation.java"))
-        .including(getResourceFile("/org/foo/connection/extension/file.txt"),
-                   "file.txt")
-        .compile("mule-module-connect-1.0.0.jar", "1.0.0");
-
-    classloaderConfigConnectionExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/connection/config/ClassloaderConfigConnectExtension.java"),
-                   getResourceFile("/org/foo/connection/config/ClassloaderConfigOperation.java"))
-        .including(getResourceFile("/org/foo/connection/extension/file.txt"),
-                   "file.txt")
-        .compile("mule-module-classloader-config-1.0.0.jar", "1.0.0");
-
-    usingObjectStoreJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/os/UsingObjectStoreExtension.java"))
-        .compile("mule-module-using-object-store-1.0.0.jar", "1.0.0");
-
-    goodbyeExtensionV1JarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/goodbye/GoodByeConfiguration.java"),
-                   getResourceFile("/org/foo/goodbye/GoodByeExtension.java"))
-        .compile("mule-module-goodbye-1.0.0.jar", "1.0.0");
-
-    helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
-                                                                getResourceFile("/org/foo/hello/HelloOperation.java"))
-        .compile("mule-module-hello-2.0.0.jar", "2.0.0");
-
-    policyDependencyInjectionExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/policyIsolation/PolicyDependencyInjectionExtension.java"),
-                   getResourceFile("/org/foo/policyIsolation/PolicyDependencyInjectionOperations.java"),
-                   getResourceFile("/org/foo/policyIsolation/internal/InternalRegistryBean.java"),
-                   getResourceFile("/org/foo/policyIsolation/internal/PolicyDependencyInjectionFunctions.java"))
-        .including(getResourceFile("/org/foo/policyIsolation/registry-bootstrap.properties"),
-                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
-        .compile("mule-module-with-internal-dependency-4.0-SNAPSHOT.jar", "1.0.0");
-
-    policyConfigurationExtensionJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/policyIsolation/PolicyConfigurationExtension.java"),
-                   getResourceFile("/org/foo/policyIsolation/PolicyConfigurationOperations.java"))
-        .compile("mule-module-with-internal-dependency-4.0-SNAPSHOT.jar", "1.0.0");
-
-    loadsAppResourceCallbackClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
-    loadsAppResourceCallbackJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/LoadsAppResourceCallback.java"))
-        .compile("loadsAppResourceCallback.jar");
-    pluginEcho1TestClassFile =
-        new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
-
     internalIsRunningTests =
         (Boolean) readDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true);
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true, true);
@@ -451,107 +245,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", internalIsRunningTests,
                              true);
   }
-
-  protected static File getResourceFile(String resource) throws URISyntaxException {
-    return new File(AbstractDeploymentTestCase.class.getResource(resource).toURI());
-  }
-
-  protected static File getResourceFile(String resource, File tempFolder) {
-    final File targetFile = new File(tempFolder, resource);
-    try {
-      copyInputStreamToFile(AbstractDeploymentTestCase.class.getResourceAsStream(resource), targetFile);
-    } catch (IOException e) {
-      throw new MuleRuntimeException(e);
-    }
-    return targetFile;
-  }
-
-  // Application plugin file builders
-  protected final ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin")
-      .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-      .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile));
-  protected final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
-  protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
-  protected final ArtifactPluginFileBuilder goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
-  protected final ArtifactPluginFileBuilder oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
-  protected final ArtifactPluginFileBuilder loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
-  protected final ArtifactPluginFileBuilder callbackExtensionPlugin = createCallbackExtensionPluginFileBuilder();
-  protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
-  protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
-  protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
-  protected final ArtifactPluginFileBuilder usingObjectStorePlugin = createUsingObjectStorePluginFileBuilder();
-  protected final ArtifactPluginFileBuilder classloaderConnectExtensionPlugin =
-      createClassloaderConnectExtensionPluginFileBuilder(classloaderConnectionExtensionJarFile, "classloaderConnectExtension",
-                                                         "org.foo.connection.operation.ClassloaderConnectExtension");
-  protected final ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin =
-      createClassloaderConnectExtensionPluginFileBuilder(classloaderConfigConnectionExtensionJarFile,
-                                                         "classloaderConfigConnectExtension",
-                                                         "org.foo.connection.config.ClassloaderConfigConnectExtension");
-
-  // Application file builders
-  protected final ApplicationFileBuilder emptyAppFileBuilder =
-      new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
-  protected final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
-      .definedBy("dummy-app-config.xml")
-      .configuredWith("myCustomProp", "someValue")
-      .containingResource("serialized/dummy-app.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
-      .dependingOn(callbackExtensionPlugin)
-      .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
-  protected final ApplicationFileBuilder dummyAppWithBrokenAstDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
-      .definedBy("dummy-app-config.xml")
-      .configuredWith("myCustomProp", "someValue")
-      .containingResource("serialized/broken.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
-      .dependingOn(callbackExtensionPlugin)
-      .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
-  protected final ApplicationFileBuilder dummyFlowErrorAppDescriptorFileBuilder =
-      new ApplicationFileBuilder("dummy-error-flow-app")
-          .definedBy("dummy-app-several-flows.xml").configuredWith("myCustomProp", "someValue")
-          .dependingOn(callbackExtensionPlugin)
-          .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
-  protected final ApplicationFileBuilder dummyErrorAppOnStartDescriptorFileBuilder =
-      new ApplicationFileBuilder("dummy-error-app-start")
-          .definedBy("dummy-error-app-start.xml").configuredWith("myCustomProp", "someValue");
-
-  // Domain file builders
-  protected DomainFileBuilder dummyDomainFileBuilder =
-      new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
-  protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
-      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
-          .dependingOn(exceptionThrowingPlugin);
-
-  // Policy file builders
-  protected final PolicyFileBuilder barPolicyFileBuilder =
-      new PolicyFileBuilder(BAR_POLICY_NAME).describedBy(new MulePolicyModelBuilder()
-          .setMinMuleVersion(MIN_MULE_VERSION)
-          .setName(BAR_POLICY_NAME)
-          .setRequiredProduct(MULE)
-          .withBundleDescriptorLoader(
-                                      createBundleDescriptorLoader(BAR_POLICY_NAME,
-                                                                   MULE_POLICY_CLASSIFIER,
-                                                                   PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-          .withClassLoaderModelDescriptorLoader(
-                                                new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-          .build());
-  protected final PolicyFileBuilder policyUsingAppPluginFileBuilder =
-      new PolicyFileBuilder(BAR_POLICY_NAME).describedBy(new MulePolicyModelBuilder()
-          .setMinMuleVersion(MIN_MULE_VERSION)
-          .setName(BAR_POLICY_NAME)
-          .setRequiredProduct(MULE)
-          .withBundleDescriptorLoader(
-                                      createBundleDescriptorLoader(BAR_POLICY_NAME,
-                                                                   MULE_POLICY_CLASSIFIER,
-                                                                   PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-          .withClassLoaderModelDescriptorLoader(
-                                                new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-          .build());
-  protected final PolicyFileBuilder policyIncludingPluginFileBuilder =
-      createPolicyIncludingPluginFileBuilder();
-  protected final PolicyFileBuilder policyIncludingHelloPluginV2FileBuilder =
-      createPolicyIncludingHelloPluginV2FileBuilder();
-  protected final PolicyFileBuilder exceptionThrowingPluginImportingPolicyFileBuilder =
-      createExceptionThrowingPluginImportingPolicyFileBuilder();
-  protected final PolicyFileBuilder policyIncludingDependantPluginFileBuilder =
-      createPolicyIncludingDependantPluginFileBuilder();
 
   private File muleHome;
   protected File appsDir;
@@ -720,12 +413,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void installFooService() throws IOException {
     installService("fooService", "org.mule.runtime.service.test.api.FooService", "org.mule.service.foo.FooServiceProvider",
-                   defaultFooServiceJarFile);
+                   defaultFooServiceJarFile.get());
   }
 
   protected void installEchoService() throws IOException {
     installService("echoService", "org.mule.runtime.service.test.api.EchoService", "org.mule.echo.EchoServiceProvider",
-                   defaulServiceEchoJarFile);
+                   defaultServiceEchoJarFile.get());
   }
 
   protected File getExpressionLanguageServiceFile(File tempFolder) {
@@ -1512,300 +1205,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     void perform() throws Exception;
   }
 
-  protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
-                                                                             String bundleDescriptorLoaderId) {
-    return createBundleDescriptorLoader(artifactId, classifier, bundleDescriptorLoaderId, "1.0.0");
-  }
 
-  protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
-                                                                             String bundleDescriptorLoaderId, String version) {
-    Map<String, Object> attributes = SmallMap.of(VERSION, version,
-                                                 GROUP_ID, "org.mule.test",
-                                                 ARTIFACT_ID, artifactId,
-                                                 CLASSIFIER, classifier,
-                                                 TYPE, EXTENSION_BUNDLE_TYPE);
-
-    return new MuleArtifactLoaderDescriptor(bundleDescriptorLoaderId, attributes);
-  }
-
-  private PolicyFileBuilder createPolicyIncludingHelloPluginV2FileBuilder() {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME).setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    mulePolicyModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    return new PolicyFileBuilder(BAZ_POLICY_NAME)
-        .describedBy(mulePolicyModelBuilder.build())
-        .dependingOn(helloExtensionV2Plugin);
-  }
-
-  private ArtifactPluginFileBuilder createHelloExtensionV2PluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .setId(MULE_LOADER_ID).build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.hello.HelloExtension")
-        .addProperty("version", "2.0.0");
-    return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0.0")
-        .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private ArtifactPluginFileBuilder createGoodbyeExtensionV1PluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("goodbyeExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("goodbyeExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .setId(MULE_LOADER_ID).build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.goodbye.GoodByeExtension")
-        .addProperty("version", "2.0.0");
-    return new ArtifactPluginFileBuilder("goodbyeExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("goodbyeExtensionV1", goodbyeExtensionV1JarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private PolicyFileBuilder createExceptionThrowingPluginImportingPolicyFileBuilder() {
-    return new PolicyFileBuilder(EXCEPTION_POLICY_NAME).describedBy(new MulePolicyModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION)
-        .setName(EXCEPTION_POLICY_NAME)
-        .setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(
-                                    createBundleDescriptorLoader(EXCEPTION_POLICY_NAME,
-                                                                 MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-        .withClassLoaderModelDescriptorLoader(
-                                              new MuleArtifactLoaderDescriptor(MULE_LOADER_ID,
-                                                                               emptyMap()))
-        .build())
-        .dependingOn(callbackExtensionPlugin);
-  }
-
-  private ArtifactPluginFileBuilder createByeXmlPluginFileBuilder() {
-    final String prefixModuleName = "module-bye";
-    String extensionName = "bye-extension";
-    final String resources = "org/mule/module/";
-    String moduleDestination = resources + prefixModuleName + ".xml";
-    MulePluginModel.MulePluginModelBuilder builder =
-        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
-    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
-                                                                                                  moduleDestination);
-    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
-    builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
-
-    return new ArtifactPluginFileBuilder(extensionName)
-        .containingResource("module-byeSource.xml", moduleDestination)
-        .containingResource("module-using-bye-catalogSource.xml", resources + prefixModuleName + "-catalog.xml")
-        .containingResource("module-bye-type-schemaSource.json", resources + "type1-schema.json")
-        .containingResource("module-bye-type-schemaSource.json", resources + "inner/folder/type2-schema.json")
-        .containingResource("module-bye-type-schemaSource.json", "org/mule/type3-schema.json")
-        .describedBy(builder.build());
-  }
-
-  private ArtifactPluginFileBuilder createModuleUsingByeXmlPluginFileBuilder() {
-    String moduleFileName = "module-using-bye.xml";
-    String extensionName = "using-bye-extension";
-    String moduleDestination = "org/mule/module/" + moduleFileName;
-
-    MulePluginModel.MulePluginModelBuilder builder =
-        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION)
-            .setRequiredProduct(MULE);
-    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
-                                                                                                  moduleDestination);
-    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID)
-        .build());
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
-
-    return new ArtifactPluginFileBuilder(extensionName)
-        .containingResource("module-using-byeSource.xml", moduleDestination)
-        .dependingOn(byeXmlExtensionPlugin)
-        .describedBy(builder.build());
-  }
-
-  private ArtifactPluginFileBuilder createExceptionThrowingPluginFileBuilder() {
-    final String pluginName = "exceptionPlugin";
-
-    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION)
-        .setName(pluginName)
-        .setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(pluginName,
-                                                                 MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID,
-                                                                 "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .setId(MULE_LOADER_ID)
-        .addProperty(EXPORTED_RESOURCES,
-                     asList("/META-INF/mule-exception.xsd",
-                            "/META-INF/mule.schemas"))
-        .build());
-
-    File exceptionTestClassFile = null;
-    File serviceTestClassFile = null;
-
-    try {
-      exceptionTestClassFile =
-          new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
-      serviceTestClassFile = new CompilerUtils.SingleClassCompiler()
-          .compile(getResourceFile("/org/exception/ExceptionComponentBuildingDefinitionProvider.java"));
-    } catch (URISyntaxException e) {
-      fail(e.getMessage());
-    }
-
-    ArtifactPluginFileBuilder exceptionPluginFileBuilder = new ArtifactPluginFileBuilder("exceptionPlugin")
-        .containingResource("exception/META-INF/mule.schemas", "META-INF/mule.schemas")
-        .containingResource("exception/META-INF/mule-exception.xsd", "META-INF/mule-exception.xsd")
-        .containingResource("exception/META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider",
-                            "META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider")
-        .containingClass(exceptionTestClassFile, "org/exception/CustomException.class")
-        .containingClass(serviceTestClassFile, "org/exception/ExceptionComponentBuildingDefinitionProvider.class")
-        .configuredWith(EXPORTED_RESOURCE_PROPERTY, "META-INF/mule-exception.xsd,META-INF/mule.schemas")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.exception")
-        .describedBy(mulePluginModelBuilder.build());
-
-    return exceptionPluginFileBuilder;
-
-  }
-
-  private ArtifactPluginFileBuilder createHelloExtensionV1PluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.hello.HelloExtension")
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private ArtifactPluginFileBuilder createLoadClassExtensionPluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("loadClassExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("loadClassExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.classloading.LoadClassExtension")
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("loadClassExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("loadClassExtension", loadClassExtensionJarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private ArtifactPluginFileBuilder createCallbackExtensionPluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("callbackExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.callback.CallbackExtension")
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("callbackExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("callbackExtension", callbackExtensionJarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private ArtifactPluginFileBuilder createOracleExtensionPluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("oracleExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("oracleExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.oracle.OracleExtension")
-        .addProperty("version", "1.0.0");
-    ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("oracleExtensionPlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("oracleExtension", oracleExtensionJarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-
-    try {
-      pluginFileBuilder
-          .dependingOnSharedLibrary(new JarFileBuilder("oracle-driver-v1", getResourceFile("/oracle/jdbc/oracle-driver-v1.jar")));
-
-    } catch (URISyntaxException e) {
-      logger.error(e.getMessage());
-    }
-    return pluginFileBuilder;
-  }
-
-  private ArtifactPluginFileBuilder createClassloaderConnectExtensionPluginFileBuilder(File jarFile, String extensionName,
-                                                                                       String extensionPath) {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName(extensionName + "Plugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName + "Plugin",
-                                                                 MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", extensionPath)
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder(extensionName + "Plugin-1.0.0")
-        .dependingOn(new JarFileBuilder(extensionName, jarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private ArtifactPluginFileBuilder createUsingObjectStorePluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("usingObjectStorePlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("usingObjectStorePlugin", MULE_PLUGIN_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.os.UsingObjectStoreExtension")
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("usingObjectStorePlugin-1.0.0")
-        .dependingOn(new JarFileBuilder("usingObjectStore", usingObjectStoreJarFile))
-        .describedBy((mulePluginModelBuilder.build()));
-  }
-
-  private PolicyFileBuilder createPolicyIncludingPluginFileBuilder() {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
-        .setRequiredProduct(Product.MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
-        .build()).dependingOn(helloExtensionV1Plugin);
-  }
-
-  private PolicyFileBuilder createPolicyIncludingDependantPluginFileBuilder() {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
-        .setRequiredProduct(Product.MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    ArtifactPluginFileBuilder dependantPlugin;
-    try {
-      dependantPlugin =
-          new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-              .containingClass(new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java")),
-                               "org/foo/echo/Plugin3Echo.class")
-              .dependingOn(helloExtensionV1Plugin);
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-
-    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
-        .build()).dependingOn(dependantPlugin);
-  }
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
     return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());

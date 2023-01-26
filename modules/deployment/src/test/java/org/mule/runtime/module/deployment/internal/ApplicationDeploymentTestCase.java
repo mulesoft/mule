@@ -40,6 +40,21 @@ import static org.mule.runtime.module.deployment.internal.processor.SerializedAs
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeploy;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.barUtils1_0JarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.byeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.dummyAppDescriptorFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.dummyAppWithBrokenAstDescriptorFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.dummyFlowErrorAppDescriptorFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoTestJarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.emptyAppFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.helloExtensionV1JarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.moduleUsingByeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.pluginEcho1TestClassFile;
+import static org.mule.runtime.module.deployment.internal.util.Utils.createBundleDescriptorLoader;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ArtifactAstSerialization.AST_JSON_DESERIALIZER;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -157,8 +172,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(callbackExtensionPlugin)
-        .containingClass(echoTestClassFile,
+        .dependingOn(callbackExtensionPlugin.get())
+        .containingClass(echoTestClassFile.get(),
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
         .withMinMuleVersion("4.3.0") // MULE-19038
@@ -166,34 +181,34 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
         .withMinMuleVersion("4.3.0") // MULE-19127
         .definedBy("dummy-app-with-stopped-flow-config.xml")
-        .dependingOn(callbackExtensionPlugin)
-        .containingClass(echoTestClassFile,
+        .dependingOn(callbackExtensionPlugin.get())
+        .containingClass(echoTestClassFile.get(),
                          "org/foo/EchoTest.class");
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile.get()))
+        .containingClass(pluginEcho1TestClassFile.get(), "org/foo/Plugin1Echo.class");
   }
 
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipOnStartup() throws Exception {
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.get().getId());
 
     // just assert no privileged entries were put in the registry
-    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    final Application app = findApp(dummyAppDescriptorFileBuilder.get().getId(), 1);
 
     // Checks that the configuration's ID was properly configured
     assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
-               equalTo(dummyAppDescriptorFileBuilder.getId()));
+               equalTo(dummyAppDescriptorFileBuilder.get().getId()));
   }
 
   @Test
@@ -201,43 +216,43 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysAppZipOnStartupUsingSerializedAst() throws Exception {
     restartServer(new SerializedAstArtifactConfigurationProcessor());
 
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
   public void deploysAppZipOnStartupUsingSerializedAstFallback() throws Exception {
-    addPackedAppFromBuilder(dummyAppWithBrokenAstDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppWithBrokenAstDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppWithBrokenAstDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppWithBrokenAstDescriptorFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(dummyAppWithBrokenAstDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppWithBrokenAstDescriptorFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {dummyAppWithBrokenAstDescriptorFileBuilder.get().getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppWithBrokenAstDescriptorFileBuilder.get().getId());
 
     // just assert no privileged entries were put in the registry
-    final Application app = findApp(dummyAppWithBrokenAstDescriptorFileBuilder.getId(), 1);
+    final Application app = findApp(dummyAppWithBrokenAstDescriptorFileBuilder.get().getId(), 1);
 
     // Checks that the configuration's ID was properly configured
     assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
-               equalTo(dummyAppWithBrokenAstDescriptorFileBuilder.getId()));
+               equalTo(dummyAppWithBrokenAstDescriptorFileBuilder.get().getId()));
   }
 
   @Test
   public void memoryManagementCanBeInjectedInApplication() throws Exception {
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.get().getId());
 
     // just assert no privileged entries were put in the registry
-    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    final Application app = findApp(dummyAppDescriptorFileBuilder.get().getId(), 1);
 
     InjectedMemoryManagement injectedMemoryManagementService = new InjectedMemoryManagement();
     app.getArtifactContext().getMuleContext().getInjector().inject(injectedMemoryManagementService);
@@ -248,7 +263,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void extensionManagerPresent() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     assertThat(app.getArtifactContext().getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get(),
                is(notNullValue()));
   }
@@ -293,7 +308,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipAfterStartup() throws Exception {
-    deployAfterStartUp(dummyAppDescriptorFileBuilder);
+    deployAfterStartUp(dummyAppDescriptorFileBuilder.get());
   }
 
   @Test
@@ -302,8 +317,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final ApplicationFileBuilder dummyAppDescriptorFileBuilderWithUpperCaseInExtension =
         appFileBuilder("dummy-app", true)
             .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
-            .dependingOn(callbackExtensionPlugin)
-            .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+            .dependingOn(callbackExtensionPlugin.get())
+            .containingClass(echoTestClassFile.get(), "org/foo/EchoTest.class");
 
     deployAfterStartUp(dummyAppDescriptorFileBuilderWithUpperCaseInExtension);
   }
@@ -448,11 +463,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     app.stop();
 
     assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
@@ -461,12 +476,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
 
     assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(app);
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
@@ -490,13 +505,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     reset(applicationDeploymentListener);
 
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
     assertDeploymentFailure(applicationDeploymentListener, brokenAppWithFunkyNameAppFileBuilder.getId(), never());
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
     assertDeploymentFailure(applicationDeploymentListener, brokenAppWithFunkyNameAppFileBuilder.getId(), never());
   }
 
@@ -521,27 +536,27 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void redeploysAppZipDeployedOnStartup() throws Exception {
     startDeployment();
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.get().getId());
 
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
   }
 
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void removesPreviousAppFolderOnStart() throws Exception {
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
 
     ApplicationFileBuilder emptyAppFileBuilder =
         appFileBuilder("empty-app").usingResource("empty-config.xml", "empty-config.xml")
@@ -562,30 +577,30 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppOnStartup() throws Exception {
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
+    assertApplicationAnchorFileExists(emptyAppFileBuilder.get().getId());
   }
 
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppOnStartupWhenExplodedAppIsAlsoPresent() throws Exception {
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Checks that dummy app was deployed just once
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
@@ -593,17 +608,17 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
+    assertApplicationAnchorFileExists(emptyAppFileBuilder.get().getId());
   }
 
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedAppOnStartup() throws Exception {
-    addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get(), "app with spaces");
 
     startDeployment();
 
@@ -619,7 +634,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysInvalidExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
-    addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get(), "app with spaces");
 
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
@@ -633,14 +648,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysInvalidExplodedOnlyOnce() throws Exception {
     startDeployment();
 
-    addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get(), "app with spaces");
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces", times(1));
 
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
 
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // After three update cycles should have only one deployment failure notification for the broken app
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
@@ -722,7 +737,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidZipAppOnStartup() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.jar");
+    addPackedAppFromBuilder(emptyAppFileBuilder.get(), "app with spaces.jar");
 
     startDeployment();
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
@@ -737,7 +752,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysInvalidZipAppAfterStartup() throws Exception {
     startDeployment();
 
-    addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.jar");
+    addPackedAppFromBuilder(emptyAppFileBuilder.get(), "app with spaces.jar");
 
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
@@ -749,7 +764,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deployAppNameWithZipSuffix() throws Exception {
-    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("empty-app.jar", emptyAppFileBuilder);
+    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("empty-app.jar", emptyAppFileBuilder.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -835,7 +850,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppJustOnce() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     String appName = "empty-app-1.0.0-mule-application";
     String apps = format("%s:%s:%s", appName, appName, appName);
@@ -843,8 +858,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, apps, () -> {
       startDeployment();
 
-      assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-      assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+      assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
 
       List<Application> applications = deploymentService.getApplications();
       assertEquals(1, applications.size());
@@ -854,15 +869,15 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void tracksAppConfigUpdateTime() throws Exception {
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
 
     // Sets a modification time in the future
-    File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.getId());
+    File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.get().getId());
     File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
     configFile.setLastModified(currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
     startDeployment();
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
     reset(applicationDeploymentListener);
 
     assertNoDeploymentInvoked(applicationDeploymentListener);
@@ -873,19 +888,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void receivesMuleContextDeploymentNotifications() throws Exception {
     // NOTE: need an integration test like this because DefaultMuleApplication
     // class cannot be unit tested.
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertMuleContextCreated(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertMuleContextInitialized(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    assertMuleContextCreated(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    assertMuleContextInitialized(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
   }
 
   @Test
   @Story(UNDEPLOYMENT)
   public void undeploysStoppedApp() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     app.stop();
     assertStatus(app, STOPPED);
 
@@ -894,17 +909,17 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Test
   public void whenAppIsUndeployedStoppedPersistenceIsDeleted() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     app.stop();
     assertStatus(app, STOPPED);
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
     deploymentService.undeploy(app);
 
-    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
@@ -912,14 +927,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void runtimeWithStoppedAppRestartsAndDoesNotStartAppOnDeployBecauseOfStatusDeploymentProperties() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     app.stop();
     assertStatus(app, STOPPED);
 
     restartServer();
 
-    assertAppDeploymentAndStatus(emptyAppFileBuilder, CREATED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertAppDeploymentAndStatus(emptyAppFileBuilder.get(), CREATED);
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
@@ -928,16 +943,16 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void runtimeWithStoppedAppRestartsAndDoesNotStartAppOnDeployButItCanBeStartedManually() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     app.stop();
     assertStatus(app, STOPPED);
 
     restartServer();
 
-    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    final Application app_2 = findApp(emptyAppFileBuilder.get().getId(), 1);
     assertStatus(app_2, CREATED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
@@ -949,31 +964,31 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void runtimeWithStartedAppRestartsAndStartsAppOnDeploy() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     assertStatus(app, STARTED);
 
     restartServer();
 
-    assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertAppDeploymentAndStatus(emptyAppFileBuilder.get(), STARTED);
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
   public void redeploysStoppedAppAndStartsItOnDeployBecauseStatusPersistenceGetsDeleted() throws Exception {
-    final Application app = deployApplication(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder.get());
     app.stop();
     assertStatus(app, STOPPED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
     reset(applicationDeploymentListener);
 
-    redeploy(deploymentService, emptyAppFileBuilder.getId());
+    redeploy(deploymentService, emptyAppFileBuilder.get().getId());
 
-    assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
-    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertAppDeploymentAndStatus(emptyAppFileBuilder.get(), STARTED);
+    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.get().getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
@@ -982,14 +997,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void undeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
-    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder.get());
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
     restartServer();
 
-    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder.get(), STARTED);
     assertIfFlowsHaveStarted(app_2, false);
   }
 
@@ -998,15 +1013,15 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void undeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
 
     restartServer();
 
-    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder.get(), STARTED);
     assertIfFlowsHaveStarted(app_2, true);
   }
 
@@ -1015,16 +1030,16 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
-    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder.get());
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
     reset(applicationDeploymentListener);
-    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
-    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.get().getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
 
-    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder.get(), STARTED);
     assertIfFlowsHaveStarted(app_2, false);
   }
 
@@ -1033,15 +1048,15 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
-    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder.get());
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
     reset(applicationDeploymentListener);
-    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.get().getId());
 
-    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder.get(), STARTED);
     for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(false));
       flow.start();
@@ -1054,13 +1069,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
-    deployApplication(dummyAppDescriptorFileBuilder);
+    deployApplication(dummyAppDescriptorFileBuilder.get());
 
     reset(applicationDeploymentListener);
-    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
-    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.get().getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
 
-    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder.get(), STARTED);
     assertIfFlowsHaveStarted(app_2, true);
   }
 
@@ -1069,7 +1084,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
-    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder.get());
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
@@ -1086,7 +1101,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void stopsAndStartsAppWithStartedFlowAndDoesNotStopIt() throws Exception {
-    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder.get());
     app.stop();
     assertStatus(app, STOPPED);
     app.start();
@@ -1117,18 +1132,18 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
-    Application app = deployApplication(emptyAppFileBuilder);
+    Application app = deployApplication(emptyAppFileBuilder.get());
 
-    assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.getId()));
+    assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.get().getId()));
 
-    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
     assertStatus(app, DESTROYED);
   }
 
   @Test
   @Story(UNDEPLOYMENT)
   public void undeploysAppCompletelyEvenOnStoppingException() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     domainManager.addDomain(createDefaultDomain());
@@ -1140,14 +1155,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.setAppFactory(appFactory);
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    Application app = findApp(emptyAppFileBuilder.get().getId(), 1);
 
-    assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.getId()));
+    assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.get().getId()));
 
-    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
-    assertAppFolderIsDeleted(emptyAppFileBuilder.getId());
+    assertAppFolderIsDeleted(emptyAppFileBuilder.get().getId());
     assertStatus(app, DESTROYED);
   }
 
@@ -1160,14 +1175,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
     startDeployment();
-    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     reset(applicationDeploymentListener);
     emptyDomainManager.addDomain(createDefaultDomain());
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
   }
 
   @Test
@@ -1180,16 +1195,16 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.setAppFactory(appFactory);
 
     domainManager.addDomain(createDefaultDomain());
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
     startDeployment();
 
-    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
   }
 
   @Test
   @Story(UNDEPLOYMENT)
   public void undeploysAppCompletelyEvenOnDisposingException() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     domainManager.addDomain(createDefaultDomain());
@@ -1200,14 +1215,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.setAppFactory(appFactory);
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    Application app = findApp(emptyAppFileBuilder.get().getId(), 1);
 
-    assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.getId()));
+    assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.get().getId()));
 
-    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
     assertStatus(app, STOPPED);
-    assertAppFolderIsDeleted(emptyAppFileBuilder.getId());
+    assertAppFolderIsDeleted(emptyAppFileBuilder.get().getId());
   }
 
   @Test
@@ -1220,9 +1235,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
@@ -1239,9 +1254,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
@@ -1258,9 +1273,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
@@ -1272,8 +1287,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysAppZipWithPlugin() throws Exception {
     final ApplicationFileBuilder echoPluginAppFileBuilder =
         appFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml")
-            .dependingOn(callbackExtensionPlugin)
-            .dependingOn(echoPlugin);
+            .dependingOn(callbackExtensionPlugin.get())
+            .dependingOn(echoPlugin.get());
 
     addPackedAppFromBuilder(echoPluginAppFileBuilder);
 
@@ -1286,7 +1301,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithExtensionPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -1316,7 +1331,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPlugin")
-        .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
+        .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     final DefaultDomainManager domainManager = new DefaultDomainManager();
@@ -1337,7 +1352,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysWithExtensionXmlPluginWithXmlDependencies() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPluginWithXmlDependencies")
         .definedBy("app-with-extension-xml-plugin-module-using-bye.xml")
-        .dependingOn(moduleUsingByeXmlExtensionPlugin);
+        .dependingOn(moduleUsingByeXmlExtensionPlugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     final DefaultDomainManager domainManager = new DefaultDomainManager();
@@ -1372,8 +1387,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .describedBy(builder.build())
         .containingResource("module-using-javaSource.xml", moduleDestination)
-        .dependingOn(callbackExtensionPlugin)
-        .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile))
+        .dependingOn(callbackExtensionPlugin.get())
+        .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile.get()))
         .describedBy(builder.build());
 
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPluginWithDependencies")
@@ -1471,7 +1486,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public void deploysAppWithPluginBootstrapProperty() throws Exception {
     final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
         .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES)
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .containingClass(echoTestClassFile.get(), "org/foo/EchoTest.class")
         .configuredWith(EXPORTED_RESOURCE_PROPERTY, BOOTSTRAP_PROPERTIES);
 
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-with-plugin-bootstrap")
@@ -1486,7 +1501,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(DEPLOYMENT_FAILURE)
   public void failsToDeployApplicationOnMissingService() throws Exception {
     ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
-        .dependingOn(new JarFileBuilder("bundleExtensionv1", helloExtensionV1JarFile))
+        .dependingOn(new JarFileBuilder("bundleExtensionv1", helloExtensionV1JarFile.get()))
         .configuredWith(EXPORTED_RESOURCE_PROPERTY, "/, META-INF");
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionPlugin")
         .definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG).dependingOn(extensionPlugin);
@@ -1503,34 +1518,34 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final int totalApps = 20;
 
     for (int i = 1; i <= totalApps; i++) {
-      addExplodedAppFromBuilder(appFileBuilder(Integer.toString(i), emptyAppFileBuilder));
+      addExplodedAppFromBuilder(appFileBuilder(Integer.toString(i), emptyAppFileBuilder.get()));
     }
 
     startDeployment();
 
     for (int i = 1; i <= totalApps; i++) {
       assertDeploymentSuccess(applicationDeploymentListener,
-                              appFileBuilder(Integer.toString(i), emptyAppFileBuilder).getId());
+                              appFileBuilder(Integer.toString(i), emptyAppFileBuilder.get()).getId());
     }
   }
 
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesAppDeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.get().getArtifactFile().toURI());
 
     final Action assertAction =
-        () -> verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
+        () -> verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.get().getId());
     doSynchronizedAppDeploymentActionTest(action, assertAction);
   }
 
   @Test
   @Story(UNDEPLOYMENT)
   public void synchronizesAppUndeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.getId());
+    final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.get().getId());
 
     final Action assertAction =
-        () -> verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.getId());
+        () -> verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.get().getId());
     doSynchronizedAppDeploymentActionTest(action, assertAction);
   }
 
@@ -1540,25 +1555,25 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Action action = () -> {
       // Clears notification from first deployment
       reset(applicationDeploymentListener);
-      deploymentService.redeploy(emptyAppFileBuilder.getId());
+      deploymentService.redeploy(emptyAppFileBuilder.get().getId());
     };
 
     final Action assertAction =
-        () -> verify(applicationDeploymentListener, never()).onDeploymentStart(emptyAppFileBuilder.getId());
+        () -> verify(applicationDeploymentListener, never()).onDeploymentStart(emptyAppFileBuilder.get().getId());
     doSynchronizedAppDeploymentActionTest(action, assertAction);
   }
 
   private void doSynchronizedAppDeploymentActionTest(final Action deploymentAction, final Action assertAction) throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, applicationDeploymentListener,
-                                               emptyAppFileBuilder.getId());
+                                               emptyAppFileBuilder.get().getId());
   }
 
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesDeploymentOnStart() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     Thread deploymentServiceThread = new Thread(() -> {
       try {
@@ -1592,11 +1607,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
       deploymentClientThread.join();
 
       return null;
-    }).when(applicationDeploymentListener).onDeploymentStart(emptyAppFileBuilder.getId());
+    }).when(applicationDeploymentListener).onDeploymentStart(emptyAppFileBuilder.get().getId());
 
     deploymentServiceThread.start();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
   }
@@ -1604,12 +1619,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(UNDEPLOYMENT)
   public void undeploysAppRemovesTemporaryData() throws Exception {
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.get().getId(), 1);
 
     File metaFolder = getAppMetaFolder(app);
 
@@ -1617,9 +1632,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertThat(metaFolder, exists);
 
     // Remove the anchor file so undeployment starts
-    assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptorFileBuilder.getId()));
+    assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptorFileBuilder.get().getId()));
 
-    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
     assertStatus(app, DESTROYED);
 
     // Check the tmp directory was effectively removed
@@ -1629,29 +1644,29 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
-    testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
-                               () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
+    testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder.get()),
+                               () -> addExplodedAppFromBuilder(emptyAppFileBuilder.get()));
   }
 
   @Test
   @Story(APPLICATION_REDEPLOYMENT)
   public void packedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
-    testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
-                               () -> addPackedAppFromBuilder(emptyAppFileBuilder));
+    testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder.get()),
+                               () -> addPackedAppFromBuilder(emptyAppFileBuilder.get()));
   }
 
   @Test
   @Story(APPLICATION_REDEPLOYMENT)
   public void packedAppRedeploymentWithExplodedDoesNotDeleteTempFile() throws Exception {
-    testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
-                               () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
+    testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder.get()),
+                               () -> addExplodedAppFromBuilder(emptyAppFileBuilder.get()));
   }
 
   @Test
   @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentWithPackedDoesNotDeleteTempFile() throws Exception {
-    testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
-                               () -> addPackedAppFromBuilder(emptyAppFileBuilder));
+    testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder.get()),
+                               () -> addPackedAppFromBuilder(emptyAppFileBuilder.get()));
   }
 
   @Test
@@ -1661,24 +1676,24 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     // Deploy an application (packed)
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
     startDeployment();
 
     // Application was deployed
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
     verify(mockDeploymentListener, times(1)).onDeploymentSuccess(
-                                                                 dummyAppDescriptorFileBuilder.getId());
+                                                                 dummyAppDescriptorFileBuilder.get().getId());
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
-                                                                   dummyAppDescriptorFileBuilder.getId());
+                                                                   dummyAppDescriptorFileBuilder.get().getId());
 
     reset(mockDeploymentListener);
 
     // Redeploy by using deploy method
-    deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    deploy(deploymentService, dummyAppDescriptorFileBuilder.get().getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
-                                                                   dummyAppDescriptorFileBuilder.getId());
+                                                                   dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
@@ -1688,19 +1703,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     // Deploy an application (exploded)
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
     startDeployment();
 
     // Application was deployed
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
 
     // Redeploy by using deploy method
-    deploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    deploy(deploymentService, dummyAppDescriptorFileBuilder.get().getArtifactFile().toURI());
 
     // Application was redeployed
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
@@ -1708,14 +1723,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
   public void whenDeploymentFailsDoNotPersistFlows() throws Exception {
-    addPackedAppFromBuilder(dummyFlowErrorAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyFlowErrorAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertDeploymentFailure(applicationDeploymentListener, dummyFlowErrorAppDescriptorFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, dummyFlowErrorAppDescriptorFileBuilder.get().getId());
 
     Properties flowDeploymentProperties =
-        resolveFlowDeploymentProperties(dummyFlowErrorAppDescriptorFileBuilder.getId(), empty());
+        resolveFlowDeploymentProperties(dummyFlowErrorAppDescriptorFileBuilder.get().getId(), empty());
     assertThat(flowDeploymentProperties, is(notNullValue()));
     for (int i = 1; i < 4; i++) {
       Object mustStartFlow = flowDeploymentProperties.get("test" + i + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY);
@@ -1742,9 +1757,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final String TEST_FILE_NAME = "testFile";
     startDeployment();
     deployApp.run();
-    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
-    Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    Application app = findApp(emptyAppFileBuilder.get().getId(), 1);
 
     final File preRedeploymentMetaFolder = getAppMetaFolder(app);
 
@@ -1763,9 +1778,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     redeployApp.run();
 
-    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.get().getId());
 
-    app = findApp(emptyAppFileBuilder.getId(), 1);
+    app = findApp(emptyAppFileBuilder.get().getId(), 1);
     final File postRedeploymentMetaFolder = getAppMetaFolder(app);
     final File postRedeploymentMetaTestFile = new File(postRedeploymentMetaFolder, TEST_FILE_NAME);
 

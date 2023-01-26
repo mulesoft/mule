@@ -47,6 +47,7 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,7 +60,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -156,8 +156,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // stated applications to launch
         scheduleChangeMonitor();
       } else {
-        String[] explodedDomains = domainsDir.list(DIRECTORY);
-        String[] packagedDomains = domainsDir.list(JAR_ARTIFACT_FILTER);
+        String[] explodedDomains = listFiles(domainsDir, DIRECTORY);
+        String[] packagedDomains = listFiles(domainsDir, JAR_ARTIFACT_FILTER);
 
         deployPackedDomains(packagedDomains);
         deployExplodedDomains(explodedDomains);
@@ -288,9 +288,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
       deployDomainBundles();
 
       // list new domains
-      String[] domains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
-
-      final String[] domainZips = domainsDir.list(JAR_ARTIFACT_FILTER);
+      String[] domains = listFiles(domainsDir, DIRECTORY);
+      final String[] domainZips = listFiles(domainsDir, JAR_ARTIFACT_FILTER);
 
       redeployModifiedDomains();
 
@@ -298,7 +297,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
       // re-scan exploded domains and update our state, as deploying Mule domains archives might have added some
       if (domainZips.length > 0 || dirty) {
-        domains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
+        domains = listFiles(domainsDir, DIRECTORY);
       }
 
       deployExplodedDomains(domains);
@@ -306,15 +305,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
       redeployModifiedApplications();
 
       // list new apps
-      String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-
-      final String[] appZips = appsDir.list(JAR_ARTIFACT_FILTER);
+      String[] apps = listFiles(appsDir, DIRECTORY);
+      final String[] appZips = listFiles(appsDir, JAR_ARTIFACT_FILTER);
 
       deployPackedApps(appZips);
 
       // re-scan exploded apps and update our state, as deploying Mule app archives might have added some
       if (appZips.length > 0 || dirty) {
-        apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+        apps = listFiles(appsDir, DIRECTORY);
       }
 
       // Sorts apps to ensure they are always deployed in the same order
@@ -336,7 +334,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void deployDomainBundles() {
-    final String[] domainBundles = domainsDir.list(ZIP_ARTIFACT_FILTER);
+    final String[] domainBundles = listFiles(domainsDir, ZIP_ARTIFACT_FILTER);
 
     for (String domainBundle : domainBundles) {
       try {
@@ -346,6 +344,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // Ignore and continue
       }
     }
+  }
+
+  private String[] listFiles(File directory, FilenameFilter filter) {
+    String[] files = directory.list(filter);
+    if (files == null) {
+      return new String[] {};
+    }
+    return files;
   }
 
   public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
@@ -368,7 +374,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
                                                                                  ObservableList<? extends Artifact<D>> artifacts,
                                                                                  ArchiveDeployer<D, ? extends Artifact<D>> archiveDeployer) {
     // we care only about removed anchors
-    String[] currentAnchors = artifactDir.list(new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
+    String[] currentAnchors = listFiles(artifactDir, new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Current anchors:%n"));
@@ -449,7 +455,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private void deleteAnchorsFromDirectory(final File directory) {
     // Deletes any leftover anchor files from previous shutdowns
-    String[] anchors = directory.list(new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
+    String[] anchors = listFiles(directory, new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
     for (String anchor : anchors) {
       // ignore result
       new File(directory, anchor).delete();

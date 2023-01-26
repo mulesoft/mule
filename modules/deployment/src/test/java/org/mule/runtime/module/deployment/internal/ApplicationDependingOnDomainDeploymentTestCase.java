@@ -33,34 +33,40 @@ import org.junit.Test;
 @Feature(DOMAIN_DEPLOYMENT)
 public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
-  private final DomainFileBuilder emptyDomain100FileBuilder =
+  private static final DomainFileBuilder emptyDomain100FileBuilder =
       new DomainFileBuilder("empty-domain").definedBy("empty-domain-config.xml").withVersion("1.0.0");
-  private final DomainFileBuilder emptyDomain101FileBuilder =
+  private static final DomainFileBuilder emptyDomain101FileBuilder =
       new DomainFileBuilder("empty-domain").definedBy("empty-domain-config.xml").withVersion("1.0.1");
 
-  private final ApplicationFileBuilder appDependingOnDomain100FileBuilder = new ApplicationFileBuilder("dummy-domain100-app")
-      .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder);
-  private final ApplicationFileBuilder appDependingOnDomain101FileBuilder = new ApplicationFileBuilder("dummy-domain101-app")
-      .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder);
+  private static final ApplicationFileBuilder appDependingOnDomain100FileBuilder =
+      new ApplicationFileBuilder("dummy-domain100-app")
+          .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder);
+  private static final ApplicationFileBuilder appDependingOnDomain101FileBuilder =
+      new ApplicationFileBuilder("dummy-domain101-app")
+          .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder);
 
-  private final ApplicationFileBuilder appReferencingDomain101FileBuilder = new ApplicationFileBuilder("dummy-domain101-app-ref")
-      .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder)
-      .deployedWith("domain", "empty-domain-1.0.1-mule-domain");
-  private final ApplicationFileBuilder appReferencingDomain100FileBuilder = new ApplicationFileBuilder("dummy-domain100-app-ref")
-      .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder)
-      .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
+  private static final ApplicationFileBuilder appReferencingDomain101FileBuilder =
+      new ApplicationFileBuilder("dummy-domain101-app-ref")
+          .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder)
+          .deployedWith("domain", "empty-domain-1.0.1-mule-domain");
+  private static final ApplicationFileBuilder appReferencingDomain100FileBuilder =
+      new ApplicationFileBuilder("dummy-domain100-app-ref")
+          .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder)
+          .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
 
-  private final ApplicationFileBuilder appReferencingDefaultDomainFileBuilder = new ApplicationFileBuilder("app-with-default-ref")
-      .definedBy("empty-config.xml").deployedWith("domain", "default");
+  private static final ApplicationFileBuilder appReferencingDefaultDomainFileBuilder =
+      new ApplicationFileBuilder("app-with-default-ref")
+          .definedBy("empty-config.xml").deployedWith("domain", "default");
 
-  private final ApplicationFileBuilder defaultDomainAppFileBuilder = new ApplicationFileBuilder("default-domain-app")
+  private static final ApplicationFileBuilder defaultDomainAppFileBuilder = new ApplicationFileBuilder("default-domain-app")
       .definedBy("empty-config.xml");
 
-  private final ApplicationFileBuilder incompatibleDomainNameAppFileBuilder = new ApplicationFileBuilder("bad-domain-app-ref")
-      .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder)
-      .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
+  private static final ApplicationFileBuilder incompatibleDomainNameAppFileBuilder =
+      new ApplicationFileBuilder("bad-domain-app-ref")
+          .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder)
+          .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
 
-  private final ApplicationFileBuilder appWithDomainNameButMissingBundleDescriptor =
+  private static final ApplicationFileBuilder appWithDomainNameButMissingBundleDescriptor =
       new ApplicationFileBuilder("dummy-domain101-app-ref")
           .definedBy("empty-config.xml").deployedWith("domain", "empty-domain-1.0.1-mule-domain");
 

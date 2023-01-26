@@ -11,6 +11,12 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.barUtils1_0JarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.dummyAppDescriptorFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.emptyAppFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.pluginEcho1TestClassFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 
@@ -78,8 +84,8 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(callbackExtensionPlugin)
-        .containingClass(echoTestClassFile,
+        .dependingOn(callbackExtensionPlugin.get())
+        .containingClass(echoTestClassFile.get(),
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
         .withMinMuleVersion("4.3.0") // MULE-19038
@@ -87,15 +93,15 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
         .withMinMuleVersion("4.3.0") // MULE-19127
         .definedBy("dummy-app-with-stopped-flow-config.xml")
-        .dependingOn(callbackExtensionPlugin)
-        .containingClass(echoTestClassFile,
+        .dependingOn(callbackExtensionPlugin.get())
+        .containingClass(echoTestClassFile.get(),
                          "org/foo/EchoTest.class");
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile.get()))
+        .containingClass(pluginEcho1TestClassFile.get(), "org/foo/Plugin1Echo.class");
   }
 
   @Parameters(name = "Parallel: {0}")
@@ -108,11 +114,11 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
   public void removesPreviousAppFolderOnRedeploy() throws Exception {
     startDeployment();
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
@@ -130,60 +136,61 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
   @Test
   public void redeploysAppZipDeployedAfterStartup() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.get().getId());
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
   }
 
   @Test
   public void redeploysExplodedAppOnStartup() throws Exception {
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + separator + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File configFile = new File(appsDir + separator + dummyAppDescriptorFileBuilder.get().getDeployedPath(),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
-    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
   public void redeploysExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.get().getId()}, true);
 
     reset(applicationDeploymentListener);
 
     File configFile =
-        new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
+        new File(appsDir + "/" + emptyAppFileBuilder.get().getDeployedPath(),
+                 getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat("Configuration file does not exists", configFile.exists(), is(true));
     assertThat("Could not update last updated time in configuration file",
                configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS), is(true));
 
-    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.get().getId());
   }
 
   @Test
@@ -237,48 +244,48 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
   @Test
   public void redeploysInvalidExplodedAppAfterSuccessfulDeploymentOnStartup() throws Exception {
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
 
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.get().getDeployedPath(),
                                        getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
-    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.get().getDeployedPath(),
                            getConfigFilePathWithinArtifact(SERIALIZED_ARTIFACT_AST_LOCATION)));
 
-    assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
   public void redeploysInvalidExplodedAppAfterSuccessfulDeploymentAfterStartup() throws Exception {
     startDeployment();
 
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.get().getDeployedPath(),
                                        getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat(originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
-    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.get().getDeployedPath(),
                            getConfigFilePathWithinArtifact(SERIALIZED_ARTIFACT_AST_LOCATION)));
 
-    assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
@@ -299,8 +306,8 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     copyFile(newConfigFile, originalConfigFile);
     assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
@@ -329,8 +336,8 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
@@ -338,43 +345,43 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
   @Test
   public void redeploysZipAppOnConfigChanges() throws Exception {
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
 
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.get().getDeployedPath(),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
-    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.get().getId()}, true);
   }
 
   @Test
   public void redeployedFailedAppAfterTouched() throws Exception {
-    addExplodedAppFromBuilder(emptyAppFileBuilder);
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get());
 
-    File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.getId());
+    File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.get().getId());
 
     File configFile = new File(appFolder, getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     writeStringToFile(configFile, "you shall not pass");
 
     startDeployment();
-    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
     reset(applicationDeploymentListener);
 
     URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
     copyFile(new File(url.toURI()), configFile);
 
-    assertFailedApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(emptyAppFileBuilder.get().getId());
   }
 
   @Test
@@ -386,12 +393,12 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getZipPath());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get(), incompleteAppFileBuilder.getZipPath());
     assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
     assertNoZombiePresent(deploymentService.getZombieApplications());
@@ -406,11 +413,11 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getZipPath());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get(), incompleteAppFileBuilder.getZipPath());
     assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
     assertNoZombiePresent(deploymentService.getZombieApplications());
@@ -418,28 +425,28 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
   @Test
   public void redeploysInvalidZipAppAfterSuccessfulDeploymentOnStartup() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     reset(applicationDeploymentListener);
 
-    addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.getZipPath());
+    addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.get().getZipPath());
 
-    assertApplicationRedeploymentFailure(emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentFailure(emptyAppFileBuilder.get().getId());
   }
 
   @Test
   public void redeploysInvalidZipAppAfterSuccessfulDeploymentAfterStartup() throws Exception {
     startDeployment();
 
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
-    addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.getZipPath());
-    assertApplicationRedeploymentFailure(emptyAppFileBuilder.getId());
+    addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.get().getZipPath());
+    assertApplicationRedeploymentFailure(emptyAppFileBuilder.get().getId());
   }
 
   @Test
@@ -480,12 +487,12 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    addPackedAppFromBuilder(emptyAppFileBuilder.get());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.get().getId());
 
     // Redeploys a fixed version for incompleteApp
-    addExplodedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getId());
+    addExplodedAppFromBuilder(emptyAppFileBuilder.get(), incompleteAppFileBuilder.getId());
 
     assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
     assertNoZombiePresent(deploymentService.getZombieApplications());
@@ -497,21 +504,21 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     // Deploy an application (packed)
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
     startDeployment();
 
     // Application was deployed
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
 
     reset(mockDeploymentListener);
 
     // Redeploy by using redeploy method
-    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.get().getArtifactFile().toURI());
 
     // Application was redeployed
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
   }
 
   @Test
@@ -520,19 +527,19 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     // Deploy an application (exploded)
-    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder.get());
     startDeployment();
 
     // Application was deployed
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.get().getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
 
     // Redeploy by using redeploy method
-    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.get().getArtifactFile().toURI());
 
     // Application was redeployed
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.get().getId());
   }
 
 }

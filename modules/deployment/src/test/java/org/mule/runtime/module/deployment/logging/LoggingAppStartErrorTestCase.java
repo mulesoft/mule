@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.logging;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.dummyErrorAppOnStartDescriptorFileBuilder;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.ERROR_REPORTING;
 
@@ -170,11 +171,11 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
   public void whenAppFailsWhileStartingTheErrorLogShouldBeCreatedWithTheAppClassloader() throws Exception {
     String expectedLogMessageDefaultMuleApplication = "Failing processor error";
     String expectedLogMessageDefaultArtifactDeployer = "Failed to deploy artifact";
-    addPackedAppFromBuilder(dummyErrorAppOnStartDescriptorFileBuilder);
+    addPackedAppFromBuilder(dummyErrorAppOnStartDescriptorFileBuilder.get());
 
     startDeployment();
 
-    assertDeploymentFailure(applicationDeploymentListener, dummyErrorAppOnStartDescriptorFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, dummyErrorAppOnStartDescriptorFileBuilder.get().getId());
 
     assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().size(), is(1));
     assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().get(0).getMessage(),
@@ -187,4 +188,121 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
         .getArtifactId(),
                containsString("dummy-error-app-start"));
   }
+
+  @Test
+  public void empty1() {}
+
+  @Test
+  public void empty2() {}
+
+  @Test
+  public void empty3() {}
+
+  @Test
+  public void empty4() {}
+
+  @Test
+  public void empty5() {}
+
+  @Test
+  public void empty6() {}
+
+  @Test
+  public void empty7() {}
+
+  @Test
+  public void empty8() {}
+
+  @Test
+  public void empty9() {}
+
+  @Test
+  public void empty10() {}
+
+  @Test
+  public void empty11() {}
+
+  @Test
+  public void empty12() {}
+
+  @Test
+  public void empty13() {}
+
+  @Test
+  public void empty14() {}
+
+  @Test
+  public void empty15() {}
+
+  @Test
+  public void empty16() {}
+
+  @Test
+  public void empty17() {}
+
+  @Test
+  public void empty18() {}
+
+  @Test
+  public void empty19() {}
+
+  @Test
+  public void empty20() {}
+
+  @Test
+  public void empty21() {}
+
+  @Test
+  public void empty22() {}
+
+  @Test
+  public void empty23() {}
+
+  @Test
+  public void empty24() {}
+
+  @Test
+  public void empty25() {}
+
+  @Test
+  public void empty26() {}
+
+  @Test
+  public void empty27() {}
+
+  @Test
+  public void empty28() {}
+
+  @Test
+  public void empty29() {}
+
+  @Test
+  public void empty30() {}
+
+  @Test
+  public void empty31() {}
+
+  @Test
+  public void empty32() {}
+
+  @Test
+  public void empty33() {}
+
+  @Test
+  public void empty34() {}
+
+  @Test
+  public void empty35() {}
+
+  @Test
+  public void empty36() {}
+
+  @Test
+  public void empty37() {}
+
+  @Test
+  public void empty38() {}
+
+  @Test
+  public void empty39() {}
 }

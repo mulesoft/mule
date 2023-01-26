@@ -13,6 +13,10 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.MULE_POLICY_CLASSIFIER;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.util.Utils.createBundleDescriptorLoader;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
 
@@ -263,8 +267,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
     if (useEchoPluginInApp) {
-      return createExtensionApplicationWithServices(xmlFile + ".xml",
-                                                    helloExtensionV1Plugin);
+      return createExtensionApplicationWithServices(xmlFile + ".xml", helloExtensionV1Plugin.get());
     } else {
       return new ApplicationFileBuilder(xmlFile)
           .definedBy(xmlFile + ".xml");

@@ -48,6 +48,26 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.BAR_POLICY_NAME;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.BAZ_POLICY_NAME;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.EXCEPTION_POLICY_NAME;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.MULE_POLICY_CLASSIFIER;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.barPolicyFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.byeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.exceptionThrowingPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.exceptionThrowingPluginImportingDomain;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.exceptionThrowingPluginImportingPolicyFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.moduleUsingByeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.policyConfigurationExtensionJarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.policyDependencyInjectionExtensionJarFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.policyIncludingHelloPluginV2FileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.policyIncludingPluginFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.policyUsingAppPluginFileBuilder;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.usingObjectStorePlugin;
+import static org.mule.runtime.module.deployment.internal.util.Utils.createBundleDescriptorLoader;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_REORDER;
@@ -206,10 +226,10 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Issue("MULE-18433")
   public void policyWithOperationAfterPolicy() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -219,7 +239,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
                                                       getResourceFile("/policyWithOperation.xml"), emptyList()));
 
@@ -233,7 +253,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -255,10 +275,10 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   public void appliesMultipleApplicationPolicies() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
-    policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(barPolicyFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -268,7 +288,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
-    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
                                                       getResourceFile("/barPolicy.xml"), emptyList()));
 
@@ -281,7 +301,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -311,7 +331,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -339,10 +359,10 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Story(POLICY_REORDER)
   public void reorderApplicationPolicy() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
-    policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(barPolicyFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -353,7 +373,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       singletonMap(POLICY_PROPERTY_KEY, FOO_POLICY_NAME),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2,
                                                       singletonMap(POLICY_PROPERTY_KEY, BAR_POLICY_NAME),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
@@ -380,7 +400,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -428,7 +448,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(brokenPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -458,7 +478,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -482,7 +502,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -512,21 +532,21 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingAppPlugin() throws Exception {
-    PolicyFileBuilder policyFileBuilder = policyUsingAppPluginFileBuilder;
+    PolicyFileBuilder policyFileBuilder = policyUsingAppPluginFileBuilder.get();
     if (isIsolatedPolicy()) {
       // Since the feature flag ENABLE_POLICY_ISOLATION is active, the policy must declare as dependencies all the extensions
-      policyFileBuilder = policyFileBuilder.dependingOn(helloExtensionV1Plugin);
+      policyFileBuilder = policyFileBuilder.dependingOn(helloExtensionV1Plugin.get());
     }
     policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -536,7 +556,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingPluginOnlyInPolicy() throws Exception {
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder =
         createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG, createSingleExtensionPlugin());
@@ -545,7 +565,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -558,7 +578,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   public void appliesApplicationPolicyIncludingPlugin() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
                                                                                            simpleExtensionPlugin);
@@ -567,7 +587,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -578,16 +598,16 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyDuplicatingExtensionPlugin() throws Exception {
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -622,7 +642,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(policyIncludingByePlugin.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder =
-        createExtensionApplicationWithServices(APP_WITH_MODULE_BYE_CONFIG, createSingleExtensionPlugin(), byeXmlExtensionPlugin);
+        createExtensionApplicationWithServices(APP_WITH_MODULE_BYE_CONFIG, createSingleExtensionPlugin(),
+                                               byeXmlExtensionPlugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -640,18 +661,19 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
 
-    policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.get().getArtifactFile());
 
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           exceptionThrowingPlugin,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           exceptionThrowingPlugin.get(),
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(),
+                            exceptionThrowingPluginImportingPolicyFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(EXCEPTION_POLICY_NAME, s -> true, 1, emptyMap(),
                                                       getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
@@ -666,19 +688,21 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyDuplicatingPluginOnDomain() throws Exception {
 
-    addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain);
+    addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain.get());
 
-    policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin)
-                                                                                               .dependingOn(exceptionThrowingPluginImportingDomain);
+                                                                                           helloExtensionV1Plugin.get())
+                                                                                               .dependingOn(exceptionThrowingPluginImportingDomain
+                                                                                                   .get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(),
+                            exceptionThrowingPluginImportingPolicyFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(EXCEPTION_POLICY_NAME, s -> true, 1, emptyMap(),
                                                       getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
@@ -692,17 +716,17 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Ignore("MULE-15842: fix once we support declaring share objects plugins in policies")
   public void failsToApplyApplicationPolicyWithPluginVersionMismatch() throws Exception {
-    policyManager.registerPolicyTemplate(policyIncludingHelloPluginV2FileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyIncludingHelloPluginV2FileBuilder.get().getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     try {
-      policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getArtifactId(),
+      policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.get().getArtifactId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                         getResourceFile("/appPluginPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
@@ -714,7 +738,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   public void injectsObjectsFromApplicationIntoPolicies() throws Exception {
     final ArtifactPluginFileBuilder bootstrapPluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
         .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES)
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .containingClass(echoTestClassFile.get(), "org/foo/EchoTest.class")
         .configuredWith(EXPORTED_RESOURCE_PROPERTY, BOOTSTRAP_PROPERTIES);
 
     PolicyFileBuilder fooPolicyFileBuilder = createInjectedPolicy();
@@ -751,7 +775,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-using-policy-class-in-expression.xml"),
                                                       emptyList()));
@@ -805,7 +829,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-colliding-error.xml"),
                                                       emptyList()));
@@ -826,7 +850,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   public void appliesPolicyAndAppWithSameExtensionDeclaringError() throws Exception {
     ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
 
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.get()
         .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder =
@@ -837,7 +861,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get()
         .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-error-declaration-extension.xml"),
@@ -983,13 +1007,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                              getResourceFile("/policy-using-security-manager.xml"),
                                                              emptyList());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(), policy);
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(), policy);
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
 
     policyManager.removePolicy(applicationFileBuilder.getId(), BAR_POLICY_ID);
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(), policy);
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(), policy);
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
@@ -1007,7 +1031,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
+                                                                                           helloExtensionV1Plugin.get());
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -1033,8 +1057,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build())
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .dependingOn(helloExtensionV1Plugin);
+        .containingClass(echoTestClassFile.get(), "org/foo/EchoTest.class")
+        .dependingOn(helloExtensionV1Plugin.get());
   }
 
   private PolicyFileBuilder policyWithPluginUsingObjectStore() {
@@ -1050,7 +1074,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build())
-        .dependingOn(usingObjectStorePlugin)
+        .dependingOn(usingObjectStorePlugin.get())
         .withVersion(version);
   }
 
@@ -1114,7 +1138,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .addProperty("type", "org.foo.policyIsolation.PolicyDependencyInjectionExtension")
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("policyDependencyInjectionExtensionPlugin")
-        .dependingOn(new JarFileBuilder("policyDependencyInjectionExtension", policyDependencyInjectionExtensionJarFile))
+        .dependingOn(new JarFileBuilder("policyDependencyInjectionExtension", policyDependencyInjectionExtensionJarFile.get()))
         .describedBy(mulePluginModelBuilder.build());
   }
 
@@ -1130,7 +1154,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .addProperty("type", "org.foo.policyIsolation.PolicyConfigurationExtension")
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("policyConfigurationPlugin")
-        .dependingOn(new JarFileBuilder("policyConfigurationExtension", policyConfigurationExtensionJarFile))
+        .dependingOn(new JarFileBuilder("policyConfigurationExtension", policyConfigurationExtensionJarFile.get()))
         .describedBy(mulePluginModelBuilder.build());
   }
 
@@ -1166,14 +1190,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
-        .build()).dependingOn(moduleUsingByeXmlExtensionPlugin);
+        .build()).dependingOn(moduleUsingByeXmlExtensionPlugin.get());
   }
 
   private void configureSimpleAppAndPolicyWithErrorDeclarationExtensionAndErrorMapping() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
     ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
     PolicyFileBuilder withErrorDeclarationPolicyFileBuilder =
-        policyIncludingPluginFileBuilder.dependingOn(withErrorDeclarationExtensionPlugin);
+        policyIncludingPluginFileBuilder.get().dependingOn(withErrorDeclarationExtensionPlugin);
     if (isIsolatedPolicy()) {
       // Since the feature flag ENABLE_POLICY_ISOLATION is active, the policy must declare as dependencies all the extensions
       withErrorDeclarationPolicyFileBuilder = withErrorDeclarationPolicyFileBuilder.dependingOn(simpleExtensionPlugin);
@@ -1188,7 +1212,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-error-mapping.xml"),
                                                       emptyList()));
@@ -1198,7 +1222,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
     ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
 
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.dependingOn(simpleExtensionPlugin).getArtifactFile());
+    policyManager
+        .registerPolicyTemplate(policyIncludingPluginFileBuilder.get().dependingOn(simpleExtensionPlugin).getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
                                                                                            withErrorDeclarationExtensionPlugin,
@@ -1209,7 +1234,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.get().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-error-mapping.xml"),
                                                       emptyList()));

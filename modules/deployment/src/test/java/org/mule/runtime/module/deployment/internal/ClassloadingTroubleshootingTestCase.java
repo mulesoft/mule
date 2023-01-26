@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 

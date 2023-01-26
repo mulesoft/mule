@@ -11,6 +11,11 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.barUtils1ClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.util.TestArtifactsRepository.loadsAppResourceCallbackClassFile;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -54,14 +59,14 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
   public void deploysAppWithLocalPackageAndPlugin() throws Exception {
     ArtifactPluginFileBuilder loadsAppResourcePlugin = new ArtifactPluginFileBuilder("loadsAppResourcePlugin")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
+        .containingClass(loadsAppResourceCallbackClassFile.get(), "org/foo/LoadsAppResourceCallback.class");
 
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .dependingOn(callbackExtensionPlugin)
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .dependingOn(callbackExtensionPlugin.get())
+        .containingClass(barUtils1ClassFile.get(), "org/bar/BarUtils.class")
         .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
@@ -84,9 +89,9 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .dependingOn(callbackExtensionPlugin.containingClass(loadsAppResourceCallbackClassFile,
-                                                             "org/foo/LoadsAppResourceCallback.class"))
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .dependingOn(callbackExtensionPlugin.get().containingClass(loadsAppResourceCallbackClassFile.get(),
+                                                                   "org/foo/LoadsAppResourceCallback.class"))
+        .containingClass(barUtils1ClassFile.get(), "org/bar/BarUtils.class")
         .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
@@ -121,8 +126,8 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-plugin-bootstrap.xml")
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .containingClass(barUtils1ClassFile.get(), "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile.get(), "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourceInterceptorPlugin);
@@ -151,8 +156,8 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .definedBy("app-with-interceptor.xml")
         .containingClass(loadsOwnResourceInterceptorFactoryClassFile, "org/foo/LoadsOwnResourceInterceptorFactory.class")
         .containingClass(loadsOwnResourceInterceptorClassFile, "org/foo/LoadsOwnResourceInterceptor.class")
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .containingClass(barUtils1ClassFile.get(), "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile.get(), "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 
