@@ -59,6 +59,8 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
+    executeApplicationFlow("main");
+
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       assertThat(countLiveThreadsWithName(ORACLE_DRIVER_TIMER_THREAD_NAME, ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME),
                  is(greaterThanOrEqualTo(1)));
