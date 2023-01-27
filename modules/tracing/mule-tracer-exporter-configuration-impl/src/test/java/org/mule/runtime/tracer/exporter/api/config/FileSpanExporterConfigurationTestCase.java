@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.exporter.api.config;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_IN_APP;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
@@ -67,7 +67,7 @@ public class FileSpanExporterConfigurationTestCase {
   @Before
   public void before() {
     this.featureFlaggingService = mock(FeatureFlaggingService.class);
-    when(featureFlaggingService.isEnabled(ENABLE_TRACER_CONFIGURATION_IN_APP)).thenReturn(enableConfigInFile);
+    when(featureFlaggingService.isEnabled(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL)).thenReturn(enableConfigInFile);
   }
 
   @After
