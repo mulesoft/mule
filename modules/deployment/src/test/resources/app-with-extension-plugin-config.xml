@@ -8,11 +8,6 @@
     <hello:config name="default" message="Hello from app!!!"/>
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="1000"/>
-            </scheduling-strategy>
-        </scheduler>
         <set-payload value=""/>
         <hello:print-message config-ref="default" />
     </flow>

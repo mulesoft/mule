@@ -8,11 +8,6 @@
     <oracle:config name="default" url="jdbc:oracle:thin:@//localhost:49161/xe" user="system" password="oracle"/>
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="1000"/>
-            </scheduling-strategy>
-        </scheduler>
         <oracle:connect config-ref="default" />
     </flow>
 </mule>

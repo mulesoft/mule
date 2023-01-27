@@ -6,11 +6,6 @@
       http://www.mulesoft.org/schema/mule/with-error-declaration http://www.mulesoft.org/schema/mule/with-error-declaration/current/mule-with-error-declaration.xsd">
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="10000"/>
-            </scheduling-strategy>
-        </scheduler>
         <set-payload value=""/>
         <with-error-declaration:print-message/>
     </flow>

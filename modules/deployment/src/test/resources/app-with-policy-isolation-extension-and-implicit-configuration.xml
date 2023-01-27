@@ -6,11 +6,6 @@
       http://www.mulesoft.org/schema/mule/policy-configuration http://www.mulesoft.org/schema/mule/policy-configuration/current/mule-policy-configuration.xsd">
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="10000"/>
-            </scheduling-strategy>
-        </scheduler>
         <set-payload value=""/>
         <policy-configuration:check-implicit-configuration />
     </flow>

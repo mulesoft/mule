@@ -8,11 +8,6 @@
       http://www.mulesoft.org/schema/mule/module-bye http://www.mulesoft.org/schema/mule/module-bye/current/mule-module-bye.xsd">
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="10000"/>
-            </scheduling-strategy>
-        </scheduler>
         <module-bye:say-bye/>
         <simple:print-message/>
         <set-payload value=""/>

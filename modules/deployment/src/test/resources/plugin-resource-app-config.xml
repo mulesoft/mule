@@ -6,11 +6,6 @@
     <configuration-properties file="pluginResourceSource.properties"/>
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="1000"/>
-            </scheduling-strategy>
-        </scheduler>
         <set-payload value="${pluginDefinedProperty}"/>
         <logger/>
     </flow>
