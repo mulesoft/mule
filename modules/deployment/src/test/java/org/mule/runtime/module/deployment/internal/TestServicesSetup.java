@@ -72,4 +72,17 @@ public class TestServicesSetup extends ExternalResource {
           buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
     }
   }
+
+  @Override
+  protected void after() {
+    if (schedulerService == null) {
+      schedulerService.delete();
+    }
+    if (expressionLanguageService == null) {
+      expressionLanguageService.delete();
+    }
+    if (expressionLanguageMetadataService == null) {
+      expressionLanguageMetadataService.delete();
+    }
+  }
 }
