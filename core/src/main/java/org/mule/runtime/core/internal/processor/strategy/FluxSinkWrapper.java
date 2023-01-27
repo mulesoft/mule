@@ -8,12 +8,18 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+
+import java.util.function.LongConsumer;
+
 import reactor.core.Disposable;
 import reactor.core.publisher.FluxSink;
 import reactor.util.context.Context;
 
-import java.util.function.LongConsumer;
-
+/**
+ * A wrapper that can be used when checking if a flux sink is already in use
+ *
+ * @see AbstractCachedThreadReactorSinkProvider
+ */
 public class FluxSinkWrapper implements FluxSink<CoreEvent> {
 
   private final FluxSink<CoreEvent> sink;
