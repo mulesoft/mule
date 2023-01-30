@@ -28,7 +28,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 class ComponentInitializationState {
 
   private final ConfigurationComponentLocator componentLocator;
-  private final TrackingPostProcessor trackingPostProcessor = new TrackingPostProcessor();
+  private TrackingPostProcessor trackingPostProcessor = new TrackingPostProcessor();
   private final Set<String> currentComponentLocationsRequested = new HashSet<>();
   private final List<ConfigurableObjectProvider> objectProvidersToConfigure = new ArrayList<>();
   private boolean isApplyStartPhaseRequested = false;
@@ -63,6 +63,8 @@ class ComponentInitializationState {
    * @param beanFactory The {@link ConfigurableListableBeanFactory} to register the bean post processor with.
    */
   public void registerTrackingPostProcessor(ConfigurableListableBeanFactory beanFactory) {
+    // Creates a new post processor, just to make sure everything is cleared.
+    trackingPostProcessor = new TrackingPostProcessor();
     beanFactory.addBeanPostProcessor(trackingPostProcessor);
   }
 
@@ -156,6 +158,7 @@ class ComponentInitializationState {
    * {@link #ComponentInitializationState constructor} is external and will not be affected.
    */
   public void clear() {
+    trackingPostProcessor = new TrackingPostProcessor();
     trackingPostProcessor.stopTracking();
     trackingPostProcessor.reset();
 
