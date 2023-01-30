@@ -617,6 +617,18 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(contextRef.get().getParameter(DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS), is(of(true)));
   }
 
+  @Test
+  @Issue("W-12377294")
+  public void testModuleCustomErrorInFlowRef() {
+    String modulePath = "modules/module-custom-error-in-flow-ref.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-custom-error-in-flow-ref"));
+    assertThat(extensionModel.getConfigurationModels().size(), is(0));
+    assertThat(extensionModel.getOperationModels().size(), is(1));
+    assertThat(extensionModel.getErrorModels().size(), is(1));
+  }
+
   /**
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
    * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
