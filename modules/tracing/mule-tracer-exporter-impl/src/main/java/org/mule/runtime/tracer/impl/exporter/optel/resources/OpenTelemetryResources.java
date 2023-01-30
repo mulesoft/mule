@@ -9,12 +9,9 @@ package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE;
-import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.valueOf;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -24,7 +21,6 @@ import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
-import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 import java.util.Collection;
@@ -79,7 +75,10 @@ public class OpenTelemetryResources {
 
   private static Tracer doGetTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
       throws SpanExporterConfiguratorException {
-    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder().addSpanProcessor(resolveOpenTelemetrySpanProcessor(spanExporterConfiguration, resolveOpenTelemetrySpanExporter(spanExporterConfiguration))).setResource(getResource(serviceName));
+    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder()
+        .addSpanProcessor(resolveOpenTelemetrySpanProcessor(spanExporterConfiguration,
+                                                            resolveOpenTelemetrySpanExporter(spanExporterConfiguration)))
+        .setResource(getResource(serviceName));
 
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProviderBuilder.build())
@@ -93,14 +92,6 @@ public class OpenTelemetryResources {
     return getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, serviceName)));
   }
 
-  public static ExportedSpanSniffer getNewExportedSpanSniffer() {
-    return capturingSpanExporterWrapper.getSpanCapturer();
-  }
-
-  private static SpanProcessor resolveDummyExporterWithSniffer() {
-    return create(capturingSpanExporterWrapper);
-  }
-
   public static ContextPropagators getPropagator() {
     return PROPAGATOR;
   }
@@ -108,10 +99,6 @@ public class OpenTelemetryResources {
   public static SpanProcessor resolveOpenTelemetrySpanProcessor(SpanExporterConfiguration spanExporterConfiguration,
                                                                 SpanExporter spanExporter)
       throws SpanExporterConfiguratorException {
-
-    if (!parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, FALSE.toString()))) {
-      return resolveDummyExporterWithSniffer();
-    }
 
     int batchSize = parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE, "512"));
 
@@ -146,7 +133,7 @@ public class OpenTelemetryResources {
   /**
    * A dummy span exporter.
    */
-  public static class DummySpanExporter implements SpanExporter {
+  public static class NoOpSpanExporter implements SpanExporter {
 
     @Override
     public CompletableResultCode export(Collection<SpanData> collection) {
