@@ -8,11 +8,6 @@
     <policy-configuration:config name="test" configurationParameter="non default value"/>
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="10000"/>
-            </scheduling-strategy>
-        </scheduler>
         <set-payload value=""/>
         <policy-configuration:check-explicit-configuration config-ref="test"/>
     </flow>

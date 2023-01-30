@@ -11,11 +11,6 @@
     <object name="overrideMe" class="test.OverrideMe"/>
 
     <flow name="classloading-appFlow" >
-        <scheduler>
-            <scheduling-strategy >
-                <fixed-frequency frequency="100" timeUnit="MILLISECONDS" />
-            </scheduling-strategy>
-        </scheduler>
         <logger level="ERROR" message="works!"/>
     </flow>
 

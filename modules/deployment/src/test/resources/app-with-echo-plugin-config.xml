@@ -7,11 +7,6 @@
             http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
     <flow name="main">
-        <scheduler>
-            <scheduling-strategy>
-                <fixed-frequency frequency="1000"/>
-            </scheduling-strategy>
-        </scheduler>
         <set-payload value="Hello!!"/>
         <callback:callback class="org.foo.EchoTest"/>
     </flow>
