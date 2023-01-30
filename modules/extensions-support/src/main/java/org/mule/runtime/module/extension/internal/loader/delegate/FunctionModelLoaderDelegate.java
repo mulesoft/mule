@@ -52,8 +52,7 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
-      // TODO: W-12398760 uncomment the next line when done.
-      // parser.getMinMuleVersion().ifPresent(function::withMinMuleVersion);
+      parser.getMinMuleVersion().ifPresent(function::withMinMuleVersion);
 
       addSemanticTerms(function.getDeclaration(), parser);
 
