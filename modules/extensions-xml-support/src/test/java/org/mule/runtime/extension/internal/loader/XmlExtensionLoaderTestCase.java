@@ -47,6 +47,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -627,6 +628,9 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getOperationModels().size(), is(1));
     assertThat(extensionModel.getErrorModels().size(), is(1));
+    ErrorModel errorModel = extensionModel.getErrorModels().stream().findFirst().get();
+    assertThat(errorModel.getNamespace(), is("RAISE-ERROR-IN-FLOW-REF"));
+    assertThat(errorModel.getType(), is("CUSTOM_ERROR"));
   }
 
   /**
