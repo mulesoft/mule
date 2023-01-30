@@ -75,15 +75,15 @@ public class TestServicesSetup extends ExternalResource {
 
   @Override
   protected void after() {
-    if (schedulerService == null) {
+    if (schedulerService != null) {
       schedulerService.delete();
       schedulerService = null;
     }
-    if (expressionLanguageService == null) {
+    if (expressionLanguageService != null) {
       expressionLanguageService.delete();
       expressionLanguageService = null;
     }
-    if (expressionLanguageMetadataService == null) {
+    if (expressionLanguageMetadataService != null) {
       expressionLanguageMetadataService.delete();
       expressionLanguageMetadataService = null;
     }
