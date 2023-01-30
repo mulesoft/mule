@@ -177,7 +177,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // components.
     this.graph = generateFor(getApplicationModel());
 
-    this.componentInitializationAstGenerator = new ComponentInitializationArtifactAstGenerator(graph);
+    this.componentInitializationAstGenerator = new ComponentInitializationArtifactAstGenerator(graph,
+                                                                                               currentComponentInitializationState);
   }
 
   @Override
@@ -335,24 +336,27 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // For the time being we only support going for the same "apply start phase" setting as in the original initialization
     // request.
-    createComponentsAndApplyLifecycle(new ComponentInitializationRequest(location, currentComponentInitializationState
-        .isApplyStartPhaseRequested(), true));
+    createComponentsAndApplyLifecycle(getRequestBuilder(currentComponentInitializationState.isApplyStartPhaseRequested(),
+                                                        true).build(location));
   }
 
   @Override
   public void initializeComponent(Location location, boolean applyStartPhase) {
-    createComponentsAndApplyLifecycle(new ComponentInitializationRequest(location, applyStartPhase, false));
+    createComponentsAndApplyLifecycle(getRequestBuilder(applyStartPhase, false).build(location));
   }
 
   @Override
   public void initializeComponents(ComponentLocationFilter filter, boolean applyStartPhase) {
-    createComponentsAndApplyLifecycle(new ComponentInitializationRequest(filter, applyStartPhase, false));
+    createComponentsAndApplyLifecycle(getRequestBuilder(applyStartPhase, false).build(filter));
   }
 
   @Override
-  public void initializeComponents(Predicate<ComponentAst> componentModelPredicate,
-                                   boolean applyStartPhase) {
-    createComponentsAndApplyLifecycle(new ComponentInitializationRequest(componentModelPredicate, applyStartPhase, false));
+  public void initializeComponents(Predicate<ComponentAst> componentModelPredicate, boolean applyStartPhase) {
+    createComponentsAndApplyLifecycle(getRequestBuilder(applyStartPhase, false).build(componentModelPredicate));
+  }
+
+  private ComponentInitializationRequest.Builder getRequestBuilder(boolean applyStartPhase, boolean keepPrevious) {
+    return new ComponentInitializationRequest.Builder(componentInitializationAstGenerator, applyStartPhase, keepPrevious);
   }
 
   private void createComponentsAndApplyLifecycle(ComponentInitializationRequest initializationRequest) {
@@ -419,17 +423,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private List<Object> createComponents(ComponentInitializationRequest initializationRequest,
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     return withContextClassLoader(getMuleContext().getExecutionClassLoader(), () -> {
-
-      initializationRequest.computeRequestedLocations(getApplicationModel());
-
       // Checks if the current request is compatible with the already created components, so can we avoid doing anything.
       if (currentComponentInitializationState.isRequestSatisfied(initializationRequest)) {
         return emptyList();
       }
 
-      ArtifactAst minimalAst = componentInitializationAstGenerator.getMinimalArtifactAst(initializationRequest,
-                                                                                         currentComponentInitializationState,
-                                                                                         this::validateModel);
+      initializationRequest.validateRequestedAst(this::validateModel);
+      ArtifactAst minimalAst = initializationRequest.getFilteredAstToInitialize();
 
       initializationRequest.getLocation()
           .ifPresent(location -> validateRequestedComponentExists(location, minimalAst));

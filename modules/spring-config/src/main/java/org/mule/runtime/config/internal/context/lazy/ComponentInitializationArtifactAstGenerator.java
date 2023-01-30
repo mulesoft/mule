@@ -13,9 +13,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.ast.internal.FilteredArtifactAst;
-import org.mule.runtime.core.api.config.ConfigurationException;
 
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -23,82 +21,53 @@ import java.util.function.Predicate;
  */
 class ComponentInitializationArtifactAstGenerator {
 
-  /**
-   * A callback for performing validations over the minimal artifact AST.
-   * <p>
-   * Unlike a regular {@link Consumer}, this one can throw a {@link ConfigurationException}.
-   */
-  @FunctionalInterface
-  public interface ArtifactAstValidator {
-
-    void validate(ArtifactAst artifactAst) throws ConfigurationException;
-  }
-
   private final ArtifactAstDependencyGraph graph;
+  private final ComponentInitializationState componentInitializationState;
 
   /**
    * Creates the generator instance.
    *
-   * @param graph The {@link ArtifactAstDependencyGraph} to use for extracting the minimal AST from a predicate.
+   * @param graph                        The {@link ArtifactAstDependencyGraph} to use for extracting the minimal AST from a
+   *                                     predicate.
+   * @param componentInitializationState The current {@link ComponentInitializationState}.
    */
-  ComponentInitializationArtifactAstGenerator(ArtifactAstDependencyGraph graph) {
+  ComponentInitializationArtifactAstGenerator(ArtifactAstDependencyGraph graph,
+                                              ComponentInitializationState componentInitializationState) {
     this.graph = graph;
+    this.componentInitializationState = componentInitializationState;
   }
 
   /**
-   * Creates the minimal artifact AST that satisfies the given {@code componentInitializationRequest} and taking into account the
-   * current {@code componentInitializationState}.
+   * Creates the minimal artifact AST that satisfies the given {@code componentInitializationRequest}.
    * <p>
-   * A minimal artifact AST in this context is the one that includes the requested components and all of their dependencies but
-   * excluding any that may be already initialized.
+   * A minimal artifact AST in this context is the one that includes the requested components and all of their dependencies.
    *
    * @param componentInitializationRequest The {@link ComponentInitializationRequest} to satisfy.
-   * @param componentInitializationState   The current {@link ComponentInitializationState} to take into account.
-   * @param astValidator                   A validator to call with the minimal artifact AST. Already initialized components are
-   *                                       still included at this stage.
-   * @return The minimal (and potentially also filtered) artifact AST.
-   * @throws ConfigurationException If the validation fails.
+   * @return The minimal artifact AST that satisfies the given {@code componentInitializationRequest}.
    */
-  public ArtifactAst getMinimalArtifactAst(ComponentInitializationRequest componentInitializationRequest,
-                                           ComponentInitializationState componentInitializationState,
-                                           ArtifactAstValidator astValidator)
-      throws ConfigurationException {
+  public ArtifactAst getMinimalArtifactAstForRequest(ComponentInitializationRequest componentInitializationRequest) {
     Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst(componentInitializationRequest);
-    ArtifactAst minimalAst = buildAndValidateMinimalApplicationModel(minimalApplicationFilter, astValidator);
-    return filterResultingMinimalAst(minimalAst, componentInitializationRequest, componentInitializationState);
+    return graph.minimalArtifactFor(minimalApplicationFilter);
   }
 
-  private ArtifactAst buildAndValidateMinimalApplicationModel(Predicate<ComponentAst> basePredicate,
-                                                              ArtifactAstValidator astValidator)
-      throws ConfigurationException {
-    final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-    astValidator.validate(minimalApplicationModel);
-    return minimalApplicationModel;
+  /**
+   * @param artifactAst An {@link ArtifactAst}.
+   * @return A filtered version of the given {@code artifactAst} where the already initialized components are excluded.
+   */
+  public ArtifactAst getArtifactAstExcludingAlreadyInitialized(ArtifactAst artifactAst) {
+    return new FilteredArtifactAst(artifactAst, comp -> !componentInitializationState.isComponentAlreadyInitialized(comp));
   }
 
-  private ArtifactAst buildMinimalApplicationModel(Predicate<ComponentAst> basePredicate) {
-    return graph.minimalArtifactFor(basePredicate);
-  }
-
-  private Predicate<ComponentAst> getFilterForMinimalArtifactAst(ComponentInitializationRequest componentInitializationRequest) {
+  private static Predicate<ComponentAst> getFilterForMinimalArtifactAst(ComponentInitializationRequest componentInitializationRequest) {
     if (componentInitializationRequest.isKeepPreviousRequested()) {
       return componentInitializationRequest.getComponentFilter();
     } else {
-      return componentInitializationRequest.getComponentFilter().or(this::isAlwaysEnabledComponent);
+      return componentInitializationRequest.getComponentFilter()
+          .or(ComponentInitializationArtifactAstGenerator::isAlwaysEnabledComponent);
     }
   }
 
-  private ArtifactAst filterResultingMinimalAst(ArtifactAst artifactAst,
-                                                ComponentInitializationRequest componentInitializationRequest,
-                                                ComponentInitializationState componentInitializationState) {
-    if (componentInitializationRequest.isKeepPreviousRequested()) {
-      return new FilteredArtifactAst(artifactAst, comp -> !componentInitializationState.isComponentAlreadyInitialized(comp));
-    } else {
-      return artifactAst;
-    }
-  }
-
-  private boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
+  private static boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
     return componentAst.getModel(HasStereotypeModel.class)
         .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
         .orElse(false);
