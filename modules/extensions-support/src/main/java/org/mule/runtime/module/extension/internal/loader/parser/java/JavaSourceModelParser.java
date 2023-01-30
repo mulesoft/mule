@@ -312,13 +312,11 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    // TODO W-12392052
     return of(getSourceResult(sourceElement).getMinMuleVersion());
   }
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
-    // TODO W-12392052
     return of(getSourceResult(sourceElement).getReason());
   }
 

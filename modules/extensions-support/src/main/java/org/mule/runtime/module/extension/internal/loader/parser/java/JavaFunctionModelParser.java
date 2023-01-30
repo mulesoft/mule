@@ -142,7 +142,6 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    // TODO W-12392052
     return of(getFunctionResult(functionElement,
                                 getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
                                                                      ExpressionFunctions::value,
@@ -151,7 +150,6 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
-    // TODO W-12392052
     return of(getFunctionResult(functionElement,
                                 getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
                                                                      ExpressionFunctions::value,

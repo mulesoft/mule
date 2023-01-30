@@ -230,13 +230,11 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    // TODO W-12392052
     return of(getConnectionProviderResult(element).getMinMuleVersion());
   }
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
-    // TODO W-12392052
     return of(getConnectionProviderResult(element).getReason());
   }
 

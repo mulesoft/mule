@@ -195,7 +195,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    // TODO W-12392052
     return of(getConfigurationResult(configElement,
                                      getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
                                                                           Configurations::value, configElement))
@@ -204,7 +203,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
-    // TODO W-12392052
     return of(getConfigurationResult(configElement,
                                      getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
                                                                           Configurations::value, configElement))

@@ -391,13 +391,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    // TODO W-12392052
     return of(getExtensionResult(extensionElement).getMinMuleVersion());
   }
 
   @Override
   public Optional<String> getMinMuleVersionReason() {
-    // TODO W-12392052
     return of(getExtensionResult(extensionElement).getReason());
   }
 
