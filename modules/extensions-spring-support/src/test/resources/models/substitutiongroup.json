@@ -3,6 +3,7 @@
   "description": "",
   "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
+  "minMuleVersion": "4.1.1",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "sg",
@@ -263,6 +264,7 @@
         }
       ],
       "externalLibraryModels": [],
+      "minMuleVersion": "4.1.1",
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],

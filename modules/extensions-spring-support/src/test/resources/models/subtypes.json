@@ -3,6 +3,7 @@
   "description": "",
   "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
+  "minMuleVersion": "4.5.0",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "subtypes",
@@ -1078,6 +1079,7 @@
         }
       ],
       "externalLibraryModels": [],
+      "minMuleVersion": "4.5.0",
       "operations": [
         {
           "blocking": true,
@@ -1120,6 +1122,7 @@
               }
             }
           },
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1463,6 +1466,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1968,6 +1972,7 @@
               "namespace": "MULE"
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2408,6 +2413,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2734,6 +2740,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3049,6 +3056,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3370,6 +3378,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3756,6 +3765,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4131,6 +4141,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4486,6 +4497,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4956,6 +4968,7 @@
           "namespace": "MULE"
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -5378,6 +5391,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
