@@ -329,8 +329,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     initializeComponents(filter, true);
   }
 
-  @Override
-  public void initializeAdditionalComponent(Location location) {
+  private void initializeAdditionalComponent(Location location) {
     checkState(currentComponentInitializationState.isInitializationAlreadyDone(),
                "initializeComponents must have been called before initializeAdditionalComponent");
 
