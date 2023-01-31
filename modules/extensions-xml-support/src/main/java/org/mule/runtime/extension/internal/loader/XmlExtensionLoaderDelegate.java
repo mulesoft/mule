@@ -69,7 +69,6 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -538,6 +537,44 @@ public final class XmlExtensionLoaderDelegate {
 
     loadOperationsFrom(of(declarer), hasOperationDeclarer, moduleAst, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, allTnsExtensionModel);
+    addErrorModels(declarer, artifactAst);
+  }
+
+  private void addErrorModels(ExtensionDeclarer declarer, ArtifactAst artifactAst) {
+    // Add error models for error types used in raise and error mapping for completeness of the extension model.
+    artifactAst.recursiveStream()
+        .forEach(comp -> {
+          if (comp.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
+            final ComponentParameterAst parameter = comp.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_ATTRIBUTE);
+
+            if (parameter != null) {
+              parameter.getValue().getValue()
+                  .map(r -> (String) r)
+                  // We can just ignore this as we should allow an empty value here
+                  .filter(representation -> !isEmpty(representation))
+                  .ifPresent(representation -> {
+                    ComponentIdentifier raiseType = buildFromStringRepresentation(representation);
+                    declarer.withErrorModel(ErrorModelBuilder.newError(raiseType.getName(), raiseType.getNamespace())
+                        .withParent(ErrorModelBuilder.newError(ANY).build())
+                        .build());
+                  });
+            }
+          }
+
+          forEachErrorMappingDo(comp, mappings -> mappings
+              .forEach(mapping -> {
+                final String representation = mapping.getTarget();
+                if (isEmpty(representation)) {
+                  // We can just ignore this as it will be validated afterwards
+                  return;
+                }
+
+                ComponentIdentifier target = buildFromStringRepresentation(representation);
+                declarer.withErrorModel(ErrorModelBuilder.newError(target.getName(), target.getNamespace())
+                    .withParent(ErrorModelBuilder.newError(ANY).build())
+                    .build());
+              }));
+        });
   }
 
   private void validateNoCycles(Graph<String, DefaultEdge> directedGraph) {
@@ -1119,43 +1156,6 @@ public final class XmlExtensionLoaderDelegate {
           operationDeclarer.withErrorModel(errorModel);
           extensionDeclarer.ifPresent(ext -> ext.withErrorModel(errorModel));
         }));
-
-    // Add error models for error types used in raise and error mapping for completeness of the extension model.
-    extensionDeclarer.ifPresent(ext -> {
-      operationModel.getModel(ParameterizedModel.class).ifPresent(om -> operationModel.recursiveStream()
-          .forEach(comp -> {
-            if (comp.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-              final ComponentParameterAst parameter = comp.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_ATTRIBUTE);
-
-              if (parameter != null) {
-                parameter.getValue().getValue()
-                    .map(r -> (String) r)
-                    // We can just ignore this as we should allow an empty value here
-                    .filter(representation -> !isEmpty(representation))
-                    .ifPresent(representation -> {
-                      ComponentIdentifier raiseType = buildFromStringRepresentation(representation);
-                      ext.withErrorModel(ErrorModelBuilder.newError(raiseType.getName(), raiseType.getNamespace())
-                          .withParent(ErrorModelBuilder.newError(ANY).build())
-                          .build());
-                    });
-              }
-            }
-
-            forEachErrorMappingDo(comp, mappings -> mappings
-                .forEach(mapping -> {
-                  final String representation = mapping.getTarget();
-                  if (isEmpty(representation)) {
-                    // We can just ignore this as it will be validated afterwards
-                    return;
-                  }
-
-                  ComponentIdentifier target = buildFromStringRepresentation(representation);
-                  ext.withErrorModel(ErrorModelBuilder.newError(target.getName(), target.getNamespace())
-                      .withParent(ErrorModelBuilder.newError(ANY).build())
-                      .build());
-                }));
-          }));
-    });
   }
 
   /**

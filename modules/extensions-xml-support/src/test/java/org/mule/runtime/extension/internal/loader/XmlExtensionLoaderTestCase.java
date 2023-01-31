@@ -43,6 +43,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -585,6 +586,21 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
         configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME);
     assertThat(connectionProviderModel.isPresent(), is(true));
     assertThat(connectionProviderModel.get().supportsConnectivityTesting(), is(true));
+  }
+
+  @Test
+  @Issue("W-12377294")
+  public void testModuleCustomErrorInFlowRef() {
+    String modulePath = "modules/module-custom-error-in-flow-ref.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-custom-error-in-flow-ref"));
+    assertThat(extensionModel.getConfigurationModels().size(), is(0));
+    assertThat(extensionModel.getOperationModels().size(), is(1));
+    assertThat(extensionModel.getErrorModels().size(), is(1));
+    ErrorModel errorModel = extensionModel.getErrorModels().stream().findFirst().get();
+    assertThat(errorModel.getNamespace(), is("RAISE-ERROR-IN-FLOW-REF"));
+    assertThat(errorModel.getType(), is("CUSTOM_ERROR"));
   }
 
   /**
