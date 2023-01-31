@@ -479,7 +479,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -1018,7 +1018,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -1589,7 +1589,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -2158,7 +2158,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -2970,7 +2970,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -3477,7 +3477,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -4016,7 +4016,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "endpoint",
                   "description": "",
@@ -5558,7 +5558,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -6097,7 +6097,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -6668,7 +6668,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -7237,7 +7237,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -8049,7 +8049,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -8556,7 +8556,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -9095,7 +9095,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
@@ -9429,7 +9429,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [
-                "apiContract.endPoint"
+                "apiContract.endpoint"
               ],
               "name": "endpoint",
               "description": "",
