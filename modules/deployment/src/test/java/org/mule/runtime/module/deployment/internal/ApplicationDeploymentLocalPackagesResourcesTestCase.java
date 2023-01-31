@@ -13,6 +13,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils1ClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -84,12 +85,15 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
   @Issue("MULE-13756")
   @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
   public void deploysAppWithLocalPackage() throws Exception {
+    ArtifactPluginFileBuilder callbackPluginLoadingResource = createCallbackExtensionPluginFileBuilder()
+        .containingClass(loadsAppResourceCallbackClassFile,
+                         "org/foo/LoadsAppResourceCallback.class");
+
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .dependingOn(callbackExtensionPlugin.containingClass(loadsAppResourceCallbackClassFile,
-                                                             "org/foo/LoadsAppResourceCallback.class"))
+        .dependingOn(callbackPluginLoadingResource)
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
         .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")

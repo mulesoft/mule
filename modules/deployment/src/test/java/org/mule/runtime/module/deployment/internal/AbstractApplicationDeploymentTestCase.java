@@ -13,7 +13,7 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.b
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenJavaJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
 
@@ -106,7 +106,7 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(callbackExtensionPlugin.containingClass(echoTestClassFile, "org/foo/EchoTest.class"));
+        .dependingOn(createCallbackExtensionPluginFileBuilder().containingClass(echoTestClassFile, "org/foo/EchoTest.class"));
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
