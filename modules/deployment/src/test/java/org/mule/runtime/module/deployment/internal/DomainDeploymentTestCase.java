@@ -44,11 +44,13 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.l
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleThirdPartyEchoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deployDomain;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeployDomain;
-import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeployDomain;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -121,24 +123,18 @@ import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
 
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Contains test for domain deployment
  */
 @Feature(DOMAIN_DEPLOYMENT)
 public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
-
-  private static File pluginForbiddenJavaEchoTestClassFile;
-  private static File pluginForbiddenMuleContainerEchoTestClassFile;
-  private static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
 
   // Domain artifacts builders
   private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -178,19 +174,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public DomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
-  }
-
-  @BeforeClass
-  public static void compileTestClasses() throws Exception {
-    pluginForbiddenJavaEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
-    pluginForbiddenMuleContainerEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
-    pluginForbiddenMuleThirdPartyEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
   }
 
   @After

@@ -93,52 +93,39 @@ public class TestArtifactsCatalog {
   // Dynamically compiled classes and jars
   public static File barUtils1ClassFile;
   public static File barUtils1_0JarFile;
-
-
-
   public static File barUtils2ClassFile;
   public static File barUtils2_0JarFile;
-
   public static File barUtilsJavaxClassFile;
   public static File barUtilsJavaxJarFile;
-
   public static File barUtilsForbiddenJavaClassFile;
   public static File barUtilsForbiddenJavaJarFile;
-
   public static File barUtilsForbiddenMuleContainerClassFile;
   public static File barUtilsForbiddenMuleContainerJarFile;
-
   public static File barUtilsForbiddenMuleThirdPartyClassFile;
   public static File barUtilsForbiddenMuleThirdPartyJarFile;
-
   public static File echoTestClassFile;
   public static File echoTestJarFile;
-
   public static File oracleExtensionJarFile;
-
   public static File classloaderConnectionExtensionJarFile;
   public static File classloaderConfigConnectionExtensionJarFile;
-
   public static File defaulServiceEchoJarFile;
-
   public static File defaultFooServiceJarFile;
-
   public static File helloExtensionV1JarFile;
   public static File loadClassExtensionJarFile;
   public static File callbackExtensionJarFile;
   public static File callbackExtensionPomFile;
   public static File customExceptionClassFile;
   public static File usingObjectStoreJarFile;
-
   public static File goodbyeExtensionV1JarFile;
-
   private static File helloExtensionV2JarFile;
   public static File policyDependencyInjectionExtensionJarFile;
   public static File policyConfigurationExtensionJarFile;
-
   public static File loadsAppResourceCallbackClassFile;
   public static File loadsAppResourceCallbackJarFile;
   public static File pluginEcho1TestClassFile;
+  public static File pluginForbiddenJavaEchoTestClassFile;
+  public static File pluginForbiddenMuleContainerEchoTestClassFile;
+  public static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
 
   private static void initFiles() throws URISyntaxException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -261,6 +248,13 @@ public class TestArtifactsCatalog {
         .compile("loadsAppResourceCallback.jar");
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+    pluginForbiddenJavaEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
+        .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
+    pluginForbiddenMuleContainerEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
+        .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
+    pluginForbiddenMuleThirdPartyEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
+        .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
   }
 
 
