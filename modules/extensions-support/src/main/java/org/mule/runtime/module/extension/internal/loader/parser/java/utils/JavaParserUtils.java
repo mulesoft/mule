@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -307,7 +308,9 @@ public final class JavaParserUtils {
 
   private static MuleVersion calculateOutputMinMuleVersion(Type outputType) {
     MuleVersion calculatedMMV = FIRST_MULE_VERSION;
-    if (outputType.asMetadataType() instanceof ArrayType) {
+    if (outputType.isArray()) {
+      calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(outputType.getArrayComponentType().get()));
+    } else if (outputType.isAssignableTo(Iterable.class) || outputType.isAssignableTo(Iterator.class)) {
       for (TypeGeneric typeGeneric : outputType.getGenerics()) {
         calculatedMMV = max(calculatedMMV, calculateOutputMinMuleVersion(typeGeneric.getConcreteType()));
       }

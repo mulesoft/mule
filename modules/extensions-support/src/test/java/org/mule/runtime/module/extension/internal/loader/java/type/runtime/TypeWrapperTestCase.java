@@ -22,6 +22,7 @@ import org.mule.sdk.api.annotation.semantics.security.Password;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -113,6 +114,26 @@ public class TypeWrapperTestCase {
                is(true));
   }
 
+  @Test
+  public void isArray() {
+    java.util.Optional<FieldElement> field = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(Thread.currentThread().getContextClassLoader())).getFields().stream()
+            .filter(f -> f.getName().contains("arrayOfStrings")).findAny();
+    assertThat(field.isPresent(), is(true));
+    assertThat(field.get().getType().isArray(), is(true));
+    assertThat(field.get().getType().getArrayComponentType().get().getTypeName(), containsString("String"));
+  }
+
+  @Test
+  public void listIsNotArray() {
+    java.util.Optional<FieldElement> field = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(Thread.currentThread().getContextClassLoader())).getFields().stream()
+            .filter(f -> f.getName().contains("listOfStrings")).findAny();
+    assertThat(field.isPresent(), is(true));
+    assertThat(field.get().getType().isArray(), is(false));
+    assertThat(field.get().getType().getArrayComponentType().isPresent(), is(false));
+  }
+
   @Alias("Some Class Alias")
   @Extension(name = "Some Extension")
   // Similar to java.util.stream.BaseStream
@@ -131,6 +152,10 @@ public class TypeWrapperTestCase {
 
     @Deprecated(message = "No longer supported", since = "4.4")
     public void childMethod(@Optional String optionalParameter) {}
+
+    String[] arrayOfStrings;
+
+    List<Boolean> listOfStrings;
   }
 
   public enum TestEnum {

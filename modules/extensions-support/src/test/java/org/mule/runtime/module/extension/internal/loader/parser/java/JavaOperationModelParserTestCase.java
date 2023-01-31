@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -183,6 +184,22 @@ public class JavaOperationModelParserTestCase {
     assertThat(minMuleVersion.get().toString(), is("4.4.0"));
   }
 
+  @Test
+  public void getMMVForOperationWithArrayListOutput() throws NoSuchMethodException {
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withArrayListOutput");
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+  }
+
+  @Test
+  public void getMMVForOperationWithNativeArrayOutput() throws NoSuchMethodException {
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withNativeArrayOutput");
+    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
+    assertThat(minMuleVersion.isPresent(), is(true));
+    assertThat(minMuleVersion.get().toString(), is("4.4"));
+  }
+
   public void parseOperation(ExtensionElement extensionElement, Class<?> operationClass, String methodName,
                              Class<?>... parameterType)
       throws NoSuchMethodException {
@@ -279,6 +296,14 @@ public class JavaOperationModelParserTestCase {
 
     public Result<String, Void> withResultOutput() {
       return Result.<String, Void>builder().build();
+    }
+
+    public ArrayList<Literal<String>> withArrayListOutput() {
+      return new ArrayList<>();
+    }
+
+    public Result<String, Void>[] withNativeArrayOutput() {
+      return new Result[1];
     }
 
     public void withConfigParameter(@Config SomeConfiguration configParameter) {
