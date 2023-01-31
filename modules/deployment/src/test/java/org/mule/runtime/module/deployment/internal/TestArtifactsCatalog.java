@@ -126,6 +126,8 @@ public class TestArtifactsCatalog {
   public static File pluginForbiddenJavaEchoTestClassFile;
   public static File pluginForbiddenMuleContainerEchoTestClassFile;
   public static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
+  public static File plugin2EchoClassFile;
+  public static File plugin3EchoClassFile;
 
   private static void initFiles() throws URISyntaxException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -255,6 +257,10 @@ public class TestArtifactsCatalog {
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
     pluginForbiddenMuleThirdPartyEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
+
+    plugin2EchoClassFile = new SingleClassCompiler().dependingOn(barUtils2_0JarFile)
+        .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
+    plugin3EchoClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
   }
 
 

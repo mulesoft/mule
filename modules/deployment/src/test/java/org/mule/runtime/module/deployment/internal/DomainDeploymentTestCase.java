@@ -43,6 +43,8 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.h
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadClassExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.plugin2EchoClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.plugin3EchoClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
@@ -104,7 +106,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.util.CompilerUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -335,8 +336,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
             .dependingOn(createCallbackExtensionPluginFileBuilder()
-                .containingClass(new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-                    .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java")), "org/foo/echo/Plugin2Echo.class"));
+                .containingClass(plugin2EchoClassFile, "org/foo/echo/Plugin2Echo.class"));
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -370,8 +370,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
             .dependingOn(createCallbackExtensionPluginFileBuilder()
-                .containingClass(new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-                    .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java")), "org/foo/echo/Plugin2Echo.class"));
+                .containingClass(plugin2EchoClassFile, "org/foo/echo/Plugin2Echo.class"));
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -892,8 +891,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java")),
-                             "org/foo/echo/Plugin3Echo.class")
+            .containingClass(plugin3EchoClassFile, "org/foo/echo/Plugin3Echo.class")
             .dependingOn(echoPlugin);
 
     ApplicationFileBuilder echoPluginAppFileBuilder =

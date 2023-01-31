@@ -43,6 +43,7 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.e
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV2Plugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.plugin3EchoClassFile;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
@@ -160,7 +161,6 @@ import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils;
-import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
 import java.io.File;
@@ -255,7 +255,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static Latch undeployLatch = new Latch();
 
   @BeforeClass
-  public static void beforeClass() throws URISyntaxException, IllegalAccessException {
+  public static void beforeClass() throws IllegalAccessException {
     // Reduces unnecessary logging
     TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
     compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
@@ -1369,16 +1369,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    ArtifactPluginFileBuilder dependantPlugin;
-    try {
-      dependantPlugin =
-          new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-              .containingClass(new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java")),
-                               "org/foo/echo/Plugin3Echo.class")
-              .dependingOn(helloExtensionV1Plugin);
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+
+    ArtifactPluginFileBuilder dependantPlugin = new ArtifactPluginFileBuilder("dependantPlugin")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .containingClass(plugin3EchoClassFile, "org/foo/echo/Plugin3Echo.class")
+        .dependingOn(helloExtensionV1Plugin);
 
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build()).dependingOn(dependantPlugin);
