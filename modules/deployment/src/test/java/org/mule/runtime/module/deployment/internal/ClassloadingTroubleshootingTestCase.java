@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
+import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
@@ -18,11 +24,6 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
-import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -41,17 +42,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
-import com.google.common.collect.ImmutableList;
+import io.qameta.allure.Feature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import io.qameta.allure.Feature;
 
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
