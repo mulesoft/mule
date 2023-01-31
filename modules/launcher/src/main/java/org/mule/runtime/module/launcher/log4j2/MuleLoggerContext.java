@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
-import java.beans.PropertyChangeListener;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +35,7 @@ import org.apache.logging.log4j.message.MessageFactory;
  *
  * @since 3.6.0
  */
-class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject {
+class MuleLoggerContext extends LoggerContext {
 
   private final LoggerContextConfigurer loggerContextConfigurer = new LoggerContextConfigurer();
 
@@ -108,16 +106,6 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   public void updateLoggers(Configuration config) {
     loggerContextConfigurer.update(this);
     super.updateLoggers(config);
-  }
-
-  @Override
-  public void registerLogConfigChangeListener(PropertyChangeListener logConfigChangeListener) {
-    addPropertyChangeListener(logConfigChangeListener);
-  }
-
-  @Override
-  public void unregisterLogConfigChangeListener(PropertyChangeListener logConfigChangeListener) {
-    removePropertyChangeListener(logConfigChangeListener);
   }
 
   /**

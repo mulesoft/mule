@@ -18,18 +18,12 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
-import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.inject.Inject;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.spi.LoggerContext;
 
 /**
  * Manager for handling message processing troubleshooting data.
@@ -45,7 +39,6 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   private ServerNotificationManager notificationManager;
 
   private volatile boolean listenersAdded = false;
-  private final PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
 
 
   public MessageProcessingFlowTraceManager() {
@@ -55,21 +48,12 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void initialise() throws InitialisationException {
-    withLoggerContext(context -> ((LogConfigChangeSubject) context).registerLogConfigChangeListener(logConfigChangeListener));
     handleNotificationListeners();
   }
 
   @Override
   public void dispose() {
-    withLoggerContext(context -> ((LogConfigChangeSubject) context).unregisterLogConfigChangeListener(logConfigChangeListener));
     removeNotificationListeners();
-  }
-
-  protected void withLoggerContext(Consumer<LoggerContext> action) {
-    LoggerContext context = LogManager.getContext(false);
-    if (context != null && context instanceof LogConfigChangeSubject) {
-      action.accept(context);
-    }
   }
 
   protected synchronized void handleNotificationListeners() {
