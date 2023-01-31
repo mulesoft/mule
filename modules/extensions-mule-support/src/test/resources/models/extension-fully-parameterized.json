@@ -3,6 +3,7 @@
   "description": "",
   "version": "1.2.3",
   "vendor": "Extension Producers Inc.",
+  "minMuleVersion": "4.5.0",
   "category": "PREMIUM",
   "xmlDsl": {
     "prefix": "fully-param",
@@ -60,6 +61,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -88,6 +90,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "input",
               "description": "",
               "modelProperties": {}
@@ -329,11 +332,10 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
-  "artifactCoordinates":
-  {
-    "artifact id":"TestExtension",
-    "group id":"TestGroup",
-    "version":"1.2.3"
+  "artifactCoordinates": {
+    "artifact id": "TestExtension",
+    "group id": "TestGroup",
+    "version": "1.2.3"
   },
   "notifications": [],
   "errors": [
