@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
@@ -90,6 +87,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.junit.rules.RuleChain.outerRule;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -188,18 +186,17 @@ import java.util.function.Supplier;
 
 import com.github.valfirst.slf4jtest.TestLogger;
 import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import org.mockito.verification.VerificationMode;
-
+import org.slf4j.Logger;
 import uk.org.lidalia.slf4jext.Level;
 
 @RunWith(Parameterized.class)
@@ -211,10 +208,6 @@ import uk.org.lidalia.slf4jext.Level;
 public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   public static final Logger logger = getLogger(AbstractDeploymentTestCase.class);
-
-  private static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
-  private static final String EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME = "expressionLanguageMetadataService";
-  private static final String SCHEDULER_SERVICE_NAME = "schedulerService";
   protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 2000;
   protected static final String FLOW_PROPERTY_NAME = "flowName";
   protected static final String COMPONENT_NAME = "componentValue";
@@ -246,6 +239,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String FOO_POLICY_ID = "fooPolicy";
 
   protected static final String MIN_MULE_VERSION = "4.0.0";
+
+  protected static TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  protected static TestServicesSetup testServicesSetup = new TestServicesSetup(compilerWorkFolder);
+
+  @ClassRule
+  public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup);
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
   protected ModuleRepository moduleRepository;
@@ -575,9 +574,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
 
-  @Rule
-  public TemporaryFolder compilerWorkFolder = new TemporaryFolder();
-
   private File services;
 
   public AbstractDeploymentTestCase(boolean parallelDeployment) {
@@ -602,13 +598,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     services = getServicesFolder();
     services.mkdirs();
-    copyDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME)),
-                  new File(services, SCHEDULER_SERVICE_NAME));
-    copyDirectory(getExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME)),
-                  new File(services, EXPRESSION_LANGUAGE_SERVICE_NAME));
-    copyDirectory(buildExpressionLanguageMetadataServiceFile(compilerWorkFolder
-        .newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME)),
-                  new File(services, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+    testServicesSetup.copyServicesToFolder(services);
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     testDeploymentListener = new TestDeploymentListener();
@@ -726,10 +716,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void installEchoService() throws IOException {
     installService("echoService", "org.mule.runtime.service.test.api.EchoService", "org.mule.echo.EchoServiceProvider",
                    defaulServiceEchoJarFile);
-  }
-
-  protected File getExpressionLanguageServiceFile(File tempFolder) {
-    return buildExpressionLanguageServiceFile(tempFolder);
   }
 
   private void installService(String serviceName, String satisfiedServiceClassName, String serviceProviderClassName,
