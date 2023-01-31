@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -32,6 +33,7 @@ import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithDeclaringClass;
@@ -43,6 +45,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.stream.Stream;
 
 @SmallTest
 public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
@@ -64,7 +68,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
 
     ExtensionElement extensionElement = mock(ExtensionElement.class, RETURNS_DEEP_STUBS);
     when(extensionElement.getName()).thenReturn("LoaderTest");
-    when(extensionElement.getConfigurations()).thenReturn(emptyList());
+    when(extensionElement.getConfigurations()).thenReturn(singletonList(mock(ConfigurationElement.class)));
     when(extensionElement.getConnectionProviders()).thenReturn(emptyList());
     when(extensionElement.getSources()).thenReturn(emptyList());
     when(extensionElement.getOperations()).thenReturn(emptyList());
@@ -72,6 +76,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     when(extensionElement.getFunctionContainers()).thenReturn(emptyList());
     when(extensionElement.getFunctions()).thenReturn(emptyList());
     when(extensionElement.getTypeName()).thenReturn("java.");
+    when(extensionElement.getEnclosingMethods()).thenReturn(Stream.empty());
 
     baseMetadataType = createMetadataType(BASE_TYPE_ID);
     subMetadataType = createMetadataType(SUBTYPE_ID);

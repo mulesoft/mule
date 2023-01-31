@@ -3,6 +3,7 @@
   "description": "",
   "version": "1.0.0",
   "vendor": "Mulesoft",
+  "minMuleVersion": "4.5.0",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "this",
@@ -43,11 +44,11 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "BLOCKING_HELLO_WORLD",
         "namespace": "THIS",
@@ -60,6 +61,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -88,6 +90,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -121,6 +124,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -154,6 +158,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -186,6 +191,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -453,11 +459,11 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DEPRECATED_OPERATION",
         "namespace": "THIS",
@@ -474,6 +480,7 @@
         "message": "Some deprecation message",
         "deprecatedSince": "1.1.0"
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -740,6 +747,7 @@
         "deprecatedSince": "1.1.0",
         "toRemoveIn": "2.0.0"
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -984,7 +992,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [
         "TEST-COMPONENTS:INTEGER_NOTIFICATION",
         "TEST-COMPONENTS:STRING_NOTIFICATION"
@@ -992,6 +999,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "EMIT",
         "namespace": "THIS",
@@ -1004,6 +1012,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1248,13 +1257,13 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HELLO_AND_INTRODUCE",
         "namespace": "THIS",
@@ -1267,6 +1276,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1295,6 +1305,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -1327,6 +1338,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "myName",
               "displayModel": {
                 "summary": "The gentleman\u0027s name"
@@ -1359,6 +1371,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "myNationalID",
               "displayModel": {
                 "summary": "The gentleman\u0027s identification"
@@ -1392,6 +1405,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -1425,6 +1439,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -1457,6 +1472,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -1724,13 +1740,13 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PRIVATE",
       "notifications": [],
       "nestedComponents": [],
       "errors": [
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
+      "visibility": "PRIVATE",
       "stereotype": {
         "type": "HELLO_PLACE",
         "namespace": "THIS",
@@ -1743,6 +1759,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1771,6 +1788,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -1803,6 +1821,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "city",
               "displayModel": {
                 "summary": "The name of a city to say hello to"
@@ -1835,6 +1854,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "country",
               "displayModel": {
                 "summary": "The name of a country to say hello to"
@@ -2110,13 +2130,13 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HELLO_WORLD",
         "namespace": "THIS",
@@ -2129,6 +2149,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2157,6 +2178,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -2190,6 +2212,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -2223,6 +2246,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -2255,6 +2279,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -2522,13 +2547,13 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "INTRODUCE_MYSELF",
         "namespace": "THIS",
@@ -2541,6 +2566,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2569,6 +2595,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "name",
               "displayModel": {
                 "summary": "The gentleman\u0027s name"
@@ -2601,6 +2628,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "nationalID",
               "displayModel": {
                 "summary": "The gentleman\u0027s identification"
@@ -2867,11 +2895,11 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "NON_BLOCKING_HELLO_WORLD",
         "namespace": "THIS",
@@ -2884,6 +2912,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2912,6 +2941,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -2945,6 +2975,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -2978,6 +3009,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -3010,6 +3042,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -3294,6 +3327,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3321,12 +3355,13 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
               "deprecationModel": {
                 "message": "Some deprecation message",
                 "deprecatedSince": "1.1.0",
                 "toRemoveIn": "2.0.0"
               },
+              "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "deprecatedParameter",
               "displayModel": {
                 "summary": "Some deprecated param"
@@ -3527,6 +3562,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3555,6 +3591,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -3587,6 +3624,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "count",
               "displayModel": {
                 "summary": "The number of times to repeat the greeting message"
@@ -3620,6 +3658,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -3653,6 +3692,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -3685,6 +3725,7 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -3972,6 +4013,7 @@
           }
         }
       },
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4025,6 +4067,7 @@
                 }
               ],
               "semanticTerms": [],
+              "minMuleVersion": "4.5.0",
               "name": "missileLauncherConfig",
               "description": "",
               "modelProperties": {}
@@ -4266,12 +4309,11 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
-  "artifactCoordinates":
-    {
-      "artifact id":"mule-test",
-      "group id":"org.mule.tests",
-      "version":"1.0.0"
-    },
+  "artifactCoordinates": {
+    "artifact id": "mule-test",
+    "group id": "org.mule.tests",
+    "version": "1.0.0"
+  },
   "notifications": [],
   "errors": [
     {

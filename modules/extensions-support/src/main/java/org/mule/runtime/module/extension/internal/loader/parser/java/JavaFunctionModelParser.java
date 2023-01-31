@@ -48,6 +48,7 @@ import java.util.Set;
 public class JavaFunctionModelParser extends AbstractJavaExecutableComponentModelParser implements FunctionModelParser {
 
   private final FunctionElement functionElement;
+  private MuleVersion minMuleVersion;
 
   public JavaFunctionModelParser(ExtensionElement extensionElement,
                                  FunctionElement functionElement,
@@ -59,6 +60,12 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
+      this.minMuleVersion = calculateFunctionMinMuleVersion(functionElement,
+                                                            getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                 ExpressionFunctions.class,
+                                                                                                 ExpressionFunctions::value,
+                                                                                                 functionElement
+                                                                                                     .getEnclosingType()));
     }
   }
 
@@ -140,10 +147,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateFunctionMinMuleVersion(functionElement,
-                                              getContainerAnnotationMinMuleVersion(extensionElement, ExpressionFunctions.class,
-                                                                                   ExpressionFunctions::value,
-                                                                                   functionElement.getEnclosingType())));
+    return of(this.minMuleVersion);
   }
 
   @Override

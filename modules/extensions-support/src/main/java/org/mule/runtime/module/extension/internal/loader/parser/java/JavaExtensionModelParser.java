@@ -105,6 +105,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<NotificationModel> notificationModels = new LinkedList<>();
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
+  private MuleVersion minMuleVersion;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this(extensionElement, new StereotypeModelLoaderDelegate(loadingContext), loadingContext);
@@ -135,6 +136,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseImportedTypes();
     parseSubtypes();
     parseNotificationModels();
+
+    this.minMuleVersion = calculateExtensionMinMuleVersion(extensionElement);
   }
 
   private void parseSubtypes() {
@@ -388,7 +391,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateExtensionMinMuleVersion(extensionElement));
+    return of(this.minMuleVersion);
   }
 
   @Override

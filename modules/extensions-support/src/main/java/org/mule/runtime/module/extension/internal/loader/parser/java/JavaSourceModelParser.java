@@ -85,6 +85,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   private final Class<?> sourceClass;
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
+  private MuleVersion minMuleVersion;
 
 
   public JavaSourceModelParser(ExtensionElement extensionElement,
@@ -100,6 +101,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
+      this.minMuleVersion = calculateSourceMinMuleVersion(sourceElement);
     }
   }
 
@@ -310,7 +312,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<MuleVersion> getMinMuleVersion() {
-    return of(calculateSourceMinMuleVersion(sourceElement));
+    return of(this.minMuleVersion);
   }
 
   @Override

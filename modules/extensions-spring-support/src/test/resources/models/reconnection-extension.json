@@ -3,6 +3,7 @@
   "description": "",
   "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
+  "minMuleVersion": "4.1.1",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "reconnection",
@@ -290,6 +291,7 @@
         }
       ],
       "externalLibraryModels": [],
+      "minMuleVersion": "4.1.1",
       "operations": [
         {
           "blocking": true,
@@ -354,6 +356,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -910,6 +913,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1747,6 +1751,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2533,6 +2538,7 @@
               "namespace": "MULE"
             }
           },
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2808,6 +2814,7 @@
               }
             }
           },
+          "minMuleVersion": "4.4.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3300,6 +3307,7 @@
               }
             }
           },
+          "minMuleVersion": "4.4.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3792,6 +3800,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4311,6 +4320,7 @@
         }
       ],
       "externalLibraryModels": [],
+      "minMuleVersion": "4.1.1",
       "operations": [],
       "connectionProviders": [
         {
@@ -4326,6 +4336,7 @@
               "namespace": "MULE"
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4622,6 +4633,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5140,6 +5152,7 @@
         }
       ],
       "externalLibraryModels": [],
+      "minMuleVersion": "4.1.1",
       "operations": [],
       "connectionProviders": [
         {
@@ -5155,6 +5168,7 @@
               "namespace": "MULE"
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5652,6 +5666,7 @@
               }
             }
           },
+          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -6197,6 +6212,7 @@
           }
         }
       },
+      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [

@@ -327,4 +327,17 @@ public class TypeWrapper implements Type {
   public Stream<Type> getImplementingInterfaces() {
     return stream(aClass.getInterfaces()).map(clazz -> new TypeWrapper(clazz, typeLoader));
   }
+
+  @Override
+  public boolean isArray() {
+    return aClass.isArray();
+  }
+
+  @Override
+  public Optional<Type> getArrayComponentType() {
+    if (isArray()) {
+      return Optional.of(new TypeWrapper(aClass.getComponentType(), typeLoader));
+    }
+    return empty();
+  }
 }
