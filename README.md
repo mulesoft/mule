@@ -4,6 +4,7 @@ Mule is a lightweight integration platform that allows you to connect anything a
 
 At the simplest level, Mule applications accept and process messages through several Lego-block-like message processors plugged together in what we call a flow. Understanding the basic flow architecture is key to understanding Mule. Essentially every Mule flow contains a series of building blocks that accept, then transform and process messages. 
 
+
 Receive
 =======
 Based on the concept of Event Driven Architecture (EDA), Mule works by responding to messages initiated by external resources (i.e. events). For example, a message can be initiated by an event such as a consumer request from a mobile device, or a change to data in a database, or the creation of a new customer ID in a SaaS application. 
