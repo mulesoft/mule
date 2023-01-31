@@ -19,6 +19,23 @@ import java.util.function.Function;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
+/**
+ * TestRule used to build the mule services before executing the tests. It's intended to be used as a
+ * {@link org.junit.ClassRule} instead of using it as a {@link org.junit.Rule}, because the service building process
+ * is time expensive.
+ * <p>
+ * After building the services, you can use the methods {@link #overrideSchedulerService(Function)},
+ * {@link #overrideExpressionLanguageMetadataService(Function)}, and {@link #overrideExpressionLanguageService(Function)}
+ * to override the default test implementations. You have to pass a {@link Function} that receives the folder where the
+ * service should be built, and builds the service.
+ * <p>
+ * Once that you created this rule, and optionally overwrote some services, you have to call
+ * {@link #copyServicesToFolder(File)} in order to copy the implementations to the corresponding folder. This allows you
+ * to use only one muleHome folder per suite or one per test, according to your needs.
+ * <p>
+ * Note: After some profiling in the deployment test cases, we noticed that the expensive part of setting the services
+ * up is to compile and build them, and not copying them to the muleHome folder.
+ */
 public class TestServicesSetup extends ExternalResource {
 
   private static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
@@ -35,19 +52,40 @@ public class TestServicesSetup extends ExternalResource {
     this.compilerWorkFolder = compilerWorkFolder;
   }
 
+  /**
+   * Allows to override the scheduler service implementation to be used in the test suite.
+   * @param supplier a function that receives the folder where the service should be built and returns the artifact file.
+   * @throws IOException if the temp folder for the service couldn't be created.
+   */
   public void overrideSchedulerService(Function<File, File> supplier) throws IOException {
     this.schedulerService = supplier.apply(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
   }
 
+  /**
+   * Allows to override the expression language service implementation to be used in the test suite.
+   * @param supplier a function that receives the folder where the service should be built and returns the artifact file.
+   * @throws IOException if the temp folder for the service couldn't be created.
+   */
   public void overrideExpressionLanguageService(Function<File, File> supplier) throws IOException {
     this.expressionLanguageService = supplier.apply(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
   }
 
+  /**
+   * Allows to override the expression language metadata service implementation to be used in the test suite.
+   * @param supplier a function that receives the folder where the service should be built and returns the artifact file.
+   * @throws IOException if the temp folder for the service couldn't be created.
+   */
   public void overrideExpressionLanguageMetadataService(Function<File, File> supplier) throws IOException {
     this.expressionLanguageMetadataService =
         supplier.apply(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
   }
 
+  /**
+   * Copies the pre-built services to the services folder being used by the test. The first call to this method actually
+   * builds the services.
+   * @param servicesFolder the {@code $MULE_HOME/services} folder.
+   * @throws IOException if some sub-folder of the services folder couldn't be created.
+   */
   public void copyServicesToFolder(File servicesFolder) throws IOException {
     initNotOverriddenServices();
 

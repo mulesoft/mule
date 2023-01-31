@@ -94,12 +94,12 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
 
   private static File getRealExpressionLanguageServiceFile(File tempFolder) {
     final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
-    final File defaultServiceSchedulerJarFile = getResourceFile(weaveJarUrl.getFile(), tempFolder);
+    final File defaultServiceJarFile = getResourceFile(weaveJarUrl.getFile(), tempFolder);
 
     return new ServiceFileBuilder("expressionLanguageService")
         .withServiceProviderClass("org.mule.weave.v2.el.WeaveServiceProvider")
         .forContract("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")
-        .usingLibrary(defaultServiceSchedulerJarFile.getAbsolutePath())
+        .usingLibrary(defaultServiceJarFile.getAbsolutePath())
         .unpack(true)
         .getArtifactFile();
   }
