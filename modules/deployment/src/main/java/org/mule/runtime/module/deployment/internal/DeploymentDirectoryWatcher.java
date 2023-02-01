@@ -349,7 +349,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private String[] listFiles(File directory, FilenameFilter filter) {
     String[] files = directory.list(filter);
     if (files == null) {
-      return new String[] {};
+      throw new IllegalStateException(format("We got a null while listing the contents of director '%s'. Some common " +
+          "causes for this is a lack of permissions to the directory or that it's being deleted concurrently",
+                                             directory.getName()));
     }
     return files;
   }
