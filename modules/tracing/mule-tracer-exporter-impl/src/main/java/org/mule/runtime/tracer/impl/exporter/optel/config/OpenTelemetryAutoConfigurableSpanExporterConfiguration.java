@@ -16,6 +16,7 @@ import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.api.config.FileSpanExporterConfiguration;
@@ -30,6 +31,9 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private static final String DEFAULT_BACKOFF_MULTIPLIER = "1.5";
   private static final String DEFAULT_INITIAL_BACKOFF = "1";
@@ -58,7 +62,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   public String getStringValue(String key) {
     try {
       if (delegate == null) {
-        this.delegate = new FileSpanExporterConfiguration(muleContext);
+        this.delegate = new FileSpanExporterConfiguration(muleContext, featureFlaggingService);
         initialiseDefaultConfigurationValues();
       }
 
