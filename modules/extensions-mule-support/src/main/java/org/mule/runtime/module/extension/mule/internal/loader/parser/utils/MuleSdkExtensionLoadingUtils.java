@@ -16,9 +16,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.type.catalog.DefaultArtifactTypeLoader;
 
 import java.util.NoSuchElementException;
 

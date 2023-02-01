@@ -4,20 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.type.catalog;
+package org.mule.runtime.module.extension.internal.type.catalog;
 
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
-import static org.mule.runtime.core.internal.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.module.extension.internal.type.catalog.SpecialTypesTypeLoader.VOID;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES_CATALOG;
 
 import static java.util.Collections.singleton;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,13 +25,13 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 @Feature(REUSE)
 @Story(TYPES_CATALOG)
