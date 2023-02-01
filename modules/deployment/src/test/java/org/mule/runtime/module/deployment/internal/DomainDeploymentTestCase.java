@@ -43,8 +43,8 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.h
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadClassExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackJarFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.plugin2EchoClassFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.plugin3EchoClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
@@ -336,7 +336,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
             .dependingOn(createCallbackExtensionPluginFileBuilder()
-                .containingClass(plugin2EchoClassFile, "org/foo/echo/Plugin2Echo.class"));
+                .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class"));
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -370,7 +370,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
             .dependingOn(createCallbackExtensionPluginFileBuilder()
-                .containingClass(plugin2EchoClassFile, "org/foo/echo/Plugin2Echo.class"));
+                .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class"));
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -891,7 +891,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(plugin3EchoClassFile, "org/foo/echo/Plugin3Echo.class")
+            .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
             .dependingOn(echoPlugin);
 
     ApplicationFileBuilder echoPluginAppFileBuilder =

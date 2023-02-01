@@ -13,73 +13,34 @@ import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.runtime.module.deployment.internal.util.Utils.createBundleDescriptorLoader;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 
-import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Map;
 
 public class TestArtifactsCatalog {
 
-  protected static final String MIN_MULE_VERSION = "4.0.0";
-
-  protected static File getResourceFile(String resource) throws URISyntaxException {
-    return new File(TestArtifactsCatalog.class.getResource(resource).toURI());
-  }
-
-  protected static File getResourceFile(String resource, File tempFolder) {
-    final File targetFile = new File(tempFolder, resource);
-    try {
-      copyInputStreamToFile(TestArtifactsCatalog.class.getResourceAsStream(resource), targetFile);
-    } catch (IOException e) {
-      throw new MuleRuntimeException(e);
-    }
-    return targetFile;
-  }
-
-  protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
-                                                                             String bundleDescriptorLoaderId) {
-    return createBundleDescriptorLoader(artifactId, classifier, bundleDescriptorLoaderId, "1.0.0");
-  }
-
-  protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
-                                                                             String bundleDescriptorLoaderId, String version) {
-    Map<String, Object> attributes = SmallMap.of(VERSION, version,
-                                                 GROUP_ID, "org.mule.test",
-                                                 ARTIFACT_ID, artifactId,
-                                                 CLASSIFIER, classifier,
-                                                 TYPE, EXTENSION_BUNDLE_TYPE);
-
-    return new MuleArtifactLoaderDescriptor(bundleDescriptorLoaderId, attributes);
-  }
+  private static final String MIN_MULE_VERSION = "4.0.0";
 
   static {
     try {
@@ -126,8 +87,8 @@ public class TestArtifactsCatalog {
   public static File pluginForbiddenJavaEchoTestClassFile;
   public static File pluginForbiddenMuleContainerEchoTestClassFile;
   public static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
-  public static File plugin2EchoClassFile;
-  public static File plugin3EchoClassFile;
+  public static File pluginEcho2ClassFile;
+  public static File pluginEcho3ClassFile;
 
   private static void initFiles() throws URISyntaxException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -248,8 +209,13 @@ public class TestArtifactsCatalog {
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
     loadsAppResourceCallbackJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/LoadsAppResourceCallback.java"))
         .compile("loadsAppResourceCallback.jar");
-    pluginEcho1TestClassFile =
-        new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+    pluginEcho1TestClassFile = new SingleClassCompiler().dependingOn(barUtils1_0JarFile)
+        .compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+    pluginEcho2ClassFile = new SingleClassCompiler().dependingOn(barUtils2_0JarFile)
+        .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
+    pluginEcho3ClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
 
     pluginForbiddenJavaEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
@@ -257,15 +223,12 @@ public class TestArtifactsCatalog {
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
     pluginForbiddenMuleThirdPartyEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
-
-    plugin2EchoClassFile = new SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-        .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
-    plugin3EchoClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
   }
 
 
-
-  // Application plugin file builders
+  /* ********************************* *
+   * Application plugin file builders  *
+   * ********************************* */
   public static ArtifactPluginFileBuilder echoPlugin;
   public static ArtifactPluginFileBuilder helloExtensionV1Plugin;
   public static ArtifactPluginFileBuilder helloExtensionV2Plugin;
@@ -354,7 +317,7 @@ public class TestArtifactsCatalog {
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_PACKAGES, singletonList("org.foo")).setId(MULE_LOADER_ID)
         .build());
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
 
@@ -394,7 +357,7 @@ public class TestArtifactsCatalog {
       fail(e.getMessage());
     }
 
-    ArtifactPluginFileBuilder exceptionPluginFileBuilder = new ArtifactPluginFileBuilder("exceptionPlugin")
+    return new ArtifactPluginFileBuilder("exceptionPlugin")
         .containingResource("exception/META-INF/mule.schemas", "META-INF/mule.schemas")
         .containingResource("exception/META-INF/mule-exception.xsd", "META-INF/mule-exception.xsd")
         .containingResource("exception/META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider",
@@ -404,8 +367,6 @@ public class TestArtifactsCatalog {
         .configuredWith(EXPORTED_RESOURCE_PROPERTY, "META-INF/mule-exception.xsd,META-INF/mule.schemas")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.exception")
         .describedBy(mulePluginModelBuilder.build());
-
-    return exceptionPluginFileBuilder;
 
   }
 

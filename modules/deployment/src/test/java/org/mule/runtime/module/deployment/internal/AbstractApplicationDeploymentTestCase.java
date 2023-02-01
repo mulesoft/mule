@@ -12,6 +12,7 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.b
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusEcho;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.tck.util.CompilerUtils;

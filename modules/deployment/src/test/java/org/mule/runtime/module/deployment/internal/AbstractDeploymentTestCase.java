@@ -43,7 +43,7 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.e
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV2Plugin;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.plugin3EchoClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
@@ -275,20 +275,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   public static void afterClass() throws IllegalAccessException {
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", internalIsRunningTests,
                              true);
-  }
-
-  protected static File getResourceFile(String resource) throws URISyntaxException {
-    return new File(AbstractDeploymentTestCase.class.getResource(resource).toURI());
-  }
-
-  protected static File getResourceFile(String resource, File tempFolder) {
-    final File targetFile = new File(tempFolder, resource);
-    try {
-      copyInputStreamToFile(AbstractDeploymentTestCase.class.getResourceAsStream(resource), targetFile);
-    } catch (IOException e) {
-      throw new MuleRuntimeException(e);
-    }
-    return targetFile;
   }
 
   // Application file builders
@@ -1372,7 +1358,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     ArtifactPluginFileBuilder dependantPlugin = new ArtifactPluginFileBuilder("dependantPlugin")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .containingClass(plugin3EchoClassFile, "org/foo/echo/Plugin3Echo.class")
+        .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
         .dependingOn(helloExtensionV1Plugin);
 
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
