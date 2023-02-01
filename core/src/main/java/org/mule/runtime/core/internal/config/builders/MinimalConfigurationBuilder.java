@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
@@ -98,7 +97,6 @@ import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
@@ -161,7 +159,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerStreamingManager(muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
-    registerObject(OBJECT_ARTIFACT_TYPE_LOADER, new DefaultArtifactTypeLoader(muleContext.getExtensionManager()), muleContext);
 
     registerTransactionFactoryLocator(muleContext);
 

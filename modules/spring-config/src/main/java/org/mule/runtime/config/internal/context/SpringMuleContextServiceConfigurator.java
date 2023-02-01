@@ -124,7 +124,6 @@ import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
@@ -136,6 +135,7 @@ import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheMa
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
+import org.mule.runtime.module.extension.internal.type.catalog.DefaultArtifactTypeLoader;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;

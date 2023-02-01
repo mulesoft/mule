@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.type.catalog;
+package org.mule.runtime.module.extension.internal.type.catalog;
 
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
