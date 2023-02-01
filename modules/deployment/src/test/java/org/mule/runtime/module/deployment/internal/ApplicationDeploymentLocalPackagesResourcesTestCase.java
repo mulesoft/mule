@@ -16,6 +16,8 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.c
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -67,7 +69,7 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
         .dependingOn(callbackExtensionPlugin)
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
+        .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourcePlugin);
@@ -95,7 +97,7 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
         .dependingOn(callbackPluginLoadingResource)
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class")
+        .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 

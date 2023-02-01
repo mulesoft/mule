@@ -43,6 +43,7 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.e
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1JarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.moduleUsingByeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.privilegedExtensionV1JarFile;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;

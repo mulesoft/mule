@@ -31,6 +31,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
@@ -51,7 +52,9 @@ public class TestArtifactsCatalog {
     }
   }
 
-  // Dynamically compiled classes and jars
+  /*
+   * Dynamically compiled classes and jars.
+   */
   public static File barUtils1ClassFile;
   public static File barUtils1_0JarFile;
   public static File barUtils2ClassFile;
@@ -83,12 +86,17 @@ public class TestArtifactsCatalog {
   public static File policyConfigurationExtensionJarFile;
   public static File loadsAppResourceCallbackClassFile;
   public static File loadsAppResourceCallbackJarFile;
-  public static File pluginEcho1TestClassFile;
   public static File pluginForbiddenJavaEchoTestClassFile;
   public static File pluginForbiddenMuleContainerEchoTestClassFile;
   public static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
+  public static File pluginEcho1ClassFile;
   public static File pluginEcho2ClassFile;
   public static File pluginEcho3ClassFile;
+  public static File pluginEchoSpiTestClassFile;
+  public static File privilegedExtensionV1JarFile;
+  public static JarFileBuilder overriderLibrary;
+  public static JarFileBuilder overrider2Library;
+  public static JarFileBuilder overriderTestLibrary;
 
   private static void initFiles() throws URISyntaxException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -210,7 +218,7 @@ public class TestArtifactsCatalog {
     loadsAppResourceCallbackJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/LoadsAppResourceCallback.java"))
         .compile("loadsAppResourceCallback.jar");
 
-    pluginEcho1TestClassFile = new SingleClassCompiler().dependingOn(barUtils1_0JarFile)
+    pluginEcho1ClassFile = new SingleClassCompiler().dependingOn(barUtils1_0JarFile)
         .compile(getResourceFile("/org/foo/Plugin1Echo.java"));
     pluginEcho2ClassFile = new SingleClassCompiler().dependingOn(barUtils2_0JarFile)
         .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
@@ -223,12 +231,30 @@ public class TestArtifactsCatalog {
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
     pluginForbiddenMuleThirdPartyEchoTestClassFile = new SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
+
+    pluginEchoSpiTestClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/PluginSpiEcho.java"));
+
+    privilegedExtensionV1JarFile =
+        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
+                                                        getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
+            .compile("mule-module-privileged-1.0.jar", "1.0");
+
+    overriderLibrary = new JarFileBuilder("overrider-library", new JarCompiler()
+        .compiling(getResourceFile("/classloading-troubleshooting/src/OverrideMe.java"))
+        .compile("overrider-library.jar"));
+    overrider2Library = new JarFileBuilder("overrider2-library", new JarCompiler()
+        .compiling(getResourceFile("/classloading-troubleshooting/src/OverrideMe2.java"))
+        .compile("overrider2-library.jar"));
+    overriderTestLibrary = new JarFileBuilder("overrider-test-library", new JarCompiler()
+        .compiling(getResourceFile("/classloading-troubleshooting/src/test/OverrideMe.java"))
+        .compile("overrider-test-library.jar"));
   }
 
 
-  /* ********************************* *
-   * Application plugin file builders  *
-   * ********************************* */
+  /*
+   * Application plugin file builders.
+   */
   public static ArtifactPluginFileBuilder echoPlugin;
   public static ArtifactPluginFileBuilder helloExtensionV1Plugin;
   public static ArtifactPluginFileBuilder helloExtensionV2Plugin;
@@ -275,7 +301,7 @@ public class TestArtifactsCatalog {
     return new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
   }
 
   private static ArtifactPluginFileBuilder createEchoPluginBuilder() {

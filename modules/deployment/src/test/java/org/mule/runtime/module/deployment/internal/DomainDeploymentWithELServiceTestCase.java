@@ -12,6 +12,7 @@ import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasR
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConnectExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
