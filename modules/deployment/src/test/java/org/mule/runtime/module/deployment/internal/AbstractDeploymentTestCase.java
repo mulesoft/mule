@@ -734,7 +734,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
-                                                            DeploymentListener domainDeploymentListener, String artifactId) {
+                                                            DeploymentListener domainDeploymentListener, String artifactId)
+      throws InterruptedException {
     Thread deploymentServiceThread = new Thread(() -> {
       try {
         startDeployment();
@@ -769,8 +770,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     deploymentServiceThread.start();
 
     assertDeploymentSuccess(domainDeploymentListener, artifactId);
-
     assertFalse("Able to perform a deployment action while another deployment operation was in progress", deployedFromClient[0]);
+
+    deploymentServiceThread.join();
   }
 
   protected void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception {
