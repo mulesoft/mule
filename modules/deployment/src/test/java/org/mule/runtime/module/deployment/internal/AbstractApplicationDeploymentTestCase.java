@@ -7,19 +7,13 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils1_0JarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils2_0JarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenJavaJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusEcho;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
@@ -66,8 +60,6 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
   protected ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
   protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilder;
 
-  // Application plugin artifact builders
-  protected ArtifactPluginFileBuilder echoPluginWithLib1;
 
   @BeforeClass
   public static void compileTestClasses() throws Exception {
@@ -106,13 +98,7 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(createCallbackExtensionPluginFileBuilder().containingClass(echoTestClassFile, "org/foo/EchoTest.class"));
-
-    // Application plugin artifact builders
-    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .dependingOn(callbackExtensionPlusEcho);
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {

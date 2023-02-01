@@ -7,16 +7,6 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.System.getProperty;
-import static java.util.Arrays.asList;
-import static org.apache.commons.io.FileUtils.copyFile;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.times;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -39,14 +29,25 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.c
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPomFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPluginWithLib1;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
-import org.junit.Before;
-import org.junit.Rule;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
+
+import static org.apache.commons.io.FileUtils.copyFile;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.times;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -66,12 +67,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Contains test for application classloading isolation scenarios
@@ -121,12 +123,6 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
         .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
-
-    // Application plugin artifact builders
-    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   @Test

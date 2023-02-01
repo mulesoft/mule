@@ -273,12 +273,14 @@ public class TestArtifactsCatalog {
   public static ArtifactPluginFileBuilder oracleExtensionPlugin;
   public static ArtifactPluginFileBuilder loadClassExtensionPlugin;
   public static ArtifactPluginFileBuilder callbackExtensionPlugin;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusEcho;
   public static ArtifactPluginFileBuilder exceptionThrowingPlugin;
   public static ArtifactPluginFileBuilder byeXmlExtensionPlugin;
   public static ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin;
   public static ArtifactPluginFileBuilder usingObjectStorePlugin;
   public static ArtifactPluginFileBuilder classloaderConnectExtensionPlugin;
   public static ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin;
+  public static ArtifactPluginFileBuilder echoPluginWithLib1;
 
   public static void initArtifactPluginFileBuilders() throws URISyntaxException {
     echoPlugin = createEchoPluginBuilder();
@@ -287,7 +289,6 @@ public class TestArtifactsCatalog {
     goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
     oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
     loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
-    callbackExtensionPlugin = createCallbackExtensionPluginFileBuilder();
     exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
     byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
     moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
@@ -299,6 +300,19 @@ public class TestArtifactsCatalog {
         createClassloaderConnectExtensionPluginFileBuilder(classloaderConfigConnectionExtensionJarFile,
                                                            "classloaderConfigConnectExtension",
                                                            "org.foo.connection.config.ClassloaderConfigConnectExtension");
+    echoPluginWithLib1 = createEchoPluginWithLib1();
+
+    callbackExtensionPlugin = createCallbackExtensionPluginFileBuilder();
+    callbackExtensionPlusEcho = createCallbackExtensionPluginFileBuilder()
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+
+  }
+
+  private static ArtifactPluginFileBuilder createEchoPluginWithLib1() {
+    return new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   private static ArtifactPluginFileBuilder createEchoPluginBuilder() {

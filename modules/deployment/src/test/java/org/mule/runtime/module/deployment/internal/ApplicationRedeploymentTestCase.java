@@ -7,13 +7,10 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils1_0JarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1TestClassFile;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
@@ -34,8 +31,6 @@ import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -43,13 +38,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 /**
  * Contains test for application re-deployment on the default domain
@@ -94,12 +88,6 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
         .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
-
-    // Application plugin artifact builders
-    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   @Parameters(name = "Parallel: {0}")
