@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.context.lazy;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
@@ -343,14 +342,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private <T> Either<T, Throwable> doInitializeAndRetry(String name, Supplier<T> supplier) {
     // TODO: detect cycles
 
-    // Builds a location just from the bean name, this will only work for top level components. It should be enough for our
-    // use cases.
-    // No need to check if the location exists in the artifact at this point. We will fail rather quickly during the
-    // initialization attempt.
-    // TODO: do not support any location, try to match it with the component ID
-    Location location = builderFromStringRepresentation(name).build();
+    // Tries to initialize a component with a componentId matching the bean name
     try {
-      initializeAdditionalComponent(location);
+      initializeAdditionalComponent(componentAst -> componentAst.getComponentId().map(id -> id.equals(name)).orElse(false));
     } catch (Exception initializationException) {
       return Either.right(initializationException);
     }
@@ -430,14 +424,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     initializeComponents(filter, true);
   }
 
-  private void initializeAdditionalComponent(Location location) {
+  private void initializeAdditionalComponent(Predicate<ComponentAst> componentModelPredicate) {
     checkState(currentComponentInitializationState.isInitializationAlreadyDone(),
                "initializeComponents must have been called before initializeAdditionalComponent");
 
     // For the time being we only support going for the same "apply start phase" setting as in the original initialization
     // request.
     createComponentsAndApplyLifecycle(getRequestBuilder(currentComponentInitializationState.isApplyStartPhaseRequested(),
-                                                        true).build(location));
+                                                        true).build(componentModelPredicate));
   }
 
   @Override
