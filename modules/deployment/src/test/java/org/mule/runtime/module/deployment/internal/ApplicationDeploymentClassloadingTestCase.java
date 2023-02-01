@@ -23,12 +23,12 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.b
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenJavaJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsJavaxJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPomFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPluginWithJavaxLib;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPluginWithLib1;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestJarFile;
@@ -66,7 +66,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
-import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -230,15 +229,6 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Test
   @Issue("MULE-17225")
   public void appOverridingContainerClassAlsoPluginLocal() throws Exception {
-    File pluginEchoJavaxTestClassFile =
-        new SingleClassCompiler().dependingOn(barUtilsJavaxJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginJavaxEcho.java"));
-
-    ArtifactPluginFileBuilder echoPluginWithJavaxLib = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .dependingOn(new JarFileBuilder("barUtilsJavax", barUtilsJavaxJarFile))
-        .containingClass(pluginEchoJavaxTestClassFile, "org/foo/echo/PluginJavaxEcho.class");
-
     final ApplicationFileBuilder withJavaxEchoPlugin = appFileBuilder("appWithJavaxEchoPlugin")
         .definedBy("app-with-javax-echo-plugin-config.xml")
         .dependingOn(callbackExtensionPlugin)

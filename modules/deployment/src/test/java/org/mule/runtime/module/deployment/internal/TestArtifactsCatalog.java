@@ -97,6 +97,7 @@ public class TestArtifactsCatalog {
   public static JarFileBuilder overriderLibrary;
   public static JarFileBuilder overrider2Library;
   public static JarFileBuilder overriderTestLibrary;
+  public static File pluginEchoJavaxTestClassFile;
 
   private static void initFiles() throws URISyntaxException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -249,6 +250,10 @@ public class TestArtifactsCatalog {
     overriderTestLibrary = new JarFileBuilder("overrider-test-library", new JarCompiler()
         .compiling(getResourceFile("/classloading-troubleshooting/src/test/OverrideMe.java"))
         .compile("overrider-test-library.jar"));
+
+    pluginEchoJavaxTestClassFile = new SingleClassCompiler()
+        .dependingOn(barUtilsJavaxJarFile)
+        .compile(getResourceFile("/org/foo/echo/PluginJavaxEcho.java"));
   }
 
 
@@ -270,6 +275,7 @@ public class TestArtifactsCatalog {
   public static ArtifactPluginFileBuilder classloaderConnectExtensionPlugin;
   public static ArtifactPluginFileBuilder classloaderConfigConnectExtensionPlugin;
   public static ArtifactPluginFileBuilder echoPluginWithLib1;
+  public static ArtifactPluginFileBuilder echoPluginWithJavaxLib;
 
   public static void initArtifactPluginFileBuilders() throws URISyntaxException {
     echoPlugin = createEchoPluginBuilder();
@@ -295,6 +301,14 @@ public class TestArtifactsCatalog {
     callbackExtensionPlusEcho = createCallbackExtensionPluginFileBuilder()
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
 
+    echoPluginWithJavaxLib = createEchoPluginWithJavaxLib();
+  }
+
+  private static ArtifactPluginFileBuilder createEchoPluginWithJavaxLib() {
+    return new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .dependingOn(new JarFileBuilder("barUtilsJavax", barUtilsJavaxJarFile))
+        .containingClass(pluginEchoJavaxTestClassFile, "org/foo/echo/PluginJavaxEcho.class");
   }
 
   private static ArtifactPluginFileBuilder createEchoPluginWithLib1() {
