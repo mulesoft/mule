@@ -20,6 +20,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
+import static java.lang.String.format;
+import static java.lang.ThreadLocal.withInitial;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
@@ -68,6 +70,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -111,6 +114,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private final ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator;
 
   private final ComponentInitializationState currentComponentInitializationState;
+
+  // Used for detecting cycles when initializing beans that are dynamically referenced
+  private final ThreadLocal<Set<String>> beanNamesBeingInitialized = withInitial(HashSet::new);
 
   private final Map<String, String> artifactProperties;
   private final LockFactory runtimeLockFactory;
@@ -340,13 +346,19 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private <T> Either<T, Throwable> doInitializeAndRetry(String name, Supplier<T> supplier) {
-    // TODO: detect cycles
+    // Checks for cycles
+    if (beanNamesBeingInitialized.get().contains(name)) {
+      throw new IllegalArgumentException(format("A cyclic dependency was found when trying to initialize bean '%s'.", name));
+    }
 
     // Tries to initialize a component with a componentId matching the bean name
     try {
+      beanNamesBeingInitialized.get().add(name);
       initializeAdditionalComponent(componentAst -> componentAst.getComponentId().map(id -> id.equals(name)).orElse(false));
     } catch (Exception initializationException) {
       return Either.right(initializationException);
+    } finally {
+      beanNamesBeingInitialized.get().remove(name);
     }
     return Either.left(supplier.get());
   }
@@ -749,9 +761,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       try {
         unregisterObject(getMuleContext(), beanName);
       } catch (Exception e) {
-        logger.error(String
-            .format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
-                    beanName, e.getMessage()));
+        logger.error(
+                     format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
+                            beanName, e.getMessage()));
         throw new MuleRuntimeException(I18nMessageFactory
             .createStaticMessage("There was an error while unregistering component '%s'", beanName), e);
       }
