@@ -505,13 +505,25 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     objectProviders.clear();
     resetMuleSecurityManager();
+  }
 
-    // This has to be called after all previous state has been cleared because the unregister/cleanup process requires the
-    // errorTypeRepository as it was during its initialization.
-    // TODO: check this, it used to be done with the filtered AST, doing it like this might have a perf impact (not confirmed)
-    // Note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
-    // is because the FilteredArtifactAst has some special case for error handlers.
-    doRegisterErrors(new FilteredArtifactAst(getApplicationModel(), c -> true));
+  private void doRegisterErrors(ComponentInitializationRequest initializationRequest) {
+    if (currentComponentInitializationState.isAllErrorTypesRegistered()) {
+      // Once all error types from the full artifact AST have been registered there is no point in doing it again
+      return;
+    }
+
+    if (initializationRequest.isKeepPreviousRequested()) {
+      // We do not currently have the capability to add error types to the repository incrementally, hence we need to register
+      // all error types this time.
+      // Note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
+      // is because the FilteredArtifactAst has some special case for error handlers.
+      doRegisterErrors(new FilteredArtifactAst(getApplicationModel(), c -> true));
+      currentComponentInitializationState.setAllErrorTypesRegistered();
+    } else {
+      // If we do not care about previously registered errors, we can discover the error types just from the filtered AST
+      doRegisterErrors(initializationRequest.getFilteredAstToInitialize());
+    }
   }
 
   private List<Object> createComponents(ComponentInitializationRequest initializationRequest,
@@ -536,6 +548,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       if (!initializationRequest.isKeepPreviousRequested()) {
         cleanupAndResetComponentsState();
       }
+
+      // This has to be called after all previous state has been cleared because the unregister/cleanup process requires the
+      // errorTypeRepository as it was during its initialization.
+      doRegisterErrors(initializationRequest);
 
       // Remembers the currently requested locations in order to skip future requests if they are compatible.
       currentComponentInitializationState.update(initializationRequest);

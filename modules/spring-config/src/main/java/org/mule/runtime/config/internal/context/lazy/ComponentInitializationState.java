@@ -33,6 +33,7 @@ class ComponentInitializationState {
   private final List<ConfigurableObjectProvider> objectProvidersToConfigure = new ArrayList<>();
   private boolean isApplyStartPhaseRequested = false;
   private boolean isInitializationAlreadyDone = false;
+  private boolean isAllErrorTypesRegistered = false;
 
   /**
    * Creates the instance.
@@ -55,6 +56,20 @@ class ComponentInitializationState {
    */
   public boolean isInitializationAlreadyDone() {
     return isInitializationAlreadyDone;
+  }
+
+  /**
+   * @return Whether all error types from the artifact have already been registered.
+   */
+  public boolean isAllErrorTypesRegistered() {
+    return isAllErrorTypesRegistered;
+  }
+
+  /**
+   * Marks that all error types from the artifact have already been registered. Cannot be unmarked.
+   */
+  public void setAllErrorTypesRegistered() {
+    isAllErrorTypesRegistered = true;
   }
 
   /**
@@ -164,6 +179,7 @@ class ComponentInitializationState {
 
     isApplyStartPhaseRequested = false;
     isInitializationAlreadyDone = false;
+    isAllErrorTypesRegistered = false;
     currentComponentLocationsRequested.clear();
     objectProvidersToConfigure.clear();
   }
