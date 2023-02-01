@@ -24,8 +24,6 @@ import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unre
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -33,6 +31,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -77,16 +76,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.ResolvableType;
+import org.springframework.lang.Nullable;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -110,7 +112,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private final ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator;
 
   private final ComponentInitializationState currentComponentInitializationState;
-  private final ReentrantLock initializingBeanLock = new ReentrantLock();
 
   private final Map<String, String> artifactProperties;
   private final LockFactory runtimeLockFactory;
@@ -217,44 +218,143 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public Object getBean(String name) throws BeansException {
-    try {
-      return super.getBean(name);
-    } catch (NoSuchBeanDefinitionException e) {
-      // It is possible that getting the bean failed because the bean definition was not yet registered.
-      // We will try to do that now.
-      // If it fails, we will re-throw the original exception as if the lazy initialization attempt never occurred.
-      return tryInitializeAndGetBean(name).orElseThrow(() -> e);
+    return tryWithLazyInitializationFallback(name, () -> super.getBean(name));
+  }
+
+  @Override
+  public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+    return tryWithLazyInitializationFallback(name, () -> super.getBean(name, requiredType));
+  }
+
+  @Override
+  public Object getBean(String name, Object... args) throws BeansException {
+    throwIfInitializationAlreadyDone();
+    return super.getBean(name, args);
+  }
+
+  @Override
+  public <T> T getBean(Class<T> requiredType) throws BeansException {
+    throwIfInitializationAlreadyDone();
+    return super.getBean(requiredType);
+  }
+
+  @Override
+  public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
+    throwIfInitializationAlreadyDone();
+    return super.getBean(requiredType, args);
+  }
+
+  @Override
+  public <T> ObjectProvider<T> getBeanProvider(Class<T> requiredType) {
+    throwIfInitializationAlreadyDone();
+    return super.getBeanProvider(requiredType);
+  }
+
+  @Override
+  public <T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType) {
+    throwIfInitializationAlreadyDone();
+    return super.getBeanProvider(requiredType);
+  }
+
+  @Override
+  public boolean containsBean(String name) {
+    return tryWithLazyInitializationFallback(name, () -> super.containsBean(name));
+  }
+
+  @Override
+  public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isSingleton(name));
+  }
+
+  @Override
+  public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isPrototype(name));
+  }
+
+  @Override
+  public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isTypeMatch(name, typeToMatch));
+  }
+
+  @Override
+  public boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isTypeMatch(name, typeToMatch));
+  }
+
+  @Override
+  @Nullable
+  public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.getType(name));
+  }
+
+  @Override
+  @Nullable
+  public Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.getType(name, allowFactoryBeanInit));
+  }
+
+  @Override
+  public String[] getAliases(String name) {
+    return tryWithLazyInitializationFallback(name, () -> super.getAliases(name));
+  }
+
+  private void throwIfInitializationAlreadyDone() {
+    if (currentComponentInitializationState.isInitializationAlreadyDone()) {
+      throw new UnsupportedOperationException("Operation is not supported after initialization");
     }
   }
 
-  private Optional<Object> tryInitializeAndGetBean(String name) {
-    if (initializingBeanLock.isHeldByCurrentThread()) {
-      // Prevents reentrancy. We shouldn't try to initialize some missing bean while we are trying to initialize some other.
-      // (Dependencies should be handled by the lazy initialization mechanism without going through here)
-      return empty();
-    }
-
-    initializingBeanLock.lock();
+  private <T> T tryWithLazyInitializationFallback(String name, Supplier<T> supplier) {
+    // It is possible that the operation on the bean factory failed because the bean definition was not yet registered.
+    // We will try to do that now.
+    // If it fails, we will re-throw the original exception as if the lazy initialization attempt never occurred.
     try {
-      // Re-checks for bean existence in the registry again before attempting initialization.
-      // This is because some other thread may have initialized the bean already.
-      try {
-        return of(super.getBean(name));
-      } catch (NoSuchBeanDefinitionException e) {
-        // Builds a location just from the bean name, this will only work for top level components. It should be enough for our
-        // use cases.
-        // No need to check if the location exists in the artifact at this point. We will fail rather quickly during the
-        // initialization attempt.
-        Location location = builderFromStringRepresentation(name).build();
-        initializeAdditionalComponent(location);
+      T returnValue = supplier.get();
+      // Some BeanFactory implementations return null instead of NoSuchBeanDefinitionException.
+      if (returnValue == null) {
+        // This Either may be a right, but we still want to return null in that case as did the original supplier.
+        return initializeAndRetry(name, supplier).getLeft();
       }
-    } catch (Exception ignored) {
-      return empty();
-    } finally {
-      initializingBeanLock.unlock();
+      return returnValue;
+    } catch (NoSuchBeanDefinitionException e) {
+      Either<T, Throwable> result = initializeAndRetry(name, supplier);
+      if (result.isRight()) {
+        // Rethrows the original exception.
+        throw e;
+      }
+      return result.getLeft();
     }
+  }
 
-    return of(super.getBean(name));
+  private synchronized <T> Either<T, Throwable> initializeAndRetry(String name, Supplier<T> supplier) {
+    // Re-checks for bean existence in the registry again before attempting initialization.
+    // This is because some other thread may have initialized the bean already.
+    try {
+      T returnValue = supplier.get();
+      if (returnValue == null) {
+        return doInitializeAndRetry(name, supplier);
+      }
+      return Either.left(returnValue);
+    } catch (NoSuchBeanDefinitionException e) {
+      return doInitializeAndRetry(name, supplier);
+    }
+  }
+
+  private <T> Either<T, Throwable> doInitializeAndRetry(String name, Supplier<T> supplier) {
+    // TODO: detect cycles
+
+    // Builds a location just from the bean name, this will only work for top level components. It should be enough for our
+    // use cases.
+    // No need to check if the location exists in the artifact at this point. We will fail rather quickly during the
+    // initialization attempt.
+    // TODO: do not support any location, try to match it with the component ID
+    Location location = builderFromStringRepresentation(name).build();
+    try {
+      initializeAdditionalComponent(location);
+    } catch (Exception initializationException) {
+      return Either.right(initializationException);
+    }
+    return Either.left(supplier.get());
   }
 
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
