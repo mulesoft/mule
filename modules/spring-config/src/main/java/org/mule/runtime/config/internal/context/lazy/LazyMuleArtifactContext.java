@@ -111,8 +111,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
   private final ArtifactAstDependencyGraph graph;
-  private final ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator;
-
   private final ComponentInitializationState currentComponentInitializationState;
 
   // Used for detecting cycles when initializing beans that are dynamically referenced
@@ -182,9 +180,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
     // components.
     this.graph = generateFor(getApplicationModel());
-
-    this.componentInitializationAstGenerator = new ComponentInitializationArtifactAstGenerator(graph,
-                                                                                               currentComponentInitializationState);
   }
 
   @Override
@@ -462,7 +457,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private ComponentInitializationRequest.Builder getRequestBuilder(boolean applyStartPhase, boolean keepPrevious) {
-    return new ComponentInitializationRequest.Builder(componentInitializationAstGenerator, applyStartPhase, keepPrevious);
+    return new ComponentInitializationRequest.Builder(graph,
+                                                      currentComponentInitializationState,
+                                                      MuleArtifactContext::isAlwaysEnabledComponent,
+                                                      applyStartPhase,
+                                                      keepPrevious);
   }
 
   private void createComponentsAndApplyLifecycle(ComponentInitializationRequest initializationRequest) {

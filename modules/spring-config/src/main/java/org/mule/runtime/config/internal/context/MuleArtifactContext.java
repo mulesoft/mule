@@ -481,7 +481,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * @param componentAst The {@link ComponentAst} to test.
    * @return if the {@code componentAst} needs to be always enabled.
    */
-  protected boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
+  protected static boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
     return componentAst.getModel(HasStereotypeModel.class)
         .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
         .orElse(false);
@@ -519,7 +519,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                                            Map<ComponentAst, SpringComponentModel> springComponentModels) {
     Set<String> alwaysEnabledTopLevelComponents = new HashSet<>();
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(this::isAlwaysEnabledComponent)
+        .filter(MuleArtifactContext::isAlwaysEnabledComponent)
         .peek(cm -> cm.getComponentId().ifPresent(alwaysEnabledTopLevelComponents::add))
         .filter(cm -> !cm.getComponentId().isPresent())
         .map(ComponentAst::getIdentifier)

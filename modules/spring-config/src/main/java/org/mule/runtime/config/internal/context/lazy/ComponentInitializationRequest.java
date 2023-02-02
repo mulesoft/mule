@@ -15,6 +15,8 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.ast.internal.FilteredArtifactAst;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
@@ -26,6 +28,8 @@ import java.util.function.Predicate;
 /**
  * Represents a component initialization request, grouping together all its parameters and adapting for the different ways they
  * can be expressed.
+ * <p>
+ * The result of some methods may depend on the current initialization state.
  * <p>
  * This implementation is not thread safe.
  */
@@ -48,21 +52,30 @@ class ComponentInitializationRequest {
    */
   public static class Builder {
 
-    private final ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator;
+    private final ArtifactAstDependencyGraph graph;
+    private final ComponentInitializationState componentInitializationState;
+    private final Predicate<ComponentAst> alwaysEnabledComponentPredicate;
     private final boolean applyStartPhase;
     private final boolean keepPrevious;
 
     /**
      * Creates a request builder from the given required parameters.
      *
-     * @param componentInitializationAstGenerator A {@link ComponentInitializationArtifactAstGenerator}.
-     * @param applyStartPhase                     Whether to also apply the start lifecycle phase to the requested components.
-     * @param keepPrevious                        Whether previously initialized components should be kept unchanged.
+     * @param graph                           The {@link ArtifactAstDependencyGraph} to use for extracting the minimal AST from a
+     *                                        predicate.
+     * @param componentInitializationState    The current {@link ComponentInitializationState}.
+     * @param alwaysEnabledComponentPredicate A {@link Predicate} to determine if a component must always be initialized.
+     * @param applyStartPhase                 Whether to also apply the start lifecycle phase to the requested components.
+     * @param keepPrevious                    Whether previously initialized components should be kept unchanged.
      */
-    public Builder(ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator,
+    public Builder(ArtifactAstDependencyGraph graph,
+                   ComponentInitializationState componentInitializationState,
+                   Predicate<ComponentAst> alwaysEnabledComponentPredicate,
                    boolean applyStartPhase,
                    boolean keepPrevious) {
-      this.componentInitializationAstGenerator = componentInitializationAstGenerator;
+      this.graph = graph;
+      this.componentInitializationState = componentInitializationState;
+      this.alwaysEnabledComponentPredicate = alwaysEnabledComponentPredicate;
       this.applyStartPhase = applyStartPhase;
       this.keepPrevious = keepPrevious;
     }
@@ -72,7 +85,9 @@ class ComponentInitializationRequest {
      * @return A {@link ComponentInitializationRequest} for the given {@code location}.
      */
     public ComponentInitializationRequest build(Location location) {
-      return new ComponentInitializationRequest(componentInitializationAstGenerator,
+      return new ComponentInitializationRequest(graph,
+                                                componentInitializationState,
+                                                alwaysEnabledComponentPredicate,
                                                 buildFilterFromLocation(location),
                                                 of(location),
                                                 applyStartPhase,
@@ -84,7 +99,9 @@ class ComponentInitializationRequest {
      * @return A {@link ComponentInitializationRequest} for the given {@code componentFilter}.
      */
     public ComponentInitializationRequest build(Predicate<ComponentAst> componentFilter) {
-      return new ComponentInitializationRequest(componentInitializationAstGenerator,
+      return new ComponentInitializationRequest(graph,
+                                                componentInitializationState,
+                                                alwaysEnabledComponentPredicate,
                                                 componentFilter,
                                                 empty(),
                                                 applyStartPhase,
@@ -101,7 +118,9 @@ class ComponentInitializationRequest {
     }
   }
 
-  private final ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator;
+  private final ArtifactAstDependencyGraph graph;
+  private final ComponentInitializationState componentInitializationState;
+  private final Predicate<ComponentAst> alwaysEnabledComponentPredicate;
   private final Optional<Location> location;
   private final Predicate<ComponentAst> componentFilter;
   private final boolean isApplyStartPhaseRequested;
@@ -112,12 +131,16 @@ class ComponentInitializationRequest {
   private ArtifactAst artifactAstToInitialize;
   private Set<String> requestedLocations;
 
-  private ComponentInitializationRequest(ComponentInitializationArtifactAstGenerator componentInitializationAstGenerator,
+  private ComponentInitializationRequest(ArtifactAstDependencyGraph graph,
+                                         ComponentInitializationState componentInitializationState,
+                                         Predicate<ComponentAst> alwaysEnabledComponentPredicate,
                                          Predicate<ComponentAst> componentFilter,
                                          Optional<Location> location,
                                          boolean applyStartPhase,
                                          boolean keepPrevious) {
-    this.componentInitializationAstGenerator = componentInitializationAstGenerator;
+    this.graph = graph;
+    this.componentInitializationState = componentInitializationState;
+    this.alwaysEnabledComponentPredicate = alwaysEnabledComponentPredicate;
     this.location = location;
     this.componentFilter = componentFilter;
     this.isApplyStartPhaseRequested = applyStartPhase;
@@ -129,13 +152,6 @@ class ComponentInitializationRequest {
    */
   public Optional<Location> getLocation() {
     return location;
-  }
-
-  /**
-   * @return A {@link ComponentAst} filter based on the request parameters.
-   */
-  public Predicate<ComponentAst> getComponentFilter() {
-    return componentFilter;
   }
 
   /**
@@ -206,22 +222,40 @@ class ComponentInitializationRequest {
 
   private ArtifactAst getMinimalAst() {
     if (minimalArtifactAst == null) {
-      minimalArtifactAst = componentInitializationAstGenerator.getMinimalArtifactAstForRequest(this);
+      minimalArtifactAst = doGetMinimalAst();
     }
     return minimalArtifactAst;
+  }
+
+  private ArtifactAst doGetMinimalAst() {
+    Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst();
+    return graph.minimalArtifactFor(minimalApplicationFilter);
+  }
+
+  private Predicate<ComponentAst> getFilterForMinimalArtifactAst() {
+    // Always enabled components should be included in the minimal graph even if no one depends on them, however, we don't
+    // want to include them when keeping previous components because:
+    // 1- They will have already been initialized.
+    // 2- For some of them we can't detect if they were initialized as we do with other components because they may be unnamed
+    // and non-locatable.
+    if (isKeepPreviousRequested()) {
+      return componentFilter;
+    } else {
+      return componentFilter.or(alwaysEnabledComponentPredicate);
+    }
   }
 
   private Set<String> doGetRequestedLocations(ArtifactAst artifactAst) {
     return getLocation().map(location -> singleton(location.toString()))
         .orElseGet(() -> artifactAst
-            .filteredComponents(getComponentFilter())
+            .filteredComponents(componentFilter)
             .map(comp -> comp.getLocation().getLocation())
             .collect(toSet()));
   }
 
   private ArtifactAst doGetFilteredAstToInitialize(ArtifactAst artifactAst) {
     if (isKeepPreviousRequested()) {
-      return componentInitializationAstGenerator.getArtifactAstExcludingAlreadyInitialized(artifactAst);
+      return new FilteredArtifactAst(artifactAst, comp -> !componentInitializationState.isComponentAlreadyInitialized(comp));
     } else {
       return artifactAst;
     }
