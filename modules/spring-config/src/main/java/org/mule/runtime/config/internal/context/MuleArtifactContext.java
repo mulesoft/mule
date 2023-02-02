@@ -490,11 +490,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   /**
    * Callback to perform actions when a new configurable object provider is discovered as part of the creation of components.
+   * <p>
+   * Derived classes must call the super class's implementation of this method.
    *
    * @param objectProvider The {@link ConfigurableObjectProvider} just discovered.
    */
   protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
-    // Does nothing
+    objectProviders.add(objectProvider);
   }
 
   /**
@@ -563,10 +565,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     objectProvidersByName.stream()
         .map(pair -> springComponentModels.get(pair.getFirst()).getObjectInstance())
-        .forEach(objectProvider -> {
-          objectProviders.add(objectProvider);
-          onObjectProviderDiscovered(objectProvider);
-        });
+        .forEach(this::onObjectProviderDiscovered);
     registerObjectFromObjectProviders(beanFactory);
 
     Set<String> objectProviderNames = objectProvidersByName.stream()
