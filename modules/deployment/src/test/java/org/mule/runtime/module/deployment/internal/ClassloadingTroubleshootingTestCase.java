@@ -6,6 +6,15 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
+import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.overrider2Library;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.overriderLibrary;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.overriderTestLibrary;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
@@ -18,11 +27,6 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
-import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -33,7 +37,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.tck.util.CompilerUtils.JarCompiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,17 +44,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
-import com.google.common.collect.ImmutableList;
+import io.qameta.allure.Feature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import io.qameta.allure.Feature;
 
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
@@ -63,9 +63,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
 
   private File mavenRepoFolder;
-  private JarFileBuilder overriderLibrary;
-  private JarFileBuilder overrider2Library;
-  private JarFileBuilder overriderTestLibrary;
 
   TestLogger loggerDefaultMuleDomain = getTestLogger(DefaultMuleDomain.class);
   TestLogger loggerDefaultArchiveDeployer = getTestLogger(DefaultArchiveDeployer.class);
@@ -83,19 +80,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   @Before
   public void setup() throws URISyntaxException {
     mavenRepoFolder = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
-    overriderLibrary =
-        new JarFileBuilder("overrider-library",
-                           new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/OverrideMe.java"))
-                               .compile("overrider-library.jar"));
-    overrider2Library =
-        new JarFileBuilder("overrider2-library",
-                           new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/OverrideMe2.java"))
-                               .compile("overrider2-library.jar"));
-    overriderTestLibrary =
-        new JarFileBuilder("overrider-test-library",
-                           new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/test/OverrideMe.java"))
-                               .compile("overrider-test-library.jar"));
-
   }
 
   @Test

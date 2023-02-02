@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -36,10 +35,18 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.byeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1JarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.moduleUsingByeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.privilegedExtensionV1JarFile;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
-import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeploy;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ArtifactAstSerialization.AST_JSON_DESERIALIZER;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -116,15 +123,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
@@ -169,12 +174,6 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
         .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
-
-    // Application plugin artifact builders
-    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   @Test

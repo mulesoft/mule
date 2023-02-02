@@ -24,11 +24,36 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.D
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils1ClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils1_0JarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils2_0JarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenJavaJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionCustomException;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionLoadingResource;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin1Echo;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin2Echo;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConnectExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.goodbyeExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV2Plugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadClassExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1ClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleThirdPartyEchoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.deployDomain;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeployDomain;
-import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.undeployDomain;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -82,7 +107,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.util.CompilerUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -101,24 +125,18 @@ import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
 
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Contains test for domain deployment
  */
 @Feature(DOMAIN_DEPLOYMENT)
 public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
-
-  private static File pluginForbiddenJavaEchoTestClassFile;
-  private static File pluginForbiddenMuleContainerEchoTestClassFile;
-  private static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
 
   // Domain artifacts builders
   private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -158,19 +176,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public DomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
-  }
-
-  @BeforeClass
-  public static void compileTestClasses() throws Exception {
-    pluginForbiddenJavaEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
-    pluginForbiddenMuleContainerEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
-    pluginForbiddenMuleThirdPartyEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
   }
 
   @After
@@ -247,7 +252,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app")
         .definedBy("app-shared-lib-precedence-config.xml")
         .dependingOnSharedLibrary(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
-        .dependingOn(callbackExtensionPlugin.containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class"))
+        .dependingOn(callbackExtensionPlusPlugin1Echo)
         .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -269,7 +274,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
             .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
-            .dependingOn(callbackExtensionPlugin.containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class"))
+            .dependingOn(callbackExtensionPlusPlugin1Echo)
             .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -287,7 +292,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final String domainId = "shared-lib";
     final ArtifactPluginFileBuilder pluginFileBuilder =
         new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-            .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+            .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class")
             .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
     final DomainFileBuilder domainFileBuilder =
@@ -317,7 +322,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
 
     final String domainId = "shared-lib";
     final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId)
@@ -329,9 +334,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .definedBy("app-plugin-different-lib-config.xml")
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
-            .dependingOn(callbackExtensionPlugin
-                .containingClass(new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-                    .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java")), "org/foo/echo/Plugin2Echo.class"));
+            .dependingOn(callbackExtensionPlusPlugin2Echo);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -352,7 +355,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .withGroupId("com.mulesoft.connectors").withVersion("2.3.1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
 
     final String domainId = "shared-lib";
     final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId)
@@ -364,9 +367,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .definedBy("app-plugin-different-lib-config.xml")
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
-            .dependingOn(callbackExtensionPlugin
-                .containingClass(new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-                    .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java")), "org/foo/echo/Plugin2Echo.class"));
+            .dependingOn(callbackExtensionPlusPlugin2Echo);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -404,8 +405,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ApplicationFileBuilder applicationFileBuilder =
         createExtensionApplicationWithServices("exception-throwing-app.xml")
-            .dependingOn(callbackExtensionPlugin.containingClass(customExceptionClassFile,
-                                                                 "org/exception/CustomException.class"));
+            .dependingOn(callbackExtensionCustomException);
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
 
@@ -824,7 +824,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final String domainId = "shared-lib";
     final ArtifactPluginFileBuilder pluginFileBuilder =
         new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-            .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+            .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class")
             .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
     final DomainFileBuilder domainFileBuilder =
@@ -861,8 +861,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .dependingOn(callbackExtensionPlugin
-            .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class"))
+        .dependingOn(callbackExtensionLoadingResource)
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
@@ -887,8 +886,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java")),
-                             "org/foo/echo/Plugin3Echo.class")
+            .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
             .dependingOn(echoPlugin);
 
     ApplicationFileBuilder echoPluginAppFileBuilder =

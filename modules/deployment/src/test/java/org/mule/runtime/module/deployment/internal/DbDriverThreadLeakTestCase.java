@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.oracleExtensionPlugin;
 
 import io.qameta.allure.Issue;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -90,8 +91,7 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
   }
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
-    return createExtensionApplicationWithServices(xmlFile + ".xml",
-                                                  oracleExtensionPlugin);
+    return createExtensionApplicationWithServices(xmlFile + ".xml", oracleExtensionPlugin);
   }
 
   @Override

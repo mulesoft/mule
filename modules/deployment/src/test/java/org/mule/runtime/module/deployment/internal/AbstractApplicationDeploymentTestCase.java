@@ -7,19 +7,15 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusEcho;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 public abstract class AbstractApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
@@ -41,15 +37,6 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     }
   };
 
-  // Classes and JAR resources
-  protected static File pluginEchoSpiTestClassFile;
-  protected static File pluginEcho3TestClassFile;
-  protected static File pluginEcho2TestClassFile;
-  protected static File pluginForbiddenJavaEchoTestClassFile;
-  protected static File pluginForbiddenMuleContainerEchoTestClassFile;
-  protected static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
-  protected static File privilegedExtensionV1JarFile;
-
   // Application artifact builders
   protected ApplicationFileBuilder incompleteAppFileBuilder;
   protected ApplicationFileBuilder brokenAppFileBuilder;
@@ -57,34 +44,6 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
   protected ApplicationFileBuilder waitAppFileBuilder;
   protected ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
   protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilder;
-
-  // Application plugin artifact builders
-  protected ArtifactPluginFileBuilder echoPluginWithLib1;
-
-  @BeforeClass
-  public static void compileTestClasses() throws Exception {
-    pluginEcho2TestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-            .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
-    pluginEcho3TestClassFile = new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
-    pluginEchoSpiTestClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/PluginSpiEcho.java"));
-
-    pluginForbiddenJavaEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
-    pluginForbiddenMuleContainerEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
-    pluginForbiddenMuleThirdPartyEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
-
-    privilegedExtensionV1JarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
-                                                        getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
-            .compile("mule-module-privileged-1.0.jar", "1.0");
-  }
 
   public AbstractApplicationDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -98,13 +57,7 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(callbackExtensionPlugin.containingClass(echoTestClassFile, "org/foo/EchoTest.class"));
-
-    // Application plugin artifact builders
-    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+        .dependingOn(callbackExtensionPlusEcho);
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
@@ -118,5 +71,4 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
   protected ApplicationFileBuilder appFileBuilder(String artifactId, boolean upperCaseInExtension) {
     return new ApplicationFileBuilder(artifactId, upperCaseInExtension);
   }
-
 }

@@ -12,7 +12,9 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
 
@@ -263,8 +265,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
     if (useEchoPluginInApp) {
-      return createExtensionApplicationWithServices(xmlFile + ".xml",
-                                                    helloExtensionV1Plugin);
+      return createExtensionApplicationWithServices(xmlFile + ".xml", helloExtensionV1Plugin);
     } else {
       return new ApplicationFileBuilder(xmlFile)
           .definedBy(xmlFile + ".xml");

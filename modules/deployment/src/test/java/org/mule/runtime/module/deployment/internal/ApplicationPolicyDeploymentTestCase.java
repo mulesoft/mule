@@ -46,8 +46,17 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.byeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.moduleUsingByeXmlExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.policyConfigurationExtensionJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.policyDependencyInjectionExtensionJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.usingObjectStorePlugin;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
+import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_REORDER;
