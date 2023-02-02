@@ -32,7 +32,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelL
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -71,6 +70,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
@@ -102,7 +102,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
-  private MuleVersion minMuleVersion;
+  private MinMuleVersionResult minMuleVersionResult;
 
   private ExtensionParameter nestedChain;
   private boolean blocking = false;
@@ -129,7 +129,10 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      this.minMuleVersion = getMinMuleVersion().get();
+      this.minMuleVersionResult = getOperationResult(operationElement, this.operationContainer,
+                                                     getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
+                                                                                          Operations::value,
+                                                                                          this.operationContainer));
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -411,19 +414,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(getOperationResult(operationElement, operationContainer,
-                                 getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
-                                                                      Operations::value, operationContainer))
-                                                                          .getMinMuleVersion());
-  }
-
-  @Override
-  public Optional<String> getMinMuleVersionReason() {
-    return of(getOperationResult(operationElement, operationContainer,
-                                 getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
-                                                                      Operations::value, operationContainer))
-                                                                          .getReason());
+  public MinMuleVersionResult getMinMuleVersionResult() {
+    return this.minMuleVersionResult;
   }
 
   @Override

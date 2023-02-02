@@ -12,6 +12,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -101,12 +102,8 @@ public interface ConfigurationModelParser extends StereotypeModelParser, Additio
   Optional<DisplayModel> getDisplayModel();
 
   /**
-   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   * @return a {@link MinMuleVersionResult} that contains the minimum mule version this component can run on and the reason why
+   *         that version was assigned.
    */
-  Optional<MuleVersion> getMinMuleVersion();
-
-  /**
-   * @return the reason why the model has the minimum mule version specified in {@link #getMinMuleVersion()}
-   */
-  Optional<String> getMinMuleVersionReason();
+  MinMuleVersionResult getMinMuleVersionResult();
 }

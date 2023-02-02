@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -18,6 +17,7 @@ import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -150,14 +150,10 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   SourceClusterSupportModelProperty getSourceClusterSupportModelProperty();
 
   /**
-   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   * @return a {@link MinMuleVersionResult} that contains the minimum mule version this component can run on and the reason why
+   *         that version was assigned.
    */
-  Optional<MuleVersion> getMinMuleVersion();
-
-  /**
-   * @return the reason why the model has the minimum mule version specified in {@link #getMinMuleVersion()}
-   */
-  Optional<String> getMinMuleVersionReason();
+  MinMuleVersionResult getMinMuleVersionResult();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a

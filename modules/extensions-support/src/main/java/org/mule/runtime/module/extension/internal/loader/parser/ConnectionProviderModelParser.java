@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
@@ -15,6 +14,7 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -95,12 +95,8 @@ public interface ConnectionProviderModelParser extends SemanticTermsParser, Ster
   Optional<DisplayModel> getDisplayModel();
 
   /**
-   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   * @return a {@link MinMuleVersionResult} that contains the minimum mule version this component can run on and the reason why
+   *         that version was assigned.
    */
-  Optional<MuleVersion> getMinMuleVersion();
-
-  /**
-   * @return the reason why the model has the minimum mule version specified in {@link #getMinMuleVersion()}
-   */
-  Optional<String> getMinMuleVersionReason();
+  MinMuleVersionResult getMinMuleVersionResult();
 }

@@ -49,7 +49,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
       ConnectionProviderDeclaration connectionProviderDeclaration = providerDeclarer.getDeclaration();
       parser.getDeprecationModel().ifPresent(connectionProviderDeclaration::withDeprecation);
       parser.getDisplayModel().ifPresent(connectionProviderDeclaration::setDisplayModel);
-      parser.getMinMuleVersion().ifPresent(connectionProviderDeclaration::withMinMuleVersion);
+      connectionProviderDeclaration.withMinMuleVersion(parser.getMinMuleVersionResult().getMinMuleVersion());
 
       parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 

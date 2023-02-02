@@ -109,7 +109,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
-    parser.getMinMuleVersion().ifPresent(declarer::withMinMuleVersion);
+    declarer.withMinMuleVersion(parser.getMinMuleVersionResult().getMinMuleVersion());
 
     declareErrorModels(parser, declarer);
     declareExports(parser, declarer);

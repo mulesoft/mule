@@ -7,10 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.sdk.api.annotation.MinMuleVersion;
 
 /**
- * Holds information about an SdkComponent, its {@link MinMuleVersion} and the reason for that value.
+ * Holds information about the minimum {@link MuleVersion} that a component can run on and the reason for that value.
  *
  * @since 4.6
  */

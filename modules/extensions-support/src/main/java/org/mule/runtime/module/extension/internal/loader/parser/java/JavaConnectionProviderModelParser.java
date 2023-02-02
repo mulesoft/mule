@@ -31,7 +31,6 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.util
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -60,6 +59,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.connectivity.NoConnectivityTest;
 
@@ -84,7 +84,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   private final ConnectionProviderElement element;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
-  private final MuleVersion minMuleVersion;
+  private final MinMuleVersionResult minMuleVersionResult;
 
   public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
                                            ExtensionElement extensionElement,
@@ -96,7 +96,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
-    this.minMuleVersion = getMinMuleVersion().get();
+    this.minMuleVersionResult = getConnectionProviderResult(element);
   }
 
   @Override
@@ -229,13 +229,8 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(getConnectionProviderResult(element).getMinMuleVersion());
-  }
-
-  @Override
-  public Optional<String> getMinMuleVersionReason() {
-    return of(getConnectionProviderResult(element).getReason());
+  public MinMuleVersionResult getMinMuleVersionResult() {
+    return this.minMuleVersionResult;
   }
 
   @Override

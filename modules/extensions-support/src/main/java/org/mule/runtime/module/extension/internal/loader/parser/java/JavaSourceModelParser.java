@@ -33,7 +33,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -65,6 +64,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaSourceModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -85,7 +85,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   private final Class<?> sourceClass;
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
-  private MuleVersion minMuleVersion;
+  private MinMuleVersionResult minMuleVersionResult;
 
 
   public JavaSourceModelParser(ExtensionElement extensionElement,
@@ -101,7 +101,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      this.minMuleVersion = getMinMuleVersion().get();
+      this.minMuleVersionResult = getSourceResult(sourceElement);
     }
   }
 
@@ -311,13 +311,8 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(getSourceResult(sourceElement).getMinMuleVersion());
-  }
-
-  @Override
-  public Optional<String> getMinMuleVersionReason() {
-    return of(getSourceResult(sourceElement).getReason());
+  public MinMuleVersionResult getMinMuleVersionResult() {
+    return this.minMuleVersionResult;
   }
 
   @Override

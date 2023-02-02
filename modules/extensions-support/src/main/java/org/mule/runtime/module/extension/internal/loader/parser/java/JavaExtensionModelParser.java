@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.function.UnaryOperator.identity;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
@@ -32,7 +31,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -80,6 +78,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +104,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<NotificationModel> notificationModels = new LinkedList<>();
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
-  private MuleVersion minMuleVersion;
+  private MinMuleVersionResult minMuleVersionResult;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this(extensionElement, new StereotypeModelLoaderDelegate(loadingContext), loadingContext);
@@ -137,7 +136,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    this.minMuleVersion = getMinMuleVersion().get();
+    this.minMuleVersionResult = getExtensionResult(extensionElement);
   }
 
   private void parseSubtypes() {
@@ -390,13 +389,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(getExtensionResult(extensionElement).getMinMuleVersion());
-  }
-
-  @Override
-  public Optional<String> getMinMuleVersionReason() {
-    return of(getExtensionResult(extensionElement).getReason());
+  public MinMuleVersionResult getMinMuleVersionResult() {
+    return this.minMuleVersionResult;
   }
 
   @Override

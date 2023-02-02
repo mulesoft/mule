@@ -44,7 +44,7 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       configParser.getDisplayModel().ifPresent(d -> configurationDeclarer.getDeclaration().setDisplayModel(d));
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
       configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
-      configParser.getMinMuleVersion().ifPresent(configurationDeclarer::withMinMuleVersion);
+      configurationDeclarer.withMinMuleVersion(configParser.getMinMuleVersionResult().getMinMuleVersion());
 
       loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
 

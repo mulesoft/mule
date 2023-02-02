@@ -11,7 +11,6 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
@@ -21,7 +20,6 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.ster
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getConfigurationResult;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
 
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -44,6 +42,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 import org.mule.sdk.api.annotation.Configurations;
 
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   private final JavaExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
-  private final MuleVersion minMuleVersion;
+  private final MinMuleVersionResult minMuleVersionResult;
 
   public JavaConfigurationModelParser(JavaExtensionModelParser extensionModelParser,
                                       ExtensionElement extensionElement,
@@ -70,7 +69,11 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.minMuleVersion = getMinMuleVersion().get();
+    this.minMuleVersionResult = getConfigurationResult(configElement,
+                                                       getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                            Configurations.class,
+                                                                                            Configurations::value,
+                                                                                            configElement));
   }
 
   private void parseStructure() {
@@ -194,18 +197,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(getConfigurationResult(configElement,
-                                     getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
-                                                                          Configurations::value, configElement))
-                                                                              .getMinMuleVersion());
-  }
-
-  @Override
-  public Optional<String> getMinMuleVersionReason() {
-    return of(getConfigurationResult(configElement,
-                                     getContainerAnnotationMinMuleVersion(extensionElement, Configurations.class,
-                                                                          Configurations::value, configElement))
-                                                                              .getReason());
+  public MinMuleVersionResult getMinMuleVersionResult() {
+    return this.minMuleVersionResult;
   }
 }

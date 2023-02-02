@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
@@ -18,7 +17,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Funct
 import org.mule.sdk.api.annotation.ExpressionFunctions;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -37,30 +35,24 @@ public class JavaFunctionModelParserTestCase {
   @Test
   public void getMMVForFunction() throws NoSuchMethodException {
     setParser(Functions.class.getMethod("function"), ConfigurationFunctions.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    Assert.assertThat(minMuleVersion.isPresent(), is(true));
-    Assert.assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    Assert.assertThat(parser.getMinMuleVersionResult().getMinMuleVersion(), is(FIRST_MULE_VERSION));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Function function has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForSdkAnnotatedFunction() throws NoSuchMethodException {
     setParser(SdkFunctions.class.getMethod("sdkFunction"), ConfigurationFunctions.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    Assert.assertThat(minMuleVersion.isPresent(), is(true));
-    Assert.assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    Assert.assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Method sdkFunction has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.Alias. org.mule.sdk.api.annotation.Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForFunctionFromConfigurationWithSdkFunctionsAnnotation() throws NoSuchMethodException {
     setParser(Functions.class.getMethod("function"), ConfigurationWithSdkFunctionsAnnotation.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    Assert.assertThat(minMuleVersion.isPresent(), is(true));
-    Assert.assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    Assert.assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Function function has min mule version 4.5.0 because it was propagated from the @Functions annotation at the extension class used to add the function."));
   }
 

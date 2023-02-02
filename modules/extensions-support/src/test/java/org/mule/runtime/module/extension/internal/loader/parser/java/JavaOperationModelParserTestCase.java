@@ -13,7 +13,6 @@ import static org.mule.runtime.api.meta.MuleVersion.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -63,110 +62,95 @@ public class JavaOperationModelParserTestCase {
   public void getMMVForVanillaOperation() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
                    JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
-    assertThat(parser.isTransactional(), is(true));
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion(), is(FIRST_MULE_VERSION));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Operation transactionalOperation has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForOperationAnnotatedWithMMV() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "annotatedWithMMV");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Method annotatedWithMMV has min mule version 4.4 because it is the one set at the method level through the @MinMuleVersion annotation."));
   }
 
   @Test
   public void getOverwrittenMMVForOperationAnnotatedWithMMV() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "overwriteMMV");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Calculated Min Mule Version is 4.5.0 which is greater than the one set at the method level 4.4. Overriding it. Method overwriteMMV has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.Alias. org.mule.sdk.api.annotation.Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithSdkParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkParameter", Literal.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
-               is("Method withSdkParameter has min mule version 4.5.0 because of its parameter literalParameter. Parameter literalParameter has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withSdkParameter has min mule version 4.5.0 because of its parameter literalParameter. Parameter literalParameter has min mule version 4.5.0 because it is of type Literal. Type Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithSdkImplicitParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkImplicitParameter", CorrelationInfo.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
-               is("Method withSdkImplicitParameter has min mule version 4.5.0 because of its parameter info. Parameter info has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.CorrelationInfo. org.mule.sdk.api.runtime.parameter.CorrelationInfo has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withSdkImplicitParameter has min mule version 4.5.0 because of its parameter info. Parameter info has min mule version 4.5.0 because it is of type CorrelationInfo. Type CorrelationInfo has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithSdkAnnotatedParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkAnnotatedParameter", String.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(), is(getMessageForOperationWithSdkAnnotatedParameter()));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(), is(getMessageForOperationWithSdkAnnotatedParameter()));
   }
 
   @Test
   public void getMMVForOperationWithParameterGroup() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterGroup", SdkParameterGroup.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
-               is("Method withParameterGroup has min mule version 4.4 because of its parameter someField. Field someField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withParameterGroup has min mule version 4.4 because of its parameter parameterGroup. Parameter parameterGroup has min mule version 4.4 because it is of type SdkParameterGroup. Type SdkParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+  }
+
+  @Test
+  public void getMMVForOperationWithParameterContainer() throws NoSuchMethodException {
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterContainer", SdkParameterGroup.class);
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withParameterContainer has min mule version 4.4 because of its parameter parameterContainer. Parameter parameterContainer has min mule version 4.4 because it is of type SdkParameterGroup. Type SdkParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithConfigParameter() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withConfigParameter", SomeConfiguration.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
-               is("Method withConfigParameter has min mule version 4.4 because of its parameter SomeConfiguration. Configuration SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withConfigParameter has min mule version 4.4 because of its parameter configParameter. Parameter configParameter has min mule version 4.4 because it references a config of type SomeConfiguration. Configuration SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithSdkPagingProvider() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkPagingProvider");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Method withSdkPagingProvider has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.streaming.PagingProvider. org.mule.sdk.api.runtime.streaming.PagingProvider has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithPagingProviderSdkGeneric() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withPagingProviderSdkGeneric");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Method withPagingProviderSdkGeneric has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithResultOutput() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withResultOutput");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Method withResultOutput has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
@@ -174,10 +158,8 @@ public class JavaOperationModelParserTestCase {
   public void getMMVLegacyApiTransactionalOperation() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), TransactionalOperations.class, "transactionalOperation",
                    JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.1.1"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.1.1"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Operation transactionalOperation has min mule version 4.1.1 because it is the default value."));
   }
 
@@ -185,20 +167,16 @@ public class JavaOperationModelParserTestCase {
   public void getMMVLegacySdkApiTransactionalOperation() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SdkTransactionalOperations.class, "transactionalOperation",
                    JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion(), is(FIRST_MULE_VERSION));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Operation transactionalOperation has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForParameterizedOperationsContainer() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), ParameterizedOperations.class, "noArgumentsOperation");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Operation noArgumentsOperation has min mule version 4.4 because of its parameter containerParameter. Parameter containerParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
@@ -206,27 +184,25 @@ public class JavaOperationModelParserTestCase {
   public void getMMVForOperationFromConfigurationWithSdkOperationsAnnotation() throws NoSuchMethodException {
     parseOperation(getExtensionElement(ConfigurationWithSdkOperationsAnnotation.class), TransactionalOperations.class,
                    "transactionalOperation", JavaConnectionProviderModelParserTestCase.TestTransactionalConnection.class);
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4.0"));
-    assertThat(parser.getMinMuleVersionReason().get(),
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
                is("Operation transactionalOperation has min mule version 4.4.0 because it was propagated from the @Operations annotation at the extension class used to add the operation's container TransactionalOperations."));
   }
 
   @Test
   public void getMMVForOperationWithArrayListOutput() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withArrayListOutput");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withArrayListOutput has min mule version 4.5.0 because of its output type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForOperationWithNativeArrayOutput() throws NoSuchMethodException {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withNativeArrayOutput");
-    Optional<MuleVersion> minMuleVersion = parser.getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Method withNativeArrayOutput has min mule version 4.4 because of its output type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   public void parseOperation(ExtensionElement extensionElement, Class<?> operationClass, String methodName,
@@ -284,6 +260,10 @@ public class JavaOperationModelParserTestCase {
     }
 
     public void withParameterGroup(@ParameterGroup(name = "pg") SdkParameterGroup parameterGroup) {
+
+    }
+
+    public void withParameterContainer(SdkParameterGroup parameterContainer) {
 
     }
 
