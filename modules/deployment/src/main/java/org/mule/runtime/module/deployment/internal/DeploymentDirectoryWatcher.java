@@ -217,7 +217,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
   }
 
-  private static int getChangesCheckIntervalMs() {
+  static int getChangesCheckIntervalMs() {
     try {
       String value = getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
       return Integer.parseInt(value);

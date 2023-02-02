@@ -37,6 +37,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.getChangesCheckIntervalMs;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
@@ -1140,7 +1141,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void assertNoDeploymentInvoked(final DeploymentListener deploymentListener) {
     // TODO(pablo.kraan): look for a better way to test this
     boolean invoked;
-    Prober prober = new PollingProber(DeploymentDirectoryWatcher.DEFAULT_CHANGES_CHECK_INTERVAL_MS * 2, 100);
+    Prober prober = new PollingProber(getChangesCheckIntervalMs() * 2L, 100);
     try {
       prober.check(new Probe() {
 
