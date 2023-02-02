@@ -19,8 +19,6 @@ import javax.inject.Inject;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Story;
-import org.junit.Ignore;
-import org.junit.Test;
 
 @Features({@Feature(SDK), @Feature(LAZY_INITIALIZATION)})
 @Story(EXPRESSIONS_ON_CONFIG_REF)
@@ -32,20 +30,6 @@ public class LazyInitExpressionConfigRefTestCase extends PetStoreExpressionConfi
   @Override
   public boolean enableLazyInit() {
     return true;
-  }
-
-  @Ignore("W-11525405: remove ignore override once we support lazy initialization of configurations referenced by expressions")
-  @Test
-  @Override
-  public void getPetsWithExpression() throws Exception {
-    super.getPetsWithExpression();
-  }
-
-  @Ignore("W-11525405: remove ignore override once we support lazy initialization of configurations referenced by expressions")
-  @Test
-  @Override
-  public void getPetsWithExpressionResolvingToIncompatibleConfigFails() throws Exception {
-    super.getPetsWithExpressionResolvingToIncompatibleConfigFails();
   }
 
   @Override

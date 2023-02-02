@@ -19,37 +19,33 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MA
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 
+import static java.lang.String.format;
+import static java.lang.ThreadLocal.withInitial;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
-import static com.google.common.collect.ImmutableSet.copyOf;
-import static com.google.common.collect.Sets.newHashSet;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
-import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.ast.internal.FilteredArtifactAst;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
@@ -61,6 +57,7 @@ import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
@@ -82,13 +79,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.ResolvableType;
+import org.springframework.lang.Nullable;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -106,14 +108,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final boolean dslDeclarationValidationEnabled;
 
-  private TrackingPostProcessor trackingPostProcessor;
-
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
   private final ArtifactAstDependencyGraph graph;
+  private final ComponentInitializationState currentComponentInitializationState;
 
-  private final Set<String> currentComponentLocationsRequested = new HashSet<>();
-  private boolean appliedStartedPhaseRequest = false;
+  // Used for detecting cycles when initializing beans that are dynamically referenced
+  private final ThreadLocal<Set<String>> beanNamesBeingInitialized = withInitial(HashSet::new);
 
   private final Map<String, String> artifactProperties;
   private final LockFactory runtimeLockFactory;
@@ -165,6 +166,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
+    this.currentComponentInitializationState = new ComponentInitializationState(componentLocator);
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
@@ -211,8 +213,149 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   @Override
   protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
-    trackingPostProcessor = new TrackingPostProcessor();
-    addBeanPostProcessors(beanFactory, trackingPostProcessor);
+    currentComponentInitializationState.registerTrackingPostProcessor(beanFactory);
+  }
+
+  @Override
+  public Object getBean(String name) throws BeansException {
+    return tryWithLazyInitializationFallback(name, () -> super.getBean(name));
+  }
+
+  @Override
+  public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+    return tryWithLazyInitializationFallback(name, () -> super.getBean(name, requiredType));
+  }
+
+  @Override
+  public Object getBean(String name, Object... args) throws BeansException {
+    throwIfInitializationAlreadyDone();
+    return super.getBean(name, args);
+  }
+
+  @Override
+  public <T> T getBean(Class<T> requiredType) throws BeansException {
+    throwIfInitializationAlreadyDone();
+    return super.getBean(requiredType);
+  }
+
+  @Override
+  public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
+    throwIfInitializationAlreadyDone();
+    return super.getBean(requiredType, args);
+  }
+
+  @Override
+  public <T> ObjectProvider<T> getBeanProvider(Class<T> requiredType) {
+    throwIfInitializationAlreadyDone();
+    return super.getBeanProvider(requiredType);
+  }
+
+  @Override
+  public <T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType) {
+    throwIfInitializationAlreadyDone();
+    return super.getBeanProvider(requiredType);
+  }
+
+  @Override
+  public boolean containsBean(String name) {
+    return tryWithLazyInitializationFallback(name, () -> super.containsBean(name));
+  }
+
+  @Override
+  public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isSingleton(name));
+  }
+
+  @Override
+  public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isPrototype(name));
+  }
+
+  @Override
+  public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isTypeMatch(name, typeToMatch));
+  }
+
+  @Override
+  public boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.isTypeMatch(name, typeToMatch));
+  }
+
+  @Override
+  @Nullable
+  public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.getType(name));
+  }
+
+  @Override
+  @Nullable
+  public Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException {
+    return tryWithLazyInitializationFallback(name, () -> super.getType(name, allowFactoryBeanInit));
+  }
+
+  @Override
+  public String[] getAliases(String name) {
+    return tryWithLazyInitializationFallback(name, () -> super.getAliases(name));
+  }
+
+  private void throwIfInitializationAlreadyDone() {
+    if (currentComponentInitializationState.isInitializationAlreadyDone()) {
+      throw new UnsupportedOperationException("Operation is not supported after initialization");
+    }
+  }
+
+  private <T> T tryWithLazyInitializationFallback(String name, Supplier<T> supplier) {
+    // It is possible that the operation on the bean factory failed because the bean definition was not yet registered.
+    // We will try to do that now.
+    // If it fails, we will re-throw the original exception as if the lazy initialization attempt never occurred.
+    try {
+      T returnValue = supplier.get();
+      // Some BeanFactory implementations return null instead of NoSuchBeanDefinitionException.
+      if (returnValue == null) {
+        // This Either may be a right, but we still want to return null in that case as did the original supplier.
+        return initializeAndRetry(name, supplier).getLeft();
+      }
+      return returnValue;
+    } catch (NoSuchBeanDefinitionException e) {
+      Either<T, Throwable> result = initializeAndRetry(name, supplier);
+      if (result.isRight()) {
+        // Rethrows the original exception.
+        throw e;
+      }
+      return result.getLeft();
+    }
+  }
+
+  private synchronized <T> Either<T, Throwable> initializeAndRetry(String name, Supplier<T> supplier) {
+    // Re-checks for bean existence in the registry again before attempting initialization.
+    // This is because some other thread may have initialized the bean already.
+    try {
+      T returnValue = supplier.get();
+      if (returnValue == null) {
+        return doInitializeAndRetry(name, supplier);
+      }
+      return Either.left(returnValue);
+    } catch (NoSuchBeanDefinitionException e) {
+      return doInitializeAndRetry(name, supplier);
+    }
+  }
+
+  private <T> Either<T, Throwable> doInitializeAndRetry(String name, Supplier<T> supplier) {
+    // Checks for cycles
+    if (beanNamesBeingInitialized.get().contains(name)) {
+      throw new IllegalArgumentException(format("A cyclic dependency was found when trying to initialize bean '%s'.", name));
+    }
+
+    // Tries to initialize a component with a componentId matching the bean name
+    try {
+      beanNamesBeingInitialized.get().add(name);
+      initializeAdditionalComponent(componentAst -> componentAst.getComponentId().map(id -> id.equals(name)).orElse(false));
+    } catch (Exception initializationException) {
+      return Either.right(initializationException);
+    } finally {
+      beanNamesBeingInitialized.get().remove(name);
+    }
+    return Either.left(supplier.get());
   }
 
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
@@ -288,29 +431,44 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     initializeComponents(filter, true);
   }
 
+  private void initializeAdditionalComponent(Predicate<ComponentAst> componentModelPredicate) {
+    checkState(currentComponentInitializationState.isInitializationAlreadyDone(),
+               "initializeComponents must have been called before initializeAdditionalComponent");
+
+    // For the time being we only support going for the same "apply start phase" setting as in the original initialization
+    // request.
+    createComponentsAndApplyLifecycle(getRequestBuilder(currentComponentInitializationState.isApplyStartPhaseRequested(),
+                                                        true).build(componentModelPredicate));
+  }
+
   @Override
   public void initializeComponent(Location location, boolean applyStartPhase) {
-    applyLifecycle(createComponents(empty(), of(location), applyStartPhase,
-                                    getParentComponentModelInitializerAdapter(applyStartPhase)),
-                   applyStartPhase);
+    createComponentsAndApplyLifecycle(getRequestBuilder(applyStartPhase, false).build(location));
   }
 
   @Override
   public void initializeComponents(ComponentLocationFilter filter, boolean applyStartPhase) {
-    applyLifecycle(createComponents(of(componentModel -> {
-      if (componentModel.getLocation() != null) {
-        return filter.accept(componentModel.getLocation());
-      }
-      return false;
-    }), empty(), applyStartPhase, getParentComponentModelInitializerAdapter(applyStartPhase)), applyStartPhase);
+    createComponentsAndApplyLifecycle(getRequestBuilder(applyStartPhase, false).build(filter));
   }
 
   @Override
-  public void initializeComponents(Predicate<ComponentAst> componentModelPredicate,
-                                   boolean applyStartPhase) {
-    applyLifecycle(createComponents(of(componentModelPredicate), empty(), applyStartPhase,
-                                    getParentComponentModelInitializerAdapter(applyStartPhase)),
-                   applyStartPhase);
+  public void initializeComponents(Predicate<ComponentAst> componentModelPredicate, boolean applyStartPhase) {
+    createComponentsAndApplyLifecycle(getRequestBuilder(applyStartPhase, false).build(componentModelPredicate));
+  }
+
+  private ComponentInitializationRequest.Builder getRequestBuilder(boolean applyStartPhase, boolean keepPrevious) {
+    return new ComponentInitializationRequest.Builder(graph,
+                                                      currentComponentInitializationState,
+                                                      MuleArtifactContext::isAlwaysEnabledComponent,
+                                                      applyStartPhase,
+                                                      keepPrevious);
+  }
+
+  private void createComponentsAndApplyLifecycle(ComponentInitializationRequest initializationRequest) {
+    applyLifecycle(createComponents(initializationRequest,
+                                    getParentComponentModelInitializerAdapter(initializationRequest
+                                        .isApplyStartPhaseRequested())),
+                   initializationRequest.isApplyStartPhaseRequested());
   }
 
   public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(boolean applyStartPhase) {
@@ -319,89 +477,107 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
             .initializeComponents(componentModelPredicate, applyStartPhase));
   }
 
-  private List<Object> createComponents(Optional<Predicate<ComponentAst>> predicateOptional, Optional<Location> locationOptional,
-                                        boolean applyStartPhase,
+  private void validateModel(ArtifactAst artifactAst) throws ConfigurationException {
+    if (dslDeclarationValidationEnabled) {
+      doValidateModel(artifactAst, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null
+          || v.getClass().getAnnotation(IgnoreOnLazyInit.class).forceDslDeclarationValidation());
+    } else {
+      doValidateModel(artifactAst, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
+    }
+  }
+
+  private void initializeComponentsFromParent(Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
+    if (parentComponentModelInitializerAdapter.isPresent()) {
+      parentComponentModelInitializerAdapter.get()
+          .initializeComponents(componentModel -> graph.getMissingDependencies()
+              .stream()
+              .anyMatch(missingDep -> missingDep.isSatisfiedBy(componentModel)));
+    } else {
+      graph.getMissingDependencies().stream().forEach(missingDep -> {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
+        }
+      });
+    }
+  }
+
+  private void validateRequestedComponentExists(Location location, ArtifactAst minimalArtifactAst) {
+    if (minimalArtifactAst.recursiveStream()
+        .noneMatch(comp -> comp.getLocation() != null
+            && comp.getLocation().getLocation().equals(location.toString()))) {
+      throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
+          + location.toString()));
+    }
+  }
+
+  private void cleanupAndResetComponentsState() {
+    // First unregister any already initialized/started component
+    unregisterBeans(currentComponentInitializationState.getTrackedBeansInOrder());
+
+    objectProviders.clear();
+    resetMuleSecurityManager();
+  }
+
+  private void doRegisterErrors(ComponentInitializationRequest initializationRequest) {
+    if (currentComponentInitializationState.isAllErrorTypesRegistered()) {
+      // Once all error types from the full artifact AST have been registered there is no point in doing it again
+      return;
+    }
+
+    if (initializationRequest.isKeepPreviousRequested()) {
+      // We do not currently have the capability to add error types to the repository incrementally, hence we need to register
+      // all error types this time.
+      // Note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
+      // is because the FilteredArtifactAst has some special case for error handlers.
+      doRegisterErrors(new FilteredArtifactAst(getApplicationModel(), c -> true));
+      currentComponentInitializationState.setAllErrorTypesRegistered();
+    } else {
+      // If we do not care about previously registered errors, we can discover the error types just from the filtered AST
+      doRegisterErrors(initializationRequest.getFilteredAstToInitialize());
+    }
+  }
+
+  private List<Object> createComponents(ComponentInitializationRequest initializationRequest,
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
-    checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
     return withContextClassLoader(getMuleContext().getExecutionClassLoader(), () -> {
-      // User input components to be initialized...
-      final Predicate<ComponentAst> basePredicate =
-          predicateOptional.orElseGet(() -> comp -> comp.getLocation() != null
-              && comp.getLocation().getLocation().equals(locationOptional.get().toString()));
-
-      final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-
-      if (dslDeclarationValidationEnabled) {
-        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null
-            || v.getClass().getAnnotation(IgnoreOnLazyInit.class).forceDslDeclarationValidation());
-      } else {
-        doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
-      }
-
-      if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
-          .noneMatch(comp -> comp.getLocation() != null
-              && comp.getLocation().getLocation().equals(loc.toString())))
-          .orElse(false)) {
-        throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
-            + locationOptional.get().toString()));
-      }
-
-      Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))
-          .orElseGet(() -> getApplicationModel()
-              .filteredComponents(basePredicate)
-              .map(comp -> comp.getLocation().getLocation())
-              .collect(toSet()));
-
-      if (copyOf(currentComponentLocationsRequested).equals(copyOf(requestedLocations)) &&
-          appliedStartedPhaseRequest == applyStartPhase) {
-        // Same minimalApplication has been requested, so we don't need to recreate the same beans.
+      // Checks if the current request is compatible with the already created components, so can we avoid doing anything.
+      if (currentComponentInitializationState.isRequestSatisfied(initializationRequest)) {
         return emptyList();
       }
 
-      if (parentComponentModelInitializerAdapter.isPresent()) {
-        parentComponentModelInitializerAdapter.get()
-            .initializeComponents(componentModel -> graph.getMissingDependencies()
-                .stream()
-                .anyMatch(missingDep -> missingDep.isSatisfiedBy(componentModel)));
-      } else {
-        graph.getMissingDependencies().stream().forEach(missingDep -> {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
-          }
-        });
+      initializationRequest.validateRequestedAst(this::validateModel);
+      ArtifactAst minimalAst = initializationRequest.getFilteredAstToInitialize();
+
+      initializationRequest.getLocation()
+          .ifPresent(location -> validateRequestedComponentExists(location, minimalAst));
+
+      // We always initialize all components in the parent that are referenced from the *full* AST.
+      // For that reason, we don't need to make any particular consideration when "keep previous" is requested.
+      // Take that into account if we ever decide to change that.
+      initializeComponentsFromParent(parentComponentModelInitializerAdapter);
+
+      if (!initializationRequest.isKeepPreviousRequested()) {
+        cleanupAndResetComponentsState();
       }
 
-      // First unregister any already initialized/started component
-      unregisterBeans(trackingPostProcessor.getBeansTracked());
-
-      currentComponentLocationsRequested.clear();
-      currentComponentLocationsRequested.addAll(requestedLocations);
-      appliedStartedPhaseRequest = applyStartPhase;
-
-      // Clean up resources...
-      trackingPostProcessor.reset();
-      objectProviders.clear();
-      resetMuleSecurityManager();
-
       // This has to be called after all previous state has been cleared because the unregister/cleanup process requires the
-      // errorTypeRespository as it was during its initialization.
-      doRegisterErrors(minimalApplicationModel);
+      // errorTypeRepository as it was during its initialization.
+      doRegisterErrors(initializationRequest);
 
-      List<Pair<String, ComponentAst>> applicationComponents =
-          createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+      // Remembers the currently requested locations in order to skip future requests if they are compatible.
+      currentComponentInitializationState.update(initializationRequest);
 
-      super.prepareObjectProviders();
+      // Registers the bean definitions for the artifact components in the minimal model.
+      List<Pair<String, ComponentAst>> components =
+          createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalAst, false);
 
-      LOGGER.debug("Will create beans: {}", applicationComponents);
-      return createBeans(applicationComponents);
+      // Prepares/configures any recently discovered object providers
+      prepareObjectProviders(currentComponentInitializationState.takeObjectProvidersToConfigure());
+
+      // Finally, creates the beans corresponding to the requested components.
+      LOGGER.debug("Will create beans: {}", components);
+      return createBeans(components);
     });
-  }
-
-  private ArtifactAst buildMinimalApplicationModel(final Predicate<ComponentAst> basePredicate) {
-    return graph.minimalArtifactFor(basePredicate
-        .or(cm -> cm.getModel(HasStereotypeModel.class)
-            .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
-            .orElse(false)));
   }
 
   /**
@@ -468,7 +644,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @return List beans created for the given component names sorted by precedence.
    */
   private List<Object> createBeans(List<Pair<String, ComponentAst>> applicationComponentNames) {
-    trackingPostProcessor.startTracking();
+    currentComponentInitializationState.startTrackingBeans();
     Map<Pair<String, ComponentAst>, Object> objects = new LinkedHashMap<>();
     // Create beans only once by calling the lookUp at the Registry
     applicationComponentNames.forEach(componentPair -> {
@@ -485,8 +661,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           objects.put(componentPair, object);
         }
       } catch (Exception e) {
-        trackingPostProcessor.stopTracking();
-        trackingPostProcessor.intersection(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+        currentComponentInitializationState
+            .commitTrackedBeansContainedIn(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
         safeUnregisterBean(componentPair.getFirst());
 
         throw new MuleRuntimeException(e);
@@ -502,8 +678,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     });
 
     // TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
-    trackingPostProcessor.stopTracking();
-    trackingPostProcessor.intersection(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+    currentComponentInitializationState
+        .commitTrackedBeansContainedIn(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
 
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());
@@ -551,27 +727,19 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
-  protected void prepareObjectProviders() {
-    // Do not prepare object providers at this point. No components are going to be created yet. This will be done when creating
-    // lazy components
+  protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
+    super.onObjectProviderDiscovered(objectProvider);
+    currentComponentInitializationState.registerObjectProviderToConfigure(objectProvider);
   }
 
   @Override
   public void close() {
-    if (trackingPostProcessor != null) {
-      trackingPostProcessor.stopTracking();
-      trackingPostProcessor.reset();
-    }
-
-    appliedStartedPhaseRequest = false;
-    currentComponentLocationsRequested.clear();
-
+    currentComponentInitializationState.clear();
     super.close();
   }
 
   private void unregisterBeans(List<String> beans) {
-    doUnregisterBeans(beans.stream()
-        .collect(toCollection(LinkedList::new)).descendingIterator());
+    doUnregisterBeans(new LinkedList<>(beans).descendingIterator());
     componentLocator.removeComponents();
   }
 
@@ -586,9 +754,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       try {
         unregisterObject(getMuleContext(), beanName);
       } catch (Exception e) {
-        logger.error(String
-            .format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
-                    beanName, e.getMessage()));
+        logger.error(
+                     format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
+                            beanName, e.getMessage()));
         throw new MuleRuntimeException(I18nMessageFactory
             .createStaticMessage("There was an error while unregistering component '%s'", beanName), e);
       }

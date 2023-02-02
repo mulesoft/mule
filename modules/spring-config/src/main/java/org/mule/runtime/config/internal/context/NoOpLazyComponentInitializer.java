@@ -23,5 +23,4 @@ public class NoOpLazyComponentInitializer implements LazyComponentInitializer {
   public void initializeComponent(Location location) {
     // Nothing to do...
   }
-
 }

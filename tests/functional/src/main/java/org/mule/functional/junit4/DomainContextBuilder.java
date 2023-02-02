@@ -41,6 +41,8 @@ public class DomainContextBuilder {
   private String contextId;
   private String[] domainConfig = new String[0];
   private ArtifactCoordinates artifactCoordinates;
+  private boolean isEnableLazyInit = false;
+  private boolean isDisableXmlValidations = false;
 
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
@@ -53,6 +55,28 @@ public class DomainContextBuilder {
 
   public DomainContextBuilder setDomainConfig(String... domainConfig) {
     this.domainConfig = domainConfig;
+    return this;
+  }
+
+  /**
+   * Controls whether lazy initialization of components is enabled/disabled.
+   *
+   * @param enableLazyInit whether lazy initialization is enabled.
+   * @since 4.6
+   */
+  public DomainContextBuilder setEnableLazyInit(boolean enableLazyInit) {
+    isEnableLazyInit = enableLazyInit;
+    return this;
+  }
+
+  /**
+   * Controls whether if XML validations should be done over the configuration file.
+   *
+   * @param disableXmlValidations whether XML validations are disabled.
+   * @since 4.6
+   */
+  public DomainContextBuilder setDisableXmlValidations(boolean disableXmlValidations) {
+    isDisableXmlValidations = disableXmlValidations;
     return this;
   }
 
@@ -105,7 +129,12 @@ public class DomainContextBuilder {
 
   private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
     ArtifactAstXmlParserConfigurationBuilder appBuilder =
-        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, false, configResources,
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(),
+                                                     isDisableXmlValidations,
+                                                     isEnableLazyInit,
+                                                     false,
+                                                     false,
+                                                     configResources,
                                                      getExpressionLanguageMetadataService());
     appBuilder.setArtifactType(ArtifactType.DOMAIN);
     return appBuilder;

@@ -400,14 +400,25 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
 
-    prepareObjectProviders();
+    prepareObjectProviders(objectProviders);
   }
 
-  protected void prepareObjectProviders() {
+  /**
+   * Configures the given {@link ConfigurableObjectProvider}s.
+   *
+   * @param configurableObjectProviders The {@link ConfigurableObjectProvider}s to configure.
+   */
+  protected void prepareObjectProviders(List<ConfigurableObjectProvider> configurableObjectProviders) {
+    // If the object providers list is empty we don't even bother creating the ObjectProviderConfiguration
+    // (this may happen during lazy initialization for example)
+    if (configurableObjectProviders.isEmpty()) {
+      return;
+    }
+
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(configurationProperties, muleArtifactObjectProvider);
-    for (ConfigurableObjectProvider objectProvider : objectProviders) {
+    for (ConfigurableObjectProvider objectProvider : configurableObjectProviders) {
       objectProvider.configure(providerConfiguration);
     }
   }
@@ -467,6 +478,27 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   /**
+   * @param componentAst The {@link ComponentAst} to test.
+   * @return if the {@code componentAst} needs to be always enabled.
+   */
+  protected static boolean isAlwaysEnabledComponent(ComponentAst componentAst) {
+    return componentAst.getModel(HasStereotypeModel.class)
+        .map(stm -> stm.getStereotype() != null && stm.getStereotype().isAssignableTo(APP_CONFIG))
+        .orElse(false);
+  }
+
+  /**
+   * Callback to perform actions when a new configurable object provider is discovered as part of the creation of components.
+   * <p>
+   * Derived classes must call the super class's implementation of this method.
+   *
+   * @param objectProvider The {@link ConfigurableObjectProvider} just discovered.
+   */
+  protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
+    objectProviders.add(objectProvider);
+  }
+
+  /**
    * Creates the definition for all the objects to be created form the enabled components in the {@code applicationModel}.
    *
    * @param beanFactory      the bean factory in which definition must be created.
@@ -487,9 +519,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                                            Map<ComponentAst, SpringComponentModel> springComponentModels) {
     Set<String> alwaysEnabledTopLevelComponents = new HashSet<>();
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(cm -> cm.getModel(HasStereotypeModel.class)
-            .map(stm -> stm.getStereotype().isAssignableTo(APP_CONFIG))
-            .orElse(false))
+        .filter(MuleArtifactContext::isAlwaysEnabledComponent)
         .peek(cm -> cm.getComponentId().ifPresent(alwaysEnabledTopLevelComponents::add))
         .filter(cm -> !cm.getComponentId().isPresent())
         .map(ComponentAst::getIdentifier)
@@ -534,7 +564,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     objectProvidersByName.stream()
         .map(pair -> springComponentModels.get(pair.getFirst()).getObjectInstance())
-        .forEach(this.objectProviders::add);
+        .forEach(this::onObjectProviderDiscovered);
     registerObjectFromObjectProviders(beanFactory);
 
     Set<String> objectProviderNames = objectProvidersByName.stream()

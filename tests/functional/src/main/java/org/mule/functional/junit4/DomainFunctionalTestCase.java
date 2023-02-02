@@ -85,6 +85,25 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     return new String[] {getDomainConfig()};
   }
 
+  /**
+   * @return whether the applications and domains should start in lazy mode. This means that the components will be initialized on
+   *         demand.
+   * @since 4.6
+   * @see FunctionalTestCase#enableLazyInit()
+   */
+  protected boolean enableLazyInit() {
+    return false;
+  }
+
+  /**
+   * @return whether the applications and domains should be parsed without XML Validations.
+   * @since 4.6
+   * @see FunctionalTestCase#disableXmlValidations()
+   */
+  protected boolean disableXmlValidations() {
+    return false;
+  }
+
   public synchronized void disposeMuleContext(final MuleContext muleContext) {
     disposedContexts.add(muleContext);
     muleContext.dispose();
@@ -121,6 +140,8 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
       }
     }
         .setContextId(this.getClass().getSimpleName())
+        .setEnableLazyInit(enableLazyInit())
+        .setDisableXmlValidations(disableXmlValidations())
         .setDomainConfig(getDomainConfigs());
 
     final ArtifactContext domainArtifactContext = domainContextBuilder.build();
@@ -174,6 +195,8 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
         .setDomainArtifactContext(domainArtifactContext)
         .setApplicationResources(configResource)
         .setArtifactCoordinates(getTestArtifactCoordinates())
+        .setEnableLazyInit(enableLazyInit())
+        .setDisableXmlValidations(disableXmlValidations())
         .build();
   }
 
