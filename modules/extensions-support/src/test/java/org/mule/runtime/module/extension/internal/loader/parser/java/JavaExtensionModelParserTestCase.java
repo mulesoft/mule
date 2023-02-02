@@ -106,7 +106,7 @@ public class JavaExtensionModelParserTestCase {
     JavaExtensionModelParser parser = getParser(ExtensionWithSuperExtension.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Extension ExtensionWithSuperExtension has min mule version 4.4 because of its super class ParameterizedExtension. Extension ParameterizedExtension has min mule version 4.4 because of its field extensionParameter. Field extensionParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Extension ExtensionWithSuperExtension has min mule version 4.4 because of its super class ParameterizedExtension. Extension ParameterizedExtension has min mule version 4.4 because of its field extensionParameter. Field extensionParameter has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -114,7 +114,7 @@ public class JavaExtensionModelParserTestCase {
     JavaExtensionModelParser parser = getParser(ParameterizedExtension.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Extension MixedConfigurationsAnnotationExtension has min mule version 4.4 because of its field extensionParameter. Field extensionParameter has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Extension MixedConfigurationsAnnotationExtension has min mule version 4.4 because of its field extensionParameter. Field extensionParameter has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test

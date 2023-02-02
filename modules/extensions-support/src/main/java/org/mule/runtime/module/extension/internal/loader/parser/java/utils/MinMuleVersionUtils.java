@@ -652,16 +652,16 @@ public final class MinMuleVersionUtils {
 
   private static MinMuleVersionResult getEnforcedMinMuleVersion(Type type) {
     if (type.isAnnotatedWith(DoNotEnforceMinMuleVersion.class)) {
-      return new MinMuleVersionResult(type.getTypeName(), FIRST_MULE_VERSION,
+      return new MinMuleVersionResult(type.getName(), FIRST_MULE_VERSION,
                                       format("%s has the default base min mule version %s because it is annotated with @DoNotEnforceMinMuleVersion.",
-                                             type.getTypeName(), FIRST_MULE_VERSION));
+                                             type.getName(), FIRST_MULE_VERSION));
     }
     Optional<MuleVersion> mmv = getMinMuleVersionFromAnnotations(type);
     return mmv
-        .map(muleVersion -> new MinMuleVersionResult(type.getTypeName(), muleVersion,
+        .map(muleVersion -> new MinMuleVersionResult(type.getName(), muleVersion,
                                                      format("%s has min mule version %s because it is annotated with @MinMuleVersion.",
-                                                            type.getTypeName(), muleVersion)))
-        .orElseGet(() -> createResultWithDefaultMMV("Type", type.getTypeName()));
+                                                            type.getName(), muleVersion)))
+        .orElseGet(() -> createResultWithDefaultMMV("Type", type.getName()));
   }
 
   private static Optional<MuleVersion> getMinMuleVersionFromAnnotations(WithAnnotations type) {

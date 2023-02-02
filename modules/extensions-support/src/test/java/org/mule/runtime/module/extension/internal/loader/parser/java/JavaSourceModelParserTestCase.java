@@ -179,7 +179,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SdkNonClusteredSource.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SdkNonClusteredSource has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.source.ClusterSupport. org.mule.sdk.api.annotation.source.ClusterSupport has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SdkNonClusteredSource has min mule version 4.5.0 because it is annotated with ClusterSupport. ClusterSupport has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -195,7 +195,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceListResultOutput.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceListResultOutput has min mule version 4.4 because it has a generic of type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Source SourceListResultOutput has min mule version 4.4 because it has a generic of type Result. Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -203,7 +203,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceResultOutput.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceResultOutput has min mule version 4.4 because it has a generic of type org.mule.sdk.api.runtime.operation.Result. org.mule.sdk.api.runtime.operation.Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Source SourceResultOutput has min mule version 4.4 because it has a generic of type Result. Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -211,14 +211,15 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceImplementsReconnectable.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceImplementsReconnectable has min mule version 4.5.0 because it implements interface org.mule.sdk.api.runtime.connectivity.Reconnectable. org.mule.sdk.api.runtime.connectivity.Reconnectable has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceImplementsReconnectable has min mule version 4.5.0 because it implements interface Reconnectable. Reconnectable has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
   public void getMMVForSourceExtendsExtraReconnectable() {
     mockSourceWrapperWithClass(SourceImplementsExtraReconnectable.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
-    assertThat(parser.getMinMuleVersionResult().getReason(), is(getMessageStringForSourceExtendsExtraReconnectable()));
+    assertThat(parser.getMinMuleVersionResult().getReason(),
+               is("Source SourceImplementsExtraReconnectable has min mule version 4.5.0 because it implements interface ExtraReconnectable. Interface ExtraReconnectable has min mule version 4.5.0 because it implements Reconnectable. Reconnectable has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -226,7 +227,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SdkEmitsResponseSource.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SdkEmitsResponseSource has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.source.EmitsResponse. org.mule.sdk.api.annotation.source.EmitsResponse has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SdkEmitsResponseSource has min mule version 4.5.0 because it is annotated with EmitsResponse. EmitsResponse has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -234,7 +235,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithSdkField.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithSdkField has min mule version 4.5.0 because of its field someField. Field someField has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithSdkField has min mule version 4.5.0 because of its field someField. Field someField has min mule version 4.5.0 because it is of type Literal. Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -242,7 +243,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithInjectedSdkField.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithInjectedSdkField has min mule version 4.5.0 because of its field objectStoreManager. Field objectStoreManager has min mule version 4.5.0 because it is of type org.mule.sdk.api.store.ObjectStoreManager. org.mule.sdk.api.store.ObjectStoreManager has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithInjectedSdkField has min mule version 4.5.0 because of its field objectStoreManager. Field objectStoreManager has min mule version 4.5.0 because it is of type ObjectStoreManager. ObjectStoreManager has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -258,7 +259,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithAutomaticallyInjectedSdkField.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithAutomaticallyInjectedSdkField has min mule version 4.5.0 because of its field sourceTransactionalAction. Field sourceTransactionalAction has min mule version 4.5.0 because it is of type org.mule.sdk.api.tx.SourceTransactionalAction. org.mule.sdk.api.tx.SourceTransactionalAction has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithAutomaticallyInjectedSdkField has min mule version 4.5.0 because of its field sourceTransactionalAction. Field sourceTransactionalAction has min mule version 4.5.0 because it is of type SourceTransactionalAction. SourceTransactionalAction has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -266,7 +267,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithSdkConnectionProvider.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithSdkConnectionProvider has min mule version 4.5 because of its field connectionProvider. Field connectionProvider has min mule version 4.5 because it is of type org.mule.sdk.api.connectivity.ConnectionProvider. org.mule.sdk.api.connectivity.ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithSdkConnectionProvider has min mule version 4.5 because of its field connectionProvider. Field connectionProvider has min mule version 4.5 because it is of type ConnectionProvider. ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -274,7 +275,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithSdkParameterField.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithSdkParameterField has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithSdkParameterField has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -290,7 +291,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithSdkParameterGroup.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithSdkParameterGroup has min mule version 4.4 because of its field sdkParameterGroup. Field sdkParameterGroup has min mule version 4.4 because it is a parameter group of type SdkParameterGroup. Type SdkParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Parameter. org.mule.sdk.api.annotation.param.Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithSdkParameterGroup has min mule version 4.4 because of its field sdkParameterGroup. Field sdkParameterGroup has min mule version 4.4 because it is a parameter group of type SdkParameterGroup. Type SdkParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -298,7 +299,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithSdkParametersContainer.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithSdkParametersContainer has min mule version 4.5.0 because of its field parametersContainer. Field parametersContainer has min mule version 4.5.0 because it is a parameter of type SdkParametersContainer. Type SdkParametersContainer has min mule version 4.5.0 because of its field sdkLiteralParameter. Field sdkLiteralParameter has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithSdkParametersContainer has min mule version 4.5.0 because of its field parametersContainer. Field parametersContainer has min mule version 4.5.0 because it is a parameter of type SdkParametersContainer. Type SdkParametersContainer has min mule version 4.5.0 because of its field sdkLiteralParameter. Field sdkLiteralParameter has min mule version 4.5.0 because it is of type Literal. Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -306,7 +307,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithNestedContainer.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithNestedContainer has min mule version 4.5.0 because of its field parametersContainer. Field parametersContainer has min mule version 4.5.0 because it is a parameter of type HasNestedContainer. Type HasNestedContainer has min mule version 4.5.0 because of its field nestedContainer. Field nestedContainer has min mule version 4.5.0 because it is a parameter of type SdkParametersContainer. Type SdkParametersContainer has min mule version 4.5.0 because of its field sdkLiteralParameter. Field sdkLiteralParameter has min mule version 4.5.0 because it is of type org.mule.sdk.api.runtime.parameter.Literal. org.mule.sdk.api.runtime.parameter.Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithNestedContainer has min mule version 4.5.0 because of its field parametersContainer. Field parametersContainer has min mule version 4.5.0 because it is a parameter of type HasNestedContainer. Type HasNestedContainer has min mule version 4.5.0 because of its field nestedContainer. Field nestedContainer has min mule version 4.5.0 because it is a parameter of type SdkParametersContainer. Type SdkParametersContainer has min mule version 4.5.0 because of its field sdkLiteralParameter. Field sdkLiteralParameter has min mule version 4.5.0 because it is of type Literal. Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -330,7 +331,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceOnError.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceOnError has min mule version 4.5.0 because of its method onError. Method onError has min mule version 4.5.0 because it is annotated with org.mule.sdk.api.annotation.execution.OnError. org.mule.sdk.api.annotation.execution.OnError has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Source SourceOnError has min mule version 4.5.0 because of its method onError. Method onError has min mule version 4.5.0 because it is annotated with OnError. OnError has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -362,7 +363,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithLowerMMVAnnotation.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Calculated Min Mule Version is 4.5.0 which is greater than the one set at the source class level 4.4. Overriding it. Source SourceWithLowerMMVAnnotation has min mule version 4.5.0 because of its field sourceTransactionalAction. Field sourceTransactionalAction has min mule version 4.5.0 because it is of type org.mule.sdk.api.tx.SourceTransactionalAction. org.mule.sdk.api.tx.SourceTransactionalAction has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Calculated Min Mule Version is 4.5.0 which is greater than the one set at the source class level 4.4. Overriding it. Source SourceWithLowerMMVAnnotation has min mule version 4.5.0 because of its field sourceTransactionalAction. Field sourceTransactionalAction has min mule version 4.5.0 because it is of type SourceTransactionalAction. SourceTransactionalAction has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -378,7 +379,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithRecursiveParameter.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Source SourceWithRecursiveParameter has min mule version 4.4 because of its field recursiveParameter. Field recursiveParameter has min mule version 4.4 because it is a parameter of type RecursiveClass. Type RecursiveClass has min mule version 4.4 because of its field recursiveField. Field recursiveField has min mule version 4.4 because it is annotated with org.mule.sdk.api.annotation.param.Optional. org.mule.sdk.api.annotation.param.Optional has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithRecursiveParameter has min mule version 4.4 because of its field recursiveParameter. Field recursiveParameter has min mule version 4.4 because it is a parameter of type RecursiveClass. Type RecursiveClass has min mule version 4.4 because of its field recursiveField. Field recursiveField has min mule version 4.4 because it is annotated with Optional. Optional has min mule version 4.4 because it is annotated with @MinMuleVersion."));
   }
 
   private boolean parseEmitsResponseFromSourceClass(Class<? extends Source> sourceClass) {
@@ -400,10 +401,6 @@ public class JavaSourceModelParserTestCase {
     sourceElement = new SourceTypeWrapper<>(sourceClass, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     parser = new JavaSourceModelParser(mock(ExtensionElement.class), sourceElement, mock(ExtensionLoadingContext.class));
-  }
-
-  protected String getMessageStringForSourceExtendsExtraReconnectable() {
-    return "Source SourceImplementsExtraReconnectable has min mule version 4.5.0 because it implements interface org.mule.runtime.module.extension.internal.loader.parser.java.JavaSourceModelParserTestCase$ExtraReconnectable. Interface ExtraReconnectable has min mule version 4.5.0 because it implements org.mule.sdk.api.runtime.connectivity.Reconnectable. org.mule.sdk.api.runtime.connectivity.Reconnectable has min mule version 4.5.0 because it is annotated with @MinMuleVersion.";
   }
 
   public static class TestSource extends Source<String, Object> {
