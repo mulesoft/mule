@@ -40,7 +40,13 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
                                                                            removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
-  private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
+  private final Cache<Transaction, FluxSinkWrapper> sinksNestedTx =
+      Caffeine.newBuilder().weakKeys()
+          .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
+                                                                                removalCause) -> coreEventFluxSink.complete())
+          .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+  private final Cache<Transaction, FluxSink<CoreEvent>> legacySinksNestedTx =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
                                                                                 removalCause) -> coreEventFluxSink.complete())
@@ -66,22 +72,43 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
   public FluxSink<CoreEvent> getSink() {
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
-      return sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
+      if (sinkIndexEnabled) {
+        return getNestedFluxSinkWrapper(txCoord);
+      } else {
+        return sinksNestedTx.get(txCoord.getTransaction(), tx -> new FluxSinkWrapper(createSink()));
+      }
     } else {
       if (sinkIndexEnabled) {
-        int index = 0;
-        while (true) {
-          FluxSinkWrapper fluxSinkWrapper =
-              sinks.get(currentThread().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
-          if (fluxSinkWrapper.isBeingUsed()) {
-            index++;
-            continue;
-          }
-          return fluxSinkWrapper;
-        }
+        return getSimpleFluxSinkWrapper();
       } else {
         return legacySinks.get(currentThread(), t -> new FluxSinkWrapper(createSink()));
       }
+    }
+  }
+
+  private FluxSink<CoreEvent> getNestedFluxSinkWrapper(TransactionCoordination txCoord) {
+    int index = 0;
+    while (true) {
+      FluxSinkWrapper fluxSinkWrapper =
+          sinks.get(txCoord.getTransaction().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
+      if (fluxSinkWrapper.isBeingUsed()) {
+        index++;
+        continue;
+      }
+      return fluxSinkWrapper;
+    }
+  }
+
+  private FluxSinkWrapper getSimpleFluxSinkWrapper() {
+    int index = 0;
+    while (true) {
+      FluxSinkWrapper fluxSinkWrapper =
+          sinks.get(currentThread().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
+      if (fluxSinkWrapper.isBeingUsed()) {
+        index++;
+        continue;
+      }
+      return fluxSinkWrapper;
     }
   }
 
