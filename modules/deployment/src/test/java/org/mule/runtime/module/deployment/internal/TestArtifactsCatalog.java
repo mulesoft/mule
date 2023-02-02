@@ -39,7 +39,11 @@ import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import java.io.File;
 import java.net.URISyntaxException;
 
-public class TestArtifactsCatalog {
+/**
+ * Utility class that holds most of the artifacts used in the deployment module test cases, in order to avoid compiling or
+ * creating them repeatedly for each test.
+ */
+public final class TestArtifactsCatalog {
 
   private static final String MIN_MULE_VERSION = "4.0.0";
 
@@ -267,7 +271,15 @@ public class TestArtifactsCatalog {
   public static ArtifactPluginFileBuilder oracleExtensionPlugin;
   public static ArtifactPluginFileBuilder loadClassExtensionPlugin;
   public static ArtifactPluginFileBuilder callbackExtensionPlugin;
-  public static ArtifactPluginFileBuilder callbackExtensionPlusEcho;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin1Echo;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin2Echo;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin2EchoAndBar2;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin3Echo;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusForbidden;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusForbiddenContainerClass;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusForbiddenThirdPartyClass;
+  public static ArtifactPluginFileBuilder callbackExtensionLoadingResource;
+  public static ArtifactPluginFileBuilder callbackExtensionCustomException;
   public static ArtifactPluginFileBuilder exceptionThrowingPlugin;
   public static ArtifactPluginFileBuilder byeXmlExtensionPlugin;
   public static ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin;
@@ -298,8 +310,25 @@ public class TestArtifactsCatalog {
     echoPluginWithLib1 = createEchoPluginWithLib1();
 
     callbackExtensionPlugin = createCallbackExtensionPluginFileBuilder();
-    callbackExtensionPlusEcho = createCallbackExtensionPluginFileBuilder()
+    callbackExtensionPlusPlugin1Echo = createCallbackExtensionPluginFileBuilder()
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+    callbackExtensionPlusPlugin2Echo = createCallbackExtensionPluginFileBuilder()
+        .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
+    callbackExtensionPlusPlugin2EchoAndBar2 = createCallbackExtensionPluginFileBuilder()
+        .dependingOn(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
+        .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
+    callbackExtensionPlusPlugin3Echo = createCallbackExtensionPluginFileBuilder()
+        .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class");
+    callbackExtensionPlusForbidden = createCallbackExtensionPluginFileBuilder()
+        .containingClass(pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class");
+    callbackExtensionPlusForbiddenContainerClass = createCallbackExtensionPluginFileBuilder()
+        .containingClass(pluginForbiddenMuleContainerEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleContainerEcho.class");
+    callbackExtensionPlusForbiddenThirdPartyClass = createCallbackExtensionPluginFileBuilder()
+        .containingClass(pluginForbiddenMuleThirdPartyEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleThirdPartyEcho.class");
+    callbackExtensionLoadingResource = createCallbackExtensionPluginFileBuilder()
+        .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
+    callbackExtensionCustomException = createCallbackExtensionPluginFileBuilder()
+        .containingClass(customExceptionClassFile, "org/exception/CustomException.class");
 
     echoPluginWithJavaxLib = createEchoPluginWithJavaxLib();
   }
@@ -440,7 +469,7 @@ public class TestArtifactsCatalog {
         .describedBy((mulePluginModelBuilder.build()));
   }
 
-  public static ArtifactPluginFileBuilder createCallbackExtensionPluginFileBuilder() {
+  private static ArtifactPluginFileBuilder createCallbackExtensionPluginFileBuilder() {
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("callbackExtensionPlugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
@@ -536,5 +565,4 @@ public class TestArtifactsCatalog {
         .dependingOn(new JarFileBuilder("goodbyeExtensionV1", goodbyeExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
-
 }

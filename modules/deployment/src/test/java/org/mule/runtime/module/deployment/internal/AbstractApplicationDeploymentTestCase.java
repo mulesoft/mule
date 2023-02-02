@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusEcho;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin1Echo;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 
@@ -57,7 +57,7 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(callbackExtensionPlusEcho);
+        .dependingOn(callbackExtensionPlusPlugin1Echo);
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {

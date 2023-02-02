@@ -7,18 +7,19 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Arrays.asList;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtils1ClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionLoadingResource;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
 import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
+
+import static java.util.Arrays.asList;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
@@ -27,13 +28,12 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @Feature(APP_DEPLOYMENT)
 @RunWith(Parameterized.class)
@@ -87,15 +87,11 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
   @Issue("MULE-13756")
   @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
   public void deploysAppWithLocalPackage() throws Exception {
-    ArtifactPluginFileBuilder callbackPluginLoadingResource = createCallbackExtensionPluginFileBuilder()
-        .containingClass(loadsAppResourceCallbackClassFile,
-                         "org/foo/LoadsAppResourceCallback.class");
-
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .dependingOn(callbackPluginLoadingResource)
+        .dependingOn(callbackExtensionLoadingResource)
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
         .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class")
         .containingResource("test-resource.txt", "test-resource.txt")

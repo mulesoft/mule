@@ -30,21 +30,21 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.b
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenJavaJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionCustomException;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionLoadingResource;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin1Echo;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin2Echo;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConnectExtensionPlugin;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.createCallbackExtensionPluginFileBuilder;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.customExceptionClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.goodbyeExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV2Plugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadClassExtensionPlugin;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.loadsAppResourceCallbackJarFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho1ClassFile;
-import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
@@ -252,8 +252,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app")
         .definedBy("app-shared-lib-precedence-config.xml")
         .dependingOnSharedLibrary(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
-        .dependingOn(createCallbackExtensionPluginFileBuilder().containingClass(pluginEcho1ClassFile,
-                                                                                "org/foo/Plugin1Echo.class"))
+        .dependingOn(callbackExtensionPlusPlugin1Echo)
         .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -275,8 +274,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
             .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
-            .dependingOn(createCallbackExtensionPluginFileBuilder().containingClass(pluginEcho1ClassFile,
-                                                                                    "org/foo/Plugin1Echo.class"))
+            .dependingOn(callbackExtensionPlusPlugin1Echo)
             .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -336,8 +334,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .definedBy("app-plugin-different-lib-config.xml")
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
-            .dependingOn(createCallbackExtensionPluginFileBuilder()
-                .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class"));
+            .dependingOn(callbackExtensionPlusPlugin2Echo);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -370,8 +367,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .definedBy("app-plugin-different-lib-config.xml")
             .dependingOn(echoPluginWithLib1)
             .dependingOn(domainFileBuilder)
-            .dependingOn(createCallbackExtensionPluginFileBuilder()
-                .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class"));
+            .dependingOn(callbackExtensionPlusPlugin2Echo);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
@@ -409,8 +405,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ApplicationFileBuilder applicationFileBuilder =
         createExtensionApplicationWithServices("exception-throwing-app.xml")
-            .dependingOn(createCallbackExtensionPluginFileBuilder().containingClass(customExceptionClassFile,
-                                                                                    "org/exception/CustomException.class"));
+            .dependingOn(callbackExtensionCustomException);
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
 
@@ -866,8 +861,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .dependingOn(createCallbackExtensionPluginFileBuilder()
-            .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class"))
+        .dependingOn(callbackExtensionLoadingResource)
         .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
