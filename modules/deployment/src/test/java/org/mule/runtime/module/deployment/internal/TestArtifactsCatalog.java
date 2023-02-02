@@ -271,6 +271,7 @@ public final class TestArtifactsCatalog {
   public static ArtifactPluginFileBuilder oracleExtensionPlugin;
   public static ArtifactPluginFileBuilder loadClassExtensionPlugin;
   public static ArtifactPluginFileBuilder callbackExtensionPlugin;
+  public static ArtifactPluginFileBuilder callbackExtensionPlusEcho;
   public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin1Echo;
   public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin2Echo;
   public static ArtifactPluginFileBuilder callbackExtensionPlusPlugin2EchoAndBar2;
@@ -310,8 +311,10 @@ public final class TestArtifactsCatalog {
     echoPluginWithLib1 = createEchoPluginWithLib1();
 
     callbackExtensionPlugin = createCallbackExtensionPluginFileBuilder();
-    callbackExtensionPlusPlugin1Echo = createCallbackExtensionPluginFileBuilder()
+    callbackExtensionPlusEcho = createCallbackExtensionPluginFileBuilder()
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+    callbackExtensionPlusPlugin1Echo = createCallbackExtensionPluginFileBuilder()
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
     callbackExtensionPlusPlugin2Echo = createCallbackExtensionPluginFileBuilder()
         .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
     callbackExtensionPlusPlugin2EchoAndBar2 = createCallbackExtensionPluginFileBuilder()
