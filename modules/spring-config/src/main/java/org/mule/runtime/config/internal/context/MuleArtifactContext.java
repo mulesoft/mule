@@ -400,7 +400,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
 
-    prepareObjectProviders();
+    prepareObjectProviders(objectProviders);
   }
 
   /**
@@ -409,19 +409,18 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * @param configurableObjectProviders The {@link ConfigurableObjectProvider}s to configure.
    */
   protected void prepareObjectProviders(List<ConfigurableObjectProvider> configurableObjectProviders) {
+    // If the object providers list is empty we don't even bother creating the ObjectProviderConfiguration
+    // (this may happen during lazy initialization for example)
+    if (configurableObjectProviders.isEmpty()) {
+      return;
+    }
+
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(configurationProperties, muleArtifactObjectProvider);
     for (ConfigurableObjectProvider objectProvider : configurableObjectProviders) {
       objectProvider.configure(providerConfiguration);
     }
-  }
-
-  /**
-   * Configures the discovered {@link ConfigurableObjectProvider}s.
-   */
-  protected void prepareObjectProviders() {
-    prepareObjectProviders(objectProviders);
   }
 
   /**

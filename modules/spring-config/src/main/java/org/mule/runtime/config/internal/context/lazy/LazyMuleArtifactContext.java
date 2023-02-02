@@ -728,12 +728,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
-  protected void prepareObjectProviders() {
-    // Do not prepare object providers at this point. No components are going to be created yet. This will be done when creating
-    // lazy components
-  }
-
-  @Override
   protected void onObjectProviderDiscovered(ConfigurableObjectProvider objectProvider) {
     super.onObjectProviderDiscovered(objectProvider);
     currentComponentInitializationState.registerObjectProviderToConfigure(objectProvider);
