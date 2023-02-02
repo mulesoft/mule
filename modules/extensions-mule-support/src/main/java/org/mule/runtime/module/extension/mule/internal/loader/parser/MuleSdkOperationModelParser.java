@@ -51,6 +51,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.AggregatedErrorsCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
@@ -89,6 +90,7 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   private static final String VISIBILITY_PARAMETER = "visibility";
   private static final String PAYLOAD_TYPE_ELEMENT_NAME = "payload-type";
   private static final String OUTPUT_ELEMENT_NAME = "output";
+  private static final String MIN_MULE_VERSION = "4.5";
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
@@ -283,13 +285,8 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(new MuleVersion("4.5"));
-  }
-
-  @Override
-  public Optional<String> getMinMuleVersionReason() {
-    return empty();
+  public MinMuleVersionResult getMinMuleVersionResult() {
+    return new MinMuleVersionResult(name, new MuleVersion(MIN_MULE_VERSION), format("Operation %s has min mule version %s because the Mule Sdk was introduced in that version.", name, MIN_MULE_VERSION));
   }
 
   @Override
