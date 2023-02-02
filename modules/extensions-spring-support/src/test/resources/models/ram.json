@@ -1437,7 +1437,7 @@
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
-                    "apiContract.endPoint"
+                    "apiContract.endpoint"
                   ],
                   "name": "service",
                   "description": "",
