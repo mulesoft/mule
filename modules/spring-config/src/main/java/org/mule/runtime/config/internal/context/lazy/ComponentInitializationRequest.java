@@ -26,6 +26,8 @@ import java.util.function.Predicate;
 /**
  * Represents a component initialization request, grouping together all its parameters and adapting for the different ways they
  * can be expressed.
+ * <p>
+ * This implementation is not thread safe.
  */
 class ComponentInitializationRequest {
 

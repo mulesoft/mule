@@ -24,6 +24,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 /**
  * Representation of the current initialization state, including only things that are relevant in the context of lazy
  * initialization of components.
+ * <p>
+ * This implementation is not thread safe.
  */
 class ComponentInitializationState {
 
