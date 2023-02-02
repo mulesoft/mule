@@ -40,10 +40,10 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
                                                                            removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
-  private final Cache<Transaction, FluxSinkWrapper> sinksNestedTx =
-      Caffeine.newBuilder().weakKeys()
-          .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
-                                                                                removalCause) -> coreEventFluxSink.complete())
+  private final Cache<String, FluxSinkWrapper> sinksNestedTx =
+      Caffeine.newBuilder()
+          .removalListener((RemovalListener<String, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
+                                                                           removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
   private final Cache<Transaction, FluxSink<CoreEvent>> legacySinksNestedTx =
@@ -75,7 +75,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
       if (sinkIndexEnabled) {
         return getNestedFluxSinkWrapper(txCoord);
       } else {
-        return sinksNestedTx.get(txCoord.getTransaction(), tx -> new FluxSinkWrapper(createSink()));
+        return legacySinksNestedTx.get(txCoord.getTransaction(), tx -> new FluxSinkWrapper(createSink()));
       }
     } else {
       if (sinkIndexEnabled) {
@@ -90,7 +90,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
     int index = 0;
     while (true) {
       FluxSinkWrapper fluxSinkWrapper =
-          sinks.get(txCoord.getTransaction().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
+          sinksNestedTx.get(txCoord.getTransaction().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
       if (fluxSinkWrapper.isBeingUsed()) {
         index++;
         continue;
