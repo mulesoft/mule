@@ -79,7 +79,9 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
 
   @Override
   public MinMuleVersionResult getMinMuleVersionResult() {
-    return new MinMuleVersionResult(extensionName, new MuleVersion(MIN_MULE_VERSION), format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.", extensionName, MIN_MULE_VERSION));
+    return new MinMuleVersionResult(extensionName, new MuleVersion(MIN_MULE_VERSION),
+                                    format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                           extensionName, MIN_MULE_VERSION));
   }
 
   @Override

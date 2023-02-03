@@ -286,7 +286,9 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public MinMuleVersionResult getMinMuleVersionResult() {
-    return new MinMuleVersionResult(name, new MuleVersion(MIN_MULE_VERSION), format("Operation %s has min mule version %s because the Mule Sdk was introduced in that version.", name, MIN_MULE_VERSION));
+    return new MinMuleVersionResult(name, new MuleVersion(MIN_MULE_VERSION),
+                                    format("Operation %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                           name, MIN_MULE_VERSION));
   }
 
   @Override
