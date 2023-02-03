@@ -61,13 +61,13 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
 
   private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
+  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   private Map<String, Collection<ObjectType>> typesByExtension;
   private Map<String, Optional<MetadataType>> loadedTypes;
 
   @Inject
   private ExtensionManager extensionManager;
-  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   private Collection<ExtensionModel> extensionModels;
   private Collection<ModuleDefinition> moduleDefinitions;
