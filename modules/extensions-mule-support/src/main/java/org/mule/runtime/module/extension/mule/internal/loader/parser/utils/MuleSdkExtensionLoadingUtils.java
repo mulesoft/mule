@@ -49,7 +49,8 @@ public class MuleSdkExtensionLoadingUtils {
   public static TypeLoader createTypeLoader(ExtensionLoadingContext context) {
     ExpressionLanguageMetadataService expressionLanguageMetadataService =
         getRequiredLoadingParameter(context, MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME);
-    DefaultArtifactTypeLoader typeLoader = new DefaultArtifactTypeLoader(context.getDslResolvingContext().getExtensions(), expressionLanguageMetadataService);
+    DefaultArtifactTypeLoader typeLoader =
+        new DefaultArtifactTypeLoader(context.getDslResolvingContext().getExtensions(), expressionLanguageMetadataService);
     try {
       typeLoader.initialise();
     } catch (InitialisationException initialisationException) {

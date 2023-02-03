@@ -133,7 +133,6 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
       return parsed;
     }
 
-    loadModulesIfNeeded();
     return loadFromExpressionLanguageMetadataService(typeIdentifier);
   }
 
@@ -144,10 +143,6 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
       LOGGER.error("Failed to evaluate type expression '{}'", typeExpression, exception);
       return empty();
     }
-  }
-
-  private void loadModulesIfNeeded() {
-
   }
 
   private Optional<MetadataType> parseType(String typeIdentifier) {
