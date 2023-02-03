@@ -10,6 +10,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -36,4 +37,8 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader {
     super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
   }
 
+  @Override
+  public void close() throws IOException {
+    super.close();
+  }
 }

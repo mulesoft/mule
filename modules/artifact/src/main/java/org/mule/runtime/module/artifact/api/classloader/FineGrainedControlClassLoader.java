@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoInstantiate;
@@ -20,18 +22,13 @@ import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClass
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.slf4j.Logger;
-
-import sun.net.www.protocol.jar.Handler;
 
 /**
  * Defines a {@link ClassLoader} which enables the control of the class loading lookup mode.
@@ -53,7 +50,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   private final boolean verboseLogging;
 
   public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
-    super(urls, parent, new NonCachingURLStreamHandlerFactory());
+    super(urls, parent);
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
     verboseLogging = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
@@ -209,29 +206,4 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
   }
 
-  protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory {
-
-    @Override
-    public URLStreamHandler createURLStreamHandler(String protocol) {
-      return new NonCachingJarResourceURLStreamHandler();
-    }
-  }
-
-  /**
-   * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache that keeps connections open no
-   * matter what. It also prevents file descriptor leaks when accessing through SPI to implementations bundled in the application.
-   */
-  private static class NonCachingJarResourceURLStreamHandler extends Handler {
-
-    public NonCachingJarResourceURLStreamHandler() {
-      super();
-    }
-
-    @Override
-    protected java.net.URLConnection openConnection(URL u) throws IOException {
-      JarURLConnection c = new sun.net.www.protocol.jar.JarURLConnection(u, this);
-      c.setUseCaches(false);
-      return c;
-    }
-  }
 }

@@ -13,6 +13,14 @@
           "fieldName": "API_CLASSIFIERS",
           "elementKind": "field",
           "justification": "W-12395077: adding support for API dependency types."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader.NonCachingURLStreamHandlerFactory",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "NonCachingURLStreamHandlerFactory",
+          "elementKind": "class",
+          "justification": "lala"
         }
       ]
     }

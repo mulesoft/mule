@@ -345,8 +345,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                       return descriptorMapping.get(descriptor);
                     } else {
                       try {
-                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()}, getSystemClassLoader(),
-                                                  new NonCachingURLStreamHandlerFactory());
+                        // this is never closed!
+                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()}, getSystemClassLoader());
                       } catch (MalformedURLException e) {
                         throw new MuleRuntimeException(e);
                       }
@@ -490,5 +490,11 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       this.unfilteredClassLoader = unfilteredClassLoader;
       this.filter = filter;
     }
+  }
+
+  @Override
+  public void close() throws IOException {
+    super.close();
+    // y!
   }
 }

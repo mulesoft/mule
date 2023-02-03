@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -129,5 +130,11 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
         }).collect(toList()));
 
     return classLoaders;
+  }
+
+  @Override
+  public void close() throws IOException {
+    super.close();
+    // y!
   }
 }
