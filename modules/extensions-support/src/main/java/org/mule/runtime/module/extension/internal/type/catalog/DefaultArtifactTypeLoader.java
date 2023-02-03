@@ -49,9 +49,12 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 
 /**
- * a {@link ArtifactTypeLoader} for obtaining types available in the context of the current artifact. It accepts primitive type
+ * A {@link ArtifactTypeLoader} for obtaining types available in the context of the current artifact. It accepts primitive type
  * names (such as string, number, etc.) and can also access types defined in other extensions by using the
  * {@code <extension_namespace>:<type_name>} syntax.
+ * <p>
+ * Furthermore, if a type cannot be obtained with the mentioned syntax, this implementation will delegate the type resolution
+ * to the {@link ExpressionLanguageMetadataService}.
  *
  * @since 4.5.0
  */
@@ -137,6 +140,12 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
   }
 
   private Optional<MetadataType> loadFromExpressionLanguageMetadataService(String typeExpression) {
+    if (expressionLanguageMetadataService == null) {
+      LOGGER
+          .warn("Couldn't evaluate type expression '{}' because the ExpressionLanguageMetadataService wasn't correctly injected",
+                typeExpression);
+      return empty();
+    }
     try {
       return ofNullable(expressionLanguageMetadataService.evaluateTypeExpression(typeExpression, moduleDefinitions));
     } catch (ExpressionCompilationException exception) {
@@ -178,5 +187,4 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
     }
     return empty();
   }
-
 }
