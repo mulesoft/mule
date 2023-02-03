@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.core.internal.type.catalog.SpecialTypesTypeLoader.VOID;
 import static org.mule.runtime.extension.internal.declaration.type.MetadataTypeConstants.CONFIG_TYPE;
+import static org.mule.runtime.module.extension.internal.type.catalog.SpecialTypesTypeLoader.VOID;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
