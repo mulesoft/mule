@@ -53,8 +53,8 @@ import javax.inject.Inject;
  * names (such as string, number, etc.) and can also access types defined in other extensions by using the
  * {@code <extension_namespace>:<type_name>} syntax.
  * <p>
- * Furthermore, if a type cannot be obtained with the mentioned syntax, this implementation will delegate the type resolution
- * to the {@link ExpressionLanguageMetadataService}.
+ * Furthermore, if a type cannot be obtained with the mentioned syntax, this implementation will delegate the type resolution to
+ * the {@link ExpressionLanguageMetadataService}.
  *
  * @since 4.5.0
  */
