@@ -14,18 +14,25 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader;
+import org.mule.metadata.message.api.el.ModuleDefinition;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ArtifactTypeLoader;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 
 import java.util.Collection;
@@ -35,9 +42,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -60,17 +67,23 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
 
   @Inject
   private ExtensionManager extensionManager;
+  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   private Collection<ExtensionModel> extensionModels;
+  private Collection<ModuleDefinition> moduleDefinitions;
 
   @Inject
-  public DefaultArtifactTypeLoader(ExtensionManager extensionManager) {
+  public DefaultArtifactTypeLoader(ExtensionManager extensionManager,
+                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.extensionManager = extensionManager;
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
-  public DefaultArtifactTypeLoader(Collection<ExtensionModel> extensionModels) {
+  public DefaultArtifactTypeLoader(Collection<ExtensionModel> extensionModels,
+                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     requireNonNull(extensionModels, "ExtensionModels collection cannot be null.");
     this.extensionModels = extensionModels;
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
   @Override
@@ -88,6 +101,12 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
       String extensionPrefix = extensionModel.getXmlDslModel().getPrefix();
       typesByExtension.put(extensionPrefix, extensionModel.getTypes());
     }
+    this.moduleDefinitions = extensionModelsToModuleDefinitions(extensionModels);
+  }
+
+  private static Collection<ModuleDefinition> extensionModelsToModuleDefinitions(Collection<ExtensionModel> extensionModels) {
+    Function<ExtensionModel, ModuleDefinition> toModule = new ExtensionModelToModuleDefinitionTransformer();
+    return extensionModels.stream().map(toModule).collect(toSet());
   }
 
   /**
@@ -95,18 +114,45 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
    */
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {
-    return loadedTypes.computeIfAbsent(typeIdentifier, identifier -> doLoad(identifier));
+    return loadedTypes.computeIfAbsent(typeIdentifier, this::doLoad);
   }
 
   private Optional<MetadataType> doLoad(String typeIdentifier) {
-    return ofNullable(primitivesTypeLoader.load(typeIdentifier)
-        .orElseGet(() -> specialTypesLoader.load(typeIdentifier)
-            .orElseGet(() -> lookupType(typeIdentifier))));
+    Optional<MetadataType> primitive = primitivesTypeLoader.load(typeIdentifier);
+    if (primitive.isPresent()) {
+      return primitive;
+    }
+
+    Optional<MetadataType> special = specialTypesLoader.load(typeIdentifier);
+    if (special.isPresent()) {
+      return special;
+    }
+
+    Optional<MetadataType> parsed = parseType(typeIdentifier);
+    if (parsed.isPresent()) {
+      return parsed;
+    }
+
+    loadModulesIfNeeded();
+    return loadFromExpressionLanguageMetadataService(typeIdentifier);
   }
 
-  private MetadataType lookupType(String typeIdentifier) {
+  private Optional<MetadataType> loadFromExpressionLanguageMetadataService(String typeExpression) {
+    try {
+      return ofNullable(expressionLanguageMetadataService.evaluateTypeExpression(typeExpression, moduleDefinitions));
+    } catch (ExpressionCompilationException exception) {
+      LOGGER.error("Failed to evaluate type expression '{}'", typeExpression, exception);
+      return empty();
+    }
+  }
+
+  private void loadModulesIfNeeded() {
+
+  }
+
+  private Optional<MetadataType> parseType(String typeIdentifier) {
     if (!typeIdentifier.contains(":")) {
-      return null;
+      return empty();
     }
     // The first appearance of the separator and the String.substring methods are used instead of String.split because the type id
     // or alias might include the separator inside it.
@@ -119,7 +165,7 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
       for (MetadataType extensionType : typesByExtension.get(extensionIdentifier)) {
         Optional<String> extensionTypeTypeId = getTypeId(extensionType);
         if (extensionTypeTypeId.isPresent() && extensionTypeTypeId.get().equals(typeIdOrAlias)) {
-          return extensionType;
+          return of(extensionType);
         }
         String extensionTypeAlias = getAlias(extensionType);
         if (extensionTypeAlias != null && extensionTypeAlias.equals(typeIdOrAlias)) {
@@ -127,7 +173,7 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
         }
       }
       if (typesWithTypeIdentifierAsAlias.size() == 1) {
-        return typesWithTypeIdentifierAsAlias.iterator().next();
+        return of(typesWithTypeIdentifierAsAlias.iterator().next());
       } else if (typesWithTypeIdentifierAsAlias.size() > 1) {
         throw new IllegalArgumentException(format("No type with identifier [%s] and more that one with that alias. Use typeId to remove ambiguity [%s]",
                                                   typeIdOrAlias, typesWithTypeIdentifierAsAlias.stream()
@@ -135,7 +181,7 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
                                                       .collect(joining(", "))));
       }
     }
-    return null;
+    return empty();
   }
 
 }
