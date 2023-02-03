@@ -22,7 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -31,8 +33,12 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
 
-  @Rule
-  public TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  @ClassRule
+  public static final TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  private static File cachedSchedulerService = null;
+  private static File cachedHttpService = null;
+  private static File cachedELService = null;
+  private static File cachedELMService = null;
 
   protected FakeMuleServer muleServer;
 
@@ -64,19 +70,39 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     shutdown();
   }
 
+  @AfterClass
+  public static void kill() {
+    cachedELMService = null;
+    cachedELService = null;
+    cachedSchedulerService = null;
+    cachedHttpService = null;
+  }
+
   protected File getExpressionLanguageService() throws IOException {
-    return buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
+    if (cachedELService == null) {
+      cachedELService = buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
+    }
+    return cachedELService;
   }
 
   protected File getExpressionLanguageMetadataService() throws IOException {
-    return buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
+    if (cachedELMService == null) {
+      cachedELMService = buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
+    }
+    return cachedELMService;
   }
 
   protected File getSchedulerService() throws IOException {
-    return buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService"));
+    if (cachedSchedulerService == null) {
+      cachedSchedulerService = buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService"));
+    }
+    return cachedSchedulerService;
   }
 
   protected File getHttpService() throws IOException {
-    return buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
+    if (cachedHttpService == null) {
+      cachedHttpService = buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
+    }
+    return cachedHttpService;
   }
 }
