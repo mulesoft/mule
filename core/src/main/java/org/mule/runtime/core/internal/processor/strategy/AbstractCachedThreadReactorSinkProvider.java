@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
+
+import static java.lang.Integer.getInteger;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -25,6 +29,8 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
+  private static final int MAX_DEPTH =
+      getInteger(MULE_FLOW_STACK_MAX_DEPTH, getInteger(BaseEventContext.class.getName() + ".maxDepth", 50));
   private boolean sinkIndexEnabled;
 
   private final Cache<String, FluxSinkWrapper> sinks =
@@ -73,7 +79,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
       if (sinkIndexEnabled) {
-        return getNestedFluxSinkWrapper(txCoord);
+        return getNestedTxFluxSinkWrapper(txCoord);
       } else {
         return legacySinksNestedTx.get(txCoord.getTransaction(), tx -> new FluxSinkWrapper(createSink()));
       }
@@ -86,26 +92,25 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
     }
   }
 
-  private FluxSink<CoreEvent> getNestedFluxSinkWrapper(TransactionCoordination txCoord) {
-    int index = 0;
-    while (true) {
-      FluxSinkWrapper fluxSinkWrapper =
-          sinksNestedTx.get(txCoord.getTransaction().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
-      if (fluxSinkWrapper.isBeingUsed()) {
-        index++;
-        continue;
-      }
-      return fluxSinkWrapper;
-    }
+  private FluxSink<CoreEvent> getNestedTxFluxSinkWrapper(TransactionCoordination txCoord) {
+    String defaultKey = txCoord.getTransaction().getId();
+    return getFluxSinkWrapper(sinksNestedTx, defaultKey, 0);
   }
 
   private FluxSinkWrapper getSimpleFluxSinkWrapper() {
-    int index = 0;
+    String defaultKey = String.valueOf(currentThread().getId());
+    return getFluxSinkWrapper(sinks, defaultKey, 0);
+  }
+
+  private FluxSinkWrapper getFluxSinkWrapper(Cache<String, FluxSinkWrapper> cache, String defaultKey, int index) {
     while (true) {
       FluxSinkWrapper fluxSinkWrapper =
-          sinks.get(currentThread().getId() + "-" + index, t -> new FluxSinkWrapper(createSink()));
+          cache.get(defaultKey + "-" + index, t -> new FluxSinkWrapper(createSink()));
       if (fluxSinkWrapper.isBeingUsed()) {
         index++;
+        if (index > MAX_DEPTH) {
+          return fluxSinkWrapper;
+        }
         continue;
       }
       return fluxSinkWrapper;
