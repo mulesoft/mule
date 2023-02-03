@@ -87,7 +87,8 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
   protected File getExpressionLanguageMetadataService() throws IOException {
     if (cachedELMService == null) {
-      cachedELMService = buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
+      cachedELMService =
+          buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
     }
     return cachedELMService;
   }
