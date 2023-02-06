@@ -22,6 +22,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import reactor.core.publisher.FluxSink;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Abstract implementation of {@link ReactorSinkProvider} that uses a cache for the {@link FluxSink}s per thread.
  */
@@ -29,14 +32,13 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
-  private static final int MAX_DEPTH =
-      getInteger(MULE_FLOW_STACK_MAX_DEPTH, getInteger(BaseEventContext.class.getName() + ".maxDepth", 50));
   private boolean sinkIndexEnabled;
 
-  private final Cache<String, FluxSinkWrapper> sinks =
-      Caffeine.newBuilder()
-          .removalListener((RemovalListener<String, FluxSink<CoreEvent>>) (String, coreEventFluxSink,
-                                                                           removalCause) -> coreEventFluxSink.complete())
+  private final Cache<Thread, List<FluxSinkWrapper>> sinks =
+      Caffeine.newBuilder().weakKeys()
+          .removalListener((RemovalListener<Thread, List<FluxSinkWrapper>>) (String, coreEventFluxSinkList,
+                                                                             removalCause) -> coreEventFluxSinkList
+                                                                                 .forEach(FluxSinkWrapper::complete))
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
 
@@ -46,10 +48,12 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
                                                                            removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
-  private final Cache<String, FluxSinkWrapper> sinksNestedTx =
+  private final Cache<Transaction, List<FluxSinkWrapper>> sinksNestedTx =
       Caffeine.newBuilder()
-          .removalListener((RemovalListener<String, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
-                                                                           removalCause) -> coreEventFluxSink.complete())
+          .removalListener((RemovalListener<Transaction, List<FluxSinkWrapper>>) (transaction, coreEventFluxSinkList,
+                                                                                  removalCause) ->
+
+          coreEventFluxSinkList.forEach(FluxSinkWrapper::complete))
           .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
   private final Cache<Transaction, FluxSink<CoreEvent>> legacySinksNestedTx =
@@ -65,9 +69,9 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
   }
 
   public void dispose() {
-    sinks.asMap().values().forEach(FluxSink::complete);
+    sinks.asMap().values().forEach(sinkList -> sinkList.forEach(FluxSinkWrapper::complete));
     legacySinks.asMap().values().forEach(FluxSink::complete);
-    sinksNestedTx.asMap().values().forEach(FluxSink::complete);
+    sinksNestedTx.asMap().values().forEach(sinkList -> sinkList.forEach(FluxSinkWrapper::complete));
     legacySinksNestedTx.asMap().values().forEach(FluxSink::complete);
   }
 
@@ -85,40 +89,47 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
       if (sinkIndexEnabled) {
         return getNestedTxFluxSinkWrapper(txCoord);
       } else {
-        return legacySinksNestedTx.get(txCoord.getTransaction(), tx -> new FluxSinkWrapper(createSink()));
+        return legacySinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
       }
     } else {
       if (sinkIndexEnabled) {
         return getSimpleFluxSinkWrapper();
       } else {
-        return legacySinks.get(currentThread(), t -> new FluxSinkWrapper(createSink()));
+        return legacySinks.get(currentThread(), t -> createSink());
       }
     }
   }
 
   private FluxSink<CoreEvent> getNestedTxFluxSinkWrapper(TransactionCoordination txCoord) {
-    String defaultKey = txCoord.getTransaction().getId();
-    return getFluxSinkWrapper(sinksNestedTx, defaultKey, 0);
+    List<FluxSinkWrapper> fluxSinkWrapperList = sinksNestedTx.get(txCoord.getTransaction(), parameterKey -> new ArrayList<>());
+
+    for (FluxSinkWrapper fluxSinkWrapper : fluxSinkWrapperList) {
+      if (fluxSinkWrapper.isBeingUsed()) {
+        continue;
+      }
+
+      return fluxSinkWrapper;
+    }
+
+    FluxSinkWrapper fluxSinkWrapper = new FluxSinkWrapper(createSink());
+    fluxSinkWrapperList.add(fluxSinkWrapper);
+    return fluxSinkWrapper;
   }
 
   private FluxSinkWrapper getSimpleFluxSinkWrapper() {
-    String defaultKey = String.valueOf(currentThread().getId());
-    return getFluxSinkWrapper(sinks, defaultKey, 0);
-  }
+    List<FluxSinkWrapper> fluxSinkWrapperList = sinks.get(currentThread(), parameterKey -> new ArrayList<>());
 
-  private FluxSinkWrapper getFluxSinkWrapper(Cache<String, FluxSinkWrapper> cache, String defaultKey, int index) {
-    while (true) {
-      FluxSinkWrapper fluxSinkWrapper =
-          cache.get(defaultKey + "-" + index, t -> new FluxSinkWrapper(createSink()));
+    for (FluxSinkWrapper fluxSinkWrapper : fluxSinkWrapperList) {
       if (fluxSinkWrapper.isBeingUsed()) {
-        index++;
-        if (index > MAX_DEPTH) {
-          return fluxSinkWrapper;
-        }
         continue;
       }
+
       return fluxSinkWrapper;
     }
+
+    FluxSinkWrapper fluxSinkWrapper = new FluxSinkWrapper(createSink());
+    fluxSinkWrapperList.add(fluxSinkWrapper);
+    return fluxSinkWrapper;
   }
 
   protected abstract FluxSink<CoreEvent> createSink();
