@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.type.catalog;
 
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 
 import static java.lang.String.format;
@@ -44,9 +43,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * A {@link ArtifactTypeLoader} for obtaining types available in the context of the current artifact. It accepts primitive type
@@ -64,22 +63,15 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
 
   private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
   private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
-  private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   private Map<String, Collection<ObjectType>> typesByExtension;
   private Map<String, Optional<MetadataType>> loadedTypes;
-
-  @Inject
-  private ExtensionManager extensionManager;
-
+  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private Collection<ExtensionModel> extensionModels;
   private Collection<ModuleDefinition> moduleDefinitions;
 
-  @Inject
-  public DefaultArtifactTypeLoader(ExtensionManager extensionManager,
-                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    this.extensionManager = extensionManager;
-    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
+  public DefaultArtifactTypeLoader() {
+    // This constructor is intended to be used in some context such that the dependency injection will happen.
   }
 
   public DefaultArtifactTypeLoader(Collection<ExtensionModel> extensionModels,
@@ -89,11 +81,18 @@ public class DefaultArtifactTypeLoader implements ArtifactTypeLoader, Initialisa
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
+  @Inject
+  public void setExtensionManager(ExtensionManager extensionManager) {
+    this.extensionModels = extensionManager.getExtensions();
+  }
+
+  @Inject
+  public void setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    this.expressionLanguageMetadataService = expressionLanguageMetadataService;
+  }
+
   @Override
   public void initialise() throws InitialisationException {
-    if (extensionModels == null && extensionManager != null) {
-      extensionModels = extensionManager.getExtensions();
-    }
     if (extensionModels == null) {
       extensionModels = emptySet();
       LOGGER.warn("DefaultArtifactTypeLoader has been initialized with a null Collection of ExtensionModels");
