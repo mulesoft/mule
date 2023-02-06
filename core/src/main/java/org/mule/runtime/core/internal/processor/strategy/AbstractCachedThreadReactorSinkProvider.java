@@ -6,24 +6,20 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
-
-import static java.lang.Integer.getInteger;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import reactor.core.publisher.FluxSink;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Abstract implementation of {@link ReactorSinkProvider} that uses a cache for the {@link FluxSink}s per thread.
