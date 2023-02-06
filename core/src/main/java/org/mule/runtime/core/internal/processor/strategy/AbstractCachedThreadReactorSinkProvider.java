@@ -66,12 +66,16 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
 
   public void dispose() {
     sinks.asMap().values().forEach(FluxSink::complete);
+    legacySinks.asMap().values().forEach(FluxSink::complete);
     sinksNestedTx.asMap().values().forEach(FluxSink::complete);
+    legacySinksNestedTx.asMap().values().forEach(FluxSink::complete);
   }
 
   protected void invalidateAll() {
     sinks.invalidateAll();
+    legacySinks.invalidateAll();
     sinksNestedTx.invalidateAll();
+    legacySinksNestedTx.invalidateAll();
   }
 
   @Override
