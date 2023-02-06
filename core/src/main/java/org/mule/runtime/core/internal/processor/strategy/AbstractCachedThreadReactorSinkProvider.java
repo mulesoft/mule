@@ -97,24 +97,15 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
   }
 
   private FluxSink<CoreEvent> getNestedTxFluxSinkWrapper(TransactionCoordination txCoord) {
-    List<FluxSinkWrapper> fluxSinkWrapperList = sinksNestedTx.get(txCoord.getTransaction(), parameterKey -> new ArrayList<>());
-
-    for (FluxSinkWrapper fluxSinkWrapper : fluxSinkWrapperList) {
-      if (fluxSinkWrapper.isBeingUsed()) {
-        continue;
-      }
-
-      return fluxSinkWrapper;
-    }
-
-    FluxSinkWrapper fluxSinkWrapper = new FluxSinkWrapper(createSink());
-    fluxSinkWrapperList.add(fluxSinkWrapper);
-    return fluxSinkWrapper;
+    return getOrCreateFluxSinkWrapper(sinksNestedTx.get(txCoord.getTransaction(), parameterKey -> new ArrayList<>()));
   }
 
-  private FluxSinkWrapper getSimpleFluxSinkWrapper() {
-    List<FluxSinkWrapper> fluxSinkWrapperList = sinks.get(currentThread(), parameterKey -> new ArrayList<>());
 
+  private FluxSinkWrapper getSimpleFluxSinkWrapper() {
+    return getOrCreateFluxSinkWrapper(sinks.get(currentThread(), parameterKey -> new ArrayList<>()));
+  }
+
+  private FluxSinkWrapper getOrCreateFluxSinkWrapper(List<FluxSinkWrapper> fluxSinkWrapperList) {
     for (FluxSinkWrapper fluxSinkWrapper : fluxSinkWrapperList) {
       if (fluxSinkWrapper.isBeingUsed()) {
         continue;
