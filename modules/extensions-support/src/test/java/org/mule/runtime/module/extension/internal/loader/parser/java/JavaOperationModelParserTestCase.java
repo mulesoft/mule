@@ -15,7 +15,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -80,7 +80,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "overwriteMMV");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Calculated Min Mule Version is 4.5.0 which is greater than the one set at the method level 4.4. Overriding it. Method overwriteMMV has min mule version 4.5.0 because it is annotated with Alias. Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Calculated Min Mule Version is 4.5.0 which is greater than the one set at the method level 4.4. Overriding it. Method overwriteMMV has min mule version 4.5.0 because it is annotated with Alias. Alias was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -88,7 +88,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkParameter", Literal.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withSdkParameter has min mule version 4.5.0 because of its parameter literalParameter. Parameter literalParameter has min mule version 4.5.0 because it is of type Literal. Type Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Method withSdkParameter has min mule version 4.5.0 because of its parameter literalParameter. Parameter literalParameter has min mule version 4.5.0 because it is of type Literal. Literal was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -96,7 +96,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkImplicitParameter", CorrelationInfo.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withSdkImplicitParameter has min mule version 4.5.0 because of its parameter info. Parameter info has min mule version 4.5.0 because it is of type CorrelationInfo. Type CorrelationInfo has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Method withSdkImplicitParameter has min mule version 4.5.0 because of its parameter info. Parameter info has min mule version 4.5.0 because it is of type CorrelationInfo. CorrelationInfo was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -108,17 +108,32 @@ public class JavaOperationModelParserTestCase {
 
   @Test
   public void getMMVForOperationWithParameterGroup() throws NoSuchMethodException {
-    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterGroup", SdkParameterGroup.class);
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterGroup", ParameterGroup.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(), is(getMessageForOperationWithParameterGroup()));
   }
 
   @Test
+  public void getMMVForOperationWithParameterGroupWithValueAnnotation() throws NoSuchMethodException {
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withGroupAsMultiLevelValue", GroupAsMultiLevelValue.class);
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5"));
+    assertThat(parser.getMinMuleVersionResult().getReason(), is(getMessageForOperationWithParameterGroupWithValueAnnotation()));
+  }
+
+  @Test
+  public void getMMVForOperationWithParameterGroupWithLiteralField() throws NoSuchMethodException {
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withGroupWithLiteralField",
+                   ParameterGroupWithLiteralField.class);
+    assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getMinMuleVersionResult().getReason(), is(getMessageForOperationWithParameterGroupWithLiteralField()));
+  }
+
+  @Test
   public void getMMVForOperationWithParameterContainer() throws NoSuchMethodException {
-    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterContainer", SdkParameterGroup.class);
+    parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withParameterContainer", ParameterGroup.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withParameterContainer has min mule version 4.4 because of its parameter parameterContainer. Parameter parameterContainer has min mule version 4.4 because it is of type SdkParameterGroup. Type SdkParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Method withParameterContainer has min mule version 4.4 because of its parameter parameterContainer. Parameter parameterContainer has min mule version 4.4 because it is of type ParameterGroup. Type ParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test
@@ -133,7 +148,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withSdkPagingProvider");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withSdkPagingProvider has min mule version 4.4 because of its output type PagingProvider. PagingProvider has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Method withSdkPagingProvider has min mule version 4.4 because of its output type PagingProvider. PagingProvider was introduced in Mule 4.4."));
   }
 
   @Test
@@ -141,7 +156,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withPagingProviderSdkGeneric");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withPagingProviderSdkGeneric has min mule version 4.4 because of its output type Result. Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Method withPagingProviderSdkGeneric has min mule version 4.4 because of its output type Result. Result was introduced in Mule 4.4."));
   }
 
   @Test
@@ -149,7 +164,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withResultOutput");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withResultOutput has min mule version 4.4 because of its output type Result. Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Method withResultOutput has min mule version 4.4 because of its output type Result. Result was introduced in Mule 4.4."));
   }
 
   @Test
@@ -175,7 +190,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), ParameterizedOperations.class, "noArgumentsOperation");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Operation noArgumentsOperation has min mule version 4.4 because of its parameter containerParameter. Parameter containerParameter has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Operation noArgumentsOperation has min mule version 4.4 because of its parameter containerParameter. Parameter containerParameter has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test
@@ -192,7 +207,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withArrayListOutput");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withArrayListOutput has min mule version 4.5.0 because of its output type Literal. Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Method withArrayListOutput has min mule version 4.5.0 because of its output type Literal. Literal was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -200,7 +215,7 @@ public class JavaOperationModelParserTestCase {
     parseOperation(mock(ExtensionElement.class), SkdOperations.class, "withNativeArrayOutput");
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method withNativeArrayOutput has min mule version 4.4 because of its output type Result. Result has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Method withNativeArrayOutput has min mule version 4.4 because of its output type Result. Result was introduced in Mule 4.4."));
   }
 
   public void parseOperation(ExtensionElement extensionElement, Class<?> operationClass, String methodName,
@@ -219,15 +234,23 @@ public class JavaOperationModelParserTestCase {
   }
 
   protected String getMessageForOperationWithSdkAnnotatedParameter() {
-    return "Method withSdkAnnotatedParameter has min mule version 4.4 because of its parameter optionalParameter. Parameter optionalParameter has min mule version 4.4 because it is annotated with Optional. Optional has min mule version 4.4 because it is annotated with @MinMuleVersion.";
+    return "Method withSdkAnnotatedParameter has min mule version 4.4 because of its parameter optionalParameter. Parameter optionalParameter has min mule version 4.4 because it is annotated with Optional. Optional was introduced in Mule 4.4.";
   }
 
   protected String getMessageOperationWithConfigParameter() {
-    return "Method withConfigParameter has min mule version 4.4 because of its parameter configParameter. Parameter configParameter has min mule version 4.4 because it references a config of type SomeConfiguration. Configuration SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.";
+    return "Method withConfigParameter has min mule version 4.4 because of its parameter configParameter. Parameter configParameter has min mule version 4.4 because it references a config of type SomeConfiguration. Configuration SomeConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4.";
   }
 
   protected String getMessageForOperationWithParameterGroup() {
-    return "Method withParameterGroup has min mule version 4.4 because of its parameter parameterGroup. Parameter parameterGroup has min mule version 4.4 because it is of type SdkParameterGroup. Type SdkParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion.";
+    return "Method withParameterGroup has min mule version 4.4 because of its parameter parameterGroup. Parameter parameterGroup has min mule version 4.4 because it is of type ParameterGroup. Type ParameterGroup has min mule version 4.4 because of its field someField. Field someField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4.";
+  }
+
+  protected String getMessageForOperationWithParameterGroupWithLiteralField() {
+    return "Method withGroupWithLiteralField has min mule version 4.5.0 because of its parameter parameterGroup. Parameter parameterGroup has min mule version 4.5.0 because it is of type ParameterGroupWithLiteralField. Type ParameterGroupWithLiteralField has min mule version 4.5.0 because of its field anotherField. Field anotherField has min mule version 4.5.0 because it is of type Literal. Literal was introduced in Mule 4.5.0.";
+  }
+
+  protected String getMessageForOperationWithParameterGroupWithValueAnnotation() {
+    return "Method withGroupAsMultiLevelValue has min mule version 4.5 because of its parameter parameterGroup. Parameter parameterGroup has min mule version 4.5 because it is of type GroupAsMultiLevelValue. Type GroupAsMultiLevelValue has min mule version 4.5 because of its field country. Field country has min mule version 4.5 because it is annotated with ValuePart. ValuePart was introduced in Mule 4.5.";
   }
 
   private class TransactionalOperations {
@@ -243,35 +266,28 @@ public class JavaOperationModelParserTestCase {
   private static class SkdOperations {
 
     @MinMuleVersion("4.4")
-    public void annotatedWithMMV() {
-
-    }
+    public void annotatedWithMMV() {}
 
     @MinMuleVersion("4.4")
     @Alias("operation alias")
-    public void overwriteMMV() {
+    public void overwriteMMV() {}
 
-    }
+    public void withSdkParameter(Literal<String> literalParameter) {}
 
-    public void withSdkParameter(Literal<String> literalParameter) {
+    public void withSdkImplicitParameter(CorrelationInfo info) {}
 
-    }
+    public void withSdkAnnotatedParameter(@org.mule.sdk.api.annotation.param.Optional String optionalParameter) {}
 
-    public void withSdkImplicitParameter(CorrelationInfo info) {
+    public void withParameterGroup(@org.mule.runtime.extension.api.annotation.param.ParameterGroup(
+        name = "pg") JavaOperationModelParserTestCase.ParameterGroup parameterGroup) {}
 
-    }
+    public void withParameterContainer(ParameterGroup parameterContainer) {}
 
-    public void withSdkAnnotatedParameter(@org.mule.sdk.api.annotation.param.Optional String optionalParameter) {
+    public void withGroupAsMultiLevelValue(@org.mule.runtime.extension.api.annotation.param.ParameterGroup(
+        name = "pg") GroupAsMultiLevelValue parameterGroup) {}
 
-    }
-
-    public void withParameterGroup(@ParameterGroup(name = "pg") SdkParameterGroup parameterGroup) {
-
-    }
-
-    public void withParameterContainer(SdkParameterGroup parameterContainer) {
-
-    }
+    public void withGroupWithLiteralField(@org.mule.runtime.extension.api.annotation.param.ParameterGroup(
+        name = "pg") ParameterGroupWithLiteralField parameterGroup) {}
 
     public org.mule.sdk.api.runtime.streaming.PagingProvider<String, String> withSdkPagingProvider() {
       return new org.mule.sdk.api.runtime.streaming.PagingProvider<String, String>() {
@@ -348,12 +364,32 @@ public class JavaOperationModelParserTestCase {
   private static class ConfigurationWithSdkOperationsAnnotation {
   }
 
-  public static class SdkParameterGroup {
+  public static class ParameterGroup {
 
     @org.mule.sdk.api.annotation.param.Parameter
     String someField;
 
     @org.mule.sdk.api.annotation.param.Parameter
     String anotherField;
+  }
+
+  public static class ParameterGroupWithLiteralField {
+
+    @Parameter
+    String someField;
+
+    @Parameter
+    Literal<String> anotherField;
+  }
+
+  public static class GroupAsMultiLevelValue {
+
+    @Parameter
+    @ValuePart(order = 1)
+    private String continent;
+
+    @Parameter
+    @org.mule.sdk.api.annotation.values.ValuePart(order = 2)
+    private String country;
   }
 }

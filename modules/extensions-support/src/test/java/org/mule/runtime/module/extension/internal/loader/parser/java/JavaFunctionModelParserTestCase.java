@@ -45,7 +45,7 @@ public class JavaFunctionModelParserTestCase {
     setParser(SdkFunctions.class.getMethod("sdkFunction"), ConfigurationFunctions.class);
     Assert.assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Method sdkFunction has min mule version 4.5.0 because it is annotated with Alias. Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Method sdkFunction has min mule version 4.5.0 because it is annotated with Alias. Alias was introduced in Mule 4.5.0."));
   }
 
   @Test

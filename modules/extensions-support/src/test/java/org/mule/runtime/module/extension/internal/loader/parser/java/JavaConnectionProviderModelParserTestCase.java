@@ -217,7 +217,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(SdkConnectionProvider.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider SdkConnectionProvider has min mule version 4.5 because of its interface ConnectionProvider. ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider SdkConnectionProviderhas min mule version 4.5 because it implements interface ConnectionProvider. ConnectionProvider was introduced in Mule 4.5."));
   }
 
   @Test
@@ -225,7 +225,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(SdkAnnotatedConnectionProvider.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider SdkAnnotatedConnectionProvider has min mule version 4.5.0 because it is annotated with Alias. Alias has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider SdkAnnotatedConnectionProvider has min mule version 4.5.0 because it is annotated with Alias. Alias was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -233,7 +233,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderWithParameterWithSdkAnnotation.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider ConnectionProviderWithParameterWithSdkAnnotation has min mule version 4.5.0 because of its field OAuthParameter. Field OAuthParameter has min mule version 4.5.0 because it is annotated with OAuthParameter. OAuthParameter has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider ConnectionProviderWithParameterWithSdkAnnotation has min mule version 4.5.0 because of its field OAuthParameter. Field OAuthParameter has min mule version 4.5.0 because it is annotated with OAuthParameter. OAuthParameter was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -241,7 +241,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderWithSdkParameter.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider ConnectionProviderWithSdkParameter has min mule version 4.5.0 because of its field OAuthParameter. Field OAuthParameter has min mule version 4.5.0 because it is of type Literal. Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider ConnectionProviderWithSdkParameter has min mule version 4.5.0 because of its field OAuthParameter. Field OAuthParameter has min mule version 4.5.0 because it is of type Literal. Literal was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -249,7 +249,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderWithSdkField.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider ConnectionProviderWithSdkField has min mule version 4.5.0 because of its field literalField. Field literalField has min mule version 4.5.0 because it is of type Literal. Literal has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider ConnectionProviderWithSdkField has min mule version 4.5.0 because of its field literalField. Field literalField has min mule version 4.5.0 because it is of type Literal. Literal was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -257,7 +257,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderExtendsSdkConnectionProvider.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider ConnectionProviderExtendsSdkConnectionProvider has min mule version 4.5 because of its super class SdkConnectionProvider. Connection Provider SdkConnectionProvider has min mule version 4.5 because of its interface ConnectionProvider. ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider ConnectionProviderExtendsSdkConnectionProvider has min mule version 4.5 because of its super class SdkConnectionProvider. Connection Provider SdkConnectionProviderhas min mule version 4.5 because it implements interface ConnectionProvider. ConnectionProvider was introduced in Mule 4.5."));
   }
 
   @Test
@@ -265,7 +265,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderExtendsSuperClass.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider ConnectionProviderExtendsSuperClass has min mule version 4.4 because of its field superClassParameter. Field superClassParameter has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Connection Provider ConnectionProviderExtendsSuperClass has min mule version 4.4 because of its field superClassParameter. Field superClassParameter has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test
@@ -273,7 +273,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderWithHigherMMVAnnotation.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.6"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Connection Provider ConnectionProviderWithHigherMMVAnnotation has min mule version 4.6 because it is the one set at the class level."));
+               is("Connection Provider ConnectionProviderWithHigherMMVAnnotation has min mule version 4.6 because it is the one set at the class level through the @MinMuleVersion annotation."));
   }
 
   @Test
@@ -281,7 +281,7 @@ public class JavaConnectionProviderModelParserTestCase {
     mockConnectionProviderWithClass(ConnectionProviderWithLowerMMVAnnotation.class);
     assertThat(parser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getMinMuleVersionResult().getReason(),
-               is("Calculated Min Mule Version is 4.5 which is greater than the one set at the connection provider class level 4.4. Overriding it. Connection Provider ConnectionProviderWithLowerMMVAnnotation has min mule version 4.5 because of its super class SdkConnectionProvider. Connection Provider SdkConnectionProvider has min mule version 4.5 because of its interface ConnectionProvider. ConnectionProvider has min mule version 4.5 because it is annotated with @MinMuleVersion."));
+               is("Calculated Min Mule Version is 4.5 which is greater than the one set at the connection provider class level 4.4. Overriding it. Connection Provider ConnectionProviderWithLowerMMVAnnotation has min mule version 4.5 because of its super class SdkConnectionProvider. Connection Provider SdkConnectionProviderhas min mule version 4.5 because it implements interface ConnectionProvider. ConnectionProvider was introduced in Mule 4.5."));
   }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {

@@ -90,7 +90,7 @@ public class JavaConfigurationModelParserTestCase {
         getParser(LegacyAnnotationsExtension.class, NoImplicitLegacyConfiguration.class);
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.3"));
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getReason(),
-               is("Configuration NoImplicitLegacyConfiguration has min mule version 4.3 because it is annotated with NoImplicit. NoImplicit has min mule version 4.3 because it is annotated with @MinMuleVersion."));
+               is("Configuration NoImplicitLegacyConfiguration has min mule version 4.3 because it is annotated with NoImplicit. NoImplicit was introduced in Mule 4.3."));
   }
 
   @Test
@@ -99,7 +99,7 @@ public class JavaConfigurationModelParserTestCase {
         getParser(LegacyAnnotationsExtension.class, NoImplicitSdkConfiguration.class);
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getReason(),
-               is("Configuration NoImplicitSdkConfiguration has min mule version 4.5.0 because it is annotated with NoImplicit. NoImplicit has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Configuration NoImplicitSdkConfiguration has min mule version 4.5.0 because it is annotated with NoImplicit. NoImplicit was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -117,7 +117,7 @@ public class JavaConfigurationModelParserTestCase {
         getParser(LegacyAnnotationsExtension.class, SdkAnnotationConfiguration.class);
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getReason(),
-               is("Configuration SdkAnnotationConfiguration has min mule version 4.5.0 because it is annotated with Configuration. Configuration has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
+               is("Configuration SdkAnnotationConfiguration has min mule version 4.5.0 because it is annotated with Configuration. Configuration was introduced in Mule 4.5.0."));
   }
 
   @Test
@@ -126,7 +126,7 @@ public class JavaConfigurationModelParserTestCase {
         getParser(LegacyAnnotationsExtension.class, ParameterizedConfiguration.class);
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getReason(),
-               is("Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test
@@ -135,7 +135,7 @@ public class JavaConfigurationModelParserTestCase {
         getParser(LegacyAnnotationsExtension.class, ExtendsParameterizedConfiguration.class);
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getMinMuleVersion().toString(), is("4.4"));
     assertThat(javaConfigurationModelParser.getMinMuleVersionResult().getReason(),
-               is("Configuration ExtendsParameterizedConfiguration has min mule version 4.4 due to its super class ParameterizedConfiguration. Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter has min mule version 4.4 because it is annotated with @MinMuleVersion."));
+               is("Configuration ExtendsParameterizedConfiguration has min mule version 4.4 because of its super class ParameterizedConfiguration. Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test

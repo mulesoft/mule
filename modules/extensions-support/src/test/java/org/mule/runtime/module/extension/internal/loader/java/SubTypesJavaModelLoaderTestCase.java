@@ -68,7 +68,9 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
 
     ExtensionElement extensionElement = mock(ExtensionElement.class, RETURNS_DEEP_STUBS);
     when(extensionElement.getName()).thenReturn("LoaderTest");
-    when(extensionElement.getConfigurations()).thenReturn(singletonList(mock(ConfigurationElement.class)));
+    ConfigurationElement configurationElement = mock(ConfigurationElement.class);
+    when(configurationElement.getTypeName()).thenReturn("java.");
+    when(extensionElement.getConfigurations()).thenReturn(singletonList(configurationElement));
     when(extensionElement.getConnectionProviders()).thenReturn(emptyList());
     when(extensionElement.getSources()).thenReturn(emptyList());
     when(extensionElement.getOperations()).thenReturn(emptyList());
