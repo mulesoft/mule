@@ -17,6 +17,8 @@ import static java.util.Collections.singleton;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,13 +27,13 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Test;
 
 @Feature(REUSE)
 @Story(TYPES_CATALOG)
@@ -63,7 +65,9 @@ public class DefaultArtifactTypeLoaderTestCase extends AbstractMuleTestCase {
         .build();
     when(mockExtensionModel.getTypes()).thenReturn(singleton(mockType));
 
-    defaultArtifactTypeLoader = new DefaultArtifactTypeLoader(singleton(mockExtensionModel));
+    ExpressionLanguageMetadataService mockMetadataService = mock(ExpressionLanguageMetadataService.class);
+    when(mockMetadataService.evaluateTypeExpression(eq(MOCK_TYPE_ID), any())).thenReturn(mockType);
+    defaultArtifactTypeLoader = new DefaultArtifactTypeLoader(singleton(mockExtensionModel), mockMetadataService);
     defaultArtifactTypeLoader.initialise();
   }
 
