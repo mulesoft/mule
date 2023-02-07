@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
@@ -13,8 +14,10 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+import static org.mule.runtime.api.util.MuleSystemProperties.USE_TRANSACTION_SINK_INDEX_PROPERTY;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,6 +27,8 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -51,12 +56,33 @@ public class StreamPerThreadSink implements Sink, Disposable {
   private final FlowConstruct flowConstruct;
 
   private volatile boolean disposing = false;
-  private final Cache<Thread, FluxSink<CoreEvent>> sinks =
+
+  // This is kill switch: it will be removed. Managing this through a system property requires further refactoring
+  // because of initialization of processing strategies that are not managed in 4.3.x.
+  private static boolean sinkIndexEnabled = parseBoolean(getProperty(USE_TRANSACTION_SINK_INDEX_PROPERTY, "true"));
+
+  private final Cache<Thread, List<FluxSinkWrapper>> sinks =
+      Caffeine.newBuilder().weakKeys()
+          .removalListener((RemovalListener<Thread, List<FluxSinkWrapper>>) (String, coreEventFluxSinkList,
+                                                                             removalCause) -> coreEventFluxSinkList
+                                                                                 .forEach(FluxSinkWrapper::complete))
+          .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+  private final Cache<Thread, FluxSink<CoreEvent>> legacySinks =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Thread, FluxSink<CoreEvent>>) (thread, coreEventFluxSink,
                                                                            removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
-  private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
+
+  private final Cache<Transaction, List<FluxSinkWrapper>> sinksNestedTx =
+      Caffeine.newBuilder()
+          .removalListener((RemovalListener<Transaction, List<FluxSinkWrapper>>) (transaction, coreEventFluxSinkList,
+                                                                                  removalCause) ->
+
+          coreEventFluxSinkList.forEach(FluxSinkWrapper::complete))
+          .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+  private final Cache<Transaction, FluxSink<CoreEvent>> legacySinksNestedTx =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
                                                                                 removalCause) -> coreEventFluxSink.complete())
@@ -100,10 +126,41 @@ public class StreamPerThreadSink implements Sink, Disposable {
 
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
-      sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink()).next(event);
+      if (sinkIndexEnabled) {
+        getNestedTxFluxSinkWrapper(txCoord).next(event);
+      } else {
+        legacySinksNestedTx.get(txCoord.getTransaction(), tx -> createSink()).next(event);
+      }
     } else {
-      sinks.get(currentThread(), t -> createSink()).next(event);
+      if (sinkIndexEnabled) {
+        getSimpleFluxSinkWrapper().next(event);
+      } else {
+        legacySinks.get(currentThread(), t -> createSink()).next(event);
+      }
     }
+  }
+
+  private FluxSink<CoreEvent> getNestedTxFluxSinkWrapper(TransactionCoordination txCoord) {
+    return getOrCreateFluxSinkWrapper(sinksNestedTx.get(txCoord.getTransaction(), parameterKey -> new ArrayList<>()));
+  }
+
+
+  private FluxSinkWrapper getSimpleFluxSinkWrapper() {
+    return getOrCreateFluxSinkWrapper(sinks.get(currentThread(), parameterKey -> new ArrayList<>()));
+  }
+
+  private FluxSinkWrapper getOrCreateFluxSinkWrapper(List<FluxSinkWrapper> fluxSinkWrapperList) {
+    for (FluxSinkWrapper fluxSinkWrapper : fluxSinkWrapperList) {
+      if (fluxSinkWrapper.isBeingUsed()) {
+        continue;
+      }
+
+      return fluxSinkWrapper;
+    }
+
+    FluxSinkWrapper fluxSinkWrapper = new FluxSinkWrapper(createSink());
+    fluxSinkWrapperList.add(fluxSinkWrapper);
+    return fluxSinkWrapper;
   }
 
   @Override
@@ -115,8 +172,10 @@ public class StreamPerThreadSink implements Sink, Disposable {
   @Override
   public void dispose() {
     disposing = true;
-    sinks.asMap().values().forEach(sink -> sink.complete());
-    sinksNestedTx.asMap().values().forEach(sink -> sink.complete());
+    sinks.asMap().values().forEach(sinkList -> sinkList.forEach(FluxSinkWrapper::complete));
+    legacySinks.asMap().values().forEach(FluxSink::complete);
+    sinksNestedTx.asMap().values().forEach(sinkList -> sinkList.forEach(FluxSinkWrapper::complete));
+    legacySinksNestedTx.asMap().values().forEach(FluxSink::complete);
 
     final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
     long startMillis = currentTimeMillis();
