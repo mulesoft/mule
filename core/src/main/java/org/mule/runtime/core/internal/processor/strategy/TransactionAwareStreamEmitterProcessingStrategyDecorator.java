@@ -29,6 +29,7 @@ import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
@@ -67,6 +68,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
+
   public TransactionAwareStreamEmitterProcessingStrategyDecorator(ProcessingStrategy delegate) {
     super(delegate);
     if (delegate instanceof ProcessingStrategyAdapter) {
@@ -85,7 +89,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     Sink syncSink = new ReactorSinkProviderBasedSink(new DefaultCachedThreadReactorSinkProvider(flowConstruct, p -> from(p)
         .subscriberContext(popTxFromSubscriberContext())
         .transform(pipeline)
-        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER));
+        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, featureFlaggingService));
     return new TransactionalDelegateSink(syncSink, delegateSink);
   }
 
