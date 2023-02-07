@@ -13,6 +13,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
@@ -25,36 +28,95 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
 
   private static final int THREAD_CACHE_TIME_LIMIT_IN_MINUTES = 60;
   private static final int TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES = 10;
+  private boolean sinkIndexEnabled;
 
-  private final Cache<Thread, FluxSink<CoreEvent>> sinks =
+  private final Cache<Thread, List<FluxSinkWrapper>> sinks =
+      Caffeine.newBuilder().weakKeys()
+          .removalListener((RemovalListener<Thread, List<FluxSinkWrapper>>) (String, coreEventFluxSinkList,
+                                                                             removalCause) -> coreEventFluxSinkList
+                                                                                 .forEach(FluxSinkWrapper::complete))
+          .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+
+  private final Cache<Thread, FluxSink<CoreEvent>> legacySinks =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Thread, FluxSink<CoreEvent>>) (thread, coreEventFluxSink,
                                                                            removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(THREAD_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
-  private final Cache<Transaction, FluxSink<CoreEvent>> sinksNestedTx =
+
+  private final Cache<Transaction, List<FluxSinkWrapper>> sinksNestedTx =
+      Caffeine.newBuilder()
+          .removalListener((RemovalListener<Transaction, List<FluxSinkWrapper>>) (transaction, coreEventFluxSinkList,
+                                                                                  removalCause) ->
+
+          coreEventFluxSinkList.forEach(FluxSinkWrapper::complete))
+          .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
+
+  private final Cache<Transaction, FluxSink<CoreEvent>> legacySinksNestedTx =
       Caffeine.newBuilder().weakKeys()
           .removalListener((RemovalListener<Transaction, FluxSink<CoreEvent>>) (transaction, coreEventFluxSink,
                                                                                 removalCause) -> coreEventFluxSink.complete())
           .expireAfterAccess(TRANSACTION_CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();
 
+  public AbstractCachedThreadReactorSinkProvider() {}
+
+  public AbstractCachedThreadReactorSinkProvider(boolean enabled) {
+    this.sinkIndexEnabled = enabled;
+  }
+
   public void dispose() {
-    sinks.asMap().values().forEach(FluxSink::complete);
-    sinksNestedTx.asMap().values().forEach(FluxSink::complete);
+    sinks.asMap().values().forEach(sinkList -> sinkList.forEach(FluxSinkWrapper::complete));
+    legacySinks.asMap().values().forEach(FluxSink::complete);
+    sinksNestedTx.asMap().values().forEach(sinkList -> sinkList.forEach(FluxSinkWrapper::complete));
+    legacySinksNestedTx.asMap().values().forEach(FluxSink::complete);
   }
 
   protected void invalidateAll() {
     sinks.invalidateAll();
+    legacySinks.invalidateAll();
     sinksNestedTx.invalidateAll();
+    legacySinksNestedTx.invalidateAll();
   }
 
   @Override
   public FluxSink<CoreEvent> getSink() {
     TransactionCoordination txCoord = TransactionCoordination.getInstance();
     if (txCoord.runningNestedTransaction()) {
-      return sinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
+      if (sinkIndexEnabled) {
+        return getNestedTxFluxSinkWrapper(txCoord);
+      } else {
+        return legacySinksNestedTx.get(txCoord.getTransaction(), tx -> createSink());
+      }
     } else {
-      return sinks.get(currentThread(), t -> createSink());
+      if (sinkIndexEnabled) {
+        return getSimpleFluxSinkWrapper();
+      } else {
+        return legacySinks.get(currentThread(), t -> createSink());
+      }
     }
+  }
+
+  private FluxSink<CoreEvent> getNestedTxFluxSinkWrapper(TransactionCoordination txCoord) {
+    return getOrCreateFluxSinkWrapper(sinksNestedTx.get(txCoord.getTransaction(), parameterKey -> new ArrayList<>()));
+  }
+
+
+  private FluxSinkWrapper getSimpleFluxSinkWrapper() {
+    return getOrCreateFluxSinkWrapper(sinks.get(currentThread(), parameterKey -> new ArrayList<>()));
+  }
+
+  private FluxSinkWrapper getOrCreateFluxSinkWrapper(List<FluxSinkWrapper> fluxSinkWrapperList) {
+    for (FluxSinkWrapper fluxSinkWrapper : fluxSinkWrapperList) {
+      if (fluxSinkWrapper.isBeingUsed()) {
+        continue;
+      }
+
+      return fluxSinkWrapper;
+    }
+
+    FluxSinkWrapper fluxSinkWrapper = new FluxSinkWrapper(createSink());
+    fluxSinkWrapperList.add(fluxSinkWrapper);
+    return fluxSinkWrapper;
   }
 
   protected abstract FluxSink<CoreEvent> createSink();
