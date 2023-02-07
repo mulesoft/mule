@@ -194,8 +194,6 @@ public class StreamPerThreadSink implements Sink, Disposable {
         LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
                     flowConstruct.getName());
       }
-      sinks.invalidateAll();
-      sinksNestedTx.invalidateAll();
     } else if (disposableSinks.get() != 0) {
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
         throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
@@ -205,8 +203,10 @@ public class StreamPerThreadSink implements Sink, Disposable {
         LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
                     shutdownTimeout);
       }
-      sinks.invalidateAll();
-      sinksNestedTx.invalidateAll();
     }
+    sinks.invalidateAll();
+    sinksNestedTx.invalidateAll();
+    legacySinks.invalidateAll();
+    legacySinksNestedTx.invalidateAll();
   }
 }
