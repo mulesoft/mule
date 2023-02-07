@@ -32,6 +32,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -345,6 +346,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureRethrowExceptionsInIdempotentMessageValidator();
       configureForeachRouterRejectsMapExpressionFeatureFlag();
       configureHonourInsecureTlsConfiguration();
+      configureUseTransactionSinkIndex();
       configureEnableTracerConfigurationAtApplicationLevel();
     }
   }
@@ -1535,6 +1537,16 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureForeachRouterRejectsMapExpressionFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS, minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#USE_TRANSACTION_SINK_INDEX} feature flag.
+   *
+   * @since 4.0.0
+   */
+  private static void configureUseTransactionSinkIndex() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, featureContext -> true);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
