@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.List;
 import java.util.Optional;
@@ -168,8 +168,8 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
   List<ErrorModelParser> getErrorModelParsers();
 
   /**
-   * @return a {@link MinMuleVersionResult} that contains the minimum mule version this component can run on and the reason why
+   * @return a {@link ResolvedMinMuleVersion} that contains the minimum mule version this component can run on and the reason why
    *         that version was assigned.
    */
-  MinMuleVersionResult getMinMuleVersionResult();
+  Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 }

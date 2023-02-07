@@ -25,8 +25,9 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.erro
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseLegacyNotifications;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseNotifications;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getExtensionResult;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveExtensionMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -78,7 +79,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +105,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<NotificationModel> notificationModels = new LinkedList<>();
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
-  private MinMuleVersionResult minMuleVersionResult;
+  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this(extensionElement, new StereotypeModelLoaderDelegate(loadingContext), loadingContext);
@@ -136,7 +137,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    this.minMuleVersionResult = getExtensionResult(extensionElement);
+    this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement);
   }
 
   private void parseSubtypes() {
@@ -389,8 +390,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   @Override
-  public MinMuleVersionResult getMinMuleVersionResult() {
-    return this.minMuleVersionResult;
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return of(this.resolvedMinMuleVersion);
   }
 
   @Override

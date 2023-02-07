@@ -27,7 +27,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.conn
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getConnectionProviderResult;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveConnectionProviderMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -59,7 +59,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.connectivity.NoConnectivityTest;
 
@@ -84,7 +84,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   private final ConnectionProviderElement element;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
-  private final MinMuleVersionResult minMuleVersionResult;
+  private final ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
                                            ExtensionElement extensionElement,
@@ -96,7 +96,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
-    this.minMuleVersionResult = getConnectionProviderResult(element);
+    this.resolvedMinMuleVersion = resolveConnectionProviderMinMuleVersion(element);
   }
 
   @Override
@@ -229,8 +229,8 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   @Override
-  public MinMuleVersionResult getMinMuleVersionResult() {
-    return this.minMuleVersionResult;
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return of(this.resolvedMinMuleVersion);
   }
 
   @Override

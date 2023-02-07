@@ -25,6 +25,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Field
 import java.util.Optional;
 
 import org.junit.Test;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 public class JavaParameterModelParserTestCase {
 
@@ -59,14 +60,14 @@ public class JavaParameterModelParserTestCase {
   @Test
   public void minMuleVersionParameter() throws Exception {
     JavaParameterModelParser javaParameterModelParser = getParser("parameter");
-    Optional<MuleVersion> minMuleVersion = javaParameterModelParser.getMinMuleVersion();
+    Optional<ResolvedMinMuleVersion> minMuleVersion = javaParameterModelParser.getResolvedMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(false));
   }
 
   @Test
   public void minMuleVersionSdkParameter() throws Exception {
     JavaParameterModelParser javaParameterModelParser = getParser("sdkOAuthParameter");
-    Optional<MuleVersion> minMuleVersion = javaParameterModelParser.getMinMuleVersion();
+    Optional<ResolvedMinMuleVersion> minMuleVersion = javaParameterModelParser.getResolvedMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(false));
   }
 

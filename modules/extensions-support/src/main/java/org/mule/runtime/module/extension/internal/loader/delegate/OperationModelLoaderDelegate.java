@@ -22,6 +22,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,8 @@ import java.util.Map;
  * @since 4.0
  */
 final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OperationModelLoaderDelegate.class);
 
   private final Map<OperationModelParser, OperationDeclarer> operationDeclarers = new HashMap<>();
   private final RouterModelLoaderDelegate routersDelegate;
@@ -97,7 +101,10 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       parser.getMediaTypeModelProperty().ifPresent(operation::withModelProperty);
       parser.getDeprecationModel().ifPresent(operation::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
-      operation.withMinMuleVersion(parser.getMinMuleVersionResult().getMinMuleVersion());
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+        operation.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+        LOGGER.debug(resolvedMMV.getReason());
+      });
       loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
       addSemanticTerms(operation.getDeclaration(), parser);
       parser.getExecutionType().ifPresent(operation::withExecutionType);

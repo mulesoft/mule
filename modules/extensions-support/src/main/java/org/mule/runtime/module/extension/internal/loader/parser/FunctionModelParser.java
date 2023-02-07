@@ -10,7 +10,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutor;
 
 import java.util.List;
@@ -66,8 +66,8 @@ public interface FunctionModelParser extends SemanticTermsParser, AdditionalProp
   Optional<DeprecationModel> getDeprecationModel();
 
   /**
-   * @return a {@link MinMuleVersionResult} that contains the minimum mule version this component can run on and the reason why
+   * @return a {@link ResolvedMinMuleVersion} that contains the minimum mule version this component can run on and the reason why
    *         that version was assigned.
    */
-  MinMuleVersionResult getMinMuleVersionResult();
+  Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 }

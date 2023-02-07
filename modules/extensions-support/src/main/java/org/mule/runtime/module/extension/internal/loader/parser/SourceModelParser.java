@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.List;
 import java.util.Optional;
@@ -150,10 +150,10 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   SourceClusterSupportModelProperty getSourceClusterSupportModelProperty();
 
   /**
-   * @return a {@link MinMuleVersionResult} that contains the minimum mule version this component can run on and the reason why
+   * @return a {@link ResolvedMinMuleVersion} that contains the minimum mule version this component can run on and the reason why
    *         that version was assigned.
    */
-  MinMuleVersionResult getMinMuleVersionResult();
+  Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a

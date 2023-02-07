@@ -26,7 +26,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getOperationResult;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveOperationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -70,7 +70,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
@@ -102,7 +102,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
-  private MinMuleVersionResult minMuleVersionResult;
+  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   private ExtensionParameter nestedChain;
   private boolean blocking = false;
@@ -129,10 +129,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      this.minMuleVersionResult = getOperationResult(operationElement, this.operationContainer,
-                                                     getContainerAnnotationMinMuleVersion(extensionElement, Operations.class,
-                                                                                          Operations::value,
-                                                                                          this.operationContainer));
+      this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                                                   getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                        Operations.class,
+                                                                                                        Operations::value,
+                                                                                                        this.operationContainer));
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -414,8 +415,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public MinMuleVersionResult getMinMuleVersionResult() {
-    return this.minMuleVersionResult;
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return of(this.resolvedMinMuleVersion);
   }
 
   @Override

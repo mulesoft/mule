@@ -13,14 +13,15 @@ import org.mule.runtime.api.meta.MuleVersion;
  *
  * @since 4.6
  */
-public class MinMuleVersionResult {
+public class ResolvedMinMuleVersion {
 
+  public static final MuleVersion FIRST_MULE_VERSION = new MuleVersion("4.1.1");
   private String componentName;
   private MuleVersion minMuleVersion;
   private String reason;
-  private MinMuleVersionResult innerComponent = null;
+  private ResolvedMinMuleVersion innerComponent = null;
 
-  public MinMuleVersionResult(String componentName, MuleVersion minMuleVersion, String reason) {
+  public ResolvedMinMuleVersion(String componentName, MuleVersion minMuleVersion, String reason) {
     this.componentName = componentName;
     this.minMuleVersion = minMuleVersion;
     this.reason = reason;
@@ -41,7 +42,7 @@ public class MinMuleVersionResult {
     return componentName;
   }
 
-  public void updateIfHigherMMV(MinMuleVersionResult candidate, String reason) {
+  public void updateIfHigherMMV(ResolvedMinMuleVersion candidate, String reason) {
     if (!(this.minMuleVersion.atLeast(candidate.getMinMuleVersion()))) {
       this.reason = reason;
       this.minMuleVersion = candidate.getMinMuleVersion();

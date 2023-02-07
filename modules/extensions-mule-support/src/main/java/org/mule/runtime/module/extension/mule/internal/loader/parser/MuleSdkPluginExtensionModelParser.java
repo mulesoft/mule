@@ -37,7 +37,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.LicenseMo
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionResult;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,10 +96,10 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   }
 
   @Override
-  public MinMuleVersionResult getMinMuleVersionResult() {
-    return new MinMuleVersionResult(name, new MuleVersion(MIN_MULE_VERSION),
-                                    format("Plugin %s has min mule version %s because the Mule Sdk was introduced in that version.",
-                                           name, MIN_MULE_VERSION));
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
+                                         format("Plugin %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                name, MIN_MULE_VERSION)));
   }
 
   @Override

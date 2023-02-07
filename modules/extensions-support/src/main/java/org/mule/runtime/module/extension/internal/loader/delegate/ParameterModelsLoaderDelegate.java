@@ -17,6 +17,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public final class ParameterModelsLoaderDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ParameterModelsLoaderDelegate.class);
 
   private final Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader;
   private final Consumer<MetadataType> typeRegisterer;
@@ -90,7 +94,10 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getOAuthParameterModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
-        parameterParser.getMinMuleVersion().ifPresent(parameter::withMinMuleVersion);
+        parameterParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+          parameter.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+          LOGGER.debug(resolvedMMV.getReason());
+        });
 
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
         stereotypeModelLoader.get().addStereotypes(parameterParser, parameter);

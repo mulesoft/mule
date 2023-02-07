@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.List;
 import java.util.Optional;
@@ -116,5 +117,5 @@ public interface ParameterModelParser extends SemanticTermsParser, AllowedStereo
   /**
    * @return a {@link MuleVersion} representing the minimum mule version this component can run on
    */
-  Optional<MuleVersion> getMinMuleVersion();
+  Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 }
