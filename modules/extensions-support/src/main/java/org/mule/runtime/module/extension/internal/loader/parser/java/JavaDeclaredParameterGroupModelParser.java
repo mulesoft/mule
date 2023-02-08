@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -46,7 +47,8 @@ import java.util.stream.Stream;
  *
  * @since 4.5.0
  */
-public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameterGroupModelParser {
+public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameterGroupModelParser
+    implements HasExtensionParameter {
 
   private final List<ExtensionParameter> parameters;
   private final ExtensionParameter groupParameter;
@@ -217,5 +219,10 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
             .filter(f -> !f.isRequired())
             .map(WithAlias::getAlias)
             .collect(toSet()), isOneRequired));
+  }
+
+  @Override
+  public ExtensionParameter getExtensionParameter() {
+    return groupParameter;
   }
 }

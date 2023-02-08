@@ -43,12 +43,16 @@ import org.mule.runtime.extension.internal.property.NoTransactionalActionModelPr
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
@@ -298,6 +302,26 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public Optional<StereotypeModel> getStereotype(StereotypeModelFactory factory) {
+    return empty();
+  }
+
+  @Override
+  public Optional<OutputResolverModelParser> getOutputResolverModelParser() {
+    return empty();
+  }
+
+  @Override
+  public Optional<AttributesResolverModelParser> getAttributesResolverModelParser() {
+    return empty();
+  }
+
+  @Override
+  public List<InputResolverModelParser> getInputResolverModelParsers() {
+    return emptyList();
+  }
+
+  @Override
+  public Optional<MetadataKeyModelParser> getMetadataKeyModelParser() {
     return empty();
   }
 

@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
@@ -106,11 +104,11 @@ public class JavaModelLoaderUtils {
   /**
    * @param sourceElement a source
    * @return whether the given source emits response or not
-   * 
    * @since 4.5.0
    */
   public static boolean emitsResponse(SourceElement sourceElement) {
     return sourceElement.isAnnotatedWith(EmitsResponse.class)
         || sourceElement.isAnnotatedWith(org.mule.sdk.api.annotation.source.EmitsResponse.class);
   }
+
 }

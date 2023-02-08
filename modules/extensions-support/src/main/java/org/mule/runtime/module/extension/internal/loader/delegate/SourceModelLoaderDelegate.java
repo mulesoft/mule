@@ -6,23 +6,35 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareSourceMetadataKeyIdModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareTypeResolversInformationModelProperty;
 
-import static java.lang.String.format;
-import static java.util.Optional.of;
-
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -94,11 +106,25 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
         LOGGER.debug(resolvedMMV.getReason());
       });
 
+      Optional<OutputResolverModelParser> outputResolverModelParser = parser.getOutputResolverModelParser();
+      Optional<AttributesResolverModelParser> attributesResolverModelParser = parser.getAttributesResolverModelParser();
+      Optional<MetadataKeyModelParser> keyIdResolverModelParser = parser.getMetadataKeyModelParser();
+
       loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers());
 
       parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       loader.registerOutputTypes(sourceDeclarer.getDeclaration());
+
+      declareTypeResolversInformationModelProperty(sourceDeclarer.getDeclaration(), outputResolverModelParser,
+                                                   attributesResolverModelParser,
+                                                   emptyList(), keyIdResolverModelParser, parser.isConnected());
+
+      declareMetadataResolverFactoryModelProperty(sourceDeclarer.getDeclaration(), outputResolverModelParser,
+                                                  attributesResolverModelParser,
+                                                  emptyList(), keyIdResolverModelParser);
+
+      declareSourceMetadataKeyIdModelProperty(sourceDeclarer, outputResolverModelParser, keyIdResolverModelParser);
 
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
       declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);
@@ -109,9 +135,41 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
                                                             .getDefaultSourceStereotype(parser.getName())));
       parser.getAdditionalModelProperties().forEach(sourceDeclarer::withModelProperty);
 
+      Optional<SourceCallbackModelParser> successCallbackSourceCallbackModelParser = parser.getOnSuccessCallbackParser();
+      if (successCallbackSourceCallbackModelParser.isPresent()) {
+        SourceCallbackDeclarer onSuccessSourceCallbackDeclarer = sourceDeclarer.onSuccess();
+
+        List<InputResolverModelParser> sourceCallbackInputResolverModelParsers =
+            successCallbackSourceCallbackModelParser.get().getInputResolverModelParsers();
+
+        declareTypeResolversInformationModelProperty(onSuccessSourceCallbackDeclarer.getDeclaration(),
+                                                     empty(), empty(), sourceCallbackInputResolverModelParsers, empty(),
+                                                     parser.isConnected());
+
+        declareMetadataResolverFactoryModelProperty(onSuccessSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
+                                                    sourceCallbackInputResolverModelParsers, empty());
+
+        declareSourceCallbackParameters(successCallbackSourceCallbackModelParser, () -> onSuccessSourceCallbackDeclarer);
+      }
+
+      Optional<SourceCallbackModelParser> errorCallbackSourceCallbackModelParser = parser.getOnErrorCallbackParser();
+      if (errorCallbackSourceCallbackModelParser.isPresent()) {
+        SourceCallbackDeclarer onErrorSourceCallbackDeclarer = sourceDeclarer.onError();
+
+        List<InputResolverModelParser> sourceCallbackInputResolverModelParsers =
+            errorCallbackSourceCallbackModelParser.get().getInputResolverModelParsers();
+
+        declareTypeResolversInformationModelProperty(onErrorSourceCallbackDeclarer.getDeclaration(),
+                                                     empty(), empty(), sourceCallbackInputResolverModelParsers, empty(),
+                                                     parser.isConnected());
+
+        declareMetadataResolverFactoryModelProperty(onErrorSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
+                                                    sourceCallbackInputResolverModelParsers, empty());
+
+        declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), () -> onErrorSourceCallbackDeclarer);
+      }
+
       // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
-      declareSourceCallbackParameters(parser.getOnSuccessCallbackParser(), sourceDeclarer::onSuccess);
-      declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), sourceDeclarer::onError);
       declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
       declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
 
@@ -123,10 +181,10 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
     }
   }
 
-
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
                                                Supplier<ParameterizedDeclarer> declarer) {
     parser.ifPresent(callback -> loader.getParameterModelsLoaderDelegate().declare(declarer.get(),
                                                                                    callback.getParameterGroupModelParsers()));
   }
+
 }
