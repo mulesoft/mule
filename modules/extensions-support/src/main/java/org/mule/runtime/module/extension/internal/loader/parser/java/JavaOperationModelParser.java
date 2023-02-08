@@ -28,7 +28,12 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.type
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveOperationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils.parseInputResolversModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.getKeyIdResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -39,6 +44,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -59,11 +65,15 @@ import org.mule.runtime.module.extension.internal.loader.java.property.FieldOper
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
@@ -110,6 +120,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean router = false;
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
+
+  private Optional<MetadataKeyModelParser> metadataKeyModelParser;
 
   public JavaOperationModelParser(JavaExtensionModelParser extensionModelParser,
                                   ExtensionElement extensionElement,
@@ -264,9 +276,13 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void parseBlockingOperation() {
-    // TODO: Should be possible to parse dynamic types right here
-    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), false);
-    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), false);
+    Optional<OutputResolverModelParser> outputResolverModelParser = getOutputResolverModelParser();
+    boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();
+    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), isDynamicResolver);
+
+    Optional<AttributesResolverModelParser> attributesResolverModelParser = getAttributesResolverModelParser();
+    isDynamicResolver = attributesResolverModelParser.isPresent() && attributesResolverModelParser.get().hasAttributesResolver();
+    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), isDynamicResolver);
 
     if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
       parseAutoPaging();
@@ -306,10 +322,14 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                 getName(),
                                                                 CompletionCallback.class.getSimpleName()));
     }
-
     // TODO: SHould be possible to parse dynamic types right here?
-    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), false);
-    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), false);
+    Optional<OutputResolverModelParser> outputResolverModelParser = getOutputResolverModelParser();
+    boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();
+    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), isDynamicResolver);
+
+    Optional<AttributesResolverModelParser> attributesResolverModelParser = getAttributesResolverModelParser();
+    isDynamicResolver = attributesResolverModelParser.isPresent() && attributesResolverModelParser.get().hasAttributesResolver();
+    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), isDynamicResolver);
   }
 
   @Override
@@ -334,7 +354,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       methodParameters = operationElement.getParameters();
     }
 
-    ParameterDeclarationContext context = forOperation(getName());
+    ParameterDeclarationContext context = forOperation(getName(), hasKeyResolverAvailable());
 
     List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, context);
     parameterGroupModelParsers.addAll(
@@ -435,6 +455,40 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
+  public Optional<OutputResolverModelParser> getOutputResolverModelParser() {
+    Optional<OutputResolverModelParser> outputResolverModelParser = parseOutputResolverModelParser(operationElement);
+    if (outputResolverModelParser.isPresent()) {
+      return outputResolverModelParser;
+    } else {
+      if (getInputResolverModelParsers().isEmpty()) {
+        return parseOutputResolverModelParser(extensionElement, operationContainer);
+      } else {
+        return empty();
+      }
+    }
+  }
+
+  @Override
+  public Optional<AttributesResolverModelParser> getAttributesResolverModelParser() {
+    return parseAttributesResolverModelParser(operationElement);
+  }
+
+  @Override
+  public List<InputResolverModelParser> getInputResolverModelParsers() {
+    return parseInputResolversModelParser(operationElement);
+  }
+
+  @Override
+  public Optional<MetadataKeyModelParser> getMetadataKeyModelParser() {
+    return getKeyIdResolverModelParser(this, operationElement.getEnclosingType(), extensionElement);
+  }
+
+  private boolean hasKeyResolverAvailable() {
+    return parseKeyIdResolverModelParser(enclosingType, operationElement, "operation", getName(), extensionElement.getName())
+        .map(metadataKey -> metadataKey.hasKeyIdResolver()).orElse(false);
+  }
+
+  @Override
   public Set<String> getSemanticTerms() {
     Set<String> terms = new LinkedHashSet<>();
     terms.addAll(getAllTermsFromAnnotations(operationElement::isAnnotatedWith));
@@ -516,4 +570,5 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   public int hashCode() {
     return hash(operationElement);
   }
+
 }

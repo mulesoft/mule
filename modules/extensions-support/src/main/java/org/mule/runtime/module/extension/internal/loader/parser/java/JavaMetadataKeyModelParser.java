@@ -16,7 +16,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.metadata.BooleanKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.EnumKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.MuleTypeKeysResolverAdapter;
@@ -25,17 +25,20 @@ import org.mule.sdk.api.metadata.resolving.PartialTypeKeysResolver;
 
 
 /**
- * {@link KeyIdResolverModelParser} for Java based syntax
+ * {@link MetadataKeyModelParser} for Java based syntax
  *
  * @since 4.5.0
  */
-public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
+public class JavaMetadataKeyModelParser implements MetadataKeyModelParser {
 
+  private final String parameterName;
   private final MetadataType metadataType;
   private final String categoryName;
   private final Class<?> keyIdResolverDeclarationClass;
 
-  public JavaKeyIdResolverModelParser(String categoryName, MetadataType metadataType, Class<?> keyIdResolverDeclarationClass) {
+  public JavaMetadataKeyModelParser(String parameterName, String categoryName, MetadataType metadataType,
+                                    Class<?> keyIdResolverDeclarationClass) {
+    this.parameterName = parameterName;
     this.metadataType = metadataType;
     this.categoryName = categoryName;
     this.keyIdResolverDeclarationClass = keyIdResolverDeclarationClass;
@@ -73,6 +76,20 @@ public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
     }
 
     return typeKeysResolver;
+  }
+
+  public Class<?> keyIdResolverDeclarationClass() {
+    return keyIdResolverDeclarationClass;
+  }
+
+  @Override
+  public MetadataType getMetadataType() {
+    return metadataType;
+  }
+
+  @Override
+  public String getParameterName() {
+    return parameterName;
   }
 
   private TypeKeysResolver instantiateResolver() {

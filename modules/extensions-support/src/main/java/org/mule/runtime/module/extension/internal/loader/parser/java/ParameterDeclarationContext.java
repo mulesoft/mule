@@ -25,6 +25,8 @@ public final class ParameterDeclarationContext {
   private final String componentName;
   private final String componentType;
 
+  private final boolean keyResolverAvailable;
+
   public static ParameterDeclarationContext forConfig(String configName) {
     return new ParameterDeclarationContext(configName, "Configuration");
   }
@@ -33,8 +35,16 @@ public final class ParameterDeclarationContext {
     return new ParameterDeclarationContext(operationName, "Operation");
   }
 
+  public static ParameterDeclarationContext forOperation(String operationName, boolean keyResolverAvailable) {
+    return new ParameterDeclarationContext(operationName, "Operation", keyResolverAvailable);
+  }
+
   public static ParameterDeclarationContext forSource(String sourceName) {
     return new ParameterDeclarationContext(sourceName, "Source");
+  }
+
+  public static ParameterDeclarationContext forSource(String sourceName, boolean keyResolverAvailable) {
+    return new ParameterDeclarationContext(sourceName, "Source", keyResolverAvailable);
   }
 
   public static ParameterDeclarationContext forConnectionProvider(String connectionProviderName) {
@@ -50,8 +60,13 @@ public final class ParameterDeclarationContext {
   }
 
   public ParameterDeclarationContext(String componentName, String componentType) {
+    this(componentName, componentType, false);
+  }
+
+  public ParameterDeclarationContext(String componentName, String componentType, boolean keyResolverAvailable) {
     this.componentName = componentName;
     this.componentType = componentType;
+    this.keyResolverAvailable = keyResolverAvailable;
   }
 
   /**
@@ -66,6 +81,10 @@ public final class ParameterDeclarationContext {
    */
   public String getComponentType() {
     return componentType;
+  }
+
+  public boolean isKeyResolverAvailable() {
+    return keyResolverAvailable;
   }
 
   public List<ModelProperty> resolveStackableTypes(ExtensionParameter extensionParameter) {

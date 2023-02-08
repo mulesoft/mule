@@ -15,13 +15,17 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -68,9 +72,18 @@ public final class ParameterModelsLoaderDelegate {
               .defaultingTo(parameterParser.getDefaultValue());
         }
 
+        parameterParser.getMetadataKeyPart().ifPresent(metadataKeyPart -> parameter
+            .withModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.getFirst(), metadataKeyPart.getSecond())));
+
+
+        Optional<InputResolverModelParser> inputResolverModelParser = parameterParser.getInputResolverModelParser();
         final MetadataType metadataType = parameterParser.getType();
-        parameter.ofType(metadataType)
-            .describedAs(parameterParser.getDescription())
+        if (inputResolverModelParser.isPresent()) {
+          parameter.ofDynamicType(metadataType);
+        } else {
+          parameter.ofType(metadataType);
+        }
+        parameter.describedAs(parameterParser.getDescription())
             .withRole(parameterParser.getRole())
             .withExpressionSupport(parameterParser.getExpressionSupport());
 
@@ -116,5 +129,13 @@ public final class ParameterModelsLoaderDelegate {
     });
 
     return declarerList;
+  }
+
+  private void declareMetadataKeyPartModelProperty(ParameterDeclarer parameterDeclarer,
+                                                   Pair<Integer, Boolean> metadataKeyPart) {
+    if (metadataKeyPart != null) {
+      parameterDeclarer
+          .withModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.getFirst(), metadataKeyPart.getSecond()));
+    }
   }
 }

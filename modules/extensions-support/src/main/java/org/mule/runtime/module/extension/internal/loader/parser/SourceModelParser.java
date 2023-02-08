@@ -11,9 +11,9 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
-import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
@@ -156,6 +156,24 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
   /**
+   * @return an {@link Optional} {@link OutputResolverModelParser} that encapsulates the source's output resolver if dynamic
+   *         metadata were defined
+   */
+  Optional<OutputResolverModelParser> getOutputResolverModelParser();
+
+  /**
+   * @return an {@link Optional} {@link AttributesResolverModelParser} that encapsulates the source's attribute resolver if
+   *         dynamic metadata were defined
+   */
+  Optional<AttributesResolverModelParser> getAttributesResolverModelParser();
+
+  /**
+   * @return an {@link Optional} {@link MetadataKeyModelParser} that encapsulates the source's key id resolver if dynamic metadata
+   *         were defined
+   */
+  Optional<MetadataKeyModelParser> getMetadataKeyModelParser();
+
+  /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a
    * uniform way, regardless of the actual syntax used by the extension developer.
    *
@@ -172,6 +190,8 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
      * @return a list with the config's {@link ParameterGroupModelParser}
      */
     List<ParameterGroupModelParser> getParameterGroupModelParsers();
+
+    List<InputResolverModelParser> getInputResolverModelParsers();
 
   }
 }

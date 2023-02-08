@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -21,7 +24,7 @@ import java.util.stream.Stream;
  *
  * @sinc 4.5.0
  */
-abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupModelParser {
+public abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupModelParser {
 
   protected final Function<ParameterModelParser, ParameterModelParser> parameterMutator;
   private final ParameterDeclarationContext context;
