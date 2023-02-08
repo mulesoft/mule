@@ -36,6 +36,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,6 +50,8 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionModelLoaderDelegate.class);
 
   protected final String version;
 
@@ -109,7 +113,10 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
-    parser.getMinMuleVersion().ifPresent(declarer::withMinMuleVersion);
+    parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+      declarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+      LOGGER.debug(resolvedMMV.getReason());
+    });
 
     declareErrorModels(parser, declarer);
     declareExports(parser, declarer);

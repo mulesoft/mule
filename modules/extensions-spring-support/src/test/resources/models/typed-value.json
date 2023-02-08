@@ -2759,7 +2759,7 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [

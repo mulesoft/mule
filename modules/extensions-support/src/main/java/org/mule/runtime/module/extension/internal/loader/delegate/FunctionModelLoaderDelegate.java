@@ -11,6 +11,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,8 @@ import java.util.Map;
  * @since 4.0
  */
 final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(FunctionModelLoaderDelegate.class);
 
   private final Map<FunctionModelParser, FunctionDeclarer> functionDeclarers = new HashMap<>();
 
@@ -52,8 +56,10 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
-      parser.getMinMuleVersion().ifPresent(function::withMinMuleVersion);
-
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+        function.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+        LOGGER.debug(resolvedMMV.getReason());
+      });
       addSemanticTerms(function.getDeclaration(), parser);
 
       functionDeclarers.put(parser, function);

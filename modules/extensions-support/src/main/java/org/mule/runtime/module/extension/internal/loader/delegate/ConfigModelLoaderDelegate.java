@@ -16,6 +16,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for declaring configurations through a {@link DefaultExtensionModelLoaderDelegate}
@@ -23,6 +25,8 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
  * @since 4.0
  */
 final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigModelLoaderDelegate.class);
 
   ConfigModelLoaderDelegate(DefaultExtensionModelLoaderDelegate delegate) {
     super(delegate);
@@ -44,8 +48,10 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       configParser.getDisplayModel().ifPresent(d -> configurationDeclarer.getDeclaration().setDisplayModel(d));
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
       configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
-      configParser.getMinMuleVersion().ifPresent(configurationDeclarer::withMinMuleVersion);
-
+      configParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+        configurationDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+        LOGGER.debug(resolvedMMV.getReason());
+      });
       loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
 
       getOperationLoaderDelegate().declareOperations(declarer, extensionModelParser.getDevelopmentFramework(),

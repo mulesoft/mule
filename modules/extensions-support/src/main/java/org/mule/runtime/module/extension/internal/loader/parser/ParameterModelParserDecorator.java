@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -17,6 +16,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.List;
 import java.util.Optional;
@@ -129,7 +129,7 @@ public class ParameterModelParserDecorator implements ParameterModelParser {
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return decoratee.getMinMuleVersion();
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return decoratee.getResolvedMinMuleVersion();
   }
 }

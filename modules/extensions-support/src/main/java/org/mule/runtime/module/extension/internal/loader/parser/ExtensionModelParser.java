@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -19,6 +18,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.List;
 import java.util.Map;
@@ -160,9 +160,10 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   String getNamespace();
 
   /**
-   * @return a {@link MuleVersion} representing the minimum mule version this component can run on
+   * @return a {@link ResolvedMinMuleVersion} that contains the minimum mule version this component can run on and the reason why
+   *         that version was assigned.
    */
-  Optional<MuleVersion> getMinMuleVersion();
+  Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
   /**
    * @return the {@link ExtensionDevelopmentFramework} used to develop the extension being parsed.

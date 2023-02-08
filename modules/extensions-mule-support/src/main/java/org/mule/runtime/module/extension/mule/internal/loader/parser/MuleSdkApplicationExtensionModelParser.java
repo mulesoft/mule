@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
@@ -25,6 +26,7 @@ import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -38,6 +40,7 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
 
   // The namespace of the extension when it's defined within an application rather than in a separate artifact.
   public static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
+  private static final String MIN_MULE_VERSION = "4.5";
 
   private final String extensionName;
 
@@ -75,8 +78,10 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(new MuleVersion("4.5"));
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return of(new ResolvedMinMuleVersion(extensionName, new MuleVersion(MIN_MULE_VERSION),
+                                         format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                extensionName, MIN_MULE_VERSION)));
   }
 
   @Override

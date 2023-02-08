@@ -11,12 +11,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.JavaParserUtils.FIRST_MULE_VERSION;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -34,7 +33,6 @@ import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -89,37 +87,58 @@ public class JavaExtensionModelParserTestCase {
 
   @Test
   public void getMMVForLegacyExtension() {
-    Optional<MuleVersion> minMuleVersion = getParser(ExtensionUsingLegacyApi.class).getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
+    JavaExtensionModelParser parser = getParser(ExtensionUsingLegacyApi.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion(), is(FIRST_MULE_VERSION));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Extension SimpleExtension has min mule version 4.1.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForSdkExtension() {
-    Optional<MuleVersion> minMuleVersion = getParser(ExtensionUsingSdkApi.class).getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.5.0"));
+    JavaExtensionModelParser parser = getParser(ExtensionUsingSdkApi.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Extension SimpleExtension has min mule version 4.5.0 because it if annotated with the new sdk api @Extension."));
   }
 
   @Test
   public void getMMVForExtensionWithSuperExtension() {
-    Optional<MuleVersion> minMuleVersion = getParser(ExtensionWithSuperExtension.class).getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
+    JavaExtensionModelParser parser = getParser(ExtensionWithSuperExtension.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Extension ExtensionWithSuperExtension has min mule version 4.4 because of its super class ParameterizedExtension. Extension ParameterizedExtension has min mule version 4.4 because of its field extensionParameter. Field extensionParameter has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test
   public void getMMVForParameterizedExtension() {
-    Optional<MuleVersion> minMuleVersion = getParser(ParameterizedExtension.class).getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get().toString(), is("4.4"));
+    JavaExtensionModelParser parser = getParser(ParameterizedExtension.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Extension MixedConfigurationsAnnotationExtension has min mule version 4.4 because of its field extensionParameter. Field extensionParameter has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
   }
 
   @Test
   public void getMMVForExtensionWithConfiguration() {
-    Optional<MuleVersion> minMuleVersion = getParser(ExtensionWithConfiguration.class).getMinMuleVersion();
-    assertThat(minMuleVersion.isPresent(), is(true));
-    assertThat(minMuleVersion.get(), is(FIRST_MULE_VERSION));
+    JavaExtensionModelParser parser = getParser(ExtensionWithConfiguration.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion(), is(FIRST_MULE_VERSION));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Extension MixedConfigurationsAnnotationExtension has min mule version 4.1.1 because it is the default value."));
+  }
+
+  @Test
+  public void getMMVForExtensionAnnotatedWithMMV() {
+    JavaExtensionModelParser parser = getParser(ExtensionAnnotatedWithMMV.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.4"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Calculated Min Mule Version is 4.4 which is greater than the one set at the extension class level 4.3. Overriding it. Extension ExtensionAnnotatedWithMMV has min mule version 4.4 because of its method extensionMethod. Method extensionMethod has min mule version 4.4 because it is the one set at the method level through the @MinMuleVersion annotation."));
+  }
+
+  @Test
+  public void getMMVForExtensionAnnotatedWithHighMMV() {
+    JavaExtensionModelParser parser = getParser(ExtensionAnnotatedWithHighMMV.class);
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.7"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
+               is("Extension ExtensionAnnotatedWithHighMMV has min mule version 4.7 because it is the one set at the class level through the @MinMuleVersion annotation."));
   }
 
   protected JavaExtensionModelParser getParser(Class<?> extensionClass) {
@@ -149,14 +168,6 @@ public class JavaExtensionModelParserTestCase {
 
   @org.mule.runtime.extension.api.annotation.Extension(name = "SimpleExtension")
   public static class ExtensionUsingLegacyApi {
-  }
-
-  @org.mule.runtime.extension.api.annotation.Extension(name = "SimpleExtension")
-  @MinMuleVersion("4.2.1")
-  private static class SimpleExtensionUsingLegacyApiWithMMV {
-
-    @MinMuleVersion("4.6.1")
-    private String someField;
   }
 
   @Extension(name = "SimpleExtension")
@@ -205,6 +216,22 @@ public class JavaExtensionModelParserTestCase {
 
   @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionWithSuperExtension")
   private static class ExtensionWithSuperExtension extends ParameterizedExtension {
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionAnnotatedWithMMV")
+  @MinMuleVersion("4.3")
+  private static class ExtensionAnnotatedWithMMV {
+
+    @MinMuleVersion("4.4")
+    public void extensionMethod() {}
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionAnnotatedWithHighMMV")
+  @MinMuleVersion("4.7")
+  private static class ExtensionAnnotatedWithHighMMV {
+
+    @org.mule.sdk.api.annotation.param.Parameter
+    String extensionParameter;
   }
 
 }

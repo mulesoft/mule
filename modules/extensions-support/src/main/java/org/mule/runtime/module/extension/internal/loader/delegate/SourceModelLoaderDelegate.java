@@ -21,6 +21,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,8 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SourceModelLoaderDelegate.class);
 
   private final Map<SourceModelParser, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
@@ -85,7 +89,10 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
 
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
-      parser.getMinMuleVersion().ifPresent(sourceDeclarer::withMinMuleVersion);
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+        sourceDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+        LOGGER.debug(resolvedMMV.getReason());
+      });
 
       loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers());
 

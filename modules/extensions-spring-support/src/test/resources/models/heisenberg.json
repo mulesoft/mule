@@ -32410,7 +32410,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
+      "minMuleVersion": "4.6.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -33351,7 +33351,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -41882,7 +41882,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
+      "minMuleVersion": "4.6.0",
       "parameterGroupModels": [
         {
           "parameters": [

@@ -42,6 +42,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +57,7 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
 
   private static final MetadataTypeEnricher METADATA_TYPE_ENRICHER = new MetadataTypeEnricher();
   private static final Set<TypeAnnotation> METADATA_TYPE_ANNOTATIONS = singleton(new TypedValueTypeAnnotation());
+  private static final String MIN_MULE_VERSION = "4.5";
 
   protected final ComponentAst parameterAst;
   private final TypeLoader typeLoader;
@@ -245,8 +247,10 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
   }
 
   @Override
-  public Optional<MuleVersion> getMinMuleVersion() {
-    return of(new MuleVersion("4.5"));
+  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
+                                         format("Parameter %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                name, MIN_MULE_VERSION)));
   }
 
   @Override
