@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -131,8 +130,8 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
     Optional<TypeResolversInformationModelProperty> info = operation
         .getModelProperty(TypeResolversInformationModelProperty.class);
 
-    MatcherAssert.assertThat("Static resolvers information should not be declared in the model",
-                             info.isPresent(), is(false));
+    assertThat("Static resolvers information should not be declared in the model",
+               info.isPresent(), is(false));
   }
 
   @Test
@@ -195,12 +194,12 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
   }
 
   private void assertParameterIsMetadataContent(ParameterDeclaration param) {
-    MatcherAssert.assertThat(param.getRole(), is(CONTENT));
+    assertThat(param.getRole(), is(CONTENT));
   }
 
   private void assertOutputType(OutputDeclaration output, MetadataType type, boolean isDynamic) {
-    MatcherAssert.assertThat(output.getType(), equalTo(type));
-    MatcherAssert.assertThat(output.hasDynamicType(), is(isDynamic));
+    assertThat(output.getType(), equalTo(type));
+    assertThat(output.hasDynamicType(), is(isDynamic));
   }
 
   private void assertOutputResolverInfo(BaseDeclaration declaration, Optional<String> expectedName) {
@@ -208,13 +207,13 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
   }
 
   private void assertParameterType(ParameterDeclaration param, MetadataType type) {
-    MatcherAssert.assertThat(param.getType(), equalTo(type));
+    assertThat(param.getType(), equalTo(type));
   }
 
   private void assertCategoryInfo(BaseDeclaration declaration, String expectedName) {
     TypeResolversInformationModelProperty info = getResolversInfo(declaration);
-    MatcherAssert.assertThat("Name miss match for the resolvers category: ",
-                             info.getCategoryName(), is(equalTo(expectedName)));
+    assertThat("Name miss match for the resolvers category: ",
+               info.getCategoryName(), is(equalTo(expectedName)));
   }
 
   private void assertResolverInfo(BaseDeclaration declaration,
@@ -230,8 +229,8 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
       fail(format("Expected %s name to be empty, but a declaration was found in the model. "
           + "Information was: %s", kind, info.toString()));
     }
-    MatcherAssert.assertThat("Name miss match for the " + kind,
-                             resolverName.map(ResolverInformation::getResolverName), is(equalTo(expectedName)));
+    assertThat("Name miss match for the " + kind,
+               resolverName.map(ResolverInformation::getResolverName), is(equalTo(expectedName)));
   }
 
   private void assertAttributesResolverInfo(BaseDeclaration declaration, Optional<String> expectedName) {
