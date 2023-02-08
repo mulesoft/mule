@@ -1222,6 +1222,11 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "keysResolver": {
+                "resolverName": "AppleTypesResolver",
+                "requiresConnection": true,
+                "requiresConfiguration": true
+              },
               "partialTypeKeyResolver": false
             },
             "metadataKeyId": {

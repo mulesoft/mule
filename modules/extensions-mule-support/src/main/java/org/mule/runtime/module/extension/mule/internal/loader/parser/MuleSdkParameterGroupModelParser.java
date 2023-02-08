@@ -20,7 +20,6 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
@@ -111,5 +110,4 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
   public List<ModelProperty> getAdditionalModelProperties() {
     return emptyList();
   }
-
 }
