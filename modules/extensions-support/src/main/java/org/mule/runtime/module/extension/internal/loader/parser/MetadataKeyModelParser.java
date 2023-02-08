@@ -45,7 +45,7 @@ public interface MetadataKeyModelParser {
   MetadataType getMetadataType();
 
   /**
-   * @return the parameter name of the key resolver
+   * @return the parameter name of the metadata key
    */
   String getParameterName();
 }

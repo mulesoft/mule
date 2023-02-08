@@ -44,7 +44,6 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -322,7 +321,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                 getName(),
                                                                 CompletionCallback.class.getSimpleName()));
     }
-    // TODO: SHould be possible to parse dynamic types right here?
     Optional<OutputResolverModelParser> outputResolverModelParser = getOutputResolverModelParser();
     boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();
     outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), isDynamicResolver);

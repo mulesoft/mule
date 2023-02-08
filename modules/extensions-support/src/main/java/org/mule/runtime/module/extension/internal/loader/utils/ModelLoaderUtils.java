@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.sdk.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDeclaration;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
@@ -21,6 +26,7 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
@@ -35,6 +41,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsPar
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,6 +236,33 @@ public final class ModelLoaderUtils {
       return outputResolverModelParser.getOutputResolver().getCategoryName();
     } else {
       return null;
+    }
+  }
+
+  public static void declareOperationMetadataKeyIdModelProperty(OperationDeclarer operation,
+                                                                Optional<OutputResolverModelParser> outputResolverModelParser,
+                                                                List<InputResolverModelParser> inputResolverModelParsers,
+                                                                Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
+    declareMetadateKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers, keyIdResolverModelParser);
+  }
+
+  public static void declareSourceMetadataKeyIdModelProperty(SourceDeclarer source,
+                                                             Optional<OutputResolverModelParser> outputResolverModelParser,
+                                                             Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
+    declareMetadateKeyIdModelProperty(source, outputResolverModelParser, emptyList(), keyIdResolverModelParser);
+  }
+
+  private static void declareMetadateKeyIdModelProperty(ComponentDeclarer declarer,
+                                                        Optional<OutputResolverModelParser> outputResolverModelParser,
+                                                        List<InputResolverModelParser> inputResolverModelParsers,
+                                                        Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
+    if (keyIdResolverModelParser.isPresent()) {
+      String parameterName = keyIdResolverModelParser.get().getParameterName();
+      MetadataType metadataType = keyIdResolverModelParser.get().getMetadataType();
+      String categoryName = ModelLoaderUtils.getCategoryName(keyIdResolverModelParser.orElse(null), inputResolverModelParsers,
+                                                             outputResolverModelParser.orElse(null));
+
+      declarer.withModelProperty(new MetadataKeyIdModelProperty(metadataType, parameterName, categoryName));
     }
   }
 }

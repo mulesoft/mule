@@ -28,7 +28,7 @@ import java.util.Optional;
 /**
  * Helper class for introspecting input metadata.
  *
- * @since 4.5
+ * @since 4.6
  */
 public class JavaInputResolverModelParserUtils {
 

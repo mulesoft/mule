@@ -7,14 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
-
-import static java.lang.String.format;
-import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareOperationMetadataKeyIdModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareTypeResolversInformationModelProperty;
+
+import static java.lang.String.format;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -123,8 +124,8 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
                                                   attributesResolverModelParser,
                                                   inputResolverModelParsers, keyIdResolverModelParser);
 
-      declareMetadataKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers,
-                                        keyIdResolverModelParser);
+      declareOperationMetadataKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers,
+                                                 keyIdResolverModelParser);
 
       parser.getDeprecationModel().ifPresent(operation::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
@@ -157,20 +158,6 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       declareEmittedNotifications(parser, operation, loader::getNotificationModel);
 
       operationDeclarers.put(parser, operation);
-    }
-  }
-
-  private void declareMetadataKeyIdModelProperty(OperationDeclarer operation,
-                                                 Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                 List<InputResolverModelParser> inputResolverModelParsers,
-                                                 Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
-    if (keyIdResolverModelParser.isPresent()) {
-      String parameterName = keyIdResolverModelParser.get().getParameterName();
-      MetadataType metadataType = keyIdResolverModelParser.get().getMetadataType();
-      String categoryName = ModelLoaderUtils.getCategoryName(keyIdResolverModelParser.orElse(null), inputResolverModelParsers,
-                                                             outputResolverModelParser.orElse(null));
-
-      operation.withModelProperty(new MetadataKeyIdModelProperty(metadataType, parameterName, categoryName));
     }
   }
 

@@ -239,5 +239,4 @@ public class JavaMetadataKeyIdModelParserUtils {
     throw new IllegalModelDefinitionException("Unable to create Keys Resolver. A Keys Resolver is being defined " +
         "without defining an Output Resolver, Input Resolver nor Attributes Resolver");
   }
-
 }

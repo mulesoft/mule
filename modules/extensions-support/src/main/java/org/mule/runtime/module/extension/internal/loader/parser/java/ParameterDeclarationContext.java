@@ -83,6 +83,9 @@ public final class ParameterDeclarationContext {
     return componentType;
   }
 
+  /**
+   * @return whether the component has a metadata key which has a key resolver associated.
+   */
   public boolean isKeyResolverAvailable() {
     return keyResolverAvailable;
   }

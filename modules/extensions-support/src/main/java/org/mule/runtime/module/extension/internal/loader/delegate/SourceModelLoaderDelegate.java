@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDeleg
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareSourceMetadataKeyIdModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareTypeResolversInformationModelProperty;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -123,7 +124,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
                                                   attributesResolverModelParser,
                                                   emptyList(), keyIdResolverModelParser);
 
-      declareMetadataKeyIdModelProperty(sourceDeclarer, outputResolverModelParser, keyIdResolverModelParser);
+      declareSourceMetadataKeyIdModelProperty(sourceDeclarer, outputResolverModelParser, keyIdResolverModelParser);
 
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
       declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);
@@ -180,24 +181,10 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
     }
   }
 
-
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
                                                Supplier<ParameterizedDeclarer> declarer) {
     parser.ifPresent(callback -> loader.getParameterModelsLoaderDelegate().declare(declarer.get(),
                                                                                    callback.getParameterGroupModelParsers()));
-  }
-
-  private void declareMetadataKeyIdModelProperty(SourceDeclarer sourceDeclarer,
-                                                 Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                 Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
-    if (keyIdResolverModelParser.isPresent()) {
-      String parameterName = keyIdResolverModelParser.get().getParameterName();
-      MetadataType metadataType = keyIdResolverModelParser.get().getMetadataType();
-      String categoryName = ModelLoaderUtils.getCategoryName(keyIdResolverModelParser.orElse(null), emptyList(),
-                                                             outputResolverModelParser.orElse(null));
-
-      sourceDeclarer.withModelProperty(new MetadataKeyIdModelProperty(metadataType, parameterName, categoryName));
-    }
   }
 
 }

@@ -6,40 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
-import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.AbstractJavaParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.HasExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaMetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaSourceModelParser;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class JavaModelLoaderUtils {
 

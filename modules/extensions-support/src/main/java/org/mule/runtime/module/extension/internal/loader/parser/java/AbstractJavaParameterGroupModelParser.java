@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  *
  * @sinc 4.5.0
  */
-public abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupModelParser {
+abstract class AbstractJavaParameterGroupModelParser implements ParameterGroupModelParser {
 
   protected final Function<ParameterModelParser, ParameterModelParser> parameterMutator;
   private final ParameterDeclarationContext context;
