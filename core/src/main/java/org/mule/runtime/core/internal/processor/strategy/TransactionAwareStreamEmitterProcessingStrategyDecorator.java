@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -27,6 +28,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
@@ -63,6 +65,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
   public TransactionAwareStreamEmitterProcessingStrategyDecorator(ProcessingStrategy delegate) {
     super(delegate);
     if (delegate instanceof ProcessingStrategyAdapter) {
@@ -81,7 +86,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     Sink syncSink = new StreamPerThreadSink(p -> from(p)
         .subscriberContext(popTxFromSubscriberContext())
         .transform(pipeline)
-        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, flowConstruct);
+        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, flowConstruct,
+                                            featureFlaggingService.isEnabled(USE_TRANSACTION_SINK_INDEX));
     return new TransactionalDelegateSink(syncSink, delegateSink);
   }
 
