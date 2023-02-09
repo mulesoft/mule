@@ -35,6 +35,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
   @ClassRule
   public static final TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  private static boolean areServicesInitialised = false;
   private static File cachedSchedulerService = null;
   private static File cachedHttpService = null;
   private static File cachedELService = null;
@@ -49,11 +50,12 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
-    muleServer.addZippedService(getSchedulerService());
-    muleServer.addZippedService(getHttpService());
-    muleServer.addZippedService(getExpressionLanguageService());
+    initialiseServicesIfNeeded();
+    muleServer.addZippedService(cachedSchedulerService);
+    muleServer.addZippedService(cachedHttpService);
+    muleServer.addZippedService(cachedELService);
     if (addExpressionLanguageMetadataService()) {
-      muleServer.addZippedService(getExpressionLanguageMetadataService());
+      muleServer.addZippedService(cachedELMService);
     }
   }
 
@@ -70,40 +72,40 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     shutdown();
   }
 
+  private void initialiseServicesIfNeeded() throws IOException {
+    if (!areServicesInitialised) {
+      areServicesInitialised = true;
+      cachedSchedulerService = getSchedulerService();
+      cachedHttpService = getHttpService();
+      cachedELService = getExpressionLanguageService();
+      if (addExpressionLanguageMetadataService()) {
+        cachedELMService = getExpressionLanguageMetadataService();
+      }
+    }
+  }
+
   @AfterClass
-  public static void kill() {
-    cachedELMService = null;
-    cachedELService = null;
+  public static void nullifyCachedServices() {
+    areServicesInitialised = false;
     cachedSchedulerService = null;
     cachedHttpService = null;
+    cachedELService = null;
+    cachedELMService = null;
   }
 
   protected File getExpressionLanguageService() throws IOException {
-    if (cachedELService == null) {
-      cachedELService = buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
-    }
-    return cachedELService;
+    return buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
   }
 
   protected File getExpressionLanguageMetadataService() throws IOException {
-    if (cachedELMService == null) {
-      cachedELMService =
-          buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
-    }
-    return cachedELMService;
+    return buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
   }
 
   protected File getSchedulerService() throws IOException {
-    if (cachedSchedulerService == null) {
-      cachedSchedulerService = buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService"));
-    }
-    return cachedSchedulerService;
+    return buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService"));
   }
 
   protected File getHttpService() throws IOException {
-    if (cachedHttpService == null) {
-      cachedHttpService = buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
-    }
-    return cachedHttpService;
+    return buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
   }
 }
