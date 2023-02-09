@@ -1186,9 +1186,9 @@
             </build>
         </profile>
         <profile>
-            <id>jdk-12+</id>
+            <id>jdk-17</id>
             <activation>
-                <jdk>[12,)</jdk>
+                <jdk>17</jdk>
             </activation>
             <build>
                 <pluginManagement>
