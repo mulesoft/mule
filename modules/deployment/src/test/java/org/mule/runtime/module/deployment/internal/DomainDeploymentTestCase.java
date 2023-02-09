@@ -496,6 +496,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .dependingOn(callbackExtensionPlugin)
         .dependingOn(dummyDomainBundleFileBuilder));
 
+    triggerDirectoryWatcher();
+
     deploysDomain();
   }
 
@@ -1129,6 +1131,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     startDeployment();
 
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    reset(domainDeploymentListener);
 
     addExplodedDomainFromBuilder(emptyDomainFileBuilder);
 
@@ -2225,7 +2228,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     DomainFileBuilder domainBundleWrongFullRedeploy = new DomainFileBuilder("dummy-domain-bundle")
         .definedBy("incomplete-domain-config.xml");
-
 
     addPackedDomainFromBuilder(domainBundleWrongFullRedeploy);
 

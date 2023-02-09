@@ -165,6 +165,10 @@ public class MuleDeploymentService implements DeploymentService {
     notifyStartupListeners();
   }
 
+  void triggerDirectoryWatcher() {
+    deploymentDirectoryWatcher.runOnce();
+  }
+
   protected void notifyStartupListeners() {
     for (StartupListener listener : startupListeners) {
       try {

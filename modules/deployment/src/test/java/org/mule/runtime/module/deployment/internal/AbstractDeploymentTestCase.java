@@ -32,7 +32,6 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.getChangesCheckIntervalMs;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
@@ -62,6 +61,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.joining;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
@@ -154,7 +154,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
@@ -170,6 +169,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -237,6 +238,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @ClassRule
   public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup);
+
+  private static final ExecutorService executor = newSingleThreadExecutor();
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
   protected ModuleRepository moduleRepository;
@@ -353,7 +356,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected TestPolicyManager policyManager;
 
   @Rule
-  public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "10");
+  public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "100000");
 
   @Rule
   public SystemProperty parallelDeployment;
@@ -586,6 +589,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     WaitComponent.reset();
     startDeployment();
     deployArtifactAction.perform();
+    Future future = triggerDirectoryWatcherAsync();
     try {
       if (!WaitComponent.componentInitializedLatch.await(DEPLOYMENT_TIMEOUT, TimeUnit.MILLISECONDS)) {
         fail("WaitComponent should be initilaized already. Probably app deployment failed");
@@ -593,6 +597,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       verifyAnchorFileDoesNotExistsAction.perform();
     } finally {
       WaitComponent.waitLatch.release();
+      future.get();
     }
     verifyDeploymentSuccessfulAction.perform();
     verifyAnchorFileExistsAction.perform();
@@ -602,6 +607,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     serviceManager.start();
     startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start();
+  }
+
+  protected void triggerDirectoryWatcher() {
+    deploymentService.triggerDirectoryWatcher();
+  }
+
+  protected Future<?> triggerDirectoryWatcherAsync() {
+    return executor.submit(this::triggerDirectoryWatcher);
   }
 
   protected void assertApplicationDeploymentSuccess(DeploymentListener listener, String artifactName) {
@@ -645,6 +658,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private void assertArtifactRedeploymentFailure(DeploymentListener listener, String artifactName) {
+    triggerDirectoryWatcher();
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new JUnitProbe() {
 
@@ -736,6 +750,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName) {
+    triggerDirectoryWatcher();
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new JUnitProbe() {
 
@@ -809,6 +824,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertUndeploymentSuccess(final DeploymentListener listener, final String appName) {
+    triggerDirectoryWatcher();
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new JUnitProbe() {
 
@@ -843,6 +859,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertDeploymentFailure(final DeploymentListener listener, final String artifactName) {
+    triggerDirectoryWatcher();
     assertDeploymentFailure(listener, artifactName, times(1));
   }
 
@@ -877,6 +894,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void assertDeploymentFailure(final DeploymentListener listener, final String artifactName,
                                          final VerificationMode mode) {
+    triggerDirectoryWatcher();
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new JUnitProbe() {
 
@@ -894,6 +912,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertRedeploymentStart(final DeploymentListener listener, final String artifactName) {
+    triggerDirectoryWatcher();
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new JUnitProbe() {
 
@@ -925,34 +944,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertNoDeploymentInvoked(final DeploymentListener deploymentListener) {
-    // TODO(pablo.kraan): look for a better way to test this
-    boolean invoked;
-    Prober prober = new PollingProber(getChangesCheckIntervalMs() * 2L, 100);
-    try {
-      prober.check(new Probe() {
-
-        @Override
-        public boolean isSatisfied() {
-          try {
-            verify(deploymentListener, times(1)).onDeploymentStart(any(String.class));
-            return true;
-          } catch (AssertionError e) {
-            return false;
-          }
-        }
-
-        @Override
-        public String describeFailure() {
-          return "No deployment has started";
-        }
-      });
-
-      invoked = true;
-    } catch (AssertionError e) {
-      invoked = false;
-    }
-
-    assertFalse("A deployment was started", invoked);
+    triggerDirectoryWatcher();
+    verify(deploymentListener, never()).onDeploymentStart(any(String.class));
   }
 
   /**
