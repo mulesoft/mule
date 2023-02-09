@@ -22,7 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -31,8 +33,13 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
 
-  @Rule
-  public TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  @ClassRule
+  public static final TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  private static boolean areServicesInitialised = false;
+  private static File cachedSchedulerService = null;
+  private static File cachedHttpService = null;
+  private static File cachedELService = null;
+  private static File cachedELMService = null;
 
   protected FakeMuleServer muleServer;
 
@@ -43,11 +50,12 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
-    muleServer.addZippedService(getSchedulerService());
-    muleServer.addZippedService(getHttpService());
-    muleServer.addZippedService(getExpressionLanguageService());
+    initialiseServicesIfNeeded();
+    muleServer.addZippedService(cachedSchedulerService);
+    muleServer.addZippedService(cachedHttpService);
+    muleServer.addZippedService(cachedELService);
     if (addExpressionLanguageMetadataService()) {
-      muleServer.addZippedService(getExpressionLanguageMetadataService());
+      muleServer.addZippedService(cachedELMService);
     }
   }
 
@@ -62,6 +70,27 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
       muleServer = null;
     }
     shutdown();
+  }
+
+  private void initialiseServicesIfNeeded() throws IOException {
+    if (!areServicesInitialised) {
+      areServicesInitialised = true;
+      cachedSchedulerService = getSchedulerService();
+      cachedHttpService = getHttpService();
+      cachedELService = getExpressionLanguageService();
+      if (addExpressionLanguageMetadataService()) {
+        cachedELMService = getExpressionLanguageMetadataService();
+      }
+    }
+  }
+
+  @AfterClass
+  public static void nullifyCachedServices() {
+    areServicesInitialised = false;
+    cachedSchedulerService = null;
+    cachedHttpService = null;
+    cachedELService = null;
+    cachedELMService = null;
   }
 
   protected File getExpressionLanguageService() throws IOException {
