@@ -22,8 +22,6 @@ receivers:
           cert_file: $MTLS_SERVER_CERTIFICATE
           key_file: $MTLS_SERVER_KEY
 exporters:
-  logging:
-    logLevel: $LOGGING_EXPORTER_LOG_lEVEL
   otlp:
     endpoint: $OTLP_EXPORTER_ENDPOINT
     tls:
@@ -34,4 +32,4 @@ service:
   pipelines:
     traces:
       receivers: [otlp, otlp/mtls]
-      exporters: [logging, otlp]
+      exporters: [otlp]
