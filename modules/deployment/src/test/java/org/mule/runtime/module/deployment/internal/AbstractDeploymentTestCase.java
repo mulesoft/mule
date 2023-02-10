@@ -603,10 +603,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     verifyAnchorFileExistsAction.perform();
   }
 
-  protected void startDeployment() throws MuleException {
+  protected void startDeployment(boolean startDirectoryWatcher) throws MuleException {
     serviceManager.start();
     startIfNeeded(extensionModelLoaderRepository);
-    deploymentService.start();
+    deploymentService.start(startDirectoryWatcher);
+  }
+
+  protected void startDeployment() throws MuleException {
+    startDeployment(false);
   }
 
   protected void triggerDirectoryWatcher() {
@@ -786,23 +790,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertConditionOnRegistry(TestDeploymentListener listener, Function<DefaultRegistry, Boolean> verifier) {
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        DefaultRegistry registry = (DefaultRegistry) listener.getRegistry();
-        if (registry == null) {
-          return false;
-        }
-        return verifier.apply(registry);
-      }
-
-      @Override
-      public String describeFailure() {
-        return "Condition on registry not met";
-      }
-    });
+    triggerDirectoryWatcher();
+    DefaultRegistry registry = (DefaultRegistry) listener.getRegistry();
+    if (registry == null) {
+      fail("Couldn't obtain registry");
+    }
+    assertThat(verifier.apply(registry), is(true));
   }
 
   protected void assertMuleContextInitialized(final DeploymentListener listener, final String appName) {
@@ -825,37 +818,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void assertUndeploymentSuccess(final DeploymentListener listener, final String appName) {
     triggerDirectoryWatcher();
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        verify(listener, times(1)).onUndeploymentSuccess(appName);
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return "Failed to undeploy artifact: " + appName + System.lineSeparator() + super.describeFailure();
-      }
-    });
+    verify(listener, times(1)).onUndeploymentSuccess(appName);
   }
 
   protected void assertAtLeastOneUndeploymentSuccess(final DeploymentListener listener, final String appName) {
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        verify(listener, atLeastOnce()).onUndeploymentSuccess(appName);
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return "Failed to undeploy artifact: " + appName + System.lineSeparator() + super.describeFailure();
-      }
-    });
+    triggerDirectoryWatcher();
+    verify(listener, atLeastOnce()).onUndeploymentSuccess(appName);
   }
 
   protected void assertDeploymentFailure(final DeploymentListener listener, final String artifactName) {
@@ -895,52 +863,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void assertDeploymentFailure(final DeploymentListener listener, final String artifactName,
                                          final VerificationMode mode) {
     triggerDirectoryWatcher();
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        verify(listener, mode).onDeploymentFailure(eq(artifactName), any(Throwable.class));
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return getArtifactType(listener) + " deployment was supposed to fail for: " + artifactName + super.describeFailure();
-      }
-    });
+    verify(listener, mode).onDeploymentFailure(eq(artifactName), any(Throwable.class));
   }
 
   protected void assertRedeploymentStart(final DeploymentListener listener, final String artifactName) {
     triggerDirectoryWatcher();
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        verify(listener).onRedeploymentStart(eq(artifactName));
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return getArtifactType(listener) + " redeployment was supposed to start for: " + artifactName + super.describeFailure();
-      }
-    });
-  }
-
-  private String getArtifactType(DeploymentListener deploymentListener) {
-    String artifactType;
-    if (deploymentListener == applicationDeploymentListener) {
-      artifactType = "Application";
-    } else if (deploymentListener == domainDeploymentListener) {
-      artifactType = "Domain";
-    } else {
-      throw new IllegalArgumentException("Cannot determine the artifact type from deployment listener");
-    }
-
-    return artifactType;
-
+    verify(listener).onRedeploymentStart(eq(artifactName));
   }
 
   protected void assertNoDeploymentInvoked(final DeploymentListener deploymentListener) {
@@ -1383,24 +1311,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void redeployAndVerifyPropertyInRegistry(String id, Properties deploymentProperties,
                                                      Function<DefaultRegistry, Boolean> verifier)
       throws IOException {
-    try {
-      deploymentService.getLock().lock();
-      redeployId(id, deploymentProperties);
-    } finally {
-      deploymentService.getLock().unlock();
-    }
+    redeployId(id, deploymentProperties);
     assertConditionOnRegistry(testDeploymentListener, verifier);
   }
 
   protected void deployAndVerifyPropertyInRegistry(URI uri, Properties deploymentProperties,
                                                    Function<DefaultRegistry, Boolean> verifier)
       throws IOException {
-    try {
-      deploymentService.getLock().lock();
-      deployURI(uri, deploymentProperties);
-    } finally {
-      deploymentService.getLock().unlock();
-    }
+    deployURI(uri, deploymentProperties);
     assertConditionOnRegistry(testDeploymentListener, verifier);
   }
 

@@ -152,6 +152,10 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void start() {
+    start(true);
+  }
+
+  void start(boolean startDirectoryWatcher) {
     DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
     addDeploymentListener(deploymentStatusTracker.getApplicationDeploymentStatusTracker());
     addDomainDeploymentListener(deploymentStatusTracker.getDomainDeploymentStatusTracker());
@@ -160,7 +164,9 @@ public class MuleDeploymentService implements DeploymentService {
         new StartupSummaryDeploymentListener(deploymentStatusTracker, this);
     addStartupListener(summaryDeploymentListener);
 
-    deploymentDirectoryWatcher.start();
+    if (startDirectoryWatcher) {
+      deploymentDirectoryWatcher.start();
+    }
 
     notifyStartupListeners();
   }

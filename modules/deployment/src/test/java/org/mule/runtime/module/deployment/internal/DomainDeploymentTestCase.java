@@ -1484,7 +1484,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   public void deployAndRedeployDomainWithDeploymentProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
-    startDeployment();
+    startDeployment(true);
     deployAndVerifyPropertyInRegistry(domainWithPropsFileBuilder.getArtifactFile().toURI(),
                                       deploymentProperties,
                                       (registry) -> registry.lookupByName(COMPONENT_NAME_IN_APP).get() instanceof TestComponent);
