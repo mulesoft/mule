@@ -118,7 +118,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    startDeployment();
+    startDeployment(true);
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
@@ -146,7 +146,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    startDeployment();
+    startDeployment(true);
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
@@ -156,11 +156,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertThat(removeAppAnchorFile(appName), is(true));
-
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(getDeploymentListener().isAppUndeployed(), is(true));
-      return true;
-    }));
+    triggerDirectoryWatcher();
+    assertThat(getDeploymentListener().isAppUndeployed(), is(true));
 
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       clearAllLogs();
@@ -228,7 +225,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     addPackedAppFromBuilder(applicationFileBuilder);
-    startDeployment();
+    startDeployment(true);
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
     final PhantomReference<Application> firstAppRef =

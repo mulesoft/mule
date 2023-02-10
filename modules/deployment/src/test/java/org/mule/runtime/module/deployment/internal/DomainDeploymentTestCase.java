@@ -407,7 +407,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         createExtensionApplicationWithServices("exception-throwing-app.xml")
             .dependingOn(callbackExtensionCustomException);
     addPackedAppFromBuilder(applicationFileBuilder);
-    startDeployment();
+    startDeployment(true);
 
     try {
       executeApplicationFlow("main");
@@ -748,7 +748,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
     long firstFileTimestamp = dummyDomainFile.lastModified();
 
-    startDeployment();
+    startDeployment(true);
 
     Properties initialDeploymentProperties = new Properties();
     initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);

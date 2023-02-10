@@ -56,7 +56,7 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
 
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    startDeployment();
+    startDeployment(true);
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
