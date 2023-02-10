@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
+import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
+import static org.mule.maven.pom.parser.api.model.Classifier.MULE_PLUGIN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
-import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
-import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -18,17 +18,17 @@ import static java.util.stream.Collectors.toList;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 
 import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.model.BundleDependency;
-import org.mule.maven.client.api.model.BundleDescriptor;
+import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.maven.pom.parser.api.model.MavenPomModel;
+import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils;
-import org.mule.runtime.module.artifact.activation.internal.plugin.Plugin;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,12 +39,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.vdurmont.semver4j.Semver;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 
 /**
@@ -52,27 +47,25 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  */
 public class AdditionalPluginDependenciesResolver {
 
-  protected static final String MULE_EXTENSIONS_PLUGIN_GROUP_ID = "org.mule.runtime.plugins";
-  protected static final String MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID = "mule-extensions-maven-plugin";
-  protected static final String MULE_MAVEN_PLUGIN_GROUP_ID = "org.mule.tools.maven";
-  protected static final String MULE_MAVEN_PLUGIN_ARTIFACT_ID = "mule-maven-plugin";
-  protected static final String ADDITIONAL_PLUGIN_DEPENDENCIES_ELEMENT = "additionalPluginDependencies";
-  protected static final String ADDITIONAL_DEPENDENCIES_ELEMENT = "additionalDependencies";
-  protected static final String GROUP_ID_ELEMENT = "groupId";
-  protected static final String ARTIFACT_ID_ELEMENT = "artifactId";
-  protected static final String VERSION_ELEMENT = "version";
-  protected static final String PLUGIN_ELEMENT = "plugin";
-  protected static final String DEPENDENCY_ELEMENT = "dependency";
+  protected static final String MULE_APPLICATION_CLASSIFIER = "mule-application";
+
   private final File temporaryFolder;
-  private final Map<ArtifactCoordinates, Supplier<Model>> pomModels;
+  private final Map<ArtifactCoordinates, Supplier<MavenPomModel>> pomModels;
 
   private final MavenClient mavenClient;
-  private final List<Plugin> pluginsWithAdditionalDependencies;
+
+  private final List<AdditionalPluginDependencies> pluginsWithAdditionalDependencies;
 
   public AdditionalPluginDependenciesResolver(MavenClient muleMavenPluginClient,
-                                              List<Plugin> additionalPluginDependencies,
+                                              List<AdditionalPluginDependencies> additionalPluginDependencies,
+                                              File temporaryFolder) {
+    this(muleMavenPluginClient, additionalPluginDependencies, temporaryFolder, emptyMap());
+  }
+
+  public AdditionalPluginDependenciesResolver(MavenClient muleMavenPluginClient,
+                                              List<AdditionalPluginDependencies> additionalPluginDependencies,
                                               File temporaryFolder,
-                                              Map<ArtifactCoordinates, Supplier<Model>> pomModels) {
+                                              Map<ArtifactCoordinates, Supplier<MavenPomModel>> pomModels) {
     this.mavenClient = muleMavenPluginClient;
     this.pluginsWithAdditionalDependencies = new ArrayList<>(additionalPluginDependencies);
     this.temporaryFolder = temporaryFolder;
@@ -83,7 +76,7 @@ public class AdditionalPluginDependenciesResolver {
                                                                            Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     addPluginDependenciesAdditionalLibraries(applicationDependencies);
     Map<BundleDependency, List<BundleDependency>> pluginsWithAdditionalDeps = new LinkedHashMap<>();
-    for (Plugin pluginWithAdditionalDependencies : pluginsWithAdditionalDependencies) {
+    for (AdditionalPluginDependencies pluginWithAdditionalDependencies : pluginsWithAdditionalDependencies) {
       BundleDependency pluginBundleDependency =
           getPluginBundleDependency(pluginWithAdditionalDependencies, applicationDependencies);
       List<Artifact> pluginDependencies =
@@ -101,16 +94,15 @@ public class AdditionalPluginDependenciesResolver {
     return pluginsWithAdditionalDeps;
   }
 
-  private List<BundleDependency> resolveDependencies(List<Dependency> additionalDependencies) {
-    return mavenClient.resolveArtifactDependencies(additionalDependencies.stream()
-        .map(ArtifactUtils::toBundleDescriptor)
-        .collect(toList()),
+  private List<BundleDependency> resolveDependencies(List<BundleDescriptor> additionalDependencies) {
+    return mavenClient.resolveArtifactDependencies(additionalDependencies,
                                                    of(mavenClient.getMavenConfiguration()
                                                        .getLocalMavenRepositoryLocation()),
                                                    empty());
   }
 
-  private BundleDependency getPluginBundleDependency(Plugin plugin, List<BundleDependency> mulePlugins) {
+  private BundleDependency getPluginBundleDependency(AdditionalPluginDependencies plugin,
+                                                     List<BundleDependency> mulePlugins) {
     return mulePlugins.stream()
         .filter(mulePlugin -> StringUtils.equals(mulePlugin.getDescriptor().getArtifactId(), plugin.getArtifactId())
             && StringUtils.equals(mulePlugin.getDescriptor().getGroupId(), plugin.getGroupId()))
@@ -119,7 +111,8 @@ public class AdditionalPluginDependenciesResolver {
             + plugin)));
   }
 
-  private List<Artifact> getPluginDependencies(Plugin plugin, Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
+  private List<Artifact> getPluginDependencies(AdditionalPluginDependencies plugin,
+                                               Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     return pluginsDependencies.entrySet().stream().filter(
                                                           pluginDependenciesEntry -> StringUtils
                                                               .equals(pluginDependenciesEntry.getKey().getGroupId(),
@@ -132,19 +125,10 @@ public class AdditionalPluginDependenciesResolver {
             + plugin)));
   }
 
-  private boolean areSameArtifact(Dependency dependency, Artifact artifact) {
+  private boolean areSameArtifact(BundleDescriptor dependency, Artifact artifact) {
     return StringUtils.equals(dependency.getArtifactId(), artifact.getArtifactCoordinates().getArtifactId())
         && StringUtils.equals(dependency.getGroupId(), artifact.getArtifactCoordinates().getGroupId())
         && StringUtils.equals(dependency.getVersion(), artifact.getArtifactCoordinates().getVersion());
-  }
-
-  private String getChildParameterValue(Xpp3Dom element, String childName, boolean validate) {
-    Xpp3Dom child = element.getChild(childName);
-    String childValue = child != null ? child.getValue() : null;
-    if (StringUtils.isEmpty(childValue) && validate) {
-      throw new IllegalArgumentException("Expecting child element with not null value " + childName);
-    }
-    return childValue;
   }
 
   private void addPluginDependenciesAdditionalLibraries(List<BundleDependency> applicationDependencies) {
@@ -154,112 +138,75 @@ public class AdditionalPluginDependenciesResolver {
             .equals(bundleDependency.getDescriptor().getClassifier().orElse(null)))
         .collect(toList());
 
-    Collection<Plugin> additionalDependenciesFromMulePlugins = resolveAdditionalDependenciesFromMulePlugins(mulePlugins);
+    Collection<AdditionalPluginDependencies> additionalDependenciesFromMulePlugins =
+        resolveAdditionalDependenciesFromMulePlugins(mulePlugins);
 
     pluginsWithAdditionalDependencies.addAll(additionalDependenciesFromMulePlugins.stream()
         .filter(isNotRedefinedAtApplicationLevel())
         .collect(toList()));
   }
 
-  protected Collection<Plugin> resolveAdditionalDependenciesFromMulePlugins(List<BundleDependency> mulePlugins) {
-    Map<String, Plugin> additionalDependenciesFromMulePlugins = new HashMap<>();
+  private Collection<AdditionalPluginDependencies> resolveAdditionalDependenciesFromMulePlugins(List<BundleDependency> mulePlugins) {
+    Map<String, AdditionalPluginDependencies> additionalDependenciesFromMulePlugins = new HashMap<>();
 
     // See LightweightDeployableProjectModelBuilderTestCase#createDeployableProjectModelWithAdditionalDependenciesInAPlugin
     mulePlugins.stream()
-        .filter(mulePlugin -> pomModels.getOrDefault(getArtifactCoordinates(mulePlugin),
-                                                     () -> mavenClient
-                                                         .getRawPomModel(new File(mulePlugin.getBundleUri())))
-            .get().getPackaging().equals(MULE_APPLICATION_CLASSIFIER))
+        .filter(mulePlugin -> {
+          Supplier<MavenPomModel> modelSupplier = pomModels.get(getArtifactCoordinates(mulePlugin));
+          if (modelSupplier != null) {
+            return modelSupplier.get().getPackaging().equals(MULE_APPLICATION_CLASSIFIER);
+          }
+          return mavenClient.getRawPomModel(new File(mulePlugin.getBundleUri())).getPackaging()
+              .equals(MULE_APPLICATION_CLASSIFIER);
+        })
         .forEach(mulePlugin -> {
 
-          Supplier<Model> pomModel =
+          Supplier<MavenPomModel> pomModel =
               pomModels.getOrDefault(getArtifactCoordinates(mulePlugin),
                                      () -> mavenClient.getEffectiveModel(new File(mulePlugin.getBundleUri()),
                                                                          of(temporaryFolder)));
 
-          Build build = pomModel.get().getBuild();
-          if (build != null) {
-            org.apache.maven.model.Plugin packagerPlugin =
-                build.getPluginsAsMap().get(MULE_EXTENSIONS_PLUGIN_GROUP_ID + ":" + MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID);
-            if (packagerPlugin == null) {
-              packagerPlugin =
-                  build.getPluginsAsMap().get(MULE_MAVEN_PLUGIN_GROUP_ID + ":" + MULE_MAVEN_PLUGIN_ARTIFACT_ID);
-            }
-            if (packagerPlugin != null) {
-              Object configurationObject =
-                  packagerPlugin.getConfiguration();
-              if (configurationObject != null) {
-                Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configurationObject)
-                    .getChild(ADDITIONAL_PLUGIN_DEPENDENCIES_ELEMENT);
-                if (additionalPluginDependenciesDom != null) {
-                  Xpp3Dom[] additionalPluginDependencies =
-                      additionalPluginDependenciesDom.getChildren(PLUGIN_ELEMENT);
-                  if (additionalPluginDependencies != null) {
-                    Arrays.stream(additionalPluginDependencies)
-                        .forEach(additonalPluginDependencyDom -> {
-                          String pluginGroupId = getChildParameterValue(additonalPluginDependencyDom, GROUP_ID_ELEMENT, true);
-                          String pluginArtifactId =
-                              getChildParameterValue(additonalPluginDependencyDom, ARTIFACT_ID_ELEMENT, true);
-                          Plugin alreadyDefinedPluginAdditionalDependencies =
-                              additionalDependenciesFromMulePlugins.get(pluginGroupId + ":" + pluginArtifactId);
-                          List<Dependency> additionalDependencyDependencies = Arrays
-                              .stream(additonalPluginDependencyDom.getChild(ADDITIONAL_DEPENDENCIES_ELEMENT)
-                                  .getChildren(DEPENDENCY_ELEMENT))
-                              .map(dependencyDom -> {
-                                Dependency dependency = new Dependency();
-                                dependency.setGroupId(getChildParameterValue(dependencyDom, GROUP_ID_ELEMENT, true));
-                                dependency
-                                    .setArtifactId(getChildParameterValue(dependencyDom, ARTIFACT_ID_ELEMENT, true));
-                                dependency.setVersion(getChildParameterValue(dependencyDom, VERSION_ELEMENT, true));
-                                String type = getChildParameterValue(dependencyDom, "type", false);
-                                dependency.setType(type == null ? DEFAULT_ARTIFACT_TYPE : type);
-                                dependency.setClassifier(getChildParameterValue(dependencyDom, "classifier", false));
-                                dependency.setSystemPath(getChildParameterValue(dependencyDom, "systemPath", false));
-                                return dependency;
-                              })
-                              .collect(toList());
-                          if (alreadyDefinedPluginAdditionalDependencies != null) {
-                            LinkedList<Dependency> effectiveDependencies =
-                                new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
-                            additionalDependencyDependencies.forEach(additionalDependenciesDependency -> {
-                              boolean addDependency = true;
-                              for (int i = 0; i < effectiveDependencies.size(); i++) {
-                                Dependency effectiveDependency = effectiveDependencies.get(i);
-                                if (effectiveDependency.getGroupId().equals(additionalDependenciesDependency.getGroupId()) &&
-                                    effectiveDependency.getArtifactId().equals(additionalDependenciesDependency.getArtifactId())
-                                    &&
-                                    effectiveDependency.getType().equals(additionalDependenciesDependency.getType()) &&
-                                    ObjectUtils.compare(effectiveDependency.getClassifier(),
-                                                        additionalDependenciesDependency.getClassifier()) == 0) {
-                                  if (isNewerVersion(additionalDependenciesDependency.getVersion(),
-                                                     effectiveDependency.getVersion())) {
-                                    effectiveDependencies.remove(i);
-                                  } else {
-                                    addDependency = false;
-                                  }
-                                  break;
-                                }
-                              }
-                              if (addDependency) {
-                                effectiveDependencies.add(additionalDependenciesDependency);
-                              }
-                            });
-                            alreadyDefinedPluginAdditionalDependencies.setAdditionalDependencies(effectiveDependencies);
-                          } else {
-                            Plugin plugin = new Plugin();
-                            plugin.setGroupId(pluginGroupId);
-                            plugin.setArtifactId(pluginArtifactId);
-                            plugin.setAdditionalDependencies(additionalDependencyDependencies);
-                            additionalDependenciesFromMulePlugins.put(plugin.getGroupId() + ":" + plugin.getArtifactId(),
-                                                                      plugin);
-                          }
-                        });
+          MavenPomParser mavenPomParser =
+              discoverProvider().createMavenPomParserClient(pomModel.get().getPomFile().get().toPath());
+
+          mavenPomParser.getPomAdditionalPluginDependenciesForArtifacts().values().forEach(mavenPlugin -> {
+            AdditionalPluginDependencies alreadyDefinedPluginAdditionalDependencies =
+                additionalDependenciesFromMulePlugins.get(mavenPlugin.getGroupId() + ":" + mavenPlugin.getArtifactId());
+            if (alreadyDefinedPluginAdditionalDependencies != null) {
+              LinkedList<BundleDescriptor> effectiveDependencies =
+                  new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
+              mavenPlugin.getAdditionalDependencies().forEach(additionalDependenciesDependency -> {
+                boolean addDependency = true;
+                for (int i = 0; i < effectiveDependencies.size(); i++) {
+                  BundleDescriptor effectiveDependency = effectiveDependencies.get(i);
+                  if (effectiveDependency.getGroupId().equals(additionalDependenciesDependency.getGroupId()) &&
+                      effectiveDependency.getArtifactId().equals(additionalDependenciesDependency.getArtifactId())
+                      &&
+                      effectiveDependency.getType().equals(additionalDependenciesDependency.getType()) &&
+                      effectiveDependency.getClassifier()
+                          .equals(additionalDependenciesDependency.getClassifier())) {
+                    if (isNewerVersion(additionalDependenciesDependency.getVersion(),
+                                       effectiveDependency.getVersion())) {
+                      effectiveDependencies.remove(i);
+                    } else {
+                      addDependency = false;
+                    }
+                    break;
                   }
                 }
-              }
+                if (addDependency) {
+                  effectiveDependencies.add(additionalDependenciesDependency);
+                }
+              });
+              alreadyDefinedPluginAdditionalDependencies.setAdditionalDependencies(effectiveDependencies);
+            } else {
+              additionalDependenciesFromMulePlugins.put(mavenPlugin.getGroupId() + ":" + mavenPlugin.getArtifactId(),
+                                                        mavenPlugin);
             }
-          }
+          });
         });
+
+
     return additionalDependenciesFromMulePlugins.values();
   }
 
@@ -277,7 +224,7 @@ public class AdditionalPluginDependenciesResolver {
     return new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
   }
 
-  private Predicate<Plugin> isNotRedefinedAtApplicationLevel() {
+  private Predicate<AdditionalPluginDependencies> isNotRedefinedAtApplicationLevel() {
     return dependencyPluginAdditionalDependencies -> !pluginsWithAdditionalDependencies.stream()
         .filter(applicationPluginAdditionalDependency -> (dependencyPluginAdditionalDependencies.getGroupId()
             .equals(applicationPluginAdditionalDependency.getGroupId())

@@ -439,7 +439,7 @@ public class DefaultToolingService implements ToolingService {
     }
 
     @Override
-    public File findArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+    public File findArtifact(org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor) {
       if (checkArtifact(bundleDescriptor)) {
         if (bundleDescriptor.getType().equals("pom")) {
           return domainPomFile;
@@ -451,14 +451,14 @@ public class DefaultToolingService implements ToolingService {
     }
 
     @Override
-    public List<String> findVersions(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+    public List<String> findVersions(org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor) {
       if (checkArtifact(bundleDescriptor)) {
         return singletonList(this.domainBundleDescriptor.getVersion());
       }
       return emptyList();
     }
 
-    private boolean checkArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+    private boolean checkArtifact(org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor) {
       return this.domainBundleDescriptor.getGroupId().equals(bundleDescriptor.getGroupId())
           && this.domainBundleDescriptor.getArtifactId().equals(bundleDescriptor.getArtifactId())
           && this.domainBundleDescriptor.getVersion().equals(bundleDescriptor.getVersion());

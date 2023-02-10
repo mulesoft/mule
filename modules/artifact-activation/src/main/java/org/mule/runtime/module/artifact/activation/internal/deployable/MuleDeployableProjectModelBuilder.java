@@ -6,16 +6,12 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.maven.client.internal.util.MavenUtils.getPomModel;
+import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
-import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
@@ -23,8 +19,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer.deserialize;
-import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
-import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -35,12 +29,10 @@ import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.concat;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,9 +52,6 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,13 +59,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,42 +259,23 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
   private Set<BundleDescriptor> getSharedLibraries(AppClassLoaderModel packagerClassLoaderModel,
                                                    Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_110)) {
-      return findMuleMavenPluginDeclaration()
-          .map(packagingPlugin -> readSharedDependenciesFromPom(packagingPlugin, bundleDescriptors))
-          .orElse(emptySet());
+      return discoverProvider().createMavenPomParserClient(projectFolder.toPath(), getActiveProfiles())
+          .getSharedLibraries().stream().map(shareLibrary -> {
+            if (!validateMuleRuntimeSharedLibrary(shareLibrary.getGroupId(), shareLibrary.getArtifactId())) {
+              return bundleDescriptors.values().stream()
+                  .filter(bundleDescriptor -> bundleDescriptor.getGroupId().equals(shareLibrary.getGroupId())
+                      && bundleDescriptor.getArtifactId().equals(shareLibrary.getArtifactId()))
+                  .findAny()
+                  .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Shared library '%s:%s' is not among the available dependencies",
+                                                                                  shareLibrary.getGroupId(),
+                                                                                  shareLibrary.getArtifactId())));
+            }
+            return null;
+          }).filter(Objects::nonNull).collect(toSet());
     } else {
       return packagerClassLoaderModel.getDependencies().stream().filter(Artifact::isShared)
           .map(artifact -> bundleDescriptors.get(artifact.getArtifactCoordinates())).collect(toSet());
     }
-  }
-
-  private Set<BundleDescriptor> readSharedDependenciesFromPom(Plugin packagingPlugin,
-                                                              Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
-    Object configuration = packagingPlugin.getConfiguration();
-    if (configuration != null) {
-      Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) configuration).getChild(SHARED_LIBRARIES_FIELD);
-      if (sharedLibrariesDom != null) {
-        Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren(SHARED_LIBRARY_FIELD);
-        if (sharedLibraries != null) {
-          return Arrays.stream(sharedLibraries).map(sharedLibrary -> {
-            String groupId = getAttribute(sharedLibrary, GROUP_ID);
-            String artifactId = getAttribute(sharedLibrary, ARTIFACT_ID);
-
-            if (!validateMuleRuntimeSharedLibrary(groupId, artifactId)) {
-              return bundleDescriptors.values().stream()
-                  .filter(bundleDescriptor -> bundleDescriptor.getGroupId().equals(groupId)
-                      && bundleDescriptor.getArtifactId().equals(artifactId))
-                  .findAny()
-                  .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Shared library '%s:%s' is not among the available dependencies",
-                                                                                  groupId, artifactId)));
-            }
-
-            return null;
-          }).filter(Objects::nonNull).collect(toSet());
-        }
-      }
-    }
-    return emptySet();
   }
 
   protected final boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId) {
@@ -334,51 +300,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
                       attributeName, tag.toString(), projectFolder.getName()));
     return attributeValue;
 
-  }
-
-  private Optional<Plugin> findMuleMavenPluginDeclaration() {
-    Model model = getPomModel(projectFolder);
-    return findArtifactPackagerPlugin(model);
-  }
-
-  protected Optional<Plugin> findArtifactPackagerPlugin(Model model) {
-    Stream<Plugin> basePlugin = Stream.empty();
-    Build build = model.getBuild();
-    if (build != null) {
-      basePlugin = findArtifactPackagerPlugin(build.getPlugins()).map(Stream::of).orElse(Stream.empty());
-    }
-
-    // Sort them so the processing is consistent with how Maven calculates the plugin configuration for the effective pom.
-    final List<String> activeProfiles = getActiveProfiles()
-        .stream()
-        .sorted(String::compareTo)
-        .collect(toList());
-
-    final Stream<Plugin> packagerConfigsForActivePluginsStream = model.getProfiles().stream()
-        .filter(profile -> activeProfiles.contains(profile.getId()))
-        .map(profile -> findArtifactPackagerPlugin(profile.getBuild() != null ? profile.getBuild().getPlugins() : null))
-        .filter(plugin -> !plugin.equals(empty()))
-        .map(Optional::get);
-
-    return concat(basePlugin, packagerConfigsForActivePluginsStream)
-        .reduce((p1, p2) -> {
-          p1.setConfiguration(mergeXpp3Dom((Xpp3Dom) p2.getConfiguration(), (Xpp3Dom) p1.getConfiguration()));
-          p1.getDependencies().addAll(p2.getDependencies());
-
-          return p1;
-        });
-  }
-
-  private Optional<Plugin> findArtifactPackagerPlugin(List<Plugin> plugins) {
-    if (plugins != null) {
-      return plugins.stream().filter(plugin -> (plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
-          && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)) ||
-          (plugin.getArtifactId().equals(MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID) &&
-              plugin.getGroupId().equals(MULE_EXTENSIONS_PLUGIN_GROUP_ID)))
-          .findFirst();
-    } else {
-      return empty();
-    }
   }
 
   protected List<String> getActiveProfiles() {

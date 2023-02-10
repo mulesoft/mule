@@ -33,6 +33,7 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -56,8 +57,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
 
 /**
  * Implementation of {@link DeployableProjectModelBuilder} that uses Maven.
@@ -129,14 +128,14 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   }
 
   @Override
-  protected DeployableProjectModel doBuild(Model pomModel, ArtifactCoordinates deployableArtifactCoordinates) {
+  protected DeployableProjectModel doBuild(MavenPomParser parser, ArtifactCoordinates deployableArtifactCoordinates) {
     // Get exported resources and packages
     try {
-      List<String> packages = getAvailablePackages(pomModel.getBuild());
-      List<String> muleResources = getAvailableMuleResources(pomModel.getBuild());
-      List<String> nonMuleResources = getAvailableNonMuleResources(pomModel.getBuild());
+      List<String> packages = getAvailablePackages(parser);
+      List<String> muleResources = getAvailableMuleResources(parser);
+      List<String> nonMuleResources = getAvailableNonMuleResources(parser);
       List<String> allResources = concat(muleResources.stream(), nonMuleResources.stream()).collect(toList());
-      Set<String> muleConfigs = getConfigs(getMuleResourcesDirectory(pomModel.getBuild()), muleResources);
+      Set<String> muleConfigs = getConfigs(getMuleResourcesDirectory(parser), muleResources);
 
       return new DeployableProjectModel(packages, allResources, resourcesPath,
                                         buildBundleDescriptor(deployableArtifactCoordinates),
@@ -227,8 +226,8 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return new MuleArtifactLoaderDescriptor(id, attributes);
   }
 
-  private List<String> getAvailablePackages(Build build) throws IOException {
-    String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
+  private List<String> getAvailablePackages(MavenPomParser parser) throws IOException {
+    String sourceDirectory = parser.getSourceDirectory();
     Path javaDirectory = get(projectFolder.getAbsolutePath(), sourceDirectory.concat(DEFAULT_SOURCES_JAVA_DIRECTORY));
     // look for all the sources under the java directory
     if (!javaDirectory.toFile().exists()) {
@@ -251,14 +250,12 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
         .collect(toList());
   }
 
-  private String getMuleResourcesDirectory(Build build) {
-    String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
-
-    return sourceDirectory.concat(DEFAULT_MULE_DIRECTORY);
+  private String getMuleResourcesDirectory(MavenPomParser parser) {
+    return parser.getSourceDirectory().concat(DEFAULT_MULE_DIRECTORY);
   }
 
-  private List<String> getAvailableMuleResources(Build build) throws IOException {
-    String muleResourcesDirectory = getMuleResourcesDirectory(build);
+  private List<String> getAvailableMuleResources(MavenPomParser parser) throws IOException {
+    String muleResourcesDirectory = getMuleResourcesDirectory(parser);
     List<String> resources = getResourcesInFolder(muleResourcesDirectory);
     if (resources.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage(muleResourcesDirectory + " cannot be empty"));
@@ -267,23 +264,24 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return resources;
   }
 
-  private List<String> getAvailableNonMuleResources(Build build) throws IOException {
-    String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
+  private List<String> getAvailableNonMuleResources(MavenPomParser parser) throws IOException {
+    String sourceDirectory = parser.getSourceDirectory();
     List<String> resources = new ArrayList<>();
+    List<String> resourcesDirectories = parser.getResourceDirectories();
 
     // include test resources if test dependencies have to be considered
     if (isIncludeTestDependencies()) {
       resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_TEST_RESOURCES_DIRECTORY)));
     }
 
-    if (build.getResources().isEmpty()) {
+    if (resourcesDirectories.isEmpty()) {
       resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_RESOURCES_DIRECTORY)));
     } else {
-      build.getResources().forEach(r -> {
+      resourcesDirectories.forEach(r -> {
         try {
-          resources.addAll(getResourcesInFolder(r.getDirectory()));
+          resources.addAll(getResourcesInFolder(r));
         } catch (IOException e) {
-          throw new IllegalStateException("Cannot load files from" + r.getDirectory());
+          throw new IllegalStateException("Cannot load files from" + r);
         }
       });
     }

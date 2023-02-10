@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
@@ -17,14 +18,14 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import static java.util.Collections.singletonMap;
 
+import org.mule.maven.pom.parser.api.model.MavenPomModel;
+import org.mule.maven.pom.parser.api.model.PomParentCoordinates;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -37,8 +38,6 @@ import org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer;
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.maven.model.Model;
 
 /**
  * Loads a {@link BundleDescriptor} using Maven to extract the relevant information from a Mule artifact's
@@ -113,17 +112,15 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(artifactType.equals(APP) ? MULE_APPLICATION_CLASSIFIER : MULE_DOMAIN_CLASSIFIER)
           .build();
     } else {
-      Model model;
-      if (artifactFile.isDirectory()) {
-        model = getPomModelFolder(artifactFile);
-      } else {
-        model = getPomModelFromJar(artifactFile);
-      }
 
-      String version = model.getVersion() != null ? model.getVersion() : model.getParent().getVersion();
+      MavenPomModel model = discoverProvider().createMavenPomParserClient(artifactFile.toPath()).getModel();
+
+      String version =
+          model.getVersion() != null ? model.getVersion() : model.getParent().map(PomParentCoordinates::getVersion).orElse(null);
       return new BundleDescriptor.Builder()
           .setArtifactId(model.getArtifactId())
-          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+          .setGroupId(model.getGroupId() != null ? model.getGroupId()
+              : model.getParent().map(PomParentCoordinates::getGroupId).orElse(null))
           .setVersion(version)
           .setBaseVersion(version)
           .setType(JAR)

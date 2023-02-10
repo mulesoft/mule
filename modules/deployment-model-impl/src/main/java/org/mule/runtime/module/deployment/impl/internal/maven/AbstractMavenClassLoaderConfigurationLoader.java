@@ -420,7 +420,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
     Optional<File> temporaryDirectory = of(createTempDir());
     try {
-      List<org.mule.maven.client.api.model.BundleDependency> dependencies =
+      List<org.mule.maven.pom.parser.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
                                                   includeProvidedDependencies, mavenRepository,
                                                   mavenReactorResolver,

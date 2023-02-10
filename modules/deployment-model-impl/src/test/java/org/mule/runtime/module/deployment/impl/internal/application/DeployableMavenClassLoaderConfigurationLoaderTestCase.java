@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.maven.client.api.model.BundleScope.COMPILE;
+import static org.mule.maven.pom.parser.api.model.BundleScope.COMPILE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
@@ -47,8 +47,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -95,15 +95,15 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
   private static final String PATCHED_JAR_APP_WHITESPACES = "patched jar app";
   private static final String PATCHED_JAR_APP = "patched-jar-app";
   private static final String PATCHED_JAR_AND_PLUGIN_APP = "patched-jar-and-plugin-app";
-  private static final org.mule.maven.client.api.model.BundleDependency API_BUNDLE =
+  private static final org.mule.maven.pom.parser.api.model.BundleDependency API_BUNDLE =
       createBundleDependency("some.company", "dummy-api", "1.0.0", "raml");
-  private static final org.mule.maven.client.api.model.BundleDependency LIB_BUNDLE =
+  private static final org.mule.maven.pom.parser.api.model.BundleDependency LIB_BUNDLE =
       createBundleDependency("other.company", "dummy-lib", "1.2.0", "raml-fragment");
-  private static final org.mule.maven.client.api.model.BundleDependency TRAIT_BUNDLE =
+  private static final org.mule.maven.pom.parser.api.model.BundleDependency TRAIT_BUNDLE =
       createBundleDependency("some.company", "dummy-trait", "1.0.3", "raml-fragment");
   private static final String POM_FORMAT = "%s-%s.pom";
   private static final String SOURCE_TEST_CLASSES = "/source-test-classes";
-  private final List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES =
+  private final List<org.mule.maven.pom.parser.api.model.BundleDependency> BASE_DEPENDENCIES =
       asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
   private final MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
@@ -315,8 +315,9 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
    */
   @Test
   public void applicationWithDuplicatedApiArtifactDependencies() throws Exception {
-    org.mule.maven.client.api.model.BundleDependency regularDependency = createBundleDependency("a", "b", "1.0.0-SNAPSHOT", null);
-    org.mule.maven.client.api.model.BundleDependency minorLibBundle =
+    org.mule.maven.pom.parser.api.model.BundleDependency regularDependency =
+        createBundleDependency("a", "b", "1.0.0-SNAPSHOT", null);
+    org.mule.maven.pom.parser.api.model.BundleDependency minorLibBundle =
         createBundleDependency("other.company", "dummy-lib", "1.1.0", "raml-fragment");
 
     when(mockMavenClient.resolveArtifactDependencies(any(), anyBoolean(), anyBoolean(), any(), any(), any()))
@@ -358,22 +359,22 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     final String version1 = "1.0.0";
 
     final String transitiveDependency1Id = "transitiveDependency1";
-    org.mule.maven.client.api.model.BundleDependency transitive1 =
+    org.mule.maven.pom.parser.api.model.BundleDependency transitive1 =
         createBundleDependency(groupId, transitiveDependency1Id, version1, null);
 
     final String transitiveDependency2Id = "transitiveDependency2";
-    org.mule.maven.client.api.model.BundleDependency transitive2 =
+    org.mule.maven.pom.parser.api.model.BundleDependency transitive2 =
         createBundleDependency(groupId, transitiveDependency2Id, version1, null);
 
     final String depWithTransitive1Id = "depT1";
-    org.mule.maven.client.api.model.BundleDependency dependencyWithTransitive1 =
+    org.mule.maven.pom.parser.api.model.BundleDependency dependencyWithTransitive1 =
         createBundleDependency(groupId, depWithTransitive1Id, version1, null, singletonList(transitive1));
 
     final String depWithTransitive2Id = "depT2";
-    org.mule.maven.client.api.model.BundleDependency dependencyWithTransitive2 =
+    org.mule.maven.pom.parser.api.model.BundleDependency dependencyWithTransitive2 =
         createBundleDependency(groupId, depWithTransitive2Id, version1, null, singletonList(transitive2));
 
-    List<org.mule.maven.client.api.model.BundleDependency> resolvedDependencies =
+    List<org.mule.maven.pom.parser.api.model.BundleDependency> resolvedDependencies =
         asList(dependencyWithTransitive1, transitive1, dependencyWithTransitive2, transitive2);
 
     when(mockMavenClient.resolveArtifactDependencies(
@@ -394,7 +395,7 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     assertThat(classLoaderConfiguration.getUrls().length, equalTo(5));
     for (int i = 1; i < classLoaderConfiguration.getUrls().length; i++) { // The first one does not count because it's the main
                                                                           // artifact.
-      org.mule.maven.client.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
+      org.mule.maven.pom.parser.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
       URL url = getDummyUriFor(dependency.getDescriptor().getGroupId(),
                                dependency.getDescriptor().getArtifactId(),
                                dependency.getDescriptor().getVersion()).toURL();
@@ -419,16 +420,16 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     return classLoaderConfiguration;
   }
 
-  private static org.mule.maven.client.api.model.BundleDependency createBundleDependency(String groupId, String artifactId,
-                                                                                         String version, String classifier) {
+  private static org.mule.maven.pom.parser.api.model.BundleDependency createBundleDependency(String groupId, String artifactId,
+                                                                                             String version, String classifier) {
     return createBundleDependency(groupId, artifactId, version, classifier, emptyList());
   }
 
-  private static org.mule.maven.client.api.model.BundleDependency createBundleDependency(String groupId, String artifactId,
-                                                                                         String version, String classifier,
-                                                                                         List<org.mule.maven.client.api.model.BundleDependency> transitiveDependencies) {
-    org.mule.maven.client.api.model.BundleDependency.Builder bundleDependencyBuilder =
-        new org.mule.maven.client.api.model.BundleDependency.Builder();
+  private static org.mule.maven.pom.parser.api.model.BundleDependency createBundleDependency(String groupId, String artifactId,
+                                                                                             String version, String classifier,
+                                                                                             List<org.mule.maven.pom.parser.api.model.BundleDependency> transitiveDependencies) {
+    org.mule.maven.pom.parser.api.model.BundleDependency.Builder bundleDependencyBuilder =
+        new org.mule.maven.pom.parser.api.model.BundleDependency.Builder();
     bundleDependencyBuilder.setDescriptor(new BundleDescriptor.Builder()
         .setGroupId(groupId)
         .setArtifactId(artifactId)
@@ -442,7 +443,7 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     return bundleDependencyBuilder.build();
   }
 
-  private URL getDependencyUrl(org.mule.maven.client.api.model.BundleDependency dependency) throws Exception {
+  private URL getDependencyUrl(org.mule.maven.pom.parser.api.model.BundleDependency dependency) throws Exception {
     BundleDescriptor descriptor = dependency.getDescriptor();
     return getDummyUriFor(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion()).toURL();
   }

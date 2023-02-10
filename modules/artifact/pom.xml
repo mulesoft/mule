@@ -55,11 +55,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.powermock</groupId>
@@ -94,13 +89,11 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-api</artifactId>
-            <version>${muleMavenClientApi}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
-            <version>${muleMavenClientImpl}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

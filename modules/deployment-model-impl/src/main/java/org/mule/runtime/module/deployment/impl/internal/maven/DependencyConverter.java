@@ -7,7 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.util.stream.Collectors.toList;
-import org.mule.maven.client.api.model.BundleDescriptor;
+
+import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 
@@ -18,7 +19,7 @@ public class DependencyConverter {
 
   private Map<BundleDescriptor, BundleDependency> cache = new IdentityHashMap<>();
 
-  public BundleDependency convert(org.mule.maven.client.api.model.BundleDependency mavenBundleDependency) {
+  public BundleDependency convert(org.mule.maven.pom.parser.api.model.BundleDependency mavenBundleDependency) {
     BundleDependency bundleDependency = cache.get(mavenBundleDependency.getDescriptor());
     if ((bundleDependency != null && bundleDependency.getBundleUri() != null)
         || (bundleDependency != null && mavenBundleDependency.getBundleUri() == null)) {
@@ -28,7 +29,7 @@ public class DependencyConverter {
         .setScope(BundleScope.valueOf(mavenBundleDependency.getScope().name()))
         .setBundleUri(mavenBundleDependency.getBundleUri())
         .setTransitiveDependencies(mavenBundleDependency.getTransitiveDependencies().stream()
-            .filter(transitiveDependency -> !org.mule.maven.client.api.model.BundleScope.PROVIDED
+            .filter(transitiveDependency -> !org.mule.maven.pom.parser.api.model.BundleScope.PROVIDED
                 .equals(transitiveDependency.getScope()))
             .map(this::convert)
             .collect(toList()))
@@ -38,7 +39,7 @@ public class DependencyConverter {
     return bundleDependency;
   }
 
-  private org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor convertBundleDescriptor(org.mule.maven.client.api.model.BundleDescriptor descriptor) {
+  private org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor convertBundleDescriptor(BundleDescriptor descriptor) {
     org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder builder =
         new org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
             .setArtifactId(descriptor.getArtifactId())
