@@ -100,7 +100,6 @@ public class OpenTelemetryExporterConfigTestCase {
     collector =
         new GenericContainer<>(COLLECTOR_IMAGE)
             .withImagePullPolicy(PullPolicy.alwaysPull())
-            .withEnv("LOGGING_EXPORTER_LOG_LEVEL", "INFO")
             .withCopyFileToContainer(
                                      forHostPath(serverTls.certificateFile().toPath(), 365),
                                      "/server.cert")
