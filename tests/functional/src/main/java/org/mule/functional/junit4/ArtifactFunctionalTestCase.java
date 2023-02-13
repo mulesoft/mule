@@ -105,7 +105,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;
-  private static ClassLoader containerClassLoader;
+  protected static ClassLoader containerClassLoader;
   private static ClassLoader applicationClassLoader;
   private static ServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;

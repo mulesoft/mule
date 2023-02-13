@@ -57,7 +57,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
         .withStartSpanInfo(initialExportInfo)
         .withArtifactId(muleContext.getConfiguration().getId())
         .withArtifactType(muleContext.getArtifactType().getAsString())
-        .withSpanProcessor(resolveOpenTelemetrySpanProcessor())
+        .withSpanProcessor(spanProcessor.get())
         .withInternalSpan(internalSpan)
         .build();
   }

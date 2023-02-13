@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
-import static java.time.Duration.ofMillis;
+//import static java.time.Duration.ofMillis;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
@@ -22,10 +22,10 @@ import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
-import io.opentelemetry.exporter.logging.LoggingMetricExporter;
-import io.opentelemetry.sdk.metrics.SdkMeterProvider;
-import io.opentelemetry.sdk.metrics.export.MetricReader;
-import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
+//import io.opentelemetry.exporter.logging.LoggingMetricExporter;
+//import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+//import io.opentelemetry.sdk.metrics.export.MetricReader;
+//import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 
 import java.util.Collection;
@@ -53,7 +53,7 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
  */
 public class OpenTelemetryResources {
 
-  private static final long METRIC_EXPORT_INTERVAL_MS = 10000L;
+//  private static final long METRIC_EXPORT_INTERVAL_MS = 10000L;
 
   private OpenTelemetryResources() {}
 
@@ -75,6 +75,7 @@ public class OpenTelemetryResources {
           .expireAfterAccess(5, MINUTES)
           .build();
 
+  // TODO: We need to remove this.
   public static Tracer getTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
       throws SpanExporterConfiguratorException {
     return tracerCache.get(serviceName, name -> doGetTracer(spanExporterConfiguration, name));
@@ -89,21 +90,22 @@ public class OpenTelemetryResources {
 
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProviderBuilder.build())
-        .setMeterProvider(getMeterProvider())
+//        .setMeterProvider(getMeterProvider())
         .setPropagators(getPropagator())
         .build();
 
     return openTelemetry.getTracer(MULE_INSTRUMENTATION_NAME, INSTRUMENTATION_VERSION);
   }
 
-  private static SdkMeterProvider getMeterProvider() {
-    MetricReader periodicReader =
-            PeriodicMetricReader.builder(LoggingMetricExporter.create())
-                    .setInterval(ofMillis(METRIC_EXPORT_INTERVAL_MS))
-                    .build();
-
-    return SdkMeterProvider.builder().registerMetricReader(periodicReader).build();
-  }
+  // TODO: Instantiate this at the OTEL exporter level (the Tracer is no longer used and it's also not the right place)
+//  private static SdkMeterProvider getMeterProvider() {
+//    MetricReader periodicReader =
+//        PeriodicMetricReader.builder(LoggingMetricExporter.create())
+//            .setInterval(ofMillis(METRIC_EXPORT_INTERVAL_MS))
+//            .build();
+//
+//    return SdkMeterProvider.builder().registerMetricReader(periodicReader).build();
+//  }
 
   public static Resource getResource(String serviceName) {
     return getDefault().merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, serviceName)));
