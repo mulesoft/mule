@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 
 import org.mule.functional.api.exception.ExpectedError;
@@ -90,5 +91,11 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
   public void customErrorsAreCaughtUsingWildcards() throws Exception {
     CoreEvent result = runFlow("errorCaughtUsingWildcard");
     assertThat(getPayloadAsString(result.getMessage()), is("Wildcard namespace was caught; Wildcard name was caught"));
+  }
+
+  @Test
+  public void errorRaisedWithinScope() throws Exception {
+    expectedError.expectErrorType("APP", "EXPECTED");
+    runFlow("errorRaisedWithinScopeFlow");
   }
 }
