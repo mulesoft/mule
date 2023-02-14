@@ -117,8 +117,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
                             onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result));
                           }, (t, res) -> {
                             if (t instanceof MessagingException) {
-                              t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()),
-                                                         t.getCause());
+                              t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
                             }
                             ((BaseEventContext) eventWithCorrelationId.getContext()).error(t);
                             LOGGER
