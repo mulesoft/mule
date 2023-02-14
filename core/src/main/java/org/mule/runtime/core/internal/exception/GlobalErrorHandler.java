@@ -6,12 +6,9 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,8 +49,6 @@ public class GlobalErrorHandler extends ErrorHandler {
   private Consumer<Exception> newGlobalRouter(Consumer<Exception> router) {
     return new ExceptionRouter() {
 
-      final AtomicBoolean disposed = new AtomicBoolean(false);
-
       @Override
       public void accept(Exception error) {
         if (LOGGER.isDebugEnabled()) {
@@ -64,11 +59,7 @@ public class GlobalErrorHandler extends ErrorHandler {
       }
 
       @Override
-      public void dispose() {
-        if (!disposed.getAndSet(true)) {
-          disposeIfNeeded(router, LOGGER);
-        }
-      }
+      public void dispose() {}
     };
   }
 
