@@ -57,6 +57,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   };
 
   private Scheduler cpuLightScheduler;
+  private boolean cpuLightSchedulerIsStopped;
   private ReactiveProcessorEnricher processorEnricher = null;
 
   @Inject
@@ -184,9 +185,9 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
    * @return whether or not it was needed or not
    */
   protected boolean stopSchedulersIfNeeded() {
-    if (cpuLightScheduler != null) {
+    if (!cpuLightSchedulerIsStopped) {
       cpuLightScheduler.stop();
-      cpuLightScheduler = null;
+      cpuLightSchedulerIsStopped = true;
     }
 
     return true;

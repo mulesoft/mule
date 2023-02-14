@@ -78,6 +78,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
 
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
+    private boolean blockingSchedulerIsStopped;
+    private boolean cpuIntensiveSchedulerIsStopped;
 
     public ProactorStreamEmitterProcessingStrategy(int bufferSize,
                                                    int subscriberCount,
@@ -116,18 +118,18 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     @Override
     protected boolean stopSchedulersIfNeeded() {
       if (super.stopSchedulersIfNeeded()) {
-        stopScheduler(blockingScheduler);
-        stopScheduler(cpuIntensiveScheduler);
-        blockingScheduler = null;
-        cpuIntensiveScheduler = null;
+        stopScheduler(blockingScheduler, blockingSchedulerIsStopped);
+        stopScheduler(cpuIntensiveScheduler, cpuIntensiveSchedulerIsStopped);
+        blockingSchedulerIsStopped = true;
+        cpuIntensiveSchedulerIsStopped = true;
         return true;
       }
 
       return false;
     }
 
-    private void stopScheduler(Scheduler scheduler) {
-      if (scheduler != null) {
+    private void stopScheduler(Scheduler scheduler, boolean isStopped) {
+      if (!isStopped) {
         scheduler.stop();
       }
     }
