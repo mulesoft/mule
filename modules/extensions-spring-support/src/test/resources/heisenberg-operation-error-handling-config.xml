@@ -73,4 +73,10 @@
             </on-error-continue>
         </error-handler>
     </flow>
+
+    <flow name="errorRaisedWithinScopeFlow">
+        <heisenberg:payload-modifier payload="#['MESSAGE']" attributes="#[{}]">
+            <raise-error type="APP:EXPECTED" />
+        </heisenberg:payload-modifier>
+    </flow>
 </mule>
