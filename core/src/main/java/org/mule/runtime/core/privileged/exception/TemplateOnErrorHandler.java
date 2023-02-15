@@ -176,7 +176,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
               })))
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
-      if (processingStrategy.isPresent()) {
+      if (processingStrategy.isPresent() && !fromGlobalErrorHandler) {
         String location = getLocation() != null ? getLocation().getLocation() : flowLocation.map(Object::toString).orElse("");
         processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + location + "'");
       } else {
