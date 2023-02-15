@@ -118,16 +118,16 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    startDeployment(true);
+    startDeployment();
+    triggerDirectoryWatcher();
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
     assertThat(removeAppAnchorFile(appName), is(true));
 
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(getDeploymentListener().isAppUndeployed(), is(true));
-      return true;
-    }));
+    triggerDirectoryWatcher();
+
+    assertThat(getDeploymentListener().isAppUndeployed(), is(true));
 
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       clearAllLogs();
@@ -146,7 +146,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    startDeployment(true);
+    startDeployment();
+    triggerDirectoryWatcher();
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
@@ -181,8 +182,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     File configFile = new File(appsDir + "/" + applicationFileBuilder.getDeployedPath(),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
-
-    assertRededeployment(mockDeploymentListener, redeploymentSuccessThrown);
+    triggerDirectoryWatcher();
+    assertRedeployment(mockDeploymentListener, redeploymentSuccessThrown);
   }
 
   @Test
@@ -198,7 +199,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     redeploy(deploymentService, applicationFileBuilder.getArtifactFile().toURI());
 
-    assertRededeployment(mockDeploymentListener, redeploymentSuccessThrown);
+    assertRedeployment(mockDeploymentListener, redeploymentSuccessThrown);
   }
 
   @Test
@@ -214,7 +215,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     redeploy(deploymentService, appName);
 
-    assertRededeployment(mockDeploymentListener, redeploymentSuccessThrown);
+    assertRedeployment(mockDeploymentListener, redeploymentSuccessThrown);
   }
 
   private void prepareScenario(ApplicationFileBuilder applicationFileBuilder, DeploymentListener mockDeploymentListener,
@@ -225,7 +226,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     addPackedAppFromBuilder(applicationFileBuilder);
-    startDeployment(true);
+    startDeployment();
+    triggerDirectoryWatcher();
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
     final PhantomReference<Application> firstAppRef =
@@ -248,14 +250,11 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     }).when(mockDeploymentListener).onRedeploymentSuccess(appName);
   }
 
-  private void assertRededeployment(DeploymentListener mockDeploymentListener,
-                                    AtomicReference<Throwable> redeploymentSuccessThrown) {
-    new PollingProber(PROBER_POLLING_TIMEOUT + 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      if (redeploymentSuccessThrown.get() != null) {
-        throw new MuleRuntimeException(redeploymentSuccessThrown.get());
-      }
-      return true;
-    }));
+  private void assertRedeployment(DeploymentListener mockDeploymentListener,
+                                  AtomicReference<Throwable> redeploymentSuccessThrown) {
+    if (redeploymentSuccessThrown.get() != null) {
+      throw new MuleRuntimeException(redeploymentSuccessThrown.get());
+    }
 
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appName);
   }

@@ -56,7 +56,8 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
 
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    startDeployment(true);
+    startDeployment();
+    triggerDirectoryWatcher();
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
@@ -69,11 +70,8 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
     }));
 
     assertThat(removeAppAnchorFile(appName), is(true));
-
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(getDeploymentListener().isAppUndeployed(), is(true));
-      return true;
-    }));
+    triggerDirectoryWatcher();
+    assertThat(getDeploymentListener().isAppUndeployed(), is(true));
 
     assertThat(countLiveThreadsWithName(ORACLE_DRIVER_TIMER_THREAD_NAME, ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME), is(0));
   }

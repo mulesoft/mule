@@ -603,14 +603,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     verifyAnchorFileExistsAction.perform();
   }
 
-  protected void startDeployment(boolean startDirectoryWatcher) throws MuleException {
+  protected void startDeployment() throws MuleException {
     serviceManager.start();
     startIfNeeded(extensionModelLoaderRepository);
-    deploymentService.start(startDirectoryWatcher);
-  }
-
-  protected void startDeployment() throws MuleException {
-    startDeployment(false);
+    deploymentService.start(false);
   }
 
   protected void triggerDirectoryWatcher() {
