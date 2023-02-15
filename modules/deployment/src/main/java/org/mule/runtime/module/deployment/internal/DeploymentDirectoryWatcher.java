@@ -136,15 +136,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.domainTimestampListener = new ArtifactTimestampListener<>(domains);
   }
 
-  public void runOnce() {
-    deploymentLock.lock();
-    try {
-      run();
-    } finally {
-      deploymentLock.unlock();
-    }
-  }
-
   /**
    * Starts the process of deployment / undeployment of artifact.
    * <p/>

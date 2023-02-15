@@ -155,6 +155,11 @@ public class MuleDeploymentService implements DeploymentService {
     start(true);
   }
 
+  /**
+   * Starts the service, and optionally starts the directory watcher.
+   *
+   * @param startDirectoryWatcher whether to start the directory watcher or not.
+   */
   void start(boolean startDirectoryWatcher) {
     DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
     addDeploymentListener(deploymentStatusTracker.getApplicationDeploymentStatusTracker());
@@ -171,8 +176,17 @@ public class MuleDeploymentService implements DeploymentService {
     notifyStartupListeners();
   }
 
+  /**
+   * Triggers one pass of the directory watcher once in the current thread. It takes the lock in order to avoid the option of
+   * "waiting to the next poll" present in the run implementation.
+   */
   void triggerDirectoryWatcher() {
-    deploymentDirectoryWatcher.runOnce();
+    deploymentLock.lock();
+    try {
+      deploymentDirectoryWatcher.run();
+    } finally {
+      deploymentLock.unlock();
+    }
   }
 
   protected void notifyStartupListeners() {
