@@ -342,6 +342,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
     startDeployment();
+
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
     triggerDirectoryWatcher();
     deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
                                       (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
@@ -365,6 +367,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
     startDeployment();
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
     triggerDirectoryWatcher();
     deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
                                       (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
@@ -410,6 +413,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Properties deploymentProperties = new Properties();
     deploymentProperties.put("environment", "dev");
     startDeployment();
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
     triggerDirectoryWatcher();
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-import-file")
         .definedBy("app-import-file.xml").usingResource("config-dev.xml", "config-dev.xml");
@@ -426,6 +430,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Properties deploymentProperties = new Properties();
     deploymentProperties.put("oneProperty", "dev");
     startDeployment();
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
     triggerDirectoryWatcher();
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-import-file-overwritten")
         .definedBy("app-import-file-overwritten.xml").usingResource("config-dev.xml", "config-dev.xml");
@@ -441,6 +446,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE);
     startDeployment();
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
     triggerDirectoryWatcher();
     deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsDependencyFileBuilder.getArtifactFile().toURI(),
                                       deploymentProperties,
