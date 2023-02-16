@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -66,7 +68,9 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         Stoppable.class
     });
 
-    ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
+    if (reuseGlobalErrorHandler()) {
+      ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
+    }
 
     setIgnoredObjectTypes(ignoredObjects);
     // Yuo can initialise and stop
