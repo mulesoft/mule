@@ -408,6 +408,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
             .dependingOn(callbackExtensionCustomException);
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
+    triggerDirectoryWatcher();
 
     try {
       executeApplicationFlow("main");
@@ -495,6 +496,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedAppFromBuilder(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
         .dependingOn(callbackExtensionPlugin)
         .dependingOn(dummyDomainBundleFileBuilder));
+
+    triggerDirectoryWatcher();
 
     deploysDomain();
   }
@@ -747,6 +750,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     long firstFileTimestamp = dummyDomainFile.lastModified();
 
     startDeployment();
+    triggerDirectoryWatcher();
 
     Properties initialDeploymentProperties = new Properties();
     initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
@@ -1129,6 +1133,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     startDeployment();
 
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    reset(domainDeploymentListener);
 
     addExplodedDomainFromBuilder(emptyDomainFileBuilder);
 
@@ -1482,6 +1487,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
     startDeployment();
+    triggerDirectoryWatcher();
     deployAndVerifyPropertyInRegistry(domainWithPropsFileBuilder.getArtifactFile().toURI(),
                                       deploymentProperties,
                                       (registry) -> registry.lookupByName(COMPONENT_NAME_IN_APP).get() instanceof TestComponent);
@@ -2225,7 +2231,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     DomainFileBuilder domainBundleWrongFullRedeploy = new DomainFileBuilder("dummy-domain-bundle")
         .definedBy("incomplete-domain-config.xml");
-
 
     addPackedDomainFromBuilder(domainBundleWrongFullRedeploy);
 
