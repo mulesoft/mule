@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -43,6 +44,9 @@ public class GlobalErrorHandler extends ErrorHandler {
   }
 
   public Consumer<Exception> routerForChain(MessageProcessorChain chain, Supplier<Consumer<Exception>> errorRouterSupplier) {
+    if (!reuseGlobalErrorHandler()) {
+      return errorRouterSupplier.get();
+    }
     if (!routers.containsKey(chain)) {
       routers.put(chain, newGlobalRouter(errorRouterSupplier.get()));
     }
@@ -74,6 +78,11 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void initialise() throws InitialisationException {
+    if (!reuseGlobalErrorHandler()) {
+      super.initialise();
+      return;
+    }
+
     if (!initialised.getAndSet(true)) {
       super.initialise();
     }
@@ -81,6 +90,11 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void start() throws MuleException {
+    if (!reuseGlobalErrorHandler()) {
+      super.start();
+      return;
+    }
+
     if (started.getAndIncrement() == 0) {
       super.start();
     }
@@ -88,6 +102,11 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void stop() throws MuleException {
+    if (!reuseGlobalErrorHandler()) {
+      super.stop();
+      return;
+    }
+
     if (started.decrementAndGet() == 0) {
       super.stop();
     }
@@ -95,6 +114,11 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void dispose() {
+    if (!reuseGlobalErrorHandler()) {
+      super.dispose();
+      return;
+    }
+
     if (started.get() == 0 && initialised.getAndSet(false)) {
       super.dispose();
     }
@@ -106,11 +130,21 @@ public class GlobalErrorHandler extends ErrorHandler {
         .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
   }
 
+  public ErrorHandler createLocalErrorHandler(ComponentLocation flowLocation) {
+    ErrorHandler local = new ErrorHandler();
+    local.setName(name);
+    local.setExceptionListeners(getExceptionListeners());
+    local.setExceptionListenersLocation(flowLocation);
+    return local;
+  }
+
   public Map<Component, Consumer<Exception>> getRouters() {
     return routers;
   }
 
   public void clearRouterForChain(MessageProcessorChain chain) {
-    routers.remove(chain);
+    if (reuseGlobalErrorHandler()) {
+      routers.remove(chain);
+    }
   }
 }

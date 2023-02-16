@@ -1,28 +1,4 @@
 {
-  "4.6.0": {
-    "revapi": {
-      "ignore": [
-        {
-          "code": "java.field.removed",
-          "old": "field org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler",
-          "package": "org.mule.runtime.core.privileged.exception",
-          "classSimpleName": "TemplateOnErrorHandler",
-          "fieldName": "reuseGlobalErrorHandler",
-          "elementKind": "field",
-          "justification": "W-12181063: [Global Error Handling] remove the kill switch for enabling the memory fixes in 4.5"
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::reuseGlobalErrorHandler()",
-          "package": "org.mule.runtime.core.privileged.exception",
-          "classSimpleName": "TemplateOnErrorHandler",
-          "methodName": "reuseGlobalErrorHandler",
-          "elementKind": "method",
-          "justification": "W-12181063: [Global Error Handling] remove the kill switch for enabling the memory fixes in 4.5"
-        }
-      ]
-    }
-  },
   "4.5.0": {
     "revapi": {
       "ignore": [
