@@ -73,6 +73,7 @@ import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -148,6 +149,7 @@ import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.LifecycleStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -956,6 +958,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
+      if (!reuseGlobalErrorHandler()) {
+        if (rootContainerName.isPresent()) {
+          defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
+              .createLocalErrorHandler(getDefaultComponentLocation(rootContainerName.get()));
+        } else {
+          try {
+            defaultErrorHandler =
+                new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
+          } catch (RegistrationException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }
+      }
     } else {
       try {
         defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
