@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.GLOBAL_ERROR_HANDLER;
@@ -63,12 +64,18 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
+    reuseGlobalErrorHandler = true;
     globalErrorHandler = new GlobalErrorHandler();
     when(onErrorHandler.isInitialised()).thenReturn(true);
     globalErrorHandler.setExceptionListeners(new ArrayList<>(asList(onErrorHandler)));
     when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
     globalErrorHandler.setMuleContext(mockMuleContext);
     globalErrorHandler.setRootContainerName("root");
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    reuseGlobalErrorHandler = null;
   }
 
   @Test
