@@ -1559,6 +1559,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private void doSynchronizedAppDeploymentActionTest(final Action deploymentAction, final Action assertAction) throws Exception {
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
+    triggerDirectoryWatcher();
+
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
     doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, applicationDeploymentListener,
