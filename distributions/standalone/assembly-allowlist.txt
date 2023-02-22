@@ -283,7 +283,6 @@
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/j2objc-annotations-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-coreutils-equivalence-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.14-MULE-002.jar
@@ -374,7 +373,6 @@
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-8.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-/mule-standalone-${productVersion}/lib/opt/mailapi-1.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.15.jar
 /mule-standalone-${productVersion}/lib/opt/mimepull-1.9.13.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
