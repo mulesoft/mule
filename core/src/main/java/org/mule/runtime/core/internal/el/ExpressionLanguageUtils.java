@@ -38,7 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ExpressionLanguageUtils {
 
-  private static final boolean USE_PRECOMPILED_EXPRESSIONS = getBoolean("mule.experimental.usePrecompiledExpressions");
+  private static final boolean USE_PRECOMPILED_EXPRESSIONS = true;
+  // private static final boolean USE_PRECOMPILED_EXPRESSIONS = getBoolean("mule.experimental.usePrecompiledExpressions");
   private static final Map<Pair<String, ExpressionLanguage>, CompiledExpression> alreadyCompiledExpressions =
       new ConcurrentHashMap<>();
 
