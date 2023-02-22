@@ -22,16 +22,19 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -45,6 +48,8 @@ import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -52,6 +57,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager {
+
+  private static final boolean USE_PRECOMPILED_EXPRESSIONS = true;
+  // private static final boolean USE_PRECOMPILED_EXPRESSIONS = getBoolean("mule.experimental.usePrecompiledExpressions");
+  private static final Map<Pair<String, BindingContext>, CompiledExpression> alreadyCompiledExpressions =
+          new ConcurrentHashMap<>();
 
   public static final String DW_PREFIX = "dw";
   public static final String MEL_PREFIX = "mel";
@@ -159,6 +169,15 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   @Override
   public CompiledExpression compile(String expression, BindingContext context) throws ExpressionCompilationException {
+    if (USE_PRECOMPILED_EXPRESSIONS) {
+      return alreadyCompiledExpressions.computeIfAbsent(new Pair<>(expression, context),
+              pair -> doCompile(pair.getFirst(), pair.getSecond()));
+    } else {
+      return doCompile(expression, context);
+    }
+  }
+
+  private CompiledExpression doCompile(String expression, BindingContext context) throws ExpressionCompilationException {
     return expressionLanguage.compile(expression, context);
   }
 

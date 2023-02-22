@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
@@ -26,10 +25,6 @@ import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.util.Pair;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utilities for using {@link ExpressionLanguage} instances
@@ -37,11 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 4.3.0
  */
 public final class ExpressionLanguageUtils {
-
-  private static final boolean USE_PRECOMPILED_EXPRESSIONS = true;
-  // private static final boolean USE_PRECOMPILED_EXPRESSIONS = getBoolean("mule.experimental.usePrecompiledExpressions");
-  private static final Map<Pair<String, ExpressionLanguage>, CompiledExpression> alreadyCompiledExpressions =
-      new ConcurrentHashMap<>();
 
   private static final BindingContext COMPILATION_BINDING_CONTEXT =
       // just add the flow binding so that scripts referencing it are compiled fine
@@ -65,15 +55,6 @@ public final class ExpressionLanguageUtils {
    * @return a {@link CompiledExpression}
    */
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
-    if (USE_PRECOMPILED_EXPRESSIONS) {
-      return alreadyCompiledExpressions.computeIfAbsent(new Pair<>(expression, expressionLanguage),
-                                                        pair -> doCompile(pair.getFirst(), pair.getSecond()));
-    } else {
-      return doCompile(expression, expressionLanguage);
-    }
-  }
-
-  private static CompiledExpression doCompile(String expression, ExpressionLanguage expressionLanguage) {
     return expressionLanguage.compile(expression, COMPILATION_BINDING_CONTEXT);
   }
 
