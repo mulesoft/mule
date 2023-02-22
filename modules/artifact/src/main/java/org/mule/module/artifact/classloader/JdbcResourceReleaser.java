@@ -344,10 +344,10 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       return false;
     }
     String artifactId = ((ArtifactClassLoader) undeployedArtifactClassLoader).getArtifactId();
-    Matcher oracleTimerThreadNameMatcher = DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
+    Matcher timerThreadNameMatcher = DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
 
     return thread.getClass().getSimpleName().equals(DRIVER_TIMER_THREAD_CLASS_NAME)
-        && oracleTimerThreadNameMatcher.matches()
+        && timerThreadNameMatcher.matches()
         && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
