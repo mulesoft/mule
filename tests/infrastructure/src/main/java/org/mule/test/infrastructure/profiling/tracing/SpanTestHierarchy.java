@@ -7,7 +7,6 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
-import static io.opentelemetry.api.trace.StatusCode.UNSET;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.emptyOrNullString;
@@ -47,6 +46,7 @@ public class SpanTestHierarchy {
   public static final String OTEL_EXCEPTION_EVENT_NAME = "exception";
 
   public static final String NO_EXCEPTION = "NONE";
+  public static final String UNSET_ERROR_CODE = "UNSET";
 
   private SpanNode root;
   private SpanNode currentNode;
@@ -203,7 +203,7 @@ public class SpanTestHierarchy {
     if (expectedNode.getExceptionData().equals(NO_EXCEPTION)) {
       assertThat(String.format("Unexpected Span exceptions found for Span: [%s]", actualSpan),
                  actualSpan.getEvents().size(), equalTo(0));
-      assertThat(actualSpan.getStatusAsString(), is(UNSET.toString()));
+      assertThat(actualSpan.getStatusAsString(), is(UNSET_ERROR_CODE));
     } else {
       List<CapturedEventData> exceptions = actualSpan.getEvents().stream()
           .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME))
