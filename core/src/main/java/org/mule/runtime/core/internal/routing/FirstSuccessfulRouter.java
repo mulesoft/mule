@@ -106,7 +106,10 @@ class FirstSuccessfulRouter {
       subscribeUpstreamChains(downstreamContextReference.get());
 
     })
-        .doOnNext(event -> inflightEvents.decrementAndGet())
+        .doOnNext(event -> {
+          inflightEvents.decrementAndGet();
+          completeRouterIfNecessary();
+        })
         .map(getScopeResultMapper());
 
   }
@@ -188,7 +191,6 @@ class FirstSuccessfulRouter {
           nextEventContainer.pop();
           downstreamRecorder
               .next(right(Throwable.class, nextExecutionContextResolver.eventWithContext(successfulEvent, nextEventContainer)));
-          completeRouterIfNecessary();
         }).onErrorContinue((error, object) -> {
           if (object instanceof CoreEvent) {
             executeNext(next, (CoreEvent) object, error);
