@@ -12,6 +12,7 @@ import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.O
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_MESSAGE_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_STACK_TRACE_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_TYPE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.UNSET_ERROR_CODE;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.getDefaultAttributesToAssertExistence;
 
@@ -678,6 +679,10 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     CapturedExportedSpan async = mockCapturedExportedSpan();
     CapturedExportedSpan logger = mockCapturedExportedSpan();
 
+    when(muleFlow.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
+    when(async.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
+    when(logger.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
+
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
     when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
@@ -868,6 +873,8 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     // mocking start and end epoch nanos.
     when(mockedSpan.getStartEpochSpanNanos()).thenReturn(0L);
     when(mockedSpan.getEndSpanEpochNanos()).thenReturn(1L);
+
+    when(mockedSpan.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
 
     Map<String, String> basicAttributes = new HashMap<>();
     basicAttributes.put(CORRELATION_ID_KEY, "test-correlation-id");
