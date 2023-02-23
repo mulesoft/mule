@@ -7,7 +7,6 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
-import io.opentelemetry.api.trace.*;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
