@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getStatusAsString()",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classSimpleName": "CapturedExportedSpan",
+          "methodName": "getStatusAsString",
+          "elementKind": "method",
+          "justification": "New method"
+        },
+        {
+          "code": "java.method.addedToInterface",
           "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getTraceId()",
           "package": "org.mule.runtime.tracer.api.sniffer",
           "classSimpleName": "CapturedExportedSpan",
