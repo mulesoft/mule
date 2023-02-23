@@ -33,7 +33,7 @@ import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
-import static io.opentelemetry.sdk.trace.data.StatusData.ok;
+import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 import static io.opentelemetry.api.trace.SpanContext.getInvalid;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -92,7 +92,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private SpanContext spanContext;
   private SpanContext parentSpanContext = getInvalid();
   private SpanKind spanKind = INTERNAL;
-  private StatusData statusData = ok();
+  private StatusData statusData = unset();
   private List<EventData> errorEvents = emptyList();
   private String overriddenSpanName;
   private Set<String> noExportUntil;
