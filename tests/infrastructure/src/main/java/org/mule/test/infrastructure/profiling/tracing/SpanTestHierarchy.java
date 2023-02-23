@@ -7,9 +7,6 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
-import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
-import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
-
 import static io.opentelemetry.api.trace.StatusCode.UNSET;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -19,6 +16,9 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
 import java.util.ArrayList;
 import java.util.Arrays;
