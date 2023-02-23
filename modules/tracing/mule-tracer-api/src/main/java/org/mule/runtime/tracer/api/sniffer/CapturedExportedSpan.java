@@ -64,7 +64,6 @@ public interface CapturedExportedSpan {
 
   /**
    * @return the status of the span as a String.
-   *
    *         This is agnostic to the current implementation of the captured spans. For example, in the case of open telemetry the
    *         values can be OK, ERROR or UNSET.
    */
