@@ -164,6 +164,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       }
 
       @Override
+      public String getStatusAsString() {
+        return spanData.getStatus().getStatusCode().toString();
+      }
+
+      @Override
       public long getStartEpochSpanNanos() {
         return spanData.getStartEpochNanos();
       }
