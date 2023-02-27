@@ -89,7 +89,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private final SpanProcessor spanProcessor;
 
   private boolean exportable;
-  private SpanContext spanContext;
+  private SpanContext spanContext = getInvalid();
   private SpanContext parentSpanContext = getInvalid();
   private SpanKind spanKind = INTERNAL;
   private StatusData statusData = unset();
@@ -116,8 +116,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.spanProcessor = spanProcessor;
 
     // Generates the span id so that the opentelemetry spans can be lazily initialised.
-    this.spanContext = SpanContext.create(generateTraceId(getAsInternalSpan(internalSpan.getParent())), generateSpanId(),
-                                          TraceFlags.getSampled(), TraceState.getDefault());
+    if (exportable) {
+      this.spanContext = SpanContext.create(generateTraceId(getAsInternalSpan(internalSpan.getParent())), generateSpanId(),
+                                            TraceFlags.getSampled(), TraceState.getDefault());
+    } else {
+      this.spanContext = getInvalid();
+    }
   }
 
   @Nullable
@@ -205,8 +209,13 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
     parentSpanContext = extractContextFromTraceParent(serializeAsMap.get("traceparent"));
     if (parentSpanContext.isValid()) {
-      spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
-                                       TraceFlags.getSampled(), TraceState.getDefault());
+      if (!exportable) {
+        spanContext = SpanContext.create(parentSpanContext.getTraceId(), parentSpanContext.getSpanId(),
+                                         TraceFlags.getSampled(), TraceState.getDefault());
+      } else {
+        spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
+                                         TraceFlags.getSampled(), TraceState.getDefault());
+      }
     }
   }
 

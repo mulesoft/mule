@@ -28,6 +28,7 @@ public class RootInternalSpan implements InternalSpan {
 
   private String name = ROOT_SPAN;
   private Map<String, String> attributes = new HashMap<>();
+  private Runnable endCallback;
 
   @Override
   public Span getParent() {
@@ -62,6 +63,9 @@ public class RootInternalSpan implements InternalSpan {
   @Override
   public void end() {
     // Nothing to do.
+    if (endCallback != null) {
+      endCallback.run();
+    }
   }
 
   @Override
@@ -82,6 +86,11 @@ public class RootInternalSpan implements InternalSpan {
   @Override
   public int getAttributesCount() {
     return attributes.size();
+  }
+
+  @Override
+  public void registerCallbackOnEnd(Runnable callback) {
+    this.endCallback = callback;
   }
 
   @Override

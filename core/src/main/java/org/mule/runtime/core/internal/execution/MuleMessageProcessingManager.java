@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
@@ -15,8 +16,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  * Default implementation for {@link MessageProcessingManager}.
@@ -39,12 +42,18 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
   @Override
   public void processMessage(FlowProcessTemplate messageProcessTemplate,
                              MessageProcessContext messageProcessContext) {
+    processMessage(messageProcessTemplate, messageProcessContext, null);
+  }
+
+  @Override
+  public void processMessage(FlowProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext,
+                             DistributedTraceContextManager distributedTraceContextManager) {
     Thread currentThread = currentThread();
     ClassLoader originalTCCL = currentThread.getContextClassLoader();
     ClassLoader executionClassLoader = messageProcessContext.getExecutionClassLoader();
     setContextClassLoader(currentThread, originalTCCL, executionClassLoader);
     try {
-      mediator.process(messageProcessTemplate, messageProcessContext);
+      mediator.process(messageProcessTemplate, messageProcessContext, ofNullable(distributedTraceContextManager));
     } finally {
       setContextClassLoader(currentThread, executionClassLoader, originalTCCL);
     }

@@ -41,6 +41,8 @@ public class ExecutionSpan implements InternalSpan {
   private final InitialSpanInfo initialSpanInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
   private SpanError lastError;
+  private Runnable onEndCallback;
+  private BiConsumer<String, String> onAddAttributeCallBack;
 
   public static ExecutionSpanBuilder getExecutionSpanBuilder() {
     return new ExecutionSpanBuilder();
@@ -98,6 +100,11 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
+  public void registerCallbackOnEnd(Runnable callback) {
+    this.onEndCallback = callback;
+  }
+
+  @Override
   public void updateRootName(String name) {
     spanExporter.setRootName(name);
   }
@@ -111,6 +118,9 @@ public class ExecutionSpan implements InternalSpan {
   public void end() {
     this.endTime = getDefault().now();
     this.spanExporter.export();
+    if (onEndCallback != null) {
+      onEndCallback.run();
+    }
   }
 
   @Override
@@ -168,6 +178,9 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
+    if (onAddAttributeCallBack != null) {
+      onAddAttributeCallBack.accept(key, value);
+    }
     if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
       additionalAttributes.put(key, value);
     }
@@ -177,6 +190,11 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public void updateChildSpanExporter(InternalSpan internalSpan) {
     spanExporter.updateChildSpanExporter(internalSpan.getSpanExporter());
+  }
+
+  @Override
+  public void registerCallbackOnAddAttribute(BiConsumer<String, String> callback) {
+    this.onAddAttributeCallBack = callback;
   }
 
   /**

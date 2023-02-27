@@ -128,6 +128,9 @@ public interface InternalSpan extends Span {
    */
   int getAttributesCount();
 
+  void registerCallbackOnEnd(Runnable callback);
+
+  default void registerCallbackOnAddAttribute(BiConsumer<String, String> callback) {}
 
   /**
    * A wrapper as InternalSpan for other type of {@link Span}
@@ -204,5 +207,11 @@ public interface InternalSpan extends Span {
     public int getAttributesCount() {
       return 0;
     }
+
+    @Override
+    public void registerCallbackOnEnd(Runnable callback) {
+
+    }
+
   }
 }

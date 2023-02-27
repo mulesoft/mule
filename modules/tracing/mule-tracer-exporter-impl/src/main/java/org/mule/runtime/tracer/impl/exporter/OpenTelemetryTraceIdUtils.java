@@ -139,7 +139,9 @@ public class OpenTelemetryTraceIdUtils {
   }
 
   public static String generateTraceId(InternalSpan parentInternalSpan) {
-    if (parentInternalSpan != null && parentInternalSpan.getSpanExporter() instanceof OpenTelemetrySpanExporter) {
+    if (parentInternalSpan != null && parentInternalSpan.getSpanExporter() instanceof OpenTelemetrySpanExporter
+        && !((OpenTelemetrySpanExporter) parentInternalSpan.getSpanExporter()).getSpanContext().getSpanId()
+            .equals(getInvalid())) {
       return ((OpenTelemetrySpanExporter) parentInternalSpan.getSpanExporter()).getTraceId();
     }
 

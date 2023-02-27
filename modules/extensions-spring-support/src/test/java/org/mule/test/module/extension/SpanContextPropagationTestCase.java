@@ -8,6 +8,7 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
@@ -30,6 +31,7 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Feature(EVENT_CONTEXT)
 @Story(DISTRIBUTED_TRACE_CONTEXT)
@@ -118,13 +120,10 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
 
   private void assertEventPayload(List<CoreEvent> events) {
     for (CoreEvent event : events) {
-      DistributedTraceContextManager distributedTraceContextManager =
-          (DistributedTraceContextManager) event.getMessage().getPayload().getValue();
-      assertThat(distributedTraceContextManager.getClass().getName(),
-                 equalTo("org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager"));
-      // This will only resolve the correlation id, as the current span is closed after the flow is executed.
-      assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), aMapWithSize(1));
-      assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), hasEntry("X-Correlation-ID", "0000-0000"));
+      Map<String, String> distributedTraceContext =
+          (Map<String, String>) event.getMessage().getPayload().getValue();
+      assertThat(distributedTraceContext, aMapWithSize(1));
+      assertThat(distributedTraceContext, hasKey("traceparent"));
     }
   }
 

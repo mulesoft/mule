@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.tracer.api.span.InternalSpan::registerCallbackOnEnd(java.lang.Runnable)",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classSimpleName": "InternalSpan",
+          "methodName": "registerCallbackOnEnd",
+          "elementKind": "method",
+          "justification": "New method"
+        },
+        {
+          "code": "java.method.addedToInterface",
           "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getStatusAsString()",
           "package": "org.mule.runtime.tracer.api.sniffer",
           "classSimpleName": "CapturedExportedSpan",

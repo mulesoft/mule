@@ -69,6 +69,9 @@ public class EventSpanContext implements SpanContext {
   @Override
   public void setSpan(InternalSpan span, Assertion assertion) throws AssertionFailedException {
     assertion.assertOnSpan(currentSpan);
+    if (currentSpan.getName().equals("source-interaction")) {
+      span = new EndOnEndParentSpan(span, currentSpan);
+    }
     currentSpan.updateChildSpanExporter(span);
     this.currentSpan = span;
   }

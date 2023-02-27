@@ -18,7 +18,9 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionsFlowProcessingTemplate;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -39,6 +41,18 @@ class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessin
 
   @Override
   public void processMessage(FlowProcessTemplate template, MessageProcessContext messageProcessContext) {
+    checkArgument(template instanceof ExtensionsFlowProcessingTemplate, "invalid processing template");
+    ExtensionsFlowProcessingTemplate process = (ExtensionsFlowProcessingTemplate) template;
+    SourceResultAdapter resultAdapter = process.getSourceMessage();
+
+    Result result = getResult(resultAdapter);
+
+    handlerConsumer.accept(new DefaultSourceResultHandler<>(sourceClient, result, process));
+  }
+
+  @Override
+  public void processMessage(FlowProcessTemplate template, MessageProcessContext messageProcessContext,
+                             DistributedTraceContextManager distributedTraceContextManager) {
     checkArgument(template instanceof ExtensionsFlowProcessingTemplate, "invalid processing template");
     ExtensionsFlowProcessingTemplate process = (ExtensionsFlowProcessingTemplate) template;
     SourceResultAdapter resultAdapter = process.getSourceMessage();

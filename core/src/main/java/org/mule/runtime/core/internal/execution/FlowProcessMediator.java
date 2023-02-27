@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -68,6 +69,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.tracing.customization.NoExportFixedNameInitialSpanInfo;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -88,7 +90,9 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -106,6 +110,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.slf4j.Logger;
 
 /**
@@ -206,7 +211,8 @@ public class FlowProcessMediator implements Initialisable {
   }
 
   public void process(FlowProcessTemplate template,
-                      MessageProcessContext messageProcessContext) {
+                      MessageProcessContext messageProcessContext,
+                      Optional<DistributedTraceContextManager> distributedTraceContextManager) {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
@@ -218,6 +224,19 @@ public class FlowProcessMediator implements Initialisable {
 
       final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
+
+
+
+      coreEventTracer.startComponentSpan(event, new NoExportFixedNameInitialSpanInfo("source-interaction"));
+
+      if (distributedTraceContextManager.isPresent()) {
+        DistributedTraceContextManager distributedTraceContextManagerFinal = distributedTraceContextManager.get();
+
+        if (distributedTraceContextManagerFinal instanceof SpanContextAware) {
+          ((SpanContextAware) distributedTraceContextManagerFinal)
+              .setSpanContext(((SpanContextAware) event.getContext()).getSpanContext());
+        }
+      }
 
       template.getSourceMessage().getPollItemInformation().ifPresent(info -> {
         notificationManager
@@ -272,22 +291,25 @@ public class FlowProcessMediator implements Initialisable {
 
                              @Override
                              public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
-                               dispatchResponse(flowConstruct, ctx, value);
+                               dispatchResponse(flowConstruct, ctx, value, event);
                              }
 
                              @Override
                              public void error(Throwable e) {
                                dispatchResponse(flowConstruct, ctx,
                                                 left(new SourcePolicyFailureResult(new MessagingException(event, e),
-                                                                                   Collections::emptyMap)));
+                                                                                   Collections::emptyMap)),
+                                                event);
                              }
                            });
     } catch (Exception e) {
       e = (Exception) Exceptions.unwrap(e);
+      coreEventTracer.endCurrentSpan(event);
       if (e instanceof FlowBackPressureException) {
         ((BaseEventContext) event.getContext()).error(e);
         dispatchResponse(flowConstruct, ctx,
-                         mapBackPressureExceptionToPolicyFailureResult(ctx.template, event, (FlowBackPressureException) e));
+                         mapBackPressureExceptionToPolicyFailureResult(ctx.template, event, (FlowBackPressureException) e),
+                         event);
       } else {
         throw e;
       }
@@ -295,8 +317,9 @@ public class FlowProcessMediator implements Initialisable {
   }
 
   private void dispatchResponse(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx,
-                                Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result) {
-    result.apply(policyFailure(flowConstruct, ctx), policySuccess(flowConstruct, ctx));
+                                Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result,
+                                CoreEvent event) {
+    result.apply(policyFailure(flowConstruct, ctx, event), policySuccess(flowConstruct, ctx, event));
   }
 
   private void finish(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx, Throwable exception) {
@@ -349,7 +372,8 @@ public class FlowProcessMediator implements Initialisable {
    * Process success by attempting to send a response to client handling the case where response sending fails or the resolution
    * of response parameters fails.
    */
-  private Consumer<SourcePolicySuccessResult> policySuccess(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx) {
+  private Consumer<SourcePolicySuccessResult> policySuccess(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx,
+                                                            CoreEvent event) {
     return successResult -> {
       fireNotification(flowConstruct.getSource(), successResult.getResult(),
                        flowConstruct, MESSAGE_RESPONSE);
@@ -385,6 +409,8 @@ public class FlowProcessMediator implements Initialisable {
       } catch (Exception e) {
         policySuccessError(flowConstruct,
                            new SourceErrorException(successResult.getResult(), sourceResponseGenerateErrorType, e));
+      } finally {
+        coreEventTracer.endCurrentSpan(event);
       }
     };
   }
@@ -393,7 +419,8 @@ public class FlowProcessMediator implements Initialisable {
    * Process failure success by attempting to send an error response to client handling the case where error response sending
    * fails or the resolution of error response parameters fails.
    */
-  private Consumer<SourcePolicyFailureResult> policyFailure(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx) {
+  private Consumer<SourcePolicyFailureResult> policyFailure(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx,
+                                                            CoreEvent coreEvent) {
     return failureResult -> {
       fireNotification(flowConstruct.getSource(), failureResult.getMessagingException().getEvent(),
                        flowConstruct, MESSAGE_ERROR_RESPONSE);
@@ -427,6 +454,8 @@ public class FlowProcessMediator implements Initialisable {
       } catch (Exception e) {
         responseCallback.error(new SourceErrorException(failureResult.getResult(), sourceErrorResponseGenerateErrorType, e,
                                                         failureResult.getMessagingException()));
+      } finally {
+        coreEventTracer.endCurrentSpan(coreEvent);
       }
     };
   }
@@ -589,16 +618,27 @@ public class FlowProcessMediator implements Initialisable {
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
                                      FlowConstruct flowConstruct, String correlationId,
-                                     DistributedTraceContextGetter distributedTraceContextGetter) {
+                                     DistributedTraceContextManager distributedTraceContextManager) {
     return InternalEvent.builder(getEventContext(sourceLocation, responseCompletion, flowConstruct, correlationId,
-                                                 distributedTraceContextGetter));
+                                                 distributedTraceContextManager));
   }
 
   private EventContext getEventContext(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
                                        FlowConstruct flowConstruct, String correlationId,
-                                       DistributedTraceContextGetter distributedTraceContextGetter) {
+                                       DistributedTraceContextManager distributedTraceContextManager) {
     EventContext eventContext = create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion));
-    coreEventTracer.injectDistributedTraceContext(eventContext, distributedTraceContextGetter);
+    coreEventTracer.injectDistributedTraceContext(eventContext, new DistributedTraceContextGetter() {
+
+      @Override
+      public Iterable<String> keys() {
+        return distributedTraceContextManager.getRemoteTraceContextMap().keySet();
+      }
+
+      @Override
+      public Optional<String> get(String key) {
+        return ofNullable(distributedTraceContextManager.getRemoteTraceContextMap().get(key));
+      }
+    });
     return eventContext;
   }
 
