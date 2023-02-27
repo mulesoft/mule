@@ -41,9 +41,8 @@ import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.module.extension.internal.runtime.source.trace.SourceDistributedSourceTraceContext;
+import org.mule.runtime.module.extension.internal.runtime.source.trace.SourceDistributedTraceContextManager;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
-import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
@@ -267,39 +266,19 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     DistributedTraceContextManager distributedSourceTraceContextManager = context.getDistributedSourceTraceContext();
 
-    if (distributedSourceTraceContextManager instanceof SourceDistributedSourceTraceContext) {
-      name = ((SourceDistributedSourceTraceContext) distributedSourceTraceContextManager).getSpanName();
-      attributes = ((SourceDistributedSourceTraceContext) distributedSourceTraceContextManager).getSpanRootAttributes();
+    if (distributedSourceTraceContextManager instanceof SourceDistributedTraceContextManager) {
+      name = ((SourceDistributedTraceContextManager) distributedSourceTraceContextManager).getSpanName();
+      attributes = ((SourceDistributedTraceContextManager) distributedSourceTraceContextManager).getSpanRootAttributes();
     }
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
-                                context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context),
+                                context.getCorrelationId(), payloadMediaTypeResolver, context.getDistributedSourceTraceContext(),
                                 name,
                                 attributes,
                                 context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(info -> (PollItemInformation) info));
 
-    executeFlow(context, messageProcessContext, resultAdapter);
+    executeFlow(context, messageProcessContext, resultAdapter, distributedSourceTraceContextManager);
     contextAdapter.dispatched();
-  }
-
-  private DistributedTraceContextGetter getDistributedTraceContextGetter(SourceCallbackContext context) {
-    return new DistributedTraceContextGetter() {
-
-      @Override
-      public Iterable<String> keys() {
-        return context.getDistributedSourceTraceContext().getRemoteTraceContextMap().keySet();
-      }
-
-      @Override
-      public Optional<String> get(String key) {
-        return Optional.ofNullable(context.getDistributedSourceTraceContext().getRemoteTraceContextMap().get(key));
-      }
-
-      @Override
-      public boolean isEmptyDistributedTraceContext() {
-        return context.getDistributedSourceTraceContext().getRemoteTraceContextMap().isEmpty();
-      }
-    };
   }
 
   private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {
@@ -311,14 +290,16 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext,
-                           SourceResultAdapter resultAdapter) {
+                           SourceResultAdapter resultAdapter,
+                           DistributedTraceContextManager distributedSourceTraceContextManager) {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     messageProcessingManager.processMessage(
                                             new ExtensionsFlowProcessingTemplate(resultAdapter, listener,
                                                                                  contextAdapter.getNotificationsFunctions(),
                                                                                  completionHandlerFactory
                                                                                      .createCompletionHandler(contextAdapter)),
-                                            messageProcessContext);
+                                            messageProcessContext,
+                                            distributedSourceTraceContextManager);
   }
 
   protected MediaType resolveMediaType(Object value) {

@@ -9,18 +9,19 @@ package org.mule.runtime.tracer.impl.context;
 
 import static java.util.Optional.ofNullable;
 
+import static org.mule.runtime.core.internal.execution.FlowProcessMediator.FLOW_DISPATCHING_HANDLING_SPAN_NAME;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.impl.span.DeserializedSpan.getDeserializedRootSpan;
 
 import java.util.Optional;
 
+import org.mule.runtime.core.internal.execution.FlowProcessMediator;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
-import org.mule.runtime.tracer.impl.span.DeserializedSpan;
 
 /**
  * A {@link SpanContext} associated to an event.
@@ -69,6 +70,9 @@ public class EventSpanContext implements SpanContext {
   @Override
   public void setSpan(InternalSpan span, Assertion assertion) throws AssertionFailedException {
     assertion.assertOnSpan(currentSpan);
+    if (currentSpan.getName().equals(FLOW_DISPATCHING_HANDLING_SPAN_NAME)) {
+      span = new EndOnParentEndSpan(span, currentSpan);
+    }
     currentSpan.updateChildSpanExporter(span);
     this.currentSpan = span;
   }

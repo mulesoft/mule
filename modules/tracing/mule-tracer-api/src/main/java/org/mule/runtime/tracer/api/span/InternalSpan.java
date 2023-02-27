@@ -9,8 +9,6 @@ package org.mule.runtime.tracer.api.span;
 
 import static java.util.Collections.emptyMap;
 
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
@@ -20,7 +18,6 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /**
@@ -128,6 +125,19 @@ public interface InternalSpan extends Span {
    */
   int getAttributesCount();
 
+  /**
+   * Register a {@link Runnable} to run when the span is ended.
+   * 
+   * @param callback
+   */
+  default void registerCallbackOnEnd(Runnable callback) {}
+
+  /**
+   * Registers a {@link BiConsumer} to run when an attributed is added.
+   * 
+   * @param callback
+   */
+  default void registerCallbackOnAddAttribute(BiConsumer<String, String> callback) {}
 
   /**
    * A wrapper as InternalSpan for other type of {@link Span}
