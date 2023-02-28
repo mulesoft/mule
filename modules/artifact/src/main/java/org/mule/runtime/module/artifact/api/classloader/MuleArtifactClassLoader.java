@@ -310,24 +310,20 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     try {
       clearReferences();
-    } catch (Exception e) {
-      reportPossibleLeak(e, artifactId);
-    }
 
-    try {
       if (shouldReleaseJdbcReferences) {
         createResourceReleaserInstance().release();
       }
-    } catch (Exception e) {
-      reportPossibleLeak(e, artifactId);
-    }
 
-    if (shouldReleaseIbmMQResources) {
-      new IBMMQResourceReleaser(this).release();
-    }
+      if (shouldReleaseIbmMQResources) {
+        new IBMMQResourceReleaser(this).release();
+      }
 
-    if (shouldReleaseActiveMQReferences) {
-      new ActiveMQResourceReleaser(this).release();
+      if (shouldReleaseActiveMQReferences) {
+        new ActiveMQResourceReleaser(this).release();
+      }
+    } catch (Throwable t) {
+      reportPossibleLeak(t, artifactId);
     }
 
     super.dispose();
@@ -340,10 +336,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     mvelClassLoaderReleaserInstance.release();
   }
 
-  void reportPossibleLeak(Exception e, String artifactId) {
+  void reportPossibleLeak(Throwable t, String artifactId) {
     final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message, artifactId, e);
+      LOGGER.debug(message, artifactId, t);
     } else {
       LOGGER.error(message, artifactId);
     }
