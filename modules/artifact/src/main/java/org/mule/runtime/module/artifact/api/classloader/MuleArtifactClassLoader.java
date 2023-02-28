@@ -310,15 +310,27 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     try {
       clearReferences();
+    } catch (Throwable t) {
+      reportPossibleLeak(t, artifactId);
+    }
 
+    try {
       if (shouldReleaseJdbcReferences) {
         createResourceReleaserInstance().release();
       }
+    } catch (Throwable t) {
+      reportPossibleLeak(t, artifactId);
+    }
 
+    try {
       if (shouldReleaseIbmMQResources) {
         new IBMMQResourceReleaser(this).release();
       }
+    } catch (Throwable t) {
+      reportPossibleLeak(t, artifactId);
+    }
 
+    try {
       if (shouldReleaseActiveMQReferences) {
         new ActiveMQResourceReleaser(this).release();
       }
