@@ -7,10 +7,12 @@
 
 package org.mule.test.runner.utils;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.findMethod;
 
@@ -32,6 +34,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.google.common.io.ByteStreams;
+
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+
+import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.description.TypeVariableSource;
 import net.bytebuddy.description.annotation.AnnotationList;
 import net.bytebuddy.description.field.FieldDescription;
@@ -44,15 +53,13 @@ import net.bytebuddy.description.modifier.SyntheticState;
 import net.bytebuddy.description.modifier.TypeManifestation;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.PackageDescription;
+import net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape;
+import net.bytebuddy.description.type.RecordComponentList;
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeList;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.bytecode.StackSize;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.slf4j.Logger;
 
 /**
  * Utility class for runner.
@@ -478,6 +485,11 @@ public final class RunnerModuleUtils {
             }
 
             @Override
+            public String getLongSimpleName() {
+              return null;
+            }
+
+            @Override
             public String getCanonicalName() {
               return null;
             }
@@ -589,6 +601,41 @@ public final class RunnerModuleUtils {
 
             @Override
             public boolean isNestMateOf(TypeDescription typeDescription) {
+              return false;
+            }
+
+            @Override
+            public ClassFileVersion getClassFileVersion() {
+              return null;
+            }
+
+            @Override
+            public RecordComponentList<InDefinedShape> getRecordComponents() {
+              return null;
+            }
+
+            @Override
+            public Generic findExpectedVariable(String symbol) {
+              return null;
+            }
+
+            @Override
+            public TypeList getPermittedSubtypes() {
+              return null;
+            }
+
+            @Override
+            public boolean isCompileTimeConstant() {
+              return false;
+            }
+
+            @Override
+            public boolean isRecord() {
+              return false;
+            }
+
+            @Override
+            public boolean isSealed() {
               return false;
             }
 
