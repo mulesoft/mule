@@ -116,9 +116,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         catch (Exception e)
         {
-            if (getEndpoint().getProperties().get("passphrase") != null) {
-                getEndpoint().getProperties().put("passphrase", "<<passphrase>>");
-            }
             throw new DispatchException(event, getEndpoint(), e);
         }
     }

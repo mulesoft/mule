@@ -11,6 +11,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 
 /**
  * <code>RoutingException</code> is a base class for all routing exceptions.
@@ -58,7 +59,11 @@ public class RoutingException extends MessagingException
 
     private static Message generateMessage(Message message, MessageProcessor target)
     {
-        Message m = CoreMessages.failedToRouterViaEndpoint(target);
+        MessageProcessor targetCopy = target;
+        if (((DefaultOutboundEndpoint) targetCopy).getProperties().get("passphrase") != null){
+            ((DefaultOutboundEndpoint) targetCopy).getProperties().put("passphrase", "<<credentials>>");
+        }
+        Message m = CoreMessages.failedToRouterViaEndpoint(targetCopy);
         if (message != null)
         {
             message.setNextMessage(m);
