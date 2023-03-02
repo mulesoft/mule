@@ -99,7 +99,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "api-key",
       "system": "Semantic Terms",
@@ -211,7 +211,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "basic-auth",
       "system": "Semantic Terms",
@@ -323,7 +323,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "client-secret",
       "system": "Semantic Terms",
@@ -460,7 +460,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "custom",
       "system": "Semantic Terms",
@@ -562,7 +562,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "digest",
       "system": "Semantic Terms",
@@ -664,7 +664,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "kerberos",
       "system": "Semantic Terms",
@@ -766,7 +766,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "unsecured",
       "system": "Semantic Terms",

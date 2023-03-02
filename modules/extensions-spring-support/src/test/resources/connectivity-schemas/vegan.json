@@ -28,7 +28,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "apple",
       "system": "vegan",
@@ -69,7 +69,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "BananaPlantain",
       "system": "vegan",
@@ -138,7 +138,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "grape-connection",
       "system": "vegan",
@@ -174,7 +174,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "kiwi",
       "system": "vegan",
@@ -210,7 +210,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "connection",
       "system": "vegan",

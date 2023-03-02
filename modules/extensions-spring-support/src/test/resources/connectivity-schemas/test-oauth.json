@@ -189,7 +189,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "connection",
       "system": "Test OAuth Extension",
@@ -386,7 +386,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "do-not-include-redirect-uri-in-refresh-token",
       "system": "Test OAuth Extension",
@@ -583,7 +583,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "scopeless",
       "system": "Test OAuth Extension",
@@ -780,7 +780,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "validated-connection",
       "system": "Test OAuth Extension",
@@ -977,7 +977,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "with-credentials-placement",
       "system": "Test OAuth Extension",
@@ -1190,7 +1190,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "with-params-connection",
       "system": "Test OAuth Extension",
@@ -1357,7 +1357,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "client-credentials",
       "system": "Test OAuth Extension",
@@ -1554,7 +1554,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "pooled",
       "system": "Test OAuth Extension",
@@ -1751,7 +1751,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "refresh-validation",
       "system": "Test OAuth Extension",

@@ -28,7 +28,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "connection",
       "system": "reconnection",
@@ -64,7 +64,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "failing-connection",
       "system": "reconnection",
@@ -100,7 +100,7 @@
         "apiContract": "anypoint://vocabulary/api-contract.yaml"
       }
     },
-    "version": "4.4.1-SNAPSHOT",
+    "version": "{mule.version}",
     "labels": {
       "connectionProvider": "long-disconnection",
       "system": "reconnection",

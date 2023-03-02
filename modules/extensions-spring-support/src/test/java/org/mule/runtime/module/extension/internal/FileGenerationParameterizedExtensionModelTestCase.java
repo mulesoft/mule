@@ -10,6 +10,8 @@ import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 
+import static java.lang.System.getProperty;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
@@ -21,6 +23,8 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 public abstract class FileGenerationParameterizedExtensionModelTestCase extends ParameterizedExtensionModelTestCase {
+
+  public static final String MULE_VERSION_TEMPLATE = "{mule.version}";
 
   public static class ResourceExtensionUnitTest extends ExtensionUnitTest {
 
@@ -52,7 +56,8 @@ public abstract class FileGenerationParameterizedExtensionModelTestCase extends 
 
   @Before
   public void setup() throws IOException {
-    expectedContent = getResourceAsString(getExpectedFilesDir() + expectedFilePath, getClass());
+    expectedContent = getResourceAsString(getExpectedFilesDir() + expectedFilePath, getClass())
+        .replace(MULE_VERSION_TEMPLATE, getProperty("maven.projectVersion"));
   }
 
   @Test
