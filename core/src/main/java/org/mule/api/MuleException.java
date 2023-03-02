@@ -6,7 +6,7 @@
  */
 package org.mule.api;
 
-import static java.util.regex.Pattern.compile;
+import static org.mule.api.util.CredentialsMaskUtil.maskPassPhrase;
 
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
@@ -21,8 +21,6 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <code>MuleException</code> is the base exception type for the Mule server any
@@ -203,12 +201,7 @@ public abstract class MuleException extends Exception
         }
         StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(EXCEPTION_MESSAGE_DELIMITER);
-        Pattern p = compile("passphrase=([^,])+");
-        Matcher m = p.matcher(message);
-        if(m.find()){
-            message = m.replaceFirst("passphrase=<<credentials>>");
-        }
-        buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Message               : ").append(maskPassPhrase(message)).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Element               : ").append(ExceptionHelper.getExceptionInfo(this).get(LocatedMuleException.INFO_LOCATION_KEY)).append(SystemUtils.LINE_SEPARATOR);
 
         // print exception stack

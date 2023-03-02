@@ -6,6 +6,8 @@
  */
 package org.mule.config;
 
+import static org.mule.api.util.CredentialsMaskUtil.maskPassPhrase;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -565,7 +567,7 @@ public final class ExceptionHelper
         StringBuilder buf = new StringBuilder();
 
         ExceptionReader rootMuleReader = getExceptionReader(rootMule);
-        buf.append(rootMuleReader.getMessage(rootMule))
+        buf.append(maskPassPhrase(rootMuleReader.getMessage(rootMule)))
            .append(" (")
            .append(rootMule.getClass().getName())
            .append(")")
