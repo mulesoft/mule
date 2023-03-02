@@ -35,29 +35,47 @@ public class MvelClassLoaderReleaser implements ResourceReleaser {
       releaseFromASMAccessOptimizer();
       releaseFromDynamicOptimizer();
     } catch (Throwable t) {
-      LOGGER.warn("Unable to clean MVEL's DynamicOptimizer ClassLoaders", t);
+      LOGGER.warn("Unexpected error while cleaning MVEL's ASMAccessorOptimizer and DynamicOptimizer class loaders", t);
     }
   }
 
   protected void releaseFromASMAccessOptimizer() {
-    ClassLoader mvelCl = ((ClassLoader) getMVELClassLoader());
+    ClassLoader mvelCl;
+    try {
+      mvelCl = ((ClassLoader) getMVELClassLoader());
+    } catch (NoClassDefFoundError error) {
+      // MVEL is not present in the class loader, nothing to do
+      return;
+    }
 
-    if (mvelCl != null && mvelCl.getParent() == muleArtifactClassLoader) {
-      setMVELClassLoader(null);
+    try {
+      if (mvelCl != null && mvelCl.getParent() == muleArtifactClassLoader) {
+        setMVELClassLoader(null);
+      }
+    } catch (Throwable t) {
+      LOGGER.warn("Unable to clean MVEL's ASMAccessorOptimizer class loader", t);
     }
   }
 
   protected void releaseFromDynamicOptimizer() throws Exception {
-    ClassLoader mvelCl;
-    Field clField = DynamicOptimizer.class.getDeclaredField("classLoader");
+    Field clField;
+    try {
+      clField = DynamicOptimizer.class.getDeclaredField("classLoader");
+    } catch (NoClassDefFoundError error) {
+      // MVEL is not present in the class loader, nothing to do
+      return;
+    }
+
     boolean accessible = clField.isAccessible();
     clField.setAccessible(true);
     try {
-      mvelCl = (ClassLoader) clField.get(null);
+      ClassLoader mvelCl = (ClassLoader) clField.get(null);
 
       if (mvelCl != null && mvelCl.getParent() == muleArtifactClassLoader) {
         clField.set(null, null);
       }
+    } catch (Throwable t) {
+      LOGGER.warn("Unable to clean MVEL's DynamicOptimizer class loader", t);
     } finally {
       clField.setAccessible(accessible);
     }
