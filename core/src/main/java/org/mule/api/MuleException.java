@@ -162,7 +162,7 @@ public abstract class MuleException extends Exception
         }
         StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(EXCEPTION_MESSAGE_DELIMITER);
-        buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Message               : ").append(maskPassPhrase(message)).append(SystemUtils.LINE_SEPARATOR);
 
         Map info = ExceptionHelper.getExceptionInfo(this);
         for( Map.Entry entry : (Set<Map.Entry>)info.entrySet() )
