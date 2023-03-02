@@ -16,6 +16,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -129,5 +130,13 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
         }).collect(toList()));
 
     return classLoaders;
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    if (isRegionClassLoaderMember(this)) {
+      ((RegionClassLoader) this.getParent()).disposeFromOwnerClassLoader();
+    }
   }
 }

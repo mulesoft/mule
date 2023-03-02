@@ -19,6 +19,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.File;
@@ -94,5 +95,13 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
     checkArgument(!isEmpty(domainName), "domainName cannot be empty");
 
     return "domain/" + domainName;
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    if (isRegionClassLoaderMember(this)) {
+      ((RegionClassLoader) this.getParent()).disposeFromOwnerClassLoader();
+    }
   }
 }

@@ -22,7 +22,7 @@ import java.util.List;
  */
 @NoExtend
 @NoInstantiate
-public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
+public abstract class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
@@ -68,5 +68,25 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
             ? ((FilteringArtifactClassLoader) fcl).getArtifactClassLoader()
             : fcl)
         .collect(toList());
+  }
+
+//  @Override
+//  public void dispose() {
+//    if (isRegionClassLoaderMember(this)) {
+//      super.dispose();
+//      doDispose();
+//    }
+//  }
+
+  protected void doDispose() {
+    // Nothing to do
+  }
+
+  protected static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
+    return !isRegionClassLoader(classLoader) && isRegionClassLoader(classLoader.getParent());
+  }
+
+  private static boolean isRegionClassLoader(ClassLoader classLoader) {
+    return classLoader instanceof RegionClassLoader;
   }
 }
