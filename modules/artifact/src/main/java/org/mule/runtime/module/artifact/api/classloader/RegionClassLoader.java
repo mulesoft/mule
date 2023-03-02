@@ -426,25 +426,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public void dispose() {
-    try {
-      ownerClassLoader.dispose();
-    } catch (Throwable t) {
-      reportPossibleLeak(t, ownerClassLoader.getArtifactId());
-      // Attempt to dispose region resources in case something went wrong while disposing the owner class loader before releasing them
-      doDispose();
-    }
-  }
-
-  /**
-   * Disposes all the region resources except for the owner class loader. This method should only be executed from the owner class loader, which must take care of its own resources' disposal.
-   *
-   * @since 4.5
-   */
-  public void disposeFromOwnerClassLoader() {
-    doDispose();
-  }
-
-  private void doDispose() {
     registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(this::disposeClassLoader);
     registeredClassLoaders.clear();
     descriptorMapping.forEach((descriptor, classloader) -> {
@@ -458,6 +439,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     packageMapping.clear();
     resourceMapping.clear();
 
+    disposeClassLoader(ownerClassLoader);
     super.dispose();
 
     // System.gc() by default

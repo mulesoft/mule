@@ -14,6 +14,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Base {@link ArtifactClassLoader} implementation of deployable artifacts.
@@ -22,11 +23,13 @@ import java.util.List;
  */
 @NoExtend
 @NoInstantiate
-public abstract class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
+public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
   }
+
+  private AtomicBoolean disposed = new AtomicBoolean(false);
 
   /**
    * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
@@ -70,16 +73,14 @@ public abstract class MuleDeployableArtifactClassLoader extends MuleArtifactClas
         .collect(toList());
   }
 
-//  @Override
-//  public void dispose() {
-//    if (isRegionClassLoaderMember(this)) {
-//      super.dispose();
-//      doDispose();
-//    }
-//  }
-
-  protected void doDispose() {
-    // Nothing to do
+  @Override
+  public void dispose() {
+    if (!disposed.getAndSet(true)) {
+      super.dispose();
+      if (isRegionClassLoaderMember(this)) {
+        ((RegionClassLoader) this.getParent()).dispose();
+      }
+    }
   }
 
   protected static boolean isRegionClassLoaderMember(ClassLoader classLoader) {

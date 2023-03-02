@@ -809,16 +809,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   public static class TestApplicationClassLoader extends TestArtifactClassLoader {
 
-    private final RegionClassLoader parent;
-
-    public TestApplicationClassLoader(RegionClassLoader parent) {
+    public TestApplicationClassLoader(ClassLoader parent) {
       super(parent);
-      this.parent = parent;
-    }
-
-    @Override
-    public void dispose() {
-      parent.disposeFromOwnerClassLoader();
     }
   }
 
