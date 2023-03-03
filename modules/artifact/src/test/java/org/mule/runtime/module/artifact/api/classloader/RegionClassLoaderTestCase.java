@@ -263,48 +263,68 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void disposesClassLoaders() throws Exception {
+  public void disposesClassLoaders() {
     when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     RegionClassLoader regionClassLoader =
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
-    createClassLoaders(regionClassLoader);
 
-    final ArtifactClassLoader regionMember1 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    final ArtifactClassLoader ownerClassLoader = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
     final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
-    regionClassLoader.addClassLoader(regionMember1, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
-
 
     regionClassLoader.dispose();
 
-    verify(regionMember1).dispose();
+    verify(ownerClassLoader).dispose();
     verify(regionMember2).dispose();
   }
 
   @Test
-  public void disposesClassLoadersEvenOnExceptions() throws Exception {
+  public void disposesClassLoadersEvenOnExceptionOnRegionOwner() {
     when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     RegionClassLoader regionClassLoader =
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
-    createClassLoaders(regionClassLoader);
 
-    final ArtifactClassLoader regionMember1 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
-    doThrow(new RuntimeException()).when(regionMember1).dispose();
+    final ArtifactClassLoader ownerClassLoader = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    doThrow(new RuntimeException()).when(ownerClassLoader).dispose();
     final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
 
-    regionClassLoader.addClassLoader(regionMember1, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
 
     regionClassLoader.dispose();
 
-    verify(regionMember1).dispose();
+    verify(ownerClassLoader).dispose();
     verify(regionMember2).dispose();
   }
 
   @Test
-  public void verifiesThatClassLoaderIsNotAddedTwice() throws Exception {
+  public void disposesClassLoadersEvenOnExceptionOnRegionMember() {
+    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+
+    RegionClassLoader regionClassLoader =
+        new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
+
+    final ArtifactClassLoader ownerClassLoader = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    doThrow(new RuntimeException()).when(regionMember2).dispose();
+    final ArtifactClassLoader regionMember3 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+
+    regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(regionMember3, NULL_CLASSLOADER_FILTER);
+
+    regionClassLoader.dispose();
+
+    verify(ownerClassLoader).dispose();
+    verify(regionMember2).dispose();
+    verify(regionMember3).dispose();
+  }
+
+  @Test
+  public void verifiesThatClassLoaderIsNotAddedTwice() {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
 

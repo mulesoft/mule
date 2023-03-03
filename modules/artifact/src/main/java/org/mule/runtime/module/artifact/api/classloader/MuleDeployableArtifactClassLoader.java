@@ -69,4 +69,24 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
             : fcl)
         .collect(toList());
   }
+
+  /**
+   * Disposes {@code this} class loader and the region it owns in case it belongs to one.
+   * @since 4.5
+   */
+  public void disposeWithRegion() {
+    if (isRegionClassLoaderMember(this)) {
+      ((RegionClassLoader) this.getParent()).dispose();
+    } else {
+      dispose();
+    }
+  }
+
+  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
+    return !isRegionClassLoader(classLoader) && isRegionClassLoader(classLoader.getParent());
+  }
+
+  private static boolean isRegionClassLoader(ClassLoader classLoader) {
+    return classLoader instanceof RegionClassLoader;
+  }
 }

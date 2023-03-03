@@ -26,6 +26,7 @@ import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
@@ -106,8 +107,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       doDispose();
 
       if (artifactCL != null) {
-        if (isRegionClassLoaderMember(artifactCL)) {
-          ((DisposableClassLoader) artifactCL.getParent()).dispose();
+        if (artifactCL instanceof MuleDeployableArtifactClassLoader) {
+          ((MuleDeployableArtifactClassLoader) artifactCL).disposeWithRegion();
         } else if (artifactCL instanceof DisposableClassLoader) {
           ((DisposableClassLoader) artifactCL).dispose();
         }
@@ -117,10 +118,6 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       currentThread().setContextClassLoader(originalClassLoader);
       deploymentClassLoader = null;
     }
-  }
-
-  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
-    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   private void doDispose() {
