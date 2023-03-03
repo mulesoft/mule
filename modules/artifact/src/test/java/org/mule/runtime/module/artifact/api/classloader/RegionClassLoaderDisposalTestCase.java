@@ -11,6 +11,8 @@ import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactCl
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.tck.util.CollectableReference.collectedByGc;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_CLASSLOADERS;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
@@ -33,14 +35,18 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-
+@Feature(CLASSLOADING_ISOLATION)
+@Story(ARTIFACT_CLASSLOADERS)
+@Issue("W-12637122")
 @RunWith(Parameterized.class)
 public class RegionClassLoaderDisposalTestCase extends RegionClassLoaderTestCase {
 
