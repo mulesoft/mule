@@ -14,7 +14,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -108,7 +107,7 @@ public class GlobalErrorHandler extends ErrorHandler {
     return routers;
   }
 
-  public void clearRouterForChain(MessageProcessorChain chain) {
-    routers.remove(chain);
+  public void clearRouterForContext(Object key) {
+    routers.remove(key);
   }
 }

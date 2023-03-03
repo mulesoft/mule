@@ -282,12 +282,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                         () -> {
                                           errorSwitchSinkSinkRef.complete();
                                           disposeIfNeeded(errorRouter, LOGGER);
-                                          clearRouterInGlobalErrorHandler(messagingExceptionHandler);
+                                          clearRouterInGlobalErrorHandler(ctx);
                                         },
                                         t -> {
                                           errorSwitchSinkSinkRef.error(t);
                                           disposeIfNeeded(errorRouter, LOGGER);
-                                          clearRouterInGlobalErrorHandler(messagingExceptionHandler);
+                                          clearRouterInGlobalErrorHandler(ctx);
                                         }))
                                             .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
       });
@@ -331,9 +331,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return errorRouter;
   }
 
-  private void clearRouterInGlobalErrorHandler(FlowExceptionHandler messagingExceptionHandler) {
+  private void clearRouterInGlobalErrorHandler(ContextView ctx) {
     if (messagingExceptionHandler instanceof GlobalErrorHandler) {
-      ((GlobalErrorHandler) messagingExceptionHandler).clearRouterForChain(this);
+      ((GlobalErrorHandler) messagingExceptionHandler).clearRouterForContext(getKey(ctx));
     }
   }
 

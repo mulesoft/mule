@@ -42,7 +42,6 @@ import java.util.function.Supplier;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -107,36 +106,36 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sameRouterForChain() {
-    MessageProcessorChain chain = mock(MessageProcessorChain.class);
+  public void sameRouterForKey() {
+    Integer key = 1;
     Supplier<Consumer<Exception>> errorRouterSupplier = () -> mock(ExceptionRouter.class);
 
-    Consumer<Exception> errorRouter = globalErrorHandler.routerForChain(chain, errorRouterSupplier);
-    Consumer<Exception> anotherErrorRouter = globalErrorHandler.routerForChain(chain, errorRouterSupplier);
+    Consumer<Exception> errorRouter = globalErrorHandler.routerForChain(key, errorRouterSupplier);
+    Consumer<Exception> anotherErrorRouter = globalErrorHandler.routerForChain(key, errorRouterSupplier);
 
     assertThat(errorRouter, is(sameInstance(anotherErrorRouter)));
   }
 
   @Test
   public void differentRouterForChains() {
-    MessageProcessorChain chain = mock(MessageProcessorChain.class);
-    MessageProcessorChain anotherChain = mock(MessageProcessorChain.class);
+    Integer key = 1;
+    Integer anotherKey = 2;
     Supplier<Consumer<Exception>> errorRouterSupplier = () -> mock(ExceptionRouter.class);
 
-    Consumer<Exception> errorRouter = globalErrorHandler.routerForChain(chain, errorRouterSupplier);
-    Consumer<Exception> anotherErrorRouter = globalErrorHandler.routerForChain(anotherChain, errorRouterSupplier);
+    Consumer<Exception> errorRouter = globalErrorHandler.routerForChain(key, errorRouterSupplier);
+    Consumer<Exception> anotherErrorRouter = globalErrorHandler.routerForChain(anotherKey, errorRouterSupplier);
 
     assertThat(errorRouter, is(not(sameInstance(anotherErrorRouter))));
   }
 
   @Test
-  public void newRouterForChainIfCleared() {
-    MessageProcessorChain chain = mock(MessageProcessorChain.class);
+  public void newRouterForContextIfCleared() {
+    Integer key = 1;
     Supplier<Consumer<Exception>> errorRouterSupplier = () -> mock(ExceptionRouter.class);
 
-    Consumer<Exception> errorRouter = globalErrorHandler.routerForChain(chain, errorRouterSupplier);
-    globalErrorHandler.clearRouterForChain(chain);
-    Consumer<Exception> anotherErrorRouter = globalErrorHandler.routerForChain(chain, errorRouterSupplier);
+    Consumer<Exception> errorRouter = globalErrorHandler.routerForChain(key, errorRouterSupplier);
+    globalErrorHandler.clearRouterForContext(key);
+    Consumer<Exception> anotherErrorRouter = globalErrorHandler.routerForChain(key, errorRouterSupplier);
 
     assertThat(errorRouter, is(not(sameInstance(anotherErrorRouter))));
   }
