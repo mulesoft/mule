@@ -9,6 +9,8 @@ package org.mule.api.execution;
 import static java.lang.String.format;
 
 import org.mule.api.AnnotatedObject;
+
+import static org.mule.api.util.CredentialsMaskUtil.maskPassPhrase;
 import static org.mule.api.util.CredentialsMaskUtil.maskPasswords;
 
 import java.util.Map;
@@ -102,7 +104,7 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     protected static String getSourceXML(AnnotatedObject element)
     {
         Object sourceXml = element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY);
-        return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
+        return sourceXml != null ? maskPassPhrase(maskPasswords(sourceXml.toString())) : null;
     }
 
 }

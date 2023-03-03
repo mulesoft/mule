@@ -22,7 +22,8 @@ public class CredentialsMaskUtil
     public static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"|\n]*)\"");
     public static final Pattern PASSWORD_PATTERN_NO_QUOTES = compile("password=([^\\s;]+)");
     public static final Pattern USER_PATTERN_NO_QUOTES = compile("user=([^\\s;]+)");
-    public static final Pattern PASSPHRASE_PATTERN = compile("passphrase=([^, ])+");
+    public static final Pattern PASSPHRASE_PATTERN = compile("passphrase=\"([^, ])+\"");
+    public static final Pattern PASSPHRASE_PATTERN_NO_QUOTES = compile("passphrase=([^,>/ ])+");
     public static final String CREDENTIAL_MASK = "<<credentials>>";
     public static final String USER_MASK = "<<user>>";
     public static final String PASSWORD_ATTRIBUTE_MASK = "password=\"%s\"";
@@ -115,8 +116,11 @@ public class CredentialsMaskUtil
      */
     public static String maskPassPhrase(String input) {
         Matcher matcher = PASSPHRASE_PATTERN.matcher(input);
+        Matcher matcherWithoutQuotes = PASSPHRASE_PATTERN_NO_QUOTES.matcher(input);
         if (matcher.find()) {
-            input = matcher.replaceFirst(PASSPHRASE_PREFIX + CREDENTIAL_MASK);
+            input = matcher.replaceFirst(PASSPHRASE_PREFIX + '"' + CREDENTIAL_MASK + '"');
+        } else if (matcherWithoutQuotes.find()) {
+            input = matcherWithoutQuotes.replaceFirst(PASSPHRASE_PREFIX + CREDENTIAL_MASK);
         }
         return input;
     }
