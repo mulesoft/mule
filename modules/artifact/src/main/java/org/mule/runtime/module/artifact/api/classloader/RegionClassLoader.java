@@ -424,8 +424,25 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     return new CompoundEnumeration<>(enumerations.toArray(new Enumeration[0]));
   }
 
+  /**
+   * @deprecated since 4.5, use {@link #disposeFromOwnerClassLoader()} instead.
+   */
   @Override
+  @Deprecated
   public void dispose() {
+    disposeClassLoader(ownerClassLoader);
+    doDispose();
+  }
+
+  /**
+   * Disposes all the region resources except for its owner class loader. This method is intended to be called during the disposal
+   * of the owner class loader.
+   */
+  void disposeFromOwnerClassLoader() {
+    doDispose();
+  }
+
+  private void doDispose() {
     registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(this::disposeClassLoader);
     registeredClassLoaders.clear();
     descriptorMapping.forEach((descriptor, classloader) -> {
@@ -439,7 +456,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     packageMapping.clear();
     resourceMapping.clear();
 
-    disposeClassLoader(ownerClassLoader);
     super.dispose();
 
     // System.gc() by default
