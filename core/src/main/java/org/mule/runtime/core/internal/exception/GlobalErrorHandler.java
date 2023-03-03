@@ -10,8 +10,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -35,18 +33,18 @@ public class GlobalErrorHandler extends ErrorHandler {
   private final AtomicBoolean initialised = new AtomicBoolean(false);
   private final AtomicInteger started = new AtomicInteger(0);
 
-  private Map<Component, Consumer<Exception>> routers = new HashMap<>();
+  private Map<Object, Consumer<Exception>> routers = new HashMap<>();
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
   }
 
-  public Consumer<Exception> routerForChain(MessageProcessorChain chain, Supplier<Consumer<Exception>> errorRouterSupplier) {
-    if (!routers.containsKey(chain)) {
-      routers.put(chain, newGlobalRouter(errorRouterSupplier.get()));
+  public Consumer<Exception> routerForChain(Object key, Supplier<Consumer<Exception>> errorRouterSupplier) {
+    if (!routers.containsKey(key)) {
+      routers.put(key, newGlobalRouter(errorRouterSupplier.get()));
     }
-    return routers.get(chain);
+    return routers.get(key);
   }
 
   private Consumer<Exception> newGlobalRouter(Consumer<Exception> router) {
@@ -106,7 +104,7 @@ public class GlobalErrorHandler extends ErrorHandler {
         .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
   }
 
-  public Map<Component, Consumer<Exception>> getRouters() {
+  public Map<Object, Consumer<Exception>> getRouters() {
     return routers;
   }
 

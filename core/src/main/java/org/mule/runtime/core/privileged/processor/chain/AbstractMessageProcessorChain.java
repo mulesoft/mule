@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStream
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -95,6 +96,7 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -120,6 +122,7 @@ import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -250,7 +253,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                             new SpanNameAssertion(chainInitialSpanInfo.getName()));
                       }
                       errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
-                    }));
+                    }), getKey(ctx));
 
         final Flux<CoreEvent> upstream =
             from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -306,11 +309,22 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier) {
+  private Object getKey(ContextView ctx) {
+    Object key = null;
+    try {
+      Field field = ctx.get(KEY_ON_NEXT_ERROR_STRATEGY).getClass().getDeclaredField("errorConsumer");
+      field.setAccessible(true);
+      key = field.get(ctx.get(KEY_ON_NEXT_ERROR_STRATEGY));
+    } catch (Exception ignored) {
+    }
+    return key;
+  }
+
+  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, Object key) {
     final Consumer<Exception> errorRouter;
-    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+    if (messagingExceptionHandler instanceof GlobalErrorHandler && key != null) {
       errorRouter = ((GlobalErrorHandler) messagingExceptionHandler)
-          .routerForChain(this, errorRouterSupplier);
+          .routerForChain(key, errorRouterSupplier);
     } else {
       errorRouter = errorRouterSupplier.get();
     }

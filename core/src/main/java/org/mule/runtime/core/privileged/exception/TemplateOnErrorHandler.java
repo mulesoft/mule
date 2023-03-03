@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -25,7 +24,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -176,7 +174,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
               })))
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
-      if (processingStrategy.isPresent()) {
+      if (processingStrategy.isPresent() && !fromGlobalErrorHandler) {
         String location = getLocation() != null ? getLocation().getLocation() : flowLocation.map(Object::toString).orElse("");
         processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + location + "'");
       } else {

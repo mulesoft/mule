@@ -3,6 +3,18 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Map<org.mule.runtime.api.component.Component, java.util.function.Consumer<java.lang.Exception>> org.mule.runtime.core.api.exception.FlowExceptionHandler::getRouters()",
+          "new": "method java.util.Map<java.lang.Object, java.util.function.Consumer<java.lang.Exception>> org.mule.runtime.core.api.exception.FlowExceptionHandler::getRouters()",
+          "oldType": "java.util.Map<org.mule.runtime.api.component.Component, java.util.function.Consumer<java.lang.Exception>>",
+          "newType": "java.util.Map<java.lang.Object, java.util.function.Consumer<java.lang.Exception>>",
+          "package": "org.mule.runtime.core.api.exception",
+          "classSimpleName": "FlowExceptionHandler",
+          "methodName": "getRouters",
+          "elementKind": "method",
+          "justification": "W-12556497: Parallel-for-each gets stuck with global error handler optimizations"
+        },
+        {
           "code": "java.method.addedToInterface",
           "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getStatusAsString()",
           "package": "org.mule.runtime.tracer.api.sniffer",

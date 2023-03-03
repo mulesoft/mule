@@ -14,7 +14,6 @@ import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
@@ -89,7 +88,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    *
    * @return the mapping from chains to routers.
    */
-  default Map<Component, Consumer<Exception>> getRouters() {
+  default Map<Object, Consumer<Exception>> getRouters() {
     return emptyMap();
   }
 }
