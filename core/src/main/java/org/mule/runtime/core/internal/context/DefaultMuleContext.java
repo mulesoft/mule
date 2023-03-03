@@ -16,6 +16,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CON
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TIMESTAMP_NANOSECONDS_SERIALIZATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
@@ -348,6 +349,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureHonourInsecureTlsConfiguration();
       configureUseTransactionSinkIndex();
       configureEnableTracerConfigurationAtApplicationLevel();
+      configureEnableTimestampNanosecondsSerialization();
     }
   }
 
@@ -1547,6 +1549,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureUseTransactionSinkIndex() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, featureContext -> true);
+  }
+
+  private static void configureEnableTimestampNanosecondsSerialization() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_TIMESTAMP_NANOSECONDS_SERIALIZATION, featureContext -> true);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
