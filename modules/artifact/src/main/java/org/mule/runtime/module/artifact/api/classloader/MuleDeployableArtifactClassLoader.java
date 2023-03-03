@@ -72,6 +72,7 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
 
   /**
    * Disposes {@code this} class loader and the region it owns in case it belongs to one.
+   * 
    * @since 4.5
    */
   public void disposeWithRegion() {

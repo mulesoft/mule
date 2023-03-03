@@ -25,16 +25,19 @@ import org.junit.Test;
 
 public class MuleDeployableArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
-  private static final String ARTIFACT_ID = "testDeployable";
-  public static final String DEPLOYABLE_NAME = "testApp";
+  private static final String ARTIFACT_ID = "testDeployableId";
+  public static final String DEPLOYABLE_NAME = "testDeployable";
   private final ArtifactDescriptor artifactDescriptor = new ArtifactDescriptor(DEPLOYABLE_NAME);
 
   @Test
   public void disposesClassLoaderAndRegionCorrectly() {
     RegionClassLoader regionClassLoader =
-        spy(new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), mock(ClassLoaderLookupPolicy.class)));
+        spy(new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(),
+                                  mock(ClassLoaderLookupPolicy.class)));
 
-    final MuleDeployableArtifactClassLoader ownerClassLoader = spy(new MuleDeployableArtifactClassLoader(ARTIFACT_ID, artifactDescriptor, new URL[0], regionClassLoader, mock(ClassLoaderLookupPolicy.class)));
+    final MuleDeployableArtifactClassLoader ownerClassLoader =
+        spy(new MuleDeployableArtifactClassLoader(ARTIFACT_ID, artifactDescriptor, new URL[0], regionClassLoader,
+                                                  mock(ClassLoaderLookupPolicy.class)));
     final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
     regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
