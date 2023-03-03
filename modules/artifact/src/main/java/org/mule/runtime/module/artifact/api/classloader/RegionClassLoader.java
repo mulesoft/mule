@@ -62,6 +62,7 @@ import org.slf4j.Logger;
  * Only a region member can export a given package, but same resources can be exported by many members. The order in which the
  * resources are found will depend on the order in which the class loaders were added to the region.
  */
+// TODO W-12637978 - extend from MuleArtifactClassLoader and make internal
 public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";

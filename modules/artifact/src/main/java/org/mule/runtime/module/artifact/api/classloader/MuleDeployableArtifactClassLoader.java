@@ -74,6 +74,8 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
   public void dispose() {
     super.dispose();
     if (isRegionClassLoaderMember(this)) {
+      // TODO W-12637978 - do this without asking if it's a member of a region when RegionClassLoader no longer extends from
+      // MuleDeployableArtifactClassLoader
       ((RegionClassLoader) this.getParent()).disposeFromOwnerClassLoader();
     }
   }
