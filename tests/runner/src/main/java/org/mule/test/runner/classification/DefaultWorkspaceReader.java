@@ -7,12 +7,15 @@
 
 package org.mule.test.runner.classification;
 
+import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.test.runner.api.WorkspaceLocationResolver;
-import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -164,14 +167,14 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    * @return {@link File} to the {@value #POM_XML} of the artifact from the workspace path
    */
   private File findPomFile(Artifact artifact, File workspacePath) {
-    Plugin shadeMavenPlugin =
-        searchForMavenShadePlugin(MavenModelFactory.createMavenProject(new File(workspacePath, POM_XML)));
-    if (shadeMavenPlugin != null) {
+    boolean isShadeMavenPlugin = discoverProvider().createMavenPomParserClient(new File(workspacePath, POM_XML).toPath())
+        .isMavenShadePluginConfigured();
+    if (isShadeMavenPlugin) {
       // TODO (gfernandes) MULE-10485 - add support for reading the plugin configuration using Xpp3 Maven API
       // MavenXpp3Reader.parsePluginConfiguration(...)
       File reducedPom = new File(workspacePath, REDUCED_POM_XML);
       if (!reducedPom.exists()) {
-        throw new IllegalStateException(artifact + " has in its build configure the " + shadeMavenPlugin + " but default "
+        throw new IllegalStateException(artifact + " has in its build configure the shadeMavenPlugin but default "
             + REDUCED_POM_XML
             + " is not present. Run the plugin first.");
       }
@@ -180,26 +183,5 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
     } else {
       return new File(workspacePath, POM_XML);
     }
-  }
-
-  /**
-   * Searches the Maven {@link Model} for the {@url https://maven.apache.org/plugins/maven-shade-plugin/}. maven-shared-plugin
-   * would have to be configure in the pom directly and not inherited from a parent pom due to it is not supported by this
-   * implementation.
-   *
-   * @param model Maven {@link Model} to look for the Maven Shade Plugin
-   * @return {@link Plugin} model for Maven Shade Plugin if found.
-   */
-  private Plugin searchForMavenShadePlugin(Model model) {
-    if (model.getBuild() != null) {
-      for (Plugin plugin : model.getBuild().getPlugins()) {
-        if (plugin.getGroupId().equals(ORG_APACHE_MAVEN_PLUGINS_GROUP_ID)
-            && plugin.getArtifactId().equals(MAVEN_SHADE_PLUGIN_ARTIFACT_ID)) {
-          return plugin;
-        }
-      }
-    }
-
-    return null;
   }
 }
