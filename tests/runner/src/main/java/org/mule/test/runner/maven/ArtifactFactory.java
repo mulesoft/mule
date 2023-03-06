@@ -44,13 +44,13 @@ public final class ArtifactFactory {
     MavenPomParser pomParser = provider.createMavenPomParserClient(pomFile.toPath());
     MavenPomModel model = pomParser.getModel();
     return new DefaultArtifact(model.getGroupId() != null ? searchingProperties(pomParser, MavenPomModel::getGroupId)
-                                   : searchingProperties(pomParser, m -> m.getParent().map(PomParentCoordinates::getGroupId)
-                                                             .orElseThrow(()-> new MuleRuntimeException(createStaticMessage("GroupId not present in the pom or in the parent pom")))),
+        : searchingProperties(pomParser, m -> m.getParent().map(PomParentCoordinates::getGroupId)
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("GroupId not present in the pom or in the parent pom")))),
                                searchingProperties(pomParser, MavenPomModel::getArtifactId),
                                searchingProperties(pomParser, MavenPomModel::getPackaging),
                                model.getVersion() != null ? searchingProperties(pomParser, MavenPomModel::getVersion)
                                    : searchingProperties(pomParser, m -> m.getParent().map(PomParentCoordinates::getVersion)
-                                   .orElseThrow(()-> new MuleRuntimeException(createStaticMessage("Version not present in the pom or in the parent pom")))));
+                                       .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Version not present in the pom or in the parent pom")))));
   }
 
   private static String searchingProperties(MavenPomParser parser, Function<MavenPomModel, String> extractor) {

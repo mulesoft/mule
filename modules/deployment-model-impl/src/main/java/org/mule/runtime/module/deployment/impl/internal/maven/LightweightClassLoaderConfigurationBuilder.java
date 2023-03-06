@@ -177,7 +177,9 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
                       // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
                       return false;
                     }).collect(toList()));
-                additionalPluginDependenciesForPlugin.setAdditionalDependencies(effectiveAdditionalDependencies);
+                AdditionalPluginDependencies effectiveAdditionalPluginDependenciesForPlugin =
+                    new AdditionalPluginDependencies(additionalPluginDependenciesForPlugin, effectiveAdditionalDependencies);
+                deployableArtifactAdditionalLibrariesMap.replace(artifact, effectiveAdditionalPluginDependenciesForPlugin);
               } else {
                 effectivePluginsAdditionalLibrariesMap.put(artifact, additionalDependenciesForArtifact);
               }

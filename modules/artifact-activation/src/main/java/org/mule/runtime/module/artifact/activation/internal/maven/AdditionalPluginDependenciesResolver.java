@@ -170,8 +170,9 @@ public class AdditionalPluginDependenciesResolver {
               discoverProvider().createMavenPomParserClient(pomModel.get().getPomFile().get().toPath());
 
           mavenPomParser.getPomAdditionalPluginDependenciesForArtifacts().values().forEach(mavenPlugin -> {
+            String artifact = mavenPlugin.getGroupId() + ":" + mavenPlugin.getArtifactId();
             AdditionalPluginDependencies alreadyDefinedPluginAdditionalDependencies =
-                additionalDependenciesFromMulePlugins.get(mavenPlugin.getGroupId() + ":" + mavenPlugin.getArtifactId());
+                additionalDependenciesFromMulePlugins.get(artifact);
             if (alreadyDefinedPluginAdditionalDependencies != null) {
               LinkedList<BundleDescriptor> effectiveDependencies =
                   new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
@@ -198,7 +199,9 @@ public class AdditionalPluginDependenciesResolver {
                   effectiveDependencies.add(additionalDependenciesDependency);
                 }
               });
-              alreadyDefinedPluginAdditionalDependencies.setAdditionalDependencies(effectiveDependencies);
+              AdditionalPluginDependencies alreadyDefinedEffectivePluginAdditionalDependencies =
+                  new AdditionalPluginDependencies(alreadyDefinedPluginAdditionalDependencies, effectiveDependencies);
+              additionalDependenciesFromMulePlugins.replace(artifact, alreadyDefinedEffectivePluginAdditionalDependencies);
             } else {
               additionalDependenciesFromMulePlugins.put(mavenPlugin.getGroupId() + ":" + mavenPlugin.getArtifactId(),
                                                         mavenPlugin);
