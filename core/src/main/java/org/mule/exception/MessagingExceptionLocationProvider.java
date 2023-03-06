@@ -8,6 +8,7 @@ package org.mule.exception;
 
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.api.LocatedMuleException.INFO_SOURCE_XML_KEY;
+import static org.mule.api.util.CredentialsMaskUtil.maskPassPhrase;
 
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleEvent;
@@ -35,7 +36,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
             String sourceXML = getSourceXML((AnnotatedObject) lastProcessed);
             if (sourceXML != null)
             {
-                contextInfo.put(INFO_SOURCE_XML_KEY, sourceXML);
+                contextInfo.put(INFO_SOURCE_XML_KEY, maskPassPhrase(sourceXML));
             }
         }
 

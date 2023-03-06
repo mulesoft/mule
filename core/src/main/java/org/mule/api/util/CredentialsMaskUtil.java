@@ -22,12 +22,15 @@ public class CredentialsMaskUtil
     public static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"|\n]*)\"");
     public static final Pattern PASSWORD_PATTERN_NO_QUOTES = compile("password=([^\\s;]+)");
     public static final Pattern USER_PATTERN_NO_QUOTES = compile("user=([^\\s;]+)");
-    public static final String PASSWORD_MASK = "<<credentials>>";
+    public static final Pattern PASSPHRASE_PATTERN = compile("passphrase=\"([^, ])+\"");
+    public static final Pattern PASSPHRASE_PATTERN_NO_QUOTES = compile("passphrase=([^,>/ ])+");
+    public static final String CREDENTIAL_MASK = "<<credentials>>";
     public static final String USER_MASK = "<<user>>";
     public static final String PASSWORD_ATTRIBUTE_MASK = "password=\"%s\"";
 
     private static final String USER_URL_PREFIX = "user=";
     private static final String PASSWORD_URL_PREFIX = "password=";
+    private static final String PASSPHRASE_PREFIX = "passphrase=";
     
     /**
      * masks url credentials
@@ -44,7 +47,7 @@ public class CredentialsMaskUtil
         Matcher matcher = PASSWORD_PATTERN.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)
         {
-            input = input.replace(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
+            input = input.replace(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(CREDENTIAL_MASK));
         }
 
         return input;
@@ -60,7 +63,7 @@ public class CredentialsMaskUtil
      */
     public static String maskUrlPassword(String input, Pattern pattern)
     {
-        return maskUrlPattern(input, pattern, PASSWORD_MASK);
+        return maskUrlPattern(input, pattern, CREDENTIAL_MASK);
     }
 
     /**
@@ -88,7 +91,7 @@ public class CredentialsMaskUtil
      */
     public static String maskUrlUserAndPassword(String input, Pattern passwordPattern, Pattern userPattern)
     {
-        String inputMasked = maskUrlPattern(input, passwordPattern, PASSWORD_MASK, PASSWORD_URL_PREFIX);
+        String inputMasked = maskUrlPattern(input, passwordPattern, CREDENTIAL_MASK, PASSWORD_URL_PREFIX);
         return maskUrlPattern(inputMasked, userPattern, USER_MASK, USER_URL_PREFIX);
     }
 
@@ -102,6 +105,24 @@ public class CredentialsMaskUtil
     public static String maskPasswordAttribute(String password)
     {
         return format(PASSWORD_ATTRIBUTE_MASK, password);
+    }
+
+    /**
+     * masks passphrase credentials
+     *
+     * @param input input for credentials to be masked
+     *
+     * @return input with passphrase masked
+     */
+    public static String maskPassPhrase(String input) {
+        Matcher matcher = PASSPHRASE_PATTERN.matcher(input);
+        Matcher matcherWithoutQuotes = PASSPHRASE_PATTERN_NO_QUOTES.matcher(input);
+        if (matcher.find()) {
+            input = matcher.replaceFirst(PASSPHRASE_PREFIX + '"' + CREDENTIAL_MASK + '"');
+        } else if (matcherWithoutQuotes.find()) {
+            input = matcherWithoutQuotes.replaceFirst(PASSPHRASE_PREFIX + CREDENTIAL_MASK);
+        }
+        return input;
     }
 
     private static String maskUrlPattern(String input, Pattern pattern, String mask) {

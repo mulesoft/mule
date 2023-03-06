@@ -6,6 +6,8 @@
  */
 package org.mule.api;
 
+import static org.mule.api.util.CredentialsMaskUtil.maskPassPhrase;
+
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -160,7 +162,7 @@ public abstract class MuleException extends Exception
         }
         StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(EXCEPTION_MESSAGE_DELIMITER);
-        buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Message               : ").append(maskPassPhrase(message)).append(SystemUtils.LINE_SEPARATOR);
 
         Map info = ExceptionHelper.getExceptionInfo(this);
         for( Map.Entry entry : (Set<Map.Entry>)info.entrySet() )
@@ -199,9 +201,9 @@ public abstract class MuleException extends Exception
         }
         StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(EXCEPTION_MESSAGE_DELIMITER);
-        buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Message               : ").append(maskPassPhrase(message)).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Element               : ").append(ExceptionHelper.getExceptionInfo(this).get(LocatedMuleException.INFO_LOCATION_KEY)).append(SystemUtils.LINE_SEPARATOR);
-        
+
         // print exception stack
         buf.append(EXCEPTION_MESSAGE_SECTION_DELIMITER);
         buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
