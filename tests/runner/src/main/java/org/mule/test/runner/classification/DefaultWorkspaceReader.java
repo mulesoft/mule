@@ -23,8 +23,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
@@ -40,8 +38,6 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
 
   private static final String WORKSPACE = "workspace";
 
-  private static final String MAVEN_SHADE_PLUGIN_ARTIFACT_ID = "maven-shade-plugin";
-  private static final String ORG_APACHE_MAVEN_PLUGINS_GROUP_ID = "org.apache.maven.plugins";
   private static final String REDUCED_POM_XML = "dependency-reduced-pom.xml";
 
   private static final String POM = "pom";
