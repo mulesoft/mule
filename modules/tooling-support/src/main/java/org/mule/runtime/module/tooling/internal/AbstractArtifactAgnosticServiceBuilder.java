@@ -133,7 +133,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
   private void addMavenModelDependency(BundleDependency bundleDependency) {
     org.mule.maven.pom.parser.api.model.BundleDescriptor descriptor = bundleDependency.getDescriptor();
-    if (!MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier())) {
+    if (descriptor.getClassifier().isPresent() && !MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier().get())) {
       model.addSharedLibraryDependency(descriptor.getGroupId(), descriptor.getArtifactId());
     }
     model.addDependency(bundleDependency);

@@ -23,7 +23,6 @@ import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.MavenPomModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -37,6 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Builder for a {@link ClassLoaderConfiguration} responsible for resolving dependencies when lightweight packaging is used for an
@@ -84,7 +85,7 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
 
   @Override
   protected void findAndExportSharedLibrary(String groupId, String artifactId) {
-    Pair<String, String> sharedLibraryKey = new Pair<>(groupId, artifactId);
+    Pair<String, String> sharedLibraryKey = Pair.of(groupId, artifactId);
     if (sharedLibraryAlreadyExported.containsKey(sharedLibraryKey)) {
       return;
     }
