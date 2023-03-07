@@ -33,7 +33,6 @@ import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.UUID;
@@ -52,6 +51,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServiceBuilder, S>
     implements ArtifactAgnosticServiceBuilder<T, S> {
@@ -121,7 +121,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
             .setOptional(dependency.getOptional())
             .setSystemPath(dependency.getSystemPath())
             .setExclusions(dependency.getExclusions().stream()
-                .map(exclusion -> new Pair<>(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
+                .map(exclusion -> Pair.of(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
             .build();
 
     BundleDependency bundleDependency = new BundleDependency.Builder().setBundleDescriptor(bundleDescriptor)
