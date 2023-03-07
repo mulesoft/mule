@@ -7,11 +7,13 @@
 
 package org.mule.test.infrastructure.process;
 
+import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
+
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.compile;
+
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.tck.probe.PollingProber;
@@ -57,6 +59,8 @@ public abstract class AbstractOSController {
              STATUS_PID_GROUP_NAME, STATUS_WRAPPER_GROUP_NAME, STATUS_JAVA_GROUP_NAME);
   protected static final Pattern STATUS_LABELS_PATTERN = compile(STATUS_LABELS);
   private static final int DEFAULT_TIMEOUT = 30000;
+  private static final String JAVA_HOME_VARIABLE = "JAVA_HOME";
+  private static final String JAVA_HOME_SYSPROP = "java.home";
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String MULE_APP_VARIABLE = "MULE_APP";
   private static final String MULE_APP_LONG_VARIABLE = "MULE_APP_LONG";
@@ -181,6 +185,12 @@ public abstract class AbstractOSController {
     if (isNotEmpty(muleAppName) && isNotEmpty(muleAppLongName)) {
       newEnv.put(MULE_APP_VARIABLE, muleAppName);
       newEnv.put(MULE_APP_LONG_VARIABLE, muleAppLongName);
+    }
+
+    // Use the jvm running the tests to run the Mule Runtime...
+    String javaHomeProperty = System.getProperty(JAVA_HOME_SYSPROP);
+    if (javaHomeProperty != null) {
+      newEnv.put(JAVA_HOME_VARIABLE, javaHomeProperty);
     }
 
     return newEnv;
