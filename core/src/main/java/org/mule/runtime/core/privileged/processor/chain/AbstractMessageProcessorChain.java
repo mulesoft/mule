@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import static org.mule.runtime.core.internal.construct.AbstractPipeline.REACTOR_ERROR_CONSUMER;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
@@ -310,14 +311,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private Object getKey(ContextView ctx) {
-    Object key = null;
-    try {
-      Field field = ctx.get(KEY_ON_NEXT_ERROR_STRATEGY).getClass().getDeclaredField("errorConsumer");
-      field.setAccessible(true);
-      key = field.get(ctx.get(KEY_ON_NEXT_ERROR_STRATEGY));
-    } catch (Exception ignored) {
-    }
-    return key;
+    return ctx.getOrDefault(REACTOR_ERROR_CONSUMER, null);
   }
 
   private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, Object key) {
@@ -375,14 +369,16 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
+      BiConsumer<Throwable, Object> continueStrategyErrorHandler = getContinueStrategyErrorHandler(processor, errorBubbler);
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
-          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
-                                                    getLocalOperatorErrorHook(processor, errorTypeLocator,
-                                                                              exceptionContextProviders)))
+          .subscriberContext(context -> context.put(REACTOR_ERROR_CONSUMER, continueStrategyErrorHandler)
+              .put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
+                   getLocalOperatorErrorHook(processor, errorTypeLocator,
+                                             exceptionContextProviders)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
           .onErrorContinue(exception -> !(exception instanceof LifecycleException),
-                           getContinueStrategyErrorHandler(processor, errorBubbler));
+                           continueStrategyErrorHandler);
     }
     // We end the MessageProcessorChain span verifying that it is the one expected by its name.
     stream = stream.doOnNext(event -> muleEventTracer

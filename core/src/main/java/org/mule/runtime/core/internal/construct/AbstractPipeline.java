@@ -93,6 +93,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -109,6 +110,7 @@ import reactor.core.publisher.Flux;
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
 
+  public static final String REACTOR_ERROR_CONSUMER = "errorConsumer";
   private final InterceptorManager interceptorManager;
   private final NotificationDispatcher notificationFirer;
 
@@ -437,12 +439,17 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       interceptedPipeline = interceptorWrapperProcessorFunction;
     }
 
-    return stream -> from(stream)
-        .doOnNext(beforeProcessors())
-        .transform(processingStrategy.onPipeline(interceptedPipeline))
-        .doOnNext(afterProcessors())
-        .onErrorContinue(MessagingException.class,
-                         (me, e) -> ((BaseEventContext) (((MessagingException) me).getEvent().getContext())).error(me));
+    return stream -> {
+      BiConsumer<Throwable, Object> errorConsumer =
+          (me, e) -> ((BaseEventContext) (((MessagingException) me).getEvent().getContext())).error(me);
+      return from(stream)
+          .doOnNext(beforeProcessors())
+          .transform(processingStrategy.onPipeline(interceptedPipeline))
+          .doOnNext(afterProcessors())
+          .subscriberContext(ctx -> ctx.put(REACTOR_ERROR_CONSUMER, errorConsumer))
+          .onErrorContinue(MessagingException.class,
+                           errorConsumer);
+    };
   }
 
   private Consumer<CoreEvent> beforeProcessors() {
