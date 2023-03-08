@@ -76,6 +76,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
 
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
+  public static final String REACTOR_RECREATE_ROUTER = "recreateRouter";
   private final boolean mergeVariables;
 
   public AbstractForkJoinStrategyFactory() {
@@ -173,7 +174,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .transform(pair.getRoute());
       return from(processWithChildContextDontComplete(pair.getEvent(),
                                                       applyProcessingStrategy(processingStrategy, route, maxConcurrency),
-                                                      empty()))
+                                                      empty())).contextWrite(ctx -> ctx.put(REACTOR_RECREATE_ROUTER, true))
                                                           .timeout(timeout,
                                                                    onTimeout(processingStrategy, delayErrors, timeoutErrorType,
                                                                              pair),

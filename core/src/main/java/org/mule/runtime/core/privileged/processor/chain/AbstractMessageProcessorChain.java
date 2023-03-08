@@ -120,6 +120,7 @@ import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -134,6 +135,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException. " +
           "This may lead to an event getting stuck, or even a processor may stop responding.";
   public static final String UNKNOWN = "unknown";
+  public static final String REACTOR_RECREATE_ROUTER = "recreateRouter";
 
   private static Class<ClassLoader> appClClass;
 
@@ -250,7 +252,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                             new SpanNameAssertion(chainInitialSpanInfo.getName()));
                       }
                       errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
-                    }));
+                    }), recreateRouter(ctx));
 
         final Flux<CoreEvent> upstream =
             from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -306,9 +308,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier) {
+  private boolean recreateRouter(ContextView ctx) {
+    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
+  }
+
+  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, boolean recreateRouter) {
     final Consumer<Exception> errorRouter;
-    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+    if (messagingExceptionHandler instanceof GlobalErrorHandler && !recreateRouter) {
       errorRouter = ((GlobalErrorHandler) messagingExceptionHandler)
           .routerForChain(this, errorRouterSupplier);
     } else {
