@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStream
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -135,7 +136,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException. " +
           "This may lead to an event getting stuck, or even a processor may stop responding.";
   public static final String UNKNOWN = "unknown";
-  public static final String REACTOR_RECREATE_ROUTER = "recreateRouter";
 
   private static Class<ClassLoader> appClClass;
 
