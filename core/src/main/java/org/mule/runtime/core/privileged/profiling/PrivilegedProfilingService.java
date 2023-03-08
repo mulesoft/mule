@@ -43,7 +43,7 @@ public interface PrivilegedProfilingService extends ProfilingService {
    *
    * @since 4.5.0
    */
-  default SpanSnifferManager getSpanSnifferManager() {
+  default SpanSnifferManager getSpanExportManager() {
     return new SpanSnifferManager() {
 
       @Override

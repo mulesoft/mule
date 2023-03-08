@@ -125,12 +125,12 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public SpanSnifferManager getSpanSnifferManager() {
+  public SpanSnifferManager getSpanExportManager() {
     if (profilingService instanceof PrivilegedProfilingService) {
-      return ((PrivilegedProfilingService) getProfilingService()).getSpanSnifferManager();
+      return ((PrivilegedProfilingService) getProfilingService()).getSpanExportManager();
     }
 
-    return PrivilegedProfilingService.super.getSpanSnifferManager();
+    return PrivilegedProfilingService.super.getSpanExportManager();
   }
 
   private InternalProfilingService initialiseProfilingService() throws MuleRuntimeException {
