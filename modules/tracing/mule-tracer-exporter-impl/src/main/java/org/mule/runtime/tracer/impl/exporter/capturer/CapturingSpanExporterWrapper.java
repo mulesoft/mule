@@ -35,12 +35,12 @@ import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResour
  *
  * @since 4.5.0
  */
-public class OpenTelemetryCapturingSpanExporterWrapper implements SpanExporter {
+public class CapturingSpanExporterWrapper implements SpanExporter {
 
   private final SpanExporter delegate;
   private final Set<MuleSpanSniffer> spanSniffers = ConcurrentHashMap.newKeySet();
 
-  public OpenTelemetryCapturingSpanExporterWrapper(SpanExporter delegate) {
+  public CapturingSpanExporterWrapper(SpanExporter delegate) {
     this.delegate = delegate;
   }
 
@@ -74,10 +74,10 @@ public class OpenTelemetryCapturingSpanExporterWrapper implements SpanExporter {
 
   private static final class MuleSpanSniffer implements ExportedSpanSniffer {
 
-    private final OpenTelemetryCapturingSpanExporterWrapper openTelemetrySpanExporter;
+    private final CapturingSpanExporterWrapper openTelemetrySpanExporter;
     private final Set<SpanData> spanData = ConcurrentHashMap.newKeySet();
 
-    public MuleSpanSniffer(OpenTelemetryCapturingSpanExporterWrapper openTelemetrySpanExporter) {
+    public MuleSpanSniffer(CapturingSpanExporterWrapper openTelemetrySpanExporter) {
       this.openTelemetrySpanExporter = openTelemetrySpanExporter;
     }
 
