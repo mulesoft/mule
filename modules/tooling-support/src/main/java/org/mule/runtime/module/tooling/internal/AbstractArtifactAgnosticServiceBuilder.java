@@ -210,7 +210,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
   private void createTempMavenModel() {
     MavenModelBuilderProvider mavenModelBuilderProvider = discoverProvider();
-    mavenModelBuilderProvider
+    model = mavenModelBuilderProvider
         .createMavenModelBuilder(TMP_APP_GROUP_ID, TMP_APP_ARTIFACT_ID, "4.4.0", of(TMP_APP_MODEL_VERSION), empty());
   }
 
