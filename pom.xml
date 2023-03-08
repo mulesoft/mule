@@ -811,8 +811,8 @@
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
+                            <Supported-Jdks>[${javaVersion}.0,18)</Supported-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12),[17,18)</Recommended-Jdks>
                             <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${project.organization.url}/support</Support>
                             <Description>Mule Runtime and Integration Platform</Description>

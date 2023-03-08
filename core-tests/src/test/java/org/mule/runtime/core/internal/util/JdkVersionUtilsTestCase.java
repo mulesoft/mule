@@ -70,13 +70,27 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     assertTrue(JdkVersionUtils.isSupportedJdkVersion());
     setJdkVersion("11.0.0");
     assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("12.0.0");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("13.0.0");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("14.0.0");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("15.0.0");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("16.0.0");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("17.0.0");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+    setJdkVersion("17.0.6");
+    assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 
     // not supported
     setJdkVersion("1.7.2");
     assertFalse(JdkVersionUtils.isSupportedJdkVersion());
     setJdkVersion("1.7.2_12");
     assertFalse(JdkVersionUtils.isSupportedJdkVersion());
-    setJdkVersion("12.0.0");
+    setJdkVersion("18.0.0");
     assertFalse(JdkVersionUtils.isSupportedJdkVersion());
   }
 
@@ -129,6 +143,10 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
     setJdkVersion("11.0.0");
     assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("17.0.0");
+    assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("17.0.6");
+    assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 
     // not recommended
     setJdkVersion("1.4.2");
@@ -144,6 +162,16 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     setJdkVersion("10.0.0");
     assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
     setJdkVersion("12.0.0");
+    assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("13.0.0");
+    assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("14.0.0");
+    assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("15.0.0");
+    assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("16.0.0");
+    assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+    setJdkVersion("18.0.0");
     assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
   }
 
