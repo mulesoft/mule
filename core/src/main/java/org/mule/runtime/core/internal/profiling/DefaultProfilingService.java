@@ -39,7 +39,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -198,7 +198,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public SpanExporterManager getSpanExportManager() {
-    return eventTracer.getSpanExporterManager();
+  public SpanSnifferManager getSpanSnifferManager() {
+    return eventTracer.getSpanSnifferManager();
   }
 }

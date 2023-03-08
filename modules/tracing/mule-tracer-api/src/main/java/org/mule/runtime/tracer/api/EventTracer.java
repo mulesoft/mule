@@ -12,7 +12,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -146,7 +146,7 @@ public interface EventTracer<T extends Event> {
   void addCurrentSpanAttributes(T event, Map<String, String> attributes);
 
   /**
-   * @return a {@link SpanExporterManager}.
+   * @return a {@link SpanSnifferManager}.
    */
-  SpanExporterManager getSpanExporterManager();
+  SpanSnifferManager getSpanSnifferManager();
 }

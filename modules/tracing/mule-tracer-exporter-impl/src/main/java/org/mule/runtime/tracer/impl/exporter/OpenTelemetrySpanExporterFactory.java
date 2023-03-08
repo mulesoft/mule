@@ -17,7 +17,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -79,8 +79,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   }
 
   @Override
-  public SpanExporterManager getSpanExporterManager() {
-    return new OpenTelemetrySpanExporterManager();
+  public SpanSnifferManager getSpanSnifferManager() {
+    return new OpenTelemetrySpanSnifferManager();
   }
 
   @Override
@@ -88,7 +88,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     spanProcessor.get().shutdown();
   }
 
-  private static class OpenTelemetrySpanExporterManager implements SpanExporterManager {
+  private static class OpenTelemetrySpanSnifferManager implements SpanSnifferManager {
 
     @Override
     public ExportedSpanSniffer getExportedSpanSniffer() {

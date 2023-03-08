@@ -28,7 +28,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.tracer.api.sniffer.SpanExporterManager;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -149,7 +149,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   }
 
   @Override
-  public SpanExporterManager getSpanExporterManager() {
+  public SpanSnifferManager getSpanSnifferManager() {
     return eventSpanFactory.getSpanSnifferManager();
   }
 
