@@ -121,7 +121,7 @@ import org.slf4j.Logger;
 public class FlowProcessMediator implements Initialisable {
 
   private static final Logger LOGGER = getLogger(FlowProcessMediator.class);
-  public static final String FLOW_DISPATCHING_HANDLING_SPAN_NAME = "flow-dispatching-handling-name";
+  public static final String FLOW_DISPATCHING_HANDLING_SPAN_NAME = "flow-dispatching-handling";
 
   @Inject
   private InterceptorManager processorInterceptorManager;

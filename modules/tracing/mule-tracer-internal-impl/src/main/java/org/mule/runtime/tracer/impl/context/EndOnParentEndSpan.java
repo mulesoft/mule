@@ -21,9 +21,9 @@ import java.util.function.BiConsumer;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 /**
- * A {@link InternalSpan} that ends when the parent span ends.
+ * A {@link InternalSpan} that invokes the end of the span when the parent span ends.
  *
- * It registers a callback for that. All the attributes for the parent span will also be propagated to the spans.
+ * All the attributes for the parent span will also be propagated to the spans.
  */
 public class EndOnParentEndSpan implements InternalSpan {
 
