@@ -183,21 +183,50 @@ public class ApplicationStatistics extends FlowConstructStatistics
         return total;
     }
 
+    @Override
+    public long getTotalDispatchedMessages()
+    {
+        long total = 0;
+        for (FlowConstructStatistics stats : parent.getServiceStatistics())
+        {
+            if (!(stats instanceof ApplicationStatistics))
+            {
+                total += stats.getTotalDispatchedMessages();
+            }
+        }
+        return total;
+    }
 
     @Override
     public ResetOnQueryCounter getEventsReceivedCounter()
     {
-      Set<ResetOnQueryCounter> counters = new HashSet<>();
+        Set<ResetOnQueryCounter> counters = new HashSet<>();
 
-      for (FlowConstructStatistics stats : parent.getServiceStatistics())
-      {
-          if (!(stats instanceof ApplicationStatistics))
-          {
-              counters.add(stats.getEventsReceivedCounter());
-          }
-      }
+        for (FlowConstructStatistics stats : parent.getServiceStatistics())
+        {
+            if (!(stats instanceof ApplicationStatistics))
+            {
+                counters.add(stats.getEventsReceivedCounter());
+            }
+        }
 
-      return new CompositeResetOnQueryCounter(counters);
+        return new CompositeResetOnQueryCounter(counters);
+    }
+
+    @Override
+    public ResetOnQueryCounter getDispatchedMessagesCounter()
+    {
+        Set<ResetOnQueryCounter> counters = new HashSet<>();
+
+        for (FlowConstructStatistics stats : parent.getServiceStatistics())
+        {
+            if (!(stats instanceof ApplicationStatistics))
+            {
+                counters.add(stats.getDispatchedMessagesCounter());
+            }
+        }
+
+        return new CompositeResetOnQueryCounter(counters);
     }
 
     @Override

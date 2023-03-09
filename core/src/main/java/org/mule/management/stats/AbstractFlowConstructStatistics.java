@@ -25,8 +25,10 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     private long samplePeriod = 0;
     protected final AtomicLong receivedEventSync = new AtomicLong(0);
     protected final AtomicLong receivedEventASync = new AtomicLong(0);
+    protected final AtomicLong dispatchedMessages = new AtomicLong(0);
 
     private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
+    private transient final List<DefaultResetOnQueryCounter> dispatchedMessagesCounters = new CopyOnWriteArrayList<>();
 
     public AbstractFlowConstructStatistics(String flowConstructType, String name)
     {
@@ -65,6 +67,7 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     {
         receivedEventSync.set(0);
         receivedEventASync.set(0);
+        dispatchedMessages.set(0);
         samplePeriod = System.currentTimeMillis();
     }
 
@@ -87,6 +90,18 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
         }
     }
 
+    /**
+     * Indicates that a new message was dispatched from a message source
+     */
+    public void incMessagesDispatched()
+    {
+        dispatchedMessages.addAndGet(1);
+        for (DefaultResetOnQueryCounter dispatchedMessagesCounter : dispatchedMessagesCounters)
+        {
+            dispatchedMessagesCounter.increment();
+        }
+    }
+
     public long getAsyncEventsReceived()
     {
         return receivedEventASync.get();
@@ -100,6 +115,16 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
     public long getTotalEventsReceived()
     {
         return getSyncEventsReceived() + getAsyncEventsReceived();
+    }
+
+    /**
+     * @return the number of messages dispatched from a source of a flow at a given time
+     * 
+     * @since 4.5
+     */
+    public long getTotalDispatchedMessages()
+    {
+        return dispatchedMessages.get();
     }
 
     public String getFlowConstructType()
@@ -131,6 +156,27 @@ public abstract class AbstractFlowConstructStatistics implements Statistics
         DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
         eventsReceivedCounters.add(counter);
         counter.add(getTotalEventsReceived());
+        return counter;
+    }
+
+    /**
+     * Provides a counter for {@link #getTotalDispatchedMessages() total dispatched messages} that is not affected by calls to
+     * {@link #clear()} or {@link ResetOnQueryCounter#getAndReset()} calls to other instances returned by this method.
+     * <p>
+     * Counter initial value is set to the value of {@link #getTotalDispatchedMessages()} when this method is called.
+     * <p>
+     * If this is called concurrently with {@link #incReceivedEvents()}, there is chance of a race condition occurring where an
+     * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
+     * 
+     * @return a counter for {@link #getTotalDispatchedMessages()}.
+     * 
+     * @since 4.5
+     */
+    public ResetOnQueryCounter getDispatchedMessagesCounter()
+    {
+        DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
+        dispatchedMessagesCounters.add(counter);
+        counter.add(getTotalDispatchedMessages());
         return counter;
     }
 }

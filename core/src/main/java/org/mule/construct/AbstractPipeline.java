@@ -241,6 +241,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
+                    getStatistics().incMessagesDispatched();
                     return pipeline.process(event);
                 }
             });
@@ -384,6 +385,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
     }
 
+    @Override
     protected void configureSummaryStatistics()
     {
         flowsSummaryStatistics = (DefaultFlowsSummaryStatistics) muleContext.getStatistics().getFlowSummaryStatistics();

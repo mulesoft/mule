@@ -56,25 +56,45 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase
                           }
                       },
                       new Object[]
+                      {
+                          "eventsReceivedASync",
+                          new Transformer()
                           {
-                              "eventsReceivedASync",
-                              new Transformer()
-                              {
-                                @Override
-                                public Object transform(Object statistics)
-                                {
-                                  return ((FlowConstructStatistics)statistics).getEventsReceivedCounter();
-                                }
-                              },
-                              new Closure()
-                              {
-                                @Override
-                                public void execute(Object statistics)
-                                {
-                                  ((FlowConstructStatistics) statistics).incReceivedEventASync();
-                                }
-                              }
+                            @Override
+                            public Object transform(Object statistics)
+                            {
+                              return ((FlowConstructStatistics)statistics).getEventsReceivedCounter();
+                            }
                           },
+                          new Closure()
+                          {
+                            @Override
+                            public void execute(Object statistics)
+                            {
+                              ((FlowConstructStatistics) statistics).incReceivedEventASync();
+                            }
+                          }
+                      },
+                      new Object[]
+                      {
+                          "dispatchedMessages",
+                          new Transformer()
+                          {
+                            @Override
+                            public Object transform(Object statistics)
+                            {
+                              return ((FlowConstructStatistics)statistics).getDispatchedMessagesCounter();
+                            }
+                          },
+                          new Closure()
+                          {
+                            @Override
+                            public void execute(Object statistics)
+                            {
+                              ((FlowConstructStatistics) statistics).incMessagesDispatched();
+                            }
+                          }
+                      },
                       new Object[]
                       {
                           "executionErrors",
