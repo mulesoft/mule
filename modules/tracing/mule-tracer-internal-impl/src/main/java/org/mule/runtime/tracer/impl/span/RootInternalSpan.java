@@ -65,6 +65,11 @@ public class RootInternalSpan implements InternalSpan {
   }
 
   @Override
+  public void end(long endTime) {
+    // Nothing to do.
+  }
+
+  @Override
   public void addError(InternalSpanError error) {
     // Nothing to do.
   }

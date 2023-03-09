@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
+
 /**
  * A {@link InternalSpan} that ends when the parent span ends.
  *
@@ -26,6 +28,7 @@ import java.util.function.BiConsumer;
 public class EndOnParentEndSpan implements InternalSpan {
 
   private final InternalSpan delegate;
+  private long endTime;
 
   public EndOnParentEndSpan(InternalSpan delegate, InternalSpan parentSpan) {
     this.delegate = delegate;
@@ -50,7 +53,16 @@ public class EndOnParentEndSpan implements InternalSpan {
 
   @Override
   public void end() {
-    // Nothing to do.
+    this.endTime = getDefault().now();
+  }
+
+  @Override
+  public void end(long endTime) {
+    this.endTime = endTime;
+  }
+
+  private void endDelegate() {
+    delegate.end(endTime);
   }
 
   @Override

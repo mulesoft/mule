@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.tracer.api.span.InternalSpan::end(long)",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classSimpleName": "InternalSpan",
+          "methodName": "end",
+          "elementKind": "method",
+          "justification": "Added a new method to end with a timestamp"
+        },
+        {
+          "code": "java.method.addedToInterface",
           "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getStatusAsString()",
           "package": "org.mule.runtime.tracer.api.sniffer",
           "classSimpleName": "CapturedExportedSpan",

@@ -116,7 +116,12 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void end() {
-    this.endTime = getDefault().now();
+    end(getDefault().now());
+  }
+
+  @Override
+  public void end(long endTime) {
+    this.endTime = endTime;
     this.spanExporter.export();
     if (onEndCallback != null) {
       onEndCallback.run();

@@ -33,6 +33,8 @@ public interface InternalSpan extends Span {
    */
   void end();
 
+  void end(long endTime);
+
   /**
    * Adds to the Span the provided {@link InternalSpanError}.
    *
@@ -182,6 +184,11 @@ public interface InternalSpan extends Span {
 
     @Override
     public void end() {
+      // Nothing to do.
+    }
+
+    @Override
+    public void end(long endTime) {
       // Nothing to do.
     }
 
