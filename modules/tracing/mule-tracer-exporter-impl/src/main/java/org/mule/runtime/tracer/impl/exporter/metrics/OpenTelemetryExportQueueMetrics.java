@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.tracer.impl.exporter.metrics;
 
-import java.util.Collection;
-
 import static io.opentelemetry.sdk.metrics.data.AggregationTemporality.CUMULATIVE;
+
+import java.util.Collection;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.common.CompletableResultCode;
