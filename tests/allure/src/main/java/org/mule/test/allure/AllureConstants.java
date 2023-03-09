@@ -1174,4 +1174,14 @@ public interface AllureConstants {
       String SERVICE_PROVIDER_DISCOVERER = "Service provider discoverer";
     }
   }
+
+  interface SupportedEnvironmentsFeature {
+
+    String SUPPORTED_ENVIRONMENTS = "Supported environments";
+
+    interface JdkVersionStory {
+
+      String JDK_VERSION = "JDK version";
+    }
+  }
 }
