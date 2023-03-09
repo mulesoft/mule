@@ -1175,8 +1175,13 @@ public interface AllureConstants {
     }
   }
 
-  interface EnvironmentFeature {
+  interface SupportedEnvironmentsFeature {
 
-    String ENVIRONMENT = "Environment";
+    String SUPPORTED_ENVIRONMENTS = "Supported environments";
+
+    interface JdkVersionStory {
+
+      String JDK_VERSION = "JDK version";
+    }
   }
 }
