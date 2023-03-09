@@ -1174,4 +1174,9 @@ public interface AllureConstants {
       String SERVICE_PROVIDER_DISCOVERER = "Service provider discoverer";
     }
   }
+
+  interface EnvironmentFeature {
+
+    String ENVIRONMENT = "Environment";
+  }
 }

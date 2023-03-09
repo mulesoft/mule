@@ -8,8 +8,10 @@ package org.mule.runtime.core.internal.util;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_JDK_VENDOR_VALIDATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
@@ -298,9 +300,10 @@ public class JdkVersionUtils {
   public static void validateJdk() throws RuntimeException {
     if (!isSupportedJdkVersion()) {
       if (isJdkAboveRange(getJdkVersion(), createJdkVersionRanges(getSupportedJdks()))) {
-        logger.warn("We are looking into adding support for this JDK version. Use it at your own risk.");
+        logger.warn(format("We are looking into adding support for this JDK version. JDK: %s, Vendor: %s. "
+            + "Use it at your own risk.", JAVA_VERSION, JAVA_VENDOR));
       } else {
-        throw new RuntimeException("Unsupported Jdk");
+        throw new RuntimeException(format("Unsupported JDK: %s.", JAVA_VERSION));
       }
     }
     if (!isSupportedJdkVendor() && !DISABLE_JDK_VENDOR_VALIDATION) {

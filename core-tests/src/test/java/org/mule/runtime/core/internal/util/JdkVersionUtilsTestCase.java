@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.isRecommendedJdkVersion;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.isSupportedJdkVersion;
+import static org.mule.test.allure.AllureConstants.EnvironmentFeature.ENVIRONMENT;
 
 import static java.lang.System.getProperty;
 import static org.junit.Assert.assertEquals;
@@ -25,12 +26,15 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+@Feature(ENVIRONMENT)
 public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   private String originalJavaVersion;
@@ -60,6 +64,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-12622250")
   public void testIsSupportedJdkVersion() {
     // supported
     assertTrue(isSupportedJdkVersion());
@@ -137,6 +142,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-12622250")
   public void testRecommendedJdkVersion() {
     // recommended
     List<String> recommended = Arrays.asList(
