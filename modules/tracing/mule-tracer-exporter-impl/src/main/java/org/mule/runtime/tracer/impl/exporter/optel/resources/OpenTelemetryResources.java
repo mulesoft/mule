@@ -23,7 +23,7 @@ import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
-import org.mule.runtime.tracer.impl.exporter.metrics.BatchSpanExporterDroppedSpansLogger;
+import org.mule.runtime.tracer.impl.exporter.metrics.OpenTelemetryExportQueueMetrics;
 
 import java.util.Collection;
 
@@ -67,8 +67,7 @@ public class OpenTelemetryResources {
 
   private static final String INSTRUMENTATION_VERSION = "1.0.0";
 
-  // TODO: Move to a testing related package or remove after refactor (it's only used by tests)
-
+  // TODO: W-12665132 Refactor to remove this method (it's only used by tests)
   public static Tracer getTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
       throws SpanExporterConfiguratorException {
     SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder()
@@ -86,7 +85,7 @@ public class OpenTelemetryResources {
 
   private static SdkMeterProvider getMeterProvider(SpanExporterConfiguration spanExporterConfiguration) {
     MetricReader periodicReader =
-        PeriodicMetricReader.builder(new BatchSpanExporterDroppedSpansLogger())
+        PeriodicMetricReader.builder(new OpenTelemetryExportQueueMetrics())
             .setInterval(ofMillis(parseLong(spanExporterConfiguration
                 .getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY))))
             .build();
