@@ -129,7 +129,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
   @Before
   public void before() throws Exception {
     when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
-    when(message.getDistributedTraceContextGetter()).thenReturn(null);
+    when(message.getDistributedTraceContextManager()).thenReturn(null);
     template = new ExtensionsFlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
     doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onCompletion(any(), any(), any());
     doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onFailure(any(), any(), any());
@@ -329,7 +329,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);
-    when(resultAdapter.getDistributedTraceContextGetter()).thenReturn(null);
+    when(resultAdapter.getDistributedTraceContextManager()).thenReturn(null);
 
     template = new ExtensionsFlowProcessingTemplate(resultAdapter, messageProcessor, emptyList(), completionHandler);
   }

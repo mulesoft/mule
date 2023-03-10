@@ -79,6 +79,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
@@ -210,9 +211,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);
-    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
-    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
-    when(resultAdapter.getDistributedTraceContextGetter()).thenReturn(null);
+    DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
+    when(distributedTraceContextManager.getRemoteTraceContextMap()).thenReturn(emptyMap());
+    when(resultAdapter.getDistributedTraceContextManager()).thenReturn(distributedTraceContextManager);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);
 

@@ -155,7 +155,7 @@ public class SourceResultAdapter {
    *
    * @since 4.5.0
    */
-  public DistributedTraceContextManager getDistributedTraceContextGetter() {
+  public DistributedTraceContextManager getDistributedTraceContextManager() {
     return sourceDistributedTraceContextManager;
   }
 

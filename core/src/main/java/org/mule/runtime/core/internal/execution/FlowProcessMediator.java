@@ -69,7 +69,6 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.tracing.customization.NoExportFixedNameInitialSpanInfo;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -92,7 +91,6 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
@@ -585,7 +583,7 @@ public class FlowProcessMediator implements Initialisable {
     SourceResultAdapter adapter = template.getSourceMessage();
     Builder eventBuilder =
         createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter),
-                           adapter.getDistributedTraceContextGetter());
+                           adapter.getDistributedTraceContextManager());
 
     CoreEvent coreEvent = eventBuilder.message(eventCtx -> {
       final Result<?, ?> result = adapter.getResult();
