@@ -121,7 +121,6 @@ import org.slf4j.Logger;
 public class FlowProcessMediator implements Initialisable {
 
   private static final Logger LOGGER = getLogger(FlowProcessMediator.class);
-  public static final String FLOW_DISPATCHING_HANDLING_SPAN_NAME = "flow-dispatching-handling";
 
   @Inject
   private InterceptorManager processorInterceptorManager;
@@ -226,12 +225,9 @@ public class FlowProcessMediator implements Initialisable {
       final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
 
-
-      // We trace the dispatching of the event to the flow and the handling of
-      // the response to the flow so that in case the source wants to add additional
-      // attributes to the flow span after the flow, they are added.
-      // This span will not be exported and is internal to trace of runtime.
-      traceFlowDispatchingAndResponseHandling(distributedTraceContextManager, event);
+      if (distributedTraceContextManager.isPresent()) {
+        setEventToSourceDistributedTraceContextManager(distributedTraceContextManager, event);
+      }
 
       template.getSourceMessage().getPollItemInformation().ifPresent(info -> {
         notificationManager
@@ -273,15 +269,6 @@ public class FlowProcessMediator implements Initialisable {
     }
   }
 
-  private void traceFlowDispatchingAndResponseHandling(Optional<DistributedTraceContextManager> distributedTraceContextManager,
-                                                       CoreEvent event) {
-    coreEventTracer.startComponentSpan(event, getFlowDispatchingHandlingNameInitialSpanInfo());
-
-    if (distributedTraceContextManager.isPresent()) {
-      setEventToSourceDistributedTraceContextManager(distributedTraceContextManager, event);
-    }
-  }
-
   private static void setEventToSourceDistributedTraceContextManager(Optional<DistributedTraceContextManager> sourceDistributedTraceContextManager,
                                                                      CoreEvent event) {
     DistributedTraceContextManager sourceTraceContextManager = sourceDistributedTraceContextManager.get();
@@ -290,13 +277,6 @@ public class FlowProcessMediator implements Initialisable {
       ((SpanContextAware) sourceTraceContextManager)
           .setSpanContext(((SpanContextAware) event.getContext()).getSpanContext());
     }
-  }
-
-  /**
-   * @return an {@link InitialSpanInfo} that is not exportable for tracking the operation of dispatching to the flow.
-   */
-  private static NoExportFixedNameInitialSpanInfo getFlowDispatchingHandlingNameInitialSpanInfo() {
-    return new NoExportFixedNameInitialSpanInfo(FLOW_DISPATCHING_HANDLING_SPAN_NAME);
   }
 
   private void dispatch(@Nonnull CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct,

@@ -7,6 +7,7 @@
 package org.mule.runtime.tracer.impl.span;
 
 
+import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
@@ -17,6 +18,7 @@ import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+import org.mule.runtime.tracer.api.span.ExportableInternalSpan;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -33,7 +35,7 @@ import java.util.function.BiConsumer;
  *
  * @since 4.5.0
  */
-public class ExecutionSpan implements InternalSpan {
+public class ExecutionSpan implements ExportableInternalSpan {
 
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
@@ -41,8 +43,6 @@ public class ExecutionSpan implements InternalSpan {
   private final InitialSpanInfo initialSpanInfo;
   private SpanExporter spanExporter = NOOP_EXPORTER;
   private SpanError lastError;
-  private Runnable onEndCallback;
-  private BiConsumer<String, String> onAddAttributeCallBack;
 
   public static ExecutionSpanBuilder getExecutionSpanBuilder() {
     return new ExecutionSpanBuilder();
@@ -99,10 +99,6 @@ public class ExecutionSpan implements InternalSpan {
     return initialSpanInfo.getInitialAttributesCount() + additionalAttributes.size();
   }
 
-  @Override
-  public void registerCallbackOnEnd(Runnable callback) {
-    this.onEndCallback = callback;
-  }
 
   @Override
   public void updateRootName(String name) {
@@ -122,10 +118,7 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public void end(long endTime) {
     this.endTime = endTime;
-    this.spanExporter.export();
-    if (onEndCallback != null) {
-      onEndCallback.run();
-    }
+    export();
   }
 
   @Override
@@ -157,6 +150,11 @@ public class ExecutionSpan implements InternalSpan {
     return spanExporter.exportedSpanAsMap();
   }
 
+  @Override
+  public void export() {
+    this.spanExporter.export();
+  }
+
   /**
    * An default implementation for a {@link SpanDuration}
    */
@@ -183,9 +181,6 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    if (onAddAttributeCallBack != null) {
-      onAddAttributeCallBack.accept(key, value);
-    }
     if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
       additionalAttributes.put(key, value);
     }
@@ -193,13 +188,9 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void updateChildSpanExporter(InternalSpan internalSpan) {
+  public ExportableInternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
     spanExporter.updateChildSpanExporter(internalSpan.getSpanExporter());
-  }
-
-  @Override
-  public void registerCallbackOnAddAttribute(BiConsumer<String, String> callback) {
-    this.onAddAttributeCallBack = callback;
+    return asExportable(internalSpan);
   }
 
   /**

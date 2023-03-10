@@ -33,6 +33,12 @@ public interface InternalSpan extends Span {
    */
   void end();
 
+
+  /**
+   * Ends the span with the supplied endTime.
+   *
+   * @param endTime the endTime.
+   */
   void end(long endTime);
 
   /**
@@ -87,7 +93,7 @@ public interface InternalSpan extends Span {
    *
    * @param childInternalSpan the child {@link InternalSpan}.
    */
-  default void updateChildSpanExporter(InternalSpan childInternalSpan) {}
+  ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan);
 
   /**
    * Performs the {@param biConsumer} operation on each key/value
@@ -127,19 +133,6 @@ public interface InternalSpan extends Span {
    */
   int getAttributesCount();
 
-  /**
-   * Register a {@link Runnable} to run when the span is ended.
-   * 
-   * @param callback
-   */
-  default void registerCallbackOnEnd(Runnable callback) {}
-
-  /**
-   * Registers a {@link BiConsumer} to run when an attributed is added.
-   * 
-   * @param callback
-   */
-  default void registerCallbackOnAddAttribute(BiConsumer<String, String> callback) {}
 
   /**
    * A wrapper as InternalSpan for other type of {@link Span}
@@ -205,6 +198,11 @@ public interface InternalSpan extends Span {
     @Override
     public SpanExporter getSpanExporter() {
       return null;
+    }
+
+    @Override
+    public ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
+      return ExportableInternalSpan.asExportable(childInternalSpan);
     }
 
     @Override

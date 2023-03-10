@@ -10,6 +10,7 @@ import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+import org.mule.runtime.tracer.api.span.ExportableInternalSpan;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 /**
@@ -25,20 +27,18 @@ import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
  *
  * All the attributes for the parent span will also be propagated to the spans.
  */
-public class EndOnParentEndSpan implements InternalSpan {
+public class NoExportOnEndInternalSpan implements ExportableInternalSpan {
 
-  private final InternalSpan delegate;
+  private final ExportableInternalSpan delegate;
   private long endTime;
 
-  public EndOnParentEndSpan(InternalSpan delegate, InternalSpan parentSpan) {
-    this.delegate = delegate;
-    parentSpan.registerCallbackOnEnd(delegate::end);
-    parentSpan.registerCallbackOnAddAttribute(delegate::addAttribute);
+  public NoExportOnEndInternalSpan(InternalSpan delegate) {
+    this.delegate = asExportable(delegate);
   }
 
   @Override
-  public void updateChildSpanExporter(InternalSpan childInternalSpan) {
-    this.delegate.updateChildSpanExporter(childInternalSpan);
+  public ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
+    return this.delegate.updateChildSpanExporter(childInternalSpan);
   }
 
   @Override
@@ -58,11 +58,7 @@ public class EndOnParentEndSpan implements InternalSpan {
 
   @Override
   public void end(long endTime) {
-    this.endTime = endTime;
-  }
-
-  private void endDelegate() {
-    delegate.end(endTime);
+    this.delegate.end(endTime);
   }
 
   @Override
@@ -128,5 +124,10 @@ public class EndOnParentEndSpan implements InternalSpan {
   @Override
   public void addAttribute(String key, String value) {
     delegate.addAttribute(key, value);
+  }
+
+  @Override
+  public void export() {
+    this.delegate.end(endTime);
   }
 }

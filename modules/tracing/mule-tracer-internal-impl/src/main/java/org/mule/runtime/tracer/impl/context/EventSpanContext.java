@@ -9,13 +9,11 @@ package org.mule.runtime.tracer.impl.context;
 
 import static java.util.Optional.ofNullable;
 
-import static org.mule.runtime.core.internal.execution.FlowProcessMediator.FLOW_DISPATCHING_HANDLING_SPAN_NAME;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.impl.span.DeserializedSpan.getDeserializedRootSpan;
 
 import java.util.Optional;
 
-import org.mule.runtime.core.internal.execution.FlowProcessMediator;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -24,11 +22,9 @@ import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
 
 /**
- * A {@link SpanContext} associated to an event.
- *
- * A {@link org.mule.runtime.core.api.event.CoreEvent} is the component that travels through the execution of a flow. For tracing
- * purposes the {@link org.mule.runtime.api.event.EventContext} has a {@link SpanContext} that has information that may be
- * propagated through runtime boundaries for distributed tracing purposes.
+ * A {@link SpanContext} associated to an event. A {@link org.mule.runtime.core.api.event.CoreEvent} is the component that travels
+ * through the execution of a flow. For tracing purposes the {@link org.mule.runtime.api.event.EventContext} has a
+ * {@link SpanContext} that has information that may be propagated through runtime boundaries for distributed tracing purposes.
  *
  * @since 4.5.0
  */
@@ -70,11 +66,7 @@ public class EventSpanContext implements SpanContext {
   @Override
   public void setSpan(InternalSpan span, Assertion assertion) throws AssertionFailedException {
     assertion.assertOnSpan(currentSpan);
-    if (currentSpan.getName().equals(FLOW_DISPATCHING_HANDLING_SPAN_NAME)) {
-      span = new EndOnParentEndSpan(span, currentSpan);
-    }
-    currentSpan.updateChildSpanExporter(span);
-    this.currentSpan = span;
+    this.currentSpan = currentSpan.updateChildSpanExporter(span);
   }
 
   @Override
@@ -91,6 +83,7 @@ public class EventSpanContext implements SpanContext {
 
     private DistributedTraceContextGetter distributedTraceContextMapGetter;
     private boolean propagateTracingExceptions;
+    private boolean managedChildSpan;
 
     private EventSpanContextBuilder() {}
 
@@ -105,8 +98,13 @@ public class EventSpanContext implements SpanContext {
       return this;
     }
 
+    public EventSpanContextBuilder withManagedChildSpan(boolean managedChildSpan) {
+      this.managedChildSpan = managedChildSpan;
+      return this;
+    }
+
     public EventSpanContext build() {
-      return new EventSpanContext(getDeserializedRootSpan(distributedTraceContextMapGetter),
+      return new EventSpanContext(getDeserializedRootSpan(distributedTraceContextMapGetter, managedChildSpan),
                                   propagateTracingExceptions);
     }
 

@@ -25,18 +25,20 @@ public class DeserializedSpan extends RootInternalSpan {
   private static final TraceContextFieldExtractor BAGGAGE_ITEMS_EXTRACTOR =
       RuntimeEventTraceExtractors.getDefaultBaggageExtractor();
 
-  public static InternalSpan getDeserializedRootSpan(DistributedTraceContextGetter distributedTraceContextGetter) {
+  public static InternalSpan getDeserializedRootSpan(DistributedTraceContextGetter distributedTraceContextGetter,
+                                                     boolean managedChildSpan) {
     Map<String, String> mapSerialization = new HashMap<>();
     mapSerialization.putAll(TRACING_FIELD_EXTRACTOR.extract(distributedTraceContextGetter));
     mapSerialization.putAll(BAGGAGE_ITEMS_EXTRACTOR.extract(distributedTraceContextGetter));
-    return new DeserializedSpan(copyOf(mapSerialization));
+    return new DeserializedSpan(copyOf(mapSerialization), managedChildSpan);
   }
 
   private final Map<String, String> mapSerialization;
 
 
-  private DeserializedSpan(Map<String, String> mapSerialization) {
+  private DeserializedSpan(Map<String, String> mapSerialization, boolean managedChildSpan) {
     this.mapSerialization = mapSerialization;
+    this.managedChildSpan = managedChildSpan;
   }
 
   @Override
