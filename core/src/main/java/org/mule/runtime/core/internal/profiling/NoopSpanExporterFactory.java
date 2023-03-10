@@ -28,7 +28,7 @@ public class NoopSpanExporterFactory implements SpanExporterFactory {
   }
 
   @Override
-  public SpanSnifferManager getSpanExporterManager() {
+  public SpanSnifferManager getSpanSnifferManager() {
     return new NoOpSpanSnifferManager();
   }
 

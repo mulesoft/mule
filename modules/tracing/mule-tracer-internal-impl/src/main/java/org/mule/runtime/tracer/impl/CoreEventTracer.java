@@ -149,7 +149,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   }
 
   @Override
-  public SpanSnifferManager getSpanExporterManager() {
+  public SpanSnifferManager getSpanSnifferManager() {
     return eventSpanFactory.getSpanSnifferManager();
   }
 

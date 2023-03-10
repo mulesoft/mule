@@ -39,9 +39,9 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT = MULE_OPEN_TELEMETRY_EXPORTER + ".endpoint";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_SIZE = MULE_OPEN_TELEMETRY_EXPORTER + ".batch.max.size";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE = MULE_OPEN_TELEMETRY_EXPORTER + ".batch.max.size";
 
-  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_MAX_QUEUE_SIZE =
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE =
       MULE_OPEN_TELEMETRY_EXPORTER + ".batch.queue.size";
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS =
@@ -54,5 +54,8 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER =
       MULE_OPEN_TELEMETRY_EXPORTER + "backoff.multiplier";
+
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY =
+      MULE_OPEN_TELEMETRY_EXPORTER + "metrics.log.frequency";
 
 }
