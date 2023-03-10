@@ -224,5 +224,12 @@ public class MuleProperties
     public static final String MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE = SYSTEM_PROPERTY_PREFIX + "setVariable.inheritedMimeType.disable";
     public static final String MULE_CXF_PROXY_DISABLE_BINDING_OPERATION_INFO_OVERWRITE = SYSTEM_PROPERTY_PREFIX + "cxf.proxy.bindingOperationInfo.overwrite.disable";
 
+    /**
+     * When enabled this System Property, the statistics are enabled even if the monitoring service is not activated. This
+     * property is only read on deploying an app.
+     *
+     * @since 4.4, 4.3.1
+     */
+    public static final String MULE_ENABLE_STATISTICS = SYSTEM_PROPERTY_PREFIX + "enable.statistics";
 
 }
