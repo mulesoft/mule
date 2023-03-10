@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * A {@link InternalSpan} wrapper to prevent exporting on end.
+ * A {@link InternalSpan} wrapper to avoid ending a delegate span till we programmatically require it to.
  *
  * @since 4.5.1, 4.6.0
  */
-public class NoExportOnEndInternalSpan implements InternalSpan {
+public class DeferredEndSpanWrapper implements InternalSpan {
 
   private final InternalSpan delegate;
   private long endTime;
 
-  public NoExportOnEndInternalSpan(InternalSpan delegate) {
+  public DeferredEndSpanWrapper(InternalSpan delegate) {
     this.delegate = delegate;
   }
 
@@ -124,7 +124,7 @@ public class NoExportOnEndInternalSpan implements InternalSpan {
     delegate.addAttribute(key, value);
   }
 
-  public void endDelegateSpan() {
+  public void doEndOriginalSpan() {
     delegate.end(endTime);
   }
 }

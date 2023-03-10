@@ -16,7 +16,7 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
-import org.mule.runtime.tracer.impl.context.NoExportOnEndInternalSpan;
+import org.mule.runtime.tracer.impl.context.DeferredEndSpanWrapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +33,7 @@ public class RootInternalSpan implements InternalSpan {
   private Map<String, String> attributes = new HashMap<>();
 
   // This is a managed span that will not end.
-  private NoExportOnEndInternalSpan managedSpan;
+  private DeferredEndSpanWrapper managedSpan;
 
   @Override
   public Span getParent() {
@@ -68,7 +68,7 @@ public class RootInternalSpan implements InternalSpan {
   @Override
   public void end() {
     if (managedSpan != null) {
-      managedSpan.endDelegateSpan();
+      managedSpan.doEndOriginalSpan();
     }
   }
 
@@ -112,7 +112,7 @@ public class RootInternalSpan implements InternalSpan {
 
     if (managedChildSpan) {
       internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
-      managedSpan = new NoExportOnEndInternalSpan(internalSpan);
+      managedSpan = new DeferredEndSpanWrapper(internalSpan);
       return managedSpan;
     }
 
