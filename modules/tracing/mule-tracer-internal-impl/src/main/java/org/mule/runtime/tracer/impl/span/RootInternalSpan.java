@@ -7,6 +7,10 @@
 
 package org.mule.runtime.tracer.impl.span;
 
+import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
+
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
@@ -21,9 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-
-import static java.util.Collections.emptyMap;
-import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
 
 public class RootInternalSpan implements ExportableInternalSpan {
 

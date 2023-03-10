@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.tracer.impl.context;
 
+import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
+import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
+
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
@@ -19,13 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
-import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
-
 /**
- * A {@link InternalSpan} that invokes the end of the span when the parent span ends.
+ * A {@link InternalSpan} wrapper to prevent exporting on end.
  *
- * All the attributes for the parent span will also be propagated to the spans.
+ * @since 4.5.1, 4.6.0
  */
 public class NoExportOnEndInternalSpan implements ExportableInternalSpan {
 

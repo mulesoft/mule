@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracer.api.span;
 
+import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
+
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.profiling.tracing.Span;
@@ -202,7 +204,7 @@ public interface InternalSpan extends Span {
 
     @Override
     public ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
-      return ExportableInternalSpan.asExportable(childInternalSpan);
+      return asExportable(childInternalSpan);
     }
 
     @Override
