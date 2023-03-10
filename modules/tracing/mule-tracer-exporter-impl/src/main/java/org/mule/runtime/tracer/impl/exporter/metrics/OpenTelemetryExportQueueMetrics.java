@@ -18,7 +18,6 @@ import io.opentelemetry.sdk.metrics.data.LongPointData;
 import io.opentelemetry.sdk.metrics.data.MetricData;
 import io.opentelemetry.sdk.metrics.data.PointData;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +47,11 @@ public class OpenTelemetryExportQueueMetrics implements MetricExporter {
     return CompletableResultCode.ofSuccess();
   }
 
+  /**
+   * Logs a warning message if the amount of dropped spans has increased since the last call to this method.
+   * 
+   * @param metricData Metric data about the dropped spans.
+   */
   private void checkForDroppedSpans(MetricData metricData) {
     logIfRelevant(getDroppedSpans(metricData));
   }
@@ -72,7 +76,7 @@ public class OpenTelemetryExportQueueMetrics implements MetricExporter {
    */
   private void logIfRelevant(long currentDroppedSpans) {
     if (currentDroppedSpans > loggedDroppedSpans) {
-      METRICS_LOGGER.warn("Export queue overflow: {} spans has been dropped. Total spans dropped since exporter start: {}",
+      METRICS_LOGGER.warn("Export queue overflow: {} spans have been dropped. Total spans dropped since the export started: {}",
                           currentDroppedSpans - loggedDroppedSpans, currentDroppedSpans);
       loggedDroppedSpans = currentDroppedSpans;
     }
