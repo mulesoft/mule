@@ -7,8 +7,6 @@
 
 package org.mule.runtime.tracer.api.span;
 
-import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
-
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.profiling.tracing.Span;
@@ -95,7 +93,7 @@ public interface InternalSpan extends Span {
    *
    * @param childInternalSpan the child {@link InternalSpan}.
    */
-  ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan);
+  InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan);
 
   /**
    * Performs the {@param biConsumer} operation on each key/value
@@ -203,8 +201,8 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
-      return asExportable(childInternalSpan);
+    public InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
+      return childInternalSpan;
     }
 
     @Override

@@ -7,15 +7,12 @@
 
 package org.mule.runtime.tracer.impl.span;
 
-import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
-
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.tracer.api.span.ExportableInternalSpan;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -26,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class RootInternalSpan implements ExportableInternalSpan {
+public class RootInternalSpan implements InternalSpan {
 
   protected boolean managedChildSpan;
 
@@ -36,7 +33,7 @@ public class RootInternalSpan implements ExportableInternalSpan {
   private Map<String, String> attributes = new HashMap<>();
 
   // This is a managed span that will not end.
-  private ExportableInternalSpan managedSpan;
+  private NoExportOnEndInternalSpan managedSpan;
 
   @Override
   public Span getParent() {
@@ -71,7 +68,7 @@ public class RootInternalSpan implements ExportableInternalSpan {
   @Override
   public void end() {
     if (managedSpan != null) {
-      managedSpan.export();
+      managedSpan.endDelegateSpan();
     }
   }
 
@@ -107,7 +104,7 @@ public class RootInternalSpan implements ExportableInternalSpan {
 
 
   @Override
-  public ExportableInternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
+  public InternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
     if (!ROOT_SPAN.equals(name)) {
       internalSpan.updateRootName(name);
       attributes.forEach(internalSpan::setRootAttribute);
@@ -119,7 +116,7 @@ public class RootInternalSpan implements ExportableInternalSpan {
       return managedSpan;
     }
 
-    return asExportable(internalSpan);
+    return internalSpan;
   }
 
   @Override
@@ -133,10 +130,5 @@ public class RootInternalSpan implements ExportableInternalSpan {
       managedSpan.addAttribute(key, value);
     }
     attributes.put(key, value);
-  }
-
-  @Override
-  public void export() {
-    // Nothing to do.
   }
 }

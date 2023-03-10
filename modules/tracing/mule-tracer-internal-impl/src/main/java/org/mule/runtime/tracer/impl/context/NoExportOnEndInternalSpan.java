@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.tracer.impl.context;
 
-import static org.mule.runtime.tracer.api.span.ExportableInternalSpan.asExportable;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.tracer.api.span.ExportableInternalSpan;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -27,17 +25,17 @@ import java.util.function.BiConsumer;
  *
  * @since 4.5.1, 4.6.0
  */
-public class NoExportOnEndInternalSpan implements ExportableInternalSpan {
+public class NoExportOnEndInternalSpan implements InternalSpan {
 
-  private final ExportableInternalSpan delegate;
+  private final InternalSpan delegate;
   private long endTime;
 
   public NoExportOnEndInternalSpan(InternalSpan delegate) {
-    this.delegate = asExportable(delegate);
+    this.delegate = delegate;
   }
 
   @Override
-  public ExportableInternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
+  public InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
     return this.delegate.updateChildSpanExporter(childInternalSpan);
   }
 
@@ -53,12 +51,12 @@ public class NoExportOnEndInternalSpan implements ExportableInternalSpan {
 
   @Override
   public void end() {
-    this.endTime = getDefault().now();
+    end(getDefault().now());
   }
 
   @Override
   public void end(long endTime) {
-    this.delegate.end(endTime);
+    this.endTime = endTime;
   }
 
   @Override
@@ -126,8 +124,7 @@ public class NoExportOnEndInternalSpan implements ExportableInternalSpan {
     delegate.addAttribute(key, value);
   }
 
-  @Override
-  public void export() {
-    this.delegate.end(endTime);
+  public void endDelegateSpan() {
+    delegate.end(endTime);
   }
 }
