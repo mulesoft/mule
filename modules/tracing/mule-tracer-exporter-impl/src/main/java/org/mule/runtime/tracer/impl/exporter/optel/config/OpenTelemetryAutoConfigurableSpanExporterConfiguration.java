@@ -9,10 +9,13 @@ package org.mule.runtime.tracer.impl.exporter.optel.config;
 
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
@@ -39,11 +42,16 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   private static final String DEFAULT_INITIAL_BACKOFF = "1";
   private static final String DEFAULT_MAXIMUM_BACKOFF = "5";
   private static final String DEFAULT_BACKOFF_MAX_ATTEMPTS = "5";
-  public static final String GRPC_EXPORTER_TYPE = "GRPC";
-  public static final String DEFAULT_EXPORTER_TYPE = GRPC_EXPORTER_TYPE;
-  public static final String DEFAULT_GRPC_EXPORTER_ENDPOINT = "http://localhost:4317";
-  public static final String DEFAULT_HTTP_EXPORTER_ENDPOINT = "http://localhost:4318/v1/traces";
-  public static final String DEFAULT_EXPORTER_TIMEOUT = "10000";
+  private static final String GRPC_EXPORTER_TYPE = "GRPC";
+  private static final String DEFAULT_EXPORTER_TYPE = GRPC_EXPORTER_TYPE;
+  private static final String DEFAULT_GRPC_EXPORTER_ENDPOINT = "http://localhost:4317";
+  private static final String DEFAULT_HTTP_EXPORTER_ENDPOINT = "http://localhost:4318/v1/traces";
+  private static final String DEFAULT_EXPORTER_TIMEOUT = "10000";
+  private static final String DEFAULT_STATISTICS_LOG_FREQUENCY = "30000";
+  private static final String DEFAULT_BATCH_QUEUE_SIZE = "2048";
+  private static final String DEFAULT_MAX_BATCH_SIZE = "512";
+
+
 
   private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
@@ -85,5 +93,8 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_INITIAL_BACKOFF, DEFAULT_INITIAL_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BACKOFF, DEFAULT_MAXIMUM_BACKOFF);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS, DEFAULT_BACKOFF_MAX_ATTEMPTS);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY, DEFAULT_STATISTICS_LOG_FREQUENCY);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, DEFAULT_MAX_BATCH_SIZE);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE, DEFAULT_BATCH_QUEUE_SIZE);
   }
 }

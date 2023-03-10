@@ -34,6 +34,6 @@ public class ExecutionSpanFactory implements EventSpanFactory {
 
   @Override
   public SpanSnifferManager getSpanSnifferManager() {
-    return spanExporterFactory.getSpanExporterManager();
+    return spanExporterFactory.getSpanSnifferManager();
   }
 }

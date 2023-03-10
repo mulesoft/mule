@@ -31,5 +31,5 @@ public interface SpanExporterFactory {
   /**
    * @return a {@link SpanSnifferManager}.
    */
-  SpanSnifferManager getSpanExporterManager();
+  SpanSnifferManager getSpanSnifferManager();
 }

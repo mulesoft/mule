@@ -83,7 +83,7 @@ public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
   }
 
   @Override
-  public SpanSnifferManager getSpanExporterManager() {
+  public SpanSnifferManager getSpanSnifferManager() {
     return new NoopSpanSnifferManager();
   }
 
