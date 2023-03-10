@@ -255,7 +255,10 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         configureSummaryStatistics();
     }
 
-    protected abstract void configureSummaryStatistics();
+    protected void configureSummaryStatistics()
+    {
+        // Nothing to do by default.
+    }    
     
     protected void doStart() throws MuleException
     {
