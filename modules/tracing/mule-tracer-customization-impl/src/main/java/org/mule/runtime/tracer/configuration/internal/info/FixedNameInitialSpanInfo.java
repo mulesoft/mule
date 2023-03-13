@@ -5,31 +5,35 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter.optel.span;
+package org.mule.runtime.tracer.configuration.internal.info;
 
-import org.mule.runtime.core.api.tracing.customization.NoExportTillSpanWithNameInitialExportInfo;
+import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
-import java.util.Set;
+/**
+ * A {@link InitialSpanInfo} with a fixed name.
+ *
+ * @since 4.5.0
+ */
+public class FixedNameInitialSpanInfo implements InitialSpanInfo {
 
-public class NoExportInitialSpanInfo implements InitialSpanInfo {
+  private final String name;
 
-  private final NoExportTillSpanWithNameInitialExportInfo initialExportInfo;
-
-  public NoExportInitialSpanInfo(Set<String> noExportUntil) {
-    this.initialExportInfo = new NoExportTillSpanWithNameInitialExportInfo(noExportUntil, false);;
+  public FixedNameInitialSpanInfo(String name) {
+    this.name = name;
   }
 
   @Override
   public String getName() {
-    return null;
+    return name;
   }
 
 
   @Override
   public InitialExportInfo getInitialExportInfo() {
-    return initialExportInfo;
+    return DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
   }
 
   @Override

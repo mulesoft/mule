@@ -5,10 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.tracing.customization;
+package org.mule.runtime.tracer.configuration.internal.info;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 
 /**
@@ -17,17 +16,18 @@ import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
  *
  * @since 4.5.0
  */
-public class NoExportTillExecuteNextComponentExecutionInitialSpanInfo extends ComponentExecutionInitialSpanInfo {
+public class NoExportTillComponentFoundExecutionInitialSpanInfo extends ComponentExecutionInitialSpanInfo {
 
-  public static final String EXECUTE_NEXT = "execute-next";
+  private final String forceNotExportUntilComponentName;
 
-  public NoExportTillExecuteNextComponentExecutionInitialSpanInfo(Component component) {
+  public NoExportTillComponentFoundExecutionInitialSpanInfo(Component component, String forceNotExportUntilComponentName) {
     super(component);
+    this.forceNotExportUntilComponentName = forceNotExportUntilComponentName;
   }
 
   @Override
   public InitialExportInfo getInitialExportInfo() {
-    return new NoExportTillSpanWithNameInitialExportInfo(EXECUTE_NEXT, true);
+    return new NoExportTillSpanWithNameInitialExportInfo(forceNotExportUntilComponentName, true);
   }
 
   @Override

@@ -17,14 +17,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.reactivestreams.Publisher;
+
+import javax.inject.Inject;
 
 /**
  * FirstSuccessful routes an event to the first target route that can accept it without throwing or returning an exception. If no
@@ -36,14 +38,17 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   private final List<ProcessorRoute> routes = new ArrayList<>();
   private MuleContext muleContext;
 
+  @Inject
+  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+
 
   @Override
   public void initialise() throws InitialisationException {
     Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this,
-                                                                     ":attempt:" + routeNumber));
+      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
+          .withSuffix(":attempt:" + routeNumber).build());
       initialiseIfNeeded(route, muleContext);
       routeNumber++;
     }
@@ -81,7 +86,7 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor));
+    routes.add(new ProcessorRoute(processor, initialSpanInfoBuilderProvider));
   }
 
   public void setRoutes(Collection<Processor> routes) {

@@ -3,6 +3,70 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "ComponentExecutionInitialSpanInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.FixedComponentCoreExecutionInitialSpanInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "FixedComponentCoreExecutionInitialSpanInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.FixedNameInitialSpanInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "FixedNameInitialSpanInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportComponentExecutionInitialSpanInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportFixedNameInitialSpanInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportFixedNameInitialSpanInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentExecutionInitialSpanInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportTillExecuteNextComponentExecutionInitialSpanInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportTillSpanWithNameInitialExportInfo",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "NoExportTillSpanWithNameInitialExportInfo",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils",
+          "package": "org.mule.runtime.core.api.tracing.customization",
+          "classSimpleName": "SpanInitialInfoUtils",
+          "elementKind": "class",
+          "justification": "Removed class not needed as API"
+        },
+        {
           "code": "java.method.addedToInterface",
           "new": "method void org.mule.runtime.tracer.api.span.InternalSpan::end(long)",
           "package": "org.mule.runtime.tracer.api.span",

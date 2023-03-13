@@ -54,7 +54,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -75,6 +74,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +96,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private SchedulerService schedulerService;
   @Inject
   private ConfigurationComponentLocator componentLocator;
+
+  @Inject
+  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -145,7 +148,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
-    delegateBuilder.setChainInitialSpanInfo(new NoExportComponentExecutionInitialSpanInfo(this));
+    delegateBuilder
+        .setChainInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withNoExport().build());
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

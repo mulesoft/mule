@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.tracing.customization;
+package org.mule.runtime.tracer.configuration.internal.info;
 
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 

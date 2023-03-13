@@ -30,11 +30,11 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -79,6 +79,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
+  @Inject
+  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
   private int batchSize = 1;
@@ -119,7 +122,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     nestedChain =
         buildNewChainWithListOfProcessors(processingStrategy, messageProcessors,
-                                          new ComponentExecutionInitialSpanInfo(this, ":iteration"));
+                                          initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
+                                              .withSuffix(":iteration").build());
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
   }

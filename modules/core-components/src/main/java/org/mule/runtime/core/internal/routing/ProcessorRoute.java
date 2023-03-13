@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
-import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import static java.util.Objects.requireNonNull;
+
+import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,11 +25,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.FixedNameInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.MessagingExceptionHandlerAware;
 
 import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,16 +43,16 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
   private final Processor processor;
-  private InitialSpanInfo initialSpanInfo =
-      new FixedNameInitialSpanInfo("route");
+  private InitialSpanInfo initialSpanInfo;
 
   // just let the error be propagated to the outer chain...
   private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
   private MuleContext muleContext;
 
-  public ProcessorRoute(Processor processor) {
+  public ProcessorRoute(Processor processor, InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
     requireNonNull(processor, "processor can't be null");
     this.processor = processor;
+    this.initialSpanInfo = initialSpanInfoBuilderProvider.getGenericInitialSpanInfoBuilder().withName("route").build();
   }
 
   public Processor getProcessor() {

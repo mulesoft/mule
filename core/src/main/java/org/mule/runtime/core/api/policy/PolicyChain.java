@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.api.policy;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
@@ -31,13 +33,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
-
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,11 +57,15 @@ import org.reactivestreams.Publisher;
 public class PolicyChain extends AbstractComponent
     implements Initialisable, Startable, Stoppable, Disposable, Processor {
 
+  public static final String EXECUTE_NEXT_COMPONENT_NAME = "execute-next";
   @Inject
   private MuleContext muleContext;
 
   @Inject
   private ServerNotificationHandler notificationManager;
+
+  @Inject
+  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
   private ProcessingStrategy processingStrategy;
 
@@ -83,7 +88,8 @@ public class PolicyChain extends AbstractComponent
   public final void initialise() throws InitialisationException {
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
-                                          new NoExportTillExecuteNextComponentExecutionInitialSpanInfo(this));
+                                          initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
+                                              .withForceNotExportUntil(EXECUTE_NEXT_COMPONENT_NAME).build());
 
     initialiseIfNeeded(processorChain, muleContext);
 

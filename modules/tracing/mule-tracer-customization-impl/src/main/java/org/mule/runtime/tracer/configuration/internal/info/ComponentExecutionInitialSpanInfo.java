@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.tracing.customization;
+package org.mule.runtime.tracer.configuration.internal.info;
 
-import static org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils.getLocationAsString;
-import static org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils.getSpanName;
+import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getLocationAsString;
+import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
 import org.mule.runtime.api.component.Component;

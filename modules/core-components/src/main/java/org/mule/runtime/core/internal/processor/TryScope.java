@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -66,6 +65,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -87,6 +87,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Inject
   private ProfilingService profilingService;
+
+  @Inject
+  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
@@ -227,7 +230,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
-                                                         new NoExportComponentExecutionInitialSpanInfo(this));
+                                                         initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
+                                                             .withNoExport().build());
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

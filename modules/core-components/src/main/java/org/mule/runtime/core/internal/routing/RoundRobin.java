@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
@@ -28,7 +27,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.reactivestreams.Publisher;
+
+import javax.inject.Inject;
 
 import reactor.core.publisher.Flux;
 
@@ -46,6 +48,9 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
 
   private MuleContext muleContext;
 
+  @Inject
+  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
@@ -58,7 +63,8 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
+      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withSuffix(":route")
+          .build());
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -89,7 +95,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor));
+    routes.add(new ProcessorRoute(processor, initialSpanInfoBuilderProvider));
   }
 
   @Override
@@ -116,7 +122,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes);
+      super(publisher, routes, initialSpanInfoBuilderProvider);
     }
 
     @Override

@@ -13,7 +13,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 
-import static org.mule.runtime.core.api.tracing.customization.SpanInitialInfoUtils.getSpanName;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
@@ -26,11 +25,11 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +45,13 @@ import org.reactivestreams.Publisher;
  */
 public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder implements Component {
 
+
   private volatile Map<QName, Object> annotations = emptyMap();
 
   private final Object rootContainerLocationInitLock = new Object();
   private volatile Location rootContainerLocation;
+
+  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
   @Override
   public Object getAnnotation(QName qName) {
@@ -90,7 +92,11 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   @Override
   protected MessageProcessorChain createSimpleChain(List<Processor> processors,
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
-    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional);
+    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional, initialSpanInfoBuilderProvider);
+  }
+
+  public void withInitialSpanInfoBuilderProvider(InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
+    this.initialSpanInfoBuilderProvider = initialSpanInfoBuilderProvider;
   }
 
   /**
@@ -103,11 +109,13 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     private final String subFlowName;
 
     SubFlowMessageProcessorChain(String name, List<Processor> processors,
-                                 Optional<ProcessingStrategy> processingStrategyOptional) {
+                                 Optional<ProcessingStrategy> processingStrategyOptional,
+                                 InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setInitialSpanInfo(new SubFlowComponentExecutionInitialSpanInfo(this));
+      this.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withName("subflow")
+          .build());
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
@@ -126,20 +134,6 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
           // To avoid recursive transformation when there are flowref cycles, the chain is lazily transformed
           .transformDeferred(super::apply)
           .doOnNext(this::popSubFlowFlowStackElement);
-    }
-
-    private class SubFlowComponentExecutionInitialSpanInfo extends ComponentExecutionInitialSpanInfo {
-
-      private final String SUB_FLOW_SPAN_NAME = getSpanName(SubFlowMessageProcessorChain.SUB_FLOW);
-
-      public SubFlowComponentExecutionInitialSpanInfo(SubFlowMessageProcessorChain subFlowMessageProcessorChain) {
-        super(subFlowMessageProcessorChain);
-      }
-
-      @Override
-      public String getName() {
-        return SUB_FLOW_SPAN_NAME;
-      }
     }
   }
 }

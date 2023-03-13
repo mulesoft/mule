@@ -14,6 +14,7 @@ import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
 import org.mule.runtime.core.internal.routing.ProcessorRoute;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 
 import java.util.Collection;
 
@@ -23,6 +24,9 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
   private Processor defaultProcessor;
   private Collection<ProcessorExpressionRoute> conditionalMessageProcessors = emptyList();
@@ -45,7 +49,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
 
   @Override
   public ChoiceRouter doGetObject() throws Exception {
-    final ChoiceRouter router = new ChoiceRouter();
+    final ChoiceRouter router = new ChoiceRouter(initialSpanInfoBuilderProvider);
     router.setAnnotations(getAnnotations());
     router.setDefaultRoute(defaultProcessor);
     router.setMuleContext(muleContext);

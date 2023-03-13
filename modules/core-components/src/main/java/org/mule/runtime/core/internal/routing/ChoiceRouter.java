@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 
@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
@@ -53,9 +54,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
+  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
-  public ChoiceRouter() {
+  public ChoiceRouter(InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
+    this.initialSpanInfoBuilderProvider = initialSpanInfoBuilderProvider;
   }
 
   @Override
@@ -73,10 +76,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     if (defaultProcessor == null) {
       defaultProcessor = event -> event;
     }
-    routes.add(new ProcessorRoute(defaultProcessor));
+    routes.add(new ProcessorRoute(defaultProcessor, initialSpanInfoBuilderProvider));
 
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
+      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withSuffix(":route")
+          .build());
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -107,7 +111,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   }
 
   public void addRoute(final String expression, final Processor processor) {
-    routes.add(new ProcessorExpressionRoute(expression, processor));
+    routes.add(new ProcessorExpressionRoute(expression, processor, initialSpanInfoBuilderProvider));
   }
 
   public void setDefaultRoute(final Processor processor) {
@@ -147,7 +151,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes);
+      super(publisher, routes, initialSpanInfoBuilderProvider);
     }
 
     /**
