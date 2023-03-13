@@ -14,8 +14,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 
 import java.io.File;
 import java.util.List;
@@ -27,7 +26,7 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
 
   private final String artifactId;
   private final PolicyTemplateDescriptor descriptor;
-  private final ArtifactClassLoader policyClassLoader;
+  private final MuleDeployableArtifactClassLoader policyClassLoader;
   private final List<ArtifactPlugin> artifactPlugins;
   private final List<ArtifactPlugin> ownArtifactPlugins;
 
@@ -40,7 +39,8 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
    * @param artifactPlugins    artifact plugins deployed only inside the policy. Non null.
    * @param ownArtifactPlugins artifact plugins the policy depends on. Non null.
    */
-  public DefaultPolicyTemplate(String artifactId, PolicyTemplateDescriptor descriptor, ArtifactClassLoader policyClassLoader,
+  public DefaultPolicyTemplate(String artifactId, PolicyTemplateDescriptor descriptor,
+                               MuleDeployableArtifactClassLoader policyClassLoader,
                                List<ArtifactPlugin> artifactPlugins, List<ArtifactPlugin> ownArtifactPlugins) {
     checkArgument(!isEmpty(artifactId), "artifactId cannot be empty");
     checkArgument(descriptor != null, "descriptor cannot be null");
@@ -82,15 +82,9 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
 
   @Override
   public void dispose() {
-    if (isRegionClassLoaderMember((ClassLoader) policyClassLoader)) {
-      ((DisposableClassLoader) ((ClassLoader) policyClassLoader).getParent()).dispose();
-    } else if (policyClassLoader instanceof DisposableClassLoader) {
-      ((DisposableClassLoader) policyClassLoader).dispose();
+    if (policyClassLoader != null) {
+      policyClassLoader.dispose();
     }
-  }
-
-  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
-    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override

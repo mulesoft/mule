@@ -62,6 +62,7 @@ import org.slf4j.Logger;
  * Only a region member can export a given package, but same resources can be exported by many members. The order in which the
  * resources are found will depend on the order in which the class loaders were added to the region.
  */
+// TODO W-12637978 - extend from MuleArtifactClassLoader and make internal
 public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";
@@ -424,8 +425,27 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     return new CompoundEnumeration<>(enumerations.toArray(new Enumeration[0]));
   }
 
+  /**
+   * @deprecated since 4.5, the region resources are disposed while disposing the owner class loader, which calls
+   *             {@link #disposeFromOwnerClassLoader()} instead of {@link #dispose()} in order to avoid being disposed again and
+   *             thus generating an infinite loop.
+   */
   @Override
+  @Deprecated
   public void dispose() {
+    disposeClassLoader(ownerClassLoader);
+    doDispose();
+  }
+
+  /**
+   * Disposes all the region resources except for its owner class loader. This method is intended to be called during the disposal
+   * of the owner class loader.
+   */
+  void disposeFromOwnerClassLoader() {
+    doDispose();
+  }
+
+  private void doDispose() {
     registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(this::disposeClassLoader);
     registeredClassLoaders.clear();
     descriptorMapping.forEach((descriptor, classloader) -> {
@@ -439,7 +459,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     packageMapping.clear();
     resourceMapping.clear();
 
-    disposeClassLoader(ownerClassLoader);
     super.dispose();
 
     // System.gc() by default
