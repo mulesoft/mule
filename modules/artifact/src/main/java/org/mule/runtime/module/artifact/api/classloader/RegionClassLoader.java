@@ -426,7 +426,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   }
 
   /**
-   * @deprecated since 4.5, use {@link #disposeFromOwnerClassLoader()} instead.
+   * @deprecated since 4.5, the region resources are disposed while disposing the owner class loader, which calls
+   *             {@link #disposeFromOwnerClassLoader()} instead of {@link #dispose()} in order to avoid being disposed again and
+   *             thus generating an infinite loop.
    */
   @Override
   @Deprecated
