@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracer.impl.span;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
@@ -14,20 +16,24 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
+import org.mule.runtime.tracer.impl.context.DeferredEndSpanWrapper;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static java.util.Collections.emptyMap;
-
 public class RootInternalSpan implements InternalSpan {
+
+  protected boolean managedChildSpan;
 
   public static final String ROOT_SPAN = "root";
 
   private String name = ROOT_SPAN;
   private Map<String, String> attributes = new HashMap<>();
+
+  // This is a managed span that will not end.
+  private DeferredEndSpanWrapper managedSpan;
 
   @Override
   public Span getParent() {
@@ -61,7 +67,14 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public void end() {
-    // Nothing to do.
+    if (managedSpan != null) {
+      managedSpan.doEndOriginalSpan();
+    }
+  }
+
+  @Override
+  public void end(long endTime) {
+    end();
   }
 
   @Override
@@ -91,12 +104,19 @@ public class RootInternalSpan implements InternalSpan {
 
 
   @Override
-  public void updateChildSpanExporter(InternalSpan internalSpan) {
+  public InternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
     if (!ROOT_SPAN.equals(name)) {
       internalSpan.updateRootName(name);
       attributes.forEach(internalSpan::setRootAttribute);
     }
-    internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
+
+    if (managedChildSpan) {
+      internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
+      managedSpan = new DeferredEndSpanWrapper(internalSpan);
+      return managedSpan;
+    }
+
+    return internalSpan;
   }
 
   @Override
@@ -106,6 +126,9 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
+    if (managedSpan != null) {
+      managedSpan.addAttribute(key, value);
+    }
     attributes.put(key, value);
   }
 }

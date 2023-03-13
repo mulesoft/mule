@@ -9,8 +9,6 @@ package org.mule.runtime.tracer.api.span;
 
 import static java.util.Collections.emptyMap;
 
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
@@ -20,7 +18,6 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /**
@@ -35,6 +32,14 @@ public interface InternalSpan extends Span {
    * Ends the span.
    */
   void end();
+
+
+  /**
+   * Ends the span with the supplied endTime.
+   *
+   * @param endTime the endTime.
+   */
+  void end(long endTime);
 
   /**
    * Adds to the Span the provided {@link InternalSpanError}.
@@ -88,7 +93,7 @@ public interface InternalSpan extends Span {
    *
    * @param childInternalSpan the child {@link InternalSpan}.
    */
-  default void updateChildSpanExporter(InternalSpan childInternalSpan) {}
+  InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan);
 
   /**
    * Performs the {@param biConsumer} operation on each key/value
@@ -176,6 +181,11 @@ public interface InternalSpan extends Span {
     }
 
     @Override
+    public void end(long endTime) {
+      // Nothing to do.
+    }
+
+    @Override
     public void addError(InternalSpanError error) {
       // Nothing to do.
     }
@@ -188,6 +198,11 @@ public interface InternalSpan extends Span {
     @Override
     public SpanExporter getSpanExporter() {
       return null;
+    }
+
+    @Override
+    public InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
+      return childInternalSpan;
     }
 
     @Override

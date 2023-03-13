@@ -79,6 +79,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
@@ -210,9 +211,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);
-    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
-    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
-    when(resultAdapter.getDistributedTraceContextGetter()).thenReturn(distributedTraceContextGetter);
+    DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
+    when(distributedTraceContextManager.getRemoteTraceContextMap()).thenReturn(emptyMap());
+    when(resultAdapter.getDistributedTraceContextManager()).thenReturn(distributedTraceContextManager);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);
 
@@ -228,7 +229,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void success() throws Exception {
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifySuccess();
   }
@@ -238,7 +239,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     Reference<CompletableCallback<Void>> callbackReference = new Reference<>();
     doAnswer(onCallback(callbackReference::set)).when(template).sendResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     callbackReference.get().complete(null);
     verifySuccess();
@@ -248,7 +249,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void successResponseParametersError() throws Exception {
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -267,7 +268,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void successResponseSendError() throws Exception {
     doAnswer(onCallback(callback -> callback.error(mockException))).when(template).sendResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
     verify(template).sendResponseToClient(any(), any(), any());
@@ -287,7 +288,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     SourceRemoteConnectionException connectionException = new SourceRemoteConnectionException("Broken pipe");
     doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(),
                                                                                                               any());
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
     verify(template).sendResponseToClient(any(), any(), any());
@@ -308,7 +309,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(e -> failingParameterFunction.apply(e));
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -329,7 +330,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     doAnswer(onCallback(callback -> callback.error(mockException)))
         .when(template).sendFailureResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -347,7 +348,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void failure() throws Exception {
     configureFailingFlow(mockException);
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowError(isErrorTypeFlowFailure());
   }
@@ -356,7 +357,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void failureInErrorHandler() throws Exception {
     configureErrorHandlingFailingFlow(mockException);
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verifyFlowError(isErrorTypeFlowFailure());
   }
@@ -372,7 +373,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     configureFailingFlow(mockException);
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     callbackReference.get().complete(null);
     verifyFlowError(isErrorTypeFlowFailure());
@@ -385,7 +386,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     configureFailingFlow(mockException);
     doAnswer(onCallback(callbackReference::set)).when(template).sendFailureResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verify(template, never()).afterPhaseExecution(any());
 
@@ -402,7 +403,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     configureFailingFlow(mockException);
     when(failureResult.getErrorResponseParameters()).thenReturn(failingParameterSupplier);
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -418,7 +419,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     doAnswer(onCallback(callback -> callback.error(mockException))).when(template)
         .sendFailureResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -435,7 +436,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -453,7 +454,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException(flow))).when(flow)
         .checkBackpressure(eventCaptor.capture());
 
-    flowProcessMediator.process(template, context);
+    flowProcessMediator.process(template, context, empty());
 
     assertThat(((BaseEventContext) eventCaptor.getValue().getContext()).isTerminated(), is(true));
     verifyFlowError(isErrorTypeBackpressure());
