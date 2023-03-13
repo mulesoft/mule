@@ -4,6 +4,51 @@
       "ignore": [
         {
           "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.tracer.api.span.InternalSpan::end(long)",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classSimpleName": "InternalSpan",
+          "methodName": "end",
+          "elementKind": "method",
+          "justification": "Useful method"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method void org.mule.runtime.tracer.api.span.InternalSpan::updateChildSpanExporter(org.mule.runtime.tracer.api.span.InternalSpan)",
+          "new": "method org.mule.runtime.tracer.api.span.InternalSpan org.mule.runtime.tracer.api.span.InternalSpan::updateChildSpanExporter(org.mule.runtime.tracer.api.span.InternalSpan)",
+          "oldType": "void",
+          "newType": "org.mule.runtime.tracer.api.span.InternalSpan",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classSimpleName": "InternalSpan",
+          "methodName": "updateChildSpanExporter",
+          "elementKind": "method",
+          "justification": "Internal API only used by the runtime not serializable"
+        },
+        {
+          "code": "java.method.noLongerDefault",
+          "old": "method void org.mule.runtime.tracer.api.span.InternalSpan::updateChildSpanExporter(org.mule.runtime.tracer.api.span.InternalSpan)",
+          "new": "method org.mule.runtime.tracer.api.span.InternalSpan org.mule.runtime.tracer.api.span.InternalSpan::updateChildSpanExporter(org.mule.runtime.tracer.api.span.InternalSpan)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classSimpleName": "InternalSpan",
+          "methodName": "updateChildSpanExporter",
+          "elementKind": "method",
+          "justification": "Internal API only used by the runtime not serializable"
+        },
+        {
+          "code": "java.method.nowAbstract",
+          "old": "method void org.mule.runtime.tracer.api.span.InternalSpan::updateChildSpanExporter(org.mule.runtime.tracer.api.span.InternalSpan)",
+          "new": "method org.mule.runtime.tracer.api.span.InternalSpan org.mule.runtime.tracer.api.span.InternalSpan::updateChildSpanExporter(org.mule.runtime.tracer.api.span.InternalSpan)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classSimpleName": "InternalSpan",
+          "methodName": "updateChildSpanExporter",
+          "elementKind": "method",
+          "justification": "Internal API only used by the runtime not serializable"
+        },
+        {
+          "code": "java.method.addedToInterface",
           "new": "method java.lang.String org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getStatusAsString()",
           "package": "org.mule.runtime.tracer.api.sniffer",
           "classSimpleName": "CapturedExportedSpan",

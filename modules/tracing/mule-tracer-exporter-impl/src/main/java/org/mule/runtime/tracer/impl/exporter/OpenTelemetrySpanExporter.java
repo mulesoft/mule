@@ -89,7 +89,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private final SpanProcessor spanProcessor;
 
   private boolean exportable;
-  private SpanContext spanContext;
+  private SpanContext spanContext = getInvalid();
   private SpanContext parentSpanContext = getInvalid();
   private SpanKind spanKind = INTERNAL;
   private StatusData statusData = unset();
@@ -115,9 +115,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
 
-    // Generates the span id so that the opentelemetry spans can be lazily initialised.
-    this.spanContext = SpanContext.create(generateTraceId(getAsInternalSpan(internalSpan.getParent())), generateSpanId(),
-                                          TraceFlags.getSampled(), TraceState.getDefault());
+    // Generates the span id so that the opentelemetry spans can be lazily initialised if it is exportable
+    if (exportable) {
+      this.spanContext = SpanContext.create(generateTraceId(getAsInternalSpan(internalSpan.getParent())), generateSpanId(),
+                                            TraceFlags.getSampled(), TraceState.getDefault());
+    }
   }
 
   @Nullable
@@ -205,8 +207,15 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
     parentSpanContext = extractContextFromTraceParent(serializeAsMap.get("traceparent"));
     if (parentSpanContext.isValid()) {
-      spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
-                                       TraceFlags.getSampled(), TraceState.getDefault());
+      if (!exportable) {
+        // if it not exportable, we set the parent span context so that it is eventually
+        // propagated to the next exportable span.
+        spanContext = SpanContext.create(parentSpanContext.getTraceId(), parentSpanContext.getSpanId(),
+                                         TraceFlags.getSampled(), TraceState.getDefault());
+      } else {
+        spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
+                                         TraceFlags.getSampled(), TraceState.getDefault());
+      }
     }
   }
 
