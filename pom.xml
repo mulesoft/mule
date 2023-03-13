@@ -172,7 +172,7 @@
         <muleMavenClientImpl>1.6.0-20230217</muleMavenClientImpl>
         <muleMavenClientTest>1.6.0-20230217</muleMavenClientTest>
         <mulePolicyApiVersion>1.4.0-20230217</mulePolicyApiVersion>
-        <muleApiVersion>1.4.0-20230217</muleApiVersion>
+        <muleApiVersion>1.4.0-20230313</muleApiVersion>
         <muleMetadataModelVersion>1.4.0-20230217</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
