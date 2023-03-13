@@ -55,6 +55,12 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   public OpenTelemetrySpanExporterFactory() {}
 
+  /**
+   * Creates a new {@link OpenTelemetrySpanExporterFactory} instance.
+   * 
+   * @param privilegedConfiguration Configuration that will be used to config export parameters that are not meant to be
+   *                                configurable for the end users.
+   */
   protected OpenTelemetrySpanExporterFactory(SpanExporterConfiguration privilegedConfiguration) {
     this.privilegedConfiguration = privilegedConfiguration;
   }
