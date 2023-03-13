@@ -550,8 +550,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
 
     if (fromGlobalErrorHandler && exception != null) {
-      String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
-      return transaction.getComponentLocation().get().getRootContainerName().equals(location);
+      String transactionLocation = transaction.getComponentLocation().get().getLocation();
+      String failingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
+      // Get the location of the Try that contains this component.
+      failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
+      failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
+      return failingComponentLocation.equals(transactionLocation);
     }
 
     return isOwnedTransactionByLocalErrorHandler(transaction);
