@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
-
-import static java.lang.String.format;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -168,12 +164,11 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
   }
 
   @Test
-  @Issue("W-12276189")
+  @Issue("W-12680624")
   public void projectWithInvalidClassLoaderModel() throws URISyntaxException {
-    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expect(IllegalStateException.class);
     expectedException
-        .expectMessage(format("Artifact coordinates from project's class loader model are missing the 'classifier' attribute. Valid values are '%s' and '%s'.",
-                              MULE_APPLICATION_CLASSIFIER, MULE_DOMAIN_CLASSIFIER));
+        .expectMessage("Error deserializing 'classloader-model.json'. \"classifier\" not specified for 'com.test:basic'");
 
     getDeployableProjectModel("apps/heavyweight/invalid-classloader-model");
   }
