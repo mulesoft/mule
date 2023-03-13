@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 
 import static java.lang.Long.MAX_VALUE;
@@ -174,7 +173,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .transform(pair.getRoute());
       return from(processWithChildContextDontComplete(pair.getEvent(),
                                                       applyProcessingStrategy(processingStrategy, route, maxConcurrency),
-                                                      empty())).contextWrite(ctx -> ctx.put(REACTOR_RECREATE_ROUTER, true))
+                                                      empty()))
                                                           .timeout(timeout,
                                                                    onTimeout(processingStrategy, delayErrors, timeoutErrorType,
                                                                              pair),
