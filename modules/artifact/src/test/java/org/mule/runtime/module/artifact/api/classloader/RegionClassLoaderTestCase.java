@@ -15,8 +15,6 @@ import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
-import static org.mule.tck.junit4.matcher.Eventually.eventually;
-import static org.mule.tck.util.CollectableReference.collectedByGc;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_CLASSLOADERS;
 
@@ -34,8 +32,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,7 +44,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.util.CollectableReference;
 import org.mule.tck.util.EnumerationMatcher;
 
 import java.io.IOException;
@@ -61,9 +56,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -75,14 +68,14 @@ import org.junit.rules.ExpectedException;
 @Story(ARTIFACT_CLASSLOADERS)
 public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
-  private static final String PACKAGE_NAME = "java.lang";
-  private static final String CLASS_NAME = PACKAGE_NAME + ".Object";
+  protected static final String PACKAGE_NAME = "java.lang";
+  protected static final String CLASS_NAME = PACKAGE_NAME + ".Object";
   private static final Class PARENT_LOADED_CLASS = Object.class;
-  private static final Class PLUGIN_LOADED_CLASS = String.class;
+  protected static final Class PLUGIN_LOADED_CLASS = String.class;
   private static final String RESOURCE_NAME = "dummy.txt";
   private static final String NON_EXPORTED_RESOURCE_NAME = "hidden.txt";
   public static final String APP_NAME = "testApp";
-  private static final String ARTIFACT_ID = "testAppId";
+  protected static final String ARTIFACT_ID = "testAppId";
   private static final String GROUP_ID = "com.organization";
   private static final String SPECIFIC_ARTIFACT_ID = "test-artifact";
   private static final String SPECIFIC_ARTIFACT_ID_WITH_SPACES = "test-artifact-with-spaces";
@@ -105,14 +98,14 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private final URL API_LOCATION;
   private final URL API_LOADED_RESOURCE;
 
-  private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-  private final ArtifactDescriptor artifactDescriptor;
+  protected final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+  protected final ArtifactDescriptor artifactDescriptor;
   private final URL API_WITH_SPACES_LOCATION;
   private final URL API_WITH_SPACES_LOADED_RESOURCE;
   private final URL API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES;
 
-  private TestApplicationClassLoader appClassLoader;
-  private TestArtifactClassLoader pluginClassLoader;
+  protected TestApplicationClassLoader appClassLoader;
+  protected TestArtifactClassLoader pluginClassLoader;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -146,7 +139,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     regionClassLoader.loadClass(CLASS_NAME);
   }
 
-  private List<ArtifactClassLoader> createClassLoaders(ClassLoader parent) {
+  protected List<ArtifactClassLoader> createClassLoaders(RegionClassLoader parent) {
     appClassLoader = new TestApplicationClassLoader(parent);
     pluginClassLoader = new SubTestClassLoader(parent);
 
@@ -260,47 +253,6 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     expectedResources.add(PARENT_LOADED_RESOURCE);
 
     Assert.assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
-  }
-
-  @Test
-  public void disposesClassLoaders() throws Exception {
-    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
-
-    RegionClassLoader regionClassLoader =
-        new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
-    createClassLoaders(regionClassLoader);
-
-    final ArtifactClassLoader regionMember1 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
-    final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
-    regionClassLoader.addClassLoader(regionMember1, NULL_CLASSLOADER_FILTER);
-    regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
-
-
-    regionClassLoader.dispose();
-
-    verify(regionMember1).dispose();
-    verify(regionMember2).dispose();
-  }
-
-  @Test
-  public void disposesClassLoadersEvenOnExceptions() throws Exception {
-    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
-
-    RegionClassLoader regionClassLoader =
-        new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
-    createClassLoaders(regionClassLoader);
-
-    final ArtifactClassLoader regionMember1 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
-    doThrow(new RuntimeException()).when(regionMember1).dispose();
-    final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
-
-    regionClassLoader.addClassLoader(regionMember1, NULL_CLASSLOADER_FILTER);
-    regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
-
-    regionClassLoader.dispose();
-
-    verify(regionMember1).dispose();
-    verify(regionMember2).dispose();
   }
 
   @Test
@@ -433,7 +385,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   public void getResourceUsingNotNormalizedPath() {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
     when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
@@ -450,7 +402,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   public void getResourcesUsingNotNormalizedPath() throws IOException {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
     when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
@@ -470,7 +422,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   public void addClassloaderWithResourcesUsingNotNormalizedPath() throws IOException {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
     when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
@@ -569,7 +521,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
@@ -600,7 +552,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
@@ -658,36 +610,14 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                                                 new URL("http://com.mycompany/SomeOtherClass.class")));
   }
 
-  @Test
-  @Issue("W-11698566")
-  @Description("The RegionClassLoader does not keep a reference to packages and resources mappings, which could cause a MuleArtifactClassLoader leak.")
-  public void regionClassLoaderDoesNotLeakPackageMappingsAfterDispose() throws ClassNotFoundException {
-    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
-
-    final ClassLoader parentClassLoader = mock(ClassLoader.class);
-    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(regionClassLoader);
-    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
-    regionClassLoader.addClassLoader(pluginClassLoader,
-                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
-    pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
-
-    CollectableReference<TestArtifactClassLoader> collectableReference = new CollectableReference<>(pluginClassLoader);
-
-    pluginClassLoader = null;
-    regionClassLoader.dispose();
-
-    assertThat(collectableReference, is(eventually(collectedByGc())));
-  }
-
   private void findExportedPackageAsResource(String resource, URL resourceExpectedUrl, String resourcePackage) {
     ClassLoader parentClassLoader = mock(ClassLoader.class);
-    createClassLoaders(parentClassLoader);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(regionClassLoader);
 
     appClassLoader.addResource(resource, resourceExpectedUrl);
     when(lookupPolicy.getPackageLookupStrategy(resourcePackage)).thenReturn(CHILD_FIRST);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     regionClassLoader.addClassLoader(appClassLoader,
                                      new DefaultArtifactClassLoaderFilter(ImmutableSet.of(resourcePackage), emptySet()));
 
@@ -698,14 +628,14 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private void findExportedPackageClasses(String resource, String exportedPackage, List<String> classes, List<URL> urls)
       throws IOException {
     ClassLoader parentClassLoader = mock(ClassLoader.class);
-    createClassLoaders(parentClassLoader);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(regionClassLoader);
 
     for (int i = 0; i < classes.size(); i++) {
       appClassLoader.addResource(classes.get(i), urls.get(i));
     }
 
     when(lookupPolicy.getPackageLookupStrategy(exportedPackage)).thenReturn(CHILD_FIRST);
-    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     regionClassLoader.addClassLoader(appClassLoader,
                                      new DefaultArtifactClassLoaderFilter(ImmutableSet.of(exportedPackage), emptySet()));
     Enumeration<URL> resources = regionClassLoader.findResources(resource);
@@ -716,7 +646,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private void getResourceFromExportingArtifact(String resource, URL expectedResult) {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     getResourceFromExportingArtifact(resource, expectedResult, regionClassLoader);
   }
 
@@ -755,7 +685,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
-    createClassLoaders(parentClassLoader);
+    createClassLoaders(regionClassLoader);
     ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
             .setBundleUri(apiLocation.toURI())
