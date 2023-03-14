@@ -106,9 +106,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       doDispose();
 
       if (artifactCL != null) {
-        if (isRegionClassLoaderMember(artifactCL)) {
-          ((DisposableClassLoader) artifactCL.getParent()).dispose();
-        } else if (artifactCL instanceof DisposableClassLoader) {
+        if (artifactCL instanceof DisposableClassLoader) {
           ((DisposableClassLoader) artifactCL).dispose();
         }
       }
@@ -117,10 +115,6 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       currentThread().setContextClassLoader(originalClassLoader);
       deploymentClassLoader = null;
     }
-  }
-
-  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
-    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   private void doDispose() {
