@@ -128,6 +128,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
+  private final LazyValue<Optional<ConfigurationProvider>> staticallyResolvedConfigurationProvider =
+      new LazyValue<>(this::doResolveConfigurationProviderStatically);
 
   protected final ExtensionManager extensionManager;
   protected ClassLoader classLoader;
@@ -446,6 +448,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return configurationProviderResolver.resolve(valueResolvingContext);
   }
 
+  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically() {
+    // Since the resolver does not change after initialization, we can cache the result of the resolution.
+    // Also note that we can only do so because this is a static resolution (i.e.: if the resolver is dynamic, it will always
+    // return the same value: empty).
+    return staticallyResolvedConfigurationProvider.get();
+  }
+
+  private Optional<ConfigurationProvider> doResolveConfigurationProviderStatically() {
+    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
+  }
+
   private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ValueResolver<ConfigurationProvider> configurationProviderResolver) {
     // If the resolver is dynamic, then it cannot be resolved statically
     if (configurationProviderResolver.isDynamic()) {
@@ -467,7 +480,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   protected Optional<ConfigurationProvider> getConfigurationProvider() {
-    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
+    return resolveConfigurationProviderStatically();
   }
 
   protected boolean usesDynamicConfiguration() {
