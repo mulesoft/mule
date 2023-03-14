@@ -4,7 +4,8 @@
     "groupId": "com.mycompany",
     "artifactId": "packagesResourcesLoadedFromClassLoaderModel",
     "version": "1.0.0-SNAPSHOT",
-    "type": "jar"
+    "type": "jar",
+    "classifier": "mule-application"
   },
   "dependencies": [
     {
