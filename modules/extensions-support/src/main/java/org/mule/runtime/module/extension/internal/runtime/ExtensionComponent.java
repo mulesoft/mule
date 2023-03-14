@@ -128,6 +128,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
+  private final LazyValue<Boolean> usesDynamicConfiguration = new LazyValue<>(this::computeUsesDynamicConfiguration);
   private final LazyValue<Optional<ConfigurationProvider>> staticallyResolvedConfigurationProvider =
       new LazyValue<>(this::doResolveConfigurationProviderStatically);
 
@@ -484,6 +485,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   protected boolean usesDynamicConfiguration() {
+    return usesDynamicConfiguration.get();
+  }
+
+  private boolean computeUsesDynamicConfiguration() {
     // TODO W-11267571: if not being able to resolve the ValueResolver<ConfigurationProvider> at this point, hence
     // treating it as dynamic, ends up causing performance issues.
     return isConfigurationSpecified()
