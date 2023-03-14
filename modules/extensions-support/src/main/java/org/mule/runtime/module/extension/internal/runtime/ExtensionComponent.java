@@ -131,6 +131,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final LazyValue<Boolean> usesDynamicConfiguration = new LazyValue<>(this::computeUsesDynamicConfiguration);
   private final LazyValue<Optional<ConfigurationProvider>> staticallyResolvedConfigurationProvider =
       new LazyValue<>(this::doResolveConfigurationProviderStatically);
+  private final LazyValue<Optional<ConfigurationInstance>> staticConfigurationInstance =
+      new LazyValue<>(this::doGetStaticConfiguration);
 
   protected final ExtensionManager extensionManager;
   protected ClassLoader classLoader;
@@ -261,12 +263,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     // check for implicit provider
     findConfigurationProviderResolver().ifPresent(configurationProviderResolver::set);
 
-    Optional<ConfigurationInstance> staticConfiguration = getStaticConfiguration();
-    if (staticConfiguration.isPresent()) {
-      configurationResolver = event -> staticConfiguration;
-      return;
-    }
-
     if (!isConfigurationSpecified()) {
       // obtain implicit instance
       configurationResolver = event -> extensionManager.getConfiguration(extensionModel, componentModel, event);
@@ -283,7 +279,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     // we can cache the resolution of the provider at this point because the reference is static
     final ConfigurationProvider configurationProvider = getConfigurationProvider().get();
 
-    // the config provider is dynamic (we already checked for static at the beginning)
+    // the config provider can either be static or dynamic
     configurationResolver = event -> resolveConfigFromProvider(configurationProvider, event);
   }
 
@@ -500,6 +496,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * Otherwise, returns an empty value.
    */
   protected Optional<ConfigurationInstance> getStaticConfiguration() {
+    return staticConfigurationInstance.get();
+  }
+
+  private Optional<ConfigurationInstance> doGetStaticConfiguration() {
     if (!requiresConfig()) {
       return empty();
     }
