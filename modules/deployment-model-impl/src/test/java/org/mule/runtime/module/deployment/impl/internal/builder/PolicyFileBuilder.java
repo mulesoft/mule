@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> {
 
+  private static final String MULE_POLICY_CLASSIFIER = "mule-policy";
+
   private MulePolicyModel mulePolicyModel;
 
   public PolicyFileBuilder(String artifactId) {
@@ -84,4 +86,8 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
     return customResources;
   }
 
+  @Override
+  public String getClassifier() {
+    return MULE_POLICY_CLASSIFIER;
+  }
 }
