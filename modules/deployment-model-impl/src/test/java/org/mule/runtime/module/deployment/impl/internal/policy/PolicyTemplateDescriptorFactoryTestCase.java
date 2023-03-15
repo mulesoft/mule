@@ -175,9 +175,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
 
-    PolicyFileBuilder policyFileBuilder =
-        new PolicyFileBuilder(POLICY_NAME).withClassifier(POLICY_CLASSIFIER).usingLibrary(echoTestJarFile.getAbsolutePath())
-            .describedBy(mulePolicyModelBuilder.build());
+    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).usingLibrary(echoTestJarFile.getAbsolutePath())
+        .describedBy(mulePolicyModelBuilder.build());
     File tempFolder = createTempFolder();
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
@@ -205,9 +204,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     ArtifactPluginFileBuilder plugin1 = new ArtifactPluginFileBuilder("plugin1");
     ArtifactPluginFileBuilder plugin2 = new ArtifactPluginFileBuilder("plugin2");
 
-    PolicyFileBuilder policyFileBuilder =
-        new PolicyFileBuilder(POLICY_NAME).withClassifier(POLICY_CLASSIFIER).describedBy(policyModelBuilder.build())
-            .dependingOn(plugin1).dependingOn(plugin2);
+    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).describedBy(policyModelBuilder.build())
+        .dependingOn(plugin1).dependingOn(plugin2);
     File tempFolder = createTempFolder();
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
