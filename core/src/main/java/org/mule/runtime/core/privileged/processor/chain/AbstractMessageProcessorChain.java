@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -98,6 +99,7 @@ import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -194,7 +196,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))));
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))), recreateRouter(ctx));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -229,9 +231,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier) {
+  private boolean recreateRouter(ContextView ctx) {
+    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
+  }
+
+  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, boolean recreateRouter) {
     final Consumer<Exception> errorRouter;
-    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+    if (messagingExceptionHandler instanceof GlobalErrorHandler && !recreateRouter) {
       errorRouter = ((GlobalErrorHandler) messagingExceptionHandler)
           .routerForChain(this, errorRouterSupplier);
     } else {
