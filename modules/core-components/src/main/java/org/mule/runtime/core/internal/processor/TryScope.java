@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -163,7 +164,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
           .transform(nestedChain)
           .onErrorStop()
           // This is needed for all cases because of the way that transactional try cache invokes its inner chain
-          .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
+          .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true))
           .contextWrite(pushTxToSubscriberContext(getLocation().getLocation()))
           .contextWrite(ctx)
           .block();
