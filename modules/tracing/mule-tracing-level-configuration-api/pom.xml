@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule-module-tracing-parent</artifactId>
+        <version>4.6.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mule-tracing-level-configuration-api</artifactId>
+    <version>4.6.0-SNAPSHOT</version>
+    <name>Mule Tracing Levels Configuration Api</name>
+    <description>Api for the configuration of tracing levels</description>
+
+    <properties>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
+</project>
