@@ -35,6 +35,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
+import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoBuilderProvider;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -68,7 +69,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    choiceRouter = new ChoiceRouter(mock(InitialSpanInfoBuilderProvider.class));
+    choiceRouter = new ChoiceRouter(new DummyInitialSpanInfoBuilderProvider());
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     choiceRouter.setExpressionManager(muleContext.getExpressionManager());
   }
