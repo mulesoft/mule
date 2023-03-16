@@ -128,6 +128,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
+  private final LazyValue<Boolean> usesDynamicConfiguration = new LazyValue<>(this::computeUsesDynamicConfiguration);
+  private final LazyValue<Optional<ConfigurationProvider>> staticallyResolvedConfigurationProvider =
+      new LazyValue<>(this::doResolveConfigurationProviderStatically);
+  private final LazyValue<Optional<ConfigurationInstance>> staticConfigurationInstance =
+      new LazyValue<>(this::doGetStaticConfiguration);
 
   protected final ExtensionManager extensionManager;
   protected ClassLoader classLoader;
@@ -258,12 +263,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     // check for implicit provider
     findConfigurationProviderResolver().ifPresent(configurationProviderResolver::set);
 
-    Optional<ConfigurationInstance> staticConfiguration = getStaticConfiguration();
-    if (staticConfiguration.isPresent()) {
-      configurationResolver = event -> staticConfiguration;
-      return;
-    }
-
     if (!isConfigurationSpecified()) {
       // obtain implicit instance
       configurationResolver = event -> extensionManager.getConfiguration(extensionModel, componentModel, event);
@@ -280,7 +279,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     // we can cache the resolution of the provider at this point because the reference is static
     final ConfigurationProvider configurationProvider = getConfigurationProvider().get();
 
-    // the config provider is dynamic (we already checked for static at the beginning)
+    // the config provider can either be static or dynamic
     configurationResolver = event -> resolveConfigFromProvider(configurationProvider, event);
   }
 
@@ -446,6 +445,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return configurationProviderResolver.resolve(valueResolvingContext);
   }
 
+  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically() {
+    // Since the resolver does not change after initialization, we can cache the result of the resolution.
+    // Also note that we can only do so because this is a static resolution (i.e.: if the resolver is dynamic, it will always
+    // return the same value: empty).
+    return staticallyResolvedConfigurationProvider.get();
+  }
+
+  private Optional<ConfigurationProvider> doResolveConfigurationProviderStatically() {
+    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
+  }
+
   private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ValueResolver<ConfigurationProvider> configurationProviderResolver) {
     // If the resolver is dynamic, then it cannot be resolved statically
     if (configurationProviderResolver.isDynamic()) {
@@ -467,10 +477,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   protected Optional<ConfigurationProvider> getConfigurationProvider() {
-    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
+    return resolveConfigurationProviderStatically();
   }
 
   protected boolean usesDynamicConfiguration() {
+    return usesDynamicConfiguration.get();
+  }
+
+  private boolean computeUsesDynamicConfiguration() {
     // TODO W-11267571: if not being able to resolve the ValueResolver<ConfigurationProvider> at this point, hence
     // treating it as dynamic, ends up causing performance issues.
     return isConfigurationSpecified()
@@ -482,6 +496,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * Otherwise, returns an empty value.
    */
   protected Optional<ConfigurationInstance> getStaticConfiguration() {
+    return staticConfigurationInstance.get();
+  }
+
+  private Optional<ConfigurationInstance> doGetStaticConfiguration() {
     if (!requiresConfig()) {
       return empty();
     }

@@ -16,7 +16,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 
@@ -37,12 +41,15 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,10 +78,16 @@ public class ExtensionComponentTestCase extends AbstractMuleContextTestCase {
 
   private MuleArtifactClassLoader artifactClassLoader;
 
+  @Mock
+  private ConfigurationProvider configurationProvider;
+
+  private StaticValueResolver<ConfigurationProvider> configurationProviderResolver;
+
   @Before
   public void setUp() throws Exception {
+    configurationProviderResolver = spy(new StaticValueResolver<>(configurationProvider));
     extensionComponent = new TestExtensionComponent(mock(ExtensionModel.class),
-                                                    mock(ComponentModel.class), mock(ConfigurationProvider.class),
+                                                    mock(ComponentModel.class), configurationProviderResolver,
                                                     mock(CursorProviderFactory.class), mock(ExtensionManager.class));
 
     RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
@@ -115,14 +128,61 @@ public class ExtensionComponentTestCase extends AbstractMuleContextTestCase {
     assertThat(executedClassloader.get(), is(artifactClassLoader));
   }
 
+  @Test
+  @Issue("W-12271999")
+  @Description("Non functional test case to verify that the resolution of a static config provider resolver is cached. This is testing an optimization, it is not a functional requirement.")
+  public void staticConfigProviderResolutionIsCached() throws MuleException {
+    initialiseIfNeeded(extensionComponent, muleContext);
+    extensionComponent.start();
+
+    // We clear the invocations here because we are not interested in invocations during the start phase
+    clearInvocations(configurationProviderResolver);
+
+    extensionComponent.getConfigurationProvider();
+    extensionComponent.getConfigurationProvider();
+    verify(configurationProviderResolver, atMost(1)).resolve(any());
+  }
+
+  @Test
+  @Issue("W-12271999")
+  @Description("Non functional test case to verify that the retrieval of a configuration from a static provider is cached. This is testing an optimization, it is not a functional requirement.")
+  public void staticConfigInstanceIsCached() throws MuleException {
+    initialiseIfNeeded(extensionComponent, muleContext);
+    extensionComponent.start();
+
+    // We clear the invocations here because we are not interested in invocations during the start phase
+    clearInvocations(configurationProvider);
+
+    extensionComponent.getStaticConfiguration();
+    extensionComponent.getStaticConfiguration();
+    verify(configurationProvider, atMost(1)).get(any());
+  }
+
+  @Test
+  @Issue("W-12271999")
+  @Description("Non functional test case to verify that the computation of usesDynamicConfiguration is cached. This is testing an optimization, it is not a functional requirement.")
+  public void usesDynamicConfigurationIsCached() throws MuleException {
+    initialiseIfNeeded(extensionComponent, muleContext);
+    extensionComponent.start();
+
+    // We clear the invocations here because we are not interested in invocations during the start phase
+    clearInvocations(configurationProviderResolver);
+    clearInvocations(configurationProvider);
+
+    extensionComponent.usesDynamicConfiguration();
+    extensionComponent.usesDynamicConfiguration();
+    verify(configurationProviderResolver, atMost(1)).resolve(any());
+    verify(configurationProvider, atMost(1)).get(any());
+  }
+
   private final class TestExtensionComponent extends ExtensionComponent {
 
     TestExtensionComponent(ExtensionModel extensionModel,
                            ComponentModel componentModel,
-                           ConfigurationProvider configurationProvider,
+                           ValueResolver<ConfigurationProvider> configurationProviderResolver,
                            CursorProviderFactory cursorProviderFactory,
                            ExtensionManager extensionManager) {
-      super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
+      super(extensionModel, componentModel, configurationProviderResolver, cursorProviderFactory, extensionManager);
     }
 
     @Override
