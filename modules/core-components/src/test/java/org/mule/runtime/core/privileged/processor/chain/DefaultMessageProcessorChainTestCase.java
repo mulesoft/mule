@@ -58,6 +58,7 @@ import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterPr
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoBuilderProvider;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
@@ -182,7 +183,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Test
   public void choice() throws Exception {
-    ChoiceRouter choiceRouter = new ChoiceRouter(mock(InitialSpanInfoBuilderProvider.class));
+    ChoiceRouter choiceRouter = new ChoiceRouter(new DummyInitialSpanInfoBuilderProvider());
     choiceRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     choiceRouter.addRoute("true", newChain(empty(), getAppendingMP("1")));
