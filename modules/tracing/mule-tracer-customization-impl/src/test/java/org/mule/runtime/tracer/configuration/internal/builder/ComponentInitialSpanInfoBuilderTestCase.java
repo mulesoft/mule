@@ -23,7 +23,7 @@ import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilder;
 public class ComponentInitialSpanInfoBuilderTestCase extends InitialSpanInfoBuilderTestCase {
 
   @Override
-  InitialSpanInfoBuilder getComponentInitialSpanInfoBuilder() {
+  InitialSpanInfoBuilder getInitialSpanInfoBuilder() {
     Component mockedComponent = getMockedComponent();
     ComponentInitialSpanInfoBuilder componentInitialSpanInfoBuilder = new ComponentInitialSpanInfoBuilder(mockedComponent);
     return componentInitialSpanInfoBuilder;

@@ -10,17 +10,17 @@ import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
- * A {@link InitialSpanInfo} with a fixedName that indicates that a hierarchy of spans shouldn't be exported till execute-next
- * component.
+ * A {@link InitialSpanInfo} with a fixed name that indicates that a hierarchy of spans must not be exported till the component
+ * with the name passed as parameter is found.
  *
  * @since 4.6.0
  */
-public class NoFixedNamedExportTillComponentFoundExecutionInitialSpanInfo implements InitialSpanInfo {
+public class FixedNamedNoExportTillComponentFoundExecutionInitialSpanInfo implements InitialSpanInfo {
 
   private final String spanName;
   private final String forceNotExportUntilComponentName;
 
-  public NoFixedNamedExportTillComponentFoundExecutionInitialSpanInfo(String spanName, String forceNotExportUntilComponentName) {
+  public FixedNamedNoExportTillComponentFoundExecutionInitialSpanInfo(String spanName, String forceNotExportUntilComponentName) {
     this.spanName = spanName;
     this.forceNotExportUntilComponentName = forceNotExportUntilComponentName;
   }

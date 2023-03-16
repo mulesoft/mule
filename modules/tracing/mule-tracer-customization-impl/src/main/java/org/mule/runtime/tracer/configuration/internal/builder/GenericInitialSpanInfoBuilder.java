@@ -12,7 +12,7 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilder;
 import org.mule.runtime.tracer.configuration.internal.info.FixedNameInitialSpanInfo;
 import org.mule.runtime.tracer.configuration.internal.info.NoExportFixedNameInitialSpanInfo;
-import org.mule.runtime.tracer.configuration.internal.info.NoFixedNamedExportTillComponentFoundExecutionInitialSpanInfo;
+import org.mule.runtime.tracer.configuration.internal.info.FixedNamedNoExportTillComponentFoundExecutionInitialSpanInfo;
 
 /**
  * A generic {@link InitialSpanInfoBuilder} that is not based on any component.
@@ -51,7 +51,7 @@ public class GenericInitialSpanInfoBuilder implements InitialSpanInfoBuilder {
     }
 
     if (noExportUntilComponentName != null) {
-      return new NoFixedNamedExportTillComponentFoundExecutionInitialSpanInfo(getSpanName(), noExportUntilComponentName);
+      return new FixedNamedNoExportTillComponentFoundExecutionInitialSpanInfo(getSpanName(), noExportUntilComponentName);
     }
 
     if (noExport) {

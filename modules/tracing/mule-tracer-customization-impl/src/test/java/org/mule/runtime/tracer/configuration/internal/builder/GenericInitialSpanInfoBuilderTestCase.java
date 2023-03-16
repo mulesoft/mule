@@ -18,7 +18,7 @@ import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilder;
 public class GenericInitialSpanInfoBuilderTestCase extends InitialSpanInfoBuilderTestCase {
 
   @Override
-  InitialSpanInfoBuilder getComponentInitialSpanInfoBuilder() {
+  InitialSpanInfoBuilder getInitialSpanInfoBuilder() {
     return new GenericInitialSpanInfoBuilder().withName(TEST_COMPONENT_NAMESPACE + ":" + TEST_COMPONENT_NAME);
   }
 }

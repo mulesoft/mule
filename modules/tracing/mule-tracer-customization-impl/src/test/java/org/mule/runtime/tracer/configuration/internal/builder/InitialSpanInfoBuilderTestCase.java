@@ -34,28 +34,28 @@ public abstract class InitialSpanInfoBuilderTestCase {
 
   @Test
   public void testExportableInitialSpanInfo() {
-    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getComponentInitialSpanInfoBuilder();
+    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getInitialSpanInfoBuilder();
     InitialSpanInfo initialSpanInfo = componentInitialSpanInfoBuilder.build();
     assertInitialSpanInfo(initialSpanInfo, TEST_COMPONENT_NAMESPACE + ":" + TEST_COMPONENT_NAME, true, emptySet());
   }
 
   @Test
   public void testExportableInitialSpanInfoWithSuffix() {
-    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getComponentInitialSpanInfoBuilder();
+    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getInitialSpanInfoBuilder();
     InitialSpanInfo initialSpanInfo = componentInitialSpanInfoBuilder.withSuffix(TEST_SUFFIX).build();
     assertInitialSpanInfo(initialSpanInfo, TEST_COMPONENT_NAMESPACE + ":" + TEST_COMPONENT_NAME + TEST_SUFFIX, true, emptySet());
   }
 
   @Test
   public void testExportableInitialSpanInfoNoExport() {
-    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getComponentInitialSpanInfoBuilder();
+    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getInitialSpanInfoBuilder();
     InitialSpanInfo initialSpanInfo = componentInitialSpanInfoBuilder.withNoExport().build();
     assertInitialSpanInfo(initialSpanInfo, TEST_COMPONENT_NAMESPACE + ":" + TEST_COMPONENT_NAME, false, emptySet());
   }
 
   @Test
   public void testExportableInitialSpanInfoWithForceNotExportUntil() {
-    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getComponentInitialSpanInfoBuilder();
+    InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getInitialSpanInfoBuilder();
     InitialSpanInfo initialSpanInfo = componentInitialSpanInfoBuilder.withForceNoExportUntil(TEST_COMPONENT_UNTIL_NAME).build();
     assertInitialSpanInfo(initialSpanInfo, TEST_COMPONENT_NAMESPACE + ":" + TEST_COMPONENT_NAME, true,
                           singleton(TEST_COMPONENT_UNTIL_NAME));
@@ -69,5 +69,5 @@ public abstract class InitialSpanInfoBuilderTestCase {
     assertThat(initialSpanInfo.getName(), equalTo(spanName));
   }
 
-  abstract InitialSpanInfoBuilder getComponentInitialSpanInfoBuilder();
+  abstract InitialSpanInfoBuilder getInitialSpanInfoBuilder();
 }
