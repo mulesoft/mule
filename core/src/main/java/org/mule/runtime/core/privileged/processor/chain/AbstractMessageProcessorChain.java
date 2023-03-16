@@ -99,7 +99,6 @@ import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
-import reactor.util.context.ContextView;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -196,7 +195,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))), recreateRouter(ctx));
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))),
+                                                              recreateRouter(ctx));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -231,7 +231,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private boolean recreateRouter(ContextView ctx) {
+  private boolean recreateRouter(Context ctx) {
     return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
   }
 
