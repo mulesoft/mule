@@ -7,13 +7,20 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.opentelemetry.sdk.trace.SpanProcessor;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
+@Feature(PROFILING)
+@Story(OPEN_TELEMETRY_EXPORTER)
 public class OpenTelemetrySpanExporterFactoryTestCase {
 
   SpanProcessor mockedSpanProcessor = mock(SpanProcessor.class);
