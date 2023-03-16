@@ -113,7 +113,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
                                  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
-P      this.subFlowName = name;
+      this.subFlowName = name;
       this.setInitialSpanInfo(initialSpanInfoBuilderProvider.getGenericInitialSpanInfoBuilder()
           .withName(SUB_FLOW.getNamespace() + ":" + SUB_FLOW.getName())
           .build());
