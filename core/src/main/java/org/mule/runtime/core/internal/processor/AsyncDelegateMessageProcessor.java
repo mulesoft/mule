@@ -256,7 +256,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(event -> {
           fireAsyncCompleteNotification(event, null);
           ((BaseEventContext) event.getContext()).success(event);
-        }).contextWrite(ctx -> ctx.put(REACTOR_RECREATE_ROUTER, true))
+        }).subscriberContext(ctx -> ctx.put(REACTOR_RECREATE_ROUTER, true))
         .doOnError(MessagingException.class, e -> {
           fireAsyncCompleteNotification(e.getEvent(), e);
           ((BaseEventContext) e.getEvent().getContext()).error(e);
