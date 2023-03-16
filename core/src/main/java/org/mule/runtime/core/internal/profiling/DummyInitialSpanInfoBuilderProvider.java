@@ -56,7 +56,7 @@ public class DummyInitialSpanInfoBuilderProvider implements InitialSpanInfoBuild
     }
 
     @Override
-    public InitialSpanInfoBuilder withForceNotExportUntil(String componentName) {
+    public InitialSpanInfoBuilder withForceNoExportUntil(String componentName) {
       return this;
     }
 

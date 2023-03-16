@@ -46,7 +46,7 @@ public class ComponentInitialSpanInfoBuilder implements InitialSpanInfoBuilder {
   }
 
   @Override
-  public InitialSpanInfoBuilder withForceNotExportUntil(String forceNotExportUntilComponentName) {
+  public InitialSpanInfoBuilder withForceNoExportUntil(String forceNotExportUntilComponentName) {
     this.forceNotExportUntilComponentName = forceNotExportUntilComponentName;
     return this;
   }

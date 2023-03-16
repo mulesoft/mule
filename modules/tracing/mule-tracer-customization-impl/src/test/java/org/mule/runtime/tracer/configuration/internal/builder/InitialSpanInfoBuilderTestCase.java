@@ -56,7 +56,7 @@ public abstract class InitialSpanInfoBuilderTestCase {
   @Test
   public void testExportableInitialSpanInfoWithForceNotExportUntil() {
     InitialSpanInfoBuilder componentInitialSpanInfoBuilder = getComponentInitialSpanInfoBuilder();
-    InitialSpanInfo initialSpanInfo = componentInitialSpanInfoBuilder.withForceNotExportUntil(TEST_COMPONENT_UNTIL_NAME).build();
+    InitialSpanInfo initialSpanInfo = componentInitialSpanInfoBuilder.withForceNoExportUntil(TEST_COMPONENT_UNTIL_NAME).build();
     assertInitialSpanInfo(initialSpanInfo, TEST_COMPONENT_NAMESPACE + ":" + TEST_COMPONENT_NAME, true,
                           singleton(TEST_COMPONENT_UNTIL_NAME));
   }

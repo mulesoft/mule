@@ -41,7 +41,7 @@ public interface InitialSpanInfoBuilder {
    *
    * @return he {@link InitialSpanInfoBuilder}
    */
-  InitialSpanInfoBuilder withForceNotExportUntil(String componentName);
+  InitialSpanInfoBuilder withForceNoExportUntil(String componentName);
 
   /**
    * @return the resulting {@link InitialSpanInfo}.
@@ -49,7 +49,7 @@ public interface InitialSpanInfoBuilder {
   InitialSpanInfo build();
 
   /**
-   * Indicates that the export should not be exported.
+   * Indicates that the span should not be exported.
    *
    * @return the resulting {@link InitialSpanInfo}.
    */

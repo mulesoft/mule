@@ -89,7 +89,7 @@ public class PolicyChain extends AbstractComponent
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
                                           initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
-                                              .withForceNotExportUntil(EXECUTE_NEXT_COMPONENT_NAME).build());
+                                              .withForceNoExportUntil(EXECUTE_NEXT_COMPONENT_NAME).build());
 
     initialiseIfNeeded(processorChain, muleContext);
 

@@ -39,7 +39,7 @@ public class GenericInitialSpanInfoBuilder implements InitialSpanInfoBuilder {
   }
 
   @Override
-  public InitialSpanInfoBuilder withForceNotExportUntil(String noExportUntilComponentName) {
+  public InitialSpanInfoBuilder withForceNoExportUntil(String noExportUntilComponentName) {
     this.noExportUntilComponentName = noExportUntilComponentName;
     return this;
   }
