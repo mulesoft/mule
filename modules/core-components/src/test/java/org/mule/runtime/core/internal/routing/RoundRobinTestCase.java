@@ -98,6 +98,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());
     }
+    muleContext.getInjector().inject(roundRobin);
     routes.forEach(r -> roundRobin.addRoute(r));
     initialiseIfNeeded(roundRobin, muleContext);
     startIfNeeded(roundRobin);
@@ -121,6 +122,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   @Test
   public void usesFirstRouteOnFirstRequest() throws Exception {
     roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    muleContext.getInjector().inject(roundRobin);
     List<Processor> routes = new ArrayList<>(2);
     TestProcessor route1 = new TestProcessor();
     routes.add(route1);
@@ -146,8 +148,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
     List<Processor> routes = new ArrayList<>(1);
     routes.add(contextPropagationChecker);
+    muleContext.getInjector().inject(roundRobin);
     routes.forEach(r -> roundRobin.addRoute(r));
-
     initialiseIfNeeded(roundRobin, muleContext);
     startIfNeeded(roundRobin);
 

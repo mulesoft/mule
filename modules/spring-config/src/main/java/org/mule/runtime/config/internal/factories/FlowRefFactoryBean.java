@@ -71,6 +71,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
@@ -115,6 +116,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
   @Inject
   private ConfigurationComponentLocator locator;
+
+  @Inject
+  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
 
   public void setName(String name) {
     this.refName = name;
@@ -168,6 +172,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
         MessageProcessorChainBuilder chainBuilder = (MessageProcessorChainBuilder) referencedFlow;
+        ((SubflowMessageProcessorChainBuilder) chainBuilder).withInitialSpanInfoBuilderProvider(initialSpanInfoBuilderProvider);
 
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
             .ifPresent(f -> {
