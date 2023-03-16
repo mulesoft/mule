@@ -273,6 +273,7 @@ public class MuleContextUtils {
 
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
+      when(registry.lookupObject(InitialSpanInfoBuilderProvider.class)).thenReturn(new DummyInitialSpanInfoBuilderProvider());
 
       Map<Class, Object> injectableObjects = new HashMap<>();
       injectableObjects.put(MuleContext.class, muleContext);
