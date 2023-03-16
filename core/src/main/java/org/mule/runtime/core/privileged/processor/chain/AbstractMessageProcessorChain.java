@@ -206,7 +206,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))), recreateRouter(ctx));
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))),
+                                                              recreateRouter(ctx));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
