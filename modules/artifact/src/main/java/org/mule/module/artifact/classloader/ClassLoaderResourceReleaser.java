@@ -59,6 +59,7 @@ public class ClassLoaderResourceReleaser implements ResourceReleaser {
   private void clearClassLoaderSoftkeys() {
     try {
       flushCaches();
+      // W-12622341: clean up the cache using reflection until Java 11 since we didnt't detect the leak in Java 17
       if (IS_JAVA_VERSION_AT_MOST_11) {
         bustSoftReferences(this.classLoader);
       }
