@@ -19,7 +19,7 @@
     <properties>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
-        <muleSdkCompatibilityApi>0.6.0-rc7</muleSdkCompatibilityApi>
+        <muleSdkCompatibilityApi>0.6.0-rc8</muleSdkCompatibilityApi>
     </properties>
 
     <dependencies>
