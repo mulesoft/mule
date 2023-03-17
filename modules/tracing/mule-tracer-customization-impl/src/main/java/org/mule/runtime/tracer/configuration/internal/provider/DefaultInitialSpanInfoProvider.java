@@ -9,7 +9,7 @@ package org.mule.runtime.tracer.configuration.internal.provider;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.configuration.internal.MonitoringInitialExportInfoProvider;
+import org.mule.runtime.tracer.configuration.internal.export.MonitoringInitialExportInfoProvider;
 import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
 import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanInfo;
 

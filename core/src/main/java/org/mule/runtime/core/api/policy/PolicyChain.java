@@ -57,7 +57,6 @@ import org.reactivestreams.Publisher;
 public class PolicyChain extends AbstractComponent
     implements Initialisable, Startable, Stoppable, Disposable, Processor {
 
-  public static final String MULE_POLICY_CHAIN_SPAN_NAME = "mule:policy-chain";
   @Inject
   private MuleContext muleContext;
 

@@ -4,10 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.configuration.internal;
+package org.mule.runtime.tracer.configuration.internal.export;
 
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_CACHE_CHAIN;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
 
@@ -16,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
-import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.configuration.api.InternalSpanNames;
 import org.mule.runtime.tracer.configuration.internal.info.NoExportTillSpanWithNameInitialExportInfo;
 
 import java.util.HashMap;
@@ -29,25 +33,18 @@ import java.util.Map;
  */
 public class MonitoringInitialExportInfoProvider implements InitialExportInfoProvider {
 
-  public static final String EXECUTE_NEXT_COMPONENT_NAME = "execute-next";
-  public static final String MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY = "mule:policy-chain";
-
-  public static final String MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY = "policy-next-action";
-  public static final String ASYNC_INNER_CHAIN = "async-inner-chain";
-  public static final String MULE_CACHE_CHAIN = "mule:cache-chain";
-
   private final Map<Class, InitialExportInfo> initialExportInfoMapByComponentClass = new HashMap<Class, InitialExportInfo>() {
 
     {
       put(PolicyChain.class,
-          new NoExportTillSpanWithNameInitialExportInfo(EXECUTE_NEXT_COMPONENT_NAME, true));
+          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_COMPONENT_NAME, true));
     }
   };
   private final Map<String, InitialExportInfo> initialExportInfoMapByName = new HashMap<String, InitialExportInfo>() {
 
     {
       put(MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY,
-          new NoExportTillSpanWithNameInitialExportInfo(EXECUTE_NEXT_COMPONENT_NAME, true));
+          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_COMPONENT_NAME, true));
       put(MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(UNKNOWN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(ASYNC_INNER_CHAIN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
