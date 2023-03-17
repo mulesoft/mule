@@ -24,6 +24,7 @@ import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnn
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -254,7 +255,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(event -> {
           fireAsyncCompleteNotification(event, null);
           ((BaseEventContext) event.getContext()).success(event);
-        })
+        }).subscriberContext(ctx -> ctx.put(REACTOR_RECREATE_ROUTER, true))
         .doOnError(MessagingException.class, e -> {
           fireAsyncCompleteNotification(e.getEvent(), e);
           ((BaseEventContext) e.getEvent().getContext()).error(e);
