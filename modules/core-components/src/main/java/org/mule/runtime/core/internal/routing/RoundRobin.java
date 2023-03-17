@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,11 +28,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
-import org.reactivestreams.Publisher;
-
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 /**
