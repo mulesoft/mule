@@ -19,7 +19,7 @@ import org.junit.Test;
 
 public class FileTracingLevelConfigurationTestCase {
 
-  public static final String CONF_FOLDER = "src/test/resources/conf";
+  public static final String CONF_FOLDER = "conf";
   private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
 
   @Test
