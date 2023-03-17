@@ -57,6 +57,10 @@ public class RxUtils {
   public static final String KEY_ON_NEXT_ERROR_STRATEGY = "reactor.onNextError.localStrategy";
   public static final String ON_NEXT_FAILURE_STRATEGY = "reactor.core.publisher.OnNextFailureStrategy$ResumeStrategy";
 
+  // Some components involve inner chains that may reference to a global error handler (for example, the parallel-for-each).
+  // Those should recreate the error routers for each thread to avoid issues with the inflight counter. (W-12556497)
+  public static final String REACTOR_RECREATE_ROUTER = "recreateRouter";
+
   /**
    * Defers the subscription of the <it>deferredSubscriber</it> until <it>triggeringSubscriber</it> subscribes. Once that occurs
    * the latter subscription will take place on the same context. For an example of this, look at

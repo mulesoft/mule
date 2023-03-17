@@ -28,6 +28,7 @@ import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInter
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -205,7 +206,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))));
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))),
+                                                              recreateRouter(ctx));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -240,9 +242,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier) {
+  private boolean recreateRouter(Context ctx) {
+    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
+  }
+
+  private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, boolean recreateRouter) {
     final Consumer<Exception> errorRouter;
-    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+    if (messagingExceptionHandler instanceof GlobalErrorHandler && !recreateRouter) {
       errorRouter = ((GlobalErrorHandler) messagingExceptionHandler)
           .routerForChain(this, errorRouterSupplier);
     } else {
