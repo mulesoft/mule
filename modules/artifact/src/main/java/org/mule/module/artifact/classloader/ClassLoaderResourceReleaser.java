@@ -6,9 +6,13 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.mule.module.artifact.classloader.ThreadGroupContextClassLoaderSoftReferenceBuster.bustSoftReferences;
+
 import static java.beans.Introspector.flushCaches;
 import static java.lang.String.format;
-import static org.mule.module.artifact.classloader.ThreadGroupContextClassLoaderSoftReferenceBuster.bustSoftReferences;
+
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
@@ -26,6 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassLoaderResourceReleaser implements ResourceReleaser {
 
+  private static final boolean IS_JAVA_VERSION_AT_MOST_11 = isJavaVersionAtMost(JAVA_11);
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
   private volatile ClassLoader classLoader;
@@ -54,7 +59,10 @@ public class ClassLoaderResourceReleaser implements ResourceReleaser {
   private void clearClassLoaderSoftkeys() {
     try {
       flushCaches();
-      bustSoftReferences(this.classLoader);
+      // W-12622341: clean up the cache using reflection until Java 11 since we didnt't detect the leak in Java 17
+      if (IS_JAVA_VERSION_AT_MOST_11) {
+        bustSoftReferences(this.classLoader);
+      }
     } catch (Exception e) {
       logger.warn("Couldn't clear soft keys in caches. This can cause a classloader memory leak.", e);
     }
