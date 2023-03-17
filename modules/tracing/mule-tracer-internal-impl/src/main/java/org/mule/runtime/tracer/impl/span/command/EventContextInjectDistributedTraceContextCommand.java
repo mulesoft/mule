@@ -42,6 +42,7 @@ public class EventContextInjectDistributedTraceContextCommand
         ((SpanContextAware) eventContext).setSpanContext(
                                                          builder()
                                                              .withGetter(getter)
+                                                             .withManagedChildSpan(true)
                                                              .build());
       }
     };

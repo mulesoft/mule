@@ -15,7 +15,7 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import javax.inject.Inject;
 
-import static org.mule.runtime.tracer.impl.span.ExecutionSpan.getExecutionSpanBuilder;
+import static org.mule.runtime.tracer.impl.span.ExportOnEndExecutionSpan.getExecutionSpanBuilder;
 
 public class ExecutionSpanFactory implements EventSpanFactory {
 

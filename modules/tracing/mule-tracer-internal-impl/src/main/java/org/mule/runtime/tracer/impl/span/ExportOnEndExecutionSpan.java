@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
-
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
@@ -33,7 +32,7 @@ import java.util.function.BiConsumer;
  *
  * @since 4.5.0
  */
-public class ExecutionSpan implements InternalSpan {
+public class ExportOnEndExecutionSpan implements InternalSpan {
 
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
@@ -51,8 +50,8 @@ public class ExecutionSpan implements InternalSpan {
   private Long endTime;
   private final Map<String, String> additionalAttributes = new HashMap<>();
 
-  private ExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
-                        InternalSpan parent) {
+  private ExportOnEndExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
+                                   InternalSpan parent) {
     this.initialSpanInfo = initialSpanInfo;
     this.startTime = startTime;
     this.parent = parent;
@@ -97,6 +96,7 @@ public class ExecutionSpan implements InternalSpan {
     return initialSpanInfo.getInitialAttributesCount() + additionalAttributes.size();
   }
 
+
   @Override
   public void updateRootName(String name) {
     spanExporter.setRootName(name);
@@ -109,7 +109,12 @@ public class ExecutionSpan implements InternalSpan {
 
   @Override
   public void end() {
-    this.endTime = getDefault().now();
+    end(getDefault().now());
+  }
+
+  @Override
+  public void end(long endTime) {
+    this.endTime = endTime;
     this.spanExporter.export();
   }
 
@@ -175,12 +180,13 @@ public class ExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void updateChildSpanExporter(InternalSpan internalSpan) {
+  public InternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
     spanExporter.updateChildSpanExporter(internalSpan.getSpanExporter());
+    return internalSpan;
   }
 
   /**
-   * x A Builder for {@link ExecutionSpan}
+   * x A Builder for {@link ExportOnEndExecutionSpan}
    *
    * @since 4.5.0
    */
@@ -210,7 +216,7 @@ public class ExecutionSpan implements InternalSpan {
       return this;
     }
 
-    public ExecutionSpan build() {
+    public ExportOnEndExecutionSpan build() {
       if (startTime == null) {
         startTime = getDefault().now();
       }
@@ -219,14 +225,14 @@ public class ExecutionSpan implements InternalSpan {
         throw new IllegalArgumentException(THERE_IS_NO_SPAN_FACTORY_MESSAGE);
       }
 
-      ExecutionSpan executionSpan = new ExecutionSpan(initialSpanInfo,
-                                                      startTime,
-                                                      parent);
+      ExportOnEndExecutionSpan exportOnEndExecutionSpan = new ExportOnEndExecutionSpan(initialSpanInfo,
+                                                                                       startTime,
+                                                                                       parent);
 
 
-      executionSpan.spanExporter = spanExporterFactory.getSpanExporter(executionSpan, initialSpanInfo);
+      exportOnEndExecutionSpan.spanExporter = spanExporterFactory.getSpanExporter(exportOnEndExecutionSpan, initialSpanInfo);
 
-      return executionSpan;
+      return exportOnEndExecutionSpan;
     }
 
   }

@@ -7,13 +7,13 @@
 
 package org.mule.test.module.extension;
 
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.DISTRIBUTED_TRACE_CONTEXT;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
+
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -21,7 +21,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -30,6 +29,7 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Feature(EVENT_CONTEXT)
 @Story(DISTRIBUTED_TRACE_CONTEXT)
@@ -50,6 +50,7 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
 
   private static final long PROBER_TIMEOUT = 15000;
   private static final long PROBER_FREQUENCY = 1000;
+  public static final String W3C_TRACE_PARENT_HEADER = "traceparent";
 
   @Override
   protected String getConfigFile() {
@@ -118,13 +119,12 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
 
   private void assertEventPayload(List<CoreEvent> events) {
     for (CoreEvent event : events) {
-      DistributedTraceContextManager distributedTraceContextManager =
-          (DistributedTraceContextManager) event.getMessage().getPayload().getValue();
-      assertThat(distributedTraceContextManager.getClass().getName(),
-                 equalTo("org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager"));
-      // This will only resolve the correlation id, as the current span is closed after the flow is executed.
-      assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), aMapWithSize(1));
-      assertThat(distributedTraceContextManager.getRemoteTraceContextMap(), hasEntry("X-Correlation-ID", "0000-0000"));
+      Map<String, String> distributedTraceContext =
+          (Map<String, String>) event.getMessage().getPayload().getValue();
+      assertThat(distributedTraceContext, aMapWithSize(1));
+      // This test was fixed with W-12336322. Only the distributed trace context
+      // of the operation should be propagated.
+      assertThat(distributedTraceContext, hasKey(W3C_TRACE_PARENT_HEADER));
     }
   }
 

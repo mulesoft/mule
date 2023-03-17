@@ -24674,9 +24674,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.sdk.api.runtime.source.DistributedTraceContextManager",
             "classInformation": {
-              "classname": "org.mule.sdk.api.runtime.source.DistributedTraceContextManager",
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -24684,15 +24683,15 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            },
-            "typeAlias": {
-              "value": "DistributedTraceContextManager"
-            },
-            "stereotype": {
-              "allowedStereotypes": []
+              "genericTypes": [
+                "java.lang.String",
+                "java.lang.String"
+              ],
+              "isMap": true
             }
+          },
+          "open": {
+            "type": "String"
           },
           "fields": []
         },
@@ -24967,9 +24966,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.sdk.api.runtime.source.DistributedTraceContextManager",
             "classInformation": {
-              "classname": "org.mule.sdk.api.runtime.source.DistributedTraceContextManager",
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -24977,15 +24975,15 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            },
-            "typeAlias": {
-              "value": "DistributedTraceContextManager"
-            },
-            "stereotype": {
-              "allowedStereotypes": []
+              "genericTypes": [
+                "java.lang.String",
+                "java.lang.String"
+              ],
+              "isMap": true
             }
+          },
+          "open": {
+            "type": "String"
           },
           "fields": []
         },
@@ -25260,9 +25258,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.sdk.api.runtime.source.DistributedTraceContextManager",
             "classInformation": {
-              "classname": "org.mule.sdk.api.runtime.source.DistributedTraceContextManager",
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -25270,15 +25267,15 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            },
-            "typeAlias": {
-              "value": "DistributedTraceContextManager"
-            },
-            "stereotype": {
-              "allowedStereotypes": []
+              "genericTypes": [
+                "java.lang.String",
+                "java.lang.String"
+              ],
+              "isMap": true
             }
+          },
+          "open": {
+            "type": "String"
           },
           "fields": []
         },
