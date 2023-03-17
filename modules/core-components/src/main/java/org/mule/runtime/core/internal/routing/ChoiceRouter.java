@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
