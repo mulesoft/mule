@@ -44,6 +44,9 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE =
       MULE_OPEN_TELEMETRY_EXPORTER + ".batch.queue.size";
 
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY =
+      MULE_OPEN_TELEMETRY_EXPORTER + ".batch.scheduled.delay";
+
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS =
       MULE_OPEN_TELEMETRY_EXPORTER + "backoff.max.attempts";
 
