@@ -43,6 +43,11 @@ public class DummyInitialSpanInfoProvider implements InitialSpanInfoProvider {
     return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
   }
 
+  @Override
+  public InitialSpanInfo getInitialSpanInfoFrom(Component component, String overriddenName, String suffix) {
+    return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
+  }
+
   private static class DummyInitialSpanInfo implements InitialSpanInfo {
 
     public static final String DUMMY_SPAN = "dummy-span";

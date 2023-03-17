@@ -65,7 +65,7 @@ public class PolicyChain extends AbstractComponent
   private ServerNotificationHandler notificationManager;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ProcessingStrategy processingStrategy;
 
@@ -88,7 +88,7 @@ public class PolicyChain extends AbstractComponent
   public final void initialise() throws InitialisationException {
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
-                                          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(MULE_POLICY_CHAIN_SPAN_NAME));
+                                          initialSpanInfoProvider.getInitialSpanInfoFrom(this));
 
     initialiseIfNeeded(processorChain, muleContext);
 

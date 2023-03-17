@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.tracer.configuration.internal.info;
 
+import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getLocationAsString;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
@@ -40,14 +41,23 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String location;
 
   public ExecutionInitialSpanInfo(Component component, InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, initialExportInfoProvider, "");
+    this(component, initialExportInfoProvider, null, "");
+  }
+
+  public ExecutionInitialSpanInfo(Component component, String overriddenName,
+                                  InitialExportInfoProvider initialExportInfoProvider) {
+    this(component, initialExportInfoProvider, overriddenName, "");
   }
 
   public ExecutionInitialSpanInfo(Component component, InitialExportInfoProvider initialExportInfoProvider,
-                                  String spanNameSuffix) {
+                                  String overriddenName, String spanNameSuffix) {
     initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
-    name = getSpanName(component.getIdentifier()) + spanNameSuffix;
-    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT);
+    if (overriddenName == null) {
+      name = getSpanName(component.getIdentifier()) + spanNameSuffix;
+    } else {
+      name = overriddenName;
+    }
+    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain;
     this.rootSpan = isComponentOfName(component, FLOW);
     this.location = getLocationAsString(component.getLocation());
   }
@@ -57,7 +67,7 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   }
 
   public ExecutionInitialSpanInfo(String name, InitialExportInfoProvider initialExportInfoProvider, String spanNameSuffix) {
-    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + StringUtils.stripToEmpty(spanNameSuffix));
+    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + stripToEmpty(spanNameSuffix));
     this.name = name;
     this.isPolicySpan = false;
     this.rootSpan = false;

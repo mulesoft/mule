@@ -24,7 +24,6 @@ public interface InitialSpanInfoProvider {
   InitialSpanInfo getInitialSpanInfoFrom(Component component);
 
   /**
-   *
    * @param component the {@link Component} to generate the {@link InitialSpanInfo} for.
    * @param suffix    the suffix.
    * @return
@@ -39,4 +38,11 @@ public interface InitialSpanInfoProvider {
   InitialSpanInfo getInitialSpanInfoFrom(String name);
 
 
+  /**
+   * @param component      the {@link Component} to generate the {@link InitialSpanInfo} for.
+   * @param overriddenName the overridden name.
+   * @param suffix         the suffix.
+   * @return
+   */
+  InitialSpanInfo getInitialSpanInfoFrom(Component component, String overriddenName, String suffix);
 }

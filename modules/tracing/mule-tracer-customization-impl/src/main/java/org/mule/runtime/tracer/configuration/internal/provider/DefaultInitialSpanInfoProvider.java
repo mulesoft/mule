@@ -21,7 +21,7 @@ import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanI
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
   // TODO: User Story B - Implementation of Monitoring, Troubleshooting, App Level (W-12658074)
-  private InitialExportInfoProvider initialExportInfo = new MonitoringInitialExportInfoProvider();
+  private final InitialExportInfoProvider initialExportInfo = new MonitoringInitialExportInfoProvider();
 
   @Override
   public InitialSpanInfo getInitialSpanInfoFrom(Component component) {
@@ -30,11 +30,16 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
   @Override
   public InitialSpanInfo getInitialSpanInfoFrom(Component component, String suffix) {
-    return new ExecutionInitialSpanInfo(component, initialExportInfo, suffix);
+    return new ExecutionInitialSpanInfo(component, initialExportInfo, null, suffix);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfoFrom(String name) {
     return new ExecutionInitialSpanInfo(name, initialExportInfo);
+  }
+
+  @Override
+  public InitialSpanInfo getInitialSpanInfoFrom(Component component, String overriddenName, String suffix) {
+    return new ExecutionInitialSpanInfo(component, overriddenName, initialExportInfo);
   }
 }
