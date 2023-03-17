@@ -18,15 +18,15 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
-import org.reactivestreams.Publisher;
-
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * FirstSuccessful routes an event to the first target route that can accept it without throwing or returning an exception. If no
