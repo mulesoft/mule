@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 
 import static java.lang.Thread.currentThread;
@@ -508,7 +509,7 @@ public class MessageProcessors {
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
-            .put(WITHIN_PROCESS_TO_APPLY, true));
+            .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,
