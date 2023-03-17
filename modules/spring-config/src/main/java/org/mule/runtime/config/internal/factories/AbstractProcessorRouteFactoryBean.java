@@ -33,7 +33,6 @@ public abstract class AbstractProcessorRouteFactoryBean<T> extends AbstractCompo
   @Inject
   protected InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
-
   private List<Processor> messageProcessors;
 
   public void setMessageProcessors(List<Processor> messageProcessors) {
