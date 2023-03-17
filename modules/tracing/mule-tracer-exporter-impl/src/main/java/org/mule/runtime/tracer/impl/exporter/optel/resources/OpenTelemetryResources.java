@@ -7,7 +7,9 @@
 
 package org.mule.runtime.tracer.impl.exporter.optel.resources;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
+import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
@@ -26,6 +28,7 @@ import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.metrics.OpenTelemetryExportQueueMetrics;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
@@ -72,6 +75,7 @@ public class OpenTelemetryResources {
       throws SpanExporterConfiguratorException {
     SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder()
         .addSpanProcessor(resolveOpenTelemetrySpanProcessor(spanExporterConfiguration,
+                                                            spanExporterConfiguration,
                                                             resolveOpenTelemetrySpanExporter(spanExporterConfiguration)))
         .setResource(getResource(serviceName));
 
@@ -101,6 +105,7 @@ public class OpenTelemetryResources {
   }
 
   public static SpanProcessor resolveOpenTelemetrySpanProcessor(SpanExporterConfiguration spanExporterConfiguration,
+                                                                SpanExporterConfiguration privilegedSpanExporterConfiguration,
                                                                 SpanExporter spanExporter)
       throws SpanExporterConfiguratorException {
 
@@ -116,6 +121,8 @@ public class OpenTelemetryResources {
     return builder(spanExporter)
         .setMaxQueueSize(batchQueueSize)
         .setMeterProvider(getMeterProvider(spanExporterConfiguration))
+        .setScheduleDelay(parseLong(privilegedSpanExporterConfiguration
+            .getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY)), MILLISECONDS)
         .setMaxExportBatchSize(maxBatchSize).build();
   }
 
