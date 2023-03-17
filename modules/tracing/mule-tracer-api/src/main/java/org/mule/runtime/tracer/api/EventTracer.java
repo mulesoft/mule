@@ -148,5 +148,5 @@ public interface EventTracer<T extends Event> {
   /**
    * @return a {@link SpanSnifferManager}.
    */
-  SpanSnifferManager getSpanExporterManager();
+  SpanSnifferManager getSpanSnifferManager();
 }

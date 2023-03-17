@@ -38,7 +38,7 @@ import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResour
 public class CapturingSpanExporterWrapper implements SpanExporter {
 
   private final SpanExporter delegate;
-  private Set<MuleSpanSniffer> spanCapturers = ConcurrentHashMap.newKeySet();
+  private final Set<MuleSpanSniffer> spanSniffers = ConcurrentHashMap.newKeySet();
 
   public CapturingSpanExporterWrapper(SpanExporter delegate) {
     this.delegate = delegate;
@@ -46,8 +46,8 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
   @Override
   public CompletableResultCode export(Collection<SpanData> collection) {
-    if (!spanCapturers.isEmpty()) {
-      spanCapturers.forEach(capturer -> capturer.addSpans(collection));
+    if (!spanSniffers.isEmpty()) {
+      spanSniffers.forEach(sniffer -> sniffer.addSpans(collection));
     }
     return delegate.export(collection);
   }
@@ -62,23 +62,23 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
     return delegate.shutdown();
   }
 
-  public ExportedSpanSniffer getSpanCapturer() {
-    MuleSpanSniffer spanCapturer = new MuleSpanSniffer(this);
-    spanCapturers.add(spanCapturer);
-    return spanCapturer;
+  public ExportedSpanSniffer getExportedSpanSniffer() {
+    MuleSpanSniffer spanSniffer = new MuleSpanSniffer(this);
+    spanSniffers.add(spanSniffer);
+    return spanSniffer;
   }
 
-  private void dispose(ExportedSpanSniffer muleSpanCapturer) {
-    spanCapturers.remove(muleSpanCapturer);
+  private void dispose(ExportedSpanSniffer muleSpanSniffer) {
+    spanSniffers.remove(muleSpanSniffer);
   }
 
   private static final class MuleSpanSniffer implements ExportedSpanSniffer {
 
-    private final CapturingSpanExporterWrapper muleOtlpGrpcSpanExporter;
-    private Set<SpanData> spanData = ConcurrentHashMap.newKeySet();
+    private final CapturingSpanExporterWrapper openTelemetrySpanExporter;
+    private final Set<SpanData> spanData = ConcurrentHashMap.newKeySet();
 
-    public MuleSpanSniffer(CapturingSpanExporterWrapper muleOtlpGrpcSpanExporter) {
-      this.muleOtlpGrpcSpanExporter = muleOtlpGrpcSpanExporter;
+    public MuleSpanSniffer(CapturingSpanExporterWrapper openTelemetrySpanExporter) {
+      this.openTelemetrySpanExporter = openTelemetrySpanExporter;
     }
 
     public void addSpans(Collection<SpanData> spanItems) {
@@ -97,7 +97,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
     @Override
     public void dispose() {
-      muleOtlpGrpcSpanExporter.dispose(this);
+      openTelemetrySpanExporter.dispose(this);
     }
 
     private static final class SpanDataWrapper implements CapturedExportedSpan {

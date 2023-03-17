@@ -199,6 +199,6 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Override
   public SpanSnifferManager getSpanExportManager() {
-    return eventTracer.getSpanExporterManager();
+    return eventTracer.getSpanSnifferManager();
   }
 }
