@@ -48,7 +48,7 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 /**
@@ -68,6 +68,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
+  public static final String POLICY_NEXT_ACTION = "policy-next-action";
 
   @Inject
   private MuleContext muleContext;
@@ -76,7 +77,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private ServerNotificationHandler notificationManager;
 
   @Inject
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   private PolicyNotificationHelper notificationHelper;
   private PolicyEventMapper policyEventMapper;
@@ -117,7 +118,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 : policyEventMapper.onOperationPolicyNext(event))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
-    }), policyNextErrorHandler(), initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withNoExport().build());
+    }), policyNextErrorHandler(), initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(POLICY_NEXT_ACTION));
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
   }
 

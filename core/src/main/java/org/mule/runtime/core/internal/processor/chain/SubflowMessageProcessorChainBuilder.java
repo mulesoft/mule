@@ -29,7 +29,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +51,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   private final Object rootContainerLocationInitLock = new Object();
   private volatile Location rootContainerLocation;
 
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   @Override
   public Object getAnnotation(QName qName) {
@@ -95,7 +95,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional, initialSpanInfoBuilderProvider);
   }
 
-  public void withInitialSpanInfoBuilderProvider(InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
+  public void withInitialSpanInfoBuilderProvider(InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
     this.initialSpanInfoBuilderProvider = initialSpanInfoBuilderProvider;
   }
 
@@ -110,13 +110,12 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
 
     SubFlowMessageProcessorChain(String name, List<Processor> processors,
                                  Optional<ProcessingStrategy> processingStrategyOptional,
-                                 InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
+                                 InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setInitialSpanInfo(initialSpanInfoBuilderProvider.getGenericInitialSpanInfoBuilder()
-          .withName(SUB_FLOW.getNamespace() + ":" + SUB_FLOW.getName())
-          .build());
+      this.setInitialSpanInfo(initialSpanInfoBuilderProvider
+          .getInitialSpanInfoFrom(SUB_FLOW.getNamespace() + ":" + SUB_FLOW.getName()));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {

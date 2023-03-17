@@ -74,7 +74,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +98,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private ConfigurationComponentLocator componentLocator;
 
   @Inject
-  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -149,7 +149,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
     delegateBuilder
-        .setChainInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withNoExport().build());
+        .setChainInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom("async-inner-chain"));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

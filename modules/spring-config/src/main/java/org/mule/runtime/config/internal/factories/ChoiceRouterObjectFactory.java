@@ -14,7 +14,7 @@ import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
 import org.mule.runtime.core.internal.routing.ProcessorRoute;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.Collection;
 
@@ -26,7 +26,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   private Processor defaultProcessor;
   private Collection<ProcessorExpressionRoute> conditionalMessageProcessors = emptyList();

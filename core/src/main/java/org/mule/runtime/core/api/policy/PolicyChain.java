@@ -38,7 +38,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +57,7 @@ import org.reactivestreams.Publisher;
 public class PolicyChain extends AbstractComponent
     implements Initialisable, Startable, Stoppable, Disposable, Processor {
 
-  public static final String EXECUTE_NEXT_COMPONENT_NAME = "execute-next";
+  public static final String MULE_POLICY_CHAIN_SPAN_NAME = "mule:policy-chain";
   @Inject
   private MuleContext muleContext;
 
@@ -65,7 +65,7 @@ public class PolicyChain extends AbstractComponent
   private ServerNotificationHandler notificationManager;
 
   @Inject
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   private ProcessingStrategy processingStrategy;
 
@@ -88,8 +88,7 @@ public class PolicyChain extends AbstractComponent
   public final void initialise() throws InitialisationException {
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
-                                          initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
-                                              .withForceNoExportUntil(EXECUTE_NEXT_COMPONENT_NAME).build());
+                                          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(MULE_POLICY_CHAIN_SPAN_NAME));
 
     initialiseIfNeeded(processorChain, muleContext);
 

@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class SubflowMessageProcessorChainFactoryBean extends AbstractComponentFa
   protected MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   protected List processors;
   protected String name;

@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
@@ -54,9 +54,9 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
-  public ChoiceRouter(InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
+  public ChoiceRouter(InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
     this.initialSpanInfoBuilderProvider = initialSpanInfoBuilderProvider;
   }
@@ -79,8 +79,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     routes.add(new ProcessorRoute(defaultProcessor, initialSpanInfoBuilderProvider));
 
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withSuffix(":route")
-          .build());
+      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":route"));
       initialiseIfNeeded(route, muleContext);
     }
   }

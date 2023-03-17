@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 import javax.inject.Inject;
@@ -49,7 +49,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -63,8 +63,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withSuffix(":route")
-          .build());
+      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":route"));
       initialiseIfNeeded(route, muleContext);
     }
   }

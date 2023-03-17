@@ -87,7 +87,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -137,7 +137,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
@@ -151,7 +151,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
       initialSpanInfoBuilderProvider =
-          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InitialSpanInfoBuilderProvider.class);
+          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InitialSpanInfoProvider.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -196,7 +196,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
-    builder.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).build());
+    builder.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this));
     return builder.build();
   }
 

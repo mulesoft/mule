@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 import javax.inject.Inject;
@@ -39,7 +39,7 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
 
   @Override
@@ -47,8 +47,7 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
     Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
-          .withSuffix(":attempt:" + routeNumber).build());
+      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":attempt:" + routeNumber));
       initialiseIfNeeded(route, muleContext);
       routeNumber++;
     }

@@ -46,7 +46,7 @@ import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaul
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
-import static org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoBuilderProvider.getDummyInitialSpanInfoBuilderProvider;
+import static org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider.getDummyInitialSpanInfoProvider;
 import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
@@ -108,7 +108,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
@@ -318,7 +318,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   private void configureCoreTracerCustomization(MuleContext muleContext) throws RegistrationException {
-    InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider = getDummyInitialSpanInfoBuilderProvider();
+    InitialSpanInfoProvider initialSpanInfoBuilderProvider = getDummyInitialSpanInfoProvider();
     registerObject(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, initialSpanInfoBuilderProvider, muleContext);
   }
 

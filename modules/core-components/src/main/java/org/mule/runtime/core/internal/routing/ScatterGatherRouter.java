@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import javax.inject.Inject;
 
@@ -48,7 +48,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   private List<MessageProcessorChain> routes = emptyList();
 
   @Inject
-  InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   @Override
   protected Consumer<CoreEvent> onEvent() {
@@ -70,8 +70,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
     for (MessageProcessorChain route : routes) {
       if (route instanceof InitialSpanInfoAware) {
         ((InitialSpanInfoAware) route)
-            .setInitialSpanInfo(initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).withSuffix(":route")
-                .build());
+            .setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":route"));
       }
     }
   }

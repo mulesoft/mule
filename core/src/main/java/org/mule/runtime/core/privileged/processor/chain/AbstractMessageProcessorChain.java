@@ -112,7 +112,7 @@ import javax.inject.Inject;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -187,7 +187,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private SchedulerService schedulerService;
 
   @Inject
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> startingOperationExecutionDataProducer;
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
@@ -514,11 +514,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
-      initialSpanInfo = initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder((Component) processor).build();
+      initialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom((Component) processor);
     } else {
       // Other processors are not exported
       initialSpanInfo =
-          initialSpanInfoBuilderProvider.getGenericInitialSpanInfoBuilder().withNoExport().withName(UNKNOWN).build();
+          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(UNKNOWN);
     }
 
     return initialSpanInfo;
@@ -765,7 +765,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     muleEventTracer = profilingService.getCoreEventTracer();
 
     if (chainInitialSpanInfo == null) {
-      this.chainInitialSpanInfo = initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this).build();
+      this.chainInitialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this);
     }
   }
 

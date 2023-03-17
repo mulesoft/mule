@@ -65,7 +65,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -89,7 +89,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   private ProfilingService profilingService;
 
   @Inject
-  private InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
@@ -230,8 +230,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
-                                                         initialSpanInfoBuilderProvider.getComponentInitialSpanInfoBuilder(this)
-                                                             .withNoExport().build());
+                                                         initialSpanInfoBuilderProvider
+                                                             .getInitialSpanInfoFrom("async-inner-chain"));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

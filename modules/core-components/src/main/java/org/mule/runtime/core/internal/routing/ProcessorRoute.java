@@ -29,7 +29,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 
 import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,10 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
   private MuleContext muleContext;
 
-  public ProcessorRoute(Processor processor, InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
+  public ProcessorRoute(Processor processor, InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
     requireNonNull(processor, "processor can't be null");
     this.processor = processor;
-    this.initialSpanInfo = initialSpanInfoBuilderProvider.getGenericInitialSpanInfoBuilder().withName("route").build();
+    this.initialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom("route");
   }
 
   public Processor getProcessor() {

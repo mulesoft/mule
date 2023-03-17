@@ -17,7 +17,7 @@ import org.mule.runtime.core.privileged.routing.RoutingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
@@ -33,7 +33,7 @@ abstract class AbstractSinkRouter {
   private final ExecutableRoute phantomRoute;
 
   protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes,
-                               InitialSpanInfoBuilderProvider initialSpanInfoBuilderProvider) {
+                               InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
     this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
 
     // This phantomRoute exists so that the subscription/completion mechanism does not interfere with an actual route.

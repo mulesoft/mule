@@ -70,7 +70,7 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoBuilderProvider;
+import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
@@ -79,7 +79,7 @@ import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
@@ -273,7 +273,7 @@ public class MuleContextUtils {
 
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
-      when(registry.lookupObject(InitialSpanInfoBuilderProvider.class)).thenReturn(new DummyInitialSpanInfoBuilderProvider());
+      when(registry.lookupObject(InitialSpanInfoProvider.class)).thenReturn(new DummyInitialSpanInfoProvider());
 
       Map<Class, Object> injectableObjects = new HashMap<>();
       injectableObjects.put(MuleContext.class, muleContext);
@@ -291,7 +291,7 @@ public class MuleContextUtils {
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
       injectableObjects.put(InternalProfilingService.class, coreProfilingService);
       injectableObjects.put(ProfilingService.class, coreProfilingService);
-      injectableObjects.put(InitialSpanInfoBuilderProvider.class, new DummyInitialSpanInfoBuilderProvider());
+      injectableObjects.put(InitialSpanInfoProvider.class, new DummyInitialSpanInfoProvider());
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));

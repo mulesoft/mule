@@ -4,53 +4,69 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.configuration.internal.info;
 
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getLocationAsString;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
-import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
 
 import java.util.function.BiConsumer;
 
 /**
- * A {@link InitialSpanInfo} based on a component.
+ * An implementation of {@link InitialSpanInfo} for the execution.
  *
- * @since 4.5.0
+ * @since 4.6.0
  */
-public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
-
+public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   public static final String LOCATION_KEY = "location";
-  // Only attribute is the location key.
+
   public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 1;
+
   public static final String EXECUTE_NEXT = "execute-next";
   public static final String FLOW = "flow";
+  public static final String NO_LOCATION = "no-location";
 
-  protected final Component component;
+  private final InitialExportInfo initialExportInfo;
+
   private final String name;
   private final boolean isPolicySpan;
   private final boolean rootSpan;
+  private final String location;
 
-  public ComponentExecutionInitialSpanInfo(Component component,
-                                           String spanNameSuffix) {
-    this.component = component;
-    this.name = getSpanName(component.getIdentifier()) + spanNameSuffix;
-    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT);
-    this.rootSpan = isComponentOfName(component, FLOW);
+  public ExecutionInitialSpanInfo(Component component, InitialExportInfoProvider initialExportInfoProvider) {
+    this(component, initialExportInfoProvider, "");
   }
 
-  public ComponentExecutionInitialSpanInfo(Component component) {
-    this(component, "");
+  public ExecutionInitialSpanInfo(Component component, InitialExportInfoProvider initialExportInfoProvider,
+                                  String spanNameSuffix) {
+    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
+    name = getSpanName(component.getIdentifier()) + spanNameSuffix;
+    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT);
+    this.rootSpan = isComponentOfName(component, FLOW);
+    this.location = getLocationAsString(component.getLocation());
+  }
+
+  public ExecutionInitialSpanInfo(String name, InitialExportInfoProvider initialExportInfoProvider) {
+    this(name, initialExportInfoProvider, "");
+  }
+
+  public ExecutionInitialSpanInfo(String name, InitialExportInfoProvider initialExportInfoProvider, String spanNameSuffix) {
+    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + StringUtils.stripToEmpty(spanNameSuffix));
+    this.name = name;
+    this.isPolicySpan = false;
+    this.rootSpan = false;
+    this.location = NO_LOCATION;
   }
 
   @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
-    biConsumer.accept(LOCATION_KEY, getLocationAsString(component.getLocation()));
+    biConsumer.accept(LOCATION_KEY, location);
   }
 
   @Override
@@ -65,7 +81,7 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
 
   @Override
   public InitialExportInfo getInitialExportInfo() {
-    return DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+    return initialExportInfo;
   }
 
   @Override
@@ -77,7 +93,6 @@ public class ComponentExecutionInitialSpanInfo implements InitialSpanInfo {
   public boolean isRootSpan() {
     return rootSpan;
   }
-
 
   private boolean isComponentOfName(Component component, String name) {
     return component.getIdentifier() != null && name.equals(component.getIdentifier().getName());
