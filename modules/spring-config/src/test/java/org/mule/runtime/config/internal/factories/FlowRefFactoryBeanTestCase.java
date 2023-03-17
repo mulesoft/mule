@@ -93,10 +93,12 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoBuilderProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoBuilderProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -392,6 +394,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
             .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
             .setScope(BeanDefinition.SCOPE_PROTOTYPE)
             .getBeanDefinition();
+    beanFactory.registerSingleton(InitialSpanInfoBuilderProvider.class.getName(), new DummyInitialSpanInfoBuilderProvider());
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
