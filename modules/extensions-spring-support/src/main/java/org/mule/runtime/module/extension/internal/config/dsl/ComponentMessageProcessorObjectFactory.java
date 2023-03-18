@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.util.Optional.empty;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_MESSAGE_PROCESSORS;
+
+import static java.util.Optional.empty;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -21,7 +23,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.tracer.configuration.internal.info.NoExportFixedNameInitialSpanInfo;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -69,7 +71,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
     if (nestedProcessors != null) {
       nestedChain = newChain(empty(), nestedProcessors,
-                             new NoExportFixedNameInitialSpanInfo("message:processor"));
+                             registry.lookupByType(InitialSpanInfoProvider.class).get()
+                                 .getInitialSpanInfoFrom(MULE_MESSAGE_PROCESSORS));
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()

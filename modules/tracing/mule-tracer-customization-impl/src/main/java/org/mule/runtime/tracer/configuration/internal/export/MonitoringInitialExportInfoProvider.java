@@ -10,6 +10,7 @@ import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EX
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN;
 import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_CACHE_CHAIN;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_MESSAGE_PROCESSORS;
 import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY;
 import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
@@ -49,6 +50,7 @@ public class MonitoringInitialExportInfoProvider implements InitialExportInfoPro
       put(UNKNOWN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(ASYNC_INNER_CHAIN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(MULE_CACHE_CHAIN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(MULE_MESSAGE_PROCESSORS, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
     }
   };
 

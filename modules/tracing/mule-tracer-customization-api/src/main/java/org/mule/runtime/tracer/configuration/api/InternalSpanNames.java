@@ -18,4 +18,5 @@ public class InternalSpanNames {
   public static final String MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY = "mule:policy-chain";
   public static final String ASYNC_INNER_CHAIN = "async-inner-chain";
   public static final String MULE_CACHE_CHAIN = "mule:cache-chain";
+  public static final String MULE_MESSAGE_PROCESSORS = "message:processor";
 }
