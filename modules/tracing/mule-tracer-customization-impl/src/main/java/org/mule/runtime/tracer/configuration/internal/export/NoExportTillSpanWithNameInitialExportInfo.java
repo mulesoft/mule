@@ -12,7 +12,6 @@ import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  * A {@link InitialExportInfo} that indicates that the span shouldn't be exported until a span with certain names is found.
  *
