@@ -148,6 +148,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
     try {
+      // TODO: verify if the lookup in registry AbstractPipeline can be removed (W-12718088)
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
       initialSpanInfoProvider =
