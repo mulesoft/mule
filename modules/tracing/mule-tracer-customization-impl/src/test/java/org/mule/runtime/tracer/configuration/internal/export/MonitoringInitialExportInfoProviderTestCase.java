@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.tracer.configuration.internal.export;
 
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_CACHE_CHAIN;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
@@ -37,11 +37,11 @@ public class MonitoringInitialExportInfoProviderTestCase {
 
   @Test
   public void testForSpecialCasesByName() {
-    testComponent(MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY, TRUE, singleton("execute-next"));
-    testComponent(MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY, FALSE, emptySet());
+    testComponent(POLICY_CHAIN_SPAN_NAME, TRUE, singleton("execute-next"));
+    testComponent(POLICY_NEXT_ACTION_SPAN_NAME, FALSE, emptySet());
     testComponent(UNKNOWN, FALSE, emptySet());
-    testComponent(ASYNC_INNER_CHAIN, FALSE, emptySet());
-    testComponent(MULE_CACHE_CHAIN, FALSE, emptySet());
+    testComponent(ASYNC_INNER_CHAIN_SPAN_NAME, FALSE, emptySet());
+    testComponent(CACHE_CHAIN_SPAN_NAME, FALSE, emptySet());
   }
 
   @Test

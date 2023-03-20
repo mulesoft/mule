@@ -29,22 +29,22 @@ public class DummyInitialSpanInfoProvider implements InitialSpanInfoProvider {
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(Component component) {
+  public InitialSpanInfo getInitialSpanInfo(Component component) {
     return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(Component component, String suffix) {
+  public InitialSpanInfo getInitialSpanInfo(Component component, String suffix) {
     return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(String name) {
+  public InitialSpanInfo getInitialSpanInfo(String name) {
     return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(Component component, String overriddenName, String suffix) {
+  public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
     return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
   }
 

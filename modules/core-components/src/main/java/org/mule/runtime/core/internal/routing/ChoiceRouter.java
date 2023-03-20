@@ -47,6 +47,7 @@ import reactor.core.publisher.Flux;
  */
 public class ChoiceRouter extends AbstractComponent implements Router, RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
+  public static final String ROUTE_SPAN_NAME_SUFFIX = ":route";
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final List<ProcessorRoute> routes = new ArrayList<>();
 
@@ -54,11 +55,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
-  public ChoiceRouter(InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
+  public ChoiceRouter(InitialSpanInfoProvider initialSpanInfoProvider) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
-    this.initialSpanInfoBuilderProvider = initialSpanInfoBuilderProvider;
+    this.initialSpanInfoProvider = initialSpanInfoProvider;
   }
 
   @Override
@@ -76,10 +77,10 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     if (defaultProcessor == null) {
       defaultProcessor = event -> event;
     }
-    routes.add(new ProcessorRoute(defaultProcessor, initialSpanInfoBuilderProvider));
+    routes.add(new ProcessorRoute(defaultProcessor, initialSpanInfoProvider));
 
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":route"));
+      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -110,7 +111,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   }
 
   public void addRoute(final String expression, final Processor processor) {
-    routes.add(new ProcessorExpressionRoute(expression, processor, initialSpanInfoBuilderProvider));
+    routes.add(new ProcessorExpressionRoute(expression, processor, initialSpanInfoProvider));
   }
 
   public void setDefaultRoute(final Processor processor) {
@@ -150,7 +151,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, initialSpanInfoBuilderProvider);
+      super(publisher, routes, initialSpanInfoProvider);
     }
 
     /**

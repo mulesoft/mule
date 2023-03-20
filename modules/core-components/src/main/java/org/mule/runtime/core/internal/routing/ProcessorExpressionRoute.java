@@ -24,8 +24,8 @@ public class ProcessorExpressionRoute extends ProcessorRoute {
 
 
   public ProcessorExpressionRoute(String expression, Processor processor,
-                                  InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
-    super(processor, initialSpanInfoBuilderProvider);
+                                  InitialSpanInfoProvider initialSpanInfoProvider) {
+    super(processor, initialSpanInfoProvider);
     this.expression = requireNonNull(expression, "expression can't be null");
   }
 

@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -77,7 +77,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private ServerNotificationHandler notificationManager;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private PolicyNotificationHelper notificationHelper;
   private PolicyEventMapper policyEventMapper;
@@ -118,7 +118,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 : policyEventMapper.onOperationPolicyNext(event))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
-    }), policyNextErrorHandler(), initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY));
+    }), policyNextErrorHandler(), initialSpanInfoProvider.getInitialSpanInfo(POLICY_NEXT_ACTION_SPAN_NAME));
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
   }
 

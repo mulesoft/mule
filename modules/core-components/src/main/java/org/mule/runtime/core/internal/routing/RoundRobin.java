@@ -39,6 +39,7 @@ import reactor.core.publisher.Flux;
  */
 public class RoundRobin extends AbstractComponent implements Router, Lifecycle, MuleContextAware {
 
+  public static final String ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX = ":route";
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final List<ProcessorRoute> routes = new ArrayList<>();
 
@@ -48,7 +49,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -62,7 +63,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":route"));
+      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -93,7 +94,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor, initialSpanInfoBuilderProvider));
+    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
   }
 
   @Override
@@ -120,7 +121,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, initialSpanInfoBuilderProvider);
+      super(publisher, routes, initialSpanInfoProvider);
     }
 
     @Override

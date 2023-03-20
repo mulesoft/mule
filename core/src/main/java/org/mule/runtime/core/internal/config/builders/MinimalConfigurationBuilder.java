@@ -318,8 +318,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   private void configureCoreTracerCustomization(MuleContext muleContext) throws RegistrationException {
-    InitialSpanInfoProvider initialSpanInfoBuilderProvider = getDummyInitialSpanInfoProvider();
-    registerObject(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, initialSpanInfoBuilderProvider, muleContext);
+    InitialSpanInfoProvider initialSpanInfoProvider = getDummyInitialSpanInfoProvider();
+    registerObject(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, initialSpanInfoProvider, muleContext);
   }
 
   protected void configureCoreTracer(MuleContext muleContext) throws RegistrationException {

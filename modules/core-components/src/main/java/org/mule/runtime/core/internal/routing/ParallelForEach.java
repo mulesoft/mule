@@ -55,6 +55,7 @@ import org.reactivestreams.Publisher;
  */
 public class ParallelForEach extends AbstractForkJoinRouter {
 
+  public static final String PARALLEL_FOREACH_ITERATION_SPAN_NAME_SUFFIX = ":iteration";
   @Inject
   protected ExpressionManager expressionManager;
 
@@ -65,7 +66,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   protected FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   private String collectionExpression = DEFAULT_SPLIT_EXPRESSION;
   private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;
@@ -77,7 +78,8 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   public void initialise() throws InitialisationException {
     nestedChain =
         buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors,
-                                          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":iteration"));
+                                          initialSpanInfoProvider
+                                              .getInitialSpanInfo(this, PARALLEL_FOREACH_ITERATION_SPAN_NAME_SUFFIX));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, collectionExpression);
     super.initialise();
   }

@@ -27,7 +27,7 @@ public class SubflowMessageProcessorChainFactoryBean extends AbstractComponentFa
   protected MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   protected List processors;
   protected String name;
@@ -53,7 +53,7 @@ public class SubflowMessageProcessorChainFactoryBean extends AbstractComponentFa
 
   protected SubflowMessageProcessorChainBuilder getBuilderInstance() {
     SubflowMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
-    builder.withInitialSpanInfoBuilderProvider(initialSpanInfoBuilderProvider);
+    builder.withInitialSpanInfoProvider(initialSpanInfoProvider);
     builder.setName(name);
     return builder;
   }

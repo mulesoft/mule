@@ -137,7 +137,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
@@ -150,7 +150,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     try {
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
-      initialSpanInfoBuilderProvider =
+      initialSpanInfoProvider =
           ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InitialSpanInfoProvider.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
@@ -196,7 +196,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
-    builder.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this));
+    builder.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this));
     return builder.build();
   }
 

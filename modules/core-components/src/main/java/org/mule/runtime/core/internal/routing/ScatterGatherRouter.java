@@ -45,10 +45,11 @@ import org.reactivestreams.Publisher;
  */
 public class ScatterGatherRouter extends AbstractForkJoinRouter implements Router {
 
+  public static final String SCATTER_GATHER_ROUTE_SPAN_NAME_SUFFIX = ":route";
   private List<MessageProcessorChain> routes = emptyList();
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   @Override
   protected Consumer<CoreEvent> onEvent() {
@@ -70,7 +71,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
     for (MessageProcessorChain route : routes) {
       if (route instanceof InitialSpanInfoAware) {
         ((InitialSpanInfoAware) route)
-            .setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":route"));
+            .setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, SCATTER_GATHER_ROUTE_SPAN_NAME_SUFFIX));
       }
     }
   }

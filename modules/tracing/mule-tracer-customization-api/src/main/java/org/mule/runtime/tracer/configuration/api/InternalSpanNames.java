@@ -13,10 +13,11 @@ package org.mule.runtime.tracer.configuration.api;
  */
 public class InternalSpanNames {
 
-  public static final String EXECUTE_NEXT_COMPONENT_NAME = "execute-next";
-  public static final String MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY = "policy-next-action";
-  public static final String MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY = "mule:policy-chain";
-  public static final String ASYNC_INNER_CHAIN = "async-inner-chain";
-  public static final String MULE_CACHE_CHAIN = "mule:cache-chain";
-  public static final String MULE_MESSAGE_PROCESSORS = "message:processor";
+  public static final String TRY_SCOPE_INNER_CHAIN_SPAN_NAME = "try-scope-inner-chain";
+  public static final String EXECUTE_NEXT_SPAN_NAME = "execute-next";
+  public static final String POLICY_NEXT_ACTION_SPAN_NAME = "policy-next-action";
+  public static final String POLICY_CHAIN_SPAN_NAME = "mule:policy-chain";
+  public static final String ASYNC_INNER_CHAIN_SPAN_NAME = "async-inner-chain";
+  public static final String CACHE_CHAIN_SPAN_NAME = "mule:cache-chain";
+  public static final String MESSAGE_PROCESSORS_SPAN_NAME = "message:processor";
 }

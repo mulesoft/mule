@@ -33,11 +33,11 @@ abstract class AbstractSinkRouter {
   private final ExecutableRoute phantomRoute;
 
   protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes,
-                               InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
+                               InitialSpanInfoProvider initialSpanInfoProvider) {
     this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
 
     // This phantomRoute exists so that the subscription/completion mechanism does not interfere with an actual route.
-    this.phantomRoute = new ExecutableRoute(new ProcessorRoute(e -> e, initialSpanInfoBuilderProvider));
+    this.phantomRoute = new ExecutableRoute(new ProcessorRoute(e -> e, initialSpanInfoProvider));
 
     router = from(publisher)
         .doOnNext(checkedConsumer(this::route))

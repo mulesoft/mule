@@ -87,7 +87,7 @@ public class PolicyChain extends AbstractComponent
   public final void initialise() throws InitialisationException {
     processorChain =
         buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors, policyChainErrorHandler(),
-                                          initialSpanInfoProvider.getInitialSpanInfoFrom(this));
+                                          initialSpanInfoProvider.getInitialSpanInfo(this));
 
     initialiseIfNeeded(processorChain, muleContext);
 

@@ -117,7 +117,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   private ConfigurationComponentLocator locator;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   public void setName(String name) {
     this.refName = name;
@@ -171,7 +171,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
         SubflowMessageProcessorChainBuilder chainBuilder = (SubflowMessageProcessorChainBuilder) referencedFlow;
-        chainBuilder.withInitialSpanInfoBuilderProvider(initialSpanInfoBuilderProvider);
+        chainBuilder.withInitialSpanInfoProvider(initialSpanInfoProvider);
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
             .ifPresent(f -> {
               ProcessingStrategy callerFlowPs = f.getProcessingStrategy();

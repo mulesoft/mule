@@ -19,6 +19,6 @@ public class ProcessorExpressionRouteFactoryBean extends AbstractProcessorRouteF
 
   @Override
   protected ProcessorExpressionRoute getProcessorRoute(MessageProcessorChain chain) {
-    return new ProcessorExpressionRoute(expression, chain, initialSpanInfoBuilderProvider);
+    return new ProcessorExpressionRoute(expression, chain, initialSpanInfoProvider);
   }
 }

@@ -26,7 +26,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   private Processor defaultProcessor;
   private Collection<ProcessorExpressionRoute> conditionalMessageProcessors = emptyList();
@@ -49,7 +49,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
 
   @Override
   public ChoiceRouter doGetObject() throws Exception {
-    final ChoiceRouter router = new ChoiceRouter(initialSpanInfoBuilderProvider);
+    final ChoiceRouter router = new ChoiceRouter(initialSpanInfoProvider);
     router.setAnnotations(getAnnotations());
     router.setDefaultRoute(defaultProcessor);
     router.setMuleContext(muleContext);

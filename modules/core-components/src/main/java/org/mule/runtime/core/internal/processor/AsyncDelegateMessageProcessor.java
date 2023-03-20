@@ -21,7 +21,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
@@ -66,6 +66,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -77,7 +78,6 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +101,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private ConfigurationComponentLocator componentLocator;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -152,7 +152,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
     delegateBuilder
-        .setChainInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(ASYNC_INNER_CHAIN));
+        .setChainInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(ASYNC_INNER_CHAIN_SPAN_NAME));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

@@ -48,6 +48,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   private static final String DEFAULT_MILLIS_BETWEEN_RETRIES = "60000";
   private static final String DEFAULT_RETRIES = "5";
+  public static final String UNTIL_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFIX = ":attempt";
 
   @Inject
   private SchedulerService schedulerService;
@@ -62,7 +63,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
@@ -82,7 +83,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     this.nestedChain =
         buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
-                                          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":attempt"));
+                                          initialSpanInfoProvider.getInitialSpanInfo(this,
+                                                                                     UNTIL_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFIX));
 
     super.initialise();
 

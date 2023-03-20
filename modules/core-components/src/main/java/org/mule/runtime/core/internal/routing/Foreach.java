@@ -67,6 +67,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
   public static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";
+  public static final String ITERATION_SPAN_NAME_SUFFIX = ":iteration";
   private String counterVariableName = DEFAULT_COUNTER_VARIABLE;
   private String rootMessageVariableName = DEFAULT_ROOT_MESSAGE_VARIABLE;
 
@@ -80,7 +81,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
@@ -122,7 +123,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     nestedChain =
         buildNewChainWithListOfProcessors(processingStrategy, messageProcessors,
-                                          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":iteration"));
+                                          initialSpanInfoProvider.getInitialSpanInfo(this, ITERATION_SPAN_NAME_SUFFIX));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
   }

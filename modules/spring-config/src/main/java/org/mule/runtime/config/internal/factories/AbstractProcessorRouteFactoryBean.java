@@ -31,7 +31,7 @@ public abstract class AbstractProcessorRouteFactoryBean<T> extends AbstractCompo
   protected ConfigurationComponentLocator locator;
 
   @Inject
-  protected InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  protected InitialSpanInfoProvider initialSpanInfoProvider;
 
   private List<Processor> messageProcessors;
 

@@ -24,22 +24,22 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   private final InitialExportInfoProvider initialExportInfo = new MonitoringInitialExportInfoProvider();
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(Component component) {
+  public InitialSpanInfo getInitialSpanInfo(Component component) {
     return new ExecutionInitialSpanInfo(component, initialExportInfo);
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(Component component, String suffix) {
+  public InitialSpanInfo getInitialSpanInfo(Component component, String suffix) {
     return new ExecutionInitialSpanInfo(component, initialExportInfo, null, suffix);
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(String name) {
+  public InitialSpanInfo getInitialSpanInfo(String name) {
     return new ExecutionInitialSpanInfo(name, initialExportInfo);
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfoFrom(Component component, String overriddenName, String suffix) {
+  public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
     return new ExecutionInitialSpanInfo(component, overriddenName, initialExportInfo);
   }
 }

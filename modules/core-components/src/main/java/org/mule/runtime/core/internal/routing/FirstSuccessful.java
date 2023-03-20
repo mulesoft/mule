@@ -35,11 +35,12 @@ import org.reactivestreams.Publisher;
  */
 public class FirstSuccessful extends AbstractComponent implements Router, Lifecycle, MuleContextAware {
 
+  public static final String FIRST_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFFIX = ":attempt:";
   private final List<ProcessorRoute> routes = new ArrayList<>();
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
 
   @Override
@@ -47,7 +48,8 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
     Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setInitialSpanInfo(initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this, ":attempt:" + routeNumber));
+      route.setInitialSpanInfo(initialSpanInfoProvider
+          .getInitialSpanInfo(this, FIRST_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFFIX + routeNumber));
       initialiseIfNeeded(route, muleContext);
       routeNumber++;
     }
@@ -85,7 +87,7 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor, initialSpanInfoBuilderProvider));
+    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
   }
 
   public void setRoutes(Collection<Processor> routes) {

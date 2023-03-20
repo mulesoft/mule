@@ -18,7 +18,18 @@ public interface InitialExportInfoProvider {
    */
   InitialExportInfo getInitialExportInfo(Component component);
 
-  InitialExportInfo getInitialExportInfo(Component component, String suffix);
+  /**
+   * @param component      the {@link Component} the component.
+   * @param spanNameSuffix the span name suffix
+   *
+   * @return {@link InitialExportInfo} for a component.
+   */
+  InitialExportInfo getInitialExportInfo(Component component, String spanNameSuffix);
 
-  InitialExportInfo getInitialExportInfo(String name);
+  /**
+   * @param spanName the span name.
+   *
+   * @return {@link InitialExportInfo} for a component.
+   */
+  InitialExportInfo getInitialExportInfo(String spanName);
 }

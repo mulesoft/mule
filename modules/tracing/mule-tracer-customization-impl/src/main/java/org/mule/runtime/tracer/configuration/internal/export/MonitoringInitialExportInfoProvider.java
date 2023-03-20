@@ -8,11 +8,12 @@ package org.mule.runtime.tracer.configuration.internal.export;
 
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_CACHE_CHAIN;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_MESSAGE_PROCESSORS;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.TRY_SCOPE_INNER_CHAIN_SPAN_NAME;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
 
@@ -38,19 +39,20 @@ public class MonitoringInitialExportInfoProvider implements InitialExportInfoPro
 
     {
       put(PolicyChain.class,
-          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_COMPONENT_NAME, true));
+          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
     }
   };
   private final Map<String, InitialExportInfo> initialExportInfoMapByName = new HashMap<String, InitialExportInfo>() {
 
     {
-      put(MULE_POLICY_CHAIN_INITIAL_EXPORT_INFO_KEY,
-          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_COMPONENT_NAME, true));
-      put(MULE_POLICY_NEXT_ACTION_EXPORT_INFO_KEY, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(POLICY_CHAIN_SPAN_NAME,
+          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
+      put(POLICY_NEXT_ACTION_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(UNKNOWN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(ASYNC_INNER_CHAIN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(MULE_CACHE_CHAIN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(MULE_MESSAGE_PROCESSORS, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(ASYNC_INNER_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(TRY_SCOPE_INNER_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(CACHE_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(MESSAGE_PROCESSORS_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
     }
   };
 
@@ -60,7 +62,7 @@ public class MonitoringInitialExportInfoProvider implements InitialExportInfoPro
   }
 
   @Override
-  public InitialExportInfo getInitialExportInfo(Component component, String suffix) {
+  public InitialExportInfo getInitialExportInfo(Component component, String spanNameSuffix) {
     // This is done to resolve appropriately for inner classes related to policies
     // and will not be configurable.
     InitialExportInfo initialExportInfo = initialExportInfoMapByComponentClass.get(component.getClass());
@@ -69,12 +71,12 @@ public class MonitoringInitialExportInfoProvider implements InitialExportInfoPro
       return initialExportInfo;
     }
 
-    return doGetInitialExportInfo(getSpanName(component.getIdentifier()) + stripToEmpty(suffix));
+    return doGetInitialExportInfo(getSpanName(component.getIdentifier()) + stripToEmpty(spanNameSuffix));
   }
 
   @Override
-  public InitialExportInfo getInitialExportInfo(String name) {
-    return doGetInitialExportInfo(name);
+  public InitialExportInfo getInitialExportInfo(String spanName) {
+    return doGetInitialExportInfo(spanName);
   }
 
   private InitialExportInfo doGetInitialExportInfo(String componentFullyQualifiedName) {

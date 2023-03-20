@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
+  public static final String PROCESSOR_ROUTE_SPAN_NAME = "route";
 
   private final Processor processor;
   private InitialSpanInfo initialSpanInfo;
@@ -49,10 +50,10 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
   private MuleContext muleContext;
 
-  public ProcessorRoute(Processor processor, InitialSpanInfoProvider initialSpanInfoBuilderProvider) {
+  public ProcessorRoute(Processor processor, InitialSpanInfoProvider initialSpanInfoProvider) {
     requireNonNull(processor, "processor can't be null");
     this.processor = processor;
-    this.initialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom("route");
+    this.initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(PROCESSOR_ROUTE_SPAN_NAME);
   }
 
   public Processor getProcessor() {

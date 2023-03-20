@@ -187,7 +187,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private SchedulerService schedulerService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> startingOperationExecutionDataProducer;
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
@@ -514,11 +514,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
-      initialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom((Component) processor);
+      initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo((Component) processor);
     } else {
       // Other processors are not exported
       initialSpanInfo =
-          initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(UNKNOWN);
+          initialSpanInfoProvider.getInitialSpanInfo(UNKNOWN);
     }
 
     return initialSpanInfo;
@@ -765,7 +765,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     muleEventTracer = profilingService.getCoreEventTracer();
 
     if (chainInitialSpanInfo == null) {
-      this.chainInitialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(this);
+      this.chainInitialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(this);
     }
   }
 

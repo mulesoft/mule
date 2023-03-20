@@ -110,7 +110,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private InternalProfilingService profilingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoBuilderProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private EventTracer<CoreEvent> coreEventEventTracer;
 
@@ -206,7 +206,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    initialSpanInfo = initialSpanInfoBuilderProvider.getInitialSpanInfoFrom(TemplateOnErrorHandler.this);
+    initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(TemplateOnErrorHandler.this);
     coreEventEventTracer = profilingService.getCoreEventTracer();
     super.initialise();
   }
