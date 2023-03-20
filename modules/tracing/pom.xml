@@ -30,8 +30,8 @@
         <module>mule-tracer-exporter-impl</module>
         <module>mule-tracer-exporter-configuration-api</module>
         <module>mule-tracer-exporter-configuration-impl</module>
-        <module>mule-tracing-level-configuration-api</module>
-        <module>mule-tracing-level-configuration-impl</module>
+        <module>mule-tracing-configuration-api</module>
+        <module>mule-tracing-configuration-impl</module>
     </modules>
 
     <build>

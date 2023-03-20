@@ -7,6 +7,9 @@
 
 package org.mule.runtime.tracing.level.impl.config;
 
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CONFIGURATION;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -15,8 +18,12 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
+@Feature(PROFILING)
+@Story(TRACING_CONFIGURATION)
 public class FileTracingLevelConfigurationTestCase {
 
   public static final String CONF_FOLDER = "conf";

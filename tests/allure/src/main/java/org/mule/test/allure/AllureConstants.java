@@ -1067,6 +1067,8 @@ public interface AllureConstants {
       String DEFAULT_CORE_EVENT_TRACER = "Default Core Event Tracer";
 
       String OPEN_TELEMETRY_EXPORTER = "Open Telemetry Exporter";
+
+      String TRACING_CONFIGURATION = "Tracing Configuration";
     }
   }
 

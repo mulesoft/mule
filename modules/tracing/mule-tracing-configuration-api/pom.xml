@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mule-tracing-level-configuration-api</artifactId>
+    <artifactId>mule-tracing-configuration-api</artifactId>
     <version>4.6.0-SNAPSHOT</version>
-    <name>Mule Tracing Levels Configuration Api</name>
-    <description>Api for the configuration of tracing levels</description>
+    <name>Mule Tracing Configuration Api</name>
+    <description>Api to configure tracing generation</description>
 
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
