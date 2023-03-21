@@ -18,7 +18,7 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.api.util.MultiMapTestCase;
+import org.mule.runtime.api.util.tck.MultiMapTestCase;
 
 import java.util.Collection;
 import java.util.List;
