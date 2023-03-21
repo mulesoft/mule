@@ -6,19 +6,25 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.net;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.net.URLDecoder.decode;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -28,14 +34,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import sun.net.www.ParseUtil;
-
 /**
  * A URL Connection to a Mule Artifact file or an entry in a Mule Artifact file.
  *
  * <p>
  * The syntax of a Mule Artifact URL is (current support for protocols under URL are described in {@link #SUPPORTED_PROTOCOLS}):
- * 
+ *
  * <pre>
  * muleartifact:&lt;url&gt;!/{entry}
  * </pre>
@@ -66,7 +70,7 @@ import sun.net.www.ParseUtil;
  * class is meant to open every ZIP until it finds out the expected file.
  *
  * TODO(fernandezlautaro): MULE-10892 at some moment this class should be strong enough to support any type of artifact.
- * 
+ *
  * @since 4.0
  */
 @NoInstantiate
@@ -209,11 +213,18 @@ public final class MuleArtifactUrlConnection extends URLConnection {
       return asList(resources[0].concat("/").concat(resources[1]));
     }
     return Arrays.stream(resources)
-        .map(ParseUtil::decode).collect(Collectors.toList());
+        .map(resource -> {
+          try {
+            return decode(resource, StandardCharsets.UTF_8.name());
+          } catch (UnsupportedEncodingException e) {
+            // Shouldn't get here since we're using UTF-8
+            throw new MuleRuntimeException(createStaticMessage(format("Failed to decode %s with unsupported encoding",
+                                                                      resource)));
+          }
+        }).collect(Collectors.toList());
   }
 
   private boolean isCompressed(String resource) {
     return endsWithIgnoreCase(resource, ".zip") || endsWithIgnoreCase(resource, ".jar");
   }
 }
-

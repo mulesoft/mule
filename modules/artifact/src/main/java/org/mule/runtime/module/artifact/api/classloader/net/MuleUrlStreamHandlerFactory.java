@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 @NoInstantiate
 public final class MuleUrlStreamHandlerFactory extends Object implements URLStreamHandlerFactory {
 
-  private static final String HANDLER_PKGS_SYSTEM_PROPERTY = "java.protocol.handler.pkgs";
   private static final Logger log = LoggerFactory.getLogger(MuleUrlStreamHandlerFactory.class);
 
   private static Map registry = Collections.synchronizedMap(new HashMap());
@@ -67,40 +66,7 @@ public final class MuleUrlStreamHandlerFactory extends Object implements URLStre
   }
 
   public URLStreamHandler createURLStreamHandler(String protocol) {
-    URLStreamHandler handler = (URLStreamHandler) registry.get(protocol);
-    if (handler == null) {
-      handler = this.defaultHandlerCreateStrategy(protocol);
-    }
-    return handler;
-  }
-
-  private URLStreamHandler defaultHandlerCreateStrategy(String protocol) {
-    String packagePrefixList = System.getProperty(HANDLER_PKGS_SYSTEM_PROPERTY, "");
-
-    if (packagePrefixList.endsWith("|") == false) {
-      packagePrefixList += "|sun.net.www.protocol";
-    }
-
-    StringTokenizer tokenizer = new StringTokenizer(packagePrefixList, "|");
-
-    URLStreamHandler handler = null;
-    while (handler == null && tokenizer.hasMoreTokens()) {
-      String packagePrefix = tokenizer.nextToken().trim();
-      String className = packagePrefix + "." + protocol + ".Handler";
-
-      // MULE-15867 - MG says: for some mysterious reason, Java 11 is fine instantiating this class explicitly but logs
-      // a warning when instantiated by reflection.
-      if ("sun.net.www.protocol.jar.Handler".equals(className)) {
-        handler = new sun.net.www.protocol.jar.Handler();
-      } else {
-        try {
-          handler = (URLStreamHandler) ClassUtils.instantiateClass(className);
-        } catch (Exception ex) {
-          // not much we can do here
-        }
-      }
-    }
-
-    return handler;
+    // In case no custom protocol is registered, we return null and let the JDK handle the default behaviour
+    return (URLStreamHandler) registry.get(protocol);
   }
 }
