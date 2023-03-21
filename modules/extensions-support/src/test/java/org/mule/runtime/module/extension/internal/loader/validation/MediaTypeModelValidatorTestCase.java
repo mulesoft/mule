@@ -13,7 +13,8 @@ import static java.util.Optional.ofNullable;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+
+import static org.mule.runtime.api.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.metadata.api.ClassTypeLoader;

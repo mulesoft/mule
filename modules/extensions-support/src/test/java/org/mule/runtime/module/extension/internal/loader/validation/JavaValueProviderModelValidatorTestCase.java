@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static org.mule.runtime.api.util.tck.ExtensionModelTestUtils.visitableMock;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -18,7 +20,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;

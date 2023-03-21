@@ -24,7 +24,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.api.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
