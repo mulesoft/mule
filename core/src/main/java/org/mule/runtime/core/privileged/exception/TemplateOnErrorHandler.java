@@ -66,7 +66,6 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
@@ -95,6 +94,7 @@ import javax.inject.Inject;
 
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -127,6 +127,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private InternalProfilingService profilingService;
+
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private EventTracer<CoreEvent> coreEventEventTracer;
 
@@ -222,7 +225,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    initialSpanInfo = new ComponentExecutionInitialSpanInfo(TemplateOnErrorHandler.this);
+    initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(TemplateOnErrorHandler.this);
     coreEventEventTracer = profilingService.getCoreEventTracer();
     super.initialise();
   }

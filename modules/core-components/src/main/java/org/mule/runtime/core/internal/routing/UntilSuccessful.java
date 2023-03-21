@@ -27,10 +27,10 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +48,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   private static final String DEFAULT_MILLIS_BETWEEN_RETRIES = "60000";
   private static final String DEFAULT_RETRIES = "5";
+  public static final String UNTIL_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFIX = ":attempt";
 
   @Inject
   private SchedulerService schedulerService;
@@ -60,6 +61,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
+
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
@@ -79,7 +83,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     this.nestedChain =
         buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
-                                          new ComponentExecutionInitialSpanInfo(this, ":attempt"));
+                                          initialSpanInfoProvider.getInitialSpanInfo(this,
+                                                                                     UNTIL_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFIX));
 
     super.initialise();
 

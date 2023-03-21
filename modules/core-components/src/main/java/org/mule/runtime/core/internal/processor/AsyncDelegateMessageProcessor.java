@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.yield;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -26,6 +21,14 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
+
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.yield;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
+
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -54,7 +57,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -64,6 +66,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -96,6 +99,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private SchedulerService schedulerService;
   @Inject
   private ConfigurationComponentLocator componentLocator;
+
+  @Inject
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -145,7 +151,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
-    delegateBuilder.setChainInitialSpanInfo(new NoExportComponentExecutionInitialSpanInfo(this));
+    delegateBuilder
+        .setChainInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(ASYNC_INNER_CHAIN_SPAN_NAME));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

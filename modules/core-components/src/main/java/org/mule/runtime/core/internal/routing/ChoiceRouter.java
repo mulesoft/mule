@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,9 +24,9 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ import reactor.core.publisher.Flux;
  */
 public class ChoiceRouter extends AbstractComponent implements Router, RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
+  public static final String ROUTE_SPAN_NAME_SUFFIX = ":route";
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final List<ProcessorRoute> routes = new ArrayList<>();
 
@@ -53,9 +55,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
-  public ChoiceRouter() {
+  public ChoiceRouter(InitialSpanInfoProvider initialSpanInfoProvider) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
+    this.initialSpanInfoProvider = initialSpanInfoProvider;
   }
 
   @Override
@@ -73,10 +77,10 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     if (defaultProcessor == null) {
       defaultProcessor = event -> event;
     }
-    routes.add(new ProcessorRoute(defaultProcessor));
+    routes.add(new ProcessorRoute(defaultProcessor, initialSpanInfoProvider));
 
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
+      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -107,7 +111,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   }
 
   public void addRoute(final String expression, final Processor processor) {
-    routes.add(new ProcessorExpressionRoute(expression, processor));
+    routes.add(new ProcessorExpressionRoute(expression, processor, initialSpanInfoProvider));
   }
 
   public void setDefaultRoute(final Processor processor) {
@@ -147,7 +151,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes);
+      super(publisher, routes, initialSpanInfoProvider);
     }
 
     /**
