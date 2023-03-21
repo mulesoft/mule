@@ -29,6 +29,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHI
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.TRY_SCOPE_INNER_CHAIN_SPAN_NAME;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
@@ -51,7 +52,6 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -61,6 +61,7 @@ import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.List;
 
@@ -87,6 +88,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Inject
   private ProfilingService profilingService;
+
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
@@ -227,7 +231,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
-                                                         new NoExportComponentExecutionInitialSpanInfo(this));
+                                                         initialSpanInfoProvider
+                                                             .getInitialSpanInfo(TRY_SCOPE_INNER_CHAIN_SPAN_NAME));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

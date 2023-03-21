@@ -69,7 +69,6 @@ import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFacto
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
@@ -88,6 +87,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -137,6 +137,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
+  private InitialSpanInfoProvider initialSpanInfoProvider;
+
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
@@ -146,8 +148,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
     try {
+      // TODO: verify if the lookup in registry AbstractPipeline can be removed (W-12718088)
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
+      initialSpanInfoProvider =
+          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InitialSpanInfoProvider.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -192,7 +197,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
-    builder.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this));
+    builder.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this));
     return builder.build();
   }
 

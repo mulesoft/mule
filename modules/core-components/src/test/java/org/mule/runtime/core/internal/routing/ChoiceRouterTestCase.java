@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
+import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
@@ -66,7 +68,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    choiceRouter = new ChoiceRouter();
+    choiceRouter = new ChoiceRouter(new DummyInitialSpanInfoProvider());
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     choiceRouter.setExpressionManager(muleContext.getExpressionManager());
   }

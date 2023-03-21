@@ -17,10 +17,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +28,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.reactivestreams.Publisher;
+import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 /**
@@ -38,6 +39,7 @@ import reactor.core.publisher.Flux;
  */
 public class RoundRobin extends AbstractComponent implements Router, Lifecycle, MuleContextAware {
 
+  public static final String ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX = ":route";
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final List<ProcessorRoute> routes = new ArrayList<>();
 
@@ -45,6 +47,9 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private final AtomicInteger index = new AtomicInteger(0);
 
   private MuleContext muleContext;
+
+  @Inject
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -58,7 +63,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this, ":route"));
+      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -89,7 +94,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor));
+    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
   }
 
   @Override
@@ -116,7 +121,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes);
+      super(publisher, routes, initialSpanInfoProvider);
     }
 
     @Override

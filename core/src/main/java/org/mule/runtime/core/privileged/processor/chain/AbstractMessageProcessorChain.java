@@ -73,8 +73,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
-import org.mule.runtime.core.api.tracing.customization.NoExportFixedNameInitialSpanInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -114,6 +112,7 @@ import javax.inject.Inject;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -186,6 +185,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Inject
   private SchedulerService schedulerService;
+
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> startingOperationExecutionDataProducer;
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
@@ -512,11 +514,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     if (processor instanceof Component) {
       // If this is a component we create the span with the corresponding name.
-      initialSpanInfo =
-          new ComponentExecutionInitialSpanInfo((Component) processor);
+      initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo((Component) processor);
     } else {
       // Other processors are not exported
-      initialSpanInfo = new NoExportFixedNameInitialSpanInfo(UNKNOWN);
+      initialSpanInfo =
+          initialSpanInfoProvider.getInitialSpanInfo(UNKNOWN);
     }
 
     return initialSpanInfo;
@@ -763,7 +765,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     muleEventTracer = profilingService.getCoreEventTracer();
 
     if (chainInitialSpanInfo == null) {
-      chainInitialSpanInfo = new ComponentExecutionInitialSpanInfo(this);
+      this.chainInitialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(this);
     }
   }
 

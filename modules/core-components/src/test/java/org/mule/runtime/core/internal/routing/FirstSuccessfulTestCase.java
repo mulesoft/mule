@@ -98,7 +98,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(((Component) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
     fs.setMuleContext(muleContext);
-
+    muleContext.getInjector().inject(fs);
     fs.setRoutes(asList(processors));
 
     return fs;
