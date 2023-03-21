@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
-import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_DESCRIPTIONS_FILE_NAME_MASK;
 
-import org.mule.runtime.extension.internal.GenericXmlSerializer;
+import static java.lang.String.format;
+
+import org.mule.runtime.extension.internal.xml.GenericXmlSerializer;
 
 /**
  * A simple XML JAXB serializer class for {@link XmlExtensionDocumentation}s files.
