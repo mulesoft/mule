@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
+
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -53,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 /**
  * {@link ExtensionModelValidator} for the correct usage of {@link SampleDataProviderModel} and
@@ -307,11 +306,12 @@ public final class JavaSampleDataModelValidator implements ExtensionModelValidat
   private boolean isAssignableFrom(Class base, Type target) {
     if (target instanceof Class) {
       return base.isAssignableFrom((Class) target);
-    } else if (target instanceof ParameterizedTypeImpl) {
-      return base.isAssignableFrom(((ParameterizedTypeImpl) target).getRawType());
+    } else if (target instanceof ParameterizedType) {
+      Class clazz = (Class) ((ParameterizedType) target).getRawType();
+      return base.isAssignableFrom(clazz);
+    } else {
+      return false;
     }
-
-    return false;
   }
 
   private String asString(Type type) {
@@ -319,13 +319,13 @@ public final class JavaSampleDataModelValidator implements ExtensionModelValidat
   }
 
   private String asString(Type type, boolean getGenerics) {
-    if (type instanceof ParameterizedTypeImpl) {
-      ParameterizedTypeImpl parameterizedType = (ParameterizedTypeImpl) type;
+    if (type instanceof ParameterizedType) {
+      ParameterizedType parameterizedType = (ParameterizedType) type;
       if (getGenerics) {
-        return parameterizedType.getRawType().getName()
+        return ((Class) parameterizedType.getRawType()).getName()
             + asGenericSignature(asList(parameterizedType.getActualTypeArguments()), false);
       } else {
-        return parameterizedType.getRawType().getName();
+        return ((Class) parameterizedType.getRawType()).getName();
       }
     } else if (type == null) {
       return Object.class.getName();
@@ -338,9 +338,9 @@ public final class JavaSampleDataModelValidator implements ExtensionModelValidat
 
   private static class SampleDataProviderInfo {
 
-    private SampleDataProviderModel sampleDataProviderModel;
-    private ConnectableComponentModel ownerModel;
-    private String implementationClassName;
+    private final SampleDataProviderModel sampleDataProviderModel;
+    private final ConnectableComponentModel ownerModel;
+    private final String implementationClassName;
 
     public SampleDataProviderInfo(SampleDataProviderModel sampleDataProviderModel,
                                   ConnectableComponentModel ownerModel,
@@ -365,9 +365,9 @@ public final class JavaSampleDataModelValidator implements ExtensionModelValidat
 
   private static final class Delegate {
 
-    private Map<String, SampleDataProviderInfo> implInfo = new HashMap<>();
-    private MultiMap<String, String> idToImpl = new MultiMap<>();
-    private ProblemsReporter problemsReporter;
+    private final Map<String, SampleDataProviderInfo> implInfo = new HashMap<>();
+    private final MultiMap<String, String> idToImpl = new MultiMap<>();
+    private final ProblemsReporter problemsReporter;
 
     public Delegate(ProblemsReporter problemsReporter) {
       this.problemsReporter = problemsReporter;
