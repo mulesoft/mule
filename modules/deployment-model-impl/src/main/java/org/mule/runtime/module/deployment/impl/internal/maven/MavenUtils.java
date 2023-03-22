@@ -107,12 +107,7 @@ public class MavenUtils {
     URL possibleUrl;
     try {
       possibleUrl = getUrlWithinJar(artifactFile, mavenMetadataFilePath);
-      /*
-       * A specific implementation of JarURLConnection is required to read jar content because not all implementations support
-       * ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
-       */
-      JarURLConnection jarConnection =
-          new sun.net.www.protocol.jar.JarURLConnection(possibleUrl, new sun.net.www.protocol.jar.Handler());
+      JarURLConnection jarConnection = (JarURLConnection) possibleUrl.openConnection();
       jarConnection.setUseCaches(false);
       try (InputStream ignored = jarConnection.getInputStream()) {
         return possibleUrl;

@@ -346,8 +346,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                       return descriptorMapping.get(descriptor);
                     } else {
                       try {
-                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()}, getSystemClassLoader(),
-                                                  new NonCachingURLStreamHandlerFactory());
+                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
                       } catch (MalformedURLException e) {
                         throw new MuleRuntimeException(e);
                       }

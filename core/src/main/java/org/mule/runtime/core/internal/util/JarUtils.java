@@ -66,12 +66,7 @@ public final class JarUtils {
    */
   public static Optional<byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
     URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
-    /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
-     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
-     */
-    JarURLConnection jarConnection =
-        new sun.net.www.protocol.jar.JarURLConnection(jsonDescriptorUrl, new sun.net.www.protocol.jar.Handler());
+    JarURLConnection jarConnection = (JarURLConnection) jsonDescriptorUrl.openConnection();
     jarConnection.setUseCaches(false);
     try (InputStream inputStream = jarConnection.getInputStream()) {
       byte[] byteArray = toByteArray(inputStream);
@@ -89,12 +84,7 @@ public final class JarUtils {
    * @throws IOException if there was a problem reading from the jar file.
    */
   public static Optional<byte[]> loadFileContentFrom(URL jarFile) throws IOException {
-    /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
-     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
-     */
-    JarURLConnection jarConnection =
-        new sun.net.www.protocol.jar.JarURLConnection(jarFile, new sun.net.www.protocol.jar.Handler());
+    JarURLConnection jarConnection = (JarURLConnection) jarFile.openConnection();
     jarConnection.setUseCaches(false);
     try (InputStream inputStream = jarConnection.getInputStream()) {
       byte[] byteArray = toByteArray(inputStream);
