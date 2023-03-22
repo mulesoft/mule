@@ -11,7 +11,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.net.URLDecoder.decode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
@@ -212,16 +216,16 @@ public final class MuleArtifactUrlConnection extends URLConnection {
       // this scenario handles the /classes!/org/foo/echo/MyClass.class
       return asList(resources[0].concat("/").concat(resources[1]));
     }
-    return Arrays.stream(resources)
+    return stream(resources)
         .map(resource -> {
           try {
-            return decode(resource, StandardCharsets.UTF_8.name());
+            return decode(resource, UTF_8.name());
           } catch (UnsupportedEncodingException e) {
             // Shouldn't get here since we're using UTF-8
             throw new MuleRuntimeException(createStaticMessage(format("Failed to decode %s with unsupported encoding",
                                                                       resource)));
           }
-        }).collect(Collectors.toList());
+        }).collect(toList());
   }
 
   private boolean isCompressed(String resource) {
