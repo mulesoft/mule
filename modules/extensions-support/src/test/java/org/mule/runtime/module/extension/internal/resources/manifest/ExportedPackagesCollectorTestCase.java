@@ -16,7 +16,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+
+import static org.mule.runtime.api.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 
