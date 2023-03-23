@@ -43,7 +43,6 @@
         <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>javax.activation</artifactId>
-            <version>${javax.activation.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
