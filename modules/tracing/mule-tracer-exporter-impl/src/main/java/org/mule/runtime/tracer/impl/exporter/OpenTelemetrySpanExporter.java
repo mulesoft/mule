@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
+import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.ARTIFACT_ID;
@@ -36,6 +37,7 @@ import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 import static io.opentelemetry.api.trace.SpanContext.getInvalid;
 
+import io.opentelemetry.sdk.internal.InstrumentationScopeUtil;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -77,6 +79,10 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private static final String MULE_INSTRUMENTATION_LIBRARY = "mule";
   private static final String MULE_INSTRUMENTATION_LIBRARY_VERSION = "1.0.0";
+  public static final InstrumentationLibraryInfo INSTRUMENTATION_LIBRARY_INFO =
+      create(MULE_INSTRUMENTATION_LIBRARY, MULE_INSTRUMENTATION_LIBRARY_VERSION);
+  public static final InstrumentationScopeInfo INSTRUMENTATION_SCOPE_INFO =
+      toInstrumentationScopeInfo(INSTRUMENTATION_LIBRARY_INFO);
   // These are artifact.id, artifact.type and thread.end.name.
   public static final int EXPORTER_ATTRIBUTES_BASE_SIZE = 3;
 
@@ -87,6 +93,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private final String artifactType;
   private final Map<String, String> rootAttributes = new HashMap<>();
   private final SpanProcessor spanProcessor;
+  private final Resource resource;
 
   private boolean exportable;
   private SpanContext spanContext = getInvalid();
@@ -105,7 +112,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
                                     InitialSpanInfo initialSpanInfo,
                                     String artifactId,
                                     String artifactType,
-                                    SpanProcessor spanProcessor) {
+                                    SpanProcessor spanProcessor,
+                                    Resource resource) {
     this.internalSpan = internalSpan;
     this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
     this.isRootSpan = initialSpanInfo.isRootSpan();
@@ -114,6 +122,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactId = artifactId;
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
+    this.resource = resource;
 
     // Generates the span id so that the opentelemetry spans can be lazily initialised if it is exportable
     if (exportable) {
@@ -381,12 +390,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public InstrumentationLibraryInfo getInstrumentationLibraryInfo() {
-    return create(MULE_INSTRUMENTATION_LIBRARY, MULE_INSTRUMENTATION_LIBRARY_VERSION);
+    return INSTRUMENTATION_LIBRARY_INFO;
   }
 
   @Override
   public Resource getResource() {
-    return OpenTelemetryResources.getResource(artifactId);
+    return resource;
   }
 
   public String getArtifactId() {
@@ -419,7 +428,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public InstrumentationScopeInfo getInstrumentationScopeInfo() {
-    return SpanData.super.getInstrumentationScopeInfo();
+    return INSTRUMENTATION_SCOPE_INFO;
   }
 
   /**
@@ -431,6 +440,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     private InternalSpan internalSpan;
     private String artifactId;
     private String artifactType;
+    private Resource resource;
     private SpanProcessor spanProcessor;
 
     public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
@@ -458,6 +468,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       return this;
     }
 
+    public OpenTelemetrySpanExportBuilder withResource(Resource resource) {
+      this.resource = resource;
+      return this;
+    }
+
     public OpenTelemetrySpanExporter build() {
 
       if (initialSpanInfo == null) {
@@ -476,7 +491,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         throw new IllegalArgumentException("Artifact type is null");
       }
 
-      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor);
+      if (resource == null) {
+        throw new IllegalArgumentException("Resource is null");
+      }
+
+      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor, resource);
     }
   }
 
