@@ -130,7 +130,10 @@ public class TypeWrapper implements Type {
    */
   @Override
   public List<FieldElement> getFields() {
-    return IntrospectionUtils.getFields(aClass).stream().map((Field field) -> new FieldWrapper(field, typeLoader))
+    return IntrospectionUtils.getFields(aClass).stream()
+        .filter(field -> !field.getDeclaringClass().getPackage().getName().startsWith("java.")
+            && !field.getDeclaringClass().getPackage().getName().startsWith("com.sun."))
+        .map((Field field) -> new FieldWrapper(field, typeLoader))
         .collect(toList());
   }
 
