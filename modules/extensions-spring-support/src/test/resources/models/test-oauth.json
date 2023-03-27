@@ -243,7 +243,7 @@
                     },
                     "annotations": {
                       "description": {
-                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration"
+                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
                       },
                       "expressionSupport": {
                         "value": "NOT_SUPPORTED"
@@ -602,7 +602,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -636,7 +636,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -1929,7 +1929,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -1963,7 +1963,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -2499,7 +2499,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -2533,7 +2533,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -3052,7 +3052,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -3086,7 +3086,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -3640,7 +3640,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -3674,7 +3674,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4228,7 +4228,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -4262,7 +4262,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4816,7 +4816,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -4850,7 +4850,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -5404,7 +5404,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -5438,7 +5438,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -6044,7 +6044,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -6078,7 +6078,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -6904,7 +6904,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -6938,7 +6938,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -7469,7 +7469,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -7503,7 +7503,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -8499,7 +8499,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -8533,7 +8533,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -9047,7 +9047,7 @@
             }
           ],
           "name": "unauthorize",
-          "description": "Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again",
+          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
           "modelProperties": {},
           "kind": "operation"
         },
@@ -9275,7 +9275,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -9309,7 +9309,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -10668,7 +10668,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -10840,7 +10840,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -10960,7 +10960,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -10992,7 +10992,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -11053,7 +11053,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -11322,7 +11322,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -12419,7 +12419,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -12591,7 +12591,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -12711,7 +12711,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -12743,7 +12743,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -12803,7 +12803,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -13072,7 +13072,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -14168,7 +14168,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -14340,7 +14340,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -14460,7 +14460,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -14492,7 +14492,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -14552,7 +14552,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -14821,7 +14821,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -15917,7 +15917,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -16089,7 +16089,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -16209,7 +16209,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -16241,7 +16241,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -16302,7 +16302,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -16571,7 +16571,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -17668,7 +17668,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -17840,7 +17840,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -17960,7 +17960,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "tokenUrl",
-                  "description": "The service provider's token endpoint URL",
+                  "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -18042,7 +18042,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -19128,7 +19128,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -19300,7 +19300,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -19420,7 +19420,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -19452,7 +19452,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -19513,7 +19513,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -19782,7 +19782,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -20879,7 +20879,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -21051,7 +21051,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -21171,7 +21171,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -21203,7 +21203,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -21263,7 +21263,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -21532,7 +21532,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -22744,7 +22744,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -22916,7 +22916,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -23036,7 +23036,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -23068,7 +23068,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -23129,7 +23129,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -23398,7 +23398,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -24619,7 +24619,7 @@
                     },
                     "annotations": {
                       "description": {
-                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration"
+                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
                       },
                       "expressionSupport": {
                         "value": "NOT_SUPPORTED"
@@ -24978,7 +24978,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -25012,7 +25012,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -25606,7 +25606,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -25640,7 +25640,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -26176,7 +26176,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -26210,7 +26210,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -26729,7 +26729,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -26763,7 +26763,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -27317,7 +27317,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -27351,7 +27351,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -27905,7 +27905,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -27939,7 +27939,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -28493,7 +28493,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -28527,7 +28527,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -29081,7 +29081,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -29115,7 +29115,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -29721,7 +29721,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -29755,7 +29755,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -30581,7 +30581,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -30615,7 +30615,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -31146,7 +31146,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -31180,7 +31180,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -32176,7 +32176,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -32210,7 +32210,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -32724,7 +32724,7 @@
             }
           ],
           "name": "unauthorize",
-          "description": "Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again",
+          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
           "modelProperties": {},
           "kind": "operation"
         },
@@ -32952,7 +32952,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -32986,7 +32986,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -34424,7 +34424,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -34596,7 +34596,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -34716,7 +34716,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "tokenUrl",
-                  "description": "The service provider's token endpoint URL",
+                  "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -34798,7 +34798,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -34975,7 +34975,7 @@
                     },
                     "annotations": {
                       "description": {
-                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration"
+                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
                       },
                       "expressionSupport": {
                         "value": "NOT_SUPPORTED"
@@ -35334,7 +35334,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -35368,7 +35368,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -35962,7 +35962,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -35996,7 +35996,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -36532,7 +36532,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -36566,7 +36566,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -37085,7 +37085,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -37119,7 +37119,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -37673,7 +37673,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -37707,7 +37707,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -38261,7 +38261,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -38295,7 +38295,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -38849,7 +38849,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -38883,7 +38883,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -39437,7 +39437,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -39471,7 +39471,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -40077,7 +40077,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -40111,7 +40111,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -40937,7 +40937,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -40971,7 +40971,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -41502,7 +41502,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -41536,7 +41536,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -42532,7 +42532,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -42566,7 +42566,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -43080,7 +43080,7 @@
             }
           ],
           "name": "unauthorize",
-          "description": "Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again",
+          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
           "modelProperties": {},
           "kind": "operation"
         },
@@ -43308,7 +43308,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -43342,7 +43342,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -44780,7 +44780,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -44952,7 +44952,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -45072,7 +45072,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "tokenUrl",
-                  "description": "The service provider's token endpoint URL",
+                  "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -45154,7 +45154,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -46242,7 +46242,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -46414,7 +46414,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -46534,7 +46534,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -46566,7 +46566,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -46627,7 +46627,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -46896,7 +46896,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -47082,7 +47082,7 @@
                     },
                     "annotations": {
                       "description": {
-                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration"
+                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
                       },
                       "expressionSupport": {
                         "value": "NOT_SUPPORTED"
@@ -47441,7 +47441,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -47475,7 +47475,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -48069,7 +48069,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -48103,7 +48103,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -48639,7 +48639,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -48673,7 +48673,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -49192,7 +49192,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -49226,7 +49226,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -49780,7 +49780,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -49814,7 +49814,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -50368,7 +50368,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -50402,7 +50402,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -50956,7 +50956,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -50990,7 +50990,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -51544,7 +51544,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -51578,7 +51578,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -52184,7 +52184,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -52218,7 +52218,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -53044,7 +53044,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -53078,7 +53078,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -53609,7 +53609,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -53643,7 +53643,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -54639,7 +54639,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -54673,7 +54673,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -55187,7 +55187,7 @@
             }
           ],
           "name": "unauthorize",
-          "description": "Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again",
+          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
           "modelProperties": {},
           "kind": "operation"
         },
@@ -55415,7 +55415,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -55449,7 +55449,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -56808,7 +56808,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -56980,7 +56980,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -57314,7 +57314,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -57346,7 +57346,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -57406,7 +57406,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -57675,7 +57675,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -57860,7 +57860,7 @@
                     },
                     "annotations": {
                       "description": {
-                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration"
+                        "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
                       },
                       "expressionSupport": {
                         "value": "NOT_SUPPORTED"
@@ -58219,7 +58219,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -58253,7 +58253,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -58847,7 +58847,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -58881,7 +58881,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -59417,7 +59417,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -59451,7 +59451,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -59970,7 +59970,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -60004,7 +60004,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -60558,7 +60558,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -60592,7 +60592,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -61146,7 +61146,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -61180,7 +61180,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -61734,7 +61734,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -61768,7 +61768,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -62322,7 +62322,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -62356,7 +62356,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -62962,7 +62962,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -62996,7 +62996,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -63822,7 +63822,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -63856,7 +63856,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -64387,7 +64387,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -64421,7 +64421,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -65417,7 +65417,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -65451,7 +65451,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -65965,7 +65965,7 @@
             }
           ],
           "name": "unauthorize",
-          "description": "Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again",
+          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
           "modelProperties": {},
           "kind": "operation"
         },
@@ -66193,7 +66193,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation's output will be placed",
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
                 },
                 {
@@ -66227,7 +66227,7 @@
                   "displayModel": {
                     "displayName": "Target Value"
                   },
-                  "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -67586,7 +67586,7 @@
                         },
                         "annotations": {
                           "description": {
-                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy"
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
                         }
                       },
@@ -67758,7 +67758,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "reconnection",
-                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
@@ -67878,7 +67878,7 @@
                     "authorizationUrl"
                   ],
                   "name": "authorizationUrl",
-                  "description": "The service provider's authorization endpoint URL",
+                  "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -67910,7 +67910,7 @@
                     "core.tokenUrlTemplate"
                   ],
                   "name": "accessTokenUrl",
-                  "description": "The service provider's accessToken endpoint URL",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -67970,7 +67970,7 @@
                     "connectivity.clientId"
                   ],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -68239,7 +68239,7 @@
                   ],
                   "semanticTerms": [],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -68672,7 +68672,7 @@
               "displayModel": {
                 "displayName": "Target Variable"
               },
-              "description": "The name of a variable on which the operation's output will be placed",
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
             },
             {
@@ -68706,7 +68706,7 @@
               "displayModel": {
                 "displayName": "Target Value"
               },
-              "description": "An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable",
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
               "modelProperties": {}
             }
           ],
