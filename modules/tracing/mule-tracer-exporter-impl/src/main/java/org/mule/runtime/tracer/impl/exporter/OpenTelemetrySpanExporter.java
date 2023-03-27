@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterUtils.ARTIFACT_ID;
@@ -29,20 +28,19 @@ import static org.mule.runtime.tracer.impl.exporter.OpenTelemetryTraceIdUtils.ge
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import static io.opentelemetry.api.common.Attributes.of;
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
+import static io.opentelemetry.api.trace.SpanContext.getInvalid;
+import static io.opentelemetry.api.common.Attributes.of;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
+import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
-import static io.opentelemetry.api.trace.SpanContext.getInvalid;
 
-import io.opentelemetry.sdk.internal.InstrumentationScopeUtil;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
