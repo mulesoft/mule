@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.tracer.configuration.internal.provider;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,8 +18,6 @@ import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoPr
 import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanInfo;
 
 import javax.inject.Inject;
-
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 /**
  * Default implementation of {@link InitialSpanInfoProvider}
