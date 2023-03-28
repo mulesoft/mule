@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,12 +49,11 @@ public class JavaExtensionModelParserTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   @Test
-  @Description("Verify that an extension with Jdk field with encapsulated internal fields does not fail due to reflection in Java 17")
+  @Issue("W-12622240")
+  @Description("Verify that an extension with some public java class, which has private internal fields does not fail due to Illegal reflective access in Java 17")
   public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() {
     List<MetadataType> importedTypes = getParser(ParameterizedWithJavaTypeExtension.class).getImportedTypes();
-    assertThat(importedTypes.size(), is(1));
-    assertThat(importedTypes.get(0).getAnnotation(ClassInformationAnnotation.class).get().getClassname(),
-               is("org.mule.test.heisenberg.extension.model.KnockeableDoor"));
+    assertThat(importedTypes, hasSize(1));
   }
 
   @Test

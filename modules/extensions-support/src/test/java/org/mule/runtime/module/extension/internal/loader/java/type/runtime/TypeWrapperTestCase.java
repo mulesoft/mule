@@ -10,6 +10,12 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
+
+
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -26,8 +32,10 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 public class TypeWrapperTestCase {
@@ -52,19 +60,20 @@ public class TypeWrapperTestCase {
   }
 
   @Test
+  @Issue("W-12622240")
   @Description("Ensure JDK internal fields are filtered out as we can't use reflection on them in Java 17 and above")
   public void filterInternalJdkFields() {
     TypeWrapper type = new TypeWrapper(LocalDateTime.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     List<FieldElement> fields = type.getFields();
-    assertThat(fields.stream().noneMatch(f -> f.getField().get().getName().equals("serialVersionUID")),
-               is(true));
-    assertThat(fields.isEmpty(), is(true));
+    assertThat(fields, hasSize(0));
     // verify that we are not filtering out fields that are Java types in a custom class
     type = new TypeWrapper(PersonalInfo.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    assertThat(type.getFields().stream().anyMatch(f -> f.getField().get().getName().equals("dateOfConception")),
-               is(true));
+    List<String> allPackages = type.getFields().stream().map(f -> f.getField().get().getDeclaringClass().getPackage().getName())
+        .collect(
+                 Collectors.toList());
+    assertThat(allPackages, not(hasItem(startsWith("java."))));
   }
 
   @Test
