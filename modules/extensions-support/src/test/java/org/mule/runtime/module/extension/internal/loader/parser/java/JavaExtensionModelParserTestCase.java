@@ -29,11 +29,14 @@ import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.PrivilegedExport;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.vegan.extension.VeganCookBook;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Description;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +46,15 @@ public class JavaExtensionModelParserTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
+  @Description("Verify that an extension with Jdk field with encapsulated internal fields does not fail due to reflection in Java 17")
+  public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() {
+    List<MetadataType> importedTypes = getParser(ParameterizedWithJavaTypeExtension.class).getImportedTypes();
+    assertThat(importedTypes.size(), is(1));
+    assertThat(importedTypes.get(0).getAnnotation(ClassInformationAnnotation.class).get().getClassname(),
+               is("org.mule.test.heisenberg.extension.model.KnockeableDoor"));
+  }
 
   @Test
   public void getImportedTypesFromExtensionUsingTheSdkApi() {
@@ -212,6 +224,17 @@ public class JavaExtensionModelParserTestCase {
 
     @org.mule.sdk.api.annotation.param.Parameter
     String extensionParameter;
+  }
+
+  @org.mule.runtime.extension.api.annotation.Extension(name = "MixedConfigurationsAnnotationExtension")
+  @org.mule.runtime.extension.api.annotation.Import(type = KnockeableDoor.class)
+  private static class ParameterizedWithJavaTypeExtension {
+
+    @org.mule.sdk.api.annotation.param.Parameter
+    LocalDate extensionParameter;
+
+    @org.mule.sdk.api.annotation.param.Parameter
+    PersonalInfo personInfo;
   }
 
   @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionWithSuperExtension")
