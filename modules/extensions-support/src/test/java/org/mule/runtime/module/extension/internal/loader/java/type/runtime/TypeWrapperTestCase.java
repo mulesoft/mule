@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.stream.Collectors.toList;
+import static java.lang.Thread.currentThread;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
-
-
+import static org.hamcrest.Matchers.empty;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -32,7 +32,6 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
@@ -64,15 +63,16 @@ public class TypeWrapperTestCase {
   @Description("Ensure JDK internal fields are filtered out as we can't use reflection on them in Java 17 and above")
   public void filterInternalJdkFields() {
     TypeWrapper type = new TypeWrapper(LocalDateTime.class, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+        .createTypeLoader(currentThread().getContextClassLoader()));
     List<FieldElement> fields = type.getFields();
-    assertThat(fields, hasSize(0));
-    // verify that we are not filtering out fields that are Java types in a custom class
-    type = new TypeWrapper(PersonalInfo.class, new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     List<String> allPackages = type.getFields().stream().map(f -> f.getField().get().getDeclaringClass().getPackage().getName())
         .collect(
-                 Collectors.toList());
+                 toList());
+    assertThat(fields, empty());
+    // verify that we are not filtering out fields that are Java types in a custom class
+    type = new TypeWrapper(PersonalInfo.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(currentThread().getContextClassLoader()));
+
     assertThat(allPackages, not(hasItem(startsWith("java."))));
   }
 
