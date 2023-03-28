@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.tracer.configuration.internal.info;
 
-import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getLocationAsString;
 import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
+
+import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -24,6 +25,8 @@ import java.util.function.BiConsumer;
  * @since 4.6.0
  */
 public class ExecutionInitialSpanInfo implements InitialSpanInfo {
+
+  public static final String API_ID_ATTRIBUTE_KEY = "api.id";
 
   public static final String LOCATION_KEY = "location";
 
@@ -41,8 +44,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String location;
   private final String apiId;
   private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
-
-  public static final String API_ID_ATTRIBUTE_KEY = "api.id";
 
   public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
     this(component, apiId, initialExportInfoProvider, null, "");
