@@ -13,8 +13,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyVararg;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -166,7 +164,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     connection1 = strategy.getConnectionHandler();
     connection2 = strategy.getConnectionHandler();
 
-    when(connectionProvider.validate(anyVararg())).thenReturn(ConnectionValidationResult
+    when(connectionProvider.validate(any())).thenReturn(ConnectionValidationResult
         .failure("Invalid username or password",
                  new Exception("401: UNAUTHORIZED")));
     strategy.getConnectionHandler().getConnection();
@@ -178,7 +176,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     connection1 = strategy.getConnectionHandler();
     connection2 = strategy.getConnectionHandler();
 
-    when(connectionProvider.validate(anyVararg())).thenReturn(null);
+    when(connectionProvider.validate(any())).thenReturn(null);
     strategy.getConnectionHandler().getConnection();
   }
 
@@ -307,7 +305,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   private void resetConnectionProvider() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
-    when(connectionProvider.validate(anyObject())).thenReturn(ConnectionValidationResult.success());
+    when(connectionProvider.validate(any())).thenReturn(ConnectionValidationResult.success());
     this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext));
   }
 
