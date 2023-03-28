@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import io.qameta.allure.Description;
-import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
@@ -23,11 +26,9 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import io.qameta.allure.Description;
+import org.junit.Test;
 
 public class TypeWrapperTestCase {
 
