@@ -45,6 +45,9 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   private SpanExporterConfiguration privilegedConfiguration =
       new OpenTelemetryAutoConfigurableSpanExporterConfiguration(key -> null);
 
+  @Inject
+  MuleContext muleContext;
+
   private final LazyValue<SpanProcessor> spanProcessor = new LazyValue<>(this::resolveOpenTelemetrySpanProcessor);
 
   private static final CapturingSpanExporterWrapper SNIFFED_EXPORTER =
@@ -66,6 +69,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
     return builder()
         .withStartSpanInfo(initialExportInfo)
+        .withArtifactId(muleContext.getConfiguration().getId())
+        .withArtifactType(muleContext.getArtifactType().getAsString())
         .withSpanProcessor(spanProcessor.get())
         .withInternalSpan(internalSpan)
         .build();
