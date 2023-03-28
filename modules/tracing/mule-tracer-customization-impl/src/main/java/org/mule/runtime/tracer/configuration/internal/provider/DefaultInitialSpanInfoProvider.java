@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.tracer.configuration.internal.provider;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -19,8 +21,6 @@ import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoPr
 import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanInfo;
 
 import javax.inject.Inject;
-
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 /**
  * Default implementation of {@link InitialSpanInfoProvider}
@@ -45,22 +45,22 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider, 
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component) {
-    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, artifactId, artifactTypeStringValue, initialExportInfo);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component, String suffix) {
-    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo, null, suffix);
+    return new ExecutionInitialSpanInfo(component, apiId, artifactId, artifactTypeStringValue, initialExportInfo, null, suffix);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(String name) {
-    return new ExecutionInitialSpanInfo(name, apiId, initialExportInfo);
+    return new ExecutionInitialSpanInfo(name, apiId, artifactId, artifactTypeStringValue, initialExportInfo);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
-    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, artifactId, artifactTypeStringValue, overriddenName, initialExportInfo);
   }
 
   @Override

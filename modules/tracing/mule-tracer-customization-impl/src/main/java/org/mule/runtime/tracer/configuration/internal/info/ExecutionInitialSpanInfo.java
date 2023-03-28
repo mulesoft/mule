@@ -27,7 +27,11 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   public static final String LOCATION_KEY = "location";
 
-  public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 1;
+  public static final String API_ID_ATTRIBUTE_KEY = "api.id";
+  public static final String ARTIFACT_ID_KEY = "artifact.id";
+  public static final String ARTIFACT_TYPE_KEY = "artifact.type";
+
+  public static final int INITIAL_ATTRIBUTES_BASE_COUNT = 3;
 
   public static final String EXECUTE_NEXT = "execute-next";
   public static final String FLOW = "flow";
@@ -40,20 +44,23 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final boolean rootSpan;
   private final String location;
   private final String apiId;
+  private final String artifactId;
+  private final String artifactType;
   private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
 
-  public static final String API_ID_ATTRIBUTE_KEY = "api.id";
-
-  public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, apiId, initialExportInfoProvider, null, "");
-  }
-
-  public ExecutionInitialSpanInfo(Component component, String apiId, String overriddenName,
+  public ExecutionInitialSpanInfo(Component component, String apiId, String artifactId, String artifactType,
                                   InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, apiId, initialExportInfoProvider, overriddenName, "");
+    this(component, apiId, artifactId, artifactType, initialExportInfoProvider, null, "");
   }
 
-  public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider,
+  public ExecutionInitialSpanInfo(Component component, String apiId, String artifactId, String artifactType,
+                                  String overriddenName,
+                                  InitialExportInfoProvider initialExportInfoProvider) {
+    this(component, apiId, artifactId, artifactType, initialExportInfoProvider, overriddenName, "");
+  }
+
+  public ExecutionInitialSpanInfo(Component component, String apiId, String artifactId, String artifactType,
+                                  InitialExportInfoProvider initialExportInfoProvider,
                                   String overriddenName, String spanNameSuffix) {
     initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
     if (overriddenName == null) {
@@ -64,17 +71,21 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain;
     this.rootSpan = isComponentOfName(component, FLOW);
     this.location = getLocationAsString(component.getLocation());
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
     this.apiId = apiId;
     if (apiId != null) {
       this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
     }
   }
 
-  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
-    this(name, apiId, initialExportInfoProvider, "");
+  public ExecutionInitialSpanInfo(String name, String apiId, String artifactId, String artifactType,
+                                  InitialExportInfoProvider initialExportInfoProvider) {
+    this(name, apiId, artifactId, artifactType, initialExportInfoProvider, "");
   }
 
-  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider,
+  public ExecutionInitialSpanInfo(String name, String apiId, String artifactId, String artifactType,
+                                  InitialExportInfoProvider initialExportInfoProvider,
                                   String spanNameSuffix) {
     initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + stripToEmpty(spanNameSuffix));
     this.name = name;
@@ -82,6 +93,8 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     this.rootSpan = false;
     this.location = NO_LOCATION;
     this.apiId = apiId;
+    this.artifactId = artifactId;
+    this.artifactType = artifactType;
     if (apiId != null) {
       this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
     }
@@ -91,6 +104,8 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     biConsumer.accept(LOCATION_KEY, location);
+    biConsumer.accept(ARTIFACT_ID_KEY, artifactId);
+    biConsumer.accept(ARTIFACT_TYPE_KEY, artifactType);
     if (apiId != null) {
       biConsumer.accept(API_ID_ATTRIBUTE_KEY, apiId);
     }

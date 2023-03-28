@@ -464,14 +464,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         throw new IllegalArgumentException("Start span info is null");
       }
 
-      if (artifactId == null) {
-        throw new IllegalArgumentException("Artifact id is null");
-      }
-
-      if (artifactType == null) {
-        throw new IllegalArgumentException("Artifact type is null");
-      }
-
       if (spanProcessor == null) {
         throw new IllegalArgumentException("Artifact type is null");
       }
