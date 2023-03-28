@@ -8,7 +8,6 @@ package org.mule.runtime.tracer.configuration.internal.provider;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
