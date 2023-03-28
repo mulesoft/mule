@@ -9,9 +9,13 @@ package org.mule.runtime.tracer.impl.exporter;
 
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporter.builder;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getResource;
+
 import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
@@ -28,6 +32,7 @@ import org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResour
 
 import javax.inject.Inject;
 
+import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 
@@ -37,7 +42,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
  *
  * @since 4.5.0
  */
-public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Disposable {
+public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Disposable, Initialisable {
 
   @Inject
   private SpanExporterConfiguration configuration;
@@ -52,6 +57,11 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   private static final CapturingSpanExporterWrapper SNIFFED_EXPORTER =
       new CapturingSpanExporterWrapper(new OpenTelemetryResources.NoOpSpanExporter());
+  private Resource resource;
+
+  private String artifactId;
+
+  private String artifactType;
 
   public OpenTelemetrySpanExporterFactory() {}
 
@@ -69,12 +79,15 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
     return builder()
         .withStartSpanInfo(initialExportInfo)
-        .withArtifactId(muleContext.getConfiguration().getId())
-        .withArtifactType(muleContext.getArtifactType().getAsString())
+        .withArtifactId(artifactId)
+        .withResource(resource)
+        .withArtifactType(artifactType)
         .withSpanProcessor(spanProcessor.get())
         .withInternalSpan(internalSpan)
         .build();
   }
+
+
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {
     if (isExportEnabled()) {
@@ -96,6 +109,13 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Override
   public SpanSnifferManager getSpanSnifferManager() {
     return new OpenTelemetrySpanSnifferManager();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.artifactId = muleContext.getConfiguration().getId();
+    this.artifactType = muleContext.getArtifactType().getAsString();
+    this.resource = getResource(artifactId);
   }
 
   @Override
