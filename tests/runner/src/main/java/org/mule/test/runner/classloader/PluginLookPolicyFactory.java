@@ -45,6 +45,8 @@ public class PluginLookPolicyFactory {
         continue;
       }
 
+      // Esto parece emular lo que se hace en DefaultArtifactClassLoaderResolver#createPluginLookupPolicy. Para eso
+      // va a haber que tener los descriptores de todos los plugins creados e implica la necesidad de tener BundleDependencies
       if (pluginClassification.getPluginDependencies().contains(dependencyPluginClassification.getArtifactId())) {
         LookupStrategy lookUpPolicyStrategy = PARENT_FIRST;
 

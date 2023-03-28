@@ -65,7 +65,11 @@ public final class ArtifactClassLoaderHolder {
    * @return the {@link ArtifactClassLoader} that corresponds to the test runner plugin
    */
   public ArtifactClassLoader getTestRunnerPluginClassLoader() {
-    return pluginsArtifactClassLoaders.stream().filter(cl -> cl.getArtifactId().equals("Region/plugin/test-runner")).findFirst()
+    // return pluginsArtifactClassLoaders.stream().filter(cl ->
+    // cl.getArtifactId().equals("Region/plugin/test-runner")).findFirst()
+    return pluginsArtifactClassLoaders.stream()
+        .filter(cl -> cl.getArtifactId().equals("parent/app/app/plugin/org.mule.tests.plugin:mule-tests-runner-plugin:"))
+        .findFirst()
         .orElseThrow(() -> new IllegalStateException("No test runner plugin found"));
   }
 }

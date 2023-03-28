@@ -428,7 +428,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
           }
         });
 
-    ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
+    ContainerOnlyLookupStrategy containerOnlyLookupStrategy =
+        new ContainerOnlyLookupStrategy(containerClassLoader.getClassLoader());
     Set<String> muleModulesExportedPackages = new HashSet<>();
 
     for (MuleModule module : moduleRepository.getModules()) {

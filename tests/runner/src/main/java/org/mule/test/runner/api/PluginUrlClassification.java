@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
 import java.net.URL;
 import java.util.List;
@@ -37,6 +38,7 @@ public class PluginUrlClassification {
   private final Set<String> exportedResources;
   private final Set<String> privilegedExportedPackages;
   private final Set<String> privilegedArtifacts;
+  private BundleDependency bundleDependency;
 
   /**
    * Creates an instance of the classification.
@@ -113,5 +115,13 @@ public class PluginUrlClassification {
 
   public Set<String> getPrivilegedArtifacts() {
     return privilegedArtifacts;
+  }
+
+  public void setBundleDependency(BundleDependency bundleDependency) {
+    this.bundleDependency = bundleDependency;
+  }
+
+  public BundleDependency getBundleDependency() {
+    return bundleDependency;
   }
 }

@@ -10,6 +10,7 @@ package org.mule.test.runner.api;
 import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
 import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
@@ -41,6 +42,9 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 import org.mule.test.runner.utils.RunnerModuleUtils;
@@ -68,6 +72,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
@@ -695,12 +700,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       final List<String> pluginDependencies = node.getArtifactDependencies().stream()
           .map(dependency -> toVersionlessId(dependency.getArtifact()))
           .collect(toList());
+      final List<BundleDependency> transitiveDependencies = node.getArtifactDependencies().stream()
+          .map(dependency -> artifactToBundleDependency(dependency.getArtifact()).build()).collect(toList());
+      final BundleDependency bundleDependency = artifactToBundleDependency(node.getArtifact(), transitiveDependencies).build();
       final String versionLessId = toVersionlessId(node.getArtifact());
       final PluginUrlClassification pluginUrlClassification =
           pluginResourcesResolver.resolvePluginResourcesFor(
                                                             new PluginUrlClassification(versionLessId, node.getUrls(),
                                                                                         node.getExportClasses(),
                                                                                         pluginDependencies));
+      pluginUrlClassification.setBundleDependency(bundleDependency);
 
       classifiedPluginUrls.put(versionLessId, pluginUrlClassification);
     }
@@ -718,6 +727,41 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     return newArrayList(classifiedPluginUrls.values());
+  }
+
+  static BundleDependency.Builder artifactToBundleDependency(Artifact artifact) {
+    return artifactToBundleDependency(artifact, emptyList());
+  }
+
+  static BundleDependency.Builder artifactToBundleDependency(Artifact artifact, List<BundleDependency> transitiveDependencies) {
+    final BundleDescriptor.Builder bundleDescriptorBuilder = artifactToBundleDescriptor(artifact);
+
+    // BundleScope bundleScope = StringUtils.isEmpty(scope) ? BundleScope.COMPILE : BundleScope.valueOf(scope.toUpperCase());
+    BundleScope bundleScope = BundleScope.COMPILE;
+    BundleDependency.Builder builder = new BundleDependency.Builder()
+        .setDescriptor(bundleDescriptorBuilder.build())
+        .setScope(bundleScope);
+    if (artifact.getFile() != null) {
+      builder.setBundleUri(artifact.getFile().toURI());
+    }
+    builder.setTransitiveDependencies(transitiveDependencies);
+    return builder;
+  }
+
+  static BundleDescriptor.Builder artifactToBundleDescriptor(Artifact artifact) {
+    final BundleDescriptor.Builder bundleDescriptorBuilder = new BundleDescriptor.Builder()
+        .setArtifactId(artifact.getArtifactId())
+        .setGroupId(artifact.getGroupId())
+        .setVersion(artifact.getVersion())
+        .setBaseVersion(artifact.getBaseVersion())
+        .setType(artifact.getExtension());
+
+    String classifier = artifact.getClassifier();
+    if (!isEmpty(classifier)) {
+      bundleDescriptorBuilder.setClassifier(classifier);
+    }
+
+    return bundleDescriptorBuilder;
   }
 
   /**
