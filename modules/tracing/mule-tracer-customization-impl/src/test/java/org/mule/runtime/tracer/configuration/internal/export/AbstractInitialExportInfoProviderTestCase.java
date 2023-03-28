@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.tracer.configuration.internal.export;
 
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.UNKNOWN;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
+import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 
@@ -30,11 +30,11 @@ import java.util.Set;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.mule.runtime.tracer.customization.impl.export.MonitoringInitialExportInfoProvider;
+import org.mule.runtime.tracer.configuration.internal.provider.MonitoringInitialExportInfoProvider;
 
 @Feature(PROFILING)
 @Story(TRACING_CUSTOMIZATION)
-public class MonitoringInitialExportInfoProviderTestCase {
+public class AbstractInitialExportInfoProviderTestCase {
 
   @Test
   public void testForSpecialCasesByName() {
@@ -47,7 +47,7 @@ public class MonitoringInitialExportInfoProviderTestCase {
 
   @Test
   public void testForSpecialCasesByClass() {
-    MonitoringInitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+    InitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
     PolicyChain component = new PolicyChain();
     InitialExportInfo initialExportInfo = monitoringInitialExportInfoProvider.getInitialExportInfo(component);
     assertThat(initialExportInfo.noExportUntil(), equalTo(singleton("execute-next")));
@@ -55,7 +55,7 @@ public class MonitoringInitialExportInfoProviderTestCase {
   }
 
   private static void testComponent(String componentName, boolean expectedExportable, Set<String> noExportUntil) {
-    MonitoringInitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+    InitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
     InitialExportInfo initialExportInfo = monitoringInitialExportInfoProvider.getInitialExportInfo(componentName);
     assertThat(initialExportInfo.noExportUntil(), equalTo(noExportUntil));
     assertThat(initialExportInfo.isExportable(), equalTo(expectedExportable));

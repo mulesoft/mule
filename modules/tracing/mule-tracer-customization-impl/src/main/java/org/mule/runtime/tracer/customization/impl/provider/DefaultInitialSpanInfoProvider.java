@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.customization.impl.provider;
+package org.mule.runtime.tracer.configuration.internal.provider;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
@@ -12,10 +12,11 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.MonitoringInitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.info.ExecutionInitialSpanInfo;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanInfo;
+import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
+import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
 import javax.inject.Inject;
 
@@ -34,8 +35,11 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   @Inject
   ConfigurationProperties configurationProperties;
 
+  @Inject
+  TracingLevelConfiguration tracingLevelConfiguration;
+
   // TODO: User Story B - Implementation of Monitoring, Troubleshooting, App Level (W-12658074)
-  private final InitialExportInfoProvider initialExportInfo = new MonitoringInitialExportInfoProvider();
+  private InitialExportInfoProvider initialExportInfoProvider;
   private String apiId;
   private boolean initialisedAttributes;
 
@@ -46,7 +50,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider());
   }
 
   @Override
@@ -56,7 +60,17 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo, null, suffix);
+    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(), null, suffix);
+  }
+
+  @Override
+  public InitialSpanInfo getDebugLevelInitialSpanInfo(String name) {
+    // TODO: Verify initialisation order in mule context (W-12761329)
+    if (!initialisedAttributes) {
+      initialiseAttributes();
+      initialisedAttributes = true;
+    }
+    return new ExecutionInitialSpanInfo(name, apiId, getInitialExportInfoProvider(), true);
   }
 
   @Override
@@ -66,7 +80,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(name, apiId, initialExportInfo);
+    return new ExecutionInitialSpanInfo(name, apiId, getInitialExportInfoProvider());
   }
 
   @Override
@@ -76,13 +90,34 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getInitialExportInfoProvider());
   }
 
   public void initialiseAttributes() {
     if (muleContext.getArtifactType().equals(POLICY)) {
       apiId = configurationProperties.resolveStringProperty(API_ID_CONFIGURATION_PROPERTIES_KEY).orElse(null);
     }
+  }
 
+  private InitialExportInfoProvider getInitialExportInfoProvider() {
+    if (initialExportInfoProvider == null) {
+      TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
+      resolveInitialExportInfoProvider(tracingLevel);
+    }
+
+    return initialExportInfoProvider;
+  }
+
+  private void resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
+    switch (tracingLevel) {
+      case OVERVIEW:
+        initialExportInfoProvider = new OverviewInitialExportInfoProvider();
+        break;
+      case DEBUG:
+        initialExportInfoProvider = new DebugInitialExportInfoProvider();
+        break;
+      default:
+        initialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+    }
   }
 }

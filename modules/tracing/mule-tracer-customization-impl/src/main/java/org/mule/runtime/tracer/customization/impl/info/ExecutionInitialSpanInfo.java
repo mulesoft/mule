@@ -72,12 +72,17 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   }
 
   public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
-    this(name, apiId, initialExportInfoProvider, "");
+    this(name, apiId, initialExportInfoProvider, "", false);
   }
 
   public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider,
-                                  String spanNameSuffix) {
-    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + stripToEmpty(spanNameSuffix));
+                                  boolean debugLevel) {
+    this(name, apiId, initialExportInfoProvider, "", debugLevel);
+  }
+
+  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider,
+                                  String spanNameSuffix, boolean debugLevel) {
+    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + stripToEmpty(spanNameSuffix), debugLevel);
     this.name = name;
     this.isPolicySpan = false;
     this.rootSpan = false;
@@ -86,7 +91,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     if (apiId != null) {
       this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
     }
-
   }
 
   @Override

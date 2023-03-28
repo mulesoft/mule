@@ -22,36 +22,30 @@ import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
+<<<<<<<< HEAD:modules/tracing/mule-tracer-customization-impl/src/main/java/org/mule/runtime/tracer/customization/impl/export/MonitoringInitialExportInfoProvider.java
 import org.mule.runtime.tracer.customization.api.InternalSpanNames;
+========
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.configuration.api.InternalSpanNames;
+import org.mule.runtime.tracer.configuration.internal.info.NoExportTillSpanWithNameInitialExportInfo;
+>>>>>>>> a95e8137388 (W-12658074: User Story B - Implementation of Monitoring, Troubleshooting, App Level):modules/tracing/mule-tracer-customization-impl/src/main/java/org/mule/runtime/tracer/customization/impl/export/AbstractInitialExportInfoProvider.java
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The monitoring level {@link InitialExportInfoProvider}.
+ * An {@link InitialExportInfoProvider} corresponding to the
+ * {@link org.mule.runtime.tracer.level.api.config.TracerLevel#MONITORING}
  *
  * @since 4.6.0
  */
-public class MonitoringInitialExportInfoProvider implements InitialExportInfoProvider {
+public abstract class AbstractInitialExportInfoProvider implements InitialExportInfoProvider {
 
   private final Map<Class, InitialExportInfo> initialExportInfoMapByComponentClass = new HashMap<Class, InitialExportInfo>() {
 
     {
       put(PolicyChain.class,
           new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
-    }
-  };
-  private final Map<String, InitialExportInfo> initialExportInfoMapByName = new HashMap<String, InitialExportInfo>() {
-
-    {
-      put(POLICY_CHAIN_SPAN_NAME,
-          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
-      put(POLICY_NEXT_ACTION_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(UNKNOWN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(ASYNC_INNER_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(TRY_SCOPE_INNER_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(CACHE_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(MESSAGE_PROCESSORS_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
     }
   };
 
@@ -75,16 +69,38 @@ public class MonitoringInitialExportInfoProvider implements InitialExportInfoPro
 
   @Override
   public InitialExportInfo getInitialExportInfo(String spanName) {
+    return getInitialExportInfo(spanName, false);
+  }
+
+  @Override
+  public InitialExportInfo getInitialExportInfo(String spanName, boolean debugLevel) {
+    if (debugLevel) {
+      return doGetInitialExportInfoForDebugLevel();
+    }
+
     return doGetInitialExportInfo(spanName);
   }
 
+  protected abstract InitialExportInfo doGetInitialExportInfoForDebugLevel();
+
   private InitialExportInfo doGetInitialExportInfo(String componentFullyQualifiedName) {
-    InitialExportInfo initialExportInfo = initialExportInfoMapByName.get(componentFullyQualifiedName);
+    InitialExportInfo initialExportInfo = getInitialExportInfoMapByName().get(componentFullyQualifiedName);
 
     if (initialExportInfo == null) {
-      initialExportInfo = DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+      initialExportInfo = getDefaultInitialExportInfo();
     }
 
     return initialExportInfo;
   }
+
+  /**
+   * @return the default initial export info for this {@link InitialSpanInfoProvider}
+   */
+  protected abstract InitialExportInfo getDefaultInitialExportInfo();
+
+  /**
+   * @return a map that has named {@link InitialExportInfo}
+   */
+  protected abstract Map<String, InitialExportInfo> getInitialExportInfoMapByName();
+
 }

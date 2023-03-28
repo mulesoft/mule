@@ -55,8 +55,12 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
-            <version>4.6.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-configuration-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

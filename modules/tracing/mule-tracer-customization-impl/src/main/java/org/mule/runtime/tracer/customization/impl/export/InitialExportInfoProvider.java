@@ -32,4 +32,13 @@ public interface InitialExportInfoProvider {
    * @return {@link InitialExportInfo} for a component.
    */
   InitialExportInfo getInitialExportInfo(String spanName);
+
+  /**
+   * @param spanName   the span name.
+   *
+   * @param debugLevel indicates if it debug level.
+   *
+   * @return {@link InitialExportInfo} for a component.
+   */
+  InitialExportInfo getInitialExportInfo(String spanName, boolean debugLevel);
 }

@@ -39,6 +39,14 @@ public interface InitialSpanInfoProvider {
 
 
   /**
+   * @param name the name for the span.
+   *
+   * @return a {@link InitialSpanInfo} based on a name taking into account that this is a debug level span.
+   */
+  InitialSpanInfo getDebugLevelInitialSpanInfo(String name);
+
+
+  /**
    * @param component      the {@link Component} to generate the {@link InitialSpanInfo} for.
    * @param overriddenName the overridden name.
    * @param suffix         the suffix.
