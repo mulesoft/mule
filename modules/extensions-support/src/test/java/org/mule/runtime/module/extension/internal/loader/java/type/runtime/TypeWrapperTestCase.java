@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import io.qameta.allure.Description;
 import org.junit.Test;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -18,7 +19,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.semantics.security.Password;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -45,6 +48,22 @@ public class TypeWrapperTestCase {
       assertThat(parameter.getType().getTypeName(),
                  is(("org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapperTestCase$SomeClass")));
     }
+  }
+
+  @Test
+  @Description("Ensure JDK internal fields are filtered out as we can't use reflection on them in Java 17 and above")
+  public void filterInternalJdkFields() {
+    TypeWrapper type = new TypeWrapper(LocalDateTime.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    List<FieldElement> fields = type.getFields();
+    assertThat(fields.stream().noneMatch(f -> f.getField().get().getName().equals("serialVersionUID")),
+               is(true));
+    assertThat(fields.isEmpty(), is(true));
+    // verify that we are not filtering out fields that are Java types in a custom class
+    type = new TypeWrapper(PersonalInfo.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(Thread.currentThread().getContextClassLoader()));
+    assertThat(type.getFields().stream().anyMatch(f -> f.getField().get().getName().equals("dateOfConception")),
+               is(true));
   }
 
   @Test
