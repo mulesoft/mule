@@ -39,17 +39,21 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final boolean isPolicySpan;
   private final boolean rootSpan;
   private final String location;
+  private final String apiId;
+  private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
 
-  public ExecutionInitialSpanInfo(Component component, InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, initialExportInfoProvider, null, "");
+  public static final String API_ID_ATTRIBUTE_KEY = "api.id";
+
+  public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
+    this(component, apiId, initialExportInfoProvider, null, "");
   }
 
-  public ExecutionInitialSpanInfo(Component component, String overriddenName,
+  public ExecutionInitialSpanInfo(Component component, String apiId, String overriddenName,
                                   InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, initialExportInfoProvider, overriddenName, "");
+    this(component, apiId, initialExportInfoProvider, overriddenName, "");
   }
 
-  public ExecutionInitialSpanInfo(Component component, InitialExportInfoProvider initialExportInfoProvider,
+  public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider,
                                   String overriddenName, String spanNameSuffix) {
     initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
     if (overriddenName == null) {
@@ -60,28 +64,41 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain;
     this.rootSpan = isComponentOfName(component, FLOW);
     this.location = getLocationAsString(component.getLocation());
+    this.apiId = apiId;
+    if (apiId != null) {
+      this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
+    }
   }
 
-  public ExecutionInitialSpanInfo(String name, InitialExportInfoProvider initialExportInfoProvider) {
-    this(name, initialExportInfoProvider, "");
+  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
+    this(name, apiId, initialExportInfoProvider, "");
   }
 
-  public ExecutionInitialSpanInfo(String name, InitialExportInfoProvider initialExportInfoProvider, String spanNameSuffix) {
+  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider,
+                                  String spanNameSuffix) {
     initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + stripToEmpty(spanNameSuffix));
     this.name = name;
     this.isPolicySpan = false;
     this.rootSpan = false;
     this.location = NO_LOCATION;
+    this.apiId = apiId;
+    if (apiId != null) {
+      this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
+    }
+
   }
 
   @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     biConsumer.accept(LOCATION_KEY, location);
+    if (apiId != null) {
+      biConsumer.accept(API_ID_ATTRIBUTE_KEY, apiId);
+    }
   }
 
   @Override
   public int getInitialAttributesCount() {
-    return INITIAL_ATTRIBUTES_BASE_COUNT;
+    return initialAttributesCount;
   }
 
   @Override
