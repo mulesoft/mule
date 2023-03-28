@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.security.Authentication;
@@ -112,7 +112,7 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
     try {
       manager.authenticate(authentication);
     } finally {
-      verifyZeroInteractions(provider);
+      verifyNoInteractions(provider);
     }
   }
 
