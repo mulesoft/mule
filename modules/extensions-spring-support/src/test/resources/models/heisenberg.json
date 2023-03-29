@@ -121,9 +121,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.PersonalInfo"
@@ -171,9 +169,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.String"
@@ -221,9 +217,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.Long"
@@ -241,9 +235,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
@@ -340,9 +332,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
@@ -407,9 +397,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.util.Collection"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [
                         "java.lang.String"
@@ -459,9 +447,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -538,9 +524,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.Object"
@@ -588,9 +572,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.Object"
@@ -936,9 +918,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.HealthStatus"
@@ -1069,9 +1049,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -1278,9 +1256,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Ricin"
@@ -1387,9 +1363,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -1436,12 +1410,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.time.temporal.Temporal",
-                      "java.time.temporal.TemporalAdjuster",
-                      "java.time.chrono.ChronoLocalDateTime",
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -1486,11 +1455,7 @@
                     "isInstantiable": true,
                     "isAbstract": false,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -1535,11 +1500,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -1587,11 +1548,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -1635,9 +1592,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.String"
@@ -2385,9 +2340,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -2458,9 +2411,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -3383,9 +3334,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -3456,9 +3405,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -3583,9 +3530,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -3642,9 +3587,7 @@
                         "isInstantiable": false,
                         "isAbstract": false,
                         "isFinal": true,
-                        "implementedInterfaces": [
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "java.lang.Number",
                         "genericTypes": [],
                         "isMap": false
@@ -4165,9 +4108,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -4238,9 +4179,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -4365,9 +4304,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -4424,9 +4361,7 @@
                         "isInstantiable": false,
                         "isAbstract": false,
                         "isFinal": true,
-                        "implementedInterfaces": [
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "java.lang.Number",
                         "genericTypes": [],
                         "isMap": false
@@ -4947,9 +4882,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -5020,9 +4953,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -5700,9 +5631,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -5773,9 +5702,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -5879,9 +5806,7 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.util.Collection"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.runtime.extension.api.runtime.operation.Result"
@@ -5900,9 +5825,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -6625,9 +6548,7 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.util.Collection"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.runtime.extension.api.runtime.operation.Result"
@@ -6646,9 +6567,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -6670,9 +6589,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Closeable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -7455,9 +7372,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -7528,9 +7443,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -7656,9 +7569,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -8211,9 +8122,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -8284,9 +8193,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -9168,9 +9075,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -9192,9 +9097,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Closeable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -9826,9 +9729,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -9899,9 +9800,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -10027,9 +9926,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -10687,9 +10584,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -10760,9 +10655,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -11406,9 +11299,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -11479,9 +11370,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -11933,9 +11822,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -12006,9 +11893,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -12439,9 +12324,7 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.util.Collection"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.runtime.extension.api.runtime.operation.Result"
@@ -12460,9 +12343,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -12877,9 +12758,7 @@
                   "isInstantiable": false,
                   "isAbstract": false,
                   "isFinal": true,
-                  "implementedInterfaces": [
-                    "java.lang.Comparable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
@@ -13271,9 +13150,7 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.io.Closeable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [],
                   "isMap": false
@@ -13881,9 +13758,7 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.io.Closeable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [],
                   "isMap": false
@@ -13938,9 +13813,7 @@
                         "isInstantiable": false,
                         "isAbstract": false,
                         "isFinal": true,
-                        "implementedInterfaces": [
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "java.lang.Number",
                         "genericTypes": [],
                         "isMap": false
@@ -14546,9 +14419,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -14619,9 +14490,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -15299,9 +15168,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -15372,9 +15239,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -15499,9 +15364,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -16035,9 +15898,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -16108,9 +15969,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -16799,9 +16658,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -17335,9 +17192,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -17408,9 +17263,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -17740,9 +17593,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -17813,9 +17664,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -18744,9 +18593,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -18817,9 +18664,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -18944,9 +18789,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -19156,9 +18999,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -19259,9 +19100,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -19308,12 +19147,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -19358,11 +19192,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -19407,11 +19237,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -19459,11 +19285,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -19507,9 +19329,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -19798,9 +19618,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -19901,9 +19719,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -19950,12 +19766,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -20000,11 +19811,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -20049,11 +19856,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -20101,11 +19904,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -20149,9 +19948,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -21106,9 +20903,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -21179,9 +20974,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -21289,9 +21082,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -21501,9 +21292,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -21607,9 +21396,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -21656,12 +21443,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -21706,11 +21488,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -21755,11 +21533,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -21807,11 +21581,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -21855,9 +21625,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -22146,9 +21914,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -22249,9 +22015,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -22298,12 +22062,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -22348,11 +22107,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -22397,11 +22152,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -22449,11 +22200,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -22497,9 +22244,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -23458,9 +23203,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -23531,9 +23274,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -23641,9 +23382,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -23853,9 +23592,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -23928,9 +23665,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -23976,9 +23711,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -24237,9 +23970,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -24309,9 +24040,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -24357,9 +24086,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -25030,9 +24757,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -25103,9 +24828,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -25213,9 +24936,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -25425,9 +25146,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -25531,9 +25250,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -25580,12 +25297,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -25630,11 +25342,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -25679,11 +25387,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -25731,11 +25435,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -25779,9 +25479,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -26070,9 +25768,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -26173,9 +25869,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -26222,12 +25916,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -26272,11 +25961,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -26321,11 +26006,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -26373,11 +26054,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -26421,9 +26098,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -27415,9 +27090,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -27488,9 +27161,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -27598,9 +27269,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -27810,9 +27479,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -27916,9 +27583,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -27965,12 +27630,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28015,11 +27675,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28064,11 +27720,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28116,11 +27768,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28164,9 +27812,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -28455,9 +28101,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -28558,9 +28202,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -28607,12 +28249,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28657,11 +28294,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28706,11 +28339,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28758,11 +28387,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -28806,9 +28431,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -29800,9 +29423,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -29873,9 +29494,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -29983,9 +29602,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -30195,9 +29812,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -30301,9 +29916,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -30350,12 +29963,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -30400,11 +30008,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -30449,11 +30053,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -30501,11 +30101,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -30549,9 +30145,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -30840,9 +30434,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "org.mule.test.heisenberg.extension.model.Ricin"
@@ -30943,9 +30535,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -30992,12 +30582,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -31042,11 +30627,7 @@
                           "isInstantiable": true,
                           "isAbstract": false,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -31091,11 +30672,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -31143,11 +30720,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [],
                           "isMap": false
@@ -31191,9 +30764,7 @@
                           "isInstantiable": false,
                           "isAbstract": true,
                           "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "",
                           "genericTypes": [
                             "java.lang.String"
@@ -32152,9 +31723,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -32225,9 +31794,7 @@
                                   "isInstantiable": false,
                                   "isAbstract": false,
                                   "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
+                                  "implementedInterfaces": [],
                                   "parent": "java.lang.Number",
                                   "genericTypes": [],
                                   "isMap": false
@@ -32504,9 +32071,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -32553,12 +32118,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.time.temporal.Temporal",
-                      "java.time.temporal.TemporalAdjuster",
-                      "java.time.chrono.ChronoLocalDateTime",
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -32603,11 +32163,7 @@
                     "isInstantiable": true,
                     "isAbstract": false,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -32652,11 +32208,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -32704,11 +32256,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -32752,9 +32300,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.String"
@@ -34276,11 +33822,7 @@
               "isInstantiable": true,
               "isAbstract": false,
               "isFinal": true,
-              "implementedInterfaces": [
-                "java.io.Serializable",
-                "java.lang.Comparable",
-                "java.lang.CharSequence"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [],
               "isMap": false
@@ -35037,11 +34579,7 @@
               "isInstantiable": true,
               "isAbstract": false,
               "isFinal": true,
-              "implementedInterfaces": [
-                "java.io.Serializable",
-                "java.lang.Comparable",
-                "java.lang.CharSequence"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [],
               "isMap": false
@@ -36011,9 +35549,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "org.mule.test.heisenberg.extension.model.Ricin"
@@ -36066,9 +35602,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Ricin"
@@ -39019,9 +38553,7 @@
                     "isInstantiable": true,
                     "isAbstract": false,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Map"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.util.HashMap",
                     "genericTypes": [
                       "java.lang.String",
@@ -40380,10 +39912,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": true,
-              "implementedInterfaces": [
-                "java.lang.Cloneable",
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [],
               "isMap": false
@@ -40399,10 +39928,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": true,
-                "implementedInterfaces": [
-                  "java.lang.Cloneable",
-                  "java.io.Serializable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -40473,10 +39999,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Cloneable",
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -40492,10 +40015,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Cloneable",
-                        "java.io.Serializable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
@@ -41929,9 +41449,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -41978,12 +41496,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.time.temporal.Temporal",
-                      "java.time.temporal.TemporalAdjuster",
-                      "java.time.chrono.ChronoLocalDateTime",
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -42028,11 +41541,7 @@
                     "isInstantiable": true,
                     "isAbstract": false,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -42077,11 +41586,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -42129,11 +41634,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable",
-                      "java.lang.Cloneable",
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -42177,9 +41678,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.String"
@@ -43918,9 +43417,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "java.lang.String"
@@ -43981,9 +43478,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.Object"
@@ -44300,9 +43795,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "java.lang.String"
@@ -44363,9 +43856,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Weapon"
@@ -44688,9 +44179,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "org.mule.test.heisenberg.extension.model.Ricin"
@@ -44751,9 +44240,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Ricin"
@@ -45759,9 +45246,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "java.lang.String"
@@ -45818,9 +45303,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.KnockeableDoor"
@@ -47089,9 +46572,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Closeable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -47921,9 +47402,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "java.lang.String"
@@ -47980,9 +47459,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "java.lang.String"
@@ -48955,9 +48432,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "org.mule.test.heisenberg.extension.model.Weapon"
@@ -49014,9 +48489,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Weapon"
@@ -49309,9 +48782,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "org.mule.test.heisenberg.extension.model.Weapon"
@@ -49368,9 +48839,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Weapon"
@@ -51645,9 +51114,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -51911,9 +51378,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -52177,9 +51642,7 @@
                     "isInstantiable": false,
                     "isAbstract": false,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
@@ -54919,9 +54382,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [
                       "org.mule.test.heisenberg.extension.model.Attribute"
@@ -55911,9 +55372,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -55984,9 +55443,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -56915,9 +56372,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -56988,9 +56443,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -57111,9 +56564,7 @@
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.util.Collection"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": [
                 "org.mule.runtime.extension.api.runtime.operation.Result"
@@ -57132,9 +56583,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.io.Serializable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -57474,9 +56923,7 @@
             "isInstantiable": false,
             "isAbstract": false,
             "isFinal": true,
-            "implementedInterfaces": [
-              "java.lang.Comparable"
-            ],
+            "implementedInterfaces": [],
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
@@ -57498,9 +56945,7 @@
             "isInstantiable": false,
             "isAbstract": false,
             "isFinal": true,
-            "implementedInterfaces": [
-              "java.lang.Comparable"
-            ],
+            "implementedInterfaces": [],
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
@@ -57522,9 +56967,7 @@
             "isInstantiable": false,
             "isAbstract": false,
             "isFinal": true,
-            "implementedInterfaces": [
-              "java.lang.Comparable"
-            ],
+            "implementedInterfaces": [],
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
@@ -57553,9 +56996,7 @@
             "isInstantiable": false,
             "isAbstract": false,
             "isFinal": true,
-            "implementedInterfaces": [
-              "java.lang.Comparable"
-            ],
+            "implementedInterfaces": [],
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
@@ -57577,9 +57018,7 @@
             "isInstantiable": false,
             "isAbstract": false,
             "isFinal": true,
-            "implementedInterfaces": [
-              "java.lang.Comparable"
-            ],
+            "implementedInterfaces": [],
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
@@ -58287,9 +57726,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.PersonalInfo"
@@ -58355,9 +57792,7 @@
                         "isInstantiable": false,
                         "isAbstract": false,
                         "isFinal": true,
-                        "implementedInterfaces": [
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "java.lang.Number",
                         "genericTypes": [],
                         "isMap": false
@@ -58396,12 +57831,7 @@
                         "isInstantiable": false,
                         "isAbstract": false,
                         "isFinal": true,
-                        "implementedInterfaces": [
-                          "java.time.temporal.Temporal",
-                          "java.time.temporal.TemporalAdjuster",
-                          "java.time.chrono.ChronoLocalDateTime",
-                          "java.io.Serializable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [],
                         "isMap": false
@@ -58438,11 +57868,7 @@
                         "isInstantiable": true,
                         "isAbstract": false,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.io.Serializable",
-                          "java.lang.Cloneable",
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [],
                         "isMap": false
@@ -58479,11 +57905,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.io.Serializable",
-                          "java.lang.Cloneable",
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [],
                         "isMap": false
@@ -58525,11 +57947,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.io.Serializable",
-                          "java.lang.Cloneable",
-                          "java.lang.Comparable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [],
                         "isMap": false
@@ -58566,9 +57984,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.util.Collection"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [
                           "java.lang.String"
@@ -58640,9 +58056,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "java.lang.String"
@@ -58675,9 +58089,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "java.lang.Long"
@@ -58695,9 +58107,7 @@
                   "isInstantiable": false,
                   "isAbstract": false,
                   "isFinal": true,
-                  "implementedInterfaces": [
-                    "java.lang.Comparable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
@@ -58762,9 +58172,7 @@
                   "isInstantiable": false,
                   "isAbstract": false,
                   "isFinal": true,
-                  "implementedInterfaces": [
-                    "java.lang.Comparable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
@@ -58813,9 +58221,7 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.util.Collection"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [
                     "java.lang.String"
@@ -58938,9 +58344,7 @@
                               "isInstantiable": false,
                               "isAbstract": false,
                               "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
@@ -58970,9 +58374,7 @@
                               "isInstantiable": true,
                               "isAbstract": false,
                               "isFinal": false,
-                              "implementedInterfaces": [
-                                "java.io.Serializable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "",
                               "genericTypes": [],
                               "isMap": false
@@ -59075,9 +58477,7 @@
                       "isInstantiable": true,
                       "isAbstract": false,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.io.Serializable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
@@ -59160,9 +58560,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.util.Collection"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [
                         "org.mule.test.heisenberg.extension.model.Ricin"
@@ -59224,9 +58622,7 @@
                               "isInstantiable": false,
                               "isAbstract": false,
                               "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
@@ -59256,9 +58652,7 @@
                               "isInstantiable": true,
                               "isAbstract": false,
                               "isFinal": false,
-                              "implementedInterfaces": [
-                                "java.io.Serializable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "",
                               "genericTypes": [],
                               "isMap": false
@@ -59422,9 +58816,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
@@ -59463,12 +58855,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.time.temporal.Temporal",
-                        "java.time.temporal.TemporalAdjuster",
-                        "java.time.chrono.ChronoLocalDateTime",
-                        "java.io.Serializable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
@@ -59505,11 +58892,7 @@
                       "isInstantiable": true,
                       "isAbstract": false,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.io.Serializable",
-                        "java.lang.Cloneable",
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
@@ -59546,11 +58929,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.io.Serializable",
-                        "java.lang.Cloneable",
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
@@ -59592,11 +58971,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.io.Serializable",
-                        "java.lang.Cloneable",
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
@@ -59633,9 +59008,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.util.Collection"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [
                         "java.lang.String"
@@ -59712,9 +59085,7 @@
                 "isInstantiable": false,
                 "isAbstract": false,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
@@ -59782,9 +59153,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "java.lang.Object"
@@ -59844,9 +59213,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "java.lang.Object"
@@ -59984,9 +59351,7 @@
                   "isInstantiable": true,
                   "isAbstract": false,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.io.Serializable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": [],
                   "isMap": false
@@ -60183,9 +59548,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.HealthStatus"
@@ -60686,9 +60049,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.Investment"
@@ -60826,9 +60187,7 @@
                               "isInstantiable": false,
                               "isAbstract": false,
                               "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
@@ -60932,9 +60291,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.util.Collection"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [
                           "org.mule.test.heisenberg.extension.model.Investment"
@@ -61013,9 +60370,7 @@
                               "isInstantiable": false,
                               "isAbstract": false,
                               "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
@@ -61127,9 +60482,7 @@
                             "isInstantiable": false,
                             "isAbstract": true,
                             "isFinal": false,
-                            "implementedInterfaces": [
-                              "java.util.Collection"
-                            ],
+                            "implementedInterfaces": [],
                             "parent": "",
                             "genericTypes": [
                               "org.mule.test.heisenberg.extension.model.Investment"
@@ -61213,9 +60566,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
@@ -61335,9 +60686,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.Investment"
@@ -61475,9 +60824,7 @@
                               "isInstantiable": false,
                               "isAbstract": false,
                               "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
@@ -61581,9 +60928,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.util.Collection"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [
                           "org.mule.test.heisenberg.extension.model.Investment"
@@ -61662,9 +61007,7 @@
                               "isInstantiable": false,
                               "isAbstract": false,
                               "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
+                              "implementedInterfaces": [],
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
@@ -61776,9 +61119,7 @@
                             "isInstantiable": false,
                             "isAbstract": true,
                             "isFinal": false,
-                            "implementedInterfaces": [
-                              "java.util.Collection"
-                            ],
+                            "implementedInterfaces": [],
                             "parent": "",
                             "genericTypes": [
                               "org.mule.test.heisenberg.extension.model.Investment"
@@ -61862,9 +61203,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
@@ -62014,9 +61353,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.Investment"
@@ -62116,9 +61453,7 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": true,
-                      "implementedInterfaces": [
-                        "java.lang.Comparable"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
@@ -62155,9 +61490,7 @@
           "isInstantiable": true,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [
-            "java.io.Serializable"
-          ],
+          "implementedInterfaces": [],
           "parent": "",
           "genericTypes": [],
           "isMap": false
@@ -62365,9 +61698,7 @@
                 "isInstantiable": false,
                 "isAbstract": false,
                 "isFinal": true,
-                "implementedInterfaces": [
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
@@ -62406,12 +61737,7 @@
                 "isInstantiable": false,
                 "isAbstract": false,
                 "isFinal": true,
-                "implementedInterfaces": [
-                  "java.time.temporal.Temporal",
-                  "java.time.temporal.TemporalAdjuster",
-                  "java.time.chrono.ChronoLocalDateTime",
-                  "java.io.Serializable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -62448,11 +61774,7 @@
                 "isInstantiable": true,
                 "isAbstract": false,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.io.Serializable",
-                  "java.lang.Cloneable",
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -62489,11 +61811,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.io.Serializable",
-                  "java.lang.Cloneable",
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -62535,11 +61853,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.io.Serializable",
-                  "java.lang.Cloneable",
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -62576,9 +61890,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "java.lang.String"
@@ -62755,9 +62067,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.util.Collection"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [
                         "org.mule.test.heisenberg.extension.model.RecursiveChainA"
@@ -62796,9 +62106,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.RecursiveChainB"
@@ -62880,9 +62188,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.util.Collection"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [
                           "org.mule.test.heisenberg.extension.model.RecursiveChainA"
@@ -63036,9 +62342,7 @@
                       "isInstantiable": false,
                       "isAbstract": true,
                       "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.util.Collection"
-                      ],
+                      "implementedInterfaces": [],
                       "parent": "",
                       "genericTypes": [
                         "org.mule.test.heisenberg.extension.model.RecursiveChainB"
@@ -63077,9 +62381,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.RecursiveChainA"
@@ -63161,9 +62463,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": false,
-                        "implementedInterfaces": [
-                          "java.util.Collection"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [
                           "org.mule.test.heisenberg.extension.model.RecursiveChainB"
@@ -63249,9 +62549,7 @@
                 "isInstantiable": false,
                 "isAbstract": true,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.util.Collection"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [
                   "org.mule.test.heisenberg.extension.model.RecursivePojo"
@@ -63356,9 +62654,7 @@
                 "isInstantiable": false,
                 "isAbstract": false,
                 "isFinal": true,
-                "implementedInterfaces": [
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
@@ -63388,9 +62684,7 @@
                 "isInstantiable": true,
                 "isAbstract": false,
                 "isFinal": false,
-                "implementedInterfaces": [
-                  "java.io.Serializable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "",
                 "genericTypes": [],
                 "isMap": false
@@ -63512,9 +62806,7 @@
                 "isInstantiable": false,
                 "isAbstract": false,
                 "isFinal": true,
-                "implementedInterfaces": [
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
@@ -63696,9 +62988,7 @@
                 "isInstantiable": false,
                 "isAbstract": false,
                 "isFinal": true,
-                "implementedInterfaces": [
-                  "java.lang.Comparable"
-                ],
+                "implementedInterfaces": [],
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
@@ -63784,9 +63074,7 @@
           "isInstantiable": false,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [
-            "java.io.Serializable"
-          ],
+          "implementedInterfaces": [],
           "parent": "",
           "genericTypes": [],
           "isMap": false
@@ -63824,9 +63112,7 @@
           "isInstantiable": false,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [
-            "java.io.Serializable"
-          ],
+          "implementedInterfaces": [],
           "parent": "",
           "genericTypes": [],
           "isMap": false

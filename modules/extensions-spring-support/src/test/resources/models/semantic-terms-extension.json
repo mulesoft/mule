@@ -128,9 +128,7 @@
                           "isInstantiable": false,
                           "isAbstract": false,
                           "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
+                          "implementedInterfaces": [],
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
@@ -589,9 +587,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -662,9 +658,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -1159,9 +1153,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -1232,9 +1224,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -1730,9 +1720,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -1803,9 +1791,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -2393,10 +2379,7 @@
                         "isInstantiable": false,
                         "isAbstract": true,
                         "isFinal": true,
-                        "implementedInterfaces": [
-                          "java.lang.Cloneable",
-                          "java.io.Serializable"
-                        ],
+                        "implementedInterfaces": [],
                         "parent": "",
                         "genericTypes": [],
                         "isMap": false
@@ -2533,9 +2516,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -2606,9 +2587,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -3049,9 +3028,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -3122,9 +3099,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -3587,9 +3562,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -3660,9 +3633,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -4095,9 +4066,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -4168,9 +4137,7 @@
                                         "isInstantiable": false,
                                         "isAbstract": false,
                                         "isFinal": true,
-                                        "implementedInterfaces": [
-                                          "java.lang.Comparable"
-                                        ],
+                                        "implementedInterfaces": [],
                                         "parent": "java.lang.Number",
                                         "genericTypes": [],
                                         "isMap": false
@@ -5668,9 +5635,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -5741,9 +5706,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -6238,9 +6201,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -6311,9 +6272,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -6809,9 +6768,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -6882,9 +6839,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -7472,10 +7427,7 @@
                     "isInstantiable": false,
                     "isAbstract": true,
                     "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Cloneable",
-                      "java.io.Serializable"
-                    ],
+                    "implementedInterfaces": [],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
@@ -7612,9 +7564,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -7685,9 +7635,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -8128,9 +8076,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -8201,9 +8147,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -8666,9 +8610,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -8739,9 +8681,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -9174,9 +9114,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
@@ -9247,9 +9185,7 @@
                                     "isInstantiable": false,
                                     "isAbstract": false,
                                     "isFinal": true,
-                                    "implementedInterfaces": [
-                                      "java.lang.Comparable"
-                                    ],
+                                    "implementedInterfaces": [],
                                     "parent": "java.lang.Number",
                                     "genericTypes": [],
                                     "isMap": false
