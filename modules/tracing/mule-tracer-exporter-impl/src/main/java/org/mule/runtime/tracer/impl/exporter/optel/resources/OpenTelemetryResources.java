@@ -66,27 +66,6 @@ public class OpenTelemetryResources {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#semantic-attributes-with-dedicated-environment-variable
   public static final AttributeKey<String> SERVICE_NAME_KEY = stringKey("service.name");
 
-  private static final String MULE_INSTRUMENTATION_NAME = "mule-tracer";
-
-  private static final String INSTRUMENTATION_VERSION = "1.0.0";
-
-  // TODO: W-12665132 Refactor to remove this method (it's only used by tests)
-  public static Tracer getTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
-      throws SpanExporterConfiguratorException {
-    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder()
-        .addSpanProcessor(resolveOpenTelemetrySpanProcessor(spanExporterConfiguration,
-                                                            spanExporterConfiguration,
-                                                            resolveOpenTelemetrySpanExporter(spanExporterConfiguration)))
-        .setResource(getResource(serviceName));
-
-    OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
-        .setTracerProvider(sdkTracerProviderBuilder.build())
-        .setPropagators(getPropagator())
-        .build();
-
-    return openTelemetry.getTracer(MULE_INSTRUMENTATION_NAME, INSTRUMENTATION_VERSION);
-  }
-
   private static SdkMeterProvider getMeterProvider(SpanExporterConfiguration spanExporterConfiguration) {
     MetricReader periodicReader =
         PeriodicMetricReader.builder(new OpenTelemetryExportQueueMetrics())

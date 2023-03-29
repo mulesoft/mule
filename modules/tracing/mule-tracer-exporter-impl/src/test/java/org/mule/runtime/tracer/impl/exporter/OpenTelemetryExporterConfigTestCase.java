@@ -9,7 +9,8 @@ package org.mule.runtime.tracer.impl.exporter;
 
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_HEADERS;
-import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getTracer;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getPropagator;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.getResource;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CERT_FILE_LOCATION;
@@ -21,6 +22,8 @@ import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.api.config.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.GRPC;
 import static org.mule.runtime.tracer.impl.exporter.config.type.OpenTelemetryExporterTransport.HTTP;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.resolveOpenTelemetrySpanExporter;
+import static org.mule.runtime.tracer.impl.exporter.optel.resources.OpenTelemetryResources.resolveOpenTelemetrySpanProcessor;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
@@ -34,6 +37,7 @@ import static org.testcontainers.utility.MountableFile.forHostPath;
 
 import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.exporter.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.exporter.optel.resources.SpanExporterConfiguratorException;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -50,9 +54,13 @@ import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
 import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import com.linecorp.armeria.testing.junit4.server.ServerRule;
+import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
@@ -81,6 +89,9 @@ public class OpenTelemetryExporterConfigTestCase {
   private static final Integer COLLECTOR_HEALTH_CHECK_PORT = 13133;
 
   public static final int TIMEOUT_MILLIS = 30000;
+
+  private static final String MULE_INSTRUMENTATION_NAME = "mule-tracer";
+  private static final String INSTRUMENTATION_VERSION = "1.0.0";
 
   private GenericContainer<?> collector;
 
@@ -306,5 +317,21 @@ public class OpenTelemetryExporterConfigTestCase {
     public List<ExportTraceServiceRequest> getTraceRequests() {
       return traceRequests;
     }
+  }
+
+  private static Tracer getTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName)
+      throws SpanExporterConfiguratorException {
+    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder()
+        .addSpanProcessor(resolveOpenTelemetrySpanProcessor(spanExporterConfiguration,
+                                                            spanExporterConfiguration,
+                                                            resolveOpenTelemetrySpanExporter(spanExporterConfiguration)))
+        .setResource(getResource(serviceName));
+
+    OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
+        .setTracerProvider(sdkTracerProviderBuilder.build())
+        .setPropagators(getPropagator())
+        .build();
+
+    return openTelemetry.getTracer(MULE_INSTRUMENTATION_NAME, INSTRUMENTATION_VERSION);
   }
 }
