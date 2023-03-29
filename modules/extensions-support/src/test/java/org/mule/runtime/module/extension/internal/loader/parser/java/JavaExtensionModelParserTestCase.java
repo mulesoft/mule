@@ -227,7 +227,7 @@ public class JavaExtensionModelParserTestCase {
   }
 
   @org.mule.runtime.extension.api.annotation.Extension(name = "MixedConfigurationsAnnotationExtension")
-  @org.mule.runtime.extension.api.annotation.Import(type = KnockeableDoor.class)
+  @org.mule.runtime.extension.api.annotation.Import(type = VeganCookBook.class)
   private static class ParameterizedWithJavaTypeExtension {
 
     @org.mule.sdk.api.annotation.param.Parameter
