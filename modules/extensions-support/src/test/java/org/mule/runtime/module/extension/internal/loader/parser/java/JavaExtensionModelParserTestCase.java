@@ -70,9 +70,9 @@ import org.junit.rules.ExpectedException;
 
 public class JavaExtensionModelParserTestCase {
 
-  public static final String COMPILATION_MODE = "COMPILATION_MODE";
-  protected static Map<String, ExtensionModel> EXTENSION_MODELS = new HashMap<>();
-  protected static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
+  private static final String COMPILATION_MODE = "COMPILATION_MODE";
+  private static Map<String, ExtensionModel> EXTENSION_MODELS = new HashMap<>();
+  private static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
