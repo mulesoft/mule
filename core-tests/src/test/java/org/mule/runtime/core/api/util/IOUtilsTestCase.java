@@ -42,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mockito.MockedStatic;
+import org.mockito.invocation.InvocationOnMock;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -208,6 +209,10 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       AtomicReference<URLConnection> connection = new AtomicReference<>();
 
       final URL mockedURL = spy(url);
+      utilities.when(() -> getResourceAsStream(anyString(), any(Class.class)))
+          .then(InvocationOnMock::callRealMethod);
+      utilities.when(() -> getResourceAsStream(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(InvocationOnMock::callRealMethod);
       utilities.when(() -> IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
           .then(invocationOnMock -> mockedURL);
 
