@@ -6,18 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
-
-import static com.google.common.collect.ImmutableSet.of;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.fail;
-
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
@@ -25,8 +13,15 @@ import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -39,22 +34,17 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.collection.SmallMap;
-import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
-import org.mule.runtime.extension.api.model.config.ImmutableConfigurationModel;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.VoidOperations;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.Import;
@@ -62,19 +52,14 @@ import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.PrivilegedExport;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
-import org.mule.test.heisenberg.extension.model.PersonalInfo;
-import org.mule.test.oauth.TestOAuthExtension;
-import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.VeganCookBook;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
@@ -96,16 +81,16 @@ public class JavaExtensionModelParserTestCase {
   @Issue("W-12622240")
   @Description("Verify that ExtensionModel for an Extension with java data types such as LocalDateTime, loads the correct MetadataType i.e. DateTimeType and works in Java 17")
   public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() {
-    ExtensionModel model = loadExtension(ParameterizedWithJavaTypeExtension.class, JAVA_LOADER, null);
-    ConfigurationModel configModel = model.getConfigurationModels().iterator().next();
+    ExtensionModel extensionModel = loadExtension(ParameterizedWithJavaTypeExtension.class, JAVA_LOADER, null);
+    ConfigurationModel configModel = extensionModel.getConfigurationModels().iterator().next();
     ParameterModel parameterModel = configModel.getAllParameterModels().iterator().next();
     DefaultObjectType objectType = (DefaultObjectType) parameterModel.getType();
     assertThat(objectType.toString(),
                is("org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserTestCase.SimplePojoWithTime"));
     Collection<ObjectFieldType> fields = objectType.getFields();
-    List<String> dateTimeParameters = fields.stream().map(f -> f.getValue().getClass().getName()).collect(toList());
+    List<String> simplePojoWithTimeFields = fields.stream().map(f -> f.getValue().getClass().getName()).collect(toList());
 
-    assertThat(dateTimeParameters, hasItem(equalTo("org.mule.metadata.api.model.impl.DefaultDateTimeType")));
+    assertThat(simplePojoWithTimeFields, hasItem(equalTo("org.mule.metadata.api.model.impl.DefaultDateTimeType")));
   }
 
   @Test
@@ -309,10 +294,7 @@ public class JavaExtensionModelParserTestCase {
     String extensionParameter;
   }
 
-
-  @org.mule.runtime.extension.api.annotation.Extension(name = "SimplePojoWithTime")
-  @Operations(VoidOperations.class)
-  public static class SimplePojoWithTime {
+  private static class SimplePojoWithTime {
 
     @Parameter
     private String name;
