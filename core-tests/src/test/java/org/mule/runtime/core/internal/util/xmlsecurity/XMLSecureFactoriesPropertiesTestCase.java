@@ -6,30 +6,28 @@
  */
 package org.mule.runtime.core.internal.util.xmlsecurity;
 
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import io.qameta.allure.Issue;
-import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
-
-import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.Validator;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class)
+import io.qameta.allure.Issue;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+
+@RunWith(MockitoJUnitRunner.class)
 public class XMLSecureFactoriesPropertiesTestCase {
 
   private static final String SCHEMA_LOCATION = "http://www.w3.org/2001/XMLSchema";

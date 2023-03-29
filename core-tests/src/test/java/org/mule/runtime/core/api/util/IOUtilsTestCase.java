@@ -18,6 +18,7 @@ import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
+
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -62,27 +63,22 @@ import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-
+import org.mockito.Mockito;
 import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import org.mockito.junit.MockitoJUnitRunner;
+import sun.misc.Unsafe;
 
 @SmallTest
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtils.class)
-@PowerMockIgnore("javax.management.*")
+@RunWith(MockitoJUnitRunner.class)
 public class IOUtilsTestCase extends AbstractMuleTestCase {
 
   private static final List<String> POWER_MOCK_PLUGINS = asList("mock-maker-inline", InlineByteBuddyMockMaker.class.getName());
@@ -206,14 +202,13 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private URLConnection mockURLConnection(URL url) throws Exception {
-    PowerMockito.spy(IOUtils.class);
+    Mockito.spy(IOUtils.class);
     AtomicReference<URLConnection> connection = new AtomicReference<>();
 
     url = spy(url);
-    when(IOUtils.class, "getResourceAsUrl", anyString(), any(Class.class), anyBoolean(), anyBoolean())
-        .thenReturn(url);
+    when(IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(url);
 
-    when(url.openConnection()).then(a -> {
+    when(url.openConnection()).thenAnswer(a -> {
       URLConnection conn = spy((URLConnection) a.callRealMethod());
       connection.set(conn);
       return conn;
