@@ -10,6 +10,8 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.fail;
+
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
 
@@ -52,8 +54,9 @@ public class JavaExtensionModelParserTestCase {
   @Issue("W-12622240")
   @Description("Verify that an extension with some public java class, which has private internal fields does not fail due to Illegal reflective access in Java 17")
   public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() {
-    List<MetadataType> importedTypes = getParser(ParameterizedWithJavaTypeExtension.class).getImportedTypes();
-    assertThat(importedTypes, hasSize(1));
+    // Without the change we made in TypeWrapper to filter fields from java.x packages, we will get
+    // java.lang.reflect.InaccessibleObjectException here
+    getParser(ParameterizedWithJavaTypeExtension.class);
   }
 
   @Test
@@ -227,7 +230,6 @@ public class JavaExtensionModelParserTestCase {
   }
 
   @org.mule.runtime.extension.api.annotation.Extension(name = "MixedConfigurationsAnnotationExtension")
-  @org.mule.runtime.extension.api.annotation.Import(type = VeganCookBook.class)
   private static class ParameterizedWithJavaTypeExtension {
 
     @org.mule.sdk.api.annotation.param.Parameter

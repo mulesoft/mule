@@ -65,9 +65,8 @@ public class TypeWrapperTestCase {
     TypeWrapper type = new TypeWrapper(LocalDateTime.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader()));
     List<FieldElement> fields = type.getFields();
-    List<String> allPackages = type.getFields().stream().map(f -> f.getField().get().getDeclaringClass().getPackage().getName())
-        .collect(
-                 toList());
+    List<String> allPackages =
+        type.getFields().stream().map(f -> f.getField().get().getDeclaringClass().getPackage().getName()).collect(toList());
     assertThat(fields, empty());
     // verify that we are not filtering out fields that are Java types in a custom class
     type = new TypeWrapper(PersonalInfo.class, new DefaultExtensionsTypeLoaderFactory()
