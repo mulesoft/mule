@@ -41,6 +41,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mockito.MockedStatic;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -202,21 +203,27 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private URLConnection mockURLConnection(URL url) throws Exception {
-    Mockito.spy(IOUtils.class);
-    AtomicReference<URLConnection> connection = new AtomicReference<>();
+    MockedStatic<IOUtils> utilities = Mockito.mockStatic(IOUtils.class);
+    try {
+      AtomicReference<URLConnection> connection = new AtomicReference<>();
 
-    url = spy(url);
-    when(IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(url);
+      final URL mockedURL = spy(url);
+      utilities.when(() -> IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(invocationOnMock -> mockedURL);
 
-    when(url.openConnection()).thenAnswer(a -> {
-      URLConnection conn = spy((URLConnection) a.callRealMethod());
-      connection.set(conn);
-      return conn;
-    });
+      when(mockedURL.openConnection()).thenAnswer(a -> {
+        URLConnection conn = spy((URLConnection) a.callRealMethod());
+        connection.set(conn);
+        return conn;
+      });
 
-    getResourceAsStream(RESOURCE_NAME, getClass());
+      getResourceAsStream(RESOURCE_NAME, getClass());
 
-    return connection.get();
+      return connection.get();
+    } finally {
+      // We need to deregister the static mock.
+      utilities.close();
+    }
   }
 
   private void assertInputStream(URLConnection connection) throws Exception {
