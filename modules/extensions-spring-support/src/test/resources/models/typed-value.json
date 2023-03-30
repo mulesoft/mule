@@ -1,14 +1,14 @@
 {
   "name": "TypedValue",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "typed-value",
     "namespace": "http://www.mulesoft.org/schema/mule/typed-value",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-typed-value.xsd"
   },
   "resources": [],

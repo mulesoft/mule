@@ -1,14 +1,14 @@
 {
   "name": "Test OAuth Extension",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "test-oauth",
     "namespace": "http://www.mulesoft.org/schema/mule/test-oauth",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/test-oauth/current/mule-test-oauth.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-test-oauth.xsd"
   },
   "resources": [],

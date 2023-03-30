@@ -1,14 +1,14 @@
 {
   "name": "RAM",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "ram",
     "namespace": "http://www.mulesoft.org/schema/mule/ram",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/ram/current/mule-ram.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-ram.xsd"
   },
   "resources": [],

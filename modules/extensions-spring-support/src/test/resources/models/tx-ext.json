@@ -1,14 +1,14 @@
 {
   "name": "transactional",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "tx",
     "namespace": "http://www.mulesoft.org/schema/mule/tx",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-tx.xsd"
   },
   "resources": [],
