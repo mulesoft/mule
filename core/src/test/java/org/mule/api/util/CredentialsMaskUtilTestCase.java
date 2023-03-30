@@ -63,4 +63,11 @@ public class CredentialsMaskUtilTestCase
         String MASKED_STRING = maskPassPhrase(ENDPOINT_WITH_PASSPHRASE_BEFORE_SLASH);
         assertThat(MASKED_STRING, equalTo(EXPECTED_ENDPOINT_WITH_PASSPHRASE_BEFORE_SLASH));
     }
+
+    @Test
+    public void whenInputIsNull()
+    {
+        String MASKED_STRING = maskPassPhrase(null);
+        assertThat(MASKED_STRING, equalTo(""));
+    }
 }
