@@ -56,8 +56,6 @@ import org.junit.rules.ExpectedException;
 
 public class JavaExtensionModelParserTestCase {
 
-  private static final String COMPILATION_MODE = "COMPILATION_MODE";
-
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
