@@ -1,14 +1,14 @@
 {
   "name": "Heisenberg",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "SELECT",
   "xmlDsl": {
     "prefix": "heisenberg",
     "namespace": "http://www.mulesoft.org/schema/mule/heisenberg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-heisenberg.xsd"
   },
   "resources": [

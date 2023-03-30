@@ -1,14 +1,14 @@
 {
   "name": "Marvel",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "marvel",
     "namespace": "http://www.mulesoft.org/schema/mule/marvel",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-marvel.xsd"
   },
   "resources": [],

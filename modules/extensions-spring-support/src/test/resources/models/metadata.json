@@ -1,14 +1,14 @@
 {
   "name": "Metadata",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "metadata",
     "namespace": "http://www.mulesoft.org/schema/mule/metadata",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-metadata.xsd"
   },
   "resources": [],

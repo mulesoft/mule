@@ -1,14 +1,14 @@
 {
   "name": "Semantic Terms",
   "description": "",
-  "version": "4.4.1-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "semantic-terms",
     "namespace": "http://www.mulesoft.org/schema/mule/semantic-terms",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/semantic-terms/current/mule-semantic-terms.xsd",
-    "schemaVersion": "4.4.1-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-semantic-terms.xsd"
   },
   "resources": [],
