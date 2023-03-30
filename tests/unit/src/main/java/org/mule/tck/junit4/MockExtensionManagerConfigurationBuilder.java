@@ -46,7 +46,7 @@ public class MockExtensionManagerConfigurationBuilder implements ConfigurationBu
   public void configure(MuleContext muleContext) {
     if (muleContext.getExtensionManager() == null) {
       withContextClassLoader(MockExtensionManagerConfigurationBuilder.class.getClassLoader(), () -> {
-        ExtensionManager mockExtensionManager = mock(ExtensionManager.class, RETURNS_DEEP_STUBS.get());
+        ExtensionManager mockExtensionManager = mock(ExtensionManager.class, RETURNS_DEEP_STUBS);
         when(mockExtensionManager.getExtensions()).thenReturn(extensionModels);
         muleContext.setExtensionManager(mockExtensionManager);
       });
