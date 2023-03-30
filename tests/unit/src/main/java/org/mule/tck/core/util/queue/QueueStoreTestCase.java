@@ -139,7 +139,7 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
   }
 
   protected QueueStore createQueueWithCapacity(int capacity) {
-    MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+    MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS);
     when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
     when(mockMuleContext.getExecutionClassLoader()).thenReturn(muleContext.getExecutionClassLoader());
     when(mockMuleContext.getObjectSerializer()).thenReturn(muleContext.getObjectSerializer());
