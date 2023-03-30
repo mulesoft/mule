@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>3.9.5-20230320</version>
+        <version>3.9.5-20230330</version>
     </parent>
     <groupId>com.mulesoft.muleesb.tests</groupId>
     <artifactId>mule-tests-integration-axis</artifactId>
