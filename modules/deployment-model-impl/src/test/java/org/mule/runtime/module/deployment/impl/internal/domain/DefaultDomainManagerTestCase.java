@@ -18,9 +18,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -43,22 +43,16 @@ import org.mule.runtime.module.license.api.LicenseValidator;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class})
-@PowerMockIgnore({"javax.management.*", "javax.script.*"})
-@PowerMockRunnerDelegate(JUnit4.class)
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
   public DefaultDomainManagerTestCase() throws IOException {
@@ -83,21 +77,22 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
                                                                               mock(MemoryManagementService.class),
                                                                               mock(ArtifactConfigurationProcessor.class));
   private DefaultDomainManager domainManager;
+  private MockedStatic<AbstractDeployableProjectModelBuilder> utilities;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setUp() throws Exception {
-    mockStatic(AbstractDeployableProjectModelBuilder.class);
-    when(isHeavyPackage(any())).thenReturn(true);
-    when(defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
-    DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
+    utilities = mockStatic(AbstractDeployableProjectModelBuilder.class);
+    utilities.when(() -> isHeavyPackage(any())).thenReturn(true);
+    utilities.when(() -> defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
+    DeployableProjectModel deployableProjectModelMock = mock(DeployableProjectModel.class);
     doNothing().when(deployableProjectModelMock).validate();
     MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
-        PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
-    when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
-    whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
+        mock(MuleDeployableProjectModelBuilder.class);
+    utilities.when(() -> muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
+    mockConstruction(MuleDeployableProjectModelBuilder.class);
     domainManager = new DefaultDomainManager();
   }
 
@@ -357,6 +352,11 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     expectedException
         .expectMessage("The domain 'custom-domain-1.1.1-mule-domain' was not found. Available domains: [[custom-domain-1.1.0-mule-domain]]");
     domainManager.getCompatibleDomain(bundleDescriptor);
+  }
+
+  @After
+  public void after() {
+    utilities.close();
   }
 
 }
