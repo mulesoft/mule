@@ -22,9 +22,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -48,23 +48,16 @@ import java.io.IOException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @Feature(DOMAIN_CREATION)
 @Story(HEAVYWEIGHT)
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultDomainFactory.class,
-    AbstractDeployableProjectModelBuilder.class})
-@PowerMockIgnore({"javax.management.*", "javax.script.*"})
-@PowerMockRunnerDelegate(JUnit4.class)
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
@@ -84,20 +77,21 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
                                                                               getRuntimeLockFactory(),
                                                                               mock(MemoryManagementService.class),
                                                                               mock(ArtifactConfigurationProcessor.class));
+  private MockedStatic<AbstractDeployableProjectModelBuilder> utilities;
 
   public DefaultDomainFactoryTestCase() throws IOException {}
 
   @Before
   public void setUp() throws Exception {
-    mockStatic(AbstractDeployableProjectModelBuilder.class);
-    when(isHeavyPackage(any())).thenReturn(true);
-    when(defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
-    DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
+    utilities = mockStatic(AbstractDeployableProjectModelBuilder.class);
+    utilities.when(() -> isHeavyPackage(any())).thenReturn(true);
+    utilities.when(() -> defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
+    DeployableProjectModel deployableProjectModelMock = mock(DeployableProjectModel.class);
     doNothing().when(deployableProjectModelMock).validate();
     MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
-        PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
+        mock(MuleDeployableProjectModelBuilder.class);
     when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
-    whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
+    mockConstruction(MuleDeployableProjectModelBuilder.class);
   }
 
   @Test
@@ -138,6 +132,11 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     assertThat(domain.getArtifactName(), is(domainName));
     assertThat(domain.getDescriptor(), is(descriptor));
     assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));
+  }
+
+  @After
+  public void after() {
+    utilities.close();
   }
 
 }
