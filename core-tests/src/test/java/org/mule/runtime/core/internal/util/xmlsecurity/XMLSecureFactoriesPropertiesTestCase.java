@@ -10,9 +10,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
@@ -22,9 +21,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.Validator;
 
 import io.qameta.allure.Issue;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -34,29 +34,36 @@ public class XMLSecureFactoriesPropertiesTestCase {
 
   private org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories delegate;
 
-  @Before
-  public void setup() {
-    mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
-    delegate = mock(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
-  }
-
   @Test
   @Issue("MULE-18814")
   public void decorateDefaultXmlSecureFactories() {
-    given(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault()).willReturn(delegate);
-    XMLSecureFactories deprecated = XMLSecureFactories.createDefault();
+    MockedStatic<org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories> utilities =
+        Mockito.mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
+    try {
+      delegate = spy(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
+      utilities.when(() -> XMLSecureFactories.createDefault()).thenReturn(delegate);
+      XMLSecureFactories deprecated = XMLSecureFactories.createDefault();
 
-    assertDecoratedXMLSecureFactories(deprecated);
+      assertDecoratedXMLSecureFactories(deprecated);
+    } finally {
+      utilities.close();
+    }
   }
 
   @Test
   @Issue("MULE-18814")
   public void decorateCustomXmlSecureFactories() {
-    given(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createWithConfig(anyBoolean(), anyBoolean()))
-        .willReturn(delegate);
-    XMLSecureFactories deprecated = XMLSecureFactories.createWithConfig(false, false);
+    MockedStatic<org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories> utilities =
+        Mockito.mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
+    try {
+      delegate = spy(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
+      utilities.when(() -> XMLSecureFactories.createWithConfig(anyBoolean(), anyBoolean())).thenReturn(delegate);
+      XMLSecureFactories deprecated = XMLSecureFactories.createWithConfig(false, false);
 
-    assertDecoratedXMLSecureFactories(deprecated);
+      assertDecoratedXMLSecureFactories(deprecated);
+    } finally {
+      utilities.close();
+    }
   }
 
   private void assertDecoratedXMLSecureFactories(XMLSecureFactories deprecated) {
