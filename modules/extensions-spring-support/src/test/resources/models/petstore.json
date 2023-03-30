@@ -1,7 +1,7 @@
 {
   "name": "petstore",
   "description": "",
-  "version": "4.6.0-SNAPSHOT",
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "category": "COMMUNITY",
@@ -9,7 +9,7 @@
     "prefix": "petstore",
     "namespace": "http://www.mulesoft.org/schema/mule/petstore",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd",
-    "schemaVersion": "4.6.0-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-petstore.xsd"
   },
   "resources": [],
