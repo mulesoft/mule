@@ -14,6 +14,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
  * 
  * @since 4.5
  */
+// TODO W-12780081 - migrate to use MuleContainerClassLoaderWrapper
 public class ContainerClassLoaderProvider {
 
   /**
