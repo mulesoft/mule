@@ -18,9 +18,26 @@
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <jsoup.version>1.15.3</jsoup.version>
+        <mule.runtime.version>${project.version}</mule.runtime.version>
     </properties>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <includes>
+                    <include>**/*.json</include>
+                </includes>
+                <filtering>true</filtering>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <excludes>
+                    <exclude>**/*.json</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
