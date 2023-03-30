@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import static java.util.stream.Collectors.toList;
 import static java.lang.Thread.currentThread;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsIterableContaining.hasItem;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.Matchers.empty;
 
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -28,7 +24,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.semantics.security.Password;
-import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
