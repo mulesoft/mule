@@ -78,7 +78,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     mockArtifactContext = mock(ArtifactContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
     when(mockArtifactContext.getRegistry()).thenReturn(new DefaultRegistry(muleContext));
-    ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS.get());
+    ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS);
     when(applicationDescriptorMock.getClassLoaderConfiguration())
         .thenReturn(new ClassLoaderConfigurationBuilder().containing(new URL("file:/target/classes")).build());
     application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
