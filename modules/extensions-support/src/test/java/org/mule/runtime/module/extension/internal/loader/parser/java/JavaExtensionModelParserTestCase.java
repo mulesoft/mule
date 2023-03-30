@@ -11,12 +11,16 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.util
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static java.util.Collections.emptySet;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.lang.Class.forName;
+import static java.util.stream.Collectors.toMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -49,6 +53,7 @@ import java.util.Objects;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,17 +67,20 @@ public class JavaExtensionModelParserTestCase {
   @Test
   @Issue("W-12622240")
   @Description("Verify that ExtensionModel for an Extension with java data types such as LocalDateTime, loads the correct MetadataType i.e. DateTimeType and works in Java 17")
-  public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() {
+  public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() throws Exception {
     ExtensionModel extensionModel = loadExtension(ParameterizedWithJavaTypeExtension.class);
     ConfigurationModel configModel = extensionModel.getConfigurationModels().get(0);
     ParameterModel parameterModel = configModel.getAllParameterModels().get(0);
     DefaultObjectType objectType = (DefaultObjectType) parameterModel.getType();
-    assertThat(getTypeId(objectType).get(),
-               is("org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserTestCase.SimplePojoWithTime"));
 
-    List<ObjectFieldType> objectFieldTypes = objectType.getFields().stream().collect(toList());
-    assertThat(objectFieldTypes.get(2).getKey().getName().getLocalPart(), is("dateTime"));
-    assertThat(objectFieldTypes.get(2).getValue(), instanceOf(DefaultDateTimeType.class));
+    assertThat(forName(objectType.getAnnotation(ClassInformationAnnotation.class).get().getClassname()),
+               is(equalTo(SimplePojoWithTime.class)));
+
+    Map<String, ObjectFieldType> fieldMap = objectType.getFields().stream()
+        .collect(toMap(f -> f.getKey().getName().getLocalPart(), identity()));
+
+    assertThat(fieldMap.get("dateTime").getKey().getName().getLocalPart(), is("dateTime"));
+    assertThat(fieldMap.get("dateTime").getValue(), instanceOf(DefaultDateTimeType.class));
   }
 
   @Test
@@ -287,11 +295,7 @@ public class JavaExtensionModelParserTestCase {
     @Parameter
     private LocalDateTime dateTime;
 
-    public SimplePojoWithTime(String name, Integer age, LocalDateTime dateTime) {
-      this.name = name;
-      this.age = age;
-      this.dateTime = dateTime;
-    }
+    public SimplePojoWithTime() {}
 
     @Override
     public boolean equals(Object o) {
@@ -300,8 +304,9 @@ public class JavaExtensionModelParserTestCase {
       if (o == null || getClass() != o.getClass())
         return false;
       SimplePojoWithTime that = (SimplePojoWithTime) o;
-      return Objects.equals(name, that.name) && Objects.equals(age, that.age) && Objects.equals(
-                                                                                                dateTime, that.dateTime);
+      return Objects.equals(name, that.name) &&
+          Objects.equals(age, that.age) &&
+          Objects.equals(dateTime, that.dateTime);
     }
 
     @Override
