@@ -115,7 +115,9 @@ public class CredentialsMaskUtil
      * @return input with passphrase masked
      */
     public static String maskPassPhrase(String input) {
-        if (input == null) return "";
+        if (input == null) {
+            return "";
+        }
         Matcher matcher = PASSPHRASE_PATTERN.matcher(input);
         Matcher matcherWithoutQuotes = PASSPHRASE_PATTERN_NO_QUOTES.matcher(input);
         if (matcher.find()) {
