@@ -7,43 +7,30 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
-
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.util.collection.SmallMap;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
@@ -53,13 +40,12 @@ import org.mule.sdk.api.annotation.PrivilegedExport;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganCookBook;
+import org.mule.metadata.api.model.impl.DefaultDateTimeType;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
@@ -71,8 +57,6 @@ import org.junit.rules.ExpectedException;
 public class JavaExtensionModelParserTestCase {
 
   private static final String COMPILATION_MODE = "COMPILATION_MODE";
-  private static Map<String, ExtensionModel> EXTENSION_MODELS = new HashMap<>();
-  private static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -81,16 +65,16 @@ public class JavaExtensionModelParserTestCase {
   @Issue("W-12622240")
   @Description("Verify that ExtensionModel for an Extension with java data types such as LocalDateTime, loads the correct MetadataType i.e. DateTimeType and works in Java 17")
   public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() {
-    ExtensionModel extensionModel = loadExtension(ParameterizedWithJavaTypeExtension.class, JAVA_LOADER, null);
-    ConfigurationModel configModel = extensionModel.getConfigurationModels().iterator().next();
-    ParameterModel parameterModel = configModel.getAllParameterModels().iterator().next();
+    ExtensionModel extensionModel = loadExtension(ParameterizedWithJavaTypeExtension.class);
+    ConfigurationModel configModel = extensionModel.getConfigurationModels().get(0);
+    ParameterModel parameterModel = configModel.getAllParameterModels().get(0);
     DefaultObjectType objectType = (DefaultObjectType) parameterModel.getType();
-    assertThat(objectType.toString(),
+    assertThat(getTypeId(objectType).get(),
                is("org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserTestCase.SimplePojoWithTime"));
-    Collection<ObjectFieldType> fields = objectType.getFields();
-    List<String> simplePojoWithTimeFields = fields.stream().map(f -> f.getValue().getClass().getName()).collect(toList());
 
-    assertThat(simplePojoWithTimeFields, hasItem(equalTo("org.mule.metadata.api.model.impl.DefaultDateTimeType")));
+    List<ObjectFieldType> objectFieldTypes = objectType.getFields().stream().collect(toList());
+    assertThat(objectFieldTypes.get(2).getKey().getName().getLocalPart(), is("dateTime"));
+    assertThat(objectFieldTypes.get(2).getValue(), instanceOf(DefaultDateTimeType.class));
   }
 
   @Test
@@ -304,39 +288,27 @@ public class JavaExtensionModelParserTestCase {
 
     @Parameter
     private LocalDateTime dateTime;
-  }
 
-  protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader, ArtifactCoordinates coordinates) {
-    Map<String, Object> params = SmallMap.of(TYPE_PROPERTY_NAME, clazz.getName(),
-                                             VERSION, getProductVersion(),
-                                             COMPILATION_MODE, true);
-    final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(EXTENSION_MODELS.values()));
-
-    final String basePackage = clazz.getPackage().toString();
-    final ClassLoader pluginClassLoader = new ClassLoader(clazz.getClassLoader()) {
-
-      @Override
-      protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (name.startsWith(basePackage)) {
-          byte[] classBytes;
-          try {
-            classBytes =
-                toByteArray(this.getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class"));
-            return this.defineClass(null, classBytes, 0, classBytes.length);
-          } catch (Exception e) {
-            return super.loadClass(name);
-          }
-        } else {
-          return super.loadClass(name, resolve);
-        }
-      }
-    };
-
-    ExtensionModelLoadingRequest.Builder builder = builder(pluginClassLoader, dslResolvingContext).addParameters(params);
-    if (coordinates != null) {
-      builder.setArtifactCoordinates(coordinates);
+    public SimplePojoWithTime(String name, Integer age, LocalDateTime dateTime) {
+      this.name = name;
+      this.age = age;
+      this.dateTime = dateTime;
     }
 
-    return loader.loadExtensionModel(builder.build());
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (o == null || getClass() != o.getClass())
+        return false;
+      SimplePojoWithTime that = (SimplePojoWithTime) o;
+      return Objects.equals(name, that.name) && Objects.equals(age, that.age) && Objects.equals(
+                                                                                                dateTime, that.dateTime);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name, age, dateTime);
+    }
   }
 }
