@@ -115,7 +115,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.api.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -158,7 +158,6 @@ import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils;
-import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
 import java.io.File;
 import java.io.IOException;
@@ -192,12 +191,12 @@ import org.mockito.verification.VerificationMode;
 import org.slf4j.Logger;
 import uk.org.lidalia.slf4jext.Level;
 
-@RunWith(Parameterized.class)
 /**
  * Base class for deployment tests using a {@link MuleDeploymentService} instance.
  * <p>
  * Provides a set of test artifacts and resources to use on different test classes.
  */
+@RunWith(Parameterized.class)
 public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   public static final Logger logger = getLogger(AbstractDeploymentTestCase.class);
@@ -243,7 +242,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
   protected ModuleRepository moduleRepository;
-  private TestModuleDiscoverer moduleDiscoverer;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
@@ -394,8 +392,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     testDeploymentListener = new TestDeploymentListener();
     domainDeploymentListener = mock(DeploymentListener.class);
     domainBundleDeploymentListener = mock(DeploymentListener.class);
-    moduleDiscoverer = new TestModuleDiscoverer(getPrivilegedArtifactIds());
-    moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
+    moduleRepository = new TestPrivilegedApiModuleRepository(getPrivilegedArtifactIds());
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder()
             .moduleRepository(moduleRepository)

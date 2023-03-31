@@ -44,7 +44,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     modules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").build());
     when(moduleRepository.getModules()).thenReturn(modules);
 
-    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo1.Foo"), instanceOf(ContainerOnlyLookupStrategy.class));
@@ -64,7 +65,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
         .exportingPackages("org.ietf.jgss", "org.ietf.jgss.test", "org.xml.sax", "org.xml.sax.test").build());
     when(moduleRepository.getModules()).thenReturn(modules);
 
-    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.w3c.dom.Foo"), sameInstance(PARENT_FIRST));
@@ -84,7 +86,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   public void getResourcesFromParent() throws Exception {
     final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
 
-    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
     final Enumeration<URL> resources = containerClassLoader.getClassLoader().getResources(BOOTSTRAP_PROPERTIES);
     assertThat(resources.hasMoreElements(), is(true));
@@ -104,7 +107,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   public void doesNotFindAnyResource() throws Exception {
     final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
 
-    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
     final URL resource = containerClassLoader.findResource(BOOTSTRAP_PROPERTIES);
     assertThat(resource, is(nullValue()));
@@ -114,7 +118,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   public void doesNotFindAnyResources() throws Exception {
     final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
 
-    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
     final Enumeration<URL> resources = containerClassLoader.findResources(BOOTSTRAP_PROPERTIES);
     assertThat(resources.hasMoreElements(), is(false));
@@ -133,7 +138,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
         .build());
     when(moduleRepository.getModules()).thenReturn(modules);
 
-    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.connectivity.Foo"), sameInstance(PARENT_FIRST));

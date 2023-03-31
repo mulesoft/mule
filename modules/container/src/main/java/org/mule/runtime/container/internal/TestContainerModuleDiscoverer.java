@@ -4,18 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.test.runner.classloader;
-
-import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
-import org.mule.runtime.container.internal.ModuleDiscoverer;
+package org.mule.runtime.container.internal;
 
 import java.util.List;
 
 /**
  * Discovers container modules including both productive and test modules
  *
- * @since 4.0
+ * @since 4.6
  */
 public class TestContainerModuleDiscoverer extends ContainerModuleDiscoverer {
 

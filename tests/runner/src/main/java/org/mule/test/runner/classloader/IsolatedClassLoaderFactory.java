@@ -8,7 +8,7 @@
 package org.mule.test.runner.classloader;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
+import static org.mule.runtime.container.api.TestContainerClassLoaderAssembler.create;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
@@ -16,7 +16,6 @@ import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -27,21 +26,17 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory;
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
-import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.container.api.TestContainerClassLoaderAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
@@ -100,7 +95,8 @@ public class IsolatedClassLoaderFactory {
 
   private final ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private final PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
-  private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
+  private final ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory =
+      new ServiceClassLoaderFactory();
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -120,7 +116,7 @@ public class IsolatedClassLoaderFactory {
     JarInfo testJarInfo = getAppSharedPackages(artifactsUrlClassification.getApplicationSharedLibUrls());
     testJarInfo.getPackages().stream().forEach(p -> appExportedLookupStrategies.put(p, PARENT_FIRST));
 
-    ArtifactClassLoader containerClassLoader;
+    MuleContainerClassLoaderWrapper containerClassLoaderWrapper;
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
     RegionClassLoader regionClassLoader;
     final List<ArtifactClassLoader> filteredPluginsArtifactClassLoaders = new ArrayList<>();
@@ -128,14 +124,11 @@ public class IsolatedClassLoaderFactory {
     final List<ArtifactClassLoaderFilter> pluginArtifactClassLoaderFilters = new ArrayList<>();
     List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
-    DefaultModuleRepository moduleRepository =
-        new DefaultModuleRepository(new TestModuleDiscoverer(extraPrivilegedArtifacts,
-                                                             new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
-                                                                 .getClassLoader())));
+    try (final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
+        create(extraBootPackages, extraPrivilegedArtifacts,
+               artifactsUrlClassification.getContainerUrls())) {
 
-    try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
-        new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),
-                                            moduleRepository)) {
+      ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 
       final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 
@@ -143,17 +136,15 @@ public class IsolatedClassLoaderFactory {
         pluginUrlClassification.getExportedPackages().forEach(p -> pluginsLookupStrategies.put(p, PARENT_FIRST));
       }
 
-      containerClassLoader =
-          createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
-
-      childClassLoaderLookupPolicy =
-          testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
+      containerClassLoaderWrapper = testContainerClassLoaderAssembler.createContainerClassLoader();
 
       serviceArtifactClassLoaders =
-          createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
-                                    artifactsUrlClassification);
+          createServiceClassLoaders(containerClassLoaderWrapper, artifactsUrlClassification);
 
-      regionClassLoader = new TestRegionClassLoader(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy);
+      childClassLoaderLookupPolicy = containerClassLoaderWrapper.getContainerClassLoaderLookupPolicy();
+
+      regionClassLoader = new TestRegionClassLoader(containerClassLoaderWrapper.getContainerClassLoader().getClassLoader(),
+                                                    childClassLoaderLookupPolicy);
 
       if (!artifactsUrlClassification.getPluginUrlClassifications().isEmpty()) {
         for (PluginUrlClassification pluginUrlClassification : artifactsUrlClassification.getPluginUrlClassifications()) {
@@ -163,7 +154,7 @@ public class IsolatedClassLoaderFactory {
 
           ClassLoaderLookupPolicy pluginLookupPolicy =
               extendLookupPolicyForPrivilegedAccess(childClassLoaderLookupPolicy, moduleRepository,
-                                                    testContainerClassLoaderFactory,
+                                                    testContainerClassLoaderAssembler,
                                                     pluginUrlClassification);
           pluginLookupPolicy = pluginLookupPolicy.extend(appExportedLookupStrategies);
 
@@ -188,7 +179,7 @@ public class IsolatedClassLoaderFactory {
 
         createTestRunnerPlugin(artifactsUrlClassification, appExportedLookupStrategies, childClassLoaderLookupPolicy,
                                regionClassLoader, filteredPluginsArtifactClassLoaders, pluginsArtifactClassLoaders,
-                               pluginArtifactClassLoaderFilters, moduleRepository, testContainerClassLoaderFactory,
+                               pluginArtifactClassLoaderFilters, moduleRepository, testContainerClassLoaderAssembler,
                                testJarInfo.getPackages());
       }
 
@@ -205,8 +196,11 @@ public class IsolatedClassLoaderFactory {
         regionClassLoader.addClassLoader(filteredPluginsArtifactClassLoaders.get(i), classLoaderFilter);
       }
 
-      return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
+      return new ArtifactClassLoaderHolder(containerClassLoaderWrapper.getContainerClassLoader(), serviceArtifactClassLoaders,
+                                           pluginsArtifactClassLoaders,
                                            appClassLoader);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
     }
   }
 
@@ -241,8 +235,8 @@ public class IsolatedClassLoaderFactory {
                                       List<ArtifactClassLoader> filteredPluginsArtifactClassLoaders,
                                       List<ArtifactClassLoader> pluginsArtifactClassLoaders,
                                       List<ArtifactClassLoaderFilter> pluginArtifactClassLoaderFilters,
-                                      DefaultModuleRepository moduleRepository,
-                                      TestContainerClassLoaderFactory testContainerClassLoaderFactory,
+                                      ModuleRepository moduleRepository,
+                                      TestContainerClassLoaderAssembler testContainerClassLoaderAssembler,
                                       Set<String> parentExportedPackages) {
 
     JarInfo testRunnerJarInfo = getTestRunnerJarInfo(artifactsUrlClassification);
@@ -262,7 +256,7 @@ public class IsolatedClassLoaderFactory {
 
     ClassLoaderLookupPolicy pluginLookupPolicy =
         extendLookupPolicyForPrivilegedAccess(childClassLoaderLookupPolicy, moduleRepository,
-                                              testContainerClassLoaderFactory,
+                                              testContainerClassLoaderAssembler,
                                               testRunnerPluginClassification);
     pluginLookupPolicy = pluginLookupPolicy.extend(appExportedLookupStrategies);
 
@@ -304,10 +298,9 @@ public class IsolatedClassLoaderFactory {
 
   private ClassLoaderLookupPolicy extendLookupPolicyForPrivilegedAccess(ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
                                                                         ModuleRepository moduleRepository,
-                                                                        TestContainerClassLoaderFactory testContainerClassLoaderFactory,
+                                                                        TestContainerClassLoaderAssembler testContainerClassLoaderAssembler,
                                                                         PluginUrlClassification pluginUrlClassification) {
-    ContainerOnlyLookupStrategy containerOnlyLookupStrategy =
-        new ContainerOnlyLookupStrategy(testContainerClassLoaderFactory.getContainerClassLoader().getClassLoader());
+    LookupStrategy containerOnlyLookupStrategy = testContainerClassLoaderAssembler.getContainerOnlyLookupStrategy();
 
     Map<String, LookupStrategy> privilegedLookupStrategies = new HashMap<>();
     for (MuleModule module : moduleRepository.getModules()) {
@@ -334,13 +327,11 @@ public class IsolatedClassLoaderFactory {
    * For each service defined in the classification it creates an {@link ArtifactClassLoader} wit the name defined in
    * classification.
    *
-   * @param parent                       the parent class loader to be assigned to the new one created here
-   * @param childClassLoaderLookupPolicy look policy to be used
-   * @param artifactsUrlClassification   the url classifications to get service {@link URL}s
+   * @param containerClassLoaderWrapper the container class loader to be used as parent.
+   * @param artifactsUrlClassification  the url classifications to get service {@link URL}s
    * @return a list of {@link ArtifactClassLoader} for service class loaders
    */
-  protected List<ArtifactClassLoader> createServiceClassLoaders(ClassLoader parent,
-                                                                ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
+  protected List<ArtifactClassLoader> createServiceClassLoaders(MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
                                                                 ArtifactsUrlClassification artifactsUrlClassification) {
     List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
     for (ArtifactUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
@@ -352,8 +343,7 @@ public class IsolatedClassLoaderFactory {
           .build());
       ArtifactClassLoader artifactClassLoader = serviceClassLoaderFactory.create(serviceUrlClassification.getName(),
                                                                                  descriptor,
-                                                                                 parent,
-                                                                                 childClassLoaderLookupPolicy);
+                                                                                 containerClassLoaderWrapper);
       servicesArtifactClassLoaders.add(artifactClassLoader);
     }
     return servicesArtifactClassLoaders;
@@ -392,12 +382,12 @@ public class IsolatedClassLoaderFactory {
    * A similar sanitization is done for packages that are system packages, as child artifacts cannot redefine them.
    *
    * @param productionPackages all packages from the module under test's production code.
-   * @param testPackages       all packages from the module under test's test code
+   * @param testPackages       all packages from the module under test's test code.
    * @return sanitized packages to export on the test class loader.
    */
   private Set<String> sanitizeTestExportedPackages(Set<String> productionPackages, Set<String> testPackages) {
     Set<String> sanitizedTestPackages = new TreeSet<>(testPackages);
-    removePackagesFromTestClassLoader(sanitizedTestPackages, SYSTEM_PACKAGES);
+    removePackagesFromTestClassLoader(sanitizedTestPackages, TestContainerClassLoaderAssembler.getSystemPackages());
     removePackagesFromTestClassLoader(sanitizedTestPackages, productionPackages);
 
     return sanitizedTestPackages;
@@ -430,63 +420,6 @@ public class IsolatedClassLoaderFactory {
     systemPackages.stream().forEach(systemPackage -> packages.stream().filter(p -> p.startsWith(systemPackage))
         .forEach(p -> packagesToRemove.add(p)));
     packages.removeAll(packagesToRemove);
-  }
-
-  /**
-   * Creates an {@link ArtifactClassLoader} for the container. The difference between a mule container {@link ArtifactClassLoader}
-   * in standalone mode and this one is that it has to be aware that the parent class loader has all the URLs loaded in launcher
-   * app class loader so it has to create a particular look policy to resolve classes as CHILD_FIRST.
-   * <p/>
-   * In order to do that a {@link FilteringArtifactClassLoader} resolve is created with and empty look policy (meaning that
-   * CHILD_FIRST strategy will be used) for the {@link URL}s that are going to be exposed from the container class loader. This
-   * would be the parent class loader for the container so instead of going directly the launcher application class loader that
-   * has access to the whole classpath this filtering class loader will resolve only the classes for the {@link URL}s defined to
-   * be in the container.
-   *
-   * @param testContainerClassLoaderFactory {@link TestContainerClassLoaderFactory} that has the logic to create a container class
-   *                                        loader
-   * @param artifactsUrlClassification      the classifications to get plugins {@link URL}s
-   * @return an {@link ArtifactClassLoader} for the container
-   */
-  protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory,
-                                                                   ArtifactsUrlClassification artifactsUrlClassification) {
-    MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
-    final List<MuleModule> muleModules = emptyList();
-    ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
-        .create(testContainerClassLoaderFactory.getBootPackages(), muleModules);
-
-    logClassLoaderUrls("CONTAINER", artifactsUrlClassification.getContainerUrls());
-    ArtifactClassLoader containerClassLoader = testContainerClassLoaderFactory
-        .createContainerClassLoader(new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher, emptyList()));
-    return containerClassLoader;
-  }
-
-  /**
-   * Creates the launcher application class loader to delegate from container class loader.
-   *
-   * @return an {@link ArtifactClassLoader} for the launcher, parent of container
-   */
-  protected MuleArtifactClassLoader createLauncherArtifactClassLoader() {
-    ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
-
-    return new MuleArtifactClassLoader("mule", new ArtifactDescriptor("mule"), new URL[0], launcherClassLoader,
-                                       new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
-
-      @Override
-      public URL findResource(String name) {
-        URL url = super.findResource(name);
-        if (url == null && getParent() != null) {
-          url = getParent().getResource(name);
-          // Filter if it is not a resource from the jre
-          if (url != null && url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
-            return url;
-          } else {
-            return null;
-          }
-        }
-        return url;
-      }
-    };
   }
 
   private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification,

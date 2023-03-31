@@ -4,13 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.test.runner.classloader;
+package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.container.internal.ModuleDiscoverer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,6 +16,8 @@ import java.util.Set;
 
 /**
  * A {@link ModuleDiscoverer} that enables to change discovered modules to enable testing privileged API scenarios.
+ *
+ * @since 4.6
  */
 public class TestModuleDiscoverer implements ModuleDiscoverer {
 
