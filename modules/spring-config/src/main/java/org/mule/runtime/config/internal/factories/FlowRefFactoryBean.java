@@ -56,9 +56,9 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,6 +116,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   @Inject
   private ConfigurationComponentLocator locator;
 
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
+
   public void setName(String name) {
     this.refName = name;
   }
@@ -167,8 +170,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
-        MessageProcessorChainBuilder chainBuilder = (MessageProcessorChainBuilder) referencedFlow;
-
+        SubflowMessageProcessorChainBuilder chainBuilder = (SubflowMessageProcessorChainBuilder) referencedFlow;
+        chainBuilder.withInitialSpanInfoProvider(initialSpanInfoProvider);
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
             .ifPresent(f -> {
               ProcessingStrategy callerFlowPs = f.getProcessingStrategy();

@@ -17,12 +17,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo;
 import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 
@@ -33,8 +35,12 @@ import org.reactivestreams.Publisher;
  */
 public class FirstSuccessful extends AbstractComponent implements Router, Lifecycle, MuleContextAware {
 
+  public static final String FIRST_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFFIX = ":attempt:";
   private final List<ProcessorRoute> routes = new ArrayList<>();
   private MuleContext muleContext;
+
+  @Inject
+  InitialSpanInfoProvider initialSpanInfoProvider;
 
 
   @Override
@@ -42,8 +48,8 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
     Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setInitialSpanInfo(new ComponentExecutionInitialSpanInfo(this,
-                                                                     ":attempt:" + routeNumber));
+      route.setInitialSpanInfo(initialSpanInfoProvider
+          .getInitialSpanInfo(this, FIRST_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFFIX + routeNumber));
       initialiseIfNeeded(route, muleContext);
       routeNumber++;
     }
@@ -81,7 +87,7 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor));
+    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
   }
 
   public void setRoutes(Collection<Processor> routes) {
