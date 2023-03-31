@@ -6,16 +6,30 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static java.util.Collections.emptySet;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.lang.Class.forName;
+import static java.util.stream.Collectors.toMap;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -30,10 +44,16 @@ import org.mule.sdk.api.annotation.PrivilegedExport;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganCookBook;
+import org.mule.metadata.api.model.impl.DefaultDateTimeType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +63,25 @@ public class JavaExtensionModelParserTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
+  @Issue("W-12622240")
+  @Description("Verify that ExtensionModel for an Extension with java data types such as LocalDateTime, loads the correct MetadataType i.e. DateTimeType and works in Java 17")
+  public void getParameterizedWithJavaFieldsExtensionUsingSdkApi() throws Exception {
+    ExtensionModel extensionModel = loadExtension(ParameterizedWithJavaTypeExtension.class);
+    ConfigurationModel configModel = extensionModel.getConfigurationModels().get(0);
+    ParameterModel parameterModel = configModel.getAllParameterModels().get(0);
+    DefaultObjectType objectType = (DefaultObjectType) parameterModel.getType();
+
+    assertThat(forName(objectType.getAnnotation(ClassInformationAnnotation.class).get().getClassname()),
+               is(equalTo(SimplePojoWithTime.class)));
+
+    Map<String, ObjectFieldType> fieldMap = objectType.getFields().stream()
+        .collect(toMap(f -> f.getKey().getName().getLocalPart(), identity()));
+
+    assertThat(fieldMap.get("dateTime").getKey().getName().getLocalPart(), is("dateTime"));
+    assertThat(fieldMap.get("dateTime").getValue(), instanceOf(DefaultDateTimeType.class));
+  }
 
   @Test
   public void getImportedTypesFromExtensionUsingTheSdkApi() {
@@ -214,6 +253,17 @@ public class JavaExtensionModelParserTestCase {
     String extensionParameter;
   }
 
+  @org.mule.runtime.extension.api.annotation.Extension(name = "MixedConfigurationsAnnotationExtension")
+  public static class ParameterizedWithJavaTypeExtension {
+
+    @Parameter
+    private SimplePojoWithTime simplePojoWithTime;
+
+    public ParameterizedWithJavaTypeExtension() {
+      this.simplePojoWithTime = simplePojoWithTime;
+    }
+  }
+
   @org.mule.runtime.extension.api.annotation.Extension(name = "ExtensionWithSuperExtension")
   private static class ExtensionWithSuperExtension extends ParameterizedExtension {
   }
@@ -234,4 +284,34 @@ public class JavaExtensionModelParserTestCase {
     String extensionParameter;
   }
 
+  private static class SimplePojoWithTime {
+
+    @Parameter
+    private String name;
+
+    @Parameter
+    private Integer age;
+
+    @Parameter
+    private LocalDateTime dateTime;
+
+    public SimplePojoWithTime() {}
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (o == null || getClass() != o.getClass())
+        return false;
+      SimplePojoWithTime that = (SimplePojoWithTime) o;
+      return Objects.equals(name, that.name) &&
+          Objects.equals(age, that.age) &&
+          Objects.equals(dateTime, that.dateTime);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name, age, dateTime);
+    }
+  }
 }

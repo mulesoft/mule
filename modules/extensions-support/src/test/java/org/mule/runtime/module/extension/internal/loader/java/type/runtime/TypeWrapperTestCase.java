@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import org.junit.Test;
+import static java.lang.Thread.currentThread;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
@@ -19,12 +25,12 @@ import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.semantics.security.Password;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import org.junit.Test;
 
 public class TypeWrapperTestCase {
 
@@ -45,6 +51,16 @@ public class TypeWrapperTestCase {
       assertThat(parameter.getType().getTypeName(),
                  is(("org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapperTestCase$SomeClass")));
     }
+  }
+
+  @Test
+  @Issue("W-12622240")
+  @Description("Ensure JDK internal fields are filtered out as we can't use reflection on them in Java 17 and above")
+  public void filterInternalJdkFields() {
+    TypeWrapper type = new TypeWrapper(LocalDateTime.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(currentThread().getContextClassLoader()));
+    List<FieldElement> fields = type.getFields();
+    assertThat(fields, empty());
   }
 
   @Test
