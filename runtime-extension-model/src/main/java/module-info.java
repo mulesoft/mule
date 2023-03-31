@@ -40,4 +40,5 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.core,
       org.mule.runtime.artifact.ast.serialization.test;
   
+  uses org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
 }

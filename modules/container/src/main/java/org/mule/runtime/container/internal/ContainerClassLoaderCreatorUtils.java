@@ -13,7 +13,9 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookup
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Collections.unmodifiableSet;
 
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -21,6 +23,8 @@ import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +49,8 @@ public class ContainerClassLoaderCreatorUtils {
    * System packages define all the prefixes that must be loaded only from the container class loader, but then are filtered
    * depending on what is part of the exposed API.
    */
-  public static final Set<String> SYSTEM_PACKAGES = of("org.mule.runtime", "com.mulesoft.mule.runtime");
+  public static final Set<String> SYSTEM_PACKAGES =
+      unmodifiableSet(new HashSet<>(asList("org.mule.runtime", "com.mulesoft.mule.runtime")));
 
   /**
    * Creates the container lookup policy to be used by child class loaders.

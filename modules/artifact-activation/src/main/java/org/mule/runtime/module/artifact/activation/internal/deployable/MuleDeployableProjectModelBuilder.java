@@ -8,7 +8,6 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
@@ -32,17 +31,16 @@ import static java.util.stream.Collectors.toSet;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.container.internal.util.FileJarExplorer;
+import org.mule.runtime.container.internal.util.JarExplorer;
+import org.mule.runtime.container.internal.util.JarInfo;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer;
 import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -61,8 +59,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.vdurmont.semver4j.Semver;
+
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -288,18 +286,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     } else {
       return false;
     }
-  }
-
-  protected String getAttribute(Xpp3Dom tag, String attributeName) {
-    Xpp3Dom attributeDom = tag.getChild(attributeName);
-    checkState(attributeDom != null, format("'%s' element not declared at '%s' in the pom file of the artifact '%s'",
-                                            attributeName, tag.toString(), projectFolder.getName()));
-    String attributeValue = attributeDom.getValue().trim();
-    checkState(!isEmpty(attributeValue),
-               format("'%s' was defined but has an empty value at '%s' declared in the pom file of the artifact %s",
-                      attributeName, tag.toString(), projectFolder.getName()));
-    return attributeValue;
-
   }
 
   protected List<String> getActiveProfiles() {

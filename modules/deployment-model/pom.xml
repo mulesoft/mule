@@ -15,9 +15,30 @@
     <description>Provides descriptors and class loaders for deployment artifacts</description>
 
     <properties>
+        <!-- Avoids split package with the actual mule-module-artifact and its tests -->
+        <surefire.args>--patch-module=org.mule.runtime.artifact=${org.mule.runtime:mule-module-artifact:test-jar:tests} ${surefire.test.unit.open.args}</surefire.args>
+
+        <skipExportTests>false</skipExportTests>
+		
         <javaModuleName>org.mule.runtime.deployment.model</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -76,21 +97,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

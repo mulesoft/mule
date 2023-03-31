@@ -10,9 +10,13 @@
     <artifactId>mule-module-artifact</artifactId>
     <packaging>jar</packaging>
     <name>Mule Artifact Module</name>
+    <description>Defines the descriptors of the deployable artifacts</description>
 
     <properties>
         <javaModuleName>org.mule.runtime.artifact</javaModuleName>
+
+        <!-- Exclude test resources class names from JaCoCo instrumentation because it interferes with some ClassLoader tests -->
+        <surefire.args>${surefire.test.unit.open.args},excludes=mypackage.MyClass</surefire.args>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -27,7 +31,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-mvel</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>
@@ -83,12 +86,13 @@
 
     <build>
         <plugins>
-            <!-- Exclude test resources class names from JaCoCo instrumentation because it interferes with some ClassLoader tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec',excludes=mypackage.MyClass</argLine>
+                    <!-- This is needed so that the resource releasers tests do not fail when running on java 11, --> 
+                    <!-- replicating default runtime behaviour when running on that jvm -->
+                    <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
             <plugin>
@@ -96,9 +100,18 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>attach-test-jar</id>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                        	<includes>
+                        		<include>org/mule/runtime/module/artifact/api/classloader/FilteringArtifactClassLoaderTestCase*</include>
+                        		<include>org/mule/runtime/module/artifact/api/classloader/TestArtifactClassLoader*</include>
+                        		<include>org/mule/runtime/module/artifact/internal/util/DeploymentTestingFeatures*</include>
+                        		<include>org/mule/runtime/module/artifact/builder/**</include>
+                        	</includes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

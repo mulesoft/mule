@@ -7,15 +7,17 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.container.internal.ExportedServiceMatcher.like;
+
 import static java.util.Collections.singletonList;
+
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mule.runtime.container.internal.ExportedServiceMatcher.like;
 
+import org.mule.runtime.container.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.CompilerUtils;

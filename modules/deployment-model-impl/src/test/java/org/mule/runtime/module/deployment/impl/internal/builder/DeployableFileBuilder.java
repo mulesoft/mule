@@ -24,13 +24,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.container.internal.util.FileJarExplorer;
+import org.mule.runtime.container.internal.util.JarExplorer;
+import org.mule.runtime.container.internal.util.JarInfo;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tck.ZipUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;

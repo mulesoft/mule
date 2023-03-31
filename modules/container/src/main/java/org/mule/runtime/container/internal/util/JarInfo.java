@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.artifact.internal.util;
+package org.mule.runtime.container.internal.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 

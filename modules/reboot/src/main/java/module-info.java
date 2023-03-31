@@ -20,4 +20,6 @@ module org.mule.boot {
   // Tanuki wrapper
   requires wrapper;
 
+  exports org.mule.runtime.module.reboot;
+
 }

@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.routing.split;
 
-import static java.lang.String.format;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence
 import org.mule.runtime.core.internal.routing.outbound.IteratorMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.NodeListMessageSequence;
 import org.mule.runtime.core.internal.util.Copiable;
-import org.mule.runtime.internal.util.collection.ImmutableEntry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,5 +100,35 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
     return payload instanceof Copiable ? ((Copiable<Collection>) payload).copy() : new LinkedList(payload);
   }
 
+  /**
+   * Immutable {@link Map.Entry} implementation.
+   *
+   * @param <K> the type of the key
+   * @param <V> the type of the value
+   *
+   * @since 1.0
+   */
+  private static class ImmutableEntry<K, V> implements Map.Entry<K, V> {
 
+    private final Map.Entry<K, V> entry;
+
+    public ImmutableEntry(Map.Entry<K, V> entry) {
+      this.entry = entry;
+    }
+
+    @Override
+    public K getKey() {
+      return entry.getKey();
+    }
+
+    @Override
+    public V getValue() {
+      return entry.getValue();
+    }
+
+    @Override
+    public V setValue(V value) {
+      throw new UnsupportedOperationException("It's not possible to update a map entry result of a map iteration");
+    }
+  }
 }

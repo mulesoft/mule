@@ -10,12 +10,38 @@
     <artifactId>mule-module-launcher</artifactId>
     <packaging>jar</packaging>
     <name>Mule 4 Launcher</name>
+    <description>Provides Mule container launching and logging capabilities.</description>
 
     <properties>
+        <!-- Avoids split package with the actual mule-module-deployment-model-impl and its tests -->
+        <surefire.args>
+            --add-modules=net.bytebuddy.agent
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.util.splash=org.mule.runtime.deployment.model.impl
+            --add-opens=org.mule.runtime.launcher/org.mule.runtime.module.launcher.coreextension=org.mule.runtime.core
+            --patch-module=org.mule.runtime.deployment.model.impl=${org.mule.runtime:mule-module-deployment-model-impl:test-jar:tests}
+            ${surefire.test.unit.open.args}
+        </surefire.args>
+
         <javaModuleName>org.mule.runtime.launcher</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -81,7 +107,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>${mockitoVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

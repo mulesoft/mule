@@ -128,7 +128,21 @@ public class ClassUtils {
    * @return A URL pointing to the resource to load or null if the resource is not found
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    return org.mule.runtime.internal.util.ClassUtils.getResource(resourceName, callingClass);
+    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      return cl != null ? cl.getResource(resourceName) : null;
+    });
+
+    if (url == null) {
+      url = AccessController
+          .doPrivileged((PrivilegedAction<URL>) () -> ClassUtils.class.getClassLoader().getResource(resourceName));
+    }
+
+    if (url == null) {
+      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
+    }
+
+    return url;
   }
 
   /**

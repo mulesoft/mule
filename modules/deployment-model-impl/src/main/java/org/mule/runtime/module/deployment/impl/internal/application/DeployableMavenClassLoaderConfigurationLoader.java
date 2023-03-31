@@ -14,11 +14,11 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer.deserialize;
 
 import org.mule.maven.client.api.MavenClient;
+import org.mule.runtime.container.internal.util.JarExplorer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
-import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderConfigurationBuilder;

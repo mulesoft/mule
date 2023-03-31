@@ -24,14 +24,14 @@ import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.container.internal.util.FileJarExplorer;
+import org.mule.runtime.container.internal.util.JarInfo;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
 import java.net.MalformedURLException;

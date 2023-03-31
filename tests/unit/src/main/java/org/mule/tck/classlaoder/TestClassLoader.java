@@ -6,6 +6,8 @@
  */
 package org.mule.tck.classlaoder;
 
+import static java.util.Collections.enumeration;
+
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -79,9 +82,7 @@ public class TestClassLoader extends ClassLoader {
 
   @Override
   protected Enumeration<URL> findResources(String name) throws IOException {
-    invocations.add(new Pair<>("findResources", name));
-
-    return new EnumerationAdapter<>(resources.values());
+    return enumeration(resources.values());
   }
 
   @Override

@@ -7,16 +7,18 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.io.File.pathSeparatorChar;
 import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.container.internal.util.FileJarExplorer;
+import org.mule.runtime.container.internal.util.JarExplorer;
+import org.mule.runtime.container.internal.util.JarInfo;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

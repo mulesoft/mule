@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.singleton;
+
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.List;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Creates a container class loader without adding a filter to it.
@@ -26,8 +26,8 @@ public interface PreFilteredContainerClassLoaderCreator extends AutoCloseable {
    * Boot packages define all the prefixes that must be loaded from the container classLoader without being filtered
    */
   Set<String> BOOT_PACKAGES =
-      ImmutableSet.of(// MULE-10194 Mechanism to add custom boot packages to be exported by the container
-                      "com.yourkit");
+      singleton(// MULE-10194 Mechanism to add custom boot packages to be exported by the container
+                "com.yourkit");
 
   /**
    * @return the list of {@link MuleModule}s to be used for defining the filter

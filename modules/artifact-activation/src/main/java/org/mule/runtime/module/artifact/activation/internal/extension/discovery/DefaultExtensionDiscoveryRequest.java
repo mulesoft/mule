@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.internal.util.collection.UnmodifiableMap.unmodifiableMap;
-
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -18,7 +16,6 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
