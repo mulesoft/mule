@@ -6,12 +6,18 @@
  */
 package org.mule.runtime.tracer.configuration.internal.provider;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 import org.mule.runtime.tracer.configuration.internal.export.MonitoringInitialExportInfoProvider;
 import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
 import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanInfo;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link InitialSpanInfoProvider}
@@ -20,26 +26,63 @@ import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanI
  */
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
+  public static final String API_ID_CONFIGURATION_PROPERTIES_KEY = "apiId";
+
+  @Inject
+  MuleContext muleContext;
+
+  @Inject
+  ConfigurationProperties configurationProperties;
+
   // TODO: User Story B - Implementation of Monitoring, Troubleshooting, App Level (W-12658074)
   private final InitialExportInfoProvider initialExportInfo = new MonitoringInitialExportInfoProvider();
+  private String apiId;
+  private boolean initialisedAttributes;
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component) {
-    return new ExecutionInitialSpanInfo(component, initialExportInfo);
+    // TODO: Verify initialisation order in mule context (W-12761329)
+    if (!initialisedAttributes) {
+      initialiseAttributes();
+      initialisedAttributes = true;
+    }
+    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component, String suffix) {
-    return new ExecutionInitialSpanInfo(component, initialExportInfo, null, suffix);
+    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
+    if (!initialisedAttributes) {
+      initialiseAttributes();
+      initialisedAttributes = true;
+    }
+    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo, null, suffix);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(String name) {
-    return new ExecutionInitialSpanInfo(name, initialExportInfo);
+    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
+    if (!initialisedAttributes) {
+      initialiseAttributes();
+      initialisedAttributes = true;
+    }
+    return new ExecutionInitialSpanInfo(name, apiId, initialExportInfo);
   }
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
-    return new ExecutionInitialSpanInfo(component, overriddenName, initialExportInfo);
+    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
+    if (!initialisedAttributes) {
+      initialiseAttributes();
+      initialisedAttributes = true;
+    }
+    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, initialExportInfo);
+  }
+
+  public void initialiseAttributes() {
+    if (muleContext.getArtifactType().equals(POLICY)) {
+      apiId = configurationProperties.resolveStringProperty(API_ID_CONFIGURATION_PROPERTIES_KEY).orElse(null);
+    }
+
   }
 }
