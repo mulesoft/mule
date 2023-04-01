@@ -18,7 +18,6 @@ import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
-
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
@@ -41,8 +40,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mockito.MockedStatic;
-import org.mockito.invocation.InvocationOnMock;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -64,20 +61,20 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import sun.misc.Unsafe;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
