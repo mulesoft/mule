@@ -11,6 +11,7 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 
 import org.mule.api.annotation.Experimental;
+import org.mule.runtime.api.artifact.RegistryKeys;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
@@ -115,12 +116,20 @@ public class MuleProperties {
   // End Connector Service descriptor properties
 
   public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
-  public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
-  public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
+  public static final String MULE_HOME_DIRECTORY_PROPERTY = MuleSystemProperties.MULE_HOME_DIRECTORY_PROPERTY;
+  public static final String MULE_BASE_DIRECTORY_PROPERTY = MuleSystemProperties.MULE_BASE_DIRECTORY_PROPERTY;
   public static final String APP_HOME_DIRECTORY_PROPERTY = "app.home";
   public static final String DOMAIN_HOME_DIRECTORY_PROPERTY = "domain.home";
-  public static final String APP_NAME_PROPERTY = "app.name";
-  public static final String DOMAIN_NAME_PROPERTY = "domain.name";
+  /**
+   * @deprecated Use {@link RegistryKeys#APP_NAME_PROPERTY} instead.
+   */
+  @Deprecated
+  public static final String APP_NAME_PROPERTY = RegistryKeys.APP_NAME_PROPERTY;
+  /**
+   * @deprecated Use {@link RegistryKeys#DOMAIN_NAME_PROPERTY} instead.
+   */
+  @Deprecated
+  public static final String DOMAIN_NAME_PROPERTY = RegistryKeys.DOMAIN_NAME_PROPERTY;
 
   // Object Name Keys
   public static final String OBJECT_MULE_CONTEXT = "_muleContext";
@@ -232,7 +241,11 @@ public class MuleProperties {
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
   public static final String OBJECT_SCHEDULER_POOLS_CONFIG = "_muleSchedulerPoolsConfig";
-  public static final String OBJECT_SCHEDULER_BASE_CONFIG = "_muleSchedulerBaseConfig";
+  /**
+   * @deprecated Use {@link RegistryKeys#OBJECT_SCHEDULER_BASE_CONFIG} instead.
+   */
+  @Deprecated
+  public static final String OBJECT_SCHEDULER_BASE_CONFIG = RegistryKeys.OBJECT_SCHEDULER_BASE_CONFIG;
   public static final String OBJECT_CLUSTER_SERVICE = "_muleClusterService";
   public static final String OBJECT_NOTIFICATION_DISPATCHER = "_muleNotificationDispatcher";
   public static final String OBJECT_NOTIFICATION_LISTENER_REGISTRY = "_muleNotificationListenerRegistry";

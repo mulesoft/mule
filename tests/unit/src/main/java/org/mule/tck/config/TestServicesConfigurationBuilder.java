@@ -6,9 +6,9 @@
  */
 package org.mule.tck.config;
 
+import static org.mule.runtime.api.artifact.RegistryKeys.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import static org.hamcrest.collection.IsEmptyCollection.empty;
