@@ -129,6 +129,7 @@
 
     <properties>
         <javaVersion>1.8</javaVersion>
+        <javaReleaseVersion>8</javaReleaseVersion>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -1191,6 +1192,7 @@
                 </plugins>
             </build>
         </profile>
+        <!--
         <profile>
             <id>jdk-11</id>
             <activation>
@@ -1203,13 +1205,13 @@
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
-                                <argLine>${surefire.args} --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED</argLine>
                             </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
         </profile>
+        -->
         <profile>
             <id>jdk-17</id>
             <activation>
