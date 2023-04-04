@@ -672,44 +672,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public abstract void tx() throws Exception;
 
-  @Test
-  public void txSameThreadPolicyHonored() throws Exception {
-    assumeThat(this, instanceOf(TransactionAwareProcessingStrategyTestCase.class));
-
-    triggerableMessageSource = new TriggerableMessageSource();
-
-    flow = flowBuilder.get()
-        .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    startFlow();
-
-    getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
-    processFlow(newEvent());
-
-    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
-    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
-  }
-
-  @Test
-  public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
-    assumeThat(this, instanceOf(TransactionAwareProcessingStrategyTestCase.class));
-
-    triggerableMessageSource = new TriggerableMessageSource();
-
-    flow = flowBuilder.get()
-        .source(triggerableMessageSource)
-        .processors(asyncProcessor, cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    startFlow();
-
-    getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
-    processFlow(newEvent());
-
-    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
-    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
-  }
-
   protected void assertProcessingStrategyProfiling() {
     if (parseBoolean(enableProfilingServiceProperty.getValue())) {
       InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
@@ -732,10 +694,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   protected void assertProcessingStrategyTracing() {
     Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), notNullValue());
-  }
-
-  protected interface TransactionAwareProcessingStrategyTestCase {
-
   }
 
   protected void singleIORW(Callable<CoreEvent> eventSupplier, Matcher<Iterable<? extends String>> schedulerNameMatcher)

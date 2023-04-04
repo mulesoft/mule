@@ -31,8 +31,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
+import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.util.CollectableReference;
 
@@ -48,8 +48,7 @@ import io.qameta.allure.Story;
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
 public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
-    extends ProactorStreamEmitterProcessingStrategyTestCase
-    implements TransactionAwareProcessingStrategyTestCase {
+    extends ProactorStreamEmitterProcessingStrategyTestCase {
 
   public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode, boolean profiling) {
     super(mode, profiling);
@@ -156,6 +155,41 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
       reference = new CollectableReference<>(currentThread());
       return event;
     }
+  }
+
+
+  @Test
+  public void txSameThreadPolicyHonored() throws Exception {
+    triggerableMessageSource = new TriggerableMessageSource();
+
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    startFlow();
+
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+    processFlow(newEvent());
+
+    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
+    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
+  }
+
+  @Test
+  public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
+    triggerableMessageSource = new TriggerableMessageSource();
+
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(asyncProcessor, cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    startFlow();
+
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+    processFlow(newEvent());
+
+    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
+    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
   }
 
 }
