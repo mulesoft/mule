@@ -92,11 +92,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -754,62 +751,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
           throw new MuleRuntimeException(e);
         }
       });
-    }
-  }
-
-  @Test
-  @Ignore("As of MULE-17264, if CPU_LITE is busy, requests are bueffeed rather than rejected, as it was in 4.1.x")
-  public void backpressureOnInnerCpuLightSchedulerThrowsRejectedExecution() throws Exception {
-    assumeThat(mode, is(SOURCE));
-
-    final Scheduler cpuLightBusy = new TestScheduler(2, CPU_LIGHT, true) {
-
-      private final AtomicInteger countdown = new AtomicInteger(0);
-
-      private void countAndThrow() {
-        int v = countdown.getAndIncrement();
-        if (v % 2 == 1) {
-          throw new RejectedExecutionException();
-        }
-      }
-
-      @Override
-      public Future<?> submit(Runnable task) {
-        countAndThrow();
-        return super.submit(task);
-      }
-
-      @Override
-      public Future<?> submit(Callable task) {
-        countAndThrow();
-        return super.submit(task);
-      }
-    };
-
-    triggerableMessageSource = new TriggerableMessageSource(FAIL);
-
-    flow = flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
-                                                                                                    1,
-                                                                                                    () -> cpuLightBusy,
-                                                                                                    () -> cpuLightBusy,
-                                                                                                    () -> blocking,
-                                                                                                    () -> cpuIntensive,
-                                                                                                    4,
-                                                                                                    2,
-                                                                                                    true,
-                                                                                                    () -> muleContext
-                                                                                                        .getConfiguration()
-                                                                                                        .getShutdownTimeout()))
-        .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuIntensiveProcessor).build();
-    startFlow();
-
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
-
-    for (int i = 0; i < STREAM_ITERATIONS; i++) {
-      processFlow(newEvent());
     }
   }
 
