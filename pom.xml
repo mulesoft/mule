@@ -129,6 +129,7 @@
 
     <properties>
         <javaVersion>1.8</javaVersion>
+        <javaReleaseVersion>8</javaReleaseVersion>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -206,7 +207,7 @@
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
         <javadocPluginVersion>3.2.0</javadocPluginVersion>
-        <mavenCompilerVersion>3.8.1</mavenCompilerVersion>
+        <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
@@ -941,6 +942,32 @@
     </reporting>
     <profiles>
         <profile>
+            <id>j11</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${mavenCompilerVersion}</version>
+                            <configuration>
+                                <encoding>ISO-8859-1</encoding>
+                                <source>${javaVersion}</source>
+                                <target>${javaVersion}</target>
+                                <release>${javaReleaseVersion}</release>
+                                <testRelease>${javaReleaseVersion}</testRelease>
+                                <proc>none</proc>
+                                <parameters>true</parameters>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
             <id>mac</id>
             <activation>
                 <os>
@@ -960,7 +987,7 @@
                 <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>
-		<profile>
+        <profile>
             <id>release</id>
             <properties>
                 <skipVerifications>false</skipVerifications>
