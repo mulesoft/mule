@@ -940,31 +940,31 @@
         </plugins>
     </reporting>
     <profiles>
-		<profile>
-			<id>j11</id>
-			<activation>
-				<jdk>[11,)</jdk>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-compiler-plugin</artifactId>
-							<version>${mavenCompilerVersion}</version>
-							<configuration>
-								<encoding>ISO-8859-1</encoding>
-								<source>${javaVersion}</source>
-								<target>${javaVersion}</target>
-								<release>${javaReleaseVersion}</release>
-								<proc>none</proc>
-								<parameters>true</parameters>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
+        <profile>
+            <id>j11</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${mavenCompilerVersion}</version>
+                            <configuration>
+                                <encoding>ISO-8859-1</encoding>
+                                <source>${javaVersion}</source>
+                                <target>${javaVersion}</target>
+                                <release>${javaReleaseVersion}</release>
+                                <proc>none</proc>
+                                <parameters>true</parameters>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <profile>
             <id>mac</id>
             <activation>
@@ -985,7 +985,7 @@
                 <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>
-		<profile>
+        <profile>
             <id>release</id>
             <properties>
                 <skipVerifications>false</skipVerifications>
