@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -24,7 +25,6 @@ import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,32 +37,26 @@ public class XMLSecureFactoriesPropertiesTestCase {
   @Test
   @Issue("MULE-18814")
   public void decorateDefaultXmlSecureFactories() {
-    MockedStatic<org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories> utilities =
-        Mockito.mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
-    try {
+    try (MockedStatic<org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories> utilities =
+        mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class)) {
       delegate = spy(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
       utilities.when(() -> XMLSecureFactories.createDefault()).thenReturn(delegate);
       XMLSecureFactories deprecated = XMLSecureFactories.createDefault();
 
       assertDecoratedXMLSecureFactories(deprecated);
-    } finally {
-      utilities.close();
     }
   }
 
   @Test
   @Issue("MULE-18814")
   public void decorateCustomXmlSecureFactories() {
-    MockedStatic<org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories> utilities =
-        Mockito.mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
-    try {
+    try (MockedStatic<org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories> utilities =
+        mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class)) {
       delegate = spy(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
       utilities.when(() -> XMLSecureFactories.createWithConfig(anyBoolean(), anyBoolean())).thenReturn(delegate);
       XMLSecureFactories deprecated = XMLSecureFactories.createWithConfig(false, false);
 
       assertDecoratedXMLSecureFactories(deprecated);
-    } finally {
-      utilities.close();
     }
   }
 

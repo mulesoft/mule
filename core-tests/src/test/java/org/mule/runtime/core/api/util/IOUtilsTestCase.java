@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -71,7 +72,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -201,8 +201,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private URLConnection mockURLConnection(URL url) throws Exception {
-    MockedStatic<IOUtils> utilities = Mockito.mockStatic(IOUtils.class);
-    try {
+    try (MockedStatic<IOUtils> utilities = mockStatic(IOUtils.class)) {
       AtomicReference<URLConnection> connection = new AtomicReference<>();
 
       final URL mockedURL = spy(url);
@@ -222,9 +221,6 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       getResourceAsStream(RESOURCE_NAME, getClass());
 
       return connection.get();
-    } finally {
-      // We need to deregister the static mock.
-      utilities.close();
     }
   }
 
