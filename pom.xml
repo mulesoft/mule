@@ -958,6 +958,7 @@
                                 <source>${javaVersion}</source>
                                 <target>${javaVersion}</target>
                                 <release>${javaReleaseVersion}</release>
+                                <testRelease>${javaReleaseVersion}</testRelease>
                                 <proc>none</proc>
                                 <parameters>true</parameters>
                             </configuration>

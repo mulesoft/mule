@@ -6,15 +6,28 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
+import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.enablePlugins;
+
+import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
+import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -25,12 +38,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
-import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.enablePlugins;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,8 +49,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -52,7 +59,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -69,8 +78,6 @@ import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
-
-import sun.misc.Unsafe;
 
 @SmallTest
 @RunWith(PowerMockRunner.class)
@@ -152,7 +159,25 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       OutputStream out = mock(OutputStream.class);
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
-      ClassLoader newClassLoader = new URLClassLoader(getClassloaderURLs(contextClassLoader), null);
+
+      String classPath = getProperty("java.class.path");
+      String modulePath = getProperty("jdk.module.path");
+      List<String> classPathEntries = (modulePath != null
+          ? concat(Stream.of(classPath.split(":")),
+                   Stream.of(modulePath.split(":")))
+          : Stream.of(classPath.split(":")))
+              .filter(StringUtils::isNotBlank)
+              .collect(toList());
+
+      ClassLoader newClassLoader = new URLClassLoader(classPathEntries.stream().map(path -> {
+        try {
+          return get(path).toUri().toURL();
+        } catch (MalformedURLException e) {
+          fail(e.getMessage());
+          return null;
+        }
+      })
+          .toArray(s -> new URL[s]), null);
       Class clazz = loadClass(IOUtils.class.getCanonicalName(), newClassLoader);
 
       try {
@@ -168,21 +193,6 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
     });
   }
 
-  private URL[] getClassloaderURLs(ClassLoader classLoader) {
-    if (classLoader instanceof URLClassLoader) {
-      return ((URLClassLoader) classLoader).getURLs();
-    } else if (classLoader.getClass().getName().startsWith("jdk.internal.loader.ClassLoaders$")) {
-      return getUrls(classLoader);
-    }
-
-    String parentName = classLoader.getParent().getClass().getName();
-    if (parentName.startsWith("sun.misc.Launcher$AppClassLoader") || parentName.startsWith("jdk.internal.loader.ClassLoaders$")) {
-      return getUrls(classLoader.getParent());
-    }
-
-    throw new IllegalArgumentException("Unknown classloader type: " + classLoader);
-  }
-
   @Test
   public void convertsToStringWithEncoding() throws Exception {
 
@@ -193,28 +203,6 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
     String converted = IOUtils.toString(in, encoding);
 
     assertThat(converted, equalTo(encodedText));
-  }
-
-  private URL[] getUrls(ClassLoader classLoader) {
-    try {
-      Field field = Unsafe.class.getDeclaredField("theUnsafe");
-      field.setAccessible(true);
-      Unsafe unsafe = (Unsafe) field.get(null);
-
-      // jdk.internal.loader.ClassLoaders.AppClassLoader.ucp
-      Field ucpField = classLoader.getClass().getDeclaredField("ucp");
-      long ucpFieldOffset = unsafe.objectFieldOffset(ucpField);
-      Object ucpObject = unsafe.getObject(classLoader, ucpFieldOffset);
-
-      // jdk.internal.loader.URLClassPath.path
-      Field pathField = ucpField.getType().getDeclaredField("path");
-      long pathFieldOffset = unsafe.objectFieldOffset(pathField);
-      List<URL> path = (List<URL>) unsafe.getObject(ucpObject, pathFieldOffset);
-
-      return path.toArray(new URL[path.size()]);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private URLConnection mockURLConnection(URL url) throws Exception {
