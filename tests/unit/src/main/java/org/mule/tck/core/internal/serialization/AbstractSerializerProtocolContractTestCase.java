@@ -14,7 +14,6 @@ import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -23,13 +22,45 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
 public abstract class AbstractSerializerProtocolContractTestCase extends AbstractMuleContextTestCase {
+
+  /**
+   * This class is added to get rid of mockito spy, tried replacing it with mockito-inline, that still does not work in Java 17
+   * and it still requires us to open java.base/java.io so that protected byte[] java.io.ByteArrayInputStream.buf can be accessed,
+   * which we are trying to avoid at all costs"
+   */
+  public class CloseCounterInputStreamWrapper extends InputStream {
+
+    private final InputStream inputStream;
+
+    private AtomicInteger closeCount = new AtomicInteger();
+
+    public CloseCounterInputStreamWrapper(InputStream inputStream) {
+      this.inputStream = inputStream;
+    }
+
+    @Override
+    public int read() throws IOException {
+      return inputStream.read();
+    }
+
+    public void close() throws IOException {
+      closeCount.incrementAndGet();
+      inputStream.close();
+    }
+
+    public int getCloseCount() {
+      return closeCount.intValue();
+    }
+  }
 
   private static final String STRING_MESSAGE = "Hello World";
 
@@ -55,7 +86,8 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
   @Test
   public final void inputStreamClosed() throws Exception {
     final byte[] bytes = serializationProtocol.serialize(STRING_MESSAGE);
-    CustomByteArrayInputStream inputStream = new CustomByteArrayInputStream(new ByteArrayInputStream(bytes));
+
+    CloseCounterInputStreamWrapper inputStream = new CloseCounterInputStreamWrapper(new ByteArrayInputStream(bytes));
     String output = serializationProtocol.deserialize(inputStream);
 
     assertThat(inputStream.getCloseCount(), greaterThanOrEqualTo(1));
