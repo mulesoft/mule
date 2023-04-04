@@ -8,6 +8,9 @@ package org.mule.runtime.core.api.util;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+
+import static org.apache.commons.lang3.JavaVersion.JAVA_12;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -17,6 +20,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.isConcrete;
@@ -40,10 +44,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class ClassUtilsTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   // we do not want to match these methods when looking for a service method to
   // invoke
@@ -306,8 +315,9 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void setFinalFieldValue() throws Exception {
     final int originalHash = hashCode();
-    final List<String> newFinalHashProperties = asList("one", "two");
+    final List<String> newFinalHashProperties = asList("three", "four");
     HashBlob blob = new HashBlob(originalHash);
+    assertThat(blob.getFinalHashProperties(), equalTo(asList("one", "two")));
     ClassUtils.setFieldValue(blob, "finalHashProperties", newFinalHashProperties, false);
     assertThat(newFinalHashProperties, equalTo(blob.getFinalHashProperties()));
   }
@@ -316,22 +326,31 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void setFinalFieldValueRecursive() throws Exception {
     final int originalHash = hashCode();
-    final List<String> newFinalHashProperties = asList("one", "two");
+    final List<String> newFinalHashProperties = asList("three", "four");
     ExtendedHashBlob blob = new ExtendedHashBlob(originalHash);
+    assertThat(blob.getFinalHashProperties(), equalTo(asList("one", "two")));
     ClassUtils.setFieldValue(blob, "finalHashProperties", newFinalHashProperties, true);
     assertThat(newFinalHashProperties, equalTo(blob.getFinalHashProperties()));
   }
 
   @Test
   public void setFinalStaticFieldValue() throws Exception {
-    final List<String> newFinalStaticHashProperties = asList("one", "two");
+    if (isJavaVersionAtLeast(JAVA_12)) {
+      expectedException.expect(IllegalAccessException.class);
+      expectedException.expectMessage("Can not set static final");
+    }
+    final List<String> newFinalStaticHashProperties = asList("three", "four");
     ClassUtils.setStaticFieldValue(HashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
     assertThat(newFinalStaticHashProperties, equalTo(HashBlob.getFinalStaticHashProperties()));
   }
 
   @Test
   public void setFinalStaticFieldRecursive() throws Exception {
-    final List<String> newFinalStaticHashProperties = asList("one", "two");
+    if (isJavaVersionAtLeast(JAVA_12)) {
+      expectedException.expect(IllegalAccessException.class);
+      expectedException.expectMessage("Can not set static final");
+    }
+    final List<String> newFinalStaticHashProperties = asList("three", "four");
     ClassUtils.setStaticFieldValue(ExtendedHashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
     assertThat(newFinalStaticHashProperties, equalTo(ExtendedHashBlob.getFinalStaticHashProperties()));
   }

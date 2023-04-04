@@ -10,8 +10,11 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
+
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
+import static org.apache.commons.lang3.JavaVersion.JAVA_12;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
@@ -51,6 +54,8 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 import com.google.common.primitives.Primitives;
+import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.JavaVersion;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -439,34 +444,42 @@ public class ClassUtils {
     }
   }
 
+  @Deprecated()
+  private static void removeFinalModifierFromField(Field field) throws NoSuchFieldException, IllegalAccessException {
+    // Starting with Java 12 changing field modifiers is not allowed.
+    // https://github.com/openjdk/jdk/commit/9c70e26c146ae4c5a2e2311948efec9bf662bb8c
+    if (isJavaVersionAtLeast(JAVA_12)) {
+      return;
+    }
+    Field modifiersField = getField(Field.class, "modifiers", false);
+    boolean isModifiersFieldAccessible = modifiersField.isAccessible();
+    try {
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+    } finally {
+      modifiersField.setAccessible(isModifiersFieldAccessible);
+    }
+  }
+
   /**
    * Sets a field of an object with the given value. If this is a final field, there will be an attempt to update the value.
-   * Notice: If the field is final and it was initialized using a constant the value change may not be reflected in due compiler
+   * <p>
+   * Notice: If the field is final and it was initialized using a constant, the value change may not be reflected in due compiler
    * optimizations. http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
    * 
    * @param target    the object that holds the target field
    * @param fieldName the name of the field
    * @param value     the value to set
-   * @param recursive flags to lookup the field in subclasses of the target object
+   * @param recursive flags to look for the field in subclasses of the target object
    * @throws IllegalAccessException the field is not reachable
-   * @throws NoSuchFieldException   the field does not exists.
+   * @throws NoSuchFieldException   the field does not exist.
    */
+  @Deprecated
   public static void setFieldValue(Object target, String fieldName, Object value, boolean recursive)
       throws IllegalAccessException, NoSuchFieldException {
     Field field = getField(target.getClass(), fieldName, recursive);
     boolean isAccessible = field.isAccessible();
 
-    if (isFinal(field.getModifiers())) {
-
-      Field modifiersField = getField(Field.class, "modifiers", false);
-      boolean isModifiersFieldAccessible = modifiersField.isAccessible();
-      try {
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      } finally {
-        modifiersField.setAccessible(isModifiersFieldAccessible);
-      }
-    }
     try {
       field.setAccessible(true);
       field.set(target, value);
@@ -476,31 +489,29 @@ public class ClassUtils {
   }
 
   /**
-   * Sets a static field of a given class, even if the field has the final modifier. Notice: If the field is final and it was
-   * initialized using a constant the value change may not be reflected due compiler optimizations.
-   * http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
+   * Sets a static field of a given class. If this is a final field, there will be an attempt to update the value.
+   * <p>
+   * Notice: If the field is final and it was initialized using a constant, the value change may not be reflected due to compiler
+   * optimizations. http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
+   * <p>
+   * Additionally, starting from Java 12, static final fields cannot be modified at all.
    *
    * @param targetClass the target class
    * @param fieldName   the name of the field
    * @param value       the value to set
-   * @param recursive   flags to lookup the field in subclasses or not
-   * @throws NoSuchFieldException   when the field does not exists
-   * @throws IllegalAccessException when the field is not reachable
+   * @param recursive   flags to look for the field in subclasses or not
+   * @throws NoSuchFieldException   when the field does not exist
+   * @throws IllegalAccessException when the field is not reachable, or it doesn't have <em>write</em> access under the conditions
+   *                                specified in {@link Field#set(Object, Object)}.
    */
+  @Deprecated
   public static void setStaticFieldValue(Class<?> targetClass, String fieldName, Object value, boolean recursive)
       throws NoSuchFieldException, IllegalAccessException {
     Field field = getField(targetClass, fieldName, recursive);
     boolean isAccessible = field.isAccessible();
 
     if (isFinal(field.getModifiers())) {
-      Field modifiersField = getField(Field.class, "modifiers", false);
-      boolean isModifiersFieldAccessible = modifiersField.isAccessible();
-      try {
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      } finally {
-        modifiersField.setAccessible(isModifiersFieldAccessible);
-      }
+      removeFinalModifierFromField(field);
     }
     try {
       field.setAccessible(true);
