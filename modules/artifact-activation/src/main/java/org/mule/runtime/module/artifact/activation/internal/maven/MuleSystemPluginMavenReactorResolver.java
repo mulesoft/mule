@@ -23,6 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Resolve the maven pom file for the given artifact.
+ *
+ * @since 4.6.0
+ */
 public class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
 
   private static final String POM = "pom";

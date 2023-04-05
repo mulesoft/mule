@@ -163,14 +163,14 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    * @return {@link File} to the {@value #POM_XML} of the artifact from the workspace path
    */
   private File findPomFile(Artifact artifact, File workspacePath) {
-    boolean isShadeMavenPlugin = discoverProvider().createMavenPomParserClient(new File(workspacePath, POM_XML).toPath())
+    boolean hasShadeMavenPlugin = discoverProvider().createMavenPomParserClient(new File(workspacePath, POM_XML).toPath())
         .isMavenShadePluginConfigured();
-    if (isShadeMavenPlugin) {
+    if (hasShadeMavenPlugin) {
       // TODO (gfernandes) MULE-10485 - add support for reading the plugin configuration using Xpp3 Maven API
       // MavenXpp3Reader.parsePluginConfiguration(...)
       File reducedPom = new File(workspacePath, REDUCED_POM_XML);
       if (!reducedPom.exists()) {
-        throw new IllegalStateException(artifact + " has in its build configure the shadeMavenPlugin but default "
+        throw new IllegalStateException("'" + artifact + "' has the 'maven-shade-plugin' configured in its build, but default "
             + REDUCED_POM_XML
             + " is not present. Run the plugin first.");
       }

@@ -13,6 +13,7 @@ import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.io.FileUtils.toFile;
@@ -127,8 +128,7 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
   }
 
   @Override
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(
-                                                                                                       MavenPomParser parser) {
+  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     Map<Pair<String, String>, AdditionalPluginDependencies> deployableArtifactAdditionalLibrariesMap =
         super.doProcessAdditionalPluginLibraries(parser);
     Map<Pair<String, String>, AdditionalPluginDependencies> effectivePluginsAdditionalLibrariesMap =
@@ -154,30 +154,29 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
                 AdditionalPluginDependencies additionalPluginDependenciesForPlugin =
                     deployableArtifactAdditionalLibrariesMap.get(artifact);
                 List<org.mule.maven.pom.parser.api.model.BundleDescriptor> effectiveAdditionalDependencies =
-                    new LinkedList<>();
-                effectiveAdditionalDependencies.addAll(additionalDependenciesForArtifact.getAdditionalDependencies().stream()
-                    .filter(additionalLibrary -> {
-                      boolean additionalLibraryDefinedAtDeployableArtifact =
-                          existsInLibrariesMap(deployableArtifactAdditionalLibrariesMap,
-                                               artifact, additionalLibrary);
-                      if (!additionalLibraryDefinedAtDeployableArtifact) {
-                        Optional<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraryDefinedByAnotherPlugin =
-                            findLibraryInAdditionalLibrariesMap(effectivePluginsAdditionalLibrariesMap,
-                                                                artifact,
-                                                                additionalLibrary);
-                        try {
-                          return !additionalLibraryDefinedByAnotherPlugin.isPresent()
-                              || new MuleVersion(additionalLibrary.getVersion())
-                                  .newerThan(additionalLibraryDefinedByAnotherPlugin.get().getVersion());
-                        } catch (IllegalStateException e) {
-                          // If not using semver lets just compare the strings.
-                          return additionalLibrary.getVersion()
-                              .compareTo(additionalLibraryDefinedByAnotherPlugin.get().getVersion()) > 0;
-                        }
-                      }
-                      // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
-                      return false;
-                    }).collect(toList()));
+                    additionalDependenciesForArtifact.getAdditionalDependencies().stream()
+                        .filter(additionalLibrary -> {
+                          boolean additionalLibraryDefinedAtDeployableArtifact =
+                              existsInLibrariesMap(deployableArtifactAdditionalLibrariesMap,
+                                                   artifact, additionalLibrary);
+                          if (!additionalLibraryDefinedAtDeployableArtifact) {
+                            Optional<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraryDefinedByAnotherPlugin =
+                                findLibraryInAdditionalLibrariesMap(effectivePluginsAdditionalLibrariesMap,
+                                                                    artifact,
+                                                                    additionalLibrary);
+                            try {
+                              return !additionalLibraryDefinedByAnotherPlugin.isPresent()
+                                  || new MuleVersion(additionalLibrary.getVersion())
+                                      .newerThan(additionalLibraryDefinedByAnotherPlugin.get().getVersion());
+                            } catch (IllegalStateException e) {
+                              // If not using semver lets just compare the strings.
+                              return additionalLibrary.getVersion()
+                                  .compareTo(additionalLibraryDefinedByAnotherPlugin.get().getVersion()) > 0;
+                            }
+                          }
+                          // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
+                          return false;
+                        }).collect(toCollection(LinkedList::new));
                 AdditionalPluginDependencies effectiveAdditionalPluginDependenciesForPlugin =
                     new AdditionalPluginDependencies(additionalPluginDependenciesForPlugin, effectiveAdditionalDependencies);
                 deployableArtifactAdditionalLibrariesMap.replace(artifact, effectiveAdditionalPluginDependenciesForPlugin);

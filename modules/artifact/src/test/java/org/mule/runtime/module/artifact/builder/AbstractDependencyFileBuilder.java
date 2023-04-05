@@ -296,11 +296,10 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
         .setClassifier(getClassifier())
         .setType(getType())
         .build();
-    BundleDependency bundleDependency = new BundleDependency.Builder()
+    return new BundleDependency.Builder()
         .setBundleDescriptor(bundleDescriptor)
         .setScope(valueOf(ofNullable(getScope()).orElse(COMPILE.name())))
         .build();
-    return bundleDependency;
   }
 
   /**

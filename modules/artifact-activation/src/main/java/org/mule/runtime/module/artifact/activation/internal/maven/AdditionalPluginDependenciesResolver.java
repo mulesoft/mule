@@ -174,7 +174,7 @@ public class AdditionalPluginDependenciesResolver {
             AdditionalPluginDependencies alreadyDefinedPluginAdditionalDependencies =
                 additionalDependenciesFromMulePlugins.get(artifact);
             if (alreadyDefinedPluginAdditionalDependencies != null) {
-              LinkedList<BundleDescriptor> effectiveDependencies =
+              List<BundleDescriptor> effectiveDependencies =
                   new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
               mavenPlugin.getAdditionalDependencies().forEach(additionalDependenciesDependency -> {
                 boolean addDependency = true;

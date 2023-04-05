@@ -69,8 +69,7 @@ public class HeavyweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
   }
 
   @Override
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(
-                                                                                                       MavenPomParser parser) {
+  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()

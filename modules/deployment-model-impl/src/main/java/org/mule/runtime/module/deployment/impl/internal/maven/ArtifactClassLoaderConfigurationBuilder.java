@@ -148,8 +148,7 @@ public abstract class ArtifactClassLoaderConfigurationBuilder extends ClassLoade
     });
   }
 
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(
-                                                                                                       MavenPomParser parser) {
+  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     return parser.getPomAdditionalPluginDependenciesForArtifacts();
   }
 
@@ -237,8 +236,7 @@ public abstract class ArtifactClassLoaderConfigurationBuilder extends ClassLoade
 
   protected abstract List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency);
 
-  private org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor convertBundleDescriptor(
-                                                                                                   org.mule.maven.pom.parser.api.model.BundleDescriptor descriptor) {
+  private org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor convertBundleDescriptor(org.mule.maven.pom.parser.api.model.BundleDescriptor descriptor) {
     org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder builder =
         new org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
             .setArtifactId(descriptor.getArtifactId())
