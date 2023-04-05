@@ -20,7 +20,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -85,7 +85,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   private ArtifactAwareContextSelector selector;
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  @Mock(answer = Answers.RETURNS_MOCKS)
   private RegionClassLoader regionClassLoader;
 
   @Mock
@@ -97,6 +97,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
     when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
     when(regionClassLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
+    when(regionClassLoader.findLocalResource("log4j2-test.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
     when(regionClassLoader.getArtifactDescriptor()).thenReturn(deployableArtifactDescriptor);
   }
 
@@ -110,7 +111,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, regionClassLoader, true);
     assertThat(context, is(sameInstance(selector.getContext(EMPTY, regionClassLoader, true))));
 
-    regionClassLoader = mock(RegionClassLoader.class, RETURNS_DEEP_STUBS);
+    regionClassLoader = mock(RegionClassLoader.class, RETURNS_MOCKS);
     when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
     when(regionClassLoader.getArtifactDescriptor()).thenReturn(deployableArtifactDescriptor);
     assertThat(context, not(sameInstance(selector.getContext(EMPTY, regionClassLoader, true))));
