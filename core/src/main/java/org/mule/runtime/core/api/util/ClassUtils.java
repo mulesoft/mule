@@ -402,8 +402,11 @@ public class ClassUtils {
    * @param <T>       The expected type of the field.
    * @return the value of the field for the target object
    * @throws IllegalAccessException when the field is not reachable
-   * @throws NoSuchFieldException   when the field does not exists
+   * @throws NoSuchFieldException   when the field does not exist.
+   * @deprecated The usage of this method is discouraged because whether it succeeds or not depends on the Java version and also
+   *             in the decisions of the target class owner about whether the field is strongly encapsulated or not.
    */
+  @Deprecated
   public static <T> T getFieldValue(Object target, String fieldName, boolean recursive)
 
       throws IllegalAccessException, NoSuchFieldException {
@@ -428,7 +431,10 @@ public class ClassUtils {
    * @return the value of the field
    * @throws NoSuchFieldException   when the field is not found
    * @throws IllegalAccessException when the field is not reachable.
+   * @deprecated The usage of this method is discouraged because whether it succeeds or not depends on the Java version and also
+   *             in the decisions of the target class owner about whether the field is strongly encapsulated or not.
    */
+  @Deprecated
   public static <T> T getStaticFieldValue(Class<?> targetClass, String fieldName, boolean recursive)
       throws NoSuchFieldException, IllegalAccessException {
     Field field = getField(targetClass, fieldName, recursive);
@@ -444,7 +450,7 @@ public class ClassUtils {
     }
   }
 
-  @Deprecated()
+  @Deprecated
   private static void removeFinalModifierFromField(Field field) throws NoSuchFieldException, IllegalAccessException {
     // Starting with Java 12 changing field modifiers is not allowed.
     // https://github.com/openjdk/jdk/commit/9c70e26c146ae4c5a2e2311948efec9bf662bb8c
@@ -473,6 +479,8 @@ public class ClassUtils {
    * @param recursive flags to look for the field in subclasses of the target object
    * @throws IllegalAccessException the field is not reachable
    * @throws NoSuchFieldException   the field does not exist.
+   * @deprecated The usage of this method is discouraged because whether it succeeds or not depends on the Java version and also
+   *             in the decisions of the target class owner about whether the field is strongly encapsulated or not.
    */
   @Deprecated
   public static void setFieldValue(Object target, String fieldName, Object value, boolean recursive)
@@ -503,6 +511,8 @@ public class ClassUtils {
    * @throws NoSuchFieldException   when the field does not exist
    * @throws IllegalAccessException when the field is not reachable, or it doesn't have <em>write</em> access under the conditions
    *                                specified in {@link Field#set(Object, Object)}.
+   * @deprecated The usage of this method is discouraged because whether it succeeds or not depends on the Java version and also
+   *             in the decisions of the target class owner about whether the field is strongly encapsulated or not.
    */
   @Deprecated
   public static void setStaticFieldValue(Class<?> targetClass, String fieldName, Object value, boolean recursive)
