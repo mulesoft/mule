@@ -12,6 +12,7 @@ import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.SUPPORTED_ENVIRONMENTS;
 
 import static java.lang.System.getProperty;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -28,11 +29,9 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -104,7 +103,6 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Ignore("MULE-19045")
   public void testUndefinedJdkPreferences() throws Exception {
     setJdkVersion("1.4.2");
 
@@ -138,7 +136,6 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Ignore("MULE-19045")
   public void testSupportedJdkVendor() {
     assertTrue(JdkVersionUtils.isSupportedJdkVendor());
   }
