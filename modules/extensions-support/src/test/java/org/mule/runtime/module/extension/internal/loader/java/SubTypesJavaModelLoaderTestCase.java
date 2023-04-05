@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -49,6 +48,8 @@ import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import java.util.List;
+import java.util.stream.Stream;
 
 @SmallTest
 public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
