@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MuleProcessController {
 
@@ -159,5 +160,9 @@ public class MuleProcessController {
 
   protected Controller getController() {
     return controller;
+  }
+
+  public void setTestEnvVars(Map<String, String> testEnvVars) {
+    controller.setTestEnvVars(testEnvVars);
   }
 }
