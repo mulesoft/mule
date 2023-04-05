@@ -31,6 +31,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
@@ -69,7 +70,9 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -505,17 +508,15 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void cursorStreamProvidersAreManaged() throws Exception {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
-    final InputStream inputStream = mock(InputStream.class);
+    when(provider.isManaged()).thenReturn(false);
+    final CursorStream cursorProvider = mock(CursorStream.class);
+    when(cursorProvider.getProvider()).thenReturn(provider);
 
-    doReturn(provider).when(cursorStreamProviderFactory).of(getRoot(event.getContext()), inputStream, from(FLOW_NAME));
-
-    stubComponentExecutor(operationExecutor, inputStream);
+    stubComponentExecutor(operationExecutor, cursorProvider);
 
     messageProcessor.process(event);
-    ArgumentCaptor<CursorProvider> providerCaptor = forClass(CursorProvider.class);
-    verify(streamingManager).manage(providerCaptor.capture(), any(EventContext.class));
 
-    assertThat(unwrap(providerCaptor.getValue()), is(sameInstance(provider)));
+    verify(streamingManager).manage(eq(provider), any(EventContext.class));
   }
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {
