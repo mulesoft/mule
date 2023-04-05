@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -312,5 +313,9 @@ public class Controller {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void setTestEnvVars(Map<String, String> testEnvVars) {
+    osSpecificController.setTestEnvVars(testEnvVars);
   }
 }

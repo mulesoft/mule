@@ -72,6 +72,7 @@ public abstract class AbstractOSController {
   protected final String muleAppLongName;
   protected final String muleBin;
   protected final int timeout;
+  protected Map<String, String> testEnvVars;
 
   public AbstractOSController(String muleHome, int timeout) {
     this.muleHome = muleHome;
@@ -94,6 +95,10 @@ public abstract class AbstractOSController {
   }
 
   public abstract String getMuleBin();
+
+  public void setTestEnvVars(Map<String, String> testEnvVars) {
+    this.testEnvVars = testEnvVars;
+  }
 
   public void start(String... args) {
     int error = runSync(START_CMD, args);
@@ -179,6 +184,12 @@ public abstract class AbstractOSController {
     Map<Object, Object> newEnv = new HashMap<>();
     for (Map.Entry<String, String> it : env.entrySet()) {
       newEnv.put(it.getKey(), it.getValue());
+    }
+
+    if (this.testEnvVars != null) {
+      for (Map.Entry<String, String> it : this.testEnvVars.entrySet()) {
+        newEnv.put(it.getKey(), it.getValue());
+      }
     }
 
     newEnv.put(MULE_HOME_VARIABLE, muleHome);

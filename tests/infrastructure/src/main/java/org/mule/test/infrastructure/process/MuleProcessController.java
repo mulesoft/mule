@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MuleProcessController {
 
@@ -159,5 +160,16 @@ public class MuleProcessController {
 
   protected Controller getController() {
     return controller;
+  }
+
+
+  /**
+   * Set the environment variables with the corresponding value before running the tests. This should be called with null after
+   * running the tests.
+   *
+   * @param testEnvVars map of environment variables and their values
+   */
+  public void setTestEnvVars(Map<String, String> testEnvVars) {
+    controller.setTestEnvVars(testEnvVars);
   }
 }
