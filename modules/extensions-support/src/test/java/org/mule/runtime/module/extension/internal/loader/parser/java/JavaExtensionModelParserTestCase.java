@@ -110,7 +110,7 @@ public class JavaExtensionModelParserTestCase {
   }
 
   @Test
-  @Ignore
+  @Ignore("W-12947325")
   public void getExportedTypesFromExtensionUsingTheSdkApi() {
     List<String> exportedTypes = getParser(SimpleExtensionUsingSdkApi.class).getPrivilegedExportedPackages();
     assertThat(exportedTypes.size(), is(1));
