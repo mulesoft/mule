@@ -164,8 +164,8 @@ public class MuleProcessController {
 
 
   /**
-   * Set the environment variables with the corresponding value before running the tests.
-   * This should be called with null after running the tests.
+   * Set the environment variables with the corresponding value before running the tests. This should be called with null after
+   * running the tests.
    *
    * @param testEnvVars map of environment variables and their values
    */
