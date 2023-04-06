@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.internal.logger;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
+import static java.util.stream.Collectors.joining;
+import static java.util.Arrays.stream;
+
+import static org.apache.commons.lang3.StringUtils.replaceOnce;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.Marker;
 
 public class CustomLogger implements Logger {
 
@@ -51,8 +54,6 @@ public class CustomLogger implements Logger {
     addMessage("[TRACE] " + msg);
   }
 
-  // Implement other trace methods similarly
-
   @Override
   public boolean isDebugEnabled() {
     return true;
@@ -63,8 +64,6 @@ public class CustomLogger implements Logger {
     addMessage(msg);
   }
 
-  // Implement other debug methods similarly
-
   @Override
   public boolean isInfoEnabled() {
     return true;
@@ -72,22 +71,22 @@ public class CustomLogger implements Logger {
 
   @Override
   public void trace(String s, Object o) {
-
+    addMessage("[TRACE] " + s + o);
   }
 
   @Override
   public void trace(String s, Object o, Object o1) {
-
+    addMessage("[TRACE] " + s + o + o1);
   }
 
   @Override
   public void trace(String s, Object... objects) {
-
+    addMessage("[TRACE] " + s + stringify(objects));
   }
 
   @Override
   public void trace(String s, Throwable throwable) {
-
+    addMessage("[TRACE] " + s + throwable.getMessage());
   }
 
   @Override
@@ -97,27 +96,27 @@ public class CustomLogger implements Logger {
 
   @Override
   public void trace(Marker marker, String s) {
-
+    throw new UnsupportedOperationException("trace with marker not suppported");
   }
 
   @Override
   public void trace(Marker marker, String s, Object o) {
-
+    throw new UnsupportedOperationException("trace with marker not suppported");
   }
 
   @Override
   public void trace(Marker marker, String s, Object o, Object o1) {
-
+    throw new UnsupportedOperationException("trace with marker not suppported");
   }
 
   @Override
   public void trace(Marker marker, String s, Object... objects) {
-
+    throw new UnsupportedOperationException("trace with marker not suppported");
   }
 
   @Override
   public void trace(Marker marker, String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("trace with marker not suppported");
   }
 
   @Override
@@ -127,19 +126,19 @@ public class CustomLogger implements Logger {
 
   @Override
   public void debug(String s, Object o, Object o1) {
-    String msg = StringUtils.replaceOnce(s, "{}", o.toString());
-    msg = StringUtils.replaceOnce(msg, "{}", o1.toString());
+    String msg = replaceOnce(s, "{}", o.toString());
+    msg = replaceOnce(msg, "{}", o1.toString());
     addMessage(msg);
   }
 
   @Override
   public void debug(String s, Object... objects) {
-
+    addMessage("[DEBUG] " + s + stringify(objects));
   }
 
   @Override
   public void debug(String s, Throwable throwable) {
-
+    addMessage("[DEBUG] " + s + throwable.getMessage());
   }
 
   @Override
@@ -149,52 +148,52 @@ public class CustomLogger implements Logger {
 
   @Override
   public void debug(Marker marker, String s) {
-
+    throw new UnsupportedOperationException("debug with marker not suppported");
   }
 
   @Override
   public void debug(Marker marker, String s, Object o) {
-
+    throw new UnsupportedOperationException("debug with marker not suppported");
   }
 
   @Override
   public void debug(Marker marker, String s, Object o, Object o1) {
-
+    addMessage("[DEBUG] " + s + o + o1);
   }
 
   @Override
   public void debug(Marker marker, String s, Object... objects) {
-
+    addMessage("[DEBUG] " + s + stringify(objects));
   }
 
   @Override
   public void debug(Marker marker, String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("debug with marker not suppported");
   }
 
   @Override
   public void info(String s) {
-
+    addMessage("[INFO] " + s);
   }
 
   @Override
   public void info(String s, Object o) {
-
+    addMessage("[INFO] " + s + o);
   }
 
   @Override
   public void info(String s, Object o, Object o1) {
-
+    addMessage("[INFO] " + s + o + o1);
   }
 
   @Override
   public void info(String s, Object... objects) {
-
+    addMessage("[INFO] " + s + stringify(objects));
   }
 
   @Override
   public void info(String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("info with marker not suppported");
   }
 
   @Override
@@ -204,27 +203,27 @@ public class CustomLogger implements Logger {
 
   @Override
   public void info(Marker marker, String s) {
-
+    throw new UnsupportedOperationException("info with marker not suppported");
   }
 
   @Override
   public void info(Marker marker, String s, Object o) {
-
+    throw new UnsupportedOperationException("info with marker not suppported");
   }
 
   @Override
   public void info(Marker marker, String s, Object o, Object o1) {
-
+    throw new UnsupportedOperationException("info with marker not suppported");
   }
 
   @Override
   public void info(Marker marker, String s, Object... objects) {
-
+    throw new UnsupportedOperationException("info with marker not suppported");
   }
 
   @Override
   public void info(Marker marker, String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("info with marker not suppported");
   }
 
   @Override
@@ -234,27 +233,27 @@ public class CustomLogger implements Logger {
 
   @Override
   public void warn(String s) {
-
+    addMessage(s);
   }
 
   @Override
   public void warn(String s, Object o) {
-
+    addMessage(s + o);
   }
 
   @Override
   public void warn(String s, Object... objects) {
-
+    addMessage(s + stringify(objects));
   }
 
   @Override
   public void warn(String s, Object o, Object o1) {
-
+    addMessage(s + o + o1);
   }
 
   @Override
   public void warn(String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("warn with marker not suppported");
   }
 
   @Override
@@ -264,27 +263,27 @@ public class CustomLogger implements Logger {
 
   @Override
   public void warn(Marker marker, String s) {
-
+    throw new UnsupportedOperationException("warn with marker not suppported");
   }
 
   @Override
   public void warn(Marker marker, String s, Object o) {
-
+    throw new UnsupportedOperationException("warn with marker not suppported");
   }
 
   @Override
   public void warn(Marker marker, String s, Object o, Object o1) {
-
+    throw new UnsupportedOperationException("warn with marker not suppported");
   }
 
   @Override
   public void warn(Marker marker, String s, Object... objects) {
-
+    addMessage(s + stringify(objects));
   }
 
   @Override
   public void warn(Marker marker, String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("warn with marker not suppported");
   }
 
   @Override
@@ -294,27 +293,27 @@ public class CustomLogger implements Logger {
 
   @Override
   public void error(String s) {
-
+    addMessage(s);
   }
 
   @Override
   public void error(String s, Object o) {
-
+    addMessage(s + o);
   }
 
   @Override
   public void error(String s, Object o, Object o1) {
-
+    addMessage(s + o + o1);
   }
 
   @Override
   public void error(String s, Object... objects) {
-
+    addMessage(s + stringify(objects));
   }
 
   @Override
   public void error(String s, Throwable throwable) {
-
+    throw new UnsupportedOperationException("error with marker not suppported");
   }
 
   @Override
@@ -324,26 +323,30 @@ public class CustomLogger implements Logger {
 
   @Override
   public void error(Marker marker, String s) {
-
+    throw new UnsupportedOperationException("error with marker not suppported");
   }
 
   @Override
   public void error(Marker marker, String s, Object o) {
-
+    throw new UnsupportedOperationException("error with marker not suppported");
   }
 
   @Override
   public void error(Marker marker, String s, Object o, Object o1) {
-
+    throw new UnsupportedOperationException("error with marker not suppported");
   }
 
   @Override
   public void error(Marker marker, String s, Object... objects) {
-
+    throw new UnsupportedOperationException("error with marker not suppported");
   }
 
   @Override
   public void error(Marker marker, String s, Throwable throwable) {
+    throw new UnsupportedOperationException("error with marker not suppported");
+  }
 
+  private String stringify(Object[] objects) {
+    return stream(objects).map(a -> a.toString()).collect(joining(","));
   }
 }
