@@ -15,7 +15,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
@@ -95,7 +94,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     doAnswer(invocation -> {
       converter = invocation.getArguments()[1];
       return null;
-    }).when(configuration).addComponent(eq("Converter"), anyObject());
+    }).when(configuration).addComponent(eq("Converter"), any());
 
     when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(invocation -> converter);
   }
