@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.core.internal.logger;
 
+import static java.util.Arrays.asList;
+
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -16,7 +21,10 @@ public class CustomLoggerFactory implements ILoggerFactory {
 
   private final ILoggerFactory delegate;
   private final ConcurrentMap<String, Logger> loggerMap;
-
+  private final List<String> TESTS_WITH_CUSTOM_LOGGER =
+      asList("org.mule.runtime.core.internal.connection.PoolingConnectionHandler",
+             "org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource",
+             "org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper");
 
   public CustomLoggerFactory(ILoggerFactory delegate) {
     this.delegate = delegate;
@@ -29,11 +37,13 @@ public class CustomLoggerFactory implements ILoggerFactory {
   }
 
   private Logger createLogger(String name) {
-
-    if ("org.mule.runtime.core.internal.connection.PoolingConnectionHandler".equals(name) ||
-        "org.mule.runtime.core.internal.connection.PoolingConnectionHandlerTestCase".equals(name)) {
+    if (contains(name)) {
       return new CustomLogger(name);
     }
     return delegate.getLogger(name);
+  }
+
+  private boolean contains(String searchStr) {
+    return TESTS_WITH_CUSTOM_LOGGER.stream().anyMatch(searchStr::equals);
   }
 }

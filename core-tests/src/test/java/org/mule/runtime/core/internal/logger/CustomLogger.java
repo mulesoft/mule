@@ -312,12 +312,15 @@ public class CustomLogger implements Logger {
 
   @Override
   public void error(String s, Object o) {
-    addMessage(s + o);
+    String msg = replaceOnce(s, "{}", o.toString());
+    addMessage(msg);
   }
 
   @Override
   public void error(String s, Object o, Object o1) {
-    addMessage(s + o + o1);
+    String msg = replaceOnce(s, "{}", o.toString());
+    msg = replaceOnce(msg, "{}", o1.toString());
+    addMessage(msg);
   }
 
   @Override
