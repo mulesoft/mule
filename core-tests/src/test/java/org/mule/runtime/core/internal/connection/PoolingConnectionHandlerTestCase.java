@@ -49,7 +49,6 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   private static final String LOGGER_FIELD_NAME = "LOGGER";
 
   protected Logger logger;
-  private Logger oldLogger;
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -74,15 +73,7 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     managedConnection = new PoolingConnectionHandler<>(connection, pool, poolId, poolingListener, connectionProvider);
-    // debugMessages = new ArrayList<>();
-    // logger = createMockLogger(debugMessages, DEBUG);
-    // oldLogger = setLogger(PoolingConnectionHandler.class, LOGGER_FIELD_NAME, logger);
   }
-
-  /*
-   * @After public void restoreLogger() throws Exception { setLogger(PoolingConnectionHandler.class, LOGGER_FIELD_NAME,
-   * oldLogger); }
-   */
 
   @Test
   public void getConnection() throws Exception {

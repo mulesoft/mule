@@ -51,7 +51,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void trace(String msg) {
-    addMessage("[TRACE] " + msg);
+    addMessage(msg);
   }
 
   @Override
@@ -71,17 +71,23 @@ public class CustomLogger implements Logger {
 
   @Override
   public void trace(String s, Object o) {
-    addMessage("[TRACE] " + s + o);
+    addMessage(replaceOnce(s, "{}", o.toString()));
   }
 
   @Override
   public void trace(String s, Object o, Object o1) {
-    addMessage("[TRACE] " + s + o + o1);
+    String msg = replaceOnce(s, "{}", o.toString());
+    msg = replaceOnce(msg, "{}", o1.toString());
+    addMessage(msg);
   }
 
   @Override
   public void trace(String s, Object... objects) {
-    addMessage("[TRACE] " + s + stringify(objects));
+    String updatedStr = s;
+    for (Object object : objects) {
+      updatedStr = replaceOnce(updatedStr, "{}", object.toString());
+    }
+    addMessage(updatedStr);
   }
 
   @Override
@@ -133,7 +139,11 @@ public class CustomLogger implements Logger {
 
   @Override
   public void debug(String s, Object... objects) {
-    addMessage("[DEBUG] " + s + stringify(objects));
+    String updatedStr = s;
+    for (Object object : objects) {
+      updatedStr = replaceOnce(updatedStr, "{}", object.toString());
+    }
+    addMessage(updatedStr);
   }
 
   @Override
@@ -183,7 +193,9 @@ public class CustomLogger implements Logger {
 
   @Override
   public void info(String s, Object o, Object o1) {
-    addMessage("[INFO] " + s + o + o1);
+    String msg = replaceOnce(s, "{}", o.toString());
+    msg = replaceOnce(msg, "{}", o1.toString());
+    addMessage(msg);
   }
 
   @Override
@@ -193,7 +205,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void info(String s, Throwable throwable) {
-    throw new UnsupportedOperationException("info with marker not suppported");
+    addMessage(s + throwable);
   }
 
   @Override
@@ -248,12 +260,14 @@ public class CustomLogger implements Logger {
 
   @Override
   public void warn(String s, Object o, Object o1) {
-    addMessage(s + o + o1);
+    String msg = replaceOnce(s, "{}", o.toString());
+    msg = replaceOnce(msg, "{}", o1.toString());
+    addMessage(msg);
   }
 
   @Override
   public void warn(String s, Throwable throwable) {
-    throw new UnsupportedOperationException("warn with marker not suppported");
+    addMessage(s + throwable);
   }
 
   @Override
@@ -313,7 +327,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void error(String s, Throwable throwable) {
-    throw new UnsupportedOperationException("error with marker not suppported");
+    addMessage(s + throwable.getMessage());
   }
 
   @Override

@@ -39,6 +39,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.PollContext;
@@ -63,10 +64,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class PollingSourceWrapperTestCase {
+
+  private static final CustomLogger LOGGER = (CustomLogger) LoggerFactory.getLogger(PollingSourceWrapper.class);
 
   public static final String TEST_FLOW_NAME = "myFlow";
   public static final String EXPECTED_WATERMARK_OS = "_pollingSource_myFlow/watermark";
@@ -139,7 +143,6 @@ public class PollingSourceWrapperTestCase {
   @Test
   public void loggingOnAcceptedItem() throws MuleException, Exception {
     stubPollItem(Collections.singletonList(null), Collections.singletonList(null));
-    logger = createMockLogger(debugMessages, DEBUG);
     startSourcePollWithMockedLogger();
     verifyLogMessage(debugMessages, PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
   }
@@ -148,7 +151,6 @@ public class PollingSourceWrapperTestCase {
   public void loggingOnRejectedItem() throws Exception {
     when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(false);
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(null));
-    logger = createMockLogger(debugMessages, DEBUG);
     startSourcePollWithMockedLogger();
     verifyLogMessage(debugMessages, PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
   }
@@ -157,7 +159,6 @@ public class PollingSourceWrapperTestCase {
   public void loggingOnCreatedWatermark() throws Exception {
     String watermark = "5";
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(watermark));
-    logger = createMockLogger(traceMessages, TRACE);
     startSourcePollWithMockedLogger();
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
@@ -168,7 +169,6 @@ public class PollingSourceWrapperTestCase {
     List<String> ids = Arrays.asList("id1", "id2", "id3", "id4");
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8);
     stubPollItem(ids, watermarks);
-    logger = createMockLogger(traceMessages, TRACE);
     startSourcePollWithMockedLogger();
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
     verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
@@ -189,7 +189,6 @@ public class PollingSourceWrapperTestCase {
     List<String> ids = Arrays.asList("id1", "id2", "id3", "id4", "id5");
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8, 4);
     stubPollItem(ids, watermarks);
-    logger = createMockLogger(traceMessages, TRACE);
     startSourcePollWithMockedLogger();
     verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
     verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
@@ -230,13 +229,8 @@ public class PollingSourceWrapperTestCase {
   }
 
   private void startSourcePollWithMockedLogger() throws Exception {
-    Logger origLogger = setLogger(pollingSourceWrapper, "LOGGER", logger);
-    try {
-      pollingSourceWrapper.onStart(callbackMock);
-    } finally {
-      // restore original logger
-      setLogger(pollingSourceWrapper, "LOGGER", origLogger);
-    }
+    LOGGER.resetLogs();
+    pollingSourceWrapper.onStart(callbackMock);
   }
 
   private void stubPollItem(List<String> pollItemIds, List<Serializable> pollItemWatermarks) {
