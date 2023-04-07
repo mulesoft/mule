@@ -30,14 +30,6 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
   }
 
 
-  /**
-   * Declare the version of the SLF4J API this implementation is compiled against. The value of this field is usually modified
-   * with each release.
-   */
-  // To avoid constant folding by the compiler,
-  // this field must *not* be final
-  public static String REQUESTED_API_VERSION = "1.6"; // !final
-
   private static final String loggerFactoryClassStr = CustomLoggerFactory.class.getName();
 
   /**

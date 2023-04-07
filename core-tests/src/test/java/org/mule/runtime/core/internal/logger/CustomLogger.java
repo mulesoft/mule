@@ -83,11 +83,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void trace(String s, Object... objects) {
-    String updatedStr = s;
-    for (Object object : objects) {
-      updatedStr = replaceOnce(updatedStr, "{}", object.toString());
-    }
-    addMessage(updatedStr);
+    addMessage(buildLogMessage(s, objects));
   }
 
   @Override
@@ -139,11 +135,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void debug(String s, Object... objects) {
-    String updatedStr = s;
-    for (Object object : objects) {
-      updatedStr = replaceOnce(updatedStr, "{}", object.toString());
-    }
-    addMessage(updatedStr);
+    addMessage(buildLogMessage(s, objects));
   }
 
   @Override
@@ -168,12 +160,12 @@ public class CustomLogger implements Logger {
 
   @Override
   public void debug(Marker marker, String s, Object o, Object o1) {
-    addMessage("[DEBUG] " + s + o + o1);
+    throw new UnsupportedOperationException("debug with marker not suppported");
   }
 
   @Override
   public void debug(Marker marker, String s, Object... objects) {
-    addMessage("[DEBUG] " + s + stringify(objects));
+    throw new UnsupportedOperationException("debug with marker not suppported");
   }
 
   @Override
@@ -183,7 +175,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void info(String s) {
-    addMessage("[INFO] " + s);
+    addMessage(s);
   }
 
   @Override
@@ -200,7 +192,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void info(String s, Object... objects) {
-    addMessage("[INFO] " + s + stringify(objects));
+    addMessage(buildLogMessage(s, objects));
   }
 
   @Override
@@ -364,5 +356,13 @@ public class CustomLogger implements Logger {
 
   private String stringify(Object[] objects) {
     return stream(objects).map(a -> a.toString()).collect(joining(","));
+  }
+
+  private String buildLogMessage(String s, Object... objects) {
+    String updatedStr = s;
+    for (Object object : objects) {
+      updatedStr = replaceOnce(updatedStr, "{}", object.toString());
+    }
+    return updatedStr;
   }
 }
