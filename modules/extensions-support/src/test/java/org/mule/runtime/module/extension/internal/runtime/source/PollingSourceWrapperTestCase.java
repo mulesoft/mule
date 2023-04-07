@@ -21,14 +21,11 @@ import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
 import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
-import static org.slf4j.event.Level.DEBUG;
-import static org.slf4j.event.Level.TRACE;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -48,7 +45,6 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -63,14 +59,13 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class PollingSourceWrapperTestCase {
 
-  private static final CustomLogger LOGGER = (CustomLogger) LoggerFactory.getLogger(PollingSourceWrapper.class);
+  private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(PollingSourceWrapper.class);
 
   public static final String TEST_FLOW_NAME = "myFlow";
   public static final String EXPECTED_WATERMARK_OS = "_pollingSource_myFlow/watermark";
@@ -97,10 +92,6 @@ public class PollingSourceWrapperTestCase {
   private PollingSource pollingSource = mock(PollingSource.class);
   private SchedulingStrategy schedulingStrategy = mock(SchedulingStrategy.class);
 
-  private Logger logger;
-  private List<String> debugMessages;
-  private List<String> traceMessages;
-
   @InjectMocks
   private PollingSourceWrapper<Object, Object> pollingSourceWrapper =
       new PollingSourceWrapper<Object, Object>(pollingSource, schedulingStrategy, 4, mock(SystemExceptionHandler.class));
@@ -122,8 +113,6 @@ public class PollingSourceWrapperTestCase {
 
     when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(true);
 
-    debugMessages = new ArrayList<>();
-    traceMessages = new ArrayList<>();
   }
 
   @Test
@@ -144,7 +133,7 @@ public class PollingSourceWrapperTestCase {
   public void loggingOnAcceptedItem() throws MuleException, Exception {
     stubPollItem(Collections.singletonList(null), Collections.singletonList(null));
     startSourcePollWithMockedLogger();
-    verifyLogMessage(debugMessages, PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
+    verifyLogMessage(logger.getMessages(), PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
   }
 
   @Test
@@ -152,7 +141,7 @@ public class PollingSourceWrapperTestCase {
     when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(false);
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(null));
     startSourcePollWithMockedLogger();
-    verifyLogMessage(debugMessages, PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
+    verifyLogMessage(logger.getMessages(), PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
   }
 
   @Test
@@ -160,8 +149,8 @@ public class PollingSourceWrapperTestCase {
     String watermark = "5";
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(watermark));
     startSourcePollWithMockedLogger();
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
   }
 
   @Test
@@ -170,17 +159,17 @@ public class PollingSourceWrapperTestCase {
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8);
     stubPollItem(ids, watermarks);
     startSourcePollWithMockedLogger();
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
                      TEST_FLOW_NAME, -1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, "itemWatermark", 5,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, "itemWatermark", 5,
                      TEST_FLOW_NAME, -1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, "itemWatermark", 8,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, "itemWatermark", 8,
                      TEST_FLOW_NAME, -1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
 
   }
 
@@ -190,19 +179,19 @@ public class PollingSourceWrapperTestCase {
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8, 4);
     stubPollItem(ids, watermarks);
     startSourcePollWithMockedLogger();
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 1, "itemWatermark", 3,
                      TEST_FLOW_NAME, -1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, "itemWatermark", 5,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 3, "itemWatermark", 5,
                      TEST_FLOW_NAME, -1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, "itemWatermark", 8,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 5, "itemWatermark", 8,
                      TEST_FLOW_NAME, -1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
-    verifyLogMessage(traceMessages, WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, "itemWatermark", 4,
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, "itemWatermark", 4,
                      TEST_FLOW_NAME, 1);
-    verifyLogMessage(traceMessages, WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 4, TEST_FLOW_NAME);
+    verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 4, TEST_FLOW_NAME);
   }
 
   private void assertPersistentStoreIsCreated(String expectedName, Long expirationInterval) {
@@ -229,7 +218,7 @@ public class PollingSourceWrapperTestCase {
   }
 
   private void startSourcePollWithMockedLogger() throws Exception {
-    LOGGER.resetLogs();
+    logger.resetLogs();
     pollingSourceWrapper.onStart(callbackMock);
   }
 

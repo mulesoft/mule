@@ -127,7 +127,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void debug(String s, Object o) {
-    addMessage(s + o.toString());
+    addMessage(replaceOnce(s, "{}", o.toString()));
   }
 
   @Override
@@ -188,7 +188,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void info(String s, Object o) {
-    addMessage("[INFO] " + s + o);
+    addMessage(replaceOnce(s, "{}", o.toString()));
   }
 
   @Override
@@ -250,7 +250,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void warn(String s, Object o) {
-    addMessage(s + o);
+    addMessage(replaceOnce(s, "{}", o.toString()));
   }
 
   @Override
@@ -312,8 +312,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public void error(String s, Object o) {
-    String msg = replaceOnce(s, "{}", o.toString());
-    addMessage(msg);
+    addMessage(replaceOnce(s, "{}", o.toString()));
   }
 
   @Override

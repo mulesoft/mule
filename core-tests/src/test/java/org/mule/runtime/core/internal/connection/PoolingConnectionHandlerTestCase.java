@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -25,10 +24,7 @@ import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.List;
-
 import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.slf4j.Logger;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,13 +38,11 @@ import org.slf4j.LoggerFactory;
 @SmallTest
 public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
 
-  private static final CustomLogger LOGGER = (CustomLogger) LoggerFactory.getLogger(PoolingConnectionHandler.class);
+  private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(PoolingConnectionHandler.class);
 
   private static int DELAY = 1000;
   private static final String poolId = "SomeConfigName-123";
   private static final String LOGGER_FIELD_NAME = "LOGGER";
-
-  protected Logger logger;
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -132,15 +126,15 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void logReleaseConnection() {
-    LOGGER.resetLogs();
+    logger.resetLogs();
     managedConnection.release();
-    verifyLogRegex(LOGGER.getMessages(), "Returning back connection (.*) to pool {}", poolId);
+    verifyLogRegex(logger.getMessages(), "Returning back connection (.*) to pool {}", poolId);
   }
 
   @Test
   public void logInvalidateConnection() {
-    LOGGER.resetLogs();
+    logger.resetLogs();
     managedConnection.invalidate();
-    verifyLogRegex(LOGGER.getMessages(), "Invalidating connection (.*) from pool {}", poolId);
+    verifyLogRegex(logger.getMessages(), "Invalidating connection (.*) from pool {}", poolId);
   }
 }

@@ -87,7 +87,7 @@ import org.slf4j.LoggerFactory;
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
 
-  private static final CustomLogger LOGGER = (CustomLogger) LoggerFactory.getLogger(ExtensionMessageSource.class);
+  private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(ExtensionMessageSource.class);
 
   protected static final int TEST_TIMEOUT = 3000;
   protected static final int TEST_POLL_DELAY = 1000;
@@ -359,7 +359,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void start() throws Exception {
     initialise();
     ArrayList<String> infoMessages = new ArrayList<>();
-    LOGGER.resetLogs();
+    logger.resetLogs();
     if (!messageSource.getLifecycleState().isStarted()) {
       messageSource.start();
     }
@@ -374,11 +374,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     }));
 
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogMessage(LOGGER.getMessages(), "Message source 'source' on flow 'appleFlow' successfully started");
+      verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully started");
       return true;
     }));
     checkNot(TEST_POLL_DELAY, TEST_TIMEOUT, () -> {
-      verifyLogMessage(LOGGER.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     });
   }
@@ -587,13 +587,13 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void sourceInitializedLogMessage() throws Exception {
-    LOGGER.resetLogs();
+    logger.resetLogs();
     messageSource.initialise();
     if (primaryNodeOnly) {
-      verifyLogMessage(LOGGER.getMessages(),
+      verifyLogMessage(logger.getMessages(),
                        "Message source 'source' on flow 'appleFlow' running on the primary node is initializing. Note that this Message source must run on the primary node only.");
     } else {
-      verifyLogMessage(LOGGER.getMessages(),
+      verifyLogMessage(logger.getMessages(),
                        "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
     }
   }
@@ -601,32 +601,32 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Test
   public void sourceStartedLogMessage() throws Exception {
     ArrayList<String> debugMessages = new ArrayList<>();
-    LOGGER.resetLogs();
+    logger.resetLogs();
     messageSource.initialise();
     messageSource.start();
-    verifyLogMessage(LOGGER.getMessages(), "Message source 'source' on flow 'appleFlow' is starting");
+    verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is starting");
   }
 
   @Test
   public void sourceStoppedLogMessage() throws Exception {
-    LOGGER.resetLogs();
+    logger.resetLogs();
     messageSource.initialise();
     messageSource.start();
     messageSource.stop();
-    verifyLogMessage(LOGGER.getMessages(), "Message source 'source' on flow 'appleFlow' is stopping");
+    verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is stopping");
   }
 
 
   @Test
   public void getRetryPolicyExhaustedAndLogShutdownMessage() throws Exception {
     ArrayList<String> errorMessages = new ArrayList<>();
-    LOGGER.resetLogs();
+    logger.resetLogs();
     start();
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     doThrow(e).when(source).onStart(any());
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogRegex(LOGGER.getMessages(),
+      verifyLogRegex(logger.getMessages(),
                      "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
       return true;
     }));
@@ -635,11 +635,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Test
   public void reconnectAndLogSuccessMessage() throws Exception {
     start();
-    LOGGER.resetLogs();
+    logger.resetLogs();
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogMessage(LOGGER.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     }));
   }
