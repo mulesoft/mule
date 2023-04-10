@@ -21,6 +21,7 @@ import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUti
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.STATUS;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.THREAD_END_NAME_KEY;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.getNameWithoutNamespace;
+import static org.mule.runtime.tracer.exporter.impl.OpenTelemetryTraceIdUtils.extractContextFromTraceParent;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -211,7 +212,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
-    parentSpanContext = OpenTelemetryTraceIdUtils.extractContextFromTraceParent(serializeAsMap.get("traceparent"));
+    parentSpanContext = extractContextFromTraceParent(serializeAsMap.get("traceparent"));
     if (parentSpanContext.isValid()) {
       if (!exportable) {
         // if it not exportable, we set the parent span context so that it is eventually
