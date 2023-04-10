@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.components.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.internal.AbstractApplicationDeploymentTestCase;
