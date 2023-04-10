@@ -14,7 +14,7 @@ import static java.lang.Boolean.getBoolean;
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
+import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
 
 /**
  * A {@link RuntimeExtensionModelProvider} for Mule SDK Extensions

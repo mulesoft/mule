@@ -7,13 +7,15 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
+import static java.lang.String.format;
+
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -78,12 +80,24 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   }
 
   @Override
+  public ConfigurationInstance getConfiguration(String configurationProviderName, Event event) {
+    return getConfiguration(configurationProviderName, (CoreEvent) event);
+  }
+
+  @Override
   public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(event))
         .orElseThrow(() -> new IllegalArgumentException(
                                                         format(
                                                                "There is no registered configurationProvider under name '%s'",
                                                                configurationProviderName)));
+  }
+
+  @Override
+  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
+                                                          ComponentModel componentModel,
+                                                          Event muleEvent) {
+    return getConfiguration(extensionModel, componentModel, (CoreEvent) muleEvent);
   }
 
   @Override
@@ -101,6 +115,11 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
                                               extensionModel.getName()));
   }
 
+  @Override
+  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel,
+                                                                  Event muleEvent) {
+    return getConfigurationProvider(extensionModel, componentModel, (CoreEvent) muleEvent);
+  }
 
   @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
@@ -129,6 +148,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     return configurationProvider;
   }
 
+  @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Optional<ConfigurationProvider> configurationModel =
         childExtensionManager.getConfigurationProvider(extensionModel, componentModel);

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.api.extension;
 
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
 
 public final class CoreRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 

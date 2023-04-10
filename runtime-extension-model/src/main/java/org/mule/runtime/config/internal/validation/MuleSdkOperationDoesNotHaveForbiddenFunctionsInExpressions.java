@@ -10,8 +10,9 @@ import static org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind.DE
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.config.internal.validation.ValidationUtils.locationToAdditionalData;
-import static org.mule.runtime.core.internal.util.ExpressionUtils.getUnfixedExpression;
-import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.getUnfixedExpression;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
+
 import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.message.api.el.TypeBindings;

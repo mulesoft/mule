@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 

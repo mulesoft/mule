@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.config.ExtensionConfigurationManager;
 
 import java.util.Optional;
 import java.util.Set;
@@ -31,9 +32,12 @@ import java.util.Set;
  * method
  *
  * @since 4.0
+ * 
+ * @deprecated since 4.6, from extensions use {@link ExtensionConfigurationManager} instead.
  */
 @NoImplement
-public interface ExtensionManager {
+@Deprecated
+public interface ExtensionManager extends ExtensionConfigurationManager {
 
   /**
    * Registers the given {@link ExtensionModel}.
@@ -127,6 +131,7 @@ public interface ExtensionManager {
    * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
    * @return an {@link Optional} {@link ConfigurationProvider}
    */
+  @Override
   Optional<ConfigurationProvider> getConfigurationProvider(String configurationProviderName);
 
   /**
@@ -136,6 +141,7 @@ public interface ExtensionManager {
    * @param componentModel the {@link ComponentModel} for which a configuration is wanted
    * @return an {@link Optional} {@link ConfigurationProvider}
    */
+  @Override
   Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
                                                            ComponentModel componentModel);
 

@@ -9,9 +9,9 @@ package org.mule.functional.policy.api.extension;
 import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_NAMESPACE;
 import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_PREFIX;
 import static org.mule.runtime.api.meta.Category.SELECT;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.ANY_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;

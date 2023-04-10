@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

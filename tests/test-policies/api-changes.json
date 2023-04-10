@@ -1,0 +1,18 @@
+{
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.functional.policy.api.extension.TestPolicyRuntimeExtensionModelProvider",
+          "new": "class org.mule.functional.policy.api.extension.TestPolicyRuntimeExtensionModelProvider",
+          "interface": "org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider",
+          "package": "org.mule.functional.policy.api.extension",
+          "classSimpleName": "TestPolicyRuntimeExtensionModelProvider",
+          "elementKind": "class",
+          "justification": "W-12947646: Fix split packages between mule-runtime-extension-model and mule-core"
+        }
+      ]
+    }
+  }
+}

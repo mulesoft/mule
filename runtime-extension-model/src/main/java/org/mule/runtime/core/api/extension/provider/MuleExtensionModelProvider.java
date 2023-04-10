@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.extension;
+package org.mule.runtime.core.api.extension.provider;
 
 import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;

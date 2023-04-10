@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;

@@ -9,7 +9,7 @@ package org.mule.runtime.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.VALIDATE_XML;
 

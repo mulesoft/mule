@@ -13,7 +13,7 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
