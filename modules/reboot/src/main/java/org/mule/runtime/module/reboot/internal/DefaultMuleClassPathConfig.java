@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
+import static java.lang.System.getProperty;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -14,7 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -23,11 +24,15 @@ import java.util.List;
 // TODO this duplicates DefaultMuleClassPathConfig in the boot module. See if this class can be moved to mule-core
 public class DefaultMuleClassPathConfig {
 
+  private static final String JAVA_8_VERSION = "1.8";
+  private static final String JAVA_RUNNING_VERSION = "java.specification.version";
+
   protected static final String MULE_DIR = "/lib/mule";
   protected static final String USER_DIR = "/lib/user";
   protected static final String OPT_DIR = "/lib/opt";
+  protected static final String OPT_JDK8_DIR = "/lib/opt/jdk-8";
 
-  protected List<URL> urls = new ArrayList<URL>();
+  protected List<URL> urls = new ArrayList<>();
 
   public DefaultMuleClassPathConfig(File muleHome, File muleBase) {
     init(muleHome, muleBase);
@@ -43,6 +48,11 @@ public class DefaultMuleClassPathConfig {
     addLibraryDirectory(muleHome, USER_DIR);
     addLibraryDirectory(muleHome, MULE_DIR);
     addLibraryDirectory(muleHome, OPT_DIR);
+
+    // Do not use commons-lang3 to avoid having to add that jar to lib/boot
+    if (getProperty(JAVA_RUNNING_VERSION).startsWith(JAVA_8_VERSION)) {
+      addLibraryDirectory(muleHome, OPT_JDK8_DIR);
+    }
   }
 
   protected void addMuleBaseUserLibs(File muleHome, File muleBase) {
@@ -64,7 +74,7 @@ public class DefaultMuleClassPathConfig {
   }
 
   public List<URL> getURLs() {
-    return new ArrayList<URL>(this.urls);
+    return new ArrayList<>(this.urls);
   }
 
   public void addURLs(List<URL> moreUrls) {
@@ -83,8 +93,8 @@ public class DefaultMuleClassPathConfig {
   }
 
   public void addFiles(List<File> files) {
-    for (Iterator<File> i = files.iterator(); i.hasNext();) {
-      this.addFile(i.next());
+    for (File file : files) {
+      this.addFile(file);
     }
   }
 
@@ -102,14 +112,11 @@ public class DefaultMuleClassPathConfig {
    * @return a list of {@link java.io.File}s
    */
   protected List<File> listJars(File path) {
-    File[] jars = path.listFiles(new FileFilter() {
-
-      public boolean accept(File pathname) {
-        try {
-          return pathname.getCanonicalPath().endsWith(".jar");
-        } catch (IOException e) {
-          throw new RuntimeException(e.getMessage());
-        }
+    File[] jars = path.listFiles((FileFilter) pathname -> {
+      try {
+        return pathname.getCanonicalPath().endsWith(".jar");
+      } catch (IOException e) {
+        throw new RuntimeException(e.getMessage());
       }
     });
 
