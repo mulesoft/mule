@@ -15,6 +15,7 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED;
+import static org.mule.runtime.tracer.exporter.impl.config.SpanExporterConfigurationUtils.enableBackoffStrategy;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.parseLong;
@@ -25,7 +26,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
-import org.mule.runtime.tracer.exporter.impl.config.SpanExporterConfigurationUtils;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.SpanExporterConfigurator;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.SpanExporterConfiguratorException;
 
@@ -81,7 +81,7 @@ public class GrpcSpanExporterConfigurator implements SpanExporterConfigurator {
     }
 
     // Backoff strategy
-    SpanExporterConfigurationUtils.enableBackoffStrategy(builder, spanExporterConfiguration);
+    enableBackoffStrategy(builder, spanExporterConfiguration);
 
     return builder.build();
   }
