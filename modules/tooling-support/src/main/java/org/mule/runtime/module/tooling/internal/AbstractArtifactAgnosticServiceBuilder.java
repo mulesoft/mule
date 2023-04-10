@@ -6,26 +6,29 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
+import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 
 import static java.nio.file.Files.createDirectories;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
+import org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
@@ -43,13 +46,12 @@ import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.maven.model.Model;
+import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServiceBuilder, S>
     implements ArtifactAgnosticServiceBuilder<T, S> {
@@ -62,7 +64,8 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
   private final DefaultApplicationFactory defaultApplicationFactory;
 
   private ArtifactDeclaration artifactDeclaration;
-  private Model model;
+
+  private MavenModelBuilder model;
   private Map<String, String> artifactProperties = emptyMap();
 
   protected AbstractArtifactAgnosticServiceBuilder(DefaultApplicationFactory defaultApplicationFactory) {
@@ -90,14 +93,17 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
   @Override
   public T addDependency(String groupId, String artifactId, String artifactVersion,
                          String classifier, String type) {
-    org.apache.maven.model.Dependency dependency = new org.apache.maven.model.Dependency();
-    dependency.setGroupId(groupId);
-    dependency.setArtifactId(artifactId);
-    dependency.setVersion(artifactVersion);
-    dependency.setType(type);
-    dependency.setClassifier(classifier);
+    org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor =
+        new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
+            .setGroupId(groupId)
+            .setArtifactId(artifactId)
+            .setVersion(artifactVersion)
+            .setType(type)
+            .setClassifier(classifier).build();
 
-    addMavenModelDependency(dependency);
+    BundleDependency bundleDependency = new BundleDependency.Builder().setBundleDescriptor(bundleDescriptor).build();
+
+    addMavenModelDependency(bundleDependency);
     return getThis();
   }
 
@@ -106,31 +112,31 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
    */
   @Override
   public T addDependency(Dependency dependency) {
-    org.apache.maven.model.Dependency mavenModelDependency = new org.apache.maven.model.Dependency();
-    mavenModelDependency.setGroupId(dependency.getGroupId());
-    mavenModelDependency.setArtifactId(dependency.getArtifactId());
-    mavenModelDependency.setVersion(dependency.getVersion());
-    mavenModelDependency.setType(dependency.getType());
-    mavenModelDependency.setClassifier(dependency.getClassifier());
-    mavenModelDependency.setOptional(dependency.getOptional());
-    mavenModelDependency.setScope(dependency.getScope());
-    mavenModelDependency.setSystemPath(dependency.getSystemPath());
-    mavenModelDependency.setExclusions(dependency.getExclusions().stream().map(exclusion -> {
-      org.apache.maven.model.Exclusion mavenModelExclusion = new org.apache.maven.model.Exclusion();
-      mavenModelExclusion.setGroupId(exclusion.getGroupId());
-      mavenModelExclusion.setArtifactId(exclusion.getArtifactId());
-      return mavenModelExclusion;
-    }).collect(toList()));
+    org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor =
+        new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder().setGroupId(dependency.getGroupId())
+            .setArtifactId(dependency.getArtifactId())
+            .setVersion(dependency.getVersion())
+            .setType(dependency.getType())
+            .setClassifier(dependency.getClassifier())
+            .setOptional(dependency.getOptional())
+            .setSystemPath(dependency.getSystemPath())
+            .setExclusions(dependency.getExclusions().stream()
+                .map(exclusion -> Pair.of(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
+            .build();
 
-    addMavenModelDependency(mavenModelDependency);
+    BundleDependency bundleDependency = new BundleDependency.Builder().setBundleDescriptor(bundleDescriptor)
+        .setScope(valueOf(dependency.getScope())).build();
+
+    addMavenModelDependency(bundleDependency);
     return getThis();
   }
 
-  private void addMavenModelDependency(org.apache.maven.model.Dependency dependency) {
-    if (!MULE_PLUGIN_CLASSIFIER.equals(dependency.getClassifier())) {
-      addSharedLibraryDependency(model, dependency);
+  private void addMavenModelDependency(BundleDependency bundleDependency) {
+    org.mule.maven.pom.parser.api.model.BundleDescriptor descriptor = bundleDependency.getDescriptor();
+    if (descriptor.getClassifier().isPresent() && !MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier().get())) {
+      model.addSharedLibraryDependency(descriptor.getGroupId(), descriptor.getArtifactId());
     }
-    model.getDependencies().add(dependency);
+    model.addDependency(bundleDependency);
   }
 
   @Override
@@ -143,8 +149,8 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       deploymentProperties.putAll(forcedDeploymentProperties());
       Set<String> configs = singleton("empty-app.xml");
 
-      createDeployablePomFile(applicationFolder, model);
-      updateArtifactPom(applicationFolder, model);
+      model.createDeployablePomFile(applicationFolder.toPath());
+      model.updateArtifactPom(applicationFolder.toPath());
 
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
@@ -203,12 +209,9 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
   protected abstract S createService(ApplicationSupplier applicationSupplier);
 
   private void createTempMavenModel() {
-    model = new Model();
-    model.setArtifactId(TMP_APP_ARTIFACT_ID);
-    model.setGroupId(TMP_APP_GROUP_ID);
-    model.setVersion("4.4.0");
-    model.setDependencies(new ArrayList<>());
-    model.setModelVersion(TMP_APP_MODEL_VERSION);
+    MavenModelBuilderProvider mavenModelBuilderProvider = discoverProvider();
+    model = mavenModelBuilderProvider
+        .createMavenModelBuilder(TMP_APP_GROUP_ID, TMP_APP_ARTIFACT_ID, "4.4.0", of(TMP_APP_MODEL_VERSION), empty());
   }
 
   private BundleDescriptor createTempBundleDescriptor() {

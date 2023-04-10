@@ -6,18 +6,24 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.MavenPomModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -26,14 +32,13 @@ import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Builder for a {@link ClassLoaderConfiguration} responsible for resolving dependencies when lightweight packaging is used for an
@@ -56,7 +61,7 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
 
   @Override
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
-    List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies =
+    List<org.mule.maven.pom.parser.api.model.BundleDependency> resolvedAdditionalDependencies =
         mavenClient.resolveArtifactDependencies(
                                                 bundleDependency.getAdditionalDependenciesList().stream()
                                                     .map(additionalDependency -> toMavenClientBundleDescriptor(additionalDependency
@@ -65,12 +70,12 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
                                                 of(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation()),
                                                 empty());
     return resolvedAdditionalDependencies.stream()
-        .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri)
+        .map(org.mule.maven.pom.parser.api.model.BundleDependency::getBundleUri)
         .collect(toList());
   }
 
-  private static org.mule.maven.client.api.model.BundleDescriptor toMavenClientBundleDescriptor(BundleDescriptor descriptor) {
-    return new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+  private static org.mule.maven.pom.parser.api.model.BundleDescriptor toMavenClientBundleDescriptor(BundleDescriptor descriptor) {
+    return new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
         .setGroupId(descriptor.getGroupId())
         .setArtifactId(descriptor.getArtifactId())
         .setVersion(descriptor.getVersion())
@@ -81,7 +86,7 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
 
   @Override
   protected void findAndExportSharedLibrary(String groupId, String artifactId) {
-    Pair<String, String> sharedLibraryKey = new Pair<>(groupId, artifactId);
+    Pair<String, String> sharedLibraryKey = Pair.of(groupId, artifactId);
     if (sharedLibraryAlreadyExported.containsKey(sharedLibraryKey)) {
       return;
     }
@@ -123,72 +128,83 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
   }
 
   @Override
-  protected Map<BundleDescriptor, List<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    Map<BundleDescriptor, List<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
-        super.doProcessAdditionalPluginLibraries(packagingPlugin);
-    Map<BundleDescriptor, List<BundleDescriptor>> effectivePluginsAdditionalLibrariesMap =
+  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
+    Map<Pair<String, String>, AdditionalPluginDependencies> deployableArtifactAdditionalLibrariesMap =
+        super.doProcessAdditionalPluginLibraries(parser);
+    Map<Pair<String, String>, AdditionalPluginDependencies> effectivePluginsAdditionalLibrariesMap =
         new HashMap<>(deployableArtifactAdditionalLibrariesMap);
     nonProvidedDependencies.stream()
         .filter(bundleDependency -> MULE_PLUGIN.equals(bundleDependency.getDescriptor().getClassifier().orElse(null)))
         .forEach(bundleDependency -> {
-          Model effectiveModel;
+          MavenPomModel effectiveModel;
+
           try {
             effectiveModel = mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), empty());
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }
-          Optional<Plugin> artifactPackagerPlugin = findArtifactPackagerPlugin(effectiveModel);
-          artifactPackagerPlugin.ifPresent(plugin -> {
-            Map<BundleDescriptor, List<BundleDescriptor>> pluginAdditionalLibrariesMap =
-                super.doProcessAdditionalPluginLibraries(artifactPackagerPlugin.get());
-            pluginAdditionalLibrariesMap.forEach((pluginDescriptor, additionalLibraries) -> {
-              List<BundleDescriptor> effectivePluginAdditionalLibraries = new ArrayList<>();
-              if (deployableArtifactAdditionalLibrariesMap.containsKey(pluginDescriptor)) {
-                effectivePluginAdditionalLibraries.addAll(additionalLibraries.stream()
-                    .filter(additionalLibrary -> {
-                      boolean additionalLibraryDefinedAtDeployableArtifact =
-                          existsInLibrariesMap(deployableArtifactAdditionalLibrariesMap, pluginDescriptor, additionalLibrary);
-                      if (!additionalLibraryDefinedAtDeployableArtifact) {
-                        Optional<BundleDescriptor> additionalLibraryDefinedByAnotherPlugin =
-                            findLibraryInAdditionalLibrariesMap(effectivePluginsAdditionalLibrariesMap, pluginDescriptor,
-                                                                additionalLibrary);
-                        try {
-                          return !additionalLibraryDefinedByAnotherPlugin.isPresent()
-                              || new MuleVersion(additionalLibrary.getVersion())
-                                  .newerThan(additionalLibraryDefinedByAnotherPlugin.get().getVersion());
-                        } catch (IllegalStateException e) {
-                          // If not using semver lets just compare the strings.
-                          return additionalLibrary.getVersion()
-                              .compareTo(additionalLibraryDefinedByAnotherPlugin.get().getVersion()) > 0;
-                        }
-                      }
-                      // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
-                      return false;
-                    })
-                    .collect(toList()));
+
+          if (effectiveModel.getPomFile().isPresent()) {
+            MavenPomParser parserForPlugin = discoverProvider()
+                .createMavenPomParserClient(effectiveModel.getPomFile().get().toPath(), getActiveProfiles());
+            Map<Pair<String, String>, AdditionalPluginDependencies> pomAdditionalPluginDependenciesForArtifact =
+                parserForPlugin.getPomAdditionalPluginDependenciesForArtifacts();
+            pomAdditionalPluginDependenciesForArtifact.forEach((artifact, additionalDependenciesForArtifact) -> {
+              if (deployableArtifactAdditionalLibrariesMap.containsKey(artifact)) {
+                AdditionalPluginDependencies additionalPluginDependenciesForPlugin =
+                    deployableArtifactAdditionalLibrariesMap.get(artifact);
+                List<org.mule.maven.pom.parser.api.model.BundleDescriptor> effectiveAdditionalDependencies =
+                    additionalDependenciesForArtifact.getAdditionalDependencies().stream()
+                        .filter(additionalLibrary -> {
+                          boolean additionalLibraryDefinedAtDeployableArtifact =
+                              existsInLibrariesMap(deployableArtifactAdditionalLibrariesMap,
+                                                   artifact, additionalLibrary);
+                          if (!additionalLibraryDefinedAtDeployableArtifact) {
+                            Optional<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraryDefinedByAnotherPlugin =
+                                findLibraryInAdditionalLibrariesMap(effectivePluginsAdditionalLibrariesMap,
+                                                                    artifact,
+                                                                    additionalLibrary);
+                            try {
+                              return !additionalLibraryDefinedByAnotherPlugin.isPresent()
+                                  || new MuleVersion(additionalLibrary.getVersion())
+                                      .newerThan(additionalLibraryDefinedByAnotherPlugin.get().getVersion());
+                            } catch (IllegalStateException e) {
+                              // If not using semver lets just compare the strings.
+                              return additionalLibrary.getVersion()
+                                  .compareTo(additionalLibraryDefinedByAnotherPlugin.get().getVersion()) > 0;
+                            }
+                          }
+                          // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
+                          return false;
+                        }).collect(toCollection(LinkedList::new));
+                AdditionalPluginDependencies effectiveAdditionalPluginDependenciesForPlugin =
+                    new AdditionalPluginDependencies(additionalPluginDependenciesForPlugin, effectiveAdditionalDependencies);
+                deployableArtifactAdditionalLibrariesMap.replace(artifact, effectiveAdditionalPluginDependenciesForPlugin);
               } else {
-                effectivePluginAdditionalLibraries.addAll(additionalLibraries);
+                effectivePluginsAdditionalLibrariesMap.put(artifact, additionalDependenciesForArtifact);
               }
-              effectivePluginsAdditionalLibrariesMap.put(pluginDescriptor, additionalLibraries);
             });
-          });
+          }
         });
     return effectivePluginsAdditionalLibrariesMap;
   }
 
-  private boolean existsInLibrariesMap(Map<BundleDescriptor, List<BundleDescriptor>> additionalLibrariesPerPluginMap,
-                                       BundleDescriptor plugin, BundleDescriptor additionalLibrary) {
-    List<BundleDescriptor> additionalLibraries = additionalLibrariesPerPluginMap.get(plugin);
+  private boolean existsInLibrariesMap(Map<Pair<String, String>, AdditionalPluginDependencies> additionalLibrariesPerPluginMap,
+                                       Pair<String, String> plugin,
+                                       org.mule.maven.pom.parser.api.model.BundleDescriptor additionalLibrary) {
+    List<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraries =
+        additionalLibrariesPerPluginMap.get(plugin).getAdditionalDependencies();
     if (additionalLibraries == null) {
       return false;
     }
     return additionalLibraries.contains(additionalLibrary);
   }
 
-  private Optional<BundleDescriptor> findLibraryInAdditionalLibrariesMap(Map<BundleDescriptor, List<BundleDescriptor>> additionalLibrariesPerPluginMap,
-                                                                         BundleDescriptor plugin,
-                                                                         BundleDescriptor additionalLibrary) {
-    List<BundleDescriptor> additionalLibraries = additionalLibrariesPerPluginMap.get(plugin);
+  private Optional<org.mule.maven.pom.parser.api.model.BundleDescriptor> findLibraryInAdditionalLibrariesMap(Map<Pair<String, String>, AdditionalPluginDependencies> additionalLibrariesPerPluginMap,
+                                                                                                             Pair<String, String> plugin,
+                                                                                                             org.mule.maven.pom.parser.api.model.BundleDescriptor additionalLibrary) {
+    List<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraries =
+        additionalLibrariesPerPluginMap.get(plugin).getAdditionalDependencies();
     if (additionalLibraries == null) {
       return empty();
     }

@@ -9,23 +9,16 @@ package org.mule.runtime.module.artifact.activation.internal.classloader.model.u
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_DOMAIN;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.tools.api.classloader.Constants.ARTIFACT_ID;
-import static org.mule.tools.api.classloader.Constants.GROUP_ID;
-import static org.mule.tools.api.classloader.Constants.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
-import static org.mule.tools.api.classloader.Constants.MULE_MAVEN_PLUGIN_GROUP_ID;
-import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
-import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-import org.mule.maven.client.api.model.BundleDependency;
-import org.mule.maven.client.api.model.BundleDescriptor;
+import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
@@ -33,16 +26,9 @@ import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Helper methods to convert artifact related classes and recognize mule plugin artifacts.
@@ -87,48 +73,6 @@ public class ArtifactUtils {
     return dependencies.stream().map(ArtifactUtils::toArtifact).collect(toList());
   }
 
-  /**
-   * Checks if an {@link Artifact} instance represents a mule-plugin.
-   *
-   * @param artifact the artifact to be checked.
-   * @return true if the artifact is a mule-plugin, false otherwise.
-   */
-  public static boolean isValidMulePlugin(Artifact artifact) {
-    return ofNullable(artifact.getArtifactCoordinates().getClassifier()).map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false);
-  }
-
-  /**
-   * Converts a {@link ArtifactCoordinates} instance to a {@link BundleDescriptor} instance.
-   *
-   * @param artifactCoordinates the artifact coordinates to be converted.
-   * @return the corresponding {@link BundleDescriptor} instance.
-   */
-  public static BundleDescriptor toBundleDescriptor(ArtifactCoordinates artifactCoordinates) {
-    return new BundleDescriptor.Builder()
-        .setGroupId(artifactCoordinates.getGroupId())
-        .setArtifactId(artifactCoordinates.getArtifactId())
-        .setVersion(artifactCoordinates.getVersion())
-        .setBaseVersion(artifactCoordinates.getVersion())
-        .setClassifier(artifactCoordinates.getClassifier())
-        .setType(artifactCoordinates.getType()).build();
-  }
-
-  /**
-   * Converts a {@link Dependency} instance to a {@link BundleDescriptor} instance.
-   *
-   * @return the corresponding {@link BundleDescriptor} instance.
-   * @since 3.2.0
-   */
-  public static BundleDescriptor toBundleDescriptor(Dependency dependency) {
-    return new BundleDescriptor.Builder()
-        .setGroupId(dependency.getGroupId())
-        .setArtifactId(dependency.getArtifactId())
-        .setVersion(dependency.getVersion())
-        .setBaseVersion(dependency.getVersion())
-        .setClassifier(dependency.getClassifier())
-        .setType(dependency.getType()).build();
-  }
-
   public static List<Artifact> toApplicationModelArtifacts(List<BundleDependency> appDependencies) {
     List<Artifact> dependencies = toArtifacts(appDependencies);
     dependencies.forEach(ArtifactUtils::updateScopeIfDomain);
@@ -153,45 +97,10 @@ public class ArtifactUtils {
   }
 
   public static List<Artifact> updateArtifactsSharedState(List<BundleDependency> appDependencies, List<Artifact> artifacts,
-                                                          Model pomModel, List<String> activeProfiles) {
-    List<BuildBase> builds = new ArrayList<>();
-    if (pomModel.getBuild() != null) {
-      builds.add(pomModel.getBuild());
-    }
-    pomModel.getProfiles().forEach(p -> {
-      if (activeProfiles.contains(p.getId()))
-        builds.add(p.getBuild());
-    });
-    if (!builds.isEmpty()) {
-      List<Plugin> plugins = new ArrayList<>();
-      builds.forEach(b -> {
-        if (b != null) {
-          plugins.addAll(b.getPlugins());
-        }
-      });
-      if (!plugins.isEmpty()) {
-        Optional<Plugin> muleMavenPluginOptional = plugins.stream()
-            .filter(plugin -> plugin.getGroupId().equalsIgnoreCase(MULE_MAVEN_PLUGIN_GROUP_ID) &&
-                plugin.getArtifactId().equalsIgnoreCase(MULE_MAVEN_PLUGIN_ARTIFACT_ID))
-            .findAny();
-        muleMavenPluginOptional.ifPresent(plugin -> {
-          Object configuration = plugin.getConfiguration();
-          if (configuration != null) {
-            Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) configuration).getChild(SHARED_LIBRARIES_FIELD);
-            if (sharedLibrariesDom != null) {
-              Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren(SHARED_LIBRARY_FIELD);
-              if (sharedLibraries != null) {
-                for (Xpp3Dom sharedLibrary : sharedLibraries) {
-                  String groupId = getAttribute(sharedLibrary, GROUP_ID);
-                  String artifactId = getAttribute(sharedLibrary, ARTIFACT_ID);
-                  findAndExportSharedLibrary(groupId, artifactId, artifacts, appDependencies);
-                }
-              }
-            }
-          }
-        });
-      }
-    }
+                                                          MavenPomParser parser, List<String> activeProfiles) {
+    parser.getSharedLibraries()
+        .forEach(shareLibrary -> findAndExportSharedLibrary(shareLibrary.getGroupId(),
+                                                            shareLibrary.getArtifactId(), artifacts, appDependencies));
     return artifacts;
   }
 
@@ -239,10 +148,10 @@ public class ArtifactUtils {
     }
   }
 
-  public static ArtifactCoordinates getDeployableArtifactCoordinates(Model pomModel, ApplicationGAVModel appGAVModel) {
+  public static ArtifactCoordinates getDeployableArtifactCoordinates(MavenPomParser parser, ApplicationGAVModel appGAVModel) {
     ArtifactCoordinates deployableCoordinates = toArtifactCoordinates(getPomProjectBundleDescriptor(appGAVModel));
     deployableCoordinates.setType(PACKAGE_TYPE);
-    deployableCoordinates.setClassifier(pomModel.getPackaging());
+    deployableCoordinates.setClassifier(parser.getModel().getPackaging());
     return deployableCoordinates;
   }
 

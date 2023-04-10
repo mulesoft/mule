@@ -1,4 +1,34 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.maven.client.api.model.BundleDependency",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "BundleDependency",
+          "elementKind": "class",
+          "justification": "W-12514052: moved to the new pom parser api"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.maven.client.api.model.BundleDescriptor",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "BundleDescriptor",
+          "elementKind": "class",
+          "justification": "W-12514052: moved to the new pom parser api"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "enum org.mule.maven.client.api.model.BundleScope",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "BundleScope",
+          "elementKind": "enum",
+          "justification": "W-12514052: moved to the new pom parser api"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

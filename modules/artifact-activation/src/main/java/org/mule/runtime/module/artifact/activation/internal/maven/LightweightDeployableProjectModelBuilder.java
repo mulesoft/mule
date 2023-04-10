@@ -22,6 +22,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
+import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -35,8 +36,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import org.apache.maven.model.Model;
 
 public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeployableProjectModelBuilder {
 
@@ -55,7 +54,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
   }
 
   @Override
-  protected DeployableProjectModel doBuild(Model pomModel, ArtifactCoordinates deployableArtifactCoordinates) {
+  protected DeployableProjectModel doBuild(MavenPomParser parser, ArtifactCoordinates deployableArtifactCoordinates) {
     Supplier<MuleDeployableModel> deployableModelResolver = getDeployableModelResolver();
     MuleDeployableModel deployableModel = deployableModelResolver.get();
 

@@ -15,6 +15,8 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASS_LOADER_MODEL_VERSION_120;
 
+import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -31,7 +33,7 @@ import java.util.Map;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Plugin;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Builder for a {@link ClassLoaderConfiguration} with information from a {@link ClassLoaderModel} included when packaging the
@@ -58,16 +60,16 @@ public class HeavyweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
    * Exports the shared libraries resources and packages.
    */
   @Override
-  protected void doExportSharedLibrariesResourcesAndPackages(Plugin packagingPlugin) {
+  protected void doExportSharedLibrariesResourcesAndPackages(MavenPomParser parser) {
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_110)) {
-      super.doExportSharedLibrariesResourcesAndPackages(packagingPlugin);
+      super.doExportSharedLibrariesResourcesAndPackages(parser);
     } else {
       exportSharedLibrariesResourcesAndPackages();
     }
   }
 
   @Override
-  protected Map<BundleDescriptor, List<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()

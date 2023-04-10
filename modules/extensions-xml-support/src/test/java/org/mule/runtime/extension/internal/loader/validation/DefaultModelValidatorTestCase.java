@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.model.validation.ModelValidator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +53,7 @@ import org.junit.rules.ExpectedException;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Tests the defaults {@link ModelValidator}s provided by the {@link ExtensionModelFactory}
+ * Tests the defaults {@link org.apache.maven.model.validation.ModelValidator}s provided by the {@link ExtensionModelFactory}
  *
  * @since 4.0
  */

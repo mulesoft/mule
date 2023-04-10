@@ -6,16 +6,23 @@
  */
 package org.mule.runtime.module.artifact.builder;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.maven.pom.parser.api.model.BundleScope.COMPILE;
+import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
+import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 
+import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
+
+import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
@@ -28,13 +35,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
 /**
  * Base class for all kind of artifact that may exists in mule.
  * <p>
@@ -44,8 +44,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  */
 public abstract class AbstractDependencyFileBuilder<T extends AbstractDependencyFileBuilder<T>> {
 
-  public static final String COMPILE_SCOPE = "compile";
-  public static final String PROVIDED_SCOPE = "provided";
   private static final String MULE_MAVEN_PLUGIN_VERSION = "1.0.0";
   private final String artifactId;
   private final List<AbstractDependencyFileBuilder> dependencies = new ArrayList<>();
@@ -102,14 +100,11 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
       final File tempFile = new File(getTempFolder(), artifactId + ".pom");
       tempFile.deleteOnExit();
 
-      Model model = new Model();
-      model.setGroupId(getGroupId());
-      model.setArtifactId(getArtifactId());
-      model.setVersion(getVersion());
-      model.setModelVersion("4.0.0");
+      MavenModelBuilder model =
+          discoverProvider().createMavenModelBuilder(getGroupId(), getArtifactId(), getVersion(), of("4.0.0"), empty());
+
       if (!sharedLibraries.isEmpty()) {
-        model.setBuild(new Build());
-        model.getBuild().setPlugins(singletonList(createMuleMavenPlugin()));
+        createMuleMavenPlugin(model);
       }
 
       for (AbstractDependencyFileBuilder fileBuilderDependency : dependencies) {
@@ -117,11 +112,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
       }
 
       artifactPomFile = new File(tempFile.getAbsolutePath());
-      try (FileOutputStream fileOutputStream = new FileOutputStream(artifactPomFile)) {
-        new MavenXpp3Writer().write(fileOutputStream, model);
-      } catch (IOException e) {
-        throw new MuleRuntimeException(e);
-      }
+      model.updateArtifactPom(artifactPomFile.toPath());
     }
     return artifactPomFile;
   }
@@ -147,27 +138,11 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
     return artifactPomPropertiesFile;
   }
 
-  private Plugin createMuleMavenPlugin() {
-    Plugin plugin = new Plugin();
-    plugin.setGroupId(MULE_MAVEN_PLUGIN_GROUP_ID);
-    plugin.setArtifactId(MULE_MAVEN_PLUGIN_ARTIFACT_ID);
-    plugin.setVersion(MULE_MAVEN_PLUGIN_VERSION);
-    Xpp3Dom configuration = new Xpp3Dom("configuration");
-    plugin.setConfiguration(configuration);
-    Xpp3Dom sharedLibrariesDom = new Xpp3Dom("sharedLibraries");
-    configuration.addChild(sharedLibrariesDom);
+  private void createMuleMavenPlugin(MavenModelBuilder model) {
     dependencies.stream().filter(sharedLibraries::contains)
         .forEach(sharedLibrary -> {
-          Xpp3Dom sharedLibraryDom = new Xpp3Dom("sharedLibrary");
-          sharedLibrariesDom.addChild(sharedLibraryDom);
-          Xpp3Dom groupIdDom = new Xpp3Dom("groupId");
-          groupIdDom.setValue(sharedLibrary.getGroupId());
-          sharedLibraryDom.addChild(groupIdDom);
-          Xpp3Dom artifactIdDom = new Xpp3Dom("artifactId");
-          artifactIdDom.setValue(sharedLibrary.getArtifactId());
-          sharedLibraryDom.addChild(artifactIdDom);
+          model.addSharedLibraryDependency(sharedLibrary.groupId, sharedLibrary.artifactId);
         });
-    return plugin;
   }
 
   public T dependingOn(AbstractDependencyFileBuilder dependencyFileBuilder) {
@@ -309,19 +284,22 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   }
 
   /**
-   * Creates a {@link Dependency} object from this artifact with scope compile.
+   * Creates a {@link BundleDependency} object from this artifact with scope compile.
    *
    * @return a maven
    */
-  public Dependency getAsMavenDependency() {
-    Dependency dependency = new Dependency();
-    dependency.setVersion(getVersion());
-    dependency.setGroupId(getGroupId());
-    dependency.setArtifactId(getArtifactId());
-    dependency.setClassifier(getClassifier());
-    dependency.setType(getType());
-    dependency.setScope(ofNullable(getScope()).orElse(COMPILE_SCOPE));
-    return dependency;
+  public BundleDependency getAsMavenDependency() {
+    BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder()
+        .setVersion(getVersion())
+        .setGroupId(getGroupId())
+        .setArtifactId(getArtifactId())
+        .setClassifier(getClassifier())
+        .setType(getType())
+        .build();
+    return new BundleDependency.Builder()
+        .setBundleDescriptor(bundleDescriptor)
+        .setScope(valueOf(ofNullable(getScope()).orElse(COMPILE.name())))
+        .build();
   }
 
   /**
@@ -342,7 +320,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   public List<AbstractDependencyFileBuilder> getAllCompileDependencies() {
     Set<AbstractDependencyFileBuilder> allCompileDependencies = new HashSet<>();
     for (AbstractDependencyFileBuilder dependency : dependencies) {
-      if (dependency.getAsMavenDependency().getScope().equals(COMPILE_SCOPE)) {
+      if (dependency.getAsMavenDependency().getScope().equals(COMPILE)) {
         allCompileDependencies.addAll(dependency.getAllCompileDependencies());
         allCompileDependencies.add(dependency);
       }

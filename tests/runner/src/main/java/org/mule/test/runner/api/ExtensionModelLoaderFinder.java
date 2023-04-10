@@ -7,17 +7,19 @@
 
 package org.mule.test.runner.api;
 
+import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
+
+import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.maven.pom.parser.api.MavenPomParserProvider;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -49,9 +51,10 @@ class ExtensionModelLoaderFinder {
                                                              List<RemoteRepository> rootArtifactRemoteRepositories) {
     DefaultArtifact artifact = new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), "pom", plugin.getVersion());
     try {
+      MavenPomParserProvider provider = discoverProvider();
       ArtifactResult artifactResult = dependencyResolver.resolveArtifact(artifact, rootArtifactRemoteRepositories);
       File pomFile = artifactResult.getArtifact().getFile();
-      Model mavenProject = MavenModelFactory.createMavenProject(pomFile);
+      MavenPomParser mavenProject = provider.createMavenPomParserClient(pomFile.toPath());
       String id = mavenProject.getProperties().getProperty("testExtensionModelLoaderId");
       return id != null ? Optional.ofNullable(getLoaderById(id)) : Optional.empty();
     } catch (ArtifactResolutionException e) {

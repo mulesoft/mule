@@ -25,6 +25,7 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
+import org.mule.maven.pom.parser.api.model.MavenPomModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -47,7 +48,6 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 
-import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,8 +202,8 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
       Optional<File> mavenRepository = getLocalMavenRepo(artifactFile, mavenClient);
 
       // reactor to resolve the mule-plugin pom and jar file from the location provided in the system dependency.
-      org.mule.maven.client.api.model.BundleDescriptor mavenClientBundleDescriptor =
-          new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+      org.mule.maven.pom.parser.api.model.BundleDescriptor mavenClientBundleDescriptor =
+          new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
               .setGroupId(reactor.getEffectiveModel().getGroupId())
               .setArtifactId(reactor.getEffectiveModel().getArtifactId())
               .setVersion(reactor.getEffectiveModel().getVersion())
@@ -212,7 +212,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
               .build();
       // It will collect the dependencies of the mule-plugin following the same rules that we have when it is declared
       // as compile in a mule-application or mule-domain, without provided and test scope dependencies.
-      List<org.mule.maven.client.api.model.BundleDependency> dependencies =
+      List<org.mule.maven.pom.parser.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(ImmutableList.of(mavenClientBundleDescriptor),
                                                   mavenRepository,
                                                   of(reactor));
@@ -225,7 +225,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
 
     private final File temporaryFolder = createTempDir();
 
-    private final Model effectiveModel;
+    private final MavenPomModel effectiveModel;
 
     private final File pomFile;
     private final File artifactFile;
@@ -233,16 +233,16 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
     public MuleSystemPluginMavenReactorResolver(File artifactFile, MavenClient mavenClient) {
       this.effectiveModel = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
 
-      this.pomFile = effectiveModel.getPomFile();
+      this.pomFile = effectiveModel.getPomFile().get();
       this.artifactFile = artifactFile;
     }
 
-    public Model getEffectiveModel() {
+    public MavenPomModel getEffectiveModel() {
       return effectiveModel;
     }
 
     @Override
-    public File findArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+    public File findArtifact(org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor) {
       if (checkArtifact(bundleDescriptor)) {
         if (bundleDescriptor.getType().equals(POM)) {
           return pomFile;
@@ -254,14 +254,14 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
     }
 
     @Override
-    public List<String> findVersions(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+    public List<String> findVersions(org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor) {
       if (checkArtifact(bundleDescriptor)) {
         return ImmutableList.of(this.effectiveModel.getVersion());
       }
       return emptyList();
     }
 
-    private boolean checkArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
+    private boolean checkArtifact(org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor) {
       return this.effectiveModel.getGroupId().equals(bundleDescriptor.getGroupId())
           && this.effectiveModel.getArtifactId().equals(bundleDescriptor.getArtifactId())
           && this.effectiveModel.getVersion().equals(bundleDescriptor.getVersion());
