@@ -3116,8 +3116,8 @@
         },
         {
           "code": "java.class.nowFinal",
-          "old": "class org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider",
-          "new": "class org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider",
+          "old": "class org.mule.runtime.core.api.extension.MuleExtensionModelProvider",
+          "new": "class org.mule.runtime.core.api.extension.MuleExtensionModelProvider",
           "oldModifiers": "public",
           "newModifiers": "public final",
           "package": "org.mule.runtime.core.api.extension",
@@ -3127,8 +3127,8 @@
         },
         {
           "code": "java.annotation.added",
-          "old": "interface org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider",
-          "new": "interface org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider",
+          "old": "interface org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider",
+          "new": "interface org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider",
           "annotationType": "org.mule.api.annotation.NoImplement",
           "justification": "This interface is not meant to be implemented by the user"
         },
