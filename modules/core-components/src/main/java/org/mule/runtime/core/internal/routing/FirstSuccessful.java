@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;

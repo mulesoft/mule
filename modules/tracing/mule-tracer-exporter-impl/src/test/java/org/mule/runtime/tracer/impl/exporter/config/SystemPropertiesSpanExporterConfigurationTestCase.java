@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.mule.runtime.tracer.exporter.impl.config.SystemPropertiesSpanExporterConfiguration;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)

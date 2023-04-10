@@ -29,7 +29,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 
 import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

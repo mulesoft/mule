@@ -13,7 +13,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.routing.RoutingException;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.ArrayList;
 import java.util.List;

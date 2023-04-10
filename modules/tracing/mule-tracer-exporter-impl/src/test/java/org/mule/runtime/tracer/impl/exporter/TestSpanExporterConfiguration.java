@@ -7,7 +7,7 @@
 
 package org.mule.runtime.tracer.impl.exporter;
 
-import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
 import java.util.Map;
 

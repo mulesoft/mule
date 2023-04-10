@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.tracer.configuration.internal.export;
 
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.UNKNOWN;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 
@@ -30,6 +30,7 @@ import java.util.Set;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.mule.runtime.tracer.customization.impl.export.MonitoringInitialExportInfoProvider;
 
 @Feature(PROFILING)
 @Story(TRACING_CUSTOMIZATION)

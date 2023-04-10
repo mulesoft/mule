@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -49,7 +49,7 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 /**

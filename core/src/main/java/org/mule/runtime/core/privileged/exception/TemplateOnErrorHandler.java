@@ -78,7 +78,7 @@ import javax.inject.Inject;
 
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 

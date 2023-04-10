@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 /**
  * Represents a route with the {@link Processor} it leads to, along with an expression that should be true for the route to be

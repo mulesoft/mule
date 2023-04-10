@@ -11,7 +11,7 @@ import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTA
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 /**
  * A dummy implementation of {@link InitialSpanInfoProvider}.

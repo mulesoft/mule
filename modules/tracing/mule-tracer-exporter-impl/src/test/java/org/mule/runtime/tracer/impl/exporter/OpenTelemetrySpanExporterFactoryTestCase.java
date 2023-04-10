@@ -18,6 +18,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)

@@ -108,7 +108,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
