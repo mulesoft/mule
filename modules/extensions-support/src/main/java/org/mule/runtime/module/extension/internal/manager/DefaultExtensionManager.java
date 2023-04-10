@@ -7,6 +7,10 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -18,14 +22,8 @@ import static org.mule.runtime.module.extension.internal.manager.DefaultConfigur
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -162,11 +160,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     extensionRegistry.unregisterConfigurationProvider(configurationProvider, muleContext);
   }
 
-  @Override
-  public ConfigurationInstance getConfiguration(String configurationProviderName, Event event) {
-    return getConfiguration(configurationProviderName, (CoreEvent) event);
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -178,13 +171,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                configurationProviderName)));
   }
 
-  @Override
-  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
-                                                          ComponentModel componentModel,
-                                                          Event muleEvent) {
-    return getConfiguration(extensionModel, componentModel, (CoreEvent) muleEvent);
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -194,13 +180,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                           CoreEvent muleEvent) {
 
     return getConfigurationProvider(extensionModel, componentModel, muleEvent).map(p -> p.get(muleEvent));
-  }
-
-  @Override
-  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
-                                                                  ComponentModel componentModel,
-                                                                  Event muleEvent) {
-    return getConfigurationProvider(extensionModel, componentModel, (CoreEvent) muleEvent);
   }
 
   @Override
