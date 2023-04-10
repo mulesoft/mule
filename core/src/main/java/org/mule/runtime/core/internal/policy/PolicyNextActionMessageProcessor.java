@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.lang.ref.Reference;
 import java.util.List;
@@ -49,7 +50,6 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 
 /**

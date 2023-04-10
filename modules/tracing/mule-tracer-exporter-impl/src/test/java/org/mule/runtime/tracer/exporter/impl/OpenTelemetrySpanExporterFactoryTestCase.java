@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter;
+package org.mule.runtime.tracer.exporter.impl;
 
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
@@ -18,7 +18,6 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)

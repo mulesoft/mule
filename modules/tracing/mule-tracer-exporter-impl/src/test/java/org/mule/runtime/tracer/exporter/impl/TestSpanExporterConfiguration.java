@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.tracer.impl.exporter;
+package org.mule.runtime.tracer.exporter.impl;
 
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
