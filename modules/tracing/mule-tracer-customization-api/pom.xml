@@ -18,7 +18,7 @@
 
     <artifactId>mule-tracer-customization-api</artifactId>
     <version>4.6.0-SNAPSHOT</version>
-    <name>Mule Tracer Exporter Api</name>
+    <name>Mule Tracer Customization Api</name>
     <description>Definitions for setting configuration for tracing levels and overrides</description>
 
     <properties>
