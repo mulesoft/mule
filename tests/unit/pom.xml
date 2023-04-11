@@ -36,6 +36,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-pom-parser-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>

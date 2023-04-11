@@ -16,7 +16,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
-import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
+import static org.mule.tck.MavenTestUtils.installArtifact;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
