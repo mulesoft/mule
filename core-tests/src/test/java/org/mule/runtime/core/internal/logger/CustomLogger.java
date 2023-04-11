@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.logger;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.Arrays.stream;
-
 import static org.apache.commons.lang3.StringUtils.replaceOnce;
 
 import java.util.ArrayList;
@@ -381,7 +378,6 @@ public class CustomLogger implements Logger {
   public void error(Marker marker, String s, Throwable throwable) {
     logger.error(marker, s, throwable);
   }
-
 
   private String buildLogMessage(String s, Object... objects) {
     String updatedStr = s;
