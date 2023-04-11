@@ -45,7 +45,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled() {
-    return logger.isTraceEnabled();
+    return true;
   }
 
   @Override
@@ -56,7 +56,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isDebugEnabled() {
-    return logger.isDebugEnabled();
+    return true;
   }
 
   @Override
@@ -67,7 +67,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isInfoEnabled() {
-    return logger.isInfoEnabled();
+    return true;
   }
 
   @Override
@@ -98,7 +98,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled(Marker marker) {
-    return logger.isTraceEnabled(marker);
+    return false;
   }
 
   @Override
@@ -245,7 +245,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isWarnEnabled() {
-    return logger.isWarnEnabled();
+    return false;
   }
 
   @Override
