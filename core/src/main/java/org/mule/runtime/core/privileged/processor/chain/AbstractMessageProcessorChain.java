@@ -45,6 +45,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.replace;
+import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.getUnnamedComponent;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.deferContextual;
@@ -74,7 +75,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
-import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -207,33 +207,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   // This can happen, for example, if an exception is raised because of too many child context created
   // in a possible infinite recursion with flow-refs -> (flows/subflows)
   private boolean chainSpanCreated = false;
-  private static final Component UNKNOWN_COMPONENT = new Component() {
-
-    @Override
-    public Object getAnnotation(QName qName) {
-      return null;
-    }
-
-    @Override
-    public Map<QName, Object> getAnnotations() {
-      return Collections.emptyMap();
-    }
-
-    @Override
-    public void setAnnotations(Map<QName, Object> map) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ComponentLocation getLocation() {
-      return null;
-    }
-
-    @Override
-    public Location getRootContainerLocation() {
-      return null;
-    }
-  };
+  private static final Component UNKNOWN_COMPONENT = getUnnamedComponent();
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
