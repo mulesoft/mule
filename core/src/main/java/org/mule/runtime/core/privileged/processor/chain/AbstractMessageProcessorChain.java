@@ -31,6 +31,7 @@ import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlin
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveError;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveMessagingException;
+import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.getUnnamedComponent;
 
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
@@ -45,7 +46,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.replace;
-import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.getUnnamedComponent;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.deferContextual;
