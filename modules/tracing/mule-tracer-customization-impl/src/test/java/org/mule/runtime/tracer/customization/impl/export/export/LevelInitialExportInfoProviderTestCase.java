@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.configuration.internal.export;
+package org.mule.runtime.tracer.customization.impl.export.export;
 
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
@@ -19,15 +19,16 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.tracer.configuration.internal.provider.DebugInitialExportInfoProvider;
-import org.mule.runtime.tracer.configuration.internal.provider.MonitoringInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.DebugInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.MonitoringInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.OverviewInitialExportInfoProvider;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.tracer.configuration.internal.provider.OverviewInitialExportInfoProvider;
 
 import java.util.Arrays;
 import java.util.Collection;

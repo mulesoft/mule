@@ -4,30 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.configuration.internal.provider;
+package org.mule.runtime.tracer.customization.impl.provider;
+
+import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CONNECTION_CREATION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.EXECUTE_NEXT_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.EXECUTION_TIME_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.TRY_SCOPE_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.UNKNOWN;
+
 
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
-import org.mule.runtime.tracer.configuration.api.InternalSpanNames;
-import org.mule.runtime.tracer.configuration.internal.export.AbstractInitialExportInfoProvider;
-import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
-import org.mule.runtime.tracer.configuration.internal.info.NoExportTillSpanWithNameInitialExportInfo;
+import org.mule.runtime.tracer.customization.impl.export.AbstractInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
-import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.CONNECTION_CREATION_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.EXECUTION_TIME_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.api.InternalSpanNames.TRY_SCOPE_INNER_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.UNKNOWN;
 
 /**
  * An {@link InitialExportInfoProvider} corresponding to the {@link TracingLevel#MONITORING}
@@ -40,7 +41,7 @@ public class MonitoringInitialExportInfoProvider extends AbstractInitialExportIn
 
     {
       put(POLICY_CHAIN_SPAN_NAME,
-          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
+          new NoExportTillSpanWithNameInitialExportInfo(EXECUTE_NEXT_SPAN_NAME, true));
       put(POLICY_NEXT_ACTION_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(UNKNOWN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(ASYNC_INNER_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);

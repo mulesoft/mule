@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.configuration.internal.export;
+package org.mule.runtime.tracer.customization.impl.export;
 
-import static org.mule.runtime.tracer.configuration.internal.info.SpanInitialInfoUtils.getSpanName;
+import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getSpanName;
 
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.configuration.api.InternalSpanNames;
-import org.mule.runtime.tracer.configuration.internal.info.NoExportTillSpanWithNameInitialExportInfo;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InternalSpanNames;
+import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
 
 import java.util.HashMap;
 import java.util.Map;

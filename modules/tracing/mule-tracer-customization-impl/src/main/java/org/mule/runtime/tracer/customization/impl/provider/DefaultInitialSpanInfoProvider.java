@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.configuration.internal.provider;
+package org.mule.runtime.tracer.customization.impl.provider;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
@@ -12,9 +12,9 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.configuration.internal.export.InitialExportInfoProvider;
-import org.mule.runtime.tracer.configuration.internal.info.ExecutionInitialSpanInfo;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.info.ExecutionInitialSpanInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
