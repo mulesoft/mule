@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.source.scheduler;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -29,12 +29,12 @@ public class PeriodicSchedulerTestCase extends AbstractMuleTestCase {
    * If the {@link Scheduler} created is null then throw an {@link ScheduledPollCreationException}
    */
   @Test(expected = NullPointerException.class)
-  public void checkCreationOfNullScheduler() {
+  public void checkCreationOfNullScheduler() throws NullPointerException {
     factory(null, null).schedule(null, this.newRunnable());
   }
 
   private PeriodicScheduler factory(ScheduledFuture schedulerToReturn, MuleContext muleContext) {
-    PeriodicScheduler pollFactory = mock(PeriodicScheduler.class);
+    PeriodicScheduler pollFactory = spy(PeriodicScheduler.class);
     when(pollFactory.doSchedule(any(), any())).thenReturn(schedulerToReturn);
     return pollFactory;
   }
