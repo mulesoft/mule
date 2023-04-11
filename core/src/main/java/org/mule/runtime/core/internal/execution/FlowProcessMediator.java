@@ -106,7 +106,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -277,7 +276,7 @@ public class FlowProcessMediator implements Initialisable {
     }
   }
 
-  private void dispatch(@Nonnull CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct,
+  private void dispatch(CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct,
                         DefaultFlowProcessMediatorContext ctx)
       throws Exception {
     try {
