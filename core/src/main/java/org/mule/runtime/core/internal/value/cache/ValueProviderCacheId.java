@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.value.cache;
 
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
-import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import org.mule.runtime.extension.api.values.ValueProvider;
 
@@ -96,8 +96,8 @@ public class ValueProviderCacheId {
 
     private String sourceElementName;
     private String hashValue;
-    private List<ValueProviderCacheId> parts;
-    private Map<String, String> attributes;
+    private final List<ValueProviderCacheId> parts;
+    private final Map<String, String> attributes;
 
     public static ValueProviderCacheId aValueProviderCacheId(ValueProviderCacheIdBuilder builder) {
       return builder.build();
@@ -139,7 +139,10 @@ public class ValueProviderCacheId {
     }
 
     private ValueProviderCacheId build() {
-      checkArgument(this.hashValue != null || !this.parts.isEmpty(), "ValueProviderCacheId must have a hashValue or parts");
+      if (!(this.hashValue != null || !this.parts.isEmpty())) {
+        throw new IllegalArgumentException("ValueProviderCacheId must have a hashValue or parts");
+      }
+
       if (this.hashValue == null) {
         this.hashValue = EMPTY;
       }
