@@ -56,37 +56,17 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider,
                                   String overriddenName, String spanNameSuffix) {
-    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
+
     if (overriddenName == null) {
       name = getSpanName(component.getIdentifier()) + spanNameSuffix;
+      initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
     } else {
       name = overriddenName;
+      initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name);
     }
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain;
     this.rootSpan = isComponentOfName(component, FLOW);
     this.location = getLocationAsString(component.getLocation());
-    this.apiId = apiId;
-    if (apiId != null) {
-      this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
-    }
-  }
-
-  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
-    this(name, apiId, initialExportInfoProvider, "", false);
-  }
-
-  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider,
-                                  boolean debugLevel) {
-    this(name, apiId, initialExportInfoProvider, "", debugLevel);
-  }
-
-  public ExecutionInitialSpanInfo(String name, String apiId, InitialExportInfoProvider initialExportInfoProvider,
-                                  String spanNameSuffix, boolean debugLevel) {
-    initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name + stripToEmpty(spanNameSuffix), debugLevel);
-    this.name = name;
-    this.isPolicySpan = false;
-    this.rootSpan = false;
-    this.location = NO_LOCATION;
     this.apiId = apiId;
     if (apiId != null) {
       this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
