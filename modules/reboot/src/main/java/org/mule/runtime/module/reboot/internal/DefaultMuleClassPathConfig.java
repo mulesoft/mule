@@ -7,6 +7,8 @@
 package org.mule.runtime.module.reboot.internal;
 
 import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,8 +16,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -116,14 +116,14 @@ public class DefaultMuleClassPathConfig {
       try {
         return pathname.getCanonicalPath().endsWith(".jar");
       } catch (IOException e) {
-        throw new RuntimeException(e.getMessage());
+        throw new RuntimeException(e);
       }
     });
 
     if (jars != null) {
-      return Arrays.asList(jars);
+      return asList(jars);
     }
-    return Collections.emptyList();
+    return emptyList();
   }
 
 }
