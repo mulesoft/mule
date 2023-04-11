@@ -16,7 +16,7 @@ import org.slf4j.spi.LoggerFactoryBinder;
 public class StaticLoggerBinder implements LoggerFactoryBinder {
 
   /**
-   * xx` The unique instance of this class.
+   * The unique instance of this class.
    */
   private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
