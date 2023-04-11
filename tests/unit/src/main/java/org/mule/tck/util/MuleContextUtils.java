@@ -79,7 +79,7 @@ import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 

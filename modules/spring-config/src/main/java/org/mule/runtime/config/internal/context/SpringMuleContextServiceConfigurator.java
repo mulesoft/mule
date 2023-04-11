@@ -146,10 +146,10 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import org.mule.runtime.tracer.configuration.internal.provider.DefaultInitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.DefaultInitialSpanInfoProvider;
 import org.mule.runtime.tracer.impl.CoreEventTracer;
-import org.mule.runtime.tracer.impl.exporter.OpenTelemetrySpanExporterFactory;
-import org.mule.runtime.tracer.impl.exporter.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
+import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
+import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

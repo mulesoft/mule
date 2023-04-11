@@ -48,7 +48,7 @@ import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatis
 import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;

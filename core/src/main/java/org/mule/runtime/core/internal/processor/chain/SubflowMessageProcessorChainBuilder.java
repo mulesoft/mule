@@ -29,7 +29,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.HashMap;
 import java.util.List;

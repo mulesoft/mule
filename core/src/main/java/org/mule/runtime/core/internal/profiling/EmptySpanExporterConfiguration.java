@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling;
 
-import org.mule.runtime.tracer.exporter.api.config.SpanExporterConfiguration;
+import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
 /**
  * A {@link SpanExporterConfiguration} that is empty (no properties).

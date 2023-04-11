@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import javax.inject.Inject;
 
