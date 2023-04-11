@@ -29,7 +29,7 @@ public class PeriodicSchedulerTestCase extends AbstractMuleTestCase {
    * If the {@link Scheduler} created is null then throw an {@link ScheduledPollCreationException}
    */
   @Test(expected = NullPointerException.class)
-  public void checkCreationOfNullScheduler() throws NullPointerException {
+  public void checkCreationOfNullScheduler() {
     factory(null, null).schedule(null, this.newRunnable());
   }
 
