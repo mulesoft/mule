@@ -22,12 +22,14 @@ module org.mule.runtime.core.extension.model {
 
   requires com.google.gson;
 
-  exports org.mule.runtime.core.api.extension;
+  exports org.mule.runtime.core.api.error;
+  exports org.mule.runtime.core.api.extension.provider;
 
   provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
       org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
 
   exports org.mule.runtime.config.internal.error to
+      org.mule.runtime.core,
       org.mule.runtime.artifact.ast.serialization.test;
   
 }
