@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
-import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
+import static org.mule.tck.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 

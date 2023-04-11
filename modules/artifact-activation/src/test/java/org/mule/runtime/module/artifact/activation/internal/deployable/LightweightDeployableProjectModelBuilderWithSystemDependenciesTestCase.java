@@ -8,7 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
-import static org.mule.runtime.module.artifact.activation.internal.MavenTestUtils.installArtifact;
+import static org.mule.tck.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
