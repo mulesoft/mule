@@ -152,7 +152,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
     delegateBuilder
-        .setChainInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(ASYNC_INNER_CHAIN_SPAN_NAME));
+        .setChainInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ASYNC_INNER_CHAIN_SPAN_NAME, ""));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());
