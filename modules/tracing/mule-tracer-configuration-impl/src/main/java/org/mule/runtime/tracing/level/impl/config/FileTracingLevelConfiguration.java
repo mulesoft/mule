@@ -36,12 +36,12 @@ import org.slf4j.Logger;
  */
 public class FileTracingLevelConfiguration implements TracingLevelConfiguration {
 
-  private final String PROPERTIES_FIlE_PATH =
+  private final String CONFIGURATION_PATH =
       getProperty(TRACING_LEVEL_CONFIGURATION_PATH, getConfFolder() + FileSystems.getDefault().getSeparator());
 
   private final MuleContext muleContext;
 
-  private static final String PROPERTIES_FILE_NAME = "tracing-level.conf";
+  private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
   private static final String LEVEL_PROPERTY_NAME = "level";
   private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
   private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
@@ -69,7 +69,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     try {
       InputStream is = resourceProvider
-          .getResourceAsStream(PROPERTIES_FIlE_PATH + getPropertiesFileName());
+          .getResourceAsStream(CONFIGURATION_PATH + getPropertiesFileName());
       return loadProperties(is);
     } catch (MuleRuntimeException | IOException e) {
       LOGGER
@@ -85,7 +85,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
   }
 
   protected String getPropertiesFileName() {
-    return PROPERTIES_FILE_NAME;
+    return CONFIGURATION_FILE_NAME;
   }
 
   protected String getConfFolder() {

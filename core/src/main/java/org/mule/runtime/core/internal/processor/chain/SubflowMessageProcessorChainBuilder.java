@@ -116,7 +116,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
       this.setInitialSpanInfo(initialSpanInfoProvider
-          .getInitialSpanInfo(SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME));
+          .getInitialSpanInfo(this, SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME, ""));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {

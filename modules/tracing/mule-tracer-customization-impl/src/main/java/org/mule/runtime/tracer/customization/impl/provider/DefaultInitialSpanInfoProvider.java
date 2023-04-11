@@ -64,26 +64,6 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   }
 
   @Override
-  public InitialSpanInfo getDebugLevelInitialSpanInfo(String name) {
-    // TODO: Verify initialisation order in mule context (W-12761329)
-    if (!initialisedAttributes) {
-      initialiseAttributes();
-      initialisedAttributes = true;
-    }
-    return new ExecutionInitialSpanInfo(name, apiId, getInitialExportInfoProvider(), true);
-  }
-
-  @Override
-  public InitialSpanInfo getInitialSpanInfo(String name) {
-    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
-    if (!initialisedAttributes) {
-      initialiseAttributes();
-      initialisedAttributes = true;
-    }
-    return new ExecutionInitialSpanInfo(name, apiId, getInitialExportInfoProvider());
-  }
-
-  @Override
   public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
     // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
     if (!initialisedAttributes) {

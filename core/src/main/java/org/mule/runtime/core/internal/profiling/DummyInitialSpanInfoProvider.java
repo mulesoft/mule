@@ -39,16 +39,6 @@ public class DummyInitialSpanInfoProvider implements InitialSpanInfoProvider {
   }
 
   @Override
-  public InitialSpanInfo getInitialSpanInfo(String name) {
-    return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
-  }
-
-  @Override
-  public InitialSpanInfo getDebugLevelInitialSpanInfo(String name) {
-    return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
-  }
-
-  @Override
   public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
     return DUMMY_INITIAL_SPAN_INFO_INSTANCE;
   }

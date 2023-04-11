@@ -118,7 +118,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 : policyEventMapper.onOperationPolicyNext(event))
             .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
-    }), policyNextErrorHandler(), initialSpanInfoProvider.getInitialSpanInfo(POLICY_NEXT_ACTION_SPAN_NAME));
+    }), policyNextErrorHandler(), initialSpanInfoProvider.getInitialSpanInfo(this, POLICY_NEXT_ACTION_SPAN_NAME, ""));
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
   }
 

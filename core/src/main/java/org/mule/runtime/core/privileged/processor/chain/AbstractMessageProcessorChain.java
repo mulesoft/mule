@@ -54,6 +54,7 @@ import static reactor.core.publisher.Operators.lift;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -73,6 +74,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
+import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -96,6 +98,7 @@ import org.mule.runtime.core.internal.util.rx.RxUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +111,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
+import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
@@ -202,6 +207,33 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   // This can happen, for example, if an exception is raised because of too many child context created
   // in a possible infinite recursion with flow-refs -> (flows/subflows)
   private boolean chainSpanCreated = false;
+  private static final Component UNKNOWN_COMPONENT = new Component() {
+
+    @Override
+    public Object getAnnotation(QName qName) {
+      return null;
+    }
+
+    @Override
+    public Map<QName, Object> getAnnotations() {
+      return Collections.emptyMap();
+    }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> map) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return null;
+    }
+
+    @Override
+    public Location getRootContainerLocation() {
+      return null;
+    }
+  };
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -518,7 +550,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     } else {
       // Other processors are not exported
       initialSpanInfo =
-          initialSpanInfoProvider.getInitialSpanInfo(UNKNOWN);
+          initialSpanInfoProvider.getInitialSpanInfo(UNKNOWN_COMPONENT, UNKNOWN, "");
     }
 
     return initialSpanInfo;
