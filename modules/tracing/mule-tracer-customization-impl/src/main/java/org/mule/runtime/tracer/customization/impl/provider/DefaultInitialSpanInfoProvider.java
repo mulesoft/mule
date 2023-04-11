@@ -38,7 +38,6 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   @Inject
   TracingLevelConfiguration tracingLevelConfiguration;
 
-  // TODO: User Story B - Implementation of Monitoring, Troubleshooting, App Level (W-12658074)
   private InitialExportInfoProvider initialExportInfoProvider;
   private String apiId;
   private boolean initialisedAttributes;
