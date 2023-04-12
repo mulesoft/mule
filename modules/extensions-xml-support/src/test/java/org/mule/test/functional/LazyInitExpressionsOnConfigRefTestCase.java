@@ -34,20 +34,6 @@ public class LazyInitExpressionsOnConfigRefTestCase extends ExpressionsOnConfigR
     return true;
   }
 
-  @Ignore("W-11525405: remove ignore override once we support lazy initialization of configurations referenced by expressions")
-  @Test
-  @Override
-  public void setPayloadWithExpression() throws Exception {
-    super.setPayloadWithExpression();
-  }
-
-  @Ignore("W-11525405: remove ignore override once we support lazy initialization of configurations referenced by expressions")
-  @Test
-  @Override
-  public void setPayloadWithExpressionResolvingToIncompatibleConfigFails() throws Exception {
-    super.setPayloadWithExpressionResolvingToIncompatibleConfigFails();
-  }
-
   @Override
   protected FlowRunner flowRunner(String flowName) {
     // Initializes just the flow we are trying to run
