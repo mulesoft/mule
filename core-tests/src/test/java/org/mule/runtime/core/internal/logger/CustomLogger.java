@@ -10,35 +10,27 @@ import static org.apache.commons.lang3.StringUtils.replaceOnce;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
-import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-
 
 /**
  * In some tests we were replacing the original logger in a class with a mocked logger via reflection and then setting it back to
  * the original. This reflective access will not work in Java 17, hence writing a custom logger that will be used with specific
- * tests
+ * tests.
  */
 public class CustomLogger implements Logger {
 
   private final String name;
   private List<String> messages;
   private final Logger logger;
+  private boolean customLoggingEnabled;
 
-  public static void setLoggingLevel(ch.qos.logback.classic.Level level) {
-    ch.qos.logback.classic.Logger root =
-        (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-    root.setLevel(level);
-  }
-
-  public CustomLogger(Logger logger, String name) {
+  public CustomLogger(Logger logger, String name, boolean loggingEnabled) {
     this.name = name;
     this.messages = new ArrayList<>();
     this.logger = logger;
+    this.customLoggingEnabled = loggingEnabled;
   }
 
   public void resetLogs() {
@@ -60,7 +52,11 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled() {
-    return logger.isTraceEnabled();
+    if (customLoggingEnabled) {
+      return customLoggingEnabled;
+    } else {
+      return logger.isTraceEnabled();
+    }
   }
 
   @Override
@@ -71,7 +67,11 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isDebugEnabled() {
-    return logger.isDebugEnabled();
+    if (customLoggingEnabled) {
+      return customLoggingEnabled;
+    } else {
+      return logger.isDebugEnabled();
+    }
   }
 
   @Override
@@ -82,7 +82,11 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isInfoEnabled() {
-    return logger.isInfoEnabled();
+    if (customLoggingEnabled) {
+      return customLoggingEnabled;
+    } else {
+      return logger.isInfoEnabled();
+    }
   }
 
   @Override
@@ -113,7 +117,11 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled(Marker marker) {
-    return logger.isTraceEnabled();
+    if (customLoggingEnabled) {
+      return customLoggingEnabled;
+    } else {
+      return logger.isTraceEnabled();
+    }
   }
 
   @Override
