@@ -14,7 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
 
 public class OrderedProperties extends Properties {
 
