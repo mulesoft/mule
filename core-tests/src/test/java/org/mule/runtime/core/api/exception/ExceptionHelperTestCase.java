@@ -141,7 +141,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.apache.commons.collections.CollectionUtils.forAllDo\\(CollectionUtils.java:[0-9]+\\)",
+                                                       "  java.util.*", // Collection.forEach
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
