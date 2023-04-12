@@ -191,7 +191,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void interceptorApplied() throws Exception {
-    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor = prepareInterceptor(new TestProcessorInterceptor("test"));
     startFlowWithInterceptors(interceptor);
 
     CoreEvent result = process(flow, eventBuilder(muleContext).message(Message.of("")).build());
@@ -219,6 +219,21 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       @Override
       public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         event.message(Message.of(TEST_PAYLOAD));
+      }
+
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -250,6 +265,20 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
         event.message(Message.of(TEST_PAYLOAD));
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -280,6 +309,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -314,6 +355,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           return result;
         }));
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -344,6 +397,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.skip();
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -377,6 +442,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           result.message(Message.of(TEST_PAYLOAD));
           return result;
         }));
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -436,6 +513,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         event.message(Message.of(TEST_PAYLOAD));
         return action.fail(errorTypeMock);
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -474,6 +563,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         event.message(Message.of(TEST_PAYLOAD));
         return action.fail(errorTypeMock, FAIL);
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -509,6 +610,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.fail(cause);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -563,9 +676,24 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
+      // This is done for using mockito spied object in the case of default methods.
       @Override
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
         throw expectedException;
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -597,6 +725,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         throw expectedException;
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -633,6 +773,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           return completableFuture;
         });
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -665,6 +817,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         return action.proceed().thenCompose(result -> supplyAsync(() -> {
           throw expectedException;
         }));
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -701,6 +865,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           throw expectedException;
         });
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -735,6 +911,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         return action.skip().thenCompose(result -> supplyAsync(() -> {
           throw expectedException;
         }));
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -771,6 +959,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           throw expectedException;
         });
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -805,6 +1005,20 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         // If we don't include either a before or after method override, then the interceptor is not applied and the
         // test is not as useful
         ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -844,6 +1058,20 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         // test is not as useful
         ProcessorInterceptor.super.before(location, parameters, event);
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -881,6 +1109,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.skip();
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -1776,7 +2016,28 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     annotations.put(ANNOTATION_PARAMETERS, params);
     ((Component) processor).setAnnotations(annotations);
 
-    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
+      }
+    });
     startFlowWithInterceptors(interceptor);
 
     process(flow, eventBuilder(muleContext).message(Message.of("")).build());
@@ -1816,6 +2077,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         threadAfter.set(currentThread());
       };
 
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        return ProcessorInterceptor.super.around(location, parameters, event, action);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -1846,6 +2114,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
 
       }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
     });
     startFlowWithInterceptors(interceptor);
 
@@ -1874,6 +2148,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         completableFuture.completeExceptionally(new MessagingException(createStaticMessage("Some Error"), internalEvent,
                                                                        new RuntimeException("Some Error"), mockedComponent));
         return completableFuture;
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+
+      // This is done for using mockito spied object in the case of default methods.
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        ProcessorInterceptor.super.after(location, event, thrown);
       }
     });
   }
@@ -2174,6 +2460,23 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       return "TestProcessorInterceptor: " + name;
     }
 
+    // This is done for using mockito spied object in the case of default methods.
+    @Override
+    public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                       Map<String, ProcessorParameterValue> parameters, InterceptionEvent event,
+                                                       InterceptionAction action) {
+      return ProcessorInterceptor.super.around(location, parameters, event, action);
+    }
+
+    @Override
+    public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
+      ProcessorInterceptor.super.before(location, parameters, event);
+    }
+
+    @Override
+    public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+      ProcessorInterceptor.super.after(location, event, thrown);
+    }
   }
 
   private static final class OptionalMatcher<T> extends TypeSafeMatcher<Optional<T>> {
