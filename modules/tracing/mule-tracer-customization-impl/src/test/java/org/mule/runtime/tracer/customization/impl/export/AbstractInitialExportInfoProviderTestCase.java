@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.configuration.internal.export;
+package org.mule.runtime.tracer.customization.impl.export;
 
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
@@ -24,17 +24,18 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
+import org.mule.runtime.tracer.customization.impl.provider.MonitoringInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
 
 import java.util.Set;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.mule.runtime.tracer.customization.impl.export.MonitoringInitialExportInfoProvider;
 
 @Feature(PROFILING)
 @Story(TRACING_CUSTOMIZATION)
-public class MonitoringInitialExportInfoProviderTestCase {
+public class AbstractInitialExportInfoProviderTestCase {
 
   @Test
   public void testForSpecialCasesByName() {
@@ -47,7 +48,7 @@ public class MonitoringInitialExportInfoProviderTestCase {
 
   @Test
   public void testForSpecialCasesByClass() {
-    MonitoringInitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+    InitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
     PolicyChain component = new PolicyChain();
     InitialExportInfo initialExportInfo = monitoringInitialExportInfoProvider.getInitialExportInfo(component);
     assertThat(initialExportInfo.noExportUntil(), equalTo(singleton("execute-next")));
@@ -55,7 +56,7 @@ public class MonitoringInitialExportInfoProviderTestCase {
   }
 
   private static void testComponent(String componentName, boolean expectedExportable, Set<String> noExportUntil) {
-    MonitoringInitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+    InitialExportInfoProvider monitoringInitialExportInfoProvider = new MonitoringInitialExportInfoProvider();
     InitialExportInfo initialExportInfo = monitoringInitialExportInfoProvider.getInitialExportInfo(componentName);
     assertThat(initialExportInfo.noExportUntil(), equalTo(noExportUntil));
     assertThat(initialExportInfo.isExportable(), equalTo(expectedExportable));

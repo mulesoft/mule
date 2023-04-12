@@ -232,7 +232,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
                                                          initialSpanInfoProvider
-                                                             .getInitialSpanInfo(TRY_SCOPE_INNER_CHAIN_SPAN_NAME));
+                                                             .getInitialSpanInfo(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

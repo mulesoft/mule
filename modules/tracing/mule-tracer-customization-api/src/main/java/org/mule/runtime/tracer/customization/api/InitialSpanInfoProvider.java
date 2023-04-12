@@ -30,13 +30,6 @@ public interface InitialSpanInfoProvider {
    */
   InitialSpanInfo getInitialSpanInfo(Component component, String suffix);
 
-  /**
-   * @param name the name for the span.
-   *
-   * @return a {@link InitialSpanInfo} based on a name.
-   */
-  InitialSpanInfo getInitialSpanInfo(String name);
-
 
   /**
    * @param component      the {@link Component} to generate the {@link InitialSpanInfo} for.

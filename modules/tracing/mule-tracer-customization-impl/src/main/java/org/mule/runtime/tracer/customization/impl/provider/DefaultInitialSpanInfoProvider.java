@@ -14,8 +14,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.MonitoringInitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.info.ExecutionInitialSpanInfo;
+import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
+import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
 import javax.inject.Inject;
 
@@ -34,8 +35,10 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   @Inject
   ConfigurationProperties configurationProperties;
 
-  // TODO: User Story B - Implementation of Monitoring, Troubleshooting, App Level (W-12658074)
-  private final InitialExportInfoProvider initialExportInfo = new MonitoringInitialExportInfoProvider();
+  @Inject
+  TracingLevelConfiguration tracingLevelConfiguration;
+
+  private InitialExportInfoProvider initialExportInfoProvider;
   private String apiId;
   private boolean initialisedAttributes;
 
@@ -46,7 +49,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider());
   }
 
   @Override
@@ -56,17 +59,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, initialExportInfo, null, suffix);
-  }
-
-  @Override
-  public InitialSpanInfo getInitialSpanInfo(String name) {
-    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
-    if (!initialisedAttributes) {
-      initialiseAttributes();
-      initialisedAttributes = true;
-    }
-    return new ExecutionInitialSpanInfo(name, apiId, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(), null, suffix);
   }
 
   @Override
@@ -76,13 +69,34 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, initialExportInfo);
+    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getInitialExportInfoProvider());
   }
 
   public void initialiseAttributes() {
     if (muleContext.getArtifactType().equals(POLICY)) {
       apiId = configurationProperties.resolveStringProperty(API_ID_CONFIGURATION_PROPERTIES_KEY).orElse(null);
     }
+  }
 
+  private InitialExportInfoProvider getInitialExportInfoProvider() {
+    if (initialExportInfoProvider == null) {
+      TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
+      resolveInitialExportInfoProvider(tracingLevel);
+    }
+
+    return initialExportInfoProvider;
+  }
+
+  private void resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
+    switch (tracingLevel) {
+      case OVERVIEW:
+        initialExportInfoProvider = new OverviewInitialExportInfoProvider();
+        break;
+      case DEBUG:
+        initialExportInfoProvider = new DebugInitialExportInfoProvider();
+        break;
+      default:
+        initialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+    }
   }
 }

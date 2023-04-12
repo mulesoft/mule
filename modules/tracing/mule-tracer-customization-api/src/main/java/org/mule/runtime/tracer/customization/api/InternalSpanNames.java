@@ -20,4 +20,10 @@ public class InternalSpanNames {
   public static final String ASYNC_INNER_CHAIN_SPAN_NAME = "async-inner-chain";
   public static final String CACHE_CHAIN_SPAN_NAME = "mule:cache-chain";
   public static final String MESSAGE_PROCESSORS_SPAN_NAME = "message:processor";
+  public static final String HTTP_REQUEST_SPAN_NAME = "http:request";
+  public static final String MULE_FLOW_SPAN_NAME = "mule:flow";
+  public static final String MULE_SUB_FLOW_SPAN_NAME = "mule:subflow";
+  public static final String CONNECTION_CREATION_SPAN_NAME = "mule:connection-creation";
+  public static final String PARAMETER_RESOLUTION_SPAN_NAME = "mule:parameter-resolution";
+  public static final String EXECUTION_TIME_SPAN_NAME = "mule:execution-time";
 }

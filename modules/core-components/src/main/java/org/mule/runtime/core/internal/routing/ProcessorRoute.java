@@ -53,7 +53,7 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   public ProcessorRoute(Processor processor, InitialSpanInfoProvider initialSpanInfoProvider) {
     requireNonNull(processor, "processor can't be null");
     this.processor = processor;
-    this.initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(PROCESSOR_ROUTE_SPAN_NAME);
+    this.initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(this, PROCESSOR_ROUTE_SPAN_NAME, "");
   }
 
   public Processor getProcessor() {

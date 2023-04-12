@@ -25,6 +25,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGE
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACING_LEVEL_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_AST;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
@@ -151,6 +152,7 @@ import org.mule.runtime.tracer.impl.CoreEventTracer;
 import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
+import org.mule.runtime.tracing.level.impl.config.FileTracingLevelConfiguration;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -236,6 +238,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_CORE_SPAN_FACTORY_KEY, getBeanDefinition(ExecutionSpanFactory.class))
       .put(MULE_CORE_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetrySpanExporterFactory.class))
       .put(MULE_CORE_EVENT_TRACER_KEY, getBeanDefinition(CoreEventTracer.class))
+      .put(MULE_TRACING_LEVEL_CONFIGURATION_KEY, getBeanDefinition(FileTracingLevelConfiguration.class))
       .put(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, getBeanDefinition(DefaultInitialSpanInfoProvider.class))
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .put(FORWARD_COMPATIBILITY_HELPER_KEY, getBeanDefinition(DefaultForwardCompatibilityHelper.class))
