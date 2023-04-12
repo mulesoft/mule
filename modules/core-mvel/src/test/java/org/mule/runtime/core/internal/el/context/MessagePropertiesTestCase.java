@@ -27,7 +27,7 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
 import org.junit.Before;
 import org.junit.Test;
 

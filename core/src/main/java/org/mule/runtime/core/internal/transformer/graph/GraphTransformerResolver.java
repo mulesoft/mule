@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.collections4.map.LRUMap;
 
 public class GraphTransformerResolver implements TransformerResolver {
 

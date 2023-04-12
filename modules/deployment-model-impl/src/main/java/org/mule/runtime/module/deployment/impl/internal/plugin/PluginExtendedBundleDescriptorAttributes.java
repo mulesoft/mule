@@ -12,7 +12,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.Map;
 
-import org.apache.commons.collections.map.AbstractMapDecorator;
+import org.apache.commons.collections4.map.AbstractMapDecorator;
 
 /**
  * Allows to extends the attributes defined for a {@link org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor} when
