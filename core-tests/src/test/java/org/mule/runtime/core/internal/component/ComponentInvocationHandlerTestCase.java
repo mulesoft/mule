@@ -118,7 +118,7 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
 
     Class<Component> annotatedClass = addAnnotationsToClass(childCl.loadClass(Delegator.class.getName()));
 
-    assertThat(annotatedClass.getClassLoader(), instanceOf(CompositeClassLoader.class));
+    assertThat(annotatedClass.getClassLoader().getParent(), instanceOf(CompositeClassLoader.class));
   }
 
   @Test

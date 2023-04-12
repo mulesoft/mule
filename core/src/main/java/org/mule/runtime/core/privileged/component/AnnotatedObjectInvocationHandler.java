@@ -25,9 +25,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static net.bytebuddy.implementation.MethodDelegation.to;
 
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.bind.annotation.*;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
 
@@ -92,14 +94,12 @@ public final class AnnotatedObjectInvocationHandler {
 
     ComponentInterceptor annotatedObjectInvocationHandler = new ComponentInterceptor(MANAGED_METHODS);
 
-    DynamicType.Builder builder = byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface);
-    MANAGED_METHODS.forEach(method -> builder.method(is(method)).intercept(to(annotatedObjectInvocationHandler)));
-    annotatedObjectInvocationHandler.getOverridingMethods().keySet()
-        .forEach(method -> builder.method(is(method)).intercept(to(annotatedObjectInvocationHandler)));
-    builder.method(named("writeReplace")).intercept(to(new RemoveDynamicAnnotations()));
-    MANAGED_METHODS.forEach(method -> builder.method(named(method.getName()).and(takesArguments(method.getParameterTypes())))
-        .intercept(to(annotatedObjectInvocationHandler)));
-    builder.method(isToString().and(isDeclaredBy(Object.class))).intercept(to(ToStringInterceptor.class));
+    Reference<DynamicType.Builder> builder = new Reference<>(byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface));
+    MANAGED_METHODS.forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
+    annotatedObjectInvocationHandler.getOverridingMethods().keySet().forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
+    builder.set(builder.get().method(named("writeReplace")).intercept(to(new RemoveDynamicAnnotations())));
+    MANAGED_METHODS.forEach(method -> builder.set(builder.get().method(named(method.getName()).and(takesArguments(method.getParameterTypes()))).intercept(to(annotatedObjectInvocationHandler))));
+    builder.set(builder.get().method(isToString().and(isDeclaredBy(Object.class))).intercept(to(new ToStringInterceptor())));
 
     ClassLoader classLoader;
     if (ByteBuddy.class.getClassLoader() != clazz.getClassLoader()) {
@@ -108,8 +108,7 @@ public final class AnnotatedObjectInvocationHandler {
       classLoader = clazz.getClassLoader();
     }
 
-    Class<A> annotatedClass =
-        (Class<A>) byteBuddy.subclass(clazz).implement(dynamicInterface).make().load(classLoader).getLoaded();
+    Class<A> annotatedClass = (Class<A>) builder.get().make().load(classLoader).getLoaded();
     return annotatedClass;
   }
 
@@ -164,7 +163,7 @@ public final class AnnotatedObjectInvocationHandler {
     }
   }
 
-  private static class ComponentInterceptor extends AbstractComponent {
+  public static class ComponentInterceptor extends AbstractComponent {
 
     private final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
 
@@ -188,17 +187,17 @@ public final class AnnotatedObjectInvocationHandler {
 
   }
 
-  private static class RemoveDynamicAnnotations {
+  public static class RemoveDynamicAnnotations {
 
     public Object intercept(Object obj, Method method, Object[] args, Method superMethod, Object defaultValue) throws Throwable {
       return removeDynamicAnnotations(obj);
     }
   }
 
-  private static class ToStringInterceptor {
+  public static class ToStringInterceptor {
 
-    public static Object intercept(Object obj, Method method, Object[] args, Method superMethod, Object defaultValue)
-        throws Throwable {
+    @RuntimeType
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperMethod Method superMethod) throws Throwable {
       String base = obj.getClass().getName() + "@" + toHexString(obj.hashCode()) + "; location: ";
       if (((Component) obj).getLocation() != null) {
         return base + ((Component) obj).getLocation().getLocation();
