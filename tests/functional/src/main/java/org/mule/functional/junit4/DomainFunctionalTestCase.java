@@ -6,9 +6,11 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;

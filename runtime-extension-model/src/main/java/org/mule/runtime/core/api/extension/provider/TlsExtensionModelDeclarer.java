@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.extension;
+package org.mule.runtime.core.api.extension.provider;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_TLS_NAMESPACE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.BOOLEAN_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 
 import org.mule.metadata.api.model.MetadataType;

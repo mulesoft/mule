@@ -1,0 +1,18 @@
+{
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider",
+          "new": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider",
+          "interface": "org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider",
+          "package": "org.mule.runtime.module.extension.mule.api.extension",
+          "classSimpleName": "MuleSdkExtensionRuntimeExtensionModelProvider",
+          "elementKind": "class",
+          "justification": "W-12947646: Fix split packages between mule-runtime-extension-model and mule-core"
+        }
+      ]
+    }
+  }
+}

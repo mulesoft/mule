@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.internal.processor;
 
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
 import static org.mule.tck.util.MuleContextUtils.addExtensionModelToMock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;

@@ -12,7 +12,7 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.lang.String.format;

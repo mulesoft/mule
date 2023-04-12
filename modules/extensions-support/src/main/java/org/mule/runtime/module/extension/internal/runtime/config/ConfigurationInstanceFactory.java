@@ -8,7 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
+
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONFIGURATION_MODEL_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -22,7 +23,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;

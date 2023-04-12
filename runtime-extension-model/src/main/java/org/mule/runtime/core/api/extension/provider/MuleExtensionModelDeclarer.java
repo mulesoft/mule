@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.extension;
+package org.mule.runtime.core.api.extension.provider;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -46,17 +46,17 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.INTEGER_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.OBJECT_STORE_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.TYPE_LOADER;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.ANY_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.BOOLEAN_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.INTEGER_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.OBJECT_STORE_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.TYPE_LOADER;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;

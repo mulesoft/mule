@@ -11,9 +11,9 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.core.api.extension.MuleOperationExtensionModelDeclarer.OPERATION_NAMESPACE;
-import static org.mule.runtime.core.api.extension.MuleOperationExtensionModelDeclarer.OPTIONAL_PARAMETER;
-import static org.mule.runtime.core.internal.util.ExpressionUtils.isExpression;
+import static org.mule.runtime.core.api.extension.provider.MuleOperationExtensionModelDeclarer.OPERATION_NAMESPACE;
+import static org.mule.runtime.core.api.extension.provider.MuleOperationExtensionModelDeclarer.OPTIONAL_PARAMETER;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
