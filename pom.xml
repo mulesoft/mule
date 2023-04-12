@@ -968,6 +968,58 @@
             </build>
         </profile>
         <profile>
+            <id>testJdkWithoutXmlModule</id>
+            <activation>
+                <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
+                <!-- is the one used to run the tests, not the one used to run Maven. -->
+                <property>
+                    <name>!testJdkWithXmlModule</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>${maven.surefire.plugin.version}</version>
+                            <configuration>
+                                <additionalClasspathElements>
+                                    <!-- Add this to the classpath so it is available when running tests with jvm8 -->
+                                    <!-- but it does not interfere with the module system --> 
+                                    <!-- (it has colliding packages with java.xml module) when running with java11+ -->
+                                    <additionalClasspathElement>${org.mule.apache:xerces2-xsd11:jar:}</additionalClasspathElement>
+                                </additionalClasspathElements>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>properties</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                    <!-- This is needed only for jdk8, the required classes from here -->
+                    <!-- are already available in the jdk on versions 11+ -->
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>mac</id>
             <activation>
                 <os>
