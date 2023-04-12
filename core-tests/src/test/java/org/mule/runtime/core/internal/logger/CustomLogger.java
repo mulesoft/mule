@@ -10,15 +10,30 @@ import static org.apache.commons.lang3.StringUtils.replaceOnce;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
+import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+
+/**
+ * In some tests we were replacing the original logger in a class with a mocked logger via reflection and then setting it back to
+ * the original. This reflective access will not work in Java 17, hence writing a custom logger that will be used with specific
+ * tests
+ */
 public class CustomLogger implements Logger {
 
   private final String name;
   private List<String> messages;
   private final Logger logger;
+
+  public static void setLoggingLevel(ch.qos.logback.classic.Level level) {
+    ch.qos.logback.classic.Logger root =
+        (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+    root.setLevel(level);
+  }
 
   public CustomLogger(Logger logger, String name) {
     this.name = name;
@@ -45,7 +60,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled() {
-    return true;
+    return logger.isTraceEnabled();
   }
 
   @Override
@@ -56,7 +71,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isDebugEnabled() {
-    return true;
+    return logger.isDebugEnabled();
   }
 
   @Override
@@ -67,7 +82,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isInfoEnabled() {
-    return true;
+    return logger.isInfoEnabled();
   }
 
   @Override
@@ -98,7 +113,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled(Marker marker) {
-    return false;
+    return logger.isTraceEnabled();
   }
 
   @Override
@@ -245,7 +260,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isWarnEnabled() {
-    return false;
+    return logger.isWarnEnabled();
   }
 
   @Override

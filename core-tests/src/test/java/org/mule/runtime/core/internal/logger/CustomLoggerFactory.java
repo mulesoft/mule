@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * A factory for creating a CustomLogger, that will be used by some tests to avoid use of relection in those tests that replaced
+ * original logger with a mocked logger.
+ */
 public class CustomLoggerFactory implements ILoggerFactory {
 
   private final ILoggerFactory delegate;

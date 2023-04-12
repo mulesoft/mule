@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.core.internal.logger;
 
+import io.qameta.allure.Issue;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
+/**
+ * In some tests we were replacing the original logger in a class with a mocked logger via reflection and then setting it back to
+ * the original. This reflective access will not work in Java 17, hence writing a custom logger binder that will be used with
+ * specific tests. The tests that need Custom logger are defined in {@link CustomLoggerFactory}
+ */
+@Issue("W-12625671")
 public class CustomLoggerFactoryBinder implements LoggerFactoryBinder {
 
   private static final String LOGGER_FACTORY_CLASS_NAME = CustomLoggerFactoryBinder.class.getName();
