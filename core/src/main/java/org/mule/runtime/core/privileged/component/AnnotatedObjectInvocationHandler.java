@@ -96,7 +96,7 @@ public final class AnnotatedObjectInvocationHandler {
 
     Reference<DynamicType.Builder> builder = new Reference<>(byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface));
     MANAGED_METHODS.forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
-    annotatedObjectInvocationHandler.getOverridingMethods().keySet().forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
+    annotatedObjectInvocationHandler.overridingMethods.keySet().forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
     builder.set(builder.get().method(named("writeReplace")).intercept(to(new RemoveDynamicAnnotations())));
     MANAGED_METHODS.forEach(method -> builder.set(builder.get().method(named(method.getName()).and(takesArguments(method.getParameterTypes()))).intercept(to(annotatedObjectInvocationHandler))));
     builder.set(builder.get().method(isToString().and(isDeclaredBy(Object.class))).intercept(to(new ToStringInterceptor())));
@@ -165,7 +165,7 @@ public final class AnnotatedObjectInvocationHandler {
 
   public static class ComponentInterceptor extends AbstractComponent {
 
-    private final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
+    public final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
 
     public ComponentInterceptor(Set<Method> managedMethods) {
       for (Method method : managedMethods) {
@@ -179,10 +179,6 @@ public final class AnnotatedObjectInvocationHandler {
       } else {
         return defaultValue;
       }
-    }
-
-    public Map<Method, Method> getOverridingMethods() {
-      return overridingMethods;
     }
 
   }
