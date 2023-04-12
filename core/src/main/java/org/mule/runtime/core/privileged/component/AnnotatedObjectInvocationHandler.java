@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.core.privileged.component;
 
-import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.IMITATE_SUPER_CLASS;
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
-import static net.bytebuddy.matcher.ElementMatchers.isToString;
-import static net.bytebuddy.matcher.ElementMatchers.named;
-import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 
 import static java.lang.Integer.toHexString;
@@ -23,9 +17,20 @@ import static java.util.Collections.unmodifiableSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static net.bytebuddy.implementation.MethodDelegation.to;
+import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.IMITATE_SUPER_CLASS;
+import static net.bytebuddy.matcher.ElementMatchers.is;
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
+import static net.bytebuddy.matcher.ElementMatchers.isToString;
+import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.implementation.bind.annotation.*;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Empty;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.SuperMethod;
+import net.bytebuddy.implementation.bind.annotation.This;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -94,11 +99,16 @@ public final class AnnotatedObjectInvocationHandler {
 
     ComponentInterceptor annotatedObjectInvocationHandler = new ComponentInterceptor(MANAGED_METHODS);
 
-    Reference<DynamicType.Builder> builder = new Reference<>(byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface));
-    MANAGED_METHODS.forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
-    annotatedObjectInvocationHandler.overridingMethods.keySet().forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
+    Reference<DynamicType.Builder> builder =
+        new Reference<>(byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface));
+    MANAGED_METHODS
+        .forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
+    annotatedObjectInvocationHandler.getOverridingMethods()
+        .forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
     builder.set(builder.get().method(named("writeReplace")).intercept(to(new RemoveDynamicAnnotations())));
-    MANAGED_METHODS.forEach(method -> builder.set(builder.get().method(named(method.getName()).and(takesArguments(method.getParameterTypes()))).intercept(to(annotatedObjectInvocationHandler))));
+    MANAGED_METHODS.forEach(method -> builder
+        .set(builder.get().method(named(method.getName()).and(takesArguments(method.getParameterTypes())))
+            .intercept(to(annotatedObjectInvocationHandler))));
     builder.set(builder.get().method(isToString().and(isDeclaredBy(Object.class))).intercept(to(new ToStringInterceptor())));
 
     ClassLoader classLoader;
@@ -165,7 +175,7 @@ public final class AnnotatedObjectInvocationHandler {
 
   public static class ComponentInterceptor extends AbstractComponent {
 
-    public final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
+    private final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
 
     public ComponentInterceptor(Set<Method> managedMethods) {
       for (Method method : managedMethods) {
@@ -173,7 +183,10 @@ public final class AnnotatedObjectInvocationHandler {
       }
     }
 
-    public Object intercept(Object obj, Method method, Object[] args, Method superMethod, Object defaultValue) throws Throwable {
+    @RuntimeType
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
+                            @SuperMethod(nullIfImpossible = true) Method superMethod, @Empty Object defaultValue)
+        throws Throwable {
       if (overridingMethods.containsKey(method)) {
         return overridingMethods.get(method).invoke(this, args);
       } else {
@@ -181,11 +194,17 @@ public final class AnnotatedObjectInvocationHandler {
       }
     }
 
+    public Set<Method> getOverridingMethods() {
+      return overridingMethods.keySet();
+    }
   }
 
   public static class RemoveDynamicAnnotations {
 
-    public Object intercept(Object obj, Method method, Object[] args, Method superMethod, Object defaultValue) throws Throwable {
+    @RuntimeType
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
+                            @SuperMethod(nullIfImpossible = true) Method superMethod, @Empty Object defaultValue)
+        throws Throwable {
       return removeDynamicAnnotations(obj);
     }
   }
@@ -193,7 +212,8 @@ public final class AnnotatedObjectInvocationHandler {
   public static class ToStringInterceptor {
 
     @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperMethod Method superMethod) throws Throwable {
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperMethod Method superMethod)
+        throws Throwable {
       String base = obj.getClass().getName() + "@" + toHexString(obj.hashCode()) + "; location: ";
       if (((Component) obj).getLocation() != null) {
         return base + ((Component) obj).getLocation().getLocation();
