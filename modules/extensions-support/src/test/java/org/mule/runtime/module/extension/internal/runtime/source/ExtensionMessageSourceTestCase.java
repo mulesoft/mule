@@ -6,15 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -30,13 +38,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
-import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
-import static org.mule.tck.probe.PollingProber.checkNot;
-import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.ERROR;
+import static org.slf4j.event.Level.INFO;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -71,8 +75,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.resource.spi.work.Work;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -82,6 +84,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
@@ -358,8 +361,8 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Test
   public void start() throws Exception {
     initialise();
-    ArrayList<String> infoMessages = new ArrayList<>();
     logger.resetLogs();
+    logger.setLevel(INFO);
     if (!messageSource.getLifecycleState().isStarted()) {
       messageSource.start();
     }
@@ -381,6 +384,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     });
+    logger.resetLevel();
   }
 
   @Test
@@ -588,6 +592,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Test
   public void sourceInitializedLogMessage() throws Exception {
     logger.resetLogs();
+    logger.setLevel(DEBUG);
     messageSource.initialise();
     if (primaryNodeOnly) {
       verifyLogMessage(logger.getMessages(),
@@ -596,24 +601,29 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       verifyLogMessage(logger.getMessages(),
                        "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
     }
+    logger.resetLevel();
   }
 
   @Test
   public void sourceStartedLogMessage() throws Exception {
     ArrayList<String> debugMessages = new ArrayList<>();
     logger.resetLogs();
+    logger.setLevel(DEBUG);
     messageSource.initialise();
     messageSource.start();
     verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is starting");
+    logger.resetLevel();
   }
 
   @Test
   public void sourceStoppedLogMessage() throws Exception {
     logger.resetLogs();
+    logger.setLevel(DEBUG);
     messageSource.initialise();
     messageSource.start();
     messageSource.stop();
     verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is stopping");
+    logger.resetLevel();
   }
 
 
@@ -621,6 +631,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void getRetryPolicyExhaustedAndLogShutdownMessage() throws Exception {
     ArrayList<String> errorMessages = new ArrayList<>();
     logger.resetLogs();
+    logger.setLevel(ERROR);
     start();
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     doThrow(e).when(source).onStart(any());
@@ -630,18 +641,21 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
                      "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
       return true;
     }));
+    logger.resetLevel();
   }
 
   @Test
   public void reconnectAndLogSuccessMessage() throws Exception {
     start();
     logger.resetLogs();
+    logger.setLevel(INFO);
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
       verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     }));
+    logger.resetLevel();
   }
 
   private void registerNotificationListener(ExceptionNotificationListener exceptionNotificationListener)

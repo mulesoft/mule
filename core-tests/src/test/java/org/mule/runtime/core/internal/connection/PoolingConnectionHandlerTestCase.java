@@ -15,7 +15,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.slf4j.event.Level.DEBUG;
+
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -26,6 +29,7 @@ import org.mule.tck.size.SmallTest;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,6 +71,12 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     managedConnection = new PoolingConnectionHandler<>(connection, pool, poolId, poolingListener, connectionProvider);
+    logger.setLevel(DEBUG);
+  }
+
+  @After
+  public void restoreLogger() throws Exception {
+    logger.resetLevel();
   }
 
   @Test

@@ -17,11 +17,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.TRACE;
+
 import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
 import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
 import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
@@ -131,30 +133,42 @@ public class PollingSourceWrapperTestCase {
 
   @Test
   public void loggingOnAcceptedItem() throws MuleException, Exception {
+    logger.resetLogs();
+    logger.setLevel(DEBUG);
     stubPollItem(Collections.singletonList(null), Collections.singletonList(null));
     startSourcePollWithMockedLogger();
     verifyLogMessage(logger.getMessages(), PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
+    logger.resetLevel();
   }
 
   @Test
   public void loggingOnRejectedItem() throws Exception {
+    logger.resetLogs();
+    logger.setLevel(DEBUG);
     when(lockFactoryMock.createLock(anyString()).tryLock()).thenReturn(false);
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(null));
     startSourcePollWithMockedLogger();
     verifyLogMessage(logger.getMessages(), PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
+    logger.resetLevel();
   }
 
   @Test
   public void loggingOnCreatedWatermark() throws Exception {
+    logger.resetLogs();
+    logger.setLevel(TRACE);
     String watermark = "5";
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(watermark));
     startSourcePollWithMockedLogger();
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
+    logger.resetLevel();
   }
 
   @Test
   public void loggingOnUpdatedWatermark() throws Exception {
+    logger.resetLogs();
+    logger.setLevel(TRACE);
+
     List<String> ids = Arrays.asList("id1", "id2", "id3", "id4");
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8);
     stubPollItem(ids, watermarks);
@@ -170,11 +184,13 @@ public class PollingSourceWrapperTestCase {
                      TEST_FLOW_NAME, -1);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
-
+    logger.resetLevel();
   }
 
   @Test
   public void loggingOnUpdatedWatermarkWithPollLimit() throws MuleException, Exception {
+    logger.resetLogs();
+    logger.setLevel(TRACE);
     List<String> ids = Arrays.asList("id1", "id2", "id3", "id4", "id5");
     List<Serializable> watermarks = Arrays.asList(1, 3, 5, 8, 4);
     stubPollItem(ids, watermarks);
@@ -192,6 +208,7 @@ public class PollingSourceWrapperTestCase {
     verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, "itemWatermark", 4,
                      TEST_FLOW_NAME, 1);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 4, TEST_FLOW_NAME);
+    logger.resetLevel();
   }
 
   private void assertPersistentStoreIsCreated(String expectedName, Long expirationInterval) {

@@ -40,7 +40,7 @@ public class CustomLoggerFactory implements ILoggerFactory {
 
   private Logger createLogger(String name) {
     if (contains(name)) {
-      return new CustomLogger(delegate.getLogger(name), name, true);
+      return new CustomLogger(delegate.getLogger(name), name);
     }
     return delegate.getLogger(name);
   }

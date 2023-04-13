@@ -7,30 +7,36 @@
 package org.mule.runtime.core.internal.logger;
 
 import static org.apache.commons.lang3.StringUtils.replaceOnce;
+import static org.slf4j.event.Level.TRACE;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.INFO;
+import static org.slf4j.event.Level.ERROR;
+import static org.slf4j.event.Level.WARN;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
+import org.slf4j.event.Level;
 
 /**
  * In some tests we were replacing the original logger in a class with a mocked logger via reflection and then setting it back to
  * the original. This reflective access will not work in Java 17, hence writing a custom logger that will be used with specific
- * tests.
+ * tests.This Logger relies on caller setting the correct log level in Test setup. So before using the class you need to caall setlevel(Level)
+ * and clear the log level at the end, which would then default to log level of original underlying logger.
  */
 public class CustomLogger implements Logger {
 
   private final String name;
   private List<String> messages;
   private final Logger logger;
-  private boolean customLoggingEnabled;
+  private Level level = WARN;
 
-  public CustomLogger(Logger logger, String name, boolean loggingEnabled) {
+  public CustomLogger(Logger logger, String name) {
     this.name = name;
     this.messages = new ArrayList<>();
     this.logger = logger;
-    this.customLoggingEnabled = loggingEnabled;
   }
 
   public void resetLogs() {
@@ -50,13 +56,32 @@ public class CustomLogger implements Logger {
     return name;
   }
 
+  public void setLevel(Level level) {
+    this.level = level;
+  }
+
+  /**
+   * After test runs this should be called and restores log level to original logger's Level
+   */
+  public void resetLevel() {
+    if (logger.isInfoEnabled()) {
+      level = INFO;
+    } else if (logger.isDebugEnabled()) {
+      level = DEBUG;
+    } else if (logger.isTraceEnabled()) {
+      level = TRACE;
+    } else if (logger.isErrorEnabled()) {
+      level = ERROR;
+    } else if (logger.isWarnEnabled()) {
+      level = WARN;
+    } else {
+      level = INFO;
+    }
+  }
+
   @Override
   public boolean isTraceEnabled() {
-    if (customLoggingEnabled) {
-      return customLoggingEnabled;
-    } else {
-      return logger.isTraceEnabled();
-    }
+    return level == TRACE;
   }
 
   @Override
@@ -67,11 +92,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isDebugEnabled() {
-    if (customLoggingEnabled) {
-      return customLoggingEnabled;
-    } else {
-      return logger.isDebugEnabled();
-    }
+    return level == DEBUG;
   }
 
   @Override
@@ -82,11 +103,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isInfoEnabled() {
-    if (customLoggingEnabled) {
-      return customLoggingEnabled;
-    } else {
-      return logger.isInfoEnabled();
-    }
+    return level == INFO;
   }
 
   @Override
@@ -117,11 +134,7 @@ public class CustomLogger implements Logger {
 
   @Override
   public boolean isTraceEnabled(Marker marker) {
-    if (customLoggingEnabled) {
-      return customLoggingEnabled;
-    } else {
-      return logger.isTraceEnabled();
-    }
+    return level == TRACE;
   }
 
   @Override
