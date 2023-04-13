@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader {
+public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
@@ -39,12 +39,16 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   public MuleApplicationClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parentCl,
                                     NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
                                     ClassLoaderLookupPolicy lookupPolicy) {
-    super(artifactId, artifactDescriptor, urls.toArray(new URL[0]), parentCl, lookupPolicy);
+    super(artifactId, artifactDescriptor, parentCl, nativeLibraryFinder, urls, lookupPolicy);
     this.nativeLibraryFinder = nativeLibraryFinder;
   }
 
   @Override
   protected String findLibrary(String name) {
+    if (supportNativeLibraryDependencies) {
+      loadNativeLibraryDependencies(name);
+    }
+
     String libraryPath = super.findLibrary(name);
 
     libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
