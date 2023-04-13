@@ -25,6 +25,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
