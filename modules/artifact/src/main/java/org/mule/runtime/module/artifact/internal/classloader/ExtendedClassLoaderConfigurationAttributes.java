@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.internal.classloader;
 
 import java.util.Map;
 
-import org.apache.commons.collections.map.AbstractMapDecorator;
+import org.apache.commons.collections4.map.AbstractMapDecorator;
 
 /**
  * Allows to extends the attributes defined for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration}

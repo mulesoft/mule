@@ -14,22 +14,18 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
 
 public class OrderedProperties extends Properties {
 
   private static final long serialVersionUID = -3611415251568805458L;
 
-  private final Vector<Object> keys = new Vector<Object>();
-
-  public OrderedProperties() {
-    super();
-  }
+  private final Vector<Object> keys = new Vector<>();
 
   @Override
   @SuppressWarnings("unchecked")
   public Set<Map.Entry<Object, Object>> entrySet() {
-    Set<Map.Entry<Object, Object>> entries = new LinkedHashSet<Map.Entry<Object, Object>>();
+    Set<Map.Entry<Object, Object>> entries = new LinkedHashSet<>();
     Enumeration<?> keys = this.propertyNames();
 
     while (keys.hasMoreElements()) {
@@ -45,6 +41,7 @@ public class OrderedProperties extends Properties {
     return this.keys.elements();
   }
 
+  @Override
   public Object put(Object key, Object value) {
     if (this.keys.contains(key)) {
       this.keys.remove(key);
@@ -55,6 +52,7 @@ public class OrderedProperties extends Properties {
     return super.put(key, value);
   }
 
+  @Override
   public Object remove(Object key) {
     this.keys.remove(key);
     return super.remove(key);

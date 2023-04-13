@@ -6,21 +6,6 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Collections.sort;
-import static org.apache.commons.collections.CollectionUtils.forAllDo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionInfo;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionStack;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
@@ -32,6 +17,22 @@ import static org.mule.runtime.api.exception.MuleException.refreshVerboseExcepti
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToBuildMessage;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static java.util.Collections.sort;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.transformer.ResolverException;
@@ -41,14 +42,16 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
-import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.comparators.ComparableComparator;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 
 @SmallTest
 public class ExceptionHelperTestCase extends AbstractMuleTestCase {
@@ -129,7 +132,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
   public void filteredStackIncludingNonMuleCode() {
     int calls = 5;
     try {
-      generateStackEntries(calls, input -> forAllDo(singleton(null), input1 -> {
+      generateStackEntries(calls, input -> singleton(null).forEach(input1 -> {
         throw new RuntimeException(new DefaultMuleException(createStaticMessage("foo")));
       }));
       fail("Expected exception");
@@ -138,7 +141,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.apache.commons.collections.CollectionUtils.forAllDo\\(CollectionUtils.java:[0-9]+\\)",
+                                                       "  java.util.*", // Collection.forEach
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
@@ -198,9 +201,9 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private void generateStackEntries(int calls, Closure closure) {
+  private void generateStackEntries(int calls, Consumer closure) {
     if (calls == 0) {
-      closure.execute(null);
+      closure.accept(null);
     } else {
       generateStackEntries(--calls, closure);
     }
