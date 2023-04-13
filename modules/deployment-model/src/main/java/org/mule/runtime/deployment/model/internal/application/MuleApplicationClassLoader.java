@@ -9,12 +9,14 @@ package org.mule.runtime.deployment.model.internal.application;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryLoaderMuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -29,7 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
+public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader
+    implements ApplicationClassLoader {
 
   static {
     registerAsParallelCapable();
@@ -40,12 +43,16 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   public MuleApplicationClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parentCl,
                                     NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
                                     ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    super(artifactId, artifactDescriptor, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
+    super(artifactId, artifactDescriptor, parentCl, nativeLibraryFinder, urls, lookupPolicy, artifactPluginClassLoaders);
     this.nativeLibraryFinder = nativeLibraryFinder;
   }
 
   @Override
   protected String findLibrary(String name) {
+    if (supportNativeLibraryDependencies) {
+      loadNativeLibraryDependencies(name);
+    }
+
     String libraryPath = super.findLibrary(name);
 
     libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
