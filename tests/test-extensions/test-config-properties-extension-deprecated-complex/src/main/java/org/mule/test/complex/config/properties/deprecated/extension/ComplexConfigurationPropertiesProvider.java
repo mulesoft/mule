@@ -25,7 +25,7 @@ public class ComplexConfigurationPropertiesProvider implements ConfigurationProp
   }
 
   @Override
-  public Optional<? extends org.mule.runtime.properties.api.ConfigurationProperty> provide(String configurationAttributeKey) {
+  public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
     if (textsFromComplexParams.isEmpty()) {
       return empty();
     }
