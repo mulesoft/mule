@@ -22,12 +22,9 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+
 
 @SmallTest
-@RunWith(PowerMockRunner.class)
 public class JavaExtensionModelParserUtilsTestCase {
 
   private OperationElement operationElement = mock(OperationElement.class);
@@ -52,11 +49,10 @@ public class JavaExtensionModelParserUtilsTestCase {
   }
 
   @Test
-  @PrepareForTest(org.mule.sdk.api.runtime.operation.ExecutionType.class)
   public void operationExecutionTypeFromSdkApiAnnotationWithUndefinedExecutionType() {
     org.mule.sdk.api.runtime.operation.ExecutionType UNKNOWN_EXECUTION_TYPE =
         mock(org.mule.sdk.api.runtime.operation.ExecutionType.class);
-    Whitebox.setInternalState(UNKNOWN_EXECUTION_TYPE, "name", "UNKNOWN");
+    when(UNKNOWN_EXECUTION_TYPE.name()).thenReturn("UNKNOWN");
     mockOperationExecutionTypeFromAnnotation(org.mule.sdk.api.annotation.execution.Execution.class,
                                              UNKNOWN_EXECUTION_TYPE);
     Optional<ExecutionType> executionType = JavaExtensionModelParserUtils.getExecutionType(operationElement);
