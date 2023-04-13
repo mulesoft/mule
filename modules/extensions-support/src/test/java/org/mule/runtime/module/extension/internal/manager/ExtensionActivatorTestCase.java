@@ -113,7 +113,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
   }
 
   private static ExtensionModel extensionWithTypes(Set<ObjectType> metadataTypes) {
-    ExtensionModel mockExtensionModel = mock(ExtensionModel.class);
+    ExtensionModel mockExtensionModel = spy(ExtensionModel.class);
     XmlDslModel dslModel = XmlDslModel.builder().setPrefix(MOCK_EXTENSION_PREFIX).build();
     when(mockExtensionModel.getXmlDslModel()).thenReturn(dslModel);
     when(mockExtensionModel.getName()).thenReturn(MOCK_EXTENSION_NAME);
