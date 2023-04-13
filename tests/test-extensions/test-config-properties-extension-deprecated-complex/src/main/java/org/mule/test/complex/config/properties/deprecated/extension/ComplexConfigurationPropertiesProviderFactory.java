@@ -31,11 +31,11 @@ public class ComplexConfigurationPropertiesProviderFactory implements Configurat
 
   @Override
   public org.mule.runtime.properties.api.ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
-                                                                                         UnaryOperator<String> localResolver,
-                                                                                         ResourceProvider externalResourceProvider) {
+                                                                                        UnaryOperator<String> localResolver,
+                                                                                        ResourceProvider externalResourceProvider) {
     DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
     ConfigurationParameters configurationParameters =
-      resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
+        resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
 
     return createProvider(configurationParameters);
   }
