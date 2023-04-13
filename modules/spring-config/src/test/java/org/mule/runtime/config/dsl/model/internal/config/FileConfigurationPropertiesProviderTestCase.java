@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;

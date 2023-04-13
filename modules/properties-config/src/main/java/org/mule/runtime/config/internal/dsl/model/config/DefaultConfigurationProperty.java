@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 /**
  * Represents a configuration attribute.
@@ -46,8 +46,8 @@ public class DefaultConfigurationProperty implements ConfigurationProperty {
   }
 
   @Override
-  public Object getRawValue() {
-    return rawValue;
+  public String getValue() {
+    return rawValue.toString();
   }
 
   @Override

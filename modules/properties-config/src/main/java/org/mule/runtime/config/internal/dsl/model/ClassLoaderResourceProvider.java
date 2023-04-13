@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.properties.api.ResourceProvider;
 
 /**
  * Resource provider implementation that delegates to an actual class loader.

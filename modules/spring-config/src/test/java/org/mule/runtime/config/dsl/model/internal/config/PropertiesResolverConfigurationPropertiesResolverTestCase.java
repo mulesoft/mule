@@ -13,10 +13,10 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableList;
@@ -58,7 +58,8 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
               .build();
 
           @Override
-          public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+          public Optional<? extends org.mule.runtime.properties.api.ConfigurationProperty> provide(
+                                                                                                   String configurationAttributeKey) {
             return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
           }
 
@@ -79,7 +80,7 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
           .build();
 
       @Override
-      public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+      public Optional<? extends org.mule.runtime.properties.api.ConfigurationProperty> provide(String configurationAttributeKey) {
         return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
       }
 
