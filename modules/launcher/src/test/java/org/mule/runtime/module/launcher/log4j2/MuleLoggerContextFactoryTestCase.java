@@ -54,6 +54,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
   public void before() throws Exception {
     when(classLoader.getArtifactId()).thenReturn(getClass().getName());
     when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
+    when(classLoader.findLocalResource("log4j2-test.xml")).thenReturn(null);
 
     artifactDescriptor = new ApplicationDescriptor("myApp");
     artifactDescriptorDomain = new DomainDescriptor("myDomain");
