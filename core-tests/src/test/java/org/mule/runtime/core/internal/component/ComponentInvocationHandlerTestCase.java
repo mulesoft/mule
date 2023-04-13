@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.removeDynamicAnnotations;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.AbstractComponent;
