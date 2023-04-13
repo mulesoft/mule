@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -37,6 +38,7 @@ import org.mule.tck.size.SmallTest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -88,6 +90,8 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     contextConfigurer = new LoggerContextConfigurer();
     when(context.isStandalone()).thenReturn(true);
     when(context.getConfiguration()).thenReturn(configuration);
+    when(context.getConfigFile()).thenReturn(null);
+    when(configuration.getAppenders()).thenReturn(emptyMap());
 
     converter = null;
 
