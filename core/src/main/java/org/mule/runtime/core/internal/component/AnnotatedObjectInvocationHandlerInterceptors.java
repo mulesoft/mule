@@ -28,18 +28,6 @@ import java.util.Set;
 
 public class AnnotatedObjectInvocationHandlerInterceptors {
 
-  /**
-   * Returns a newly built object containing the state of the given {@code annotated} object, but without any of its annotations.
-   * <p>
-   * This is useful when trying to use the base object in some scenarios where the object is introspected, to avoid the
-   * dynamically added stuff to interfere with that introspection.
-   * <p>
-   * Note that there is no consistent state kept between the {@code annotated} and the returned objects. After calling this
-   * method, the {@code annotated} object should be discarded (unless it is immutable, which wouldn't cause any problems)
-   *
-   * @param annotated the object to remove dynamic stuff from
-   * @return a newly built object.
-   */
   public static <T, A> T removeDynamicAnnotations(A annotated) {
     if (annotated instanceof DynamicallyComponent) {
       Class<?> baseClass = annotated.getClass().getSuperclass();

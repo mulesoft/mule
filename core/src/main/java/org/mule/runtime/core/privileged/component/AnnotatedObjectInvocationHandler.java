@@ -27,6 +27,7 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import net.bytebuddy.dynamic.DynamicType;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
 
@@ -107,8 +108,22 @@ public final class AnnotatedObjectInvocationHandler {
       classLoader = clazz.getClassLoader();
     }
 
-    Class<A> annotatedClass = (Class<A>) builder.get().make().load(classLoader).getLoaded();
-    return annotatedClass;
+    return builder.get().make().load(classLoader).getLoaded();
   }
 
+  /**
+   * Returns a newly built object containing the state of the given {@code annotated} object, but without any of its annotations.
+   * <p>
+   * This is useful when trying to use the base object in some scenarios where the object is introspected, to avoid the
+   * dynamically added stuff to interfere with that introspection.
+   * <p>
+   * Note that there is no consistent state kept between the {@code annotated} and the returned objects. After calling this
+   * method, the {@code annotated} object should be discarded (unless it is immutable, which wouldn't cause any problems)
+   *
+   * @param annotated the object to remove dynamic stuff from
+   * @return a newly built object.
+   */
+  public static <T, A> T removeDynamicAnnotations(A annotated) {
+    return AnnotatedObjectInvocationHandlerInterceptors.removeDynamicAnnotations(annotated);
+  }
 }
