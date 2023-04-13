@@ -9,26 +9,27 @@ package org.mule.runtime.deployment.model.internal.domain;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryLoaderMuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 /**
  * Defines a {@link MuleArtifactClassLoader} for a domain artifact.
  */
-public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoader implements ArtifactClassLoader {
+public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
@@ -48,7 +49,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
                                      ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
                                      List<ArtifactClassLoader> artifactPluginClassLoaders,
                                      NativeLibraryFinder nativeLibraryFinder) {
-    super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy,
+    super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, parent, nativeLibraryFinder, urls, lookupPolicy,
           artifactPluginClassLoaders);
     this.nativeLibraryFinder = nativeLibraryFinder;
   }
@@ -58,6 +59,11 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
     if (nativeLibraryFinder == null) {
       return super.findLibrary(name);
     }
+
+    if (supportNativeLibraryDependencies) {
+      loadNativeLibraryDependencies(name);
+    }
+
     String libraryPath = super.findLibrary(name);
 
     libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
