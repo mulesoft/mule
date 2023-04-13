@@ -41,12 +41,12 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
   }
 
   @Before
-  public void setUpLogger() throws Exception {
+  public void setUpLogger() {
     logger.setLevel(DEBUG);
   }
 
   @After
-  public void restoreLogger() throws Exception {
+  public void restoreLogger() {
     logger.resetLevel();
   }
 

@@ -75,7 +75,7 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @After
-  public void restoreLogger() throws Exception {
+  public void restoreLogger() {
     logger.resetLevel();
   }
 
