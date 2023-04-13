@@ -23,10 +23,11 @@ public class CustomLoggerFactory implements ILoggerFactory {
 
   private final ILoggerFactory delegate;
   private final ConcurrentMap<String, Logger> loggerMap;
-  private final List<String> TESTS_WITH_CUSTOM_LOGGER =
+  private final List<String> CLASSES_WITH_CUSTOM_LOGGER_IN_TEST =
       asList("org.mule.runtime.core.internal.connection.PoolingConnectionHandler",
              "org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource",
-             "org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper");
+             "org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper",
+             "org.mule.runtime.core.internal.connection.PoolingConnectionManagementStrategy");
 
   public CustomLoggerFactory(ILoggerFactory delegate) {
     this.delegate = delegate;
@@ -46,6 +47,6 @@ public class CustomLoggerFactory implements ILoggerFactory {
   }
 
   private boolean contains(String searchStr) {
-    return TESTS_WITH_CUSTOM_LOGGER.stream().anyMatch(searchStr::equals);
+    return CLASSES_WITH_CUSTOM_LOGGER_IN_TEST.stream().anyMatch(searchStr::equals);
   }
 }

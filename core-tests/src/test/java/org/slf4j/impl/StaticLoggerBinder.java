@@ -12,7 +12,9 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
-
+/**
+ * This is a test class and will be used only by the tests in core-tests and extension-support
+ */
 public class StaticLoggerBinder implements LoggerFactoryBinder {
 
   /**
