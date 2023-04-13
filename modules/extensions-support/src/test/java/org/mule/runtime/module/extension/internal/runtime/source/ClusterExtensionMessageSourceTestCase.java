@@ -82,9 +82,9 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
 
   @Test
   public void dontStartIfNotPrimaryNodeLogMessage() throws Exception {
+    logger.resetLogs();
     messageSource.initialise();
     messageSource.start();
-    logger.resetLogs();
     verifyLogMessage(logger.getMessages(),
                      "Message source 'source' on flow 'appleFlow' cannot initialize. This Message source can only run on the primary node of the cluster");
   }
