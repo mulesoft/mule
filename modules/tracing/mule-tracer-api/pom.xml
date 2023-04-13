@@ -19,7 +19,7 @@
     <artifactId>mule-tracer-api</artifactId>
     <version>4.6.0-SNAPSHOT</version>
     <name>Mule Tracer Api</name>
-    <description>Definitions for mule tracer</description>
+    <description>Definitions for Mule tracer</description>
 
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>

@@ -210,7 +210,7 @@
         <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
-        <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.0.0</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
         <mule.module.maven.plugin.version>1.5.0-SNAPSHOT</mule.module.maven.plugin.version>
@@ -409,12 +409,31 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${mavenCompilerVersion}</version>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <configuration>
+                                <release>11</release>
+                                <!-- no excludes: compile everything to ensure module-info contains right entries -->
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>base-compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <release>${javaReleaseVersion}</release>
+                                <!-- recompile everything for target VM except the module-info.java -->
+                                <excludes>
+                                    <exclude>module-info.java</exclude>
+                                </excludes>
+                            </configuration>
+                        </execution>
+                    </executions>
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
-                        <source>${javaVersion}</source>
-                        <target>${javaVersion}</target>
                         <proc>none</proc>
-                        <parameters>true</parameters>
                     </configuration>
                 </plugin>
                 <plugin>
