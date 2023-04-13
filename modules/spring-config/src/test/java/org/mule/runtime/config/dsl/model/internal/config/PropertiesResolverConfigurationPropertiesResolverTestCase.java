@@ -59,7 +59,7 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
 
           @Override
           public Optional<? extends ConfigurationProperty> provide(
-                                                                                                   String configurationAttributeKey) {
+                                                                   String configurationAttributeKey) {
             return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
           }
 
