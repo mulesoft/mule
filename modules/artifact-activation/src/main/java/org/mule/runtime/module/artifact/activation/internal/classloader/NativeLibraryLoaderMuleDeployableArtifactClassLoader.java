@@ -76,10 +76,7 @@ public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader exten
       try {
         method = loader.getMethod(METHOD_NAME, String.class);
       } catch (NoSuchMethodException e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage("Can not obtain the %s method to load the native library dependencies.",
-                                                           METHOD_NAME),
-                                       e);
+        throw new MuleRuntimeException(createStaticMessage("Could not create native library loader."), e);
       }
 
       List<String> nativeLibraries = nativeLibraryFinder.findLibraryNames();
@@ -90,10 +87,7 @@ public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader exten
         try {
           method.invoke(loader.getDeclaredConstructor().newInstance(), nativeLibrary);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
-          throw new MuleRuntimeException(
-                                         createStaticMessage("Can not invoke the %s method to load the %s native library",
-                                                             METHOD_NAME, nativeLibrary),
-                                         e);
+          throw new MuleRuntimeException(createStaticMessage("Could not load %s native library.", nativeLibrary), e);
         }
       }
     }
