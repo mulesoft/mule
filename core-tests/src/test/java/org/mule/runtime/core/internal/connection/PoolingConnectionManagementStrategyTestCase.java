@@ -85,7 +85,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   @After
-  public void restoreLogger() throws Exception {
+  public void restoreLogger() {
     logger.resetLevel();
   }
 
