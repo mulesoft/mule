@@ -77,6 +77,10 @@
             <artifactId>mule-maven-client-impl</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
