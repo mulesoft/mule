@@ -58,7 +58,7 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
               .build();
 
           @Override
-          public Optional<? extends org.mule.runtime.properties.api.ConfigurationProperty> provide(
+          public Optional<? extends ConfigurationProperty> provide(
                                                                                                    String configurationAttributeKey) {
             return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
           }
@@ -80,7 +80,7 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
           .build();
 
       @Override
-      public Optional<? extends org.mule.runtime.properties.api.ConfigurationProperty> provide(String configurationAttributeKey) {
+      public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
         return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
       }
 

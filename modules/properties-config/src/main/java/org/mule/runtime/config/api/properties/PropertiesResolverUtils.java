@@ -55,7 +55,7 @@ public class PropertiesResolverUtils {
    * @param artifactAst the Artifact AST to calculate the global properties from
    * @return a Lazy Evaluator to get the Global/Default Properties of a given {@link ArtifactAst}.
    */
-  public static Supplier<Map<String, org.mule.runtime.properties.api.ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
+  public static Supplier<Map<String, ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
     return new LazyValue<>(() -> {
       final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 

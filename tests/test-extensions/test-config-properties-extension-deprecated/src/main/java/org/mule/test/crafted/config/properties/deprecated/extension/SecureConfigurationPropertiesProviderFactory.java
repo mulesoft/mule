@@ -15,6 +15,7 @@ import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ResourceProvider;
 
@@ -37,9 +38,9 @@ public class SecureConfigurationPropertiesProviderFactory implements Configurati
   }
 
   @Override
-  public org.mule.runtime.properties.api.ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
-                                                                                        UnaryOperator<String> localResolver,
-                                                                                        ResourceProvider externalResourceProvider) {
+  public ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
+                                                        UnaryOperator<String> localResolver,
+                                                        ResourceProvider externalResourceProvider) {
     DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
     ConfigurationParameters configurationParameters =
       resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
