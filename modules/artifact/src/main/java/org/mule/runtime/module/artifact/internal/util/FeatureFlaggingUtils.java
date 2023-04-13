@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.config;
+package org.mule.runtime.module.artifact.internal.util;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
+
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -24,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.slf4j.Logger;
 
 /**
  * Utility class meant to provide a {@link org.mule.runtime.api.config.FeatureFlaggingService} substitute during the earlier

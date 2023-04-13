@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.activation.internal.nativelib;
 
+import java.util.List;
+
 /**
  * Finds native libraries in a particular class loading context
  */
@@ -20,4 +22,12 @@ public interface NativeLibraryFinder {
    * @return library path to use for the given name. Can be null is no library was found.
    */
   String findLibrary(String name, String libraryPath);
+
+  /**
+   * Provides the native library names
+   *
+   * @return the native library names. Can be an empty list if no native library name is found.
+   */
+  List<String> findLibraryNames();
+  // TODO: Delete after completing W-12786373.
 }
