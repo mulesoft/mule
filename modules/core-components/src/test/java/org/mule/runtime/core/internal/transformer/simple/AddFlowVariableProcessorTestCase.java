@@ -17,7 +17,7 @@ import static org.mule.test.allure.AllureConstants.ComponentsFeature.AddVariable
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
+import org.mule.runtime.core.components.internal.processor.simple.AddFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
 import io.qameta.allure.Feature;

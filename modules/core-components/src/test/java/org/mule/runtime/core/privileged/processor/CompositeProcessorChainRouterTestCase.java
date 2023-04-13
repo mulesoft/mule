@@ -28,7 +28,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
-import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.components.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

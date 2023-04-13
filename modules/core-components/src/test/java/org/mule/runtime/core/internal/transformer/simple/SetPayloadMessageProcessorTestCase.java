@@ -20,7 +20,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
+import org.mule.runtime.core.components.internal.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;

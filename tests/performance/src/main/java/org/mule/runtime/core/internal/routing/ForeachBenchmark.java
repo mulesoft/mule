@@ -45,6 +45,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 import org.slf4j.Logger;
+import org.mule.runtime.core.components.internal.routing.Foreach;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,7 @@ public class ForeachBenchmark extends AbstractBenchmark {
 
   @Setup(Level.Trial)
   public void setup() throws Exception {
-    configurationComponentLocator = mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS.get());
+    configurationComponentLocator = mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS);
     muleContext = createMuleContextWithServices();
     muleContext.start();
 

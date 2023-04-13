@@ -16,7 +16,7 @@ import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
-import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.components.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.internal.AbstractApplicationDeploymentTestCase;
 

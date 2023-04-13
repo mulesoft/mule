@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
+import org.mule.runtime.core.components.internal.routing.ProcessorExpressionRoute;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 public class ProcessorExpressionRouteFactoryBean extends AbstractProcessorRouteFactoryBean<ProcessorExpressionRoute> {

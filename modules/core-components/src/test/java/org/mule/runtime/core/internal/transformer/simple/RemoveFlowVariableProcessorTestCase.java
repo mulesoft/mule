@@ -16,7 +16,7 @@ import static org.mule.test.allure.AllureConstants.ComponentsFeature.RemoveVaria
 
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.processor.simple.RemoveFlowVariableProcessor;
+import org.mule.runtime.core.components.internal.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Set;

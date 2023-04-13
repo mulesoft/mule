@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.internal.processor.TryScope;
+import org.mule.runtime.core.components.internal.processor.TryScope;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 
 import java.util.List;
