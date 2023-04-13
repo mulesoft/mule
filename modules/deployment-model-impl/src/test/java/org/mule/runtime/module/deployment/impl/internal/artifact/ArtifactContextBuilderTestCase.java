@@ -19,7 +19,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_CONFIGURATOR_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-import static org.mule.runtime.module.deployment.impl.internal.config.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
+import static org.mule.runtime.module.artifact.internal.util.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
 import static java.lang.Thread.currentThread;

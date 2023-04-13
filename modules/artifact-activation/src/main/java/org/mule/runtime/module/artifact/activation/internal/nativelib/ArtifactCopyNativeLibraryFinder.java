@@ -13,12 +13,18 @@ import static java.util.Arrays.stream;
 
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
@@ -32,9 +38,10 @@ import org.slf4j.LoggerFactory;
 public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
-
   protected static final String JNILIB_EXTENSION = ".jnilib";
-
+  public static final String EMPTY_STRING = "";
+  public static final String LIB_PREFIX = "lib";
+  public static final String HYPHEN_SEPARATOR = "-";
   private final File artifactTempFolder;
   private final URL[] urls;
 
@@ -127,5 +134,40 @@ public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
     } else {
       return null;
     }
+  }
+
+  public List<String> findLibraryNames() {
+    List<String> nativeLibraries = new ArrayList<>();
+    for (URL url : this.urls) {
+      String fullPath;
+      try {
+        fullPath = url.toURI().toString();
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(e);
+      }
+      String libraryName = getName(fullPath);
+      if (isNativeLibrary(libraryName)) {
+        String libraryBaseName = getLibraryBaseName(libraryName);
+        nativeLibraries.add(libraryBaseName);
+      }
+    }
+    return nativeLibraries;
+  }
+
+  private boolean isNativeLibrary(String libName) {
+    if (Objects.equals(libName, EMPTY_STRING)) {
+      return false;
+    }
+
+    for (NativeLibraryFileExtension extension : NativeLibraryFileExtension.values()) {
+      if (libName.endsWith(extension.value())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static String getLibraryBaseName(String libraryName) {
+    return getBaseName(libraryName).replaceFirst(LIB_PREFIX, EMPTY_STRING).split(HYPHEN_SEPARATOR)[0];
   }
 }

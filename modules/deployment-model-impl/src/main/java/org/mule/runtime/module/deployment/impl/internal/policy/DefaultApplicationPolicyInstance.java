@@ -15,8 +15,8 @@ import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-import static org.mule.runtime.module.deployment.impl.internal.config.FeatureFlaggingUtils.isFeatureEnabled;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
