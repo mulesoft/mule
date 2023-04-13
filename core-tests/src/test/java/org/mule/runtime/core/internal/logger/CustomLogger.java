@@ -23,8 +23,8 @@ import org.slf4j.event.Level;
 /**
  * In some tests we were replacing the original logger in a class with a mocked logger via reflection and then setting it back to
  * the original. This reflective access will not work in Java 17, hence writing a custom logger that will be used with specific
- * tests.This Logger relies on caller setting the correct log level in Test setup. So before using the class you need to caall setlevel(Level)
- * and clear the log level at the end, which would then default to log level of original underlying logger.
+ * tests.This Logger relies on caller setting the correct log level in Test setup. So before using the class you need to call
+ * setlevel(Level) and clear the log level at the end, which would then default to log level of original underlying logger.
  */
 public class CustomLogger implements Logger {
 
