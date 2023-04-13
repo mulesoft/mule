@@ -10,6 +10,8 @@ package org.mule.runtime.deployment.model.internal.nativelib;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Finds native libraries in an application's lib folder
@@ -32,6 +34,11 @@ public class PerAppNativeLibraryFinder implements NativeLibraryFinder {
     }
 
     return libraryPath;
+  }
+
+  @Override
+  public List<String> findLibraryNames() {
+    return new ArrayList<>();
   }
 
   protected String findLibraryLocally(String name) {
