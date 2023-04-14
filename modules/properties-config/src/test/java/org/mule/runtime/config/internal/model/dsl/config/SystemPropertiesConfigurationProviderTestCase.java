@@ -23,10 +23,10 @@ public class SystemPropertiesConfigurationProviderTestCase extends AbstractMuleT
   public void systemProperty() throws Exception {
     String propertyKey = "propertyA";
     String propertyValue = "propertyAValue";
-    MuleTestUtils.testWithSystemProperty(propertyKey, propertyValue, () -> {
+    testWithSystemProperty(propertyKey, propertyValue, () -> {
       systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
-      Assert.assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
-                        Is.is(propertyValue));
+      assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
+                 is(propertyValue));
     });
   }
 
@@ -34,12 +34,12 @@ public class SystemPropertiesConfigurationProviderTestCase extends AbstractMuleT
   public void systemPropertyReadAtInit() throws Exception {
     String propertyKey = "propertyA";
     String propertyValue = "propertyAValue";
-    MuleTestUtils.testWithSystemProperty(propertyKey, propertyValue, () -> {
+    testWithSystemProperty(propertyKey, propertyValue, () -> {
       systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
     });
 
-    Assert.assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
-                      Is.is(propertyValue));
+    assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
+               is(propertyValue));
   }
 
 }

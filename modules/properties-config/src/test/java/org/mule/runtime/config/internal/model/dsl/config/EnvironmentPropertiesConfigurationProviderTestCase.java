@@ -24,8 +24,8 @@ public class EnvironmentPropertiesConfigurationProviderTestCase extends Abstract
     EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
         new EnvironmentPropertiesConfigurationProvider(() -> ImmutableMap.<String, String>builder()
             .put(variableKey, variableValue).build());
-    Assert.assertThat(environmentPropertiesConfigurationProvider.provide(variableKey).get().getValue(),
-                      Is.is(variableValue));
+    assertThat(environmentPropertiesConfigurationProvider.provide(variableKey).get().getValue(),
+               is(variableValue));
   }
 
 }
