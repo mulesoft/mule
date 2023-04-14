@@ -152,8 +152,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Set that the {@link ConfigurationPropertiesResolver} to be built won't fail in case of resolving a property doesn't exist.
-   * Instead of throwing a {@link PropertyNotFoundException}, it will return
-   * null.
+   * Instead of throwing a {@link PropertyNotFoundException}, it will return null.
    * 
    * @return this builder.
    */
