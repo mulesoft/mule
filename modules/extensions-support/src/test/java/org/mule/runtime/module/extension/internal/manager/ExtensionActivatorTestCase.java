@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
@@ -20,7 +21,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_MOCKS;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -96,6 +100,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
     MuleContextWithRegistry muleContext = mockMuleContext();
     MuleRegistry spiedRegistry = spy(muleContext.getRegistry());
     when(muleContext.getRegistry()).thenReturn(spiedRegistry);
+    doNothing().when(spiedRegistry).registerObject(any(), any());
 
     // When the extension activator activates that extension model
     ExtensionActivator extensionActivator = new ExtensionActivator(muleContext);
@@ -113,11 +118,12 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
   }
 
   private static ExtensionModel extensionWithTypes(Set<ObjectType> metadataTypes) {
-    ExtensionModel mockExtensionModel = mock(ExtensionModel.class);
+    ExtensionModel mockExtensionModel = mock(ExtensionModel.class, RETURNS_MOCKS);
     XmlDslModel dslModel = XmlDslModel.builder().setPrefix(MOCK_EXTENSION_PREFIX).build();
     when(mockExtensionModel.getXmlDslModel()).thenReturn(dslModel);
     when(mockExtensionModel.getName()).thenReturn(MOCK_EXTENSION_NAME);
     when(mockExtensionModel.getTypes()).thenReturn(metadataTypes);
+    when(mockExtensionModel.getModelProperty(any())).thenReturn(empty());
     return mockExtensionModel;
   }
 }
