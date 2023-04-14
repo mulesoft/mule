@@ -37,12 +37,19 @@ module org.mule.runtime.core {
   
   requires org.reactivestreams;
 
-  requires uuid;
   requires com.google.gson;
+  // used only in org.mule.runtime.core.privileged.util.BeanUtils which is deprecated
+  requires commons.beanutils;
   requires failsafe;
-  requires reflections;
-  requires vibur.object.pool;
+  requires org.apache.commons.collections4;
+  requires org.apache.commons.pool2;
+  requires org.jgrapht.core;
   requires reactor.core;
   requires reactor.extra;
+  requires reflections;
+  requires uuid;
+  requires vibur.object.pool;
   
+  // temporarily until cglib usage is migrated to bytebuddy
+  requires cglib.nodep;
 }
