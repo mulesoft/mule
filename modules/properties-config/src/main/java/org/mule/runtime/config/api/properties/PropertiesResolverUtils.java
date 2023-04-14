@@ -22,7 +22,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;

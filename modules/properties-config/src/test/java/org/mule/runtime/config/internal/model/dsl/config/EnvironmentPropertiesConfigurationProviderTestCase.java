@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model.config;
+package org.mule.runtime.config.internal.model.dsl.config;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -24,8 +24,8 @@ public class EnvironmentPropertiesConfigurationProviderTestCase extends Abstract
     EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
         new EnvironmentPropertiesConfigurationProvider(() -> ImmutableMap.<String, String>builder()
             .put(variableKey, variableValue).build());
-    assertThat(environmentPropertiesConfigurationProvider.provide(variableKey).get().getValue(),
-               is(variableValue));
+    Assert.assertThat(environmentPropertiesConfigurationProvider.provide(variableKey).get().getValue(),
+                      Is.is(variableValue));
   }
 
 }

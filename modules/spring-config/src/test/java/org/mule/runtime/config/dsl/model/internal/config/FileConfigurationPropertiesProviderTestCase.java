@@ -16,7 +16,7 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Feature;

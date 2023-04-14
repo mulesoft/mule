@@ -6,7 +6,7 @@
  */
 package org.mule.test.complex.config.properties.deprecated.extension;
 
-import static org.mule.runtime.config.internal.dsl.model.properties.ConfigurationPropertiesProviderFactoryUtils.resolveConfigurationParameters;
+import static org.mule.runtime.config.internal.model.dsl.properties.ConfigurationPropertiesProviderFactoryUtils.resolveConfigurationParameters;
 import static org.mule.test.complex.config.properties.deprecated.extension.ConfigPropertiesExtensionDeprecated.NAMESPACE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;

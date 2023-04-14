@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model.config;
+package org.mule.runtime.config.internal.model.dsl.config;
 
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
@@ -23,10 +23,10 @@ public class SystemPropertiesConfigurationProviderTestCase extends AbstractMuleT
   public void systemProperty() throws Exception {
     String propertyKey = "propertyA";
     String propertyValue = "propertyAValue";
-    testWithSystemProperty(propertyKey, propertyValue, () -> {
+    MuleTestUtils.testWithSystemProperty(propertyKey, propertyValue, () -> {
       systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
-      assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
-                 is(propertyValue));
+      Assert.assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
+                        Is.is(propertyValue));
     });
   }
 
@@ -34,12 +34,12 @@ public class SystemPropertiesConfigurationProviderTestCase extends AbstractMuleT
   public void systemPropertyReadAtInit() throws Exception {
     String propertyKey = "propertyA";
     String propertyValue = "propertyAValue";
-    testWithSystemProperty(propertyKey, propertyValue, () -> {
+    MuleTestUtils.testWithSystemProperty(propertyKey, propertyValue, () -> {
       systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
     });
 
-    assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
-               is(propertyValue));
+    Assert.assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
+                      Is.is(propertyValue));
   }
 
 }

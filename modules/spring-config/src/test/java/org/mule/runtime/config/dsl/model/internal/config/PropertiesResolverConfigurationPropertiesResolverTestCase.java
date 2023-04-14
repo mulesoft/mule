@@ -14,8 +14,8 @@ import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFI
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
 
 import org.mule.runtime.properties.api.ConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

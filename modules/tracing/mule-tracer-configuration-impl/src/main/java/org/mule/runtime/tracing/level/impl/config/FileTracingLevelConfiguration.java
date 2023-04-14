@@ -16,7 +16,7 @@ import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;

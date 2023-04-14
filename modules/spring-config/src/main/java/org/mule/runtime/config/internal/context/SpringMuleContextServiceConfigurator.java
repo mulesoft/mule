@@ -87,7 +87,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
