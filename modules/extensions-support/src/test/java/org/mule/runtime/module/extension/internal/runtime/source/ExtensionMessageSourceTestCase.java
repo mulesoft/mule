@@ -6,8 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
+
+import javax.resource.spi.work.Work;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -30,19 +41,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
-import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
-import static org.mule.tck.probe.PollingProber.checkNot;
-import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.ERROR;
 import static org.slf4j.event.Level.INFO;
-import static org.slf4j.event.Level.WARN;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -61,6 +62,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
@@ -76,8 +78,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.resource.spi.work.Work;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -86,10 +86,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
+
+
+  private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(ExtensionMessageSource.class);
 
   protected static final int TEST_TIMEOUT = 3000;
   protected static final int TEST_POLL_DELAY = 1000;
@@ -124,6 +128,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @After
   public void restoreProperty() {
     System.clearProperty(COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY);
+    logger.resetLevel();
   }
 
   @Test
@@ -360,8 +365,8 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @Test
   public void start() throws Exception {
     initialise();
-    ArrayList<String> infoMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(infoMessages, INFO));
+    logger.resetLogs();
+    logger.setLevel(INFO);
     if (!messageSource.getLifecycleState().isStarted()) {
       messageSource.start();
     }
@@ -374,15 +379,15 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       inOrder.verify(source).onStart(sourceCallback);
       return true;
     }));
+
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogMessage(infoMessages, "Message source 'source' on flow 'appleFlow' successfully started");
+      verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully started");
       return true;
     }));
     checkNot(TEST_POLL_DELAY, TEST_TIMEOUT, () -> {
-      verifyLogMessage(infoMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     });
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
@@ -589,69 +594,66 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void sourceInitializedLogMessage() throws Exception {
-    ArrayList<String> debugMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+    logger.resetLogs();
+    logger.setLevel(DEBUG);
     messageSource.initialise();
     if (primaryNodeOnly) {
-      verifyLogMessage(debugMessages,
+      verifyLogMessage(logger.getMessages(),
                        "Message source 'source' on flow 'appleFlow' running on the primary node is initializing. Note that this Message source must run on the primary node only.");
     } else {
-      verifyLogMessage(debugMessages,
+      verifyLogMessage(logger.getMessages(),
                        "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
     }
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
   public void sourceStartedLogMessage() throws Exception {
     ArrayList<String> debugMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+    logger.resetLogs();
+    logger.setLevel(DEBUG);
     messageSource.initialise();
     messageSource.start();
-    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is starting");
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+    verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is starting");
   }
 
   @Test
   public void sourceStoppedLogMessage() throws Exception {
-    ArrayList<String> debugMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+    logger.resetLogs();
+    logger.setLevel(DEBUG);
     messageSource.initialise();
     messageSource.start();
     messageSource.stop();
-    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is stopping");
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+    verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is stopping");
   }
 
 
   @Test
   public void getRetryPolicyExhaustedAndLogShutdownMessage() throws Exception {
     ArrayList<String> errorMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(errorMessages, ERROR));
+    logger.resetLogs();
+    logger.setLevel(ERROR);
     start();
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     doThrow(e).when(source).onStart(any());
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogRegex(errorMessages,
+      verifyLogRegex(logger.getMessages(),
                      "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
       return true;
     }));
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   @Test
   public void reconnectAndLogSuccessMessage() throws Exception {
     start();
-    ArrayList<String> infoMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(infoMessages, INFO));
+    logger.resetLogs();
+    logger.setLevel(INFO);
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogMessage(infoMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     }));
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
   }
 
   private void registerNotificationListener(ExceptionNotificationListener exceptionNotificationListener)

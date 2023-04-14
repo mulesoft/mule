@@ -6,35 +6,32 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.slf4j.event.Level.DEBUG;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
+import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.logger.CustomLogger;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
-  protected List<String> debugMessages;
-  private Logger oldLogger;
+  private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(ExtensionMessageSource.class);
 
   public ClusterExtensionMessageSourceTestCase() {
     primaryNodeOnly = true;
@@ -44,14 +41,13 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
   }
 
   @Before
-  public void setUpLogger() throws Exception {
-    debugMessages = new ArrayList<>();
-    oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+  public void setUpLogger() {
+    logger.setLevel(DEBUG);
   }
 
   @After
-  public void restoreLogger() throws Exception {
-    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+  public void restoreLogger() {
+    logger.resetLevel();
   }
 
   @Override
@@ -86,19 +82,21 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
 
   @Test
   public void dontStartIfNotPrimaryNodeLogMessage() throws Exception {
+    logger.resetLogs();
     messageSource.initialise();
     messageSource.start();
-    verifyLogMessage(debugMessages,
+    verifyLogMessage(logger.getMessages(),
                      "Message source 'source' on flow 'appleFlow' cannot initialize. This Message source can only run on the primary node of the cluster");
   }
 
   @Test
   public void startWhenPrimaryNodeLogMessage() throws Exception {
+    logger.resetLogs();
     dontStartIfNotPrimaryNode();
 
     muleContext.getNotificationManager()
         .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
-    verifyLogMessage(debugMessages,
+    verifyLogMessage(logger.getMessages(),
                      "Message source 'source' on flow 'appleFlow' is initializing because the node became cluster's primary.");
   }
 
