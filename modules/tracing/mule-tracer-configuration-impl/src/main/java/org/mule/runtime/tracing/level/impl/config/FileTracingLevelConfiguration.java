@@ -75,7 +75,6 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
       LOGGER
           .info("No tracing level config found in the conf directory. The tracing level will be set to the default: "
               + DEFAULT_LEVEL);
-      e.printStackTrace();
     }
     return null;
   }
