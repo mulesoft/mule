@@ -62,13 +62,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-catalog</artifactId>
-            <exclusions>
-                <!-- TODO W- remove these exclusions -->
-                <exclusion>
-                    <groupId>org.raml</groupId>
-                    <artifactId>yagi</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
