@@ -13,4 +13,5 @@ upstreamProjects:
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C
 mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
-jdkTool: OPEN-JDK17
+# TODO W-13029381 Change to 17
+jdkTool: OPEN-JDK11
