@@ -21,6 +21,7 @@ import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.TRACE;
 
 import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
@@ -51,6 +52,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,6 +119,11 @@ public class PollingSourceWrapperTestCase {
 
   }
 
+  @After
+  public void restoreLoggerLevel() {
+    logger.resetLevel();
+  }
+
   @Test
   public void waterMarkingStoresGetCreatedOnStart() throws MuleException {
     pollingSourceWrapper.onStart(callbackMock);
@@ -138,7 +145,6 @@ public class PollingSourceWrapperTestCase {
     stubPollItem(Collections.singletonList(null), Collections.singletonList(null));
     startSourcePollWithMockedLogger();
     verifyLogMessage(logger.getMessages(), PollingSourceWrapper.ACCEPTED_ITEM_MESSAGE, "");
-    logger.resetLevel();
   }
 
   @Test
@@ -149,7 +155,6 @@ public class PollingSourceWrapperTestCase {
     stubPollItem(Collections.singletonList(POLL_ITEM_ID), Collections.singletonList(null));
     startSourcePollWithMockedLogger();
     verifyLogMessage(logger.getMessages(), PollingSourceWrapper.REJECTED_ITEM_MESSAGE, POLL_ITEM_ID, ALREADY_IN_PROCESS);
-    logger.resetLevel();
   }
 
   @Test
@@ -161,7 +166,6 @@ public class PollingSourceWrapperTestCase {
     startSourcePollWithMockedLogger();
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, watermark, TEST_FLOW_NAME);
-    logger.resetLevel();
   }
 
   @Test
@@ -184,7 +188,6 @@ public class PollingSourceWrapperTestCase {
                      TEST_FLOW_NAME, -1);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 8, TEST_FLOW_NAME);
-    logger.resetLevel();
   }
 
   @Test
@@ -208,7 +211,6 @@ public class PollingSourceWrapperTestCase {
     verifyLogMessage(logger.getMessages(), WATERMARK_COMPARISON_MESSAGE, UPDATED_WATERMARK_ITEM_OS_KEY, 8, "itemWatermark", 4,
                      TEST_FLOW_NAME, 1);
     verifyLogMessage(logger.getMessages(), WATERMARK_SAVED_MESSAGE, WATERMARK_ITEM_OS_KEY, 4, TEST_FLOW_NAME);
-    logger.resetLevel();
   }
 
   private void assertPersistentStoreIsCreated(String expectedName, Long expirationInterval) {

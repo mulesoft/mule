@@ -128,6 +128,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   @After
   public void restoreProperty() {
     System.clearProperty(COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY);
+    logger.resetLevel();
   }
 
   @Test
@@ -387,7 +388,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     });
-    logger.resetLevel();
   }
 
   @Test
@@ -604,7 +604,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       verifyLogMessage(logger.getMessages(),
                        "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
     }
-    logger.resetLevel();
   }
 
   @Test
@@ -615,7 +614,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.initialise();
     messageSource.start();
     verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is starting");
-    logger.resetLevel();
   }
 
   @Test
@@ -626,7 +624,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.start();
     messageSource.stop();
     verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' is stopping");
-    logger.resetLevel();
   }
 
 
@@ -644,7 +641,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
                      "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
       return true;
     }));
-    logger.resetLevel();
   }
 
   @Test
@@ -658,7 +654,6 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       verifyLogMessage(logger.getMessages(), "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     }));
-    logger.resetLevel();
   }
 
   private void registerNotificationListener(ExceptionNotificationListener exceptionNotificationListener)
