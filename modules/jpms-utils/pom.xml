@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
         <version>4.6.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-service</artifactId>
-    <name>Mule Services</name>
-    <description>Mule service module. Provides services support to Mule container.</description>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mule-module-jpms-utils</artifactId>
+    <name>Mule Java JPMS utilities</name>
+    <description>This module provides JMPS utilities for use within the Mule Runtime.</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.service</javaModuleName>
-        <skipExportTests>false</skipExportTests>
+        <javaModuleName>org.mule.runtime.jpms.utils</javaModuleName>
+        
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <project.build.java11SourceDirectory>${project.basedir}/src/main/java11</project.build.java11SourceDirectory>
         <project.build.java11TestSourceDirectory>${project.basedir}/src/test/java11</project.build.java11TestSourceDirectory>
@@ -89,61 +91,4 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-jpms-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-container</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-artifact</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-artifact</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-maven-pom-parser-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tools.maven</groupId>
-            <artifactId>mule-classloader-model</artifactId>
-        </dependency>
-    </dependencies>
 </project>
