@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.privileged.transaction.AbstractTransaction;x
+import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.Optional;
