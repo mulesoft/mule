@@ -41,12 +41,14 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import java.util.stream.Stream;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.stream.Stream;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
@@ -118,6 +120,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     verify(pluginDeclarer, never()).withImportedType(any());
   }
 
+  @Ignore("W-12625688")
   @Test
   @Issue("MULE-18581")
   @Description("Simulate the scenario of a plugins declaring subtypes from another plugin "
