@@ -19,7 +19,6 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <jsoup.version>1.15.3</jsoup.version>
         <mule.runtime.version>${project.version}</mule.runtime.version>
-        <jsonassert.version>1.5.2</jsonassert.version>
     </properties>
 
     <build>

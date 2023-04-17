@@ -20,7 +20,6 @@
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <jsonassert.version>1.5.2</jsonassert.version>
     </properties>
 
     <dependencies>

@@ -16,7 +16,6 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <jsonassert.version>1.5.2</jsonassert.version>
     </properties>
 
     <dependencies>
