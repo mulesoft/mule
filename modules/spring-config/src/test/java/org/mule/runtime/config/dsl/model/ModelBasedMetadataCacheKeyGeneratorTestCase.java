@@ -878,7 +878,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
                                                       CATEGORY_NAME)));
 
     when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(empty());
-    ((TestImmutableOperationModel) operation).setParameterModels(parameterModels);
+
+    when(model.getAllParameterModels()).thenReturn(parameterModels);
   }
 
   private void mockMultiLevelMetadataKeyId(OperationModel operationModel) {

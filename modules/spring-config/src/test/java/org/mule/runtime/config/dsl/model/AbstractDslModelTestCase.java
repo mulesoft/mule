@@ -43,20 +43,13 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
-import org.mule.runtime.api.meta.model.display.DisplayModel;
-import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.api.meta.model.nested.NestableElementModel;
-import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -382,10 +375,10 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
   private ImmutableOperationModel createOperationModel(String operationName, List<ParameterGroupModel> paramGroups,
                                                        Set<ModelProperty> modelProperties) {
-    return new TestImmutableOperationModel(operationName, "",
-                                           paramGroups,
-                                           emptyList(), null, null, true, ExecutionType.BLOCKING, false, false, false, null,
-                                           emptySet(), PROCESSOR, PUBLIC, modelProperties, emptySet());
+    return new ImmutableOperationModel(operationName, "",
+                                       paramGroups,
+                                       emptyList(), null, null, true, ExecutionType.BLOCKING, false, false, false, null,
+                                       emptySet(), PROCESSOR, PUBLIC, modelProperties, emptySet());
   }
 
   @After
@@ -516,32 +509,4 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     }
   }
 
-  public class TestImmutableOperationModel extends ImmutableOperationModel {
-
-    private List<ParameterModel> parameterModels;
-
-    public TestImmutableOperationModel(String name, String description, List<ParameterGroupModel> parameterGroupModels,
-                                       List<? extends NestableElementModel> nestedComponents, OutputModel output,
-                                       OutputModel outputAttributes, boolean blocking, ExecutionType executionType,
-                                       boolean requiresConnection, boolean transactional, boolean supportsStreaming,
-                                       DisplayModel displayModel, Set<ErrorModel> errors, StereotypeModel stereotype,
-                                       ComponentVisibility visibility, Set<ModelProperty> modelProperties,
-                                       Set<NotificationModel> notifications) {
-      super(name, description, parameterGroupModels, nestedComponents, output, outputAttributes, blocking, executionType,
-            requiresConnection, transactional, supportsStreaming, displayModel, errors, stereotype, visibility, modelProperties,
-            notifications, (DeprecationModel) null);
-    }
-
-    @Override
-    public List<ParameterModel> getAllParameterModels() {
-      if (parameterModels != null) {
-        return parameterModels;
-      }
-      return super.getAllParameterModels();
-    }
-
-    public void setParameterModels(List<ParameterModel> parameterModels) {
-      this.parameterModels = parameterModels;
-    }
-  }
 }
