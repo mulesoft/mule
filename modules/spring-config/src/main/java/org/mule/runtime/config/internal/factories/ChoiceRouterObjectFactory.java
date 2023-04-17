@@ -10,9 +10,9 @@ import static java.util.Collections.emptyList;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.components.internal.routing.ChoiceRouter;
-import org.mule.runtime.core.components.internal.routing.ProcessorExpressionRoute;
-import org.mule.runtime.core.components.internal.routing.ProcessorRoute;
+import org.mule.runtime.core.internal.routing.ChoiceRouter;
+import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
+import org.mule.runtime.core.internal.routing.ProcessorRoute;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 

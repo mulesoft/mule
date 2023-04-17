@@ -45,7 +45,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 import org.slf4j.Logger;
-import org.mule.runtime.core.components.internal.routing.Foreach;
+import org.mule.runtime.core.internal.routing.Foreach;
 
 import java.util.ArrayList;
 import java.util.List;

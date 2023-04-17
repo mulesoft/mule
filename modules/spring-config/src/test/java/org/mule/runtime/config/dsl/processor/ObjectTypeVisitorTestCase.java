@@ -27,7 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.components.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
