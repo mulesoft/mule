@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.routing;
+package org.mule.runtime.core.internal.routing.split;
 
 /**
  * An abstract implementation of a {@link MessageSequence}, that does not support {@link #remove()}

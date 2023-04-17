@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.processor;
+package org.mule.runtime.core.internal.transaction;
 
 import static java.util.Optional.empty;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
+import org.mule.runtime.core.privileged.transaction.AbstractTransaction;x
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.Optional;

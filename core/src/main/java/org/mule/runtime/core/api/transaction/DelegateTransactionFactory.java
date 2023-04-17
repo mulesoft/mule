@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
 
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.processor.DelegateTransaction;
+import org.mule.runtime.core.internal.transaction.DelegateTransaction;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import javax.transaction.TransactionManager;

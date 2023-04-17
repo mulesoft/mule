@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.routing;
+package org.mule.runtime.core.internal.routing.split;
+
+import org.mule.runtime.core.internal.routing.ValidationException;
 
 /**
  * Indicates that the execution of the current event is stopped becasue the message has already been processed. This exception is

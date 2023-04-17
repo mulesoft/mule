@@ -92,7 +92,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;

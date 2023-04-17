@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.routing;
+package org.mule.runtime.core.internal.routing.split;
+
+import org.mule.runtime.core.internal.routing.split.AbstractMessageSequence;
 
 public class ArrayMessageSequence extends AbstractMessageSequence<Object> {
 

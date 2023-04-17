@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.routing;
+package org.mule.runtime.core.internal.routing.split;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import org.mule.runtime.api.metadata.TypedValue;
