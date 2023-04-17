@@ -441,6 +441,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     verifyActivePolicies(1);
 
     // No more inflight events should trigger the policy disposal.
+    // This is needed because of some mockito references.
     reset(event);
     event = null;
     sourcePolicyContext = null;
