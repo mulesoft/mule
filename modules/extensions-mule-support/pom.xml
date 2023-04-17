@@ -16,6 +16,7 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <jsonassert.version>1.5.2</jsonassert.version>
     </properties>
 
     <dependencies>
@@ -223,8 +224,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.skyscreamer</groupId>
+            <groupId>org.mule.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
+            <version>${jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
          <dependency>

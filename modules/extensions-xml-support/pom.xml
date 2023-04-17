@@ -20,6 +20,7 @@
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <jsonassert.version>1.5.2</jsonassert.version>
     </properties>
 
     <dependencies>
@@ -213,8 +214,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.skyscreamer</groupId>
+            <groupId>org.mule.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
+            <version>${jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
