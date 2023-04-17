@@ -7,9 +7,12 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -21,6 +24,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Implementation of {@link ResourcesGenerator} that writes files using a {@link javax.annotation.processing.Filer} obtained
@@ -28,9 +34,10 @@ import java.util.List;
  *
  * @since 3.7.0
  */
-public final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenerator {
+public final class AnnotationProcessorResourceGenerator implements ResourcesGenerator {
 
   private final ProcessingEnvironment processingEnv;
+  private final List<GeneratedResourceFactory> resourceFactories;
 
   /**
    * Creates a new instance
@@ -40,11 +47,10 @@ public final class AnnotationProcessorResourceGenerator extends AbstractResource
    */
   public AnnotationProcessorResourceGenerator(List<GeneratedResourceFactory> resourceFactories,
                                               ProcessingEnvironment processingEnv) {
-    super(enrichFactories(resourceFactories, processingEnv));
     this.processingEnv = processingEnv;
+    this.resourceFactories = ImmutableList.copyOf(enrichFactories(resourceFactories, processingEnv));
   }
 
-  @Override
   protected void write(GeneratedResource resource) {
     FileObject file;
     try {
@@ -74,5 +80,14 @@ public final class AnnotationProcessorResourceGenerator extends AbstractResource
     });
 
     return resourceFactories;
+  }
+
+  @Override
+  public List<GeneratedResource> generateFor(ExtensionModel extensionModel) {
+    List<GeneratedResource> resources = resourceFactories.stream().map(factory -> factory.generateResource(extensionModel))
+        .filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
+
+    resources.forEach(this::write);
+    return resources;
   }
 }

@@ -12,7 +12,6 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
 
 import com.google.common.collect.ImmutableList;
 
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of an {@link AbstractResourcesGenerator} that writes the DSL generated resources to the specified target
+ * This class extends {@link ExtensionsTestLoaderResourcesGenerator} that writes the DSL generated resources to the specified target
  * directory but also exposes the content to be shared for testing purposes.
  *
  * @since 4.0
