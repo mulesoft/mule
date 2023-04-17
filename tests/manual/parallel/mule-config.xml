@@ -15,7 +15,7 @@
     </connector>
 
     <model name="dummy">
-        <mule-descriptor name="EchoUMO" implementation="org.mule.runtime.core.components.simple.EchoComponent">
+        <mule-descriptor name="EchoUMO" implementation="org.mule.runtime.core.simple.EchoComponent">
         </mule-descriptor>
     </model>
 </mule-configuration>
