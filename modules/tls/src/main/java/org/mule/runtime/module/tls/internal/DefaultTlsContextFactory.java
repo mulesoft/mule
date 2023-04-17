@@ -389,6 +389,10 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
     return tlsConfiguration.hashCode();
   }
 
+  public void setSslType(String sslType) {
+    tlsConfiguration.setSslType(sslType);
+  }
+
   private static class InsecureTrustManager implements X509TrustManager {
 
     @Override

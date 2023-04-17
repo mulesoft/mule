@@ -224,8 +224,10 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
   private void defaultIncludesDEfaultTlsVersionCiphers(String sslVersion)
       throws InitialisationException, KeyManagementException, NoSuchAlgorithmException {
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
+    tlsContextFactory.setSslType(sslVersion);
     tlsContextFactory.initialise();
     SSLSocketFactory defaultFactory = tlsContextFactory.createSslContext().getSocketFactory();
+
     SSLContext tlsContext = SSLContext.getInstance(sslVersion);
     tlsContext.init(null, null, null);
     SSLSocketFactory tlsFactory = tlsContext.getSocketFactory();
