@@ -26,8 +26,8 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Implementation of an {@link ResourcesGenerator} that writes the generated resources to the specified target directory
- * but also exposes the content to be shared for testing purposes.
+ * Implementation of an {@link ResourcesGenerator} that writes the generated resources to the specified target directory but also
+ * exposes the content to be shared for testing purposes.
  */
 class ExtensionsTestLoaderResourcesGenerator implements ResourcesGenerator {
 
@@ -73,9 +73,10 @@ class ExtensionsTestLoaderResourcesGenerator implements ResourcesGenerator {
     return allResources;
   }
 
+  @Override
   public List<GeneratedResource> generateFor(ExtensionModel extensionModel) {
     List<GeneratedResource> resources = resourceFactories.stream().map(factory -> factory.generateResource(extensionModel))
-      .filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
+        .filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
 
     resources.forEach(this::write);
     return resources;
