@@ -85,7 +85,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   private ArtifactAwareContextSelector selector;
 
-  @Mock(answer = Answers.RETURNS_MOCKS)
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private RegionClassLoader regionClassLoader;
 
   @Mock
