@@ -43,7 +43,7 @@ public class SecureConfigurationPropertiesProviderFactory implements Configurati
                                                         ResourceProvider externalResourceProvider) {
     DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
     ConfigurationParameters configurationParameters =
-      resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
+        resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
 
     return createProvider(configurationParameters, uri -> externalResourceProvider.getResourceAsStream(uri));
   }
