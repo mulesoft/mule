@@ -17,10 +17,13 @@ public class FlowConstructStatisticsMessageProcessor implements MessageProcessor
 {
     protected FlowConstruct flowConstruct;
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (flowConstruct.getStatistics().isEnabled())
         {
+            // do not filter for CH ping flow here because this metrics have always been generated in that case, to avoid breaking
+            // backwards compatibility,
             if (event.getExchangePattern().hasResponse())
             {
                 flowConstruct.getStatistics().incReceivedEventSync();
@@ -34,6 +37,7 @@ public class FlowConstructStatisticsMessageProcessor implements MessageProcessor
         return event;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
