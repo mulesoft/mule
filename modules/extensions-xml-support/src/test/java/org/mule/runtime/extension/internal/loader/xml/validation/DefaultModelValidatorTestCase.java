@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.feeder.validation;
+package org.mule.runtime.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -20,20 +20,20 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.internal.feeder.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.feeder.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
-import static org.mule.runtime.extension.internal.feeder.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.feeder.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.feeder.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.feeder.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.xml.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.xml.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
+import static org.mule.runtime.extension.internal.loader.xml.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.xml.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;

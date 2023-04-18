@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.feeder;
+package org.mule.runtime.extension.internal.loader;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
+import org.mule.runtime.extension.internal.loader.xml.ForTnsTransformerFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;

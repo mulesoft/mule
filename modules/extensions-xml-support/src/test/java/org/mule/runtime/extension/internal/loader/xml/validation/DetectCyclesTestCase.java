@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.feeder.validation;
+package org.mule.runtime.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader.VALIDATE_XML;
+import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.VALIDATE_XML;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader;
-import org.mule.runtime.extension.internal.feeder.XmlExtensionLoaderDelegate;
+import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
