@@ -39,8 +39,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
+@Issue("W-13057814")
 public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends AbstractMuleTestCase {
 
   private final DefaultApplicationFactory applicationFactory =

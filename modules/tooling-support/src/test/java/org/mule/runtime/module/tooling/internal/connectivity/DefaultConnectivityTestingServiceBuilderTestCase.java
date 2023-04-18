@@ -10,6 +10,9 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticServiceBuilderTestCase;
 
+import io.qameta.allure.Issue;
+
+@Issue("W-13057814")
 public class DefaultConnectivityTestingServiceBuilderTestCase extends AbstractArtifactAgnosticServiceBuilderTestCase {
 
   @Override
