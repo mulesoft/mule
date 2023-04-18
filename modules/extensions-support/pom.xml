@@ -72,6 +72,16 @@
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-compatibility-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-customization-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!--Other Dependencies-->
         <dependency>

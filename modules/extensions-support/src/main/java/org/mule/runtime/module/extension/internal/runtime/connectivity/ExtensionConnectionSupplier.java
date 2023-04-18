@@ -28,13 +28,14 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
-
-import javax.inject.Inject;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Optional;
+import javax.inject.Inject;
 
 /**
  * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides the connections
@@ -50,7 +51,7 @@ public class ExtensionConnectionSupplier {
   @Inject
   private ConnectionManager connectionManager;
 
-  CoreEventTracer coreEventTracer;
+  EventTracer<CoreEvent> coreEventTracer;
 
   InitialSpanInfoProvider initialSpanInfoProvider;
 
@@ -68,17 +69,18 @@ public class ExtensionConnectionSupplier {
    */
   public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
       throws ConnectionException, TransactionException {
-    InitialSpanInfo getConnectionInitialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(MULE_GET_CONNECTION);
+    InitialSpanInfo getConnectionInitialSpanInfo =
+        initialSpanInfoProvider.getInitialSpanInfo(executionContext.getComponent(), MULE_GET_CONNECTION);
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
-      connectionHandler = new TracedLazyConnection(getConnectionHandler(executionContext), profilingService.getCoreEventTracer(),
+      connectionHandler = new TracedLazyConnection(getConnectionHandler(executionContext), coreEventTracer,
                                                    getConnectionInitialSpanInfo, executionContext);
     } else {
-      profilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
+      coreEventTracer.startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
       try {
         connectionHandler = getConnectionHandler(executionContext);
       } finally {
-        profilingService.getCoreEventTracer().endCurrentSpan(executionContext.getEvent());
+        coreEventTracer.endCurrentSpan(executionContext.getEvent());
       }
     }
     return connectionHandler;
