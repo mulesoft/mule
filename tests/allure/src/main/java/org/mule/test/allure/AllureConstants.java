@@ -501,6 +501,16 @@ public interface AllureConstants {
 
   }
 
+  interface ToolingSupport {
+
+    String TOOLING_SUPPORT = "Tooling support in the Runtime";
+
+    interface ServiceBuilderStory {
+
+      String SERVICE_BUILDER = "Service builder";
+    }
+  }
+
   interface SdkToolingSupport {
 
     String SDK_TOOLING_SUPPORT = "SDK Tooling Support";
