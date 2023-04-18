@@ -12,6 +12,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.emptyOrNullString;
 
+/**
+ * Hamcrest matcher that can match against {@link CapturedEventData} instances.
+ */
 public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEventData> {
 
   public static final String OTEL_EXCEPTION_EVENT_NAME = "exception";

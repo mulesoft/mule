@@ -43,8 +43,7 @@ import java.util.function.Supplier;
  */
 public interface EventTracer<T extends Event> {
 
-  // TODO: We should refactor this to startSpan. Adding sugars to call when a component is involved would also be useful to avoid
-  // the users of this API needing to know about the InitialSpanInfoProvider.
+  // TODO: W-13057253: Refactor in order to provide Component related sugars.
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link Event}.
    *
