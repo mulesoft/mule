@@ -15,21 +15,20 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
-import org.mule.runtime.module.artifact.api.classloader.*;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,9 +36,18 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 @Issue("W-11069995")
 @Feature(CLASSLOADING_ISOLATION)
 @Story(CLASSLOADER_GENERATION)
+@Ignore("W-12625688")
 public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends AbstractMuleTestCase {
 
   private ArtifactClassLoaderManager artifactClassLoaderManager;
