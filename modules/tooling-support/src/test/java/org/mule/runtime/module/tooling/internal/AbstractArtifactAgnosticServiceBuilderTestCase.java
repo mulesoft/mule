@@ -8,6 +8,8 @@ package org.mule.runtime.module.tooling.internal;
 
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+import static org.mule.test.allure.AllureConstants.ToolingSupport.TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.ToolingSupport.ServiceBuilderStory.SERVICE_BUILDER;
 
 import static java.util.Collections.singletonMap;
 
@@ -39,9 +41,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
+@Feature(TOOLING_SUPPORT)
+@Story(SERVICE_BUILDER)
 @Issue("W-13057814")
 public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends AbstractMuleTestCase {
 
