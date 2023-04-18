@@ -178,6 +178,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
           defaultApplicationFactory.createArtifactDescriptor(applicationFolder, of(deploymentProperties));
       artifactDescriptor.setMinMuleVersion(muleVersion);
       artifactDescriptor.setArtifactDeclaration(artifactDeclaration);
+      artifactDescriptor.setAppProperties(artifactProperties);
       return defaultApplicationFactory.createArtifact(artifactDescriptor);
     });
   }
