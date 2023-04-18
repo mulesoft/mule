@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.loader;
+package org.mule.runtime.extension.internal.feeder;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_RESOURCE_PROPERTY_NAME;
@@ -22,11 +22,11 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.extension.internal.loader.enricher.StereotypesDiscoveryDeclarationEnricher;
-import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
-import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
-import org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator;
-import org.mule.runtime.extension.internal.loader.validator.TestConnectionValidator;
+import org.mule.runtime.extension.internal.feeder.enricher.StereotypesDiscoveryDeclarationEnricher;
+import org.mule.runtime.extension.internal.feeder.validator.CorrectPrefixesValidator;
+import org.mule.runtime.extension.internal.feeder.validator.ForbiddenConfigurationPropertiesValidator;
+import org.mule.runtime.extension.internal.feeder.validator.GlobalElementNamesValidator;
+import org.mule.runtime.extension.internal.feeder.validator.TestConnectionValidator;
 
 import java.util.List;
 import java.util.Optional;
