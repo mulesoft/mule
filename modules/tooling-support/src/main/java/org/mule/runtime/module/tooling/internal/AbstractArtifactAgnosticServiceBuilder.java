@@ -113,7 +113,8 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
   @Override
   public T addDependency(Dependency dependency) {
     org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor =
-        new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder().setGroupId(dependency.getGroupId())
+        new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
+            .setGroupId(dependency.getGroupId())
             .setArtifactId(dependency.getArtifactId())
             .setVersion(dependency.getVersion())
             .setType(dependency.getType())
@@ -124,10 +125,13 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
                 .map(exclusion -> Pair.of(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
             .build();
 
-    BundleDependency bundleDependency = new BundleDependency.Builder().setBundleDescriptor(bundleDescriptor)
-        .setScope(valueOf(dependency.getScope())).build();
 
-    addMavenModelDependency(bundleDependency);
+    BundleDependency.Builder bundleDependencyBuilder = new BundleDependency.Builder().setBundleDescriptor(bundleDescriptor);
+    if (dependency.getScope() != null) {
+      bundleDependencyBuilder.setScope(valueOf(dependency.getScope().toUpperCase())).build();
+    }
+
+    addMavenModelDependency(bundleDependencyBuilder.build());
     return getThis();
   }
 
