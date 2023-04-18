@@ -8,9 +8,11 @@ package org.mule.test.runner.infrastructure;
 
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
+import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,23 +21,26 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 /**
- * Implementation of an {@link AbstractResourcesGenerator} that writes the generated resources to the specified target directory
- * but also exposes the content to be shared for testing purposes.
+ * Implementation of an {@link ResourcesGenerator} that writes the generated resources to the specified target directory but also
+ * exposes the content to be shared for testing purposes.
  */
-class ExtensionsTestLoaderResourcesGenerator extends AbstractResourcesGenerator {
+class ExtensionsTestLoaderResourcesGenerator implements ResourcesGenerator {
 
   private final File targetDirectory;
   private final Map<String, StringBuilder> contents = new HashMap<>();
+  private final List<GeneratedResourceFactory> resourceFactories;
 
   ExtensionsTestLoaderResourcesGenerator(Collection<GeneratedResourceFactory> resourceFactories,
                                          File targetDirectory) {
-    super(resourceFactories);
     this.targetDirectory = targetDirectory;
+    this.resourceFactories = ImmutableList.copyOf(resourceFactories);
   }
 
-  @Override
   protected void write(GeneratedResource resource) {
     String resourceKey = Paths.get(targetDirectory.getPath(), resource.getPath()).toString();
     StringBuilder builder = contents.get(resourceKey);
@@ -66,5 +71,14 @@ class ExtensionsTestLoaderResourcesGenerator extends AbstractResourcesGenerator 
     });
 
     return allResources;
+  }
+
+  @Override
+  public List<GeneratedResource> generateFor(ExtensionModel extensionModel) {
+    List<GeneratedResource> resources = resourceFactories.stream().map(factory -> factory.generateResource(extensionModel))
+        .filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
+
+    resources.forEach(this::write);
+    return resources;
   }
 }
