@@ -151,6 +151,11 @@ public class ExtensionConnectionSupplier {
         parseBoolean(muleContext.getDeploymentProperties().getProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "false"));
   }
 
+  /**
+   * A wrapper around a lazy {@link ConnectionHandler} that generates tracing spans when the connection is actually established.
+   * 
+   * @param <T> The generic type of the connection being handled.
+   */
   private static class TracedLazyConnection<T> implements ConnectionHandler<T> {
 
     private final ConnectionHandler<T> lazyConnectionHandler;
