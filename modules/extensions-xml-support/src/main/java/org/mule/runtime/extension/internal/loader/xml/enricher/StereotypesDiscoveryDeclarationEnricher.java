@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.loader.enricher;
+package org.mule.runtime.extension.internal.loader.xml.enricher;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
