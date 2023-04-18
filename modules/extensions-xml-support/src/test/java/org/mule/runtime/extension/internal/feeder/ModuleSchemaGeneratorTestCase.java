@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.loader;
+package org.mule.runtime.extension.internal.feeder;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 
 import static java.lang.Boolean.getBoolean;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.loader;
+package org.mule.runtime.extension.internal.feeder;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;

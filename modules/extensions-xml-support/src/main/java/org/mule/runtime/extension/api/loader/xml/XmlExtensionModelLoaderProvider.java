@@ -10,7 +10,7 @@ import static java.util.Collections.singleton;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
-import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.feeder.XmlExtensionModelLoader;
 
 import java.util.Set;
 

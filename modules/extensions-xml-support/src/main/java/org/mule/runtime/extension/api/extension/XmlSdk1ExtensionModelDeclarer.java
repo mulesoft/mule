@@ -19,8 +19,8 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocat
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE_URI;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
+import static org.mule.runtime.extension.internal.feeder.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
+import static org.mule.runtime.extension.internal.feeder.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
 import static org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.builder;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
