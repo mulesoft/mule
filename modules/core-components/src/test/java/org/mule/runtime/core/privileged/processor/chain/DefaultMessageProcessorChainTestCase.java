@@ -59,8 +59,8 @@ import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessing
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider;
-import org.mule.runtime.core.components.internal.routing.ChoiceRouter;
-import org.mule.runtime.core.components.internal.routing.ScatterGatherRouter;
+import org.mule.runtime.core.internal.routing.ChoiceRouter;
+import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;

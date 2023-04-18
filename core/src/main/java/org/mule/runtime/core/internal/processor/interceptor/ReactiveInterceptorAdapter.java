@@ -43,8 +43,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.processor.HasParamsAsTemplateProcessor;
-import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.interception.HasParamsAsTemplateProcessor;
+import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.LinkedList;

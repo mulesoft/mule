@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import javax.transaction.TransactionManager;
-import org.junit.Before;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.internal.transaction.DelegateTransaction;
+import org.mule.tck.util.MuleContextUtils;
+
+import javax.transaction.TransactionManager;
 
 import org.junit.Test;
-import org.mule.tck.util.MuleContextUtils;
+import org.junit.Before;
 
 public class DelegateTransactionTestCase extends AbstractMuleTestCase {
 
