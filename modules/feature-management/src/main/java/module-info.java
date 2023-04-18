@@ -29,4 +29,7 @@ module org.mule.runtime.featureManagement {
   exports org.mule.runtime.feature.internal.togglz.user to
       org.mule.runtime.core;
   
+  provides org.togglz.core.spi.FeatureManagerProvider
+      with org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider;
+
 }

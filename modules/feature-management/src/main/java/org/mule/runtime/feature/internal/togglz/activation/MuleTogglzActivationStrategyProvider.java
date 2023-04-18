@@ -7,12 +7,19 @@
 package org.mule.runtime.feature.internal.togglz.activation;
 
 import org.mule.runtime.feature.internal.togglz.activation.strategies.MuleTogglzActivatedIfEnabledActivationStrategy;
-import org.togglz.core.activation.ActivationStrategyProvider;
-import org.togglz.core.spi.ActivationStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
+
+import org.togglz.core.activation.ActivationStrategyProvider;
+import org.togglz.core.activation.GradualActivationStrategy;
+import org.togglz.core.activation.ReleaseDateActivationStrategy;
+import org.togglz.core.activation.ScriptEngineActivationStrategy;
+import org.togglz.core.activation.ServerIpActivationStrategy;
+import org.togglz.core.activation.SystemPropertyActivationStrategy;
+import org.togglz.core.activation.UserRoleActivationStrategy;
+import org.togglz.core.activation.UsernameActivationStrategy;
+import org.togglz.core.spi.ActivationStrategy;
 
 /**
  * {@link ActivationStrategyProvider} for the Mule Runtime. It provides the @{@link ActivationStrategy}'s found through SPI in the
@@ -32,19 +39,23 @@ public class MuleTogglzActivationStrategyProvider implements ActivationStrategyP
 
   @Override
   public List<ActivationStrategy> getActivationStrategies() {
-    addSpiActivationStrategies();
+    addTogglzActivationStrategies();
     addMuleActivationStrategies();
 
     return strategies;
   }
 
-  private void addMuleActivationStrategies() {
-    strategies.add(MuleTogglzActivatedIfEnabledActivationStrategy.getInstance());
+  private void addTogglzActivationStrategies() {
+    strategies.add(new UsernameActivationStrategy());
+    strategies.add(new GradualActivationStrategy());
+    strategies.add(new ScriptEngineActivationStrategy());
+    strategies.add(new ReleaseDateActivationStrategy());
+    strategies.add(new ServerIpActivationStrategy());
+    strategies.add(new UserRoleActivationStrategy());
+    strategies.add(new SystemPropertyActivationStrategy());
   }
 
-  private void addSpiActivationStrategies() {
-    for (ActivationStrategy activationStrategy : ServiceLoader.load(ActivationStrategy.class)) {
-      strategies.add(activationStrategy);
-    }
+  private void addMuleActivationStrategies() {
+    strategies.add(MuleTogglzActivatedIfEnabledActivationStrategy.getInstance());
   }
 }

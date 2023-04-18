@@ -6,7 +6,15 @@
  */
 package org.mule.runtime.feature.internal.provider;
 
+import static org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
+import static org.mule.runtime.feature.internal.togglz.config.MuleHotSwitchProfilingFeatures.PROFILING_SERVICE_FEATURE;
+import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
+import static org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository.FEATURE_IS_NOT_REGISTERED;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
+
 import static java.lang.String.format;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -14,29 +22,24 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider.FEATURE_PROVIDER;
-import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureFlaggingUtils.withFeatureUser;
-import static org.mule.runtime.feature.internal.togglz.config.MuleHotSwitchProfilingFeatures.PROFILING_SERVICE_FEATURE;
-import static org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository.FEATURE_IS_NOT_REGISTERED;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import org.junit.Test;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzFeatureManagerProvider;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzRuntimeFeature;
 import org.mule.runtime.feature.internal.togglz.activation.strategies.MuleTogglzActivatedIfEnabledActivationStrategy;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.togglz.core.Feature;
 import org.togglz.core.manager.FeatureManager;
 import org.togglz.core.repository.FeatureState;
 import org.togglz.core.spi.ActivationStrategy;
 import org.togglz.core.user.FeatureUser;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Story;
 
@@ -55,7 +58,7 @@ public class MuleTogglzFeatureManagerProviderTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  FeatureManager featureManager = new MuleTogglzFeatureManagerProvider().getFeatureManager();
+  private final FeatureManager featureManager = new MuleTogglzFeatureManagerProvider().getFeatureManager();
 
   @Test
   public void muleActivationStrategies() {
