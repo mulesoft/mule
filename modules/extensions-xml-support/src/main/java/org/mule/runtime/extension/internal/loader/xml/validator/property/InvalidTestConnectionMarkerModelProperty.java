@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.feeder.validator.property;
+package org.mule.runtime.extension.internal.loader.xml.validator.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;

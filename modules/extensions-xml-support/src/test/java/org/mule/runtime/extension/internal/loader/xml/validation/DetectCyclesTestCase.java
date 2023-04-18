@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.loader.validation;
+package org.mule.runtime.extension.internal.loader.xml.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
