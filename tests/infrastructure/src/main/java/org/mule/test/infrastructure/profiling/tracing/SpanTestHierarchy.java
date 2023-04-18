@@ -7,16 +7,19 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
 
-import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.hamcrest.Matcher;
+import org.mule.runtime.tracer.api.sniffer.CapturedEvent;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
 import java.util.ArrayList;
@@ -26,9 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.hamcrest.CoreMatchers;
 
 /**
  * A tree-based hierarchy to model the span hierarchy that must be expected on tests.
@@ -38,16 +38,7 @@ import org.hamcrest.CoreMatchers;
 public class SpanTestHierarchy {
 
   public static final String LOCATION_KEY = "location";
-
-  public static final String OTEL_EXCEPTION_TYPE_KEY = "exception.type";
-  public static final String OTEL_EXCEPTION_MESSAGE_KEY = "exception.message";
-  public static final String OTEL_EXCEPTION_STACK_TRACE_KEY = "exception.stacktrace";
-  public static final String OTEL_EXCEPTION_ESCAPED_KEY = "exception.escaped";
-  public static final String OTEL_EXCEPTION_EVENT_NAME = "exception";
-
-  public static final String NO_EXCEPTION = "NONE";
-  public static final String UNSET_ERROR_CODE = "UNSET";
-
+  public static final String UNSET_STATUS_CODE = "UNSET";
   private SpanNode root;
   private SpanNode currentNode;
   private SpanNode lastChild;
@@ -109,13 +100,8 @@ public class SpanTestHierarchy {
     return this;
   }
 
-  public SpanTestHierarchy addExceptionData(String exceptionData) {
-    currentNode.setExceptionData(exceptionData);
-    return this;
-  }
-
-  public SpanTestHierarchy noExceptionExpected() {
-    currentNode.setExceptionData("NONE");
+  public SpanTestHierarchy addExceptionData(String errorType, String errorDescription) {
+    currentNode.expectException(errorType, errorDescription);
     return this;
   }
 
@@ -188,37 +174,16 @@ public class SpanTestHierarchy {
                                             "Actual attribute \"" + key + "\" for: " + expectedNode.spanName
                                                 + " is not the expected one",
                                             actualSpan.getAttributes().get(key), equalTo(value)));
-    expectedNode.getAttributesThatShouldExist().forEach((attribute) -> assertThat(
-                                                                                  "Actual attribute \"" + attribute + "\" for: "
-                                                                                      + expectedNode.spanName
-                                                                                      + " does not exist",
-                                                                                  actualSpan.getAttributes().get(attribute),
-                                                                                  notNullValue()));
+    expectedNode.getAttributesThatShouldExist().forEach(attribute -> assertThat(
+                                                                                "Actual attribute \"" + attribute + "\" for: "
+                                                                                    + expectedNode.spanName
+                                                                                    + " does not exist",
+                                                                                actualSpan.getAttributes().get(attribute),
+                                                                                notNullValue()));
   }
 
   private void assertException(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
-    if (expectedNode.getExceptionData() == null) {
-      return;
-    }
-    if (expectedNode.getExceptionData().equals(NO_EXCEPTION)) {
-      assertThat(String.format("Unexpected Span exceptions found for Span: [%s]", actualSpan),
-                 actualSpan.getEvents().size(), equalTo(0));
-      assertThat(actualSpan.getStatusAsString(), is(UNSET_ERROR_CODE));
-    } else {
-      List<CapturedEventData> exceptions = actualSpan.getEvents().stream()
-          .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME))
-          .collect(Collectors.toList());
-      assertThat(String.format("Expected exceptions for Span: [%s] differ", actualSpan), exceptions.size(), equalTo(1));
-      assertExceptionAttributes(exceptions.iterator().next(), expectedNode.getExceptionData());
-      assertThat(actualSpan.hasErrorStatus(), is(true));
-    }
-  }
-
-  public void assertExceptionAttributes(CapturedEventData exceptionData, String errorType) {
-    assertThat(exceptionData.getAttributes().get(OTEL_EXCEPTION_TYPE_KEY), CoreMatchers.equalTo(errorType));
-    assertThat(exceptionData.getAttributes().get(OTEL_EXCEPTION_MESSAGE_KEY), CoreMatchers.equalTo("An error occurred."));
-    assertThat(exceptionData.getAttributes().get(OTEL_EXCEPTION_ESCAPED_KEY), CoreMatchers.equalTo("true"));
-    assertThat(exceptionData.getAttributes().get(OTEL_EXCEPTION_STACK_TRACE_KEY).toString(), not(emptyOrNullString()));
+    expectedNode.assertExceptions(actualSpan);
   }
 
   private static class SpanNode {
@@ -226,9 +191,9 @@ public class SpanTestHierarchy {
     private final String spanName;
     private SpanNode parent;
     private final List<SpanNode> children = new ArrayList<>();
-    private Map<String, String> attributesThatShouldMatch = new HashMap<>();
-    private List<String> attributesThatShouldExist = new ArrayList<>();
-    private String exceptionData;
+    private final Map<String, String> attributesThatShouldMatch = new HashMap<>();
+    private final List<String> attributesThatShouldExist = new ArrayList<>();
+    private Matcher<CapturedEvent> exceptionEventMatcher;
 
     public SpanNode(String spanName) {
       this.spanName = spanName;
@@ -250,8 +215,8 @@ public class SpanTestHierarchy {
       this.attributesThatShouldExist.addAll(attributes);
     }
 
-    public void setExceptionData(String exceptionData) {
-      this.exceptionData = exceptionData;
+    public void expectException(String errorType, String errorDescription) {
+      this.exceptionEventMatcher = new ExceptionEventMatcher(errorType, errorDescription);
     }
 
     public String getAttribute(String key) {
@@ -266,8 +231,18 @@ public class SpanTestHierarchy {
       return attributesThatShouldExist;
     }
 
-    public String getExceptionData() {
-      return exceptionData;
+    public void assertExceptions(CapturedExportedSpan actualSpan) {
+      List<CapturedEvent> exceptionEvents = actualSpan.getEvents().stream()
+          .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
+      if (exceptionEventMatcher == null) {
+        assertThat(format("Unexpected Span exceptions found for Span: [%s]", actualSpan),
+                   exceptionEvents.size(), equalTo(0));
+        assertThat(actualSpan.getStatusAsString(), is(UNSET_STATUS_CODE));
+      } else {
+        assertThat(format("Expected exceptions for Span: [%s] differ", actualSpan), exceptionEvents,
+                   containsInAnyOrder(exceptionEventMatcher));
+        assertThat(actualSpan.hasErrorStatus(), is(true));
+      }
     }
   }
 }

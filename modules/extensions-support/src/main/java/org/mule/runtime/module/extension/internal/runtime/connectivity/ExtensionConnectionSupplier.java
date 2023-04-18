@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -27,15 +28,16 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
-import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
-import java.util.Optional;
+import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
+import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
 
 import javax.inject.Inject;
+
+import java.util.Optional;
 
 /**
  * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides the connections
@@ -78,8 +80,11 @@ public class ExtensionConnectionSupplier {
                                                    getConnectionInitialSpanInfo, executionContext);
     } else {
       profilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
-      connectionHandler = getConnectionHandler(executionContext);
-      profilingService.getCoreEventTracer().endCurrentSpan(executionContext.getEvent());
+      try {
+        connectionHandler = getConnectionHandler(executionContext);
+      } finally {
+        profilingService.getCoreEventTracer().endCurrentSpan(executionContext.getEvent());
+      }
     }
     return connectionHandler;
   }
@@ -164,9 +169,11 @@ public class ExtensionConnectionSupplier {
     @Override
     public T getConnection() throws ConnectionException {
       eventTracer.startComponentSpan(tracedEvent, initialSpanInfo);
-      T connection = lazyConnectionHandler.getConnection();
-      eventTracer.endCurrentSpan(tracedEvent);
-      return connection;
+      try {
+        return lazyConnectionHandler.getConnection();
+      } finally {
+        eventTracer.endCurrentSpan(tracedEvent);
+      }
     }
 
     @Override

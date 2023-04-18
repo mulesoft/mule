@@ -25,7 +25,7 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.mule.runtime.tracer.api.sniffer.CapturedEvent;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources;
@@ -136,9 +136,9 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
         return attributes;
       }
 
-      public List<CapturedEventData> getEvents() {
+      public List<CapturedEvent> getEvents() {
         return spanData.getEvents().stream().map(
-                                                 OpenTelemetryEventDataWrapper::new)
+                                                 OpenTelemetryCapturedEventWrapper::new)
             .collect(Collectors.toList());
       }
 
@@ -182,11 +182,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
     /**
      * Allows capturing the Open Telemetry Span events.
      */
-    private static final class OpenTelemetryEventDataWrapper implements CapturedEventData {
+    private static final class OpenTelemetryCapturedEventWrapper implements CapturedEvent {
 
       private final EventData eventData;
 
-      public OpenTelemetryEventDataWrapper(EventData eventData) {
+      public OpenTelemetryCapturedEventWrapper(EventData eventData) {
         this.eventData = eventData;
       }
 
