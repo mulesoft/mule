@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class XMLSecureFactoriesPropertiesTestCase {
 
   private static final String SCHEMA_LOCATION = "http://www.w3.org/2001/XMLSchema";

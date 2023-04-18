@@ -77,7 +77,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 @SmallTest
 @Ignore("MULE-16671")
 public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {

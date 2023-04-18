@@ -57,7 +57,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @Feature(DOMAIN_CREATION)
 @Story(HEAVYWEIGHT)
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);

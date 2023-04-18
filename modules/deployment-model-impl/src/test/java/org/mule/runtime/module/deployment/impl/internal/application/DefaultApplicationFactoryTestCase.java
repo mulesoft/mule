@@ -84,7 +84,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @Feature(APP_CREATION)
 @Story(HEAVYWEIGHT)
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String DOMAIN_NAME = "test-domain";
