@@ -4,7 +4,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.tracer.api.sniffer.CapturedEvent;
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
 import static java.lang.String.format;
@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.emptyOrNullString;
 
-public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEvent> {
+public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEventData> {
 
   public static final String OTEL_EXCEPTION_EVENT_NAME = "exception";
   public static final String OTEL_EXCEPTION_TYPE_KEY = "exception.type";
@@ -36,7 +36,7 @@ public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEvent> {
   }
 
   @Override
-  protected boolean matchesSafely(CapturedEvent event) {
+  protected boolean matchesSafely(CapturedEventData event) {
     return eventNameMatcher.matches(event.getName())
         && errorDescriptionMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_MESSAGE_KEY))
         && errorEscapedMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_ESCAPED_KEY))

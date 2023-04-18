@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @since 4.5.0
  */
-public interface CapturedEvent {
+public interface CapturedEventData {
 
   /**
    * @return The name of the event.

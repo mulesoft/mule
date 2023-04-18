@@ -21,8 +21,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hamcrest.Matchers;
-import org.mule.runtime.tracer.api.sniffer.CapturedEvent;
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher;
@@ -637,9 +636,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
-    CapturedEvent capturedEvent = mock(CapturedEvent.class);
-    when(capturedEvent.getName()).thenReturn(ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME);
-    when(capturedEvent.getAttributes()).thenReturn(exceptionAttributes);
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
@@ -653,7 +652,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEvent));
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
@@ -726,9 +725,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
-    CapturedEvent capturedEvent = mock(CapturedEvent.class);
-    when(capturedEvent.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
-    when(capturedEvent.getAttributes()).thenReturn(exceptionAttributes);
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
@@ -742,7 +741,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEvent));
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
@@ -776,9 +775,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
-    CapturedEvent capturedEvent = mock(CapturedEvent.class);
-    when(capturedEvent.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
-    when(capturedEvent.getAttributes()).thenReturn(exceptionAttributes);
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
@@ -789,13 +788,13 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
     when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
-    when(muleFlow.getEvents()).thenReturn(Collections.singletonList(capturedEvent));
+    when(muleFlow.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
     when(muleFlow.hasErrorStatus()).thenReturn(true);
 
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEvent));
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
@@ -829,9 +828,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
-    CapturedEvent capturedEvent = mock(CapturedEvent.class);
-    when(capturedEvent.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
-    when(capturedEvent.getAttributes()).thenReturn(exceptionAttributes);
+    CapturedEventData capturedEventData = mock(CapturedEventData.class);
+    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
@@ -845,13 +844,13 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEvent));
+    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
     when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
     when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
-    when(logger.getEvents()).thenReturn(Collections.singletonList(capturedEvent));
+    when(logger.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
     when(logger.hasErrorStatus()).thenReturn(true);
 
     capturedExportedSpans.add(muleFlow);

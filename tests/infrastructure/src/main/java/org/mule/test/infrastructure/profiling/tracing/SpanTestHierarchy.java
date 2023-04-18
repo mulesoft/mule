@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
 
 import org.hamcrest.Matcher;
-import org.mule.runtime.tracer.api.sniffer.CapturedEvent;
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
 import java.util.ArrayList;
@@ -193,7 +193,7 @@ public class SpanTestHierarchy {
     private final List<SpanNode> children = new ArrayList<>();
     private final Map<String, String> attributesThatShouldMatch = new HashMap<>();
     private final List<String> attributesThatShouldExist = new ArrayList<>();
-    private Matcher<CapturedEvent> exceptionEventMatcher;
+    private Matcher<CapturedEventData> exceptionEventMatcher;
 
     public SpanNode(String spanName) {
       this.spanName = spanName;
@@ -232,7 +232,7 @@ public class SpanTestHierarchy {
     }
 
     public void assertExceptions(CapturedExportedSpan actualSpan) {
-      List<CapturedEvent> exceptionEvents = actualSpan.getEvents().stream()
+      List<CapturedEventData> exceptionEvents = actualSpan.getEvents().stream()
           .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
       if (exceptionEventMatcher == null) {
         assertThat(format("Unexpected Span exceptions found for Span: [%s]", actualSpan),

@@ -55,7 +55,7 @@ public interface CapturedExportedSpan {
    */
   String getSpanKindName();
 
-  List<CapturedEvent> getEvents();
+  List<CapturedEventData> getEvents();
 
   /**
    * @return True if the status of the Span is ERROR.

@@ -28,9 +28,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.configuration.api.InitialSpanInfoProvider;
 
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
@@ -53,10 +50,8 @@ public class ExtensionConnectionSupplier {
   @Inject
   private ConnectionManager connectionManager;
 
-  @Inject
-  InternalProfilingService profilingService;
+  CoreEventTracer coreEventTracer;
 
-  @Inject
   InitialSpanInfoProvider initialSpanInfoProvider;
 
   private boolean lazyConnections;
@@ -149,6 +144,16 @@ public class ExtensionConnectionSupplier {
   public void setMuleContext(MuleContext muleContext) {
     this.lazyConnections =
         parseBoolean(muleContext.getDeploymentProperties().getProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "false"));
+  }
+
+  @Inject
+  public void setProfilingService(InternalProfilingService profilingService) {
+    this.coreEventTracer = profilingService.getCoreEventTracer();
+  }
+
+  @Inject
+  public void setInitialSpanInfoProvider(InitialSpanInfoProvider initialSpanInfoProvider) {
+    this.initialSpanInfoProvider = initialSpanInfoProvider;
   }
 
   /**
