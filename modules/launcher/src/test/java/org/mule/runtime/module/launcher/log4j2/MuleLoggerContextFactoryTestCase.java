@@ -80,7 +80,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     artifactDescriptor.setLogConfigFile(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
 
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, spy(ArtifactAwareContextSelector.class), true);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
   }
 
