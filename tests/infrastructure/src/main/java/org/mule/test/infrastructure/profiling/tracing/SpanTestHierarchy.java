@@ -7,8 +7,11 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
+
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,9 +19,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
 
-import org.hamcrest.Matcher;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import org.hamcrest.Matcher;
 
 /**
  * A tree-based hierarchy to model the span hierarchy that must be expected on tests.
