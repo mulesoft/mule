@@ -6,6 +6,18 @@
  */
 package org.mule.runtime.core.internal.transformer.type;
 
+import static net.bytebuddy.implementation.MethodDelegation.to;
+import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static net.bytebuddy.matcher.ElementMatchers.any;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -19,16 +31,8 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.el.BindingContext.builder;
-import static org.mule.runtime.api.metadata.DataType.NUMBER;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
-import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+
+import net.bytebuddy.implementation.bind.annotation.*;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
@@ -45,9 +49,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.report.HeapDumpOnFailure;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.utility.JavaConstant;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,8 +64,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -277,17 +283,17 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void cglibInterfaceProxy() {
-    final Message muleMessageProxy =
-        (Message) Enhancer.create(Message.class, (MethodInterceptor) (o, method, objects, methodProxy) -> null);
+  public void byteBuddyInterfaceProxy() throws Exception {
+    final Message muleMessageProxy = new ByteBuddy().subclass(Message.class).method(any())
+        .intercept(to(new TestInterceptor())).make().load(Message.class.getClassLoader()).getLoaded().newInstance();
     final DataType dataType = DataType.fromObject(muleMessageProxy);
     assertThat(dataType.getType(), is(equalTo(Message.class)));
   }
 
   @Test
-  public void cglibClassProxy() {
-    final Message muleMessageProxy =
-        (Message) Enhancer.create(MessageTestImpl.class, (MethodInterceptor) (o, method, objects, methodProxy) -> null);
+  public void byteBuddyClassProxy() throws Exception {
+    final Message muleMessageProxy = new ByteBuddy().subclass(MessageTestImpl.class).method(any())
+        .intercept(to(new TestInterceptor())).make().load(Message.class.getClassLoader()).getLoaded().newInstance();
     final DataType dataType = DataType.fromObject(muleMessageProxy);
     assertThat(dataType.getType(), is(equalTo(MessageTestImpl.class)));
   }
@@ -404,5 +410,15 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
       return parameters;
     }
 
+  }
+
+  protected static class TestInterceptor {
+
+    @RuntimeType
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
+                            @SuperMethod(nullIfImpossible = true) Method superMethod, @Empty Object defaultValue)
+        throws Throwable {
+      return null;
+    }
   }
 }
