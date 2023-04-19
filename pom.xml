@@ -301,7 +301,6 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${mockitoVersion}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
 
