@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTyp
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -46,8 +47,6 @@ import javax.inject.Inject;
  */
 public class ExtensionConnectionSupplier {
 
-  public static final String MULE_GET_CONNECTION = "mule:get-connection";
-
   @Inject
   private ConnectionManager connectionManager;
 
@@ -72,7 +71,7 @@ public class ExtensionConnectionSupplier {
   public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
       throws ConnectionException, TransactionException {
     InitialSpanInfo getConnectionInitialSpanInfo =
-        initialSpanInfoProvider.getInitialSpanInfo(executionContext.getComponent(), MULE_GET_CONNECTION);
+        initialSpanInfoProvider.getInitialSpanInfo(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler = new TracedLazyConnection(getConnectionHandler(executionContext), coreEventTracer,
