@@ -237,7 +237,7 @@
         <surefire.args>${surefire.args.base}</surefire.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
-        <groovyVersion>3.0.7</groovyVersion>
+        <groovyVersion>4.0.11</groovyVersion>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
         <allureJunitVersion>2.8.1</allureJunitVersion>
@@ -596,6 +596,12 @@
                             <groupId>org.codehaus.gmaven.runtime</groupId>
                             <artifactId>gmaven-runtime-1.8</artifactId>
                             <version>${gmavenPluginVersion}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                            <version>4.0.11</version>
+                            <scope>runtime</scope>
                         </dependency>
                     </dependencies>
                 </plugin>
