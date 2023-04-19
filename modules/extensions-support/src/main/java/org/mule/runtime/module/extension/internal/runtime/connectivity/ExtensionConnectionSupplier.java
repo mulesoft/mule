@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -48,11 +47,14 @@ import javax.inject.Inject;
 public class ExtensionConnectionSupplier {
 
   public static final String MULE_GET_CONNECTION = "mule:get-connection";
+
   @Inject
   private ConnectionManager connectionManager;
 
+  @Inject
   EventTracer<CoreEvent> coreEventTracer;
 
+  @Inject
   InitialSpanInfoProvider initialSpanInfoProvider;
 
   private boolean lazyConnections;
@@ -146,16 +148,6 @@ public class ExtensionConnectionSupplier {
   public void setMuleContext(MuleContext muleContext) {
     this.lazyConnections =
         parseBoolean(muleContext.getDeploymentProperties().getProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "false"));
-  }
-
-  @Inject
-  public void setProfilingService(InternalProfilingService profilingService) {
-    this.coreEventTracer = profilingService.getCoreEventTracer();
-  }
-
-  @Inject
-  public void setInitialSpanInfoProvider(InitialSpanInfoProvider initialSpanInfoProvider) {
-    this.initialSpanInfoProvider = initialSpanInfoProvider;
   }
 
   /**
