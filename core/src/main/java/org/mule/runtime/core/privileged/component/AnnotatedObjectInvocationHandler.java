@@ -40,7 +40,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 
 /**
- * Provides {@code annotations} handling logic for CGLib enhanced classes that implement {@link Component} dynamically.
+ * Provides {@code annotations} handling logic for Byte Buddy enhanced classes that implement {@link Component} dynamically.
  *
  * @since 4.0
  */
