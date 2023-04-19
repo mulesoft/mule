@@ -105,6 +105,11 @@ public class SpanTestHierarchy {
     return this;
   }
 
+  public SpanTestHierarchy addExceptionData(String errorType) {
+    currentNode.expectException(errorType);
+    return this;
+  }
+
   public SpanNode getRoot() {
     return root;
   }
@@ -217,6 +222,10 @@ public class SpanTestHierarchy {
 
     public void expectException(String errorType, String errorDescription) {
       this.exceptionEventMatcher = new ExceptionEventMatcher(errorType, errorDescription);
+    }
+
+    public void expectException(String errorType) {
+      this.exceptionEventMatcher = new ExceptionEventMatcher(errorType);
     }
 
     public String getAttribute(String key) {

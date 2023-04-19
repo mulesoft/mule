@@ -8,8 +8,10 @@
 package org.mule.test.infrastructure.profiling.tracing;
 
 import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.emptyOrNullString;
 
 import org.mule.runtime.api.message.ErrorType;
@@ -44,6 +46,15 @@ public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEventData> {
     }
     this.errorTypeMatcher = ErrorTypeMatcher.errorType(errorTypeComponents[0], errorTypeComponents[1]);
     this.errorDescriptionMatcher = equalTo(errorDescription);
+  }
+
+  public ExceptionEventMatcher(String errorType) {
+    String[] errorTypeComponents = errorType.split(":");
+    if (errorTypeComponents.length != 2) {
+      throw new IllegalArgumentException(format("Wrong error type: %s", errorType));
+    }
+    this.errorTypeMatcher = ErrorTypeMatcher.errorType(errorTypeComponents[0], errorTypeComponents[1]);
+    this.errorDescriptionMatcher = any(String.class);
   }
 
   @Override
