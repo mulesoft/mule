@@ -8,7 +8,7 @@
 package org.mule.test.infrastructure.profiling.tracing;
 
 import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.anything;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.any;
