@@ -243,6 +243,7 @@
         <allureJunitVersion>2.8.1</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <tikaVersion>1.24.1</tikaVersion>
+        <mockitoVersion>4.11.0</mockitoVersion>
     </properties>
 
     <dependencies>
@@ -295,6 +296,12 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${tikaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockitoVersion}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
 
