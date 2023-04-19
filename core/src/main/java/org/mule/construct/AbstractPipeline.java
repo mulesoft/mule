@@ -7,6 +7,7 @@
 package org.mule.construct;
 
 import static org.mule.management.stats.DefaultFlowsSummaryStatistics.isApiKitFlow;
+import static org.mule.management.stats.DefaultFlowsSummaryStatistics.isCloudHubPingFlow;
 import static org.mule.util.NotificationUtils.buildPathResolver;
 
 import org.mule.api.GlobalNameableObject;
@@ -79,11 +80,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     private DefaultFlowsSummaryStatistics flowsSummaryStatistics;
     private boolean triggerFlow;
     private final boolean apikitFlow;
+    private final boolean chPingFlow;
 
     public AbstractPipeline(String name, MuleContext muleContext)
     {
         super(name, muleContext);
         this.apikitFlow = isApiKitFlow(name);
+        this.chPingFlow = isCloudHubPingFlow(name);
     }
 
     /**
@@ -241,7 +244,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    getStatistics().incMessagesDispatched();
+                    if (!chPingFlow)
+                    {
+                        // filter out dispatches for the CH ping flow, to avoid billing customers for its usage.
+                        getStatistics().incMessagesDispatched();
+                    }
                     return pipeline.process(event);
                 }
             });
@@ -603,7 +610,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                               Closure apikitflowsUpdater,
                                               Closure privateFlowsUpdater)
     {
-        if(flowsSummaryStatistics == null)
+        if (flowsSummaryStatistics == null || chPingFlow)
         {
             return;
         }

@@ -17,6 +17,10 @@ import java.util.regex.Pattern;
  */
 public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
 
+    // constant from
+    // https://github.com/mulesoft/cloudhub-mule-services/blob/48cdf905b860807893a721660ba8baaf67ff3553/mule-extensions/cloudhub-monitoring-extension/src/main/java/com/mulesoft/ch/monitoring/MonitoringSettings.java#L12
+    private static final String CLOUDHUB_PING_FLOW_PREFIX = "____ping____flow____";
+
   private static final String APIKIT_FLOWNAME_REGEX =
       // method
       "(\\w*)" +
@@ -149,6 +153,11 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   public static boolean isApiKitFlow(String flowName) {
     return APIKIT_FLOWNAME_PATTERN.matcher(flowName).matches()
         || APIKIT_SOAP_FLOWNAME_PATTERN.matcher(flowName).matches();
+  }
+
+  public static boolean isCloudHubPingFlow(String flowName)
+  {
+      return flowName.startsWith(CLOUDHUB_PING_FLOW_PREFIX);
   }
 
 }
