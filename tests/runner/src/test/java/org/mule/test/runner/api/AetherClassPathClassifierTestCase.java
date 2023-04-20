@@ -29,7 +29,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -74,8 +73,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @Ignore("MULE-16671")
@@ -432,7 +429,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(classification.getServiceUrlClassifications().get(0).getUrls(), hasItem(fooServiceArtifactFile.toURI().toURL()));
 
     verify(defaultArtifactDescriptorResult, atLeastOnce()).getManagedDependencies();
-    verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class), anyObject());
+    verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class), any());
     verify(dependencyResolver, atLeastOnce())
         .resolveDependencies(argThat(equalTo(new Dependency(fooServiceDep.getArtifact(), COMPILE))),
                              argThat(equalTo(emptyList())),
